@@ -57,36 +57,31 @@ describe('getAccessibleProposals', () => {
       isAdmin: false
     });
 
-    const invisibleProposalCategory = await testUtilsProposals.generateProposalCategory({
+    const proposalCategory1 = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
-    const { page, ...invisibleCategoryProposalAuthoredByUser } = await testUtilsProposals.generateProposal({
-      categoryId: invisibleProposalCategory.id,
+    const { page, ...proposalCategory1ProposalAuthoredByUser } = await testUtilsProposals.generateProposal({
+      categoryId: proposalCategory1.id,
       spaceId: space.id,
       userId: user.id,
       proposalStatus: 'discussion'
     });
-    const { page: page2, ...invisibleCategoryProposalAuthoredByAdmin } = await testUtilsProposals.generateProposal({
-      categoryId: invisibleProposalCategory.id,
-      spaceId: space.id,
-      userId: adminUser.id,
-      proposalStatus: 'discussion'
-    });
-
-    const invisibleCategoryProposal = await testUtilsProposals.generateProposal({
-      categoryId: invisibleProposalCategory.id,
-      spaceId: space.id,
-      userId: adminUser.id,
-      proposalStatus: 'discussion'
-    });
+    const { page: page2, ...proposalCategory1DraftProposalAuthoredByAdmin } = await testUtilsProposals.generateProposal(
+      {
+        categoryId: proposalCategory1.id,
+        spaceId: space.id,
+        userId: adminUser.id,
+        proposalStatus: 'draft'
+      }
+    );
 
     const proposals = await getAccessibleProposals({
       spaceId: space.id,
       userId: user.id
     });
 
-    const expectedProposals = [invisibleCategoryProposalAuthoredByUser];
+    const expectedProposals = [proposalCategory1ProposalAuthoredByUser];
     expect(proposals.length).toBe(expectedProposals.length);
 
     expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));

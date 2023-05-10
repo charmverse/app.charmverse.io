@@ -1,9 +1,7 @@
 import type { ListProposalsRequest, ProposalWithCommentsAndUsers, ProposalWithUsers } from '@charmverse/core';
-import { prisma, generateCategoryIdQuery, hasAccessToSpace } from '@charmverse/core';
-import type { Prisma, SpaceRole } from '@charmverse/core/prisma';
+import { generateCategoryIdQuery, hasAccessToSpace, prisma } from '@charmverse/core';
+import type { Prisma, ProposalStatus, SpaceRole } from '@charmverse/core/prisma';
 import uniqBy from 'lodash/uniqBy';
-
-import { getAccessibleProposalCategories } from './getAccessibleProposalCategories';
 
 function isReviewerOrAuthorQuery({
   userId,
@@ -49,13 +47,10 @@ function isReviewerOrAuthorQuery({
 export async function getAccessibleProposals({
   spaceId,
   userId,
-  categoryIds,
+  categoryIds: requestedCategoryIds,
   includePage,
   onlyAssigned
 }: ListProposalsRequest): Promise<(ProposalWithUsers | ProposalWithCommentsAndUsers)[]> {
-  // If no category ids are provided, use the accessible categories, otherwise use the subset of accessible categories from the query
-  const queryCategoryIds = categoryIds ? generateCategoryIdQuery(categoryIds) : undefined;
-
   const { spaceRole } = await hasAccessToSpace({ spaceId, userId });
 
   const include: Prisma.ProposalInclude = {
@@ -74,9 +69,9 @@ export async function getAccessibleProposals({
   if (spaceRole?.isAdmin) {
     return prisma.proposal.findMany({
       where: {
-        OR: onlyAssigned && userId ? isReviewerOrAuthorQuery({ userId, spaceRole }) : undefined,
+        OR: onlyAssigned ? isReviewerOrAuthorQuery({ userId: userId as string, spaceRole }) : undefined,
         spaceId,
-        categoryId: queryCategoryIds
+        categoryId: requestedCategoryIds ? generateCategoryIdQuery(requestedCategoryIds) : undefined
       },
       include
     }) as Promise<(ProposalWithUsers | ProposalWithCommentsAndUsers)[]>;
@@ -84,20 +79,26 @@ export async function getAccessibleProposals({
 
   const orQuery: Prisma.ProposalWhereInput[] = [];
 
-  // Only search by category if there are accessible categories and we are not restricting to only proposals where they are a reviewer or author
-  if (queryCategoryIds && !onlyAssigned) {
+  if (spaceRole && onlyAssigned) {
+    orQuery.push(...isReviewerOrAuthorQuery({ userId: userId as string, spaceRole }));
+  } else if (spaceRole) {
+    orQuery.push(
+      ...[
+        {
+          OR: isReviewerOrAuthorQuery({ userId: userId as string, spaceRole })
+        },
+        {
+          status: {
+            not: 'draft' as ProposalStatus
+          }
+        }
+      ]
+    );
+  } else {
     orQuery.push({
       status: {
-        not: 'draft'
-      },
-      categoryId: queryCategoryIds
-    });
-  }
-
-  // Also search for proposals where user is an author or reviewer
-  if (spaceRole) {
-    orQuery.push({
-      OR: isReviewerOrAuthorQuery({ userId: userId as string, spaceRole })
+        not: 'draft' as ProposalStatus
+      }
     });
   }
   const query: Prisma.ProposalWhereInput = {
@@ -105,11 +106,15 @@ export async function getAccessibleProposals({
     page: {
       type: 'proposal'
     },
-    OR: onlyAssigned && spaceRole ? isReviewerOrAuthorQuery({ spaceRole, userId: userId as string }) : orQuery
+    categoryId: requestedCategoryIds ? generateCategoryIdQuery(requestedCategoryIds) : undefined,
+    OR: orQuery
   };
 
   const proposals = (await prisma.proposal.findMany({
-    where: query,
+    where: {
+      ...query,
+      OR: orQuery
+    },
     include
   })) as (ProposalWithUsers | ProposalWithCommentsAndUsers)[];
 
