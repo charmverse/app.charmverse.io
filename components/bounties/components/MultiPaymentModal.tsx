@@ -24,6 +24,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -34,6 +35,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const modalProps = bindPopover(popupState);
+  const { chainId } = useWeb3AuthSig();
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { onClick } = useSettingsDialog();
 
@@ -79,7 +81,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
         title={
           isDisabled
             ? `Batch payment requires at least one Completed bounty on the ${
-                getChainById(gnosisSafeChainId || 1)?.chainName
+                getChainById(gnosisSafeChainId ?? chainId ?? 1)?.chainName
               } network`
             : ''
         }
