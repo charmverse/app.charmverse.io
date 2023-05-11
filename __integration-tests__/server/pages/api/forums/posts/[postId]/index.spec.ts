@@ -180,6 +180,37 @@ describe('GET /api/forums/posts/[postId] - Get a post', () => {
       })
     );
   });
+  it('should support querying the post by space domain and path, responding with 200', async () => {
+    const post = await generateForumPost(createInput);
+
+    const retrievedPost = (
+      await request(baseUrl)
+        .get(`/api/forums/posts/${post.path}?spaceDomain=${space.domain}`)
+        .set('Cookie', userCookie)
+        .send()
+        .expect(200)
+    ).body as PostWithVotes;
+
+    // The retrieved post will have votes data, which the original generated post will not have
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<PostWithVotes>>({
+        id: post.id,
+        categoryId: post.categoryId,
+        spaceId: post.spaceId,
+        content: post.content,
+        title: post.title,
+        contentText: post.contentText,
+        path: post.path,
+        locked: post.locked,
+        pinned: post.pinned,
+        votes: {
+          downvotes: 0,
+          upvotes: 0,
+          upvoted: null
+        }
+      })
+    );
+  });
 
   it('should return the post if a user is not logged in, but the post belongs to a public category, responding with 200', async () => {
     const publicCategory = await generatePostCategory({

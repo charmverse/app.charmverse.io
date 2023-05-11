@@ -13,7 +13,7 @@ import {
 } from '@charmverse/core/shared';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
-import { SpaceNotFoundError } from 'lib/public-api';
+import { SpaceNotFoundError } from 'lib/public-api/errors';
 
 import type { Resource } from '../interfaces';
 

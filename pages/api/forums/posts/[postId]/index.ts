@@ -8,6 +8,7 @@ import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -17,6 +18,7 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getForumPostController)
   .use(
     providePermissionClients({
       key: 'postId',
@@ -24,7 +26,6 @@ handler
       resourceIdType: 'post'
     })
   )
-  .get(getForumPostController)
   .use(requireUser)
   .put(updateForumPostController)
   .delete(deleteForumPostController);
@@ -146,10 +147,12 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
 
   const post = await getForumPost({ userId, postId, spaceDomain });
 
-  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
-    resourceId: post.id,
-    userId
-  });
+  const permissions = await getPermissionsClient({ resourceId: post.id, resourceIdType: 'post' }).then(({ client }) =>
+    client.forum.computePostPermissions({
+      resourceId: post.id,
+      userId
+    })
+  );
 
   if (!permissions.view_post) {
     throw new ActionNotPermittedError(`You do not have access to this post`);
