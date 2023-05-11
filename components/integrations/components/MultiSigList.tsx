@@ -12,7 +12,8 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
@@ -23,7 +24,6 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
-import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -101,10 +101,9 @@ export function MultiSigList() {
         </Box>
       </Legend>
 
-      {sortedSafes.length === 0 && (
-        <MultiSigConnectCard connectable={!!gnosisSigner} loading={isLoadingSafes} onClick={importSafes} />
+      {sortedSafes.length === 0 && !gnosisSigner && (
+        <Typography>Please unlock your wallet and ensure it is connected to your account.</Typography>
       )}
-
       {sortedSafes.length > 0 && (
         <Table size='small' aria-label='multisig table'>
           <TableHead>
