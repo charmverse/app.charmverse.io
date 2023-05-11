@@ -239,10 +239,10 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
 
 function getPageMeta(page: IPageWithPermissions): PageMeta {
   delete (page as any).permissions;
-  // // eslint-disable-next-line guard-for-in
-  // for (const propName in page) {
-  //   const typedPropName = propName as keyof IPageWithPermissions;
-  //   if (page[typedPropName] === null) delete page[typedPropName];
-  // }
+  // eslint-disable-next-line guard-for-in
+  for (const propName in page) {
+    const typedPropName = propName as keyof IPageWithPermissions;
+    if (page[typedPropName] === null) delete page[typedPropName];
+  }
   return page;
 }
