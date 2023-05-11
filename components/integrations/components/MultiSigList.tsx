@@ -97,6 +97,7 @@ export function MultiSigList() {
       >
         <Box component='span' display='flex' alignItems='center' gap={1}>
           <KeyIcon fontSize='large' /> Multisig
+          {isLoadingSafes && <CircularProgress size={16} sx={{ ml: 1 }} color='secondary' />}
         </Box>
       </Legend>
 
