@@ -4,7 +4,7 @@ import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { capitalize, upperCase } from 'lodash';
+import { capitalize } from 'lodash';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -90,15 +90,17 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             >
               Upgrade
             </Button>
-            <Button
-              onClick={() => {
-                setUpdateSpaceSubscription(false);
-              }}
-              color='error'
-              variant='outlined'
-            >
-              Cancel Plan
-            </Button>
+            {spaceSubscription !== null && (
+              <Button
+                onClick={() => {
+                  setUpdateSpaceSubscription(false);
+                }}
+                color='error'
+                variant='outlined'
+              >
+                Cancel Plan
+              </Button>
+            )}
           </Stack>
         )}
       </Stack>

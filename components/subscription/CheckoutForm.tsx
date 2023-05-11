@@ -101,6 +101,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           >
             <CardNumberElement
               options={{
+                disabled: isProcessing,
                 placeholder: '4242 4242 4242 4242'
               }}
               onChange={(e) =>
@@ -123,6 +124,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           >
             <CardExpiryElement
               options={{
+                disabled: isProcessing,
                 placeholder: '10 / 25'
               }}
               onChange={(e) =>
@@ -145,6 +147,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           >
             <CardCvcElement
               options={{
+                disabled: isProcessing,
                 placeholder: '1234'
               }}
               onChange={(e) =>

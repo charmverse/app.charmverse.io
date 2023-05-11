@@ -40,13 +40,14 @@ export async function createSubscription({
       period,
       tier
     },
+
     customer: customer.id,
     items: [
       {
         price_data: {
           currency: 'USD',
           product: product.id,
-          unit_amount: SubscriptionUsageRecord[usage].pricing[period] * (period === 'monthly' ? 1 : 12),
+          unit_amount: SubscriptionUsageRecord[usage].pricing[period] * (period === 'monthly' ? 1 : 12) * 100,
           recurring: {
             interval: period === 'monthly' ? 'month' : 'year'
           }
