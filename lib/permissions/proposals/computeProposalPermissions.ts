@@ -4,11 +4,11 @@ import {
   buildComputePermissionsWithPermissionFilteringPolicies,
   getDefaultProposalPermissionPolicies,
   isProposalAuthor,
-  isProposalReviewer,
   prisma
 } from '@charmverse/core';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
+import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';

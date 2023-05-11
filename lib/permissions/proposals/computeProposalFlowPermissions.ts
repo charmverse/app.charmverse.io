@@ -2,9 +2,12 @@ import type { PermissionCompute, ProposalFlowPermissionFlags } from '@charmverse
 import { ProposalNotFoundError, TransitionFlags, getProposalFlagFilters, prisma } from '@charmverse/core';
 
 import { computeProposalPermissions } from './computeProposalPermissions';
+import { countReviewers } from './countReviewers';
 
 const filters = getProposalFlagFilters({
-  computeProposalPermissions
+  computeProposalPermissions,
+  // In public mode, only take into account user reviewers
+  countReviewers
 });
 
 export async function computeProposalFlowPermissions({
