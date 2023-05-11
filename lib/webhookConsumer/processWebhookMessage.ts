@@ -1,3 +1,5 @@
+import { SystemError } from '@charmverse/core';
+
 import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
 import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
@@ -40,6 +42,14 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       };
       // eslint-disable-next-line no-empty
     } catch (e: any) {
+      if (e instanceof SystemError) {
+        // We do not want to retry if this is a system error (invalid data, etc.)
+        return {
+          success: true,
+          message: `Handled error: ${e.message}`
+        };
+      }
+
       return {
         success: false,
         message: e?.message || 'Failed to process guildMemberUpdate event.'
@@ -64,6 +74,13 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
         message: 'Member removed.'
       };
     } catch (e: any) {
+      if (e instanceof SystemError) {
+        return {
+          success: true,
+          message: `Handled error: ${e.message}`
+        };
+      }
+
       return {
         success: false,
         message: e?.message || 'Failed to process guildMemberRemove event.'
