@@ -19,6 +19,7 @@ export interface IChainDetails {
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
+  shortName: string;
 }
 
 // Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services

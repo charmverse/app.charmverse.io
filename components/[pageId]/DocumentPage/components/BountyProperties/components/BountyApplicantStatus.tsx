@@ -4,7 +4,7 @@ import { Box, Tooltip, Typography } from '@mui/material';
 import { getChainExplorerLink } from 'connectors';
 
 import Link from 'components/common/Link';
-import { useGnosisTx } from 'hooks/useGnosisTx';
+import { useGnosisTransaction } from 'hooks/useGnosisTransaction';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -14,7 +14,7 @@ interface Props {
 
 export function BountyApplicantStatus({ submission }: Props) {
   const transaction = (submission as ApplicationWithTransactions).transactions[0];
-  const { safeTxUrl } = useGnosisTx({ tx: transaction });
+  const { safeTxUrl } = useGnosisTransaction({ tx: transaction });
 
   return (
     <>
