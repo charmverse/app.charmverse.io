@@ -41,7 +41,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   }, [stripePublicKey]);
 
-  const [updateSpaceSubscription, setUpdateSpaceSubscription] = useState(false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const { members } = useMembers();
 
@@ -69,7 +69,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           <Stack>
             <InputLabel>Usage</InputLabel>
             <Stack>
-              <Typography>Blocks: 0 / {SubscriptionUsageRecord[spaceSubscription.usage].totalBlocks}</Typography>
+              <Typography>Blocks: 0/{SubscriptionUsageRecord[spaceSubscription.usage].totalBlocks}</Typography>
               <Typography>
                 Members: {members.length}/{SubscriptionUsageRecord[spaceSubscription.usage].totalActiveUsers}
               </Typography>
@@ -77,9 +77,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           </Stack>
         )}
         <Divider sx={{ mb: 1 }} />
-        {updateSpaceSubscription && stripePromise ? (
+        {showCheckoutForm && stripePromise ? (
           <Elements stripe={stripePromise}>
-            <CheckoutForm refetch={refetchSpaceSubscription} onCancel={() => setUpdateSpaceSubscription(false)} />
+            <CheckoutForm
+              spaceSubscription={spaceSubscription}
+              refetch={refetchSpaceSubscription}
+              onCancel={() => setShowCheckoutForm(false)}
+            />
           </Elements>
         ) : (
           <Stack flexDirection='row' gap={1}>
@@ -87,14 +91,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               sx={{
                 width: 'fit-content'
               }}
-              onClick={() => setUpdateSpaceSubscription(true)}
+              onClick={() => setShowCheckoutForm(true)}
             >
               Upgrade
             </Button>
             {spaceSubscription !== null && (
               <Button
                 onClick={() => {
-                  setUpdateSpaceSubscription(false);
+                  setShowCheckoutForm(false);
                 }}
                 color='error'
                 variant='outlined'

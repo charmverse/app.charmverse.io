@@ -7,7 +7,7 @@ import { Box, Stack, styled } from '@mui/system';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { StripeElementChangeEvent } from '@stripe/stripe-js';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -28,8 +28,10 @@ const StyledListItemText = styled(ListItemText)`
 
 export function CheckoutForm({
   onCancel,
-  refetch
+  refetch,
+  spaceSubscription
 }: {
+  spaceSubscription: null | SpaceSubscription;
   onCancel: VoidFunction;
   refetch: KeyedMutator<SpaceSubscription>;
 }) {
@@ -39,8 +41,8 @@ export function CheckoutForm({
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
-  const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
-  const [usage, setUsage] = useState<SubscriptionUsage>(1);
+  const [period, setPeriod] = useState<SubscriptionPeriod>(spaceSubscription?.period ?? 'monthly');
+  const [usage, setUsage] = useState<SubscriptionUsage>(spaceSubscription?.usage ?? 1);
   const [cardEvent, setCardEvent] = useState<{
     cardNumber: StripeElementChangeEvent | null;
     cvc: StripeElementChangeEvent | null;
@@ -50,6 +52,13 @@ export function CheckoutForm({
     cvc: null,
     cardNumber: null
   });
+
+  useEffect(() => {
+    if (spaceSubscription) {
+      setPeriod(spaceSubscription.period);
+      setUsage(spaceSubscription.usage);
+    }
+  }, [spaceSubscription]);
 
   const cardError = cardEvent.cardNumber?.error || cardEvent.cvc?.error || cardEvent.expiry?.error;
   const cardComplete = cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete;
@@ -77,7 +86,6 @@ export function CheckoutForm({
       });
 
       if (paymentMethod.paymentMethod) {
-        // TODO: Handle period/usage for subscriptions
         const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
@@ -120,7 +128,6 @@ export function CheckoutForm({
             disabled={isProcessing}
             size='small'
             aria-label='usage'
-            defaultValue={1}
             valueLabelDisplay='off'
             value={usage}
             marks={Object.keys(SubscriptionUsageRecord).map((_usage) => ({

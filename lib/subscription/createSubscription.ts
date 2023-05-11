@@ -66,9 +66,11 @@ export async function createSubscription({
       id: spaceId
     },
     data: {
-      subscriptionId: subscription.id
+      subscriptionId: subscription.id,
+      paidTier: tier
     }
   });
+
   const paymentIntent = (subscription.latest_invoice as Stripe.Invoice).payment_intent as Stripe.PaymentIntent;
 
   return {
