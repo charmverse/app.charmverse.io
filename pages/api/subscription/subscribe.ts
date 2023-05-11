@@ -1,6 +1,7 @@
 import { UnauthorisedActionError, hasAccessToSpace } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import type stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -16,6 +17,7 @@ export type CreatePaymentSubscriptionRequest = {
 
 export type CreatePaymentSubscriptionResponse = {
   clientSecret: string | null;
+  paymentIntentStatus: stripe.PaymentIntent.Status | null;
 };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -46,7 +48,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     throw new InvalidStateError('Space already has a subscription');
   }
 
-  const { clientSecret } = await createSubscription({
+  const { clientSecret, paymentIntentStatus } = await createSubscription({
     paymentMethodId,
     spaceId,
     spaceDomain: space.domain,
@@ -55,6 +57,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   });
 
   res.status(200).json({
+    paymentIntentStatus,
     clientSecret
   });
 }

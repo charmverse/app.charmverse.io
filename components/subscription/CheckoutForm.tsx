@@ -58,15 +58,15 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
 
       if (paymentMethod.paymentMethod) {
         // TODO: Handle period/usage for subscriptions
-        const subscriptionResponse = await charmClient.subscription.createSubscription({
+        const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
           period: 'monthly',
           usage: '1'
         });
 
-        if (subscriptionResponse.clientSecret) {
-          const { error } = await stripe.confirmCardPayment(subscriptionResponse.clientSecret, {
+        if (clientSecret && paymentIntentStatus !== 'succeeded') {
+          const { error } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: paymentMethod.paymentMethod.id
           });
           if (error) {
@@ -74,8 +74,6 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           } else {
             showMessage('Payment successful! Subscription active.', 'success');
           }
-        } else {
-          showMessage('Payment failed! Please try again', 'error');
         }
       }
     } catch (err) {

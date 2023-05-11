@@ -69,8 +69,10 @@ export async function createSubscription({
       subscriptionId: subscription.id
     }
   });
+  const paymentIntent = (subscription.latest_invoice as Stripe.Invoice).payment_intent as Stripe.PaymentIntent;
 
   return {
-    clientSecret: ((subscription.latest_invoice as Stripe.Invoice).payment_intent as Stripe.PaymentIntent).client_secret
+    paymentIntentStatus: paymentIntent?.status ?? null,
+    clientSecret: paymentIntent?.client_secret ?? null
   };
 }
