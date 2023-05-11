@@ -2,7 +2,7 @@ import { testUtilsProposals } from '@charmverse/core';
 import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
-import type { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
+import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
 import {
@@ -21,7 +21,8 @@ type Fixtures = {
 
 const test = base.extend<Fixtures>({
   proposalListPage: ({ page }, use) => use(new ProposalsListPage(page)),
-  documentPage: ({ page }, use) => use(new DocumentPage(page))
+  documentPage: ({ page }, use) => use(new DocumentPage(page)),
+  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page))
 });
 
 let space: Space;
@@ -32,7 +33,7 @@ let discussionProposal: Proposal & { page: Page };
 
 let publicLink: string;
 
-test.describe.serial('Access draft proposal', () => {
+test.describe.serial('View proposal', () => {
   test('Proposal author can view their own draft proposal and other accessible proposals', async ({
     page,
     proposalListPage
@@ -72,37 +73,40 @@ test.describe.serial('Access draft proposal', () => {
     });
 
     // Finish setup start interacting with the app
-    // await proposalListPage.goToHomePage();
+    await proposalListPage.goToHomePage();
 
-    // await proposalListPage.getSidebarLink('proposals').click();
+    await proposalListPage.getSidebarLink('proposals').click();
 
-    // await proposalListPage.waitForProposalsList(space.domain);
+    await proposalListPage.waitForProposalsList(space.domain);
 
-    // const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
-    // const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
+    const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
+    const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
 
-    // await expect(draftRow).toBeVisible();
-    // await expect(discussionRow).toBeVisible();
-
-    // await page.pause();
+    await expect(draftRow).toBeVisible();
+    await expect(discussionRow).toBeVisible();
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
-    // const spaceMember = await generateUser();
-    // await prisma.spaceRole.create({
-    //   data: {
-    //     space: { connect: { id: space.id } },
-    //     user: { connect: { id: spaceMember.id } }
-    //   }
-    // });
-    // await proposalListPage.goToHomePage();
-    // await proposalListPage.getSidebarLink('proposals').click();
-    // await proposalListPage.waitForProposalsList(space.domain);
-    // const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
-    // const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
-    // await expect(draftRow).not.toBeVisible();
-    // await expect(discussionRow).toBeVisible();
-    // // Start the navigation steps
+    const spaceMember = await generateUser();
+
+    await generateSpaceRole({
+      spaceId: space.id,
+      userId: spaceMember.id
+    });
+    await loginBrowserUser({
+      browserPage: proposalListPage.page,
+      userId: spaceMember.id
+    });
+
+    await proposalListPage.goToHomePage();
+    await proposalListPage.getSidebarLink('proposals').click();
+    await proposalListPage.waitForProposalsList(space.domain);
+
+    // Check the rows content
+    const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
+    const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
+    await expect(draftRow).not.toBeVisible();
+    await expect(discussionRow).toBeVisible();
   });
   test('Proposal can be edited by the author and made public', async ({
     page,
@@ -159,21 +163,12 @@ test.describe.serial('Access draft proposal', () => {
     expect(shareLink).not.toBe(null);
 
     publicLink = shareLink as string;
-
-    await page.pause();
   });
 
-  test('Public proposal can be seen by people outside the space', async ({
-    page,
-    proposalListPage,
-    documentPage,
-    pagePermissions
-  }) => {
-    // Initial setup
-    // await loginBrowserUser({
-    //   browserPage: page,
-    //   userId: proposalAuthor.id
-    // });
+  test('Public proposal can be seen by people outside the space', async ({ page, proposalListPage, documentPage }) => {
+    await logoutBrowserUser({
+      browserPage: page
+    });
 
     await page.goto(publicLink);
 

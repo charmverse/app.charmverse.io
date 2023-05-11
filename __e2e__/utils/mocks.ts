@@ -31,7 +31,7 @@ export async function loginBrowserUser({
     .then((res) => res.json());
 }
 
-export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserPage; userId: string }): Promise<void> {
+export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserPage }): Promise<void> {
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
@@ -53,10 +53,11 @@ export async function createUser({
 
 export async function createSpace({
   browserPage,
-  permissionConfigurationMode
+  permissionConfigurationMode,
+  paidTier
 }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> &
-  Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
-  return browserPage.request
+  Partial<Pick<Space, 'permissionConfigurationMode' | 'paidTier'>>): Promise<Space> {
+  const space: Space = await browserPage.request
     .post(`${baseUrl}/api/spaces`, {
       data: {
         spaceData: {
@@ -66,6 +67,20 @@ export async function createSpace({
       }
     })
     .then((res) => res.json());
+
+  // Added this here instead of the API controller, so that we can control in prod which paid tier we initialise spaces with
+  if (paidTier) {
+    return prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        paidTier
+      }
+    });
+  } else {
+    return space;
+  }
 }
 
 export async function getPages({
@@ -88,10 +103,11 @@ export async function getPages({
 export async function createUserAndSpace({
   browserPage,
   permissionConfigurationMode = 'collaborative',
-  isOnboarded = true
+  isOnboarded = true,
+  paidTier
 }: {
   browserPage: BrowserPage;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>> & { isOnboarded?: boolean }): Promise<{
+} & Partial<Pick<Space, 'permissionConfigurationMode' | 'paidTier'>> & { isOnboarded?: boolean }): Promise<{
   user: LoggedInUser;
   address: string;
   privateKey: string;
@@ -102,7 +118,7 @@ export async function createUserAndSpace({
   const address = wallet.address;
 
   const user = await createUser({ browserPage, address });
-  const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
+  const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode, paidTier });
   const pages = await getPages({ browserPage, spaceId: space.id });
 
   const updatedRole = await prisma.spaceRole.update({
