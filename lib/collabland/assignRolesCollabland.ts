@@ -15,6 +15,10 @@ export async function assignRolesCollabland({
   const roleIdsToAdd = Array.isArray(roles) ? roles : [roles];
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
+  if (!spacesData) {
+    return;
+  }
+
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>
       createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })

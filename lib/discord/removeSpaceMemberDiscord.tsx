@@ -10,6 +10,9 @@ export async function removeSpaceMemberDiscord({
   discordServerId: string;
 }) {
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+  if (!spacesData) {
+    return;
+  }
 
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>
