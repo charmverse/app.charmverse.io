@@ -89,7 +89,14 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
             <>
               {isBasePageDocument && <DocumentParticipants />}
               {isBasePageDocument && <EditingModeToggle />}
-              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
+              {basePage?.deletedAt === null && (
+                <ShareButton
+                  headerHeight={headerHeight}
+                  pageId={basePage.id}
+                  pageType={basePage.type}
+                  proposalId={basePage.proposalId}
+                />
+              )}
             </>
           )}
 
