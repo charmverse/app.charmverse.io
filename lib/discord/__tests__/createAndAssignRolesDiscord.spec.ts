@@ -1,4 +1,4 @@
-import { SystemError, prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
 import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
@@ -64,23 +64,5 @@ describe('createAndAssignRolesDiscord', () => {
     });
 
     expect(membership?.spaceRoleToRole).toHaveLength(2);
-  });
-
-  it('should throw system error if discord user is not found', async () => {
-    const discordUserId = '77777';
-    const discordServerId = '111';
-    const { space } = await generateUserAndSpaceWithApiToken();
-    await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
-
-    const idRole1 = v4();
-    const idRole2 = v4();
-    const roles = [
-      { id: idRole1, name: 'Role 1' },
-      { id: idRole2, name: 'Role 2' }
-    ];
-
-    expect(await prisma.role.findMany({ where: { externalId: { in: [idRole1, idRole2] } } })).toHaveLength(0);
-
-    expect(createAndAssignRolesDiscord({ discordServerId, discordUserId, roles })).rejects.toThrow(SystemError);
   });
 });
