@@ -12,7 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
 
-export function CheckoutForm() {
+export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -43,15 +43,16 @@ export function CheckoutForm() {
       return;
     }
 
-    const cardElement = elements?.getElement('card');
-    if (!cardElement) {
+    const cardNumberElement = elements?.getElement('cardNumber');
+
+    if (!cardNumberElement) {
       return;
     }
 
     try {
       setIsProcessing(true);
       const paymentMethod = await stripe.createPaymentMethod({
-        card: cardElement,
+        card: cardNumberElement,
         type: 'card'
       });
 
@@ -158,13 +159,15 @@ export function CheckoutForm() {
       </Stack>
       <Stack gap={1} display='flex' flexDirection='row'>
         <Button
+          onClick={createSubscription}
           type='submit'
           sx={{ width: 'fit-content' }}
+          loading={isProcessing}
           disabled={cardError || !cardComplete || cardEmpty || isProcessing || !stripe || !elements || !space}
         >
           {isProcessing ? 'Processing ... ' : 'Upgrade'}
         </Button>
-        <Button sx={{ width: 'fit-content' }} color='secondary' variant='outlined'>
+        <Button onClick={onCancel} sx={{ width: 'fit-content' }} color='secondary' variant='outlined'>
           Cancel
         </Button>
       </Stack>
