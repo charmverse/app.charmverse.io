@@ -67,7 +67,7 @@ describe('createAndAssignRolesDiscord', () => {
   });
 
   it('should throw system error if discord user is not found', async () => {
-    const discordUserId = '111111';
+    const discordUserId = '77777';
     const discordServerId = '111';
     const { space } = await generateUserAndSpaceWithApiToken();
     await prisma.space.update({ where: { id: space.id }, data: { discordServerId } });
