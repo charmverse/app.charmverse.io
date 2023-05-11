@@ -63,6 +63,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
           <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography
               sx={{
+                display: { xs: 'none', md: 'block' },
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
@@ -73,7 +74,18 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               Powering the Future <br />
               of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6, maxWidth: '520px' }}>
+
+            <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
+              <Image src={splashImage} maxWidth={400} />
+            </Box>
+            <Typography
+              sx={{
+                display: { xs: 'none', md: 'block' },
+                fontSize: 20,
+                mb: { sm: 2, md: 6 },
+                maxWidth: { md: '520px' }
+              }}
+            >
               The solution for token communities to build relationships, work together and vote
             </Typography>
             <Box
@@ -87,8 +99,8 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
             </Box>
           </Box>
         </Grid>
-        <Grid item md={6} alignItems='center'>
-          <Image display={{ xs: 'none', md: 'block' }} px={3} src={splashImage} />
+        <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
+          <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
       <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />
