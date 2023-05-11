@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import useImportSafes from 'hooks/useImportSafes';
 import { useMembers } from 'hooks/useMembers';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -35,6 +36,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
   const modalProps = bindPopover(popupState);
   const { data: userGnosisSafes } = useMultiWalletSigs();
+  const { importSafes } = useImportSafes();
   const { onClick } = useSettingsDialog();
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
@@ -59,6 +61,12 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
       }, {}) ?? {};
 
   const { getMemberById } = useMembers();
+
+  useEffect(() => {
+    if (transactions.length) {
+      importSafes();
+    }
+  }, [transactions.length]);
 
   useEffect(() => {
     const applicationIds = transactions.map((trans) => trans.applicationId);
