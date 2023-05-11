@@ -1,6 +1,8 @@
 import { useTheme } from '@emotion/react';
+import { Divider, FormControlLabel, List, ListItemText, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import { Box, Stack } from '@mui/system';
+import Switch from '@mui/material/Switch';
+import { Box, Stack, styled } from '@mui/system';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { StripeElementChangeEvent } from '@stripe/stripe-js';
 import type { FormEvent } from 'react';
@@ -11,6 +13,15 @@ import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
+
+const StyledList = styled(List)`
+  list-style-type: disc;
+  padding-inline-start: 40px;
+`;
+
+const StyledListItemText = styled(ListItemText)`
+  display: list-item;
+`;
 
 export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
   const stripe = useStripe();
@@ -61,7 +72,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
         const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
-          period: 'monthly',
+          period,
           usage: '1'
         });
 
@@ -87,6 +98,20 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
 
   return (
     <form id='payment-form' onSubmit={createSubscription}>
+      <Stack flexDirection='row'>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={period === 'annual'}
+              onChange={(e) => {
+                setPeriod(e.target.checked ? 'annual' : 'monthly');
+              }}
+              disabled={isProcessing}
+            />
+          }
+          label='Annual'
+        />
+      </Stack>
       <Stack display='flex' mb={2} flexDirection='row' gap={1}>
         <Stack gap={0.5} flexGrow={1}>
           <InputLabel>Card number</InputLabel>
@@ -158,6 +183,15 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           </Box>
         </Stack>
       </Stack>
+      <Divider sx={{ mb: 1 }} />
+      <Typography variant='h6'>Order Summary</Typography>
+      <Typography>Paid plan: ${}/mo</Typography>
+      <StyledList>
+        <StyledListItemText>20k blocks</StyledListItemText>
+        <StyledListItemText>50 Active users</StyledListItemText>
+        <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
+      </StyledList>
+      <Divider sx={{ mb: 1 }} />
       <Stack gap={1} display='flex' flexDirection='row'>
         <Button
           onClick={createSubscription}
