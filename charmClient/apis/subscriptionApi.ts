@@ -10,10 +10,6 @@ export class SubscriptionApi {
     return http.POST<CreatePaymentSubscriptionResponse>('/api/subscription/subscribe', payload);
   }
 
-  getStripePublicKey() {
-    return http.GET<{ publicKey: string }>('/api/subscription/get-key');
-  }
-
   getSpaceSubscription({ spaceId }: { spaceId: string }) {
     return http.GET<SpaceSubscription>(`/api/spaces/${spaceId}/subscription`);
   }

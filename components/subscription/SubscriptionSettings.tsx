@@ -2,12 +2,10 @@ import type { Space } from '@charmverse/core/prisma';
 import { Divider, InputLabel, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { capitalize } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -18,28 +16,18 @@ import { SubscriptionUsageRecord } from 'lib/subscription/utils';
 
 import { CheckoutForm } from './CheckoutForm';
 
+const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string;
+
+const stripePromise = loadStripe(stripePublicKey);
+
 export function SubscriptionSettings({ space }: { space: Space }) {
   const {
     data: spaceSubscription = null,
-    isLoading: isFetchingSpaceSubscription,
+    isLoading,
     mutate: refetchSpaceSubscription
   } = useSWR(`${space.id}-subscription`, () => {
     return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
   });
-
-  const { data: stripePublicKey, isLoading: isFetchingStripePublicKey } = useSWRImmutable(`stripe-public-key`, () => {
-    return charmClient.subscription.getStripePublicKey();
-  });
-
-  const isLoading = isFetchingSpaceSubscription || isFetchingStripePublicKey;
-
-  const [stripePromise, setStripePromise] = useState<PromiseLike<Stripe | null> | null>(null);
-
-  useEffect(() => {
-    if (stripePublicKey && stripePublicKey.publicKey) {
-      setStripePromise(loadStripe(stripePublicKey.publicKey));
-    }
-  }, [stripePublicKey]);
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
