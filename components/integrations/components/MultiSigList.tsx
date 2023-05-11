@@ -12,24 +12,21 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
-import log from 'loglevel';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
-import { MultiSigConnectCard } from 'components/integrations/components/MultiSigConnectCard';
 import Legend from 'components/settings/Legend';
+import useImportSafes from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
-import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import { shortenHex } from 'lib/utilities/strings';
 
 const StyledTableCell = styled(TableCell)`
@@ -42,44 +39,14 @@ const gnosisUrl = (address: string, chainId: number) =>
 
 export function MultiSigList() {
   const { data: safeData, mutate } = useMultiWalletSigs();
-  const { showMessage } = useSnackbar();
+  const { importSafes, isLoadingSafes } = useImportSafes();
 
   const gnosisSigner = useGnosisSigner();
-  const { user } = useUser();
-  const [isLoadingSafes, setIsLoadingSafes] = useState(false);
-
-  const importSafes = useCallback(async () => {
-    if (gnosisSigner && user) {
-      setIsLoadingSafes(true);
-      try {
-        const safesCount = await importSafesFromWallet({
-          signer: gnosisSigner,
-          addresses: user.wallets.map((w) => w.address),
-          getWalletName
-        });
-
-        if (!safesCount) {
-          showMessage('You do not have any gnosis wallets', 'warning');
-        }
-        await mutate();
-      } catch (e) {
-        log.error('Error importing safes', e);
-
-        showMessage('We could not import your safes', 'error');
-      } finally {
-        setIsLoadingSafes(false);
-      }
-    }
-  }, [gnosisSigner, user]);
 
   useEffect(() => {
     // We need this to run every time a user opens the account section in the settings modal
     importSafes();
   }, []);
-
-  function getWalletName(address: string) {
-    return safeData?.find((wallet) => wallet.address === address)?.name;
-  }
 
   if (!safeData) {
     return null;
@@ -101,10 +68,9 @@ export function MultiSigList() {
         </Box>
       </Legend>
 
-      {sortedSafes.length === 0 && (
-        <MultiSigConnectCard connectable={!!gnosisSigner} loading={isLoadingSafes} onClick={importSafes} />
+      {sortedSafes.length === 0 && !gnosisSigner && (
+        <Typography>Please unlock your wallet and ensure it is connected to your account.</Typography>
       )}
-
       {sortedSafes.length > 0 && (
         <Table size='small' aria-label='multisig table'>
           <TableHead>

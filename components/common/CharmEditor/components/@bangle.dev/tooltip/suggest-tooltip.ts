@@ -34,8 +34,10 @@ export const defaultKeys = {
 function specFactory({
   markName,
   trigger,
-  markColor
+  markColor,
+  excludes
 }: {
+  excludes?: string;
   markName: string;
   trigger?: string;
   markColor?: string;
@@ -44,6 +46,7 @@ function specFactory({
     name: markName,
     type: 'mark',
     schema: {
+      excludes,
       inclusive: true,
       group: 'suggestTriggerMarks',
       parseDOM: [{ tag: `span[data-${markName}]` }],
