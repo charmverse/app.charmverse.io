@@ -91,7 +91,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
         </div>
       </Tooltip>
       {!isDisabled && (
-        <Modal {...modalProps} size='large' onClose={modalProps.onClose}>
+        <Modal open={modalProps.open} size='large' onClose={modalProps.onClose}>
           <DialogTitle onClose={popupState.close}>Pay Bount{transactions.length > 1 ? 'ies' : 'y'}</DialogTitle>
           <Box mt={2}>
             {gnosisSafes && (

@@ -175,7 +175,7 @@ function SafeRow({ safe, updateWallets }: { safe: UserGnosisSafe; updateWallets:
           )}
         />
       </TableCell>
-      <TableCell sx={{ color: 'gray', backgroundColor: 'red' }}>{getChainById(safe.chainId)?.chainName}</TableCell>
+      <TableCell>{getChainById(safe.chainId)?.chainName}</TableCell>
       <TableCell>
         <Tooltip placement='top' title={safe.address}>
           <span>
