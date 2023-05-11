@@ -78,7 +78,6 @@ function selectPageFields() {
       index: true,
       cardId: true,
       proposalId: true,
-      snapshotProposalId: true,
       fullWidth: true,
       bountyId: true,
       hasContent: true,

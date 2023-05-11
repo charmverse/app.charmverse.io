@@ -107,7 +107,6 @@ export type PageMeta = Pick<
   | 'index'
   | 'cardId'
   | 'proposalId'
-  | 'snapshotProposalId'
   | 'fullWidth'
   | 'bountyId'
   | 'hasContent'

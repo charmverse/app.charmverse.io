@@ -9,23 +9,20 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal } from 'lib/snapshot';
 
-import PublishingForm from './PublishingForm';
+import { PublishingForm } from './PublishingForm';
 
 interface Props {
   pageId: string;
+  snapshotProposalId: string | null;
   renderContent: (props: { onClick?: () => void; label: string; icon: ReactNode }) => ReactNode;
   onPublish?: () => void;
 }
 
-export function PublishToSnapshot({ pageId, renderContent, onPublish = () => null }: Props) {
-  const { pages, mutatePage } = usePages();
-  const page = pages[pageId];
-
-  const [checkingProposal, setCheckingProposal] = useState(!!page?.snapshotProposalId);
+export function PublishToSnapshot({ pageId, snapshotProposalId, renderContent, onPublish = () => null }: Props) {
+  const [checkingProposal, setCheckingProposal] = useState(!!snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const currentSpace = useCurrentSpace();
 
@@ -33,23 +30,24 @@ export function PublishToSnapshot({ pageId, renderContent, onPublish = () => nul
 
   async function verifyProposal(proposalId: string) {
     const snapshotProposal = await getSnapshotProposal(proposalId);
-
     if (!snapshotProposal) {
-      const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
-      mutatePage(pageWithoutSnapshotId);
+      await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
     }
-
-    setProposal(snapshotProposal);
-    setCheckingProposal(false);
+    return snapshotProposal;
   }
 
   useEffect(() => {
-    if (page?.snapshotProposalId) {
-      verifyProposal(page?.snapshotProposalId);
-    } else {
-      setProposal(null);
+    async function init() {
+      if (snapshotProposalId) {
+        const _proposal = await verifyProposal(snapshotProposalId);
+        setProposal(_proposal);
+      } else {
+        setProposal(null);
+      }
+      setCheckingProposal(false);
     }
-  }, [page, page?.snapshotProposalId]);
+    init();
+  }, [snapshotProposalId]);
 
   return (
     <>
@@ -70,7 +68,7 @@ export function PublishToSnapshot({ pageId, renderContent, onPublish = () => nul
           })}
           <Modal
             size='large'
-            open={isOpen && !!page}
+            open={isOpen && !!pageId}
             onClose={close}
             title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}
           >
@@ -79,7 +77,7 @@ export function PublishToSnapshot({ pageId, renderContent, onPublish = () => nul
                 close();
                 onPublish();
               }}
-              page={page!}
+              pageId={pageId}
             />
           </Modal>
         </>
