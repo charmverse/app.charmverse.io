@@ -5,16 +5,14 @@ import nc from 'next-connect';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'resourceId', location: 'body', resourceIdType: 'post' }))
-  .post(computePermissions);
+handler.post(computePermissions);
 
 async function computePermissions(req: NextApiRequest, res: NextApiResponse<PostPermissionFlags>) {
   const input = req.body as PermissionCompute;
@@ -46,10 +44,12 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Post
     }
   }
 
-  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
-    resourceId,
-    userId: req.session.user?.id
-  });
+  const permissions = await getPermissionsClient({ resourceId, resourceIdType: 'post' }).then(({ client }) =>
+    client.forum.computePostPermissions({
+      resourceId,
+      userId: req.session.user?.id
+    })
+  );
 
   res.status(200).json(permissions);
 }

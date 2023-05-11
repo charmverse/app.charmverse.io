@@ -1,22 +1,21 @@
 import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/prisma';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
+import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let space: Space;
 let user: User;
 
 beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
 
   space = generated.space;
   user = generated.user;
 });
 
-describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal', () => {
+describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal - public space', () => {
   it('should return computed permissions for a user, and respond 200', async () => {
     const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
@@ -30,21 +29,9 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       proposalStatus: 'draft'
     });
 
-    const role = await testUtilsMembers.generateRole({
-      createdBy: user.id,
-      spaceId: space.id,
-      assigneeUserIds: [user.id]
-    });
-
-    await upsertProposalCategoryPermission({
-      assignee: { group: 'role', id: role.id },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
-    });
-
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await publicPermissionsClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -70,22 +57,9 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       categoryId: proposalCategory.id,
       userId: user.id
     });
-
-    const role = await testUtilsMembers.generateRole({
-      createdBy: user.id,
-      spaceId: space.id,
-      assigneeUserIds: [user.id]
-    });
-
-    await upsertProposalCategoryPermission({
-      assignee: { group: 'role', id: role.id },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
-    });
-
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await publicPermissionsClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -112,14 +86,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       userId: user.id
     });
 
-    await upsertProposalCategoryPermission({
-      assignee: { group: 'public' },
-      permissionLevel: 'view',
-      proposalCategoryId: proposalCategory.id
-    });
-
     // Non logged in user test case
-    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const publicComputed = await publicPermissionsClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: undefined
     });

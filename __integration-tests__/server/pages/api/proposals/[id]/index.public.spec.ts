@@ -15,7 +15,7 @@ let authorCookie: string;
 let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
-  const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
+  const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
   space = generated1.space;
   author = generated1.user;
 
@@ -29,25 +29,25 @@ beforeAll(async () => {
   });
 });
 
-describe('GET /api/proposals/[id] - Get proposal', () => {
+describe('GET /api/proposals/[id] - Get proposal - public space', () => {
   it('should return the proposal with the author and reviewers', async () => {
     const generatedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
       reviewers: [{ group: 'user', id: reviewer.id }],
-      proposalStatus: 'draft'
+      proposalStatus: 'discussion'
     });
-    const proposal = (
-      await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
-    ).body as ProposalWithUsers;
+    // Unauthenticated request
+    const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
+      .body as ProposalWithUsers;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'draft',
+        status: 'discussion',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: generatedProposal.id,
@@ -69,27 +69,14 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
   it("should throw error if proposal doesn't exist", async () => {
     await request(baseUrl).get(`/api/proposals/${v4()}`).set('Cookie', authorCookie).expect(404);
   });
-
-  // Users should not be able to access draft proposals that they are not authors or reviewers of
-  it("should throw error if user doesn't have read access to proposal page", async () => {
-    const normalSpaceUser = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: space.id });
-
-    const cookie = await loginUser(normalSpaceUser.id);
-
-    const generatedProposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: author.id,
-      proposalStatus: 'draft',
-      authors: []
-    });
-
-    await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', cookie).expect(404);
-  });
 });
 
 describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal if the user is an author', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      spacePaidTier: 'free'
+    });
     const adminCookie = await loginUser(adminUser.id);
 
     const role = await testUtilsMembers.generateRole({
@@ -132,7 +119,10 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      spacePaidTier: 'free'
+    });
     const adminCookie = await loginUser(adminUser.id);
 
     const role = await testUtilsMembers.generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
@@ -172,7 +162,10 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   });
 
   it('should fail to update a proposal if the user is an admin', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      spacePaidTier: 'free'
+    });
     const adminCookie = await loginUser(adminUser.id);
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
@@ -201,7 +194,10 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   });
 
   it('should fail to update a proposal template if the user is not a space admin', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: false,
+      spacePaidTier: 'free'
+    });
     const nonAdminUser = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
     const nonAdminCookie = await loginUser(nonAdminUser.id);

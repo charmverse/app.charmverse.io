@@ -1,7 +1,7 @@
 import type { PostCategoryPermission, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
@@ -11,13 +11,13 @@ let space: Space;
 let user: User;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: false });
+  const generated = await generateUserAndSpace({ isAdmin: false, paidTier: 'free' });
 
   space = generated.space;
   user = generated.user;
 });
 
-describe('POST /api/permissions/forum/compute-post-permissions - Compute permissions for a forum post', () => {
+describe('POST /api/permissions/forum/compute-post-permissions - Compute permissions for a forum post - public space', () => {
   it('should return computed permissions for a user, and respond 200', async () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
@@ -43,7 +43,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.forum.computePostPermissions({
+    const computed = await publicPermissionsClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: user.id
     });
@@ -84,7 +84,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.forum.computePostPermissions({
+    const computed = await publicPermissionsClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: user.id
     });
@@ -118,7 +118,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
     });
 
     // Non logged in user test case
-    const publicComputed = await premiumPermissionsApiClient.forum.computePostPermissions({
+    const publicComputed = await publicPermissionsClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: undefined
     });

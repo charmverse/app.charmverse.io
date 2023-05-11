@@ -10,7 +10,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(providePermissionClients({ key: 'resourceId', location: 'body', resourceIdType: 'proposal' }))
+  .use(providePermissionClients({ key: 'resourceId', location: 'body', resourceIdType: 'proposalCategory' }))
   .post(computePermissions);
 
 async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalCategoryPermissionFlags>) {

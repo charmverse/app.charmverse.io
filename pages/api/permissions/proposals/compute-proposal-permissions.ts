@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -13,9 +13,7 @@ import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'resourceId', location: 'body', resourceIdType: 'proposal' }))
-  .post(computePermissions);
+handler.post(computePermissions);
 
 async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalPermissionFlags>) {
   const input = req.body as PermissionCompute;
@@ -49,10 +47,12 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Prop
     }
   }
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
-    resourceId,
-    userId: req.session.user?.id
-  });
+  const permissions = await getPermissionsClient({ resourceId, resourceIdType: 'proposal' }).then(({ client }) =>
+    client.proposals.computeProposalPermissions({
+      resourceId,
+      userId: req.session.user?.id
+    })
+  );
   res.status(200).json(permissions);
 }
 
