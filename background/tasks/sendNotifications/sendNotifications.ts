@@ -11,7 +11,7 @@ import * as mailer from 'lib/mailer';
 import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
-const notificationTaskLimiter = RateLimit(50);
+const notificationTaskLimiter = RateLimit(100);
 
 export async function sendUserNotifications(): Promise<number> {
   const notificationsToSend = await getNotifications();
