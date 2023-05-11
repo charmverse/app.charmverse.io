@@ -9,15 +9,24 @@ import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
-
-handler.use(requireUser).put(updatePostCommentHandler).delete(deletePostCommentHandler);
+handler
+  .use(
+    providePermissionClients({
+      key: 'postId',
+      location: 'query',
+      resourceIdType: 'post'
+    })
+  )
+  .use(requireUser)
+  .put(updatePostCommentHandler)
+  .delete(deletePostCommentHandler);
 
 async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostComment>) {
   const { commentId, postId } = req.query as any as { postId: string; commentId: string };
@@ -91,15 +100,10 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new DataNotFoundError(`Comment with id ${commentId} not found`);
   }
 
-  const permissions = await getPermissionsClient({
-    resourceId: post.id,
-    resourceIdType: 'post'
-  }).then((client) =>
-    client.forum.computePostPermissions({
-      resourceId: postId,
-      userId: req.session.user.id
-    })
-  );
+  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
+    resourceId: postId,
+    userId: req.session.user.id
+  });
 
   if (permissions.delete_comments || postComment.createdBy === userId) {
     await deletePostComment({ commentId, userId });

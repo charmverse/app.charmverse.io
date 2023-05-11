@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core';
 import type { PostCategory } from '@charmverse/core/prisma';
 
-import { checkSpacePermissionsEngine, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 
 import { getPostCategoryPath } from './getPostCategoryPath';
 
@@ -18,17 +18,6 @@ export async function createPostCategory({ name, spaceId }: CreatePostCategoryIn
       }
     }
   });
-
-  const shouldPopulatePermissions = await checkSpacePermissionsEngine({
-    resourceId: postCategory.id,
-    resourceIdType: 'postCategory'
-  });
-
-  if (shouldPopulatePermissions) {
-    await premiumPermissionsApiClient.forum.assignDefaultPostCategoryPermissions({
-      resourceId: postCategory.id
-    });
-  }
 
   return postCategory;
 }

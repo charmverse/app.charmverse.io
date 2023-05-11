@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core';
 import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 
+import { checkSpaceSpaceSubscriptionInfo } from 'lib/permissions/api/routers';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import { permissionTemplates } from 'lib/permissions/pages';
 
@@ -125,8 +126,37 @@ function isAccessible({
 }
 
 export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[]> {
+  // ref: https://www.postgresql.org/docs/12/functions-textsearch.html
+  // ref: https://www.postgresql.org/docs/10/textsearch-controls.html
+  // prisma refs: https://github.com/prisma/prisma/issues/8950
+  const formattedSearch = input.search
+    ? `${input.search
+        .split(/\s/)
+        .filter((s) => s)
+        .join(' & ')}:*`
+    : undefined;
+
   let spaceRole: SpaceRole | null = null;
 
+  // ---- Bypass page permissions and load the pages for free spaces
+  // TODO: remove this once we provide split implementations for free and paid spaces
+  const permissionsMode = await checkSpaceSpaceSubscriptionInfo({
+    resourceId: input.spaceId,
+    resourceIdType: 'space'
+  });
+
+  if (permissionsMode.tier === 'free') {
+    return prisma.page.findMany({
+      where: {
+        spaceId: input.spaceId,
+        deletedAt: input.archived ? { not: null } : null,
+        title: formattedSearch ? { search: formattedSearch } : undefined
+      },
+      ...selectPageFields()
+    });
+  }
+
+  // Resume normal function
   if (input.userId) {
     spaceRole = await prisma.spaceRole.findFirst({
       where: {
@@ -160,16 +190,6 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
           }
         })
       : [];
-
-  // ref: https://www.postgresql.org/docs/12/functions-textsearch.html
-  // ref: https://www.postgresql.org/docs/10/textsearch-controls.html
-  // prisma refs: https://github.com/prisma/prisma/issues/8950
-  const formattedSearch = input.search
-    ? `${input.search
-        .split(/\s/)
-        .filter((s) => s)
-        .join(' & ')}:*`
-    : undefined;
 
   let pages: IPageWithPermissions[];
 

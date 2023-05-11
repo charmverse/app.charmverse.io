@@ -83,7 +83,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
     const visiblePostCategories = await getPermissionsClient({
       resourceId: spaceRole.spaceId,
       resourceIdType: 'space'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.getPermissionedCategories({
         postCategories,
         userId

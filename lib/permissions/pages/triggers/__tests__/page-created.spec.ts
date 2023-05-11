@@ -36,11 +36,12 @@ beforeAll(async () => {
 
 describe('setupPermissionsAfterPageCreated', () => {
   it("should fail if the page doesn't exist", async () => {
+    const id = v4();
     try {
-      await setupPermissionsAfterPageCreated(v4());
+      await setupPermissionsAfterPageCreated(id);
       throw new ExpectedAnError();
     } catch (err) {
-      expect(err).toBeInstanceOf(PageNotFoundError);
+      expect(err).toMatchObject(new PageNotFoundError(id));
     }
   });
 

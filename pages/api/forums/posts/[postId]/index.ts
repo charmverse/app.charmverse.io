@@ -9,6 +9,7 @@ import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
@@ -16,18 +17,24 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getForumPostController).use(requireUser).put(updateForumPostController).delete(deleteForumPostController);
+handler
+  .get(getForumPostController)
+  .use(
+    providePermissionClients({
+      key: 'postId',
+      location: 'query',
+      resourceIdType: 'post'
+    })
+  )
+  .use(requireUser)
+  .put(updateForumPostController)
+  .delete(deleteForumPostController);
 
 async function updateForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const permissionsClient = await getPermissionsClient({
-    resourceId: postId,
-    resourceIdType: 'post'
-  });
-
-  const permissions = await permissionsClient.forum.computePostPermissions({
+  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
     resourceId: postId,
     userId
   });
@@ -54,7 +61,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
   // Don't allow an update to a new category ID if the user doesn't have permission to create posts in that category
   if (typeof newCategoryId === 'string' && existingPost.categoryId !== newCategoryId) {
-    const categoryPermissions = await permissionsClient.forum.computePostCategoryPermissions({
+    const categoryPermissions = await req.basePermissionsClient.forum.computePostCategoryPermissions({
       resourceId: newCategoryId,
       userId
     });
@@ -107,12 +114,10 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const permissions = await getPermissionsClient({ resourceId: postId, resourceIdType: 'post' }).then(({ forum }) =>
-    forum.computePostPermissions({
-      resourceId: postId,
-      userId
-    })
-  );
+  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
+    resourceId: postId,
+    userId
+  });
 
   if (!permissions.delete_post) {
     throw new ActionNotPermittedError(`You cannot delete this post`);
@@ -142,8 +147,8 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
 
   const post = await getForumPost({ userId, postId, spaceDomain });
 
-  const permissions = await getPermissionsClient({ resourceId: post.id, resourceIdType: 'post' }).then(({ forum }) =>
-    forum.computePostPermissions({
+  const permissions = await getPermissionsClient({ resourceId: post.id, resourceIdType: 'post' }).then(({ client }) =>
+    client.forum.computePostPermissions({
       resourceId: post.id,
       userId
     })

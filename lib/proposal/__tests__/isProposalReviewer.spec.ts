@@ -62,7 +62,8 @@ describe('isProposalReviewer', () => {
     expect(isReviewer).toBe(true);
   });
 
-  it('should return true if user has a role that is a reviewer for the proposal', async () => {
+  // In public mode, we ignore custom roles
+  it('should return false if user has a role that is a reviewer for the proposal', async () => {
     const reviewerByRole = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 
     const spaceRole = await prisma.spaceRole.findUnique({
@@ -85,7 +86,7 @@ describe('isProposalReviewer', () => {
       proposal,
       userId: reviewerByRole.id
     });
-    expect(isReviewer).toBe(true);
+    expect(isReviewer).toBe(false);
   });
 
   it('should return false if user is not a reviewer for the proposal', async () => {

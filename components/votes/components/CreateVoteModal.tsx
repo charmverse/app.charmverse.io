@@ -1,3 +1,4 @@
+import type { ProposalFlowPermissionFlags } from '@charmverse/core';
 import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -23,7 +24,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -99,7 +99,7 @@ interface CreateVoteModalProps {
   postId?: string;
   snapshotProposalId: string | null;
   proposal?: ProposalWithUsers;
-  proposalFlowFlags?: ProposalFlowFlags;
+  proposalFlowFlags?: ProposalFlowPermissionFlags;
 }
 
 export function CreateVoteModal({

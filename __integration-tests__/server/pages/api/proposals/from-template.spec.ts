@@ -1,17 +1,10 @@
-import { prisma } from '@charmverse/core';
+import { prisma, testUtilsMembers, testUtilsUser } from '@charmverse/core';
 import type { Page, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
-import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import {
-  generateRole,
-  generateSpaceUser,
-  generateUserAndSpace,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 let space: Space;
@@ -20,14 +13,14 @@ let nonAdminUser: User;
 let reviewerRole: Role;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: true });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   space = generated.space;
   adminUser = generated.user;
-  nonAdminUser = await generateSpaceUser({
+  nonAdminUser = await testUtilsUser.generateSpaceUser({
     isAdmin: false,
     spaceId: space.id
   });
-  reviewerRole = await generateRole({
+  reviewerRole = await testUtilsMembers.generateRole({
     createdBy: adminUser.id,
     spaceId: space.id
   });
@@ -129,7 +122,7 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
     expect(proposal?.categoryId).toBe(proposalCategory.id);
   });
 
-  it('should copy a proposal template if the user does not have createVote space permission and respond with 401', async () => {
+  it('should fail to create a proposal from a template if the user does not have create_proposal permission and respond with 401', async () => {
     const proposalCategory = await generateProposalCategory({
       spaceId: space.id
     });
