@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { InputLabel, Typography } from '@mui/material';
+import { Divider, InputLabel, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
@@ -19,12 +19,13 @@ import { SubscriptionUsageRecord } from 'lib/subscription/utils';
 import { CheckoutForm } from './CheckoutForm';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
-  const { data: spaceSubscription = null, isLoading: isFetchingSpaceSubscription } = useSWR(
-    `${space.id}-subscription`,
-    () => {
-      return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
-    }
-  );
+  const {
+    data: spaceSubscription = null,
+    isLoading: isFetchingSpaceSubscription,
+    mutate: refetchSpaceSubscription
+  } = useSWR(`${space.id}-subscription`, () => {
+    return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
+  });
 
   const { data: stripePublicKey, isLoading: isFetchingStripePublicKey } = useSWRImmutable(`stripe-public-key`, () => {
     return charmClient.subscription.getStripePublicKey();
@@ -75,10 +76,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             </Stack>
           </Stack>
         )}
-
+        <Divider sx={{ mb: 1 }} />
         {updateSpaceSubscription && stripePromise ? (
           <Elements stripe={stripePromise}>
-            <CheckoutForm onCancel={() => setUpdateSpaceSubscription(false)} />
+            <CheckoutForm refetch={refetchSpaceSubscription} onCancel={() => setUpdateSpaceSubscription(false)} />
           </Elements>
         ) : (
           <Stack flexDirection='row' gap={1}>

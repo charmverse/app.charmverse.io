@@ -1,18 +1,21 @@
 import { useTheme } from '@emotion/react';
 import { Divider, FormControlLabel, List, ListItemText, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
+import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import { Box, Stack, styled } from '@mui/system';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { StripeElementChangeEvent } from '@stripe/stripe-js';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
+import type { SpaceSubscription } from 'lib/subscription/interfaces';
+import { SubscriptionUsageRecord, type SubscriptionPeriod, type SubscriptionUsage } from 'lib/subscription/utils';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -23,7 +26,13 @@ const StyledListItemText = styled(ListItemText)`
   display: list-item;
 `;
 
-export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
+export function CheckoutForm({
+  onCancel,
+  refetch
+}: {
+  onCancel: VoidFunction;
+  refetch: KeyedMutator<SpaceSubscription>;
+}) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -31,7 +40,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
-  const [usage, setUsage] = useState<SubscriptionUsage>('1');
+  const [usage, setUsage] = useState<SubscriptionUsage>(1);
   const [cardEvent, setCardEvent] = useState<{
     cardNumber: StripeElementChangeEvent | null;
     cvc: StripeElementChangeEvent | null;
@@ -73,7 +82,7 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
           period,
-          usage: '1'
+          usage
         });
 
         if (clientSecret && paymentIntentStatus !== 'succeeded') {
@@ -92,14 +101,48 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
     }
 
     setIsProcessing(false);
+    await refetch();
+    onCancel();
   };
 
   const theme = useTheme();
 
   return (
-    <form id='payment-form' onSubmit={createSubscription}>
-      <Stack flexDirection='row'>
+    <Stack onSubmit={createSubscription} gap={1}>
+      <Stack>
+        <InputLabel>Usage</InputLabel>
+        <Box
+          sx={{
+            mx: 2
+          }}
+        >
+          <Slider
+            disabled={isProcessing}
+            size='small'
+            aria-label='usage'
+            defaultValue={1}
+            valueLabelDisplay='off'
+            value={usage}
+            marks={Object.keys(SubscriptionUsageRecord).map((_usage) => ({
+              value: Number(_usage),
+              label: `$${SubscriptionUsageRecord[parseInt(_usage) as SubscriptionUsage].pricing[period]}/${
+                period === 'annual' ? 'yr' : 'mo'
+              }`
+            }))}
+            min={Object.keys(SubscriptionUsageRecord).map(Number)[0]}
+            max={Object.keys(SubscriptionUsageRecord).map(Number)[Object.keys(SubscriptionUsageRecord).length - 1]}
+            onChange={(_, value) => {
+              setUsage(value as SubscriptionUsage);
+            }}
+          />
+        </Box>
+      </Stack>
+      <Stack>
+        <InputLabel>Billing Period</InputLabel>
         <FormControlLabel
+          sx={{
+            width: 'fit-content'
+          }}
           control={
             <Switch
               checked={period === 'annual'}
@@ -185,17 +228,15 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>
-      <Typography>Paid plan: ${}/mo</Typography>
+      <Typography>Paid plan: ${SubscriptionUsageRecord[usage].pricing[period]}/mo</Typography>
       <StyledList>
-        <StyledListItemText>20k blocks</StyledListItemText>
-        <StyledListItemText>50 Active users</StyledListItemText>
+        <StyledListItemText>{SubscriptionUsageRecord[usage].totalBlocks} blocks</StyledListItemText>
+        <StyledListItemText>{SubscriptionUsageRecord[usage].totalActiveUsers} Active users</StyledListItemText>
         <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
       </StyledList>
-      <Divider sx={{ mb: 1 }} />
       <Stack gap={1} display='flex' flexDirection='row'>
         <Button
           onClick={createSubscription}
-          type='submit'
           sx={{ width: 'fit-content' }}
           loading={isProcessing}
           disabled={cardError || !cardComplete || cardEmpty || isProcessing || !stripe || !elements || !space}
@@ -206,6 +247,6 @@ export function CheckoutForm({ onCancel }: { onCancel: VoidFunction }) {
           Cancel
         </Button>
       </Stack>
-    </form>
+    </Stack>
   );
 }

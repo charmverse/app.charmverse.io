@@ -1,4 +1,4 @@
-export type SubscriptionUsage = '1' | '2' | '3' | '4' | '5';
+export type SubscriptionUsage = 1 | 2 | 3 | 4 | 5;
 
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
