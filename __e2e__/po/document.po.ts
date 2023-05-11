@@ -25,6 +25,8 @@ export class DocumentPage {
 
   proposalBanner: Locator;
 
+  documentTitle: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.header = new PageHeader(page);
@@ -35,6 +37,7 @@ export class DocumentPage {
     this.trashModal = this.page.locator('data-test=trash-modal');
     this.charmEditor = this.page.locator('data-test=page-charmeditor >> div[contenteditable]').first();
     this.proposalBanner = this.page.locator('data-test=proposal-banner');
+    this.documentTitle = this.page.locator(`data-test=editor-page-title`);
   }
 
   async goToPage({ domain, path }: { domain: string; path: string }) {

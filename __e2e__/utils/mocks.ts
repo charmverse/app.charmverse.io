@@ -15,6 +15,26 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
+export async function loginBrowserUser({
+  browserPage,
+  userId
+}: {
+  browserPage: BrowserPage;
+  userId: string;
+}): Promise<LoggedInUser> {
+  return browserPage.request
+    .post(`${baseUrl}/api/profile/dev`, {
+      data: {
+        userId
+      }
+    })
+    .then((res) => res.json());
+}
+
+export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserPage; userId: string }): Promise<void> {
+  await browserPage.request.post(`${baseUrl}/api/session/logout`);
+}
+
 export async function createUser({
   browserPage,
   address
