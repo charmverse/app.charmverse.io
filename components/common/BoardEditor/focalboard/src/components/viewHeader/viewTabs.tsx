@@ -33,6 +33,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -79,8 +80,10 @@ function ViewMenuItem({
   view,
   onClick,
   onDrop,
-  href
+  href,
+  selected
 }: {
+  selected?: boolean;
   href: string;
   onDrop: (currentView: BoardView, dropzoneView: BoardView) => void;
   view: BoardView;
@@ -106,6 +109,7 @@ function ViewMenuItem({
         dense
         className={isOver ? 'dragover' : ''}
         sx={{ width: '100%' }}
+        selected={selected}
       >
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
@@ -138,34 +142,32 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
-  const viewIds = props.viewIds.length !== 0 ? props.viewIds : views.map((view) => view.id);
-
-  // Find the index of the current view
-  const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
-  const shownViews = views.slice(0, maxTabsShown);
-  let restViews = views.slice(maxTabsShown);
-
-  // If the current view index is more than what we can show in the screen
-  if (currentViewIndex >= maxTabsShown) {
-    const replacedView = shownViews[maxTabsShown - 1];
-    // Replace the current view as the last view of the shown views
-    shownViews[maxTabsShown - 1] = views[currentViewIndex];
-    restViews = restViews.filter((restView) => restView.id !== activeView?.id);
-    restViews.unshift(replacedView);
-  }
-
+  const viewIds = props.viewIds.length === views.length ? props.viewIds : views.map((view) => view.id);
   const viewsRecord = viewsProp.reduce((acc, view) => {
     acc[view.id] = view;
     return acc;
   }, {} as Record<string, BoardView>);
 
+  // Find the index of the current view
+  const currentViewIndex = viewIds.findIndex((viewId) => viewId === activeView?.id);
+  const shownViewIds = viewIds.slice(0, maxTabsShown);
+  let restViewIds = viewIds.slice(maxTabsShown);
+
+  // If the current view index is more than what we can show in the screen
+  if (currentViewIndex >= maxTabsShown) {
+    const replacedViewId = shownViewIds[maxTabsShown - 1];
+    // Replace the current view as the last view of the shown views
+    shownViewIds[maxTabsShown - 1] = viewIds[currentViewIndex];
+    restViewIds = restViewIds.filter((viewId) => viewId !== activeView?.id);
+    restViewIds.unshift(replacedViewId);
+  }
+
   // make sure active view id is visible or the value for Tabs will be invalid
   // during transition between boards, there is a period where activeView has not caught up with the new views
   const activeShowViewId =
-    shownViews.find((view) => view.id === activeView?.id)?.id ??
+    shownViewIds.find((viewId) => viewId === activeView?.id || viewId === router.query.viewId) ??
     // check viewId by the query, there is a period where activeView has not caught up
-    shownViews.find((view) => view.id === router.query.viewId)?.id ??
-    shownViews[0]?.id ??
+    shownViewIds[0] ??
     false;
 
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
@@ -176,7 +178,7 @@ function ViewTabs(props: ViewTabsProps) {
     event.stopPropagation();
     event.preventDefault();
     const viewId = event.currentTarget.id;
-    const view = views.find((v) => v.id === viewId);
+    const view = viewsRecord[viewId];
     if (!view) {
       return;
     }
@@ -224,13 +226,13 @@ function ViewTabs(props: ViewTabsProps) {
     if (!dropdownView) return;
 
     setViewMenuAnchorEl(null);
-    const nextView = views.find((o) => o !== dropdownView);
+    const nextViewId = viewIds.find((viewId) => viewId !== dropdownView.id);
     await mutator.deleteBlock(dropdownView, 'delete view');
     onDeleteView?.(dropdownView.id);
-    if (nextView) {
-      showView(nextView.id);
+    if (nextViewId) {
+      showView(nextViewId);
     }
-  }, [views, dropdownView, showView]);
+  }, [viewIds, dropdownView, showView]);
 
   function resyncGoogleFormData() {
     if (dropdownView) {
@@ -289,42 +291,47 @@ function ViewTabs(props: ViewTabsProps) {
         value={activeShowViewId}
         sx={{ minHeight: 0, mb: '-6px' }}
       >
-        {shownViews.map((view) => (
-          <TabButton
-            disableRipple
-            key={view.id}
-            href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
-            onClick={handleViewClick}
-            variant='text'
-            size='small'
-            id={view.id}
-            sx={{ p: 0 }}
-            value={view.id}
-            label={
-              <StyledTabContent
-                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
-                display='flex'
-                alignItems='center'
-                fontSize='small'
-                fontWeight={500}
-                gap={1}
-              >
-                <span>
-                  {iconForViewType(view.fields.viewType)}
-                  {view.title || formatViewTitle(view)}
-                </span>
-              </StyledTabContent>
-            }
-          />
-        ))}
-        {restViews.length !== 0 && (
+        {shownViewIds
+          .map((viewId) => {
+            const view = viewsRecord[viewId];
+            return view ? (
+              <TabButton
+                disableRipple
+                key={viewId}
+                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+                onClick={handleViewClick}
+                variant='text'
+                size='small'
+                id={view.id}
+                sx={{ p: 0 }}
+                value={view.id}
+                label={
+                  <StyledTabContent
+                    color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
+                    display='flex'
+                    alignItems='center'
+                    fontSize='small'
+                    fontWeight={500}
+                    gap={1}
+                  >
+                    <span>
+                      {iconForViewType(view.fields.viewType)}
+                      {view.title || formatViewTitle(view)}
+                    </span>
+                  </StyledTabContent>
+                }
+              />
+            ) : null;
+          })
+          .filter(isTruthy)}
+        {restViewIds.length !== 0 && (
           <TabButton
             disableRipple
             sx={{ p: 0 }}
             {...showViewsTriggerState}
             label={
               <StyledTabContent color='secondary' fontSize='small' fontWeight={500}>
-                <span>{restViews.length} more...</span>
+                <span>{restViewIds.length} more...</span>
               </StyledTabContent>
             }
           />
@@ -363,7 +370,7 @@ function ViewTabs(props: ViewTabsProps) {
               <ListItemText>{duplicateViewText}</ListItemText>
             </MenuItem>
           ]}
-        {views.length !== 1 && (
+        {viewIds.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>
               <DeleteOutlineIcon fontSize='small' />
@@ -378,6 +385,7 @@ function ViewTabs(props: ViewTabsProps) {
           (viewId) =>
             viewsRecord[viewId] && (
               <ViewMenuItem
+                selected={viewId === activeView?.id}
                 view={viewsRecord[viewId]}
                 key={viewsRecord[viewId].id}
                 href={disableUpdatingUrl ? '' : getViewUrl(viewsRecord[viewId].id)}
