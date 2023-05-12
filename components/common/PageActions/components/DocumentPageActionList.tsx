@@ -20,7 +20,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PageMeta, PageUpdates } from 'lib/pages';
+import type { PageWithContent, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { fontClassName } from 'theme/fonts';
 
@@ -37,7 +37,7 @@ import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
-  PageMeta,
+  PageWithContent,
   | 'convertedProposalId'
   | 'createdAt'
   | 'createdBy'
@@ -48,6 +48,7 @@ export type PageActionMeta = Pick<
   | 'id'
   | 'parentId'
   | 'path'
+  | 'snapshotProposalId'
   | 'title'
   | 'type'
   | 'updatedAt'
@@ -317,6 +318,7 @@ export function DocumentPageActionList({
       <Divider />
       <PublishToSnapshot
         pageId={pageId}
+        snapshotProposalId={page.snapshotProposalId}
         renderContent={({ label, onClick, icon }) => (
           <ListItemButton onClick={onClick}>
             {icon}

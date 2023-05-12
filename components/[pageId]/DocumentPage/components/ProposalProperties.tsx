@@ -31,16 +31,18 @@ interface ProposalPropertiesProps {
   readOnly?: boolean;
   pageId: string;
   proposalId: string;
+  snapshotProposalId: string | null;
   isTemplate: boolean;
   pagePermissions?: IPagePermissionFlags;
   refreshPagePermissions?: () => void;
 }
 
-export default function ProposalProperties({
+export function ProposalProperties({
   pagePermissions,
   refreshPagePermissions = () => null,
   pageId,
   proposalId,
+  snapshotProposalId,
   readOnly,
   isTemplate
 }: ProposalPropertiesProps) {
@@ -329,6 +331,7 @@ export default function ProposalProperties({
         proposalFlowFlags={proposalFlowFlags}
         proposal={proposal}
         pageId={pageId}
+        snapshotProposalId={snapshotProposalId}
         open={isVoteModalOpen}
         onCreateVote={() => {
           setIsVoteModalOpen(false);

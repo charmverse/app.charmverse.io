@@ -82,7 +82,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
         {bountyStatuses.map((bountyStatus) => (
           <div className='octo-board-column' key={bountyStatus}>
             {bountiesGroupedByStatus[bountyStatus]
-              .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
+              .filter((bounty) => Boolean(pages[bounty.page?.id]) && !pages[bounty.page.id]?.deletedAt)
               .map((bounty) => (
                 <BountyKanbanCard
                   onDelete={onClickDelete}

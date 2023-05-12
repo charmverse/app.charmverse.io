@@ -74,7 +74,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const filteredPages = Object.values(pages).filter(
     (page) =>
       page &&
-      page?.deletedAt === null &&
+      !page?.deletedAt &&
       (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)
   );
   const totalItems = filteredMembers.length + filteredPages.length;

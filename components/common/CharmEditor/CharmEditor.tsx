@@ -387,6 +387,7 @@ interface CharmEditorProps {
   postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
+  snapshotProposalId?: string | null;
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
@@ -412,6 +413,7 @@ function CharmEditor({
   postId,
   containerWidth,
   pageType,
+  snapshotProposalId,
   pagePermissions,
   placeholderText,
   focusOnInit,
@@ -584,6 +586,7 @@ function CharmEditor({
           pageId,
           pagePermissions,
           postId,
+          snapshotProposalId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
