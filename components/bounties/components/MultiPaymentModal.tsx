@@ -130,7 +130,9 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
                   }}
                 >
                   {userGnosisSafes
-                    ?.filter((safeInfo) => !safeInfo.isHidden)
+                    ?.filter(
+                      (safeInfo) => !safeInfo.isHidden && transactions.every((t) => t.chainId === safeInfo.chainId)
+                    )
                     .map((safeInfo) => (
                       <MenuItem key={safeInfo.address} value={safeInfo.address}>
                         <ListItemText>{safeInfo?.name || safeInfo.address}</ListItemText>

@@ -232,7 +232,7 @@ export function BountyPaymentButton({
             Gnosis wallets
           </MenuItem>
           {safesData
-            ?.filter((s) => !s.isHidden)
+            ?.filter((s) => !s.isHidden && chainIdToUse === s.chainId)
             .map((safeInfo) => (
               <SafeMenuItem
                 key={safeInfo.address}
