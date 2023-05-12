@@ -18,6 +18,7 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import { capitalize } from 'lodash';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -205,13 +206,12 @@ function ViewTabs(props: ViewTabsProps) {
     return `${pathWithoutQuery}?viewId=${viewId}`;
   }
 
-  const handleDuplicateView = useCallback(() => {
+  const handleDuplicateView = useCallback(async () => {
     if (!dropdownView) return;
-
     const newView = createBoardView(dropdownView);
-    newView.title = `${dropdownView.title} copy`;
+    newView.title = `${dropdownView.title || `${capitalize(dropdownView.fields.viewType)} view`} copy`;
     newView.id = Utils.createGuid(IDType.View);
-    mutator.insertBlock(
+    await mutator.insertBlock(
       newView,
       'duplicate view',
       async (block) => {
@@ -221,7 +221,15 @@ function ViewTabs(props: ViewTabsProps) {
         showView(dropdownView.id);
       }
     );
-  }, [dropdownView, showView]);
+
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, newView.id] } },
+      publishIncrementalUpdate
+    );
+    closeViewMenu();
+    handleClose();
+  }, [dropdownView, showView, viewIds]);
 
   const handleDeleteView = useCallback(async () => {
     Utils.log('deleteView');
