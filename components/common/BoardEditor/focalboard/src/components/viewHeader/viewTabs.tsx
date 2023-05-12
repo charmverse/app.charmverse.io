@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import {
   Edit as EditIcon,
@@ -119,6 +120,60 @@ function ViewMenuItem({
         <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
       </MenuItem>
     </Stack>
+  );
+}
+
+function ShownViewMenuItem({
+  view,
+  onClick,
+  onDrop,
+  href,
+  isActive
+}: {
+  isActive: boolean;
+  href?: string;
+  onDrop: (currentView: BoardView, dropzoneView: BoardView) => void;
+  view: BoardView;
+  onClick: (event: MouseEvent<HTMLElement>) => void;
+}) {
+  const theme = useTheme();
+  const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
+  return (
+    <TabButton
+      ref={columnRef as any}
+      disableRipple
+      href={href}
+      onClick={onClick}
+      variant='text'
+      size='small'
+      id={view.id}
+      sx={{
+        p: 0,
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row',
+        // The tab indicator is not shown anymore since its located in a separate component
+        borderBottom: isActive ? `1.5px solid ${theme.palette.text.primary}` : ''
+      }}
+      value={view.id}
+      label={
+        <StyledTabContent
+          color={isActive ? 'textPrimary' : 'secondary'}
+          display='flex'
+          alignItems='center'
+          fontSize='small'
+          fontWeight={500}
+          gap={1}
+        >
+          <span>
+            {iconForViewType(view.fields.viewType)}
+            {view.title || formatViewTitle(view)}
+          </span>
+        </StyledTabContent>
+      }
+    />
   );
 }
 
@@ -310,31 +365,13 @@ function ViewTabs(props: ViewTabsProps) {
           .map((viewId) => {
             const view = viewsRecord[viewId];
             return view ? (
-              <TabButton
-                disableRipple
-                key={viewId}
-                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+              <ShownViewMenuItem
                 onClick={handleViewClick}
-                variant='text'
-                size='small'
-                id={view.id}
-                sx={{ p: 0 }}
-                value={view.id}
-                label={
-                  <StyledTabContent
-                    color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
-                    display='flex'
-                    alignItems='center'
-                    fontSize='small'
-                    fontWeight={500}
-                    gap={1}
-                  >
-                    <span>
-                      {iconForViewType(view.fields.viewType)}
-                      {view.title || formatViewTitle(view)}
-                    </span>
-                  </StyledTabContent>
-                }
+                onDrop={reorderViews}
+                view={view}
+                isActive={activeView?.id === view.id}
+                key={view.id}
+                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
               />
             ) : null;
           })
