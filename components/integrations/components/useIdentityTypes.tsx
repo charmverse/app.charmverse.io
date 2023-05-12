@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import type { IntegrationModel } from 'components/profile/components';
-import { IdentityIcon } from 'components/profile/components/IdentityIcon';
+import type { IntegrationModel } from 'components/u/components';
+import { IdentityIcon } from 'components/u/components/IdentityIcon';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import randomName from 'lib/utilities/randomName';

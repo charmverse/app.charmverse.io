@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
-import { PublicProfile } from 'components/profile/PublicProfile';
 import Legend from 'components/settings/Legend';
+import { PublicProfile } from 'components/u/PublicProfile';
 import { useUser } from 'hooks/useUser';
 
 export default function ProfileSettings() {

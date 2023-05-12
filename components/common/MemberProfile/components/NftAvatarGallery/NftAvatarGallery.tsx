@@ -3,11 +3,11 @@ import { Box, CircularProgress, Grid } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
-import EmptyAvatarGallery from 'components/profile/components/NftAvatarGallery/RenderEmptyAvatarGallery';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
 
 import NftGalleryItem from './NftGalleryItem';
+import EmptyAvatarGallery from './RenderEmptyAvatarGallery';
 
 const ProgressContainer = styled.div`
   position: absolute;

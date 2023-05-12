@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core';
 
-import type { CommunityDetails } from 'components/profile/components/CommunityRow';
+import type { CommunityDetails } from 'components/u/components/CommunityRow';
 import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 
 import { combineCommunityData } from './combineCommunityData';

@@ -7,7 +7,7 @@ import { memo } from 'react';
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
+import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 

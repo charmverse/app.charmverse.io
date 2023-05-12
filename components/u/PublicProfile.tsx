@@ -3,8 +3,8 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { SpacesMemberDetails } from 'components/profile/components/SpacesMemberDetails/SpacesMemberDetails';
 import Legend from 'components/settings/Legend';
+import { UserSpaceDetails } from 'components/u/components/UserSpaceDetails/UserSpaceDetails';
 import { useUser } from 'hooks/useUser';
 import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
@@ -14,7 +14,7 @@ import AggregatedData from './components/AggregatedData';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
-import type { UserDetailsProps } from './components/UserDetails';
+import type { UserDetailsProps } from './components/UserDetails/UserDetails';
 import UserDetails from './components/UserDetails/UserDetails';
 import UserDetailsMini from './components/UserDetails/UserDetailsMini';
 import { isPublicUser } from './components/UserDetails/utils';
@@ -158,7 +158,7 @@ export function PublicProfile(props: UserDetailsProps) {
   return (
     <Box>
       {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
-      <SpacesMemberDetails memberId={user.id} />
+      <UserSpaceDetails memberId={user.id} />
       {readOnly && (
         <AggregatedData
           totalBounties={data?.bounties}

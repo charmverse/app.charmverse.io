@@ -10,23 +10,23 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberEmailForm } from 'components/members/MemberEmailForm';
-import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
-import UserDetails from 'components/profile/components/UserDetails/UserDetails';
 import Legend from 'components/settings/Legend';
+import UserDetails from 'components/u/components/UserDetails/UserDetails';
+import UserDetailsMini from 'components/u/components/UserDetails/UserDetailsMini';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
-import { MemberProperties, MemberPropertiesDialog } from '../SpacesMemberDetails/components/MemberPropertiesDialog';
-import UserDetailsMini from '../UserDetails/UserDetailsMini';
-
+import { MemberProperties } from './components/MemberProperties';
+import { MemberPropertiesDialog } from './components/MemberPropertiesDialog';
+import { MemberPropertiesForm } from './components/MemberPropertiesForm';
 import { NftsList } from './components/NftsList';
+import { OnboardingEmailForm } from './components/OnboardingEmailForm';
 import { OrgsList } from './components/OrgsList';
 import { PoapsList } from './components/PoapsList';
+import { useMemberPropertyValues } from './hooks/useMemberPropertyValues';
 
 type Step = 'email_step' | 'profile_step';
 
@@ -34,6 +34,7 @@ const ContentContainer = styled(Container)`
   width: 100%;
   margin-bottom: 0;
 `;
+
 function CurrentMemberProfile({
   currentUser,
   title = 'Edit your profile',
@@ -72,7 +73,7 @@ function CurrentMemberProfile({
   return (
     <MemberPropertiesDialog memberId={currentUser.id} onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
       {currentStep === 'email_step' ? (
-        <MemberEmailForm onClick={goNextStep} />
+        <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
         <>
           <UserDetails
@@ -83,7 +84,7 @@ function CurrentMemberProfile({
             updateUser={setUser}
           />
           <Legend mt={4}>Member details</Legend>
-          <MemberProperties
+          <MemberPropertiesForm
             memberId={currentUser.id}
             spaceId={currentSpace.id}
             updateMemberPropertyValues={updateSpaceValues}
@@ -130,25 +131,29 @@ function MemberProfile({
     );
   }
 
+  const isLoading = isFetchingUser || !user || member.id !== user.id;
+
   return (
     <Dialog
       onClose={onClose}
       fullWidth={fullWidth}
       toolbar={
-        <Button
-          size='small'
-          color='secondary'
-          href={`/u/${user?.path}`}
-          onClick={onClose}
-          variant='text'
-          target='_blank'
-          startIcon={<OpenInFullIcon fontSize='small' />}
-        >
-          View full profile
-        </Button>
+        !isLoading && (
+          <Button
+            size='small'
+            color='secondary'
+            href={`/u/${user?.path}`}
+            onClick={onClose}
+            variant='text'
+            target='_blank'
+            startIcon={<OpenInFullIcon fontSize='small' />}
+          >
+            View full profile
+          </Button>
+        )
       }
     >
-      {isFetchingUser || !user || member.id !== user.id ? (
+      {isLoading ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
@@ -160,7 +165,7 @@ function MemberProfile({
               <Legend mt={4} mb={3}>
                 {currentSpace?.name} details
               </Legend>
-              <MemberPropertiesRenderer properties={currentSpacePropertyValues?.properties ?? []} />
+              <MemberProperties properties={currentSpacePropertyValues?.properties ?? []} />
             </Grid>
             <Grid item xs={12} md={6}>
               <Box sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -182,7 +187,7 @@ function MemberProfile({
   );
 }
 
-export function MemberMiniProfile({
+export function MemberDialog({
   memberId,
   onClose,
   title,

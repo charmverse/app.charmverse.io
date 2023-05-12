@@ -1,10 +1,13 @@
-import { MemberMiniProfile } from 'components/profile/components/MemberMiniProfile/MemberMiniProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useOnboarding } from 'hooks/useOnboarding';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
-export function MemberOnboardingModal({ userId }: { userId?: string }) {
+import { useOnboarding } from './hooks/useOnboarding';
+import { MemberDialog } from './MemberDialog';
+
+// TODO: we should be able to just use the global member dialog?
+
+export function MemberDialogOnboarding() {
   const space = useCurrentSpace();
   const { user } = useUser();
   const { onboarded, completeOnboarding } = useOnboarding();
@@ -22,9 +25,9 @@ export function MemberOnboardingModal({ userId }: { userId?: string }) {
 
   return (
     <div data-test='member-onboarding-form'>
-      <MemberMiniProfile
+      <MemberDialog
         isOnboarding={!user.email}
-        memberId={userId ?? user.id}
+        memberId={user.id}
         onClose={completeOnboarding}
         title={`Welcome to ${space.name}. Set up your profile`}
       />

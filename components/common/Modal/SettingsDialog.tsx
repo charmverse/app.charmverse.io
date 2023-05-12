@@ -10,13 +10,13 @@ import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
 import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
-import ProfileSettings from 'components/profile/ProfileSettings';
 import { ApiSettings } from 'components/settings/api/Api';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/config';
 import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 import Invites from 'components/settings/invites/Invites';
 import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
+import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';

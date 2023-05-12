@@ -1,26 +1,19 @@
-import { useTheme } from '@emotion/react';
-import { Box, DialogContent, Divider, Stack, useMediaQuery } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Box, Divider, Stack } from '@mui/material';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
-import LoadingComponent from 'components/common/LoadingComponent';
-import { DialogTitle } from 'components/common/Modal';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
-import { useMembers } from 'hooks/useMembers';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
 
-import { NftsList } from '../../MemberMiniProfile/components/NftsList';
-import { OrgsList } from '../../MemberMiniProfile/components/OrgsList';
-import { PoapsList } from '../../MemberMiniProfile/components/PoapsList';
+import { useMutateMemberPropertyValues } from '../hooks/useMutateMemberPropertyValues';
+
+import { NftsList } from './NftsList';
+import { OrgsList } from './OrgsList';
+import { PoapsList } from './PoapsList';
 
 type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
@@ -29,7 +22,12 @@ type Props = {
   memberId: string;
 };
 
-export function MemberProperties({ spaceId, updateMemberPropertyValues, showBlockchainData = false, memberId }: Props) {
+export function MemberPropertiesForm({
+  spaceId,
+  updateMemberPropertyValues,
+  showBlockchainData = false,
+  memberId
+}: Props) {
   const { data: properties = [], mutate } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -125,69 +123,5 @@ export function MemberProperties({ spaceId, updateMemberPropertyValues, showBloc
         </Stack>
       )}
     </Box>
-  );
-}
-
-export function MemberPropertiesDialog({
-  children,
-  memberId,
-  spaceId,
-  onClose,
-  title,
-  isLoading = false
-}: {
-  spaceId: string | null;
-  memberId: string;
-  onClose: VoidFunction;
-  title: string;
-  children?: ReactNode;
-  isLoading?: boolean;
-}) {
-  const {
-    data,
-    mutate,
-    isLoading: isFetchingSpaceProperties
-  } = useSWR(
-    spaceId ? `members/${memberId}/values/${spaceId}` : null,
-    () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
-    { revalidateOnMount: true }
-  );
-
-  const theme = useTheme();
-  const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
-  const { mutateMembers } = useMembers();
-
-  function onClickClose() {
-    // refresh members only after all the editing is finished
-    onClose();
-    mutateMembers();
-    mutate();
-  }
-
-  if (!spaceId) {
-    return null;
-  }
-
-  return (
-    <Dialog onClose={onClickClose}>
-      <ScrollableWindow>
-        <Container fullWidth={fullWidth}>
-          {!data || isFetchingSpaceProperties || isLoading ? (
-            <DialogContent>
-              <LoadingComponent isLoading />
-            </DialogContent>
-          ) : (
-            <>
-              <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
-                {title}
-              </DialogTitle>
-              <DialogContent dividers sx={{ pb: 6 }}>
-                {children}
-              </DialogContent>
-            </>
-          )}
-        </Container>
-      </ScrollableWindow>
-    </Dialog>
   );
 }

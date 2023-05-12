@@ -17,8 +17,6 @@ import charmClient from 'charmClient';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
-import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
-import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -35,6 +33,8 @@ import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
 import UserDescription from '../UserDescription';
 import UserPathModal from '../UserPathModal';
 
+import { useUpdateProfileAvatar } from './hooks/useUpdateProfileAvatar';
+import { useUserDetails } from './hooks/useUserDetails';
 import { isPublicUser } from './utils';
 
 export interface UserDetailsProps {

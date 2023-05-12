@@ -18,9 +18,9 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import type { Social } from 'components/profile/interfaces';
+import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
+import { DiscordSocialIcon } from 'components/u/components/UserDetails/DiscordSocialIcon';
+import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';

@@ -14,17 +14,17 @@ import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import GlobalComponents from 'components/_app/GlobalComponents';
+import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
+import { MemberProfileProvider } from 'components/common/MemberProfile/hooks/useMemberProfile';
 import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
@@ -33,7 +33,6 @@ import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
-import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
@@ -156,36 +155,34 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
               <SettingsDialogProvider>
                 <NotificationsProvider>
                   <LocalizationProvider>
-                    <OnboardingProvider>
-                      <FocalBoardProvider>
-                        <NotionProvider>
-                          <IntlProvider>
-                            <PageHead />
+                    <FocalBoardProvider>
+                      <NotionProvider>
+                        <IntlProvider>
+                          <PageHead />
 
-                            <RouteGuard>
-                              <ErrorBoundary>
-                                <Snackbar
-                                  isOpen={isOldBuild}
-                                  message='New CharmVerse platform update available. Please refresh.'
-                                  actions={[
-                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                      <RefreshIcon fontSize='small' />
-                                    </IconButton>
-                                  ]}
-                                  origin={{ vertical: 'top', horizontal: 'center' }}
-                                  severity='warning'
-                                  handleClose={() => setIsOldBuild(false)}
-                                />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
 
-                                {getLayout(<Component {...pageProps} />)}
+                              {getLayout(<Component {...pageProps} />)}
 
-                                <GlobalComponents />
-                              </ErrorBoundary>
-                            </RouteGuard>
-                          </IntlProvider>
-                        </NotionProvider>
-                      </FocalBoardProvider>
-                    </OnboardingProvider>
+                              <GlobalComponents />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </IntlProvider>
+                      </NotionProvider>
+                    </FocalBoardProvider>
                   </LocalizationProvider>
                 </NotificationsProvider>
               </SettingsDialogProvider>

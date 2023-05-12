@@ -17,7 +17,7 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
+export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
   const { updateUser, user } = useUser();
 
   const {
@@ -60,7 +60,7 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
   };
 
   return (
-    <Stack gap={1}>
+    <Stack gap={2}>
       <Typography>
         CharmVerse can use your email address to let you know when there is a conversation or activity you should be
         part of.
@@ -68,7 +68,6 @@ export function MemberEmailForm({ onClick }: { onClick: VoidFunction }) {
       <TextField
         {...register('email')}
         data-test='member-email-input'
-        fullWidth
         error={!!errors.email}
         helperText={errors.email?.message}
         placeholder='me@gmail.com'

@@ -6,10 +6,9 @@ import { useEffect, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import { MemberProperties } from 'components/common/MemberProfile/components/MemberProperties';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
-
-import { MemberPropertiesRenderer } from './MemberPropertiesRenderer';
 
 type Props = {
   spaceName: string;
@@ -81,7 +80,7 @@ export function SpaceDetailsAccordion({
         </Box>
       </StyledAccordionSummary>
       <AccordionDetails>
-        <MemberPropertiesRenderer properties={properties} />
+        <MemberProperties properties={properties} />
       </AccordionDetails>
     </Accordion>
   );

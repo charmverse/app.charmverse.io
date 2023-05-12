@@ -4,8 +4,8 @@ import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
+import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';

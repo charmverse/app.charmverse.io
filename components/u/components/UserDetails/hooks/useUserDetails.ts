@@ -2,7 +2,8 @@ import type { User } from '@charmverse/core/prisma';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { UserDetailsProps } from 'components/profile/components/UserDetails';
+
+import type { UserDetailsProps } from '../UserDetails';
 
 export const useUserDetails = ({ updateUser }: Pick<UserDetailsProps, 'updateUser'> = {}) => {
   const [isSaving, setIsSaving] = useState(false);

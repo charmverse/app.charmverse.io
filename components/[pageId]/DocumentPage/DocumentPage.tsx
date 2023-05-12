@@ -37,7 +37,7 @@ import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
-export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props} />)<{
+export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
   top: number;
   fullWidth?: boolean;
 }>`

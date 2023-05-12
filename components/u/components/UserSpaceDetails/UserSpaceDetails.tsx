@@ -3,20 +3,19 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import {
-  MemberProperties,
-  MemberPropertiesDialog
-} from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesDialog';
-import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
+import { MemberPropertiesDialog } from 'components/common/MemberProfile/components/MemberPropertiesDialog';
+import { MemberPropertiesForm } from 'components/common/MemberProfile/components/MemberPropertiesForm';
+import { useMemberPropertyValues } from 'components/common/MemberProfile/hooks/useMemberPropertyValues';
 import Legend from 'components/settings/Legend';
-import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
+
+import { SpaceDetailsAccordion } from './components/SpaceDetailsAccordion';
 
 type Props = {
   memberId: string;
 };
 
-export function SpacesMemberDetails({ memberId }: Props) {
+export function UserSpaceDetails({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
   const { query } = useRouter();
@@ -58,7 +57,11 @@ export function SpacesMemberDetails({ memberId }: Props) {
           memberId={memberId}
           spaceId={editSpaceId}
         >
-          <MemberProperties memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={updateSpaceValues} />
+          <MemberPropertiesForm
+            memberId={memberId}
+            spaceId={editSpaceId}
+            updateMemberPropertyValues={updateSpaceValues}
+          />
         </MemberPropertiesDialog>
       )}
     </Box>
