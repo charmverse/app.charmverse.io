@@ -112,8 +112,8 @@ export function useMultiBountyPayment({
           await charmClient.bounties.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
-            chainId: safeData.chainId.toString(),
-            isMultisig: true
+            safeTxHash: result.txHash,
+            chainId: safeData.chainId.toString()
           });
         })
       );
