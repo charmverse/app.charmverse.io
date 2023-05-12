@@ -43,7 +43,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         (_page): PageWithContent | undefined => {
           if (_page) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].id === pageWithContent?.id) {
+              if (value[i].id === _page.id) {
                 return {
                   ..._page,
                   ...(value[i] as PageMeta)
@@ -63,7 +63,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     return () => {
       unsubscribeFromPageUpdates();
     };
-  }, []);
+  }, [mutate]);
 
   if (pageWithContent) {
     return {
