@@ -71,7 +71,7 @@ function CurrentMemberProfile({
   }
 
   return (
-    <MemberPropertiesDialog memberId={currentUser.id} onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
+    <MemberPropertiesDialog onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
@@ -125,13 +125,17 @@ function MemberProfile({
     return null;
   }
 
+  const isLoading = isFetchingUser || !user || member.id !== user.id;
+
+  if (isLoading && isOnboarding) {
+    return null;
+  }
+
   if (member.id === currentUser.id) {
     return (
       <CurrentMemberProfile isOnboarding={isOnboarding} currentUser={currentUser} onClose={onClose} title={title} />
     );
   }
-
-  const isLoading = isFetchingUser || !user || member.id !== user.id;
 
   return (
     <Dialog

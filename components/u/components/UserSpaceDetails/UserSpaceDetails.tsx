@@ -51,12 +51,7 @@ export function UserSpaceDetails({ memberId }: Props) {
       ))}
 
       {editSpaceId && (
-        <MemberPropertiesDialog
-          title='Edit space profile'
-          onClose={() => setEditSpaceId(null)}
-          memberId={memberId}
-          spaceId={editSpaceId}
-        >
+        <MemberPropertiesDialog title='Edit space profile' onClose={() => setEditSpaceId(null)} spaceId={editSpaceId}>
           <MemberPropertiesForm
             memberId={memberId}
             spaceId={editSpaceId}
