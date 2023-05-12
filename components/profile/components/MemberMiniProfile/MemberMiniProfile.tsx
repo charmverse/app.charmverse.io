@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, DialogContent, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import OpenInFullIcon from '@mui/icons-material/Launch';
+import { Box, DialogContent, Divider, Grid, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -10,7 +10,6 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { DialogTitle } from 'components/common/Modal';
 import { MemberEmailForm } from 'components/members/MemberEmailForm';
 import { MemberPropertiesRenderer } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesRenderer';
 import UserDetails from 'components/profile/components/UserDetails/UserDetails';
