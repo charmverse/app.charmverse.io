@@ -51,10 +51,6 @@ export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> &
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>;
 
-export type MemberPropertyWithSpace = MemberProperty & {
-  space: Space;
-};
-
 export type MemberPropertyValuesBySpace = {
   spaceId: string;
   spaceName: string;

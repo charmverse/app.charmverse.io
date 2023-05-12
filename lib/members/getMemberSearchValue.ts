@@ -7,7 +7,7 @@ type UserData = User & {
   discordUser: DiscordUser | null;
 };
 
-export function getMemberSearchValue(userData: UserData): string {
+export function getMemberSearchValue(userData: UserData, memberProperties: Record<string, string>): string {
   const { profile, memberPropertyValues = [], telegramUser, discordUser } = userData;
 
   const discordAccountString =
@@ -25,9 +25,9 @@ export function getMemberSearchValue(userData: UserData): string {
   const propertyValuesString = memberPropertyValues
     .map((prop) => {
       if (Array.isArray(prop.value)) {
-        return prop.value.join(' ');
+        return prop.value.map((val) => memberProperties[val as string] || val).join(' ');
       }
-      return prop.value;
+      return typeof prop.value === 'string' ? memberProperties[prop.value] : prop.value;
     })
     .join(' ');
 
