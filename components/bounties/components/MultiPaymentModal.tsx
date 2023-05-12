@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import { getChainById } from 'connectors';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
@@ -35,7 +35,6 @@ import MultiPaymentButton from './MultiPaymentButton';
 export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] }) {
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
-  const modalProps = bindPopover(popupState);
   const { chainId } = useWeb3AuthSig();
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { importSafes } = useImportSafes();
@@ -49,6 +48,11 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
         popupState.close();
       }
     });
+
+  const closePopup = () => {
+    popupState.close();
+    setGnosisSafeData(null);
+  };
 
   const gnosisSafeAddress = gnosisSafeData?.address;
   const gnosisSafeChainId = gnosisSafeData?.chainId;
@@ -101,8 +105,8 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
         </div>
       </Tooltip>
       {!isDisabled && (
-        <Modal open={modalProps.open} size='large' onClose={modalProps.onClose}>
-          <DialogTitle onClose={popupState.close}>Pay Bount{transactions.length > 1 ? 'ies' : 'y'}</DialogTitle>
+        <Modal open={popupState.isOpen} size='large' onClose={closePopup}>
+          <DialogTitle onClose={closePopup}>Pay Bount{transactions.length > 1 ? 'ies' : 'y'}</DialogTitle>
           <Box mt={2}>
             {gnosisSafes && (
               <Box justifyContent='space-between' gap={2} alignItems='center' display='flex'>
