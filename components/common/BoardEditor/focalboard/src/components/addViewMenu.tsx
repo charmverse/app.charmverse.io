@@ -13,6 +13,8 @@ import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import charmClient from 'charmClient';
+import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import Button from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -45,6 +47,10 @@ function AddViewMenu(props: AddViewProps) {
   const intl = props.intl;
   const showView = props.showView;
 
+  const views = props.views.filter((view) => !view.fields.inline);
+  const viewIds =
+    props.board.fields.viewIds.length === views.length ? props.board.fields.viewIds : views.map((view) => view.id);
+
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-view-menu' });
 
   const boardText = intl.formatMessage({
@@ -60,7 +66,7 @@ function AddViewMenu(props: AddViewProps) {
     defaultMessage: 'Gallery'
   });
 
-  const handleAddViewBoard = useCallback(() => {
+  const handleAddViewBoard = useCallback(async () => {
     const { board, activeView } = props;
     Utils.log('addview-board');
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
@@ -73,7 +79,7 @@ function AddViewMenu(props: AddViewProps) {
 
     const oldViewId = activeView?.id;
 
-    mutator.insertBlock(
+    await mutator.insertBlock(
       view,
       'add view',
       async (block: Block) => {
@@ -88,10 +94,16 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    closePopup();
-  }, [props.activeView, props.board, props.intl, showView]);
 
-  const handleAddViewTable = useCallback(() => {
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, view.id] } },
+      publishIncrementalUpdate
+    );
+    closePopup();
+  }, [viewIds, props.activeView, props.board, props.intl, showView]);
+
+  const handleAddViewTable = useCallback(async () => {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
@@ -100,7 +112,7 @@ function AddViewMenu(props: AddViewProps) {
 
     const oldViewId = activeView?.id;
 
-    mutator.insertBlock(
+    await mutator.insertBlock(
       view,
       'add view',
       async (block: Block) => {
@@ -115,10 +127,17 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    closePopup();
-  }, [props.activeView, props.board, props.intl, showView]);
 
-  const handleAddViewGallery = useCallback(() => {
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, view.id] } },
+      publishIncrementalUpdate
+    );
+
+    closePopup();
+  }, [viewIds, props.activeView, props.board, props.intl, showView]);
+
+  const handleAddViewGallery = useCallback(async () => {
     const { board, activeView } = props;
 
     Utils.log('addview-gallery');
@@ -132,7 +151,7 @@ function AddViewMenu(props: AddViewProps) {
 
     const oldViewId = activeView?.id;
 
-    mutator.insertBlock(
+    await mutator.insertBlock(
       view,
       'add view',
       async (block: Block) => {
@@ -146,10 +165,15 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, view.id] } },
+      publishIncrementalUpdate
+    );
     closePopup();
-  }, [props.board, props.activeView, props.intl, showView]);
+  }, [viewIds, props.board, props.activeView, props.intl, showView]);
 
-  const handleAddViewCalendar = useCallback(() => {
+  const handleAddViewCalendar = useCallback(async () => {
     const { board, activeView } = props;
 
     Utils.log('addview-calendar');
@@ -180,7 +204,7 @@ function AddViewMenu(props: AddViewProps) {
       view.fields.dateDisplayPropertyId = template.id;
     }
 
-    mutator.insertBlock(
+    await mutator.insertBlock(
       view,
       'add view',
       async (block: Block) => {
@@ -194,8 +218,15 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
+
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, view.id] } },
+      publishIncrementalUpdate
+    );
+
     closePopup();
-  }, [props.board, props.activeView, props.intl, showView]);
+  }, [viewIds, props.board, props.activeView, props.intl, showView]);
 
   function onClickIcon(e: MouseEvent) {
     if (props.onClickIcon) {
