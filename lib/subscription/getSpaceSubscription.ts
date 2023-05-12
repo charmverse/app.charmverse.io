@@ -1,10 +1,8 @@
 import { prisma } from '@charmverse/core';
 import type { SubscriptionTier } from '@charmverse/core/prisma';
 
-import { NotFoundError } from 'lib/middleware';
-
+import type { SubscriptionUsage, SubscriptionPeriod } from './constants';
 import { stripeClient } from './stripe';
-import type { SubscriptionUsage, SubscriptionPeriod } from './utils';
 
 export type SpaceSubscription = {
   usage: SubscriptionUsage;
@@ -28,5 +26,5 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
 
   const subscription = await stripeClient.subscriptions.retrieve(space.subscriptionId);
 
-  return subscription.metadata as SpaceSubscription;
+  return subscription.metadata as unknown as SpaceSubscription;
 }

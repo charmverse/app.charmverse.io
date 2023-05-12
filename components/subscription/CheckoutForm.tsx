@@ -14,13 +14,13 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import {
   SUBSCRIPTION_USAGE,
   SUBSCRIPTION_USAGE_RECORD,
   type SubscriptionPeriod,
   type SubscriptionUsage
-} from 'lib/subscription/utils';
+} from 'lib/subscription/constants';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -38,7 +38,7 @@ export function CheckoutForm({
 }: {
   spaceSubscription: null | SpaceSubscription;
   onCancel: VoidFunction;
-  refetch: KeyedMutator<SpaceSubscription>;
+  refetch: KeyedMutator<SpaceSubscription | null>;
 }) {
   const stripe = useStripe();
   const elements = useElements();

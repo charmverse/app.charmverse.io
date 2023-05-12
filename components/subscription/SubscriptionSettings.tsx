@@ -12,7 +12,7 @@ import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
-import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/utils';
+import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/constants';
 
 import { CheckoutForm } from './CheckoutForm';
 

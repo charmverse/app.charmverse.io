@@ -1,30 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import type stripe from 'stripe';
 
-import {
-  InvalidStateError,
-  NotFoundError,
-  onError,
-  onNoMatch,
-  requireSpaceMembership,
-  requireUser
-} from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createSubscription } from 'lib/subscription/createSubscription';
-import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/utils';
-
-export type CreatePaymentSubscriptionRequest = {
-  spaceId: string;
-  paymentMethodId: string;
-  usage: SubscriptionUsage;
-  period: SubscriptionPeriod;
-};
-
-export type CreatePaymentSubscriptionResponse = {
-  clientSecret: string | null;
-  paymentIntentStatus: stripe.PaymentIntent.Status | null;
-};
+import type {
+  CreateProSubscriptionRequest,
+  CreateProSubscriptionResponse
+} from 'lib/subscription/createProSubscription';
+import { createProSubscription } from 'lib/subscription/createProSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,29 +16,12 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId' }))
   .post(createPaymentSubscription);
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreatePaymentSubscriptionResponse>) {
-  const { period, usage, paymentMethodId, spaceId } = req.body as CreatePaymentSubscriptionRequest;
+async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
+  const { period, usage, paymentMethodId, spaceId } = req.body as CreateProSubscriptionRequest;
 
-  const space = await prisma.space.findUnique({
-    where: { id: spaceId },
-    select: {
-      subscriptionId: true,
-      domain: true
-    }
-  });
-
-  if (!space) {
-    throw new NotFoundError('Space not found');
-  }
-
-  if (space.subscriptionId) {
-    throw new InvalidStateError('Space already has a subscription');
-  }
-
-  const { clientSecret, paymentIntentStatus } = await createSubscription({
+  const { clientSecret, paymentIntentStatus } = await createProSubscription({
     paymentMethodId,
     spaceId,
-    spaceDomain: space.domain,
     period,
     usage
   });

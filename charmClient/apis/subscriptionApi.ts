@@ -1,13 +1,13 @@
 import * as http from 'adapters/http';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
-  CreatePaymentSubscriptionRequest,
-  CreatePaymentSubscriptionResponse
-} from 'pages/api/subscription/subscribe';
+  CreateProSubscriptionRequest,
+  CreateProSubscriptionResponse
+} from 'lib/subscription/createProSubscription';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 export class SubscriptionApi {
-  createSubscription(payload: CreatePaymentSubscriptionRequest) {
-    return http.POST<CreatePaymentSubscriptionResponse>('/api/subscription/subscribe', payload);
+  createSubscription(payload: CreateProSubscriptionRequest) {
+    return http.POST<CreateProSubscriptionResponse>('/api/subscription/subscribe', payload);
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {

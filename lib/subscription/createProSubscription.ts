@@ -1,41 +1,66 @@
 import { prisma } from '@charmverse/core';
-import type { SubscriptionTier } from '@charmverse/core/prisma';
 import type Stripe from 'stripe';
 
-import { stripeClient } from './stripe';
-import type { SubscriptionPeriod, SubscriptionUsage } from './utils';
-import { SUBSCRIPTION_USAGE_RECORD } from './utils';
+import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
-export async function createSubscription({
+import type { SubscriptionPeriod, SubscriptionUsage } from './constants';
+import { SUBSCRIPTION_USAGE_RECORD } from './constants';
+import { stripeClient } from './stripe';
+
+export type CreateProSubscriptionRequest = {
+  spaceId: string;
+  paymentMethodId: string;
+  usage: SubscriptionUsage;
+  period: SubscriptionPeriod;
+};
+
+export type CreateProSubscriptionResponse = {
+  clientSecret: string | null;
+  paymentIntentStatus: Stripe.PaymentIntent.Status | null;
+};
+
+export async function createProSubscription({
   paymentMethodId,
   spaceId,
-  spaceDomain,
   period,
-  usage,
-  tier = 'pro'
+  usage
 }: {
   usage: SubscriptionUsage;
   paymentMethodId: string;
   spaceId: string;
-  spaceDomain: string;
   period: SubscriptionPeriod;
-  tier?: Exclude<SubscriptionTier, 'free'>;
 }) {
+  const space = await prisma.space.findUnique({
+    where: { id: spaceId },
+    select: {
+      subscriptionId: true,
+      domain: true
+    }
+  });
+
+  if (!space) {
+    throw new NotFoundError('Space not found');
+  }
+
+  if (space.subscriptionId) {
+    throw new InvalidStateError('Space already has a subscription');
+  }
+
   // Create a customer
   const customer = await stripeClient.customers.create({
-    name: `${spaceDomain} - ${spaceId}`,
+    name: `${space.domain} - ${spaceId}`,
     payment_method: paymentMethodId,
     invoice_settings: { default_payment_method: paymentMethodId }
   });
 
-  const product = await stripeClient.products.retrieve(`${tier}-${usage}-${period}`);
+  const product = await stripeClient.products.retrieve(`pro-${usage}-${period}`);
 
   // Create a subscription
   const subscription = await stripeClient.subscriptions.create({
     metadata: {
       usage,
       period,
-      tier
+      tier: 'pro'
     },
 
     customer: customer.id,
@@ -64,7 +89,7 @@ export async function createSubscription({
     },
     data: {
       subscriptionId: subscription.id,
-      paidTier: tier
+      paidTier: 'pro'
     }
   });
 
