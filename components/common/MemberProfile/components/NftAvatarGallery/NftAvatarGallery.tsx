@@ -6,8 +6,8 @@ import Stack from '@mui/material/Stack';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
 
-import NftGalleryItem from './NftGalleryItem';
-import EmptyAvatarGallery from './RenderEmptyAvatarGallery';
+import { EmptyAvatarGallery } from './EmptyAvatarGallery';
+import { NftGalleryItem } from './NftGalleryItem';
 
 const ProgressContainer = styled.div`
   position: absolute;

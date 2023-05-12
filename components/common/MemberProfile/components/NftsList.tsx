@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 
-import NftAvatarGalleryPopup from './NftAvatarGallery/NftAvatarGalleryPopup';
+import { NftAvatarGalleryPopup } from './NftAvatarGallery/NftAvatarGalleryPopup';
 import { ProfileItemContainer, NonPinnedItem } from './ProfileItemContainer';
 import { updateProfileItem } from './utils';
 

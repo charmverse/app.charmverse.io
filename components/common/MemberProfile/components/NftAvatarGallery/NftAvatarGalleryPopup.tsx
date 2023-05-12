@@ -18,7 +18,7 @@ type Props = {
   disableAutoSelectAvatarNft?: boolean;
 };
 
-export default function NftAvatarGalleryPopup({
+export function NftAvatarGalleryPopup({
   disableAutoSelectAvatarNft,
   onSelect,
   isVisible,
