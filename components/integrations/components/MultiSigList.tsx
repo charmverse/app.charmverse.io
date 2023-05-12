@@ -125,7 +125,7 @@ function SafeRow({ safe, updateWallets }: { safe: UserGnosisSafe; updateWallets:
   );
 
   return (
-    <TableRow key={safe.id}>
+    <TableRow key={safe.id} sx={safe.isHidden ? { opacity: 0.5 } : undefined}>
       <TableCell sx={{ pl: 0 }}>
         <Controller
           name='name'
