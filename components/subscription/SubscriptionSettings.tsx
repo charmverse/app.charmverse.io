@@ -12,7 +12,7 @@ import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
-import { SubscriptionUsageRecord } from 'lib/subscription/utils';
+import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/utils';
 
 import { CheckoutForm } from './CheckoutForm';
 
@@ -57,9 +57,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           <Stack>
             <InputLabel>Usage</InputLabel>
             <Stack>
-              <Typography>Blocks: 0/{SubscriptionUsageRecord[spaceSubscription.usage].totalBlocks}</Typography>
+              <Typography>Blocks: 0/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage].totalBlocks}</Typography>
               <Typography>
-                Members: {members.length}/{SubscriptionUsageRecord[spaceSubscription.usage].totalActiveUsers}
+                Members: {members.length}/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage].totalActiveUsers}
               </Typography>
             </Stack>
           </Stack>

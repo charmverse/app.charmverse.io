@@ -14,8 +14,13 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SpaceSubscription } from 'lib/subscription/interfaces';
-import { SubscriptionUsageRecord, type SubscriptionPeriod, type SubscriptionUsage } from 'lib/subscription/utils';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import {
+  SUBSCRIPTION_USAGE,
+  SUBSCRIPTION_USAGE_RECORD,
+  type SubscriptionPeriod,
+  type SubscriptionUsage
+} from 'lib/subscription/utils';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -41,8 +46,8 @@ export function CheckoutForm({
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
-  const [period, setPeriod] = useState<SubscriptionPeriod>(spaceSubscription?.period ?? 'monthly');
-  const [usage, setUsage] = useState<SubscriptionUsage>(spaceSubscription?.usage ?? 1);
+  const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
+  const [usage, setUsage] = useState<SubscriptionUsage>(1);
   const [cardEvent, setCardEvent] = useState<{
     cardNumber: StripeElementChangeEvent | null;
     cvc: StripeElementChangeEvent | null;
@@ -130,14 +135,12 @@ export function CheckoutForm({
             aria-label='usage'
             valueLabelDisplay='off'
             value={usage}
-            marks={Object.keys(SubscriptionUsageRecord).map((_usage) => ({
-              value: Number(_usage),
-              label: `$${SubscriptionUsageRecord[parseInt(_usage) as SubscriptionUsage].pricing[period]}/${
-                period === 'annual' ? 'yr' : 'mo'
-              }`
+            marks={SUBSCRIPTION_USAGE.map((_usage) => ({
+              value: _usage,
+              label: `$${SUBSCRIPTION_USAGE_RECORD[_usage].pricing[period]}/${period === 'annual' ? 'yr' : 'mo'}`
             }))}
-            min={Object.keys(SubscriptionUsageRecord).map(Number)[0]}
-            max={Object.keys(SubscriptionUsageRecord).map(Number)[Object.keys(SubscriptionUsageRecord).length - 1]}
+            min={SUBSCRIPTION_USAGE[0]}
+            max={SUBSCRIPTION_USAGE[SUBSCRIPTION_USAGE.length - 1]}
             onChange={(_, value) => {
               setUsage(value as SubscriptionUsage);
             }}
@@ -235,10 +238,10 @@ export function CheckoutForm({
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>
-      <Typography>Paid plan: ${SubscriptionUsageRecord[usage].pricing[period]}/mo</Typography>
+      <Typography>Paid plan: ${SUBSCRIPTION_USAGE_RECORD[usage].pricing[period]}/mo</Typography>
       <StyledList>
-        <StyledListItemText>{SubscriptionUsageRecord[usage].totalBlocks} blocks</StyledListItemText>
-        <StyledListItemText>{SubscriptionUsageRecord[usage].totalActiveUsers} Active users</StyledListItemText>
+        <StyledListItemText>{SUBSCRIPTION_USAGE_RECORD[usage].totalBlocks} blocks</StyledListItemText>
+        <StyledListItemText>{SUBSCRIPTION_USAGE_RECORD[usage].totalActiveUsers} Active users</StyledListItemText>
         <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
       </StyledList>
       <Stack gap={1} display='flex' flexDirection='row'>

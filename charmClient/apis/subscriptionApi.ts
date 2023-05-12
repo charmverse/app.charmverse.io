@@ -1,5 +1,5 @@
 import * as http from 'adapters/http';
-import type { SpaceSubscription } from 'lib/subscription/interfaces';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
   CreatePaymentSubscriptionRequest,
   CreatePaymentSubscriptionResponse
@@ -11,6 +11,6 @@ export class SubscriptionApi {
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {
-    return http.GET<SpaceSubscription>(`/api/spaces/${spaceId}/subscription`);
+    return http.GET<SpaceSubscription | null>(`/api/spaces/${spaceId}/subscription`);
   }
 }

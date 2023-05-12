@@ -1,16 +1,19 @@
 import { prisma } from '@charmverse/core';
-import Stripe from 'stripe';
+import type { SubscriptionTier } from '@charmverse/core/prisma';
 
 import { NotFoundError } from 'lib/middleware';
 
-import type { SpaceSubscription } from './interfaces';
+import { stripeClient } from './stripe';
+import type { SubscriptionUsage, SubscriptionPeriod } from './utils';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2022-11-15'
-});
+export type SpaceSubscription = {
+  usage: SubscriptionUsage;
+  tier: SubscriptionTier;
+  period: SubscriptionPeriod;
+};
 
 export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
-  const space = await prisma.space.findUnique({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     },
@@ -19,15 +22,11 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
     }
   });
 
-  if (!space) {
-    throw new NotFoundError('Space not found');
-  }
-
   if (!space.subscriptionId) {
     return null;
   }
 
-  const subscription = await stripe.subscriptions.retrieve(space.subscriptionId);
+  const subscription = await stripeClient.subscriptions.retrieve(space.subscriptionId);
 
   return subscription.metadata as SpaceSubscription;
 }

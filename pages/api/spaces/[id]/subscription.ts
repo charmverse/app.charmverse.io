@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import type { SpaceSubscription } from 'lib/subscription/interfaces';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

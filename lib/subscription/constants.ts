@@ -1,8 +1,9 @@
-export type SubscriptionUsage = 1 | 2 | 3 | 4 | 5;
+export const SUBSCRIPTION_USAGE = [1, 2, 3, 4, 5] as const;
+export type SubscriptionUsage = (typeof SUBSCRIPTION_USAGE)[number];
 
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
-export const SubscriptionUsageRecord: Record<
+export const SUBSCRIPTION_USAGE_RECORD: Record<
   SubscriptionUsage,
   {
     totalBlocks: number;

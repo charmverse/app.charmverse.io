@@ -1,14 +1,10 @@
-import { SubscriptionUsageRecord } from 'lib/subscription/utils';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2022-11-15'
-});
+import { stripeClient } from 'lib/subscription/stripe';
+import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/utils';
 
 async function createStripeProducts() {
-  for (const usage of Object.keys(SubscriptionUsageRecord)) {
+  for (const usage of Object.keys(SUBSCRIPTION_USAGE_RECORD)) {
     for (const period of ["monthly", 'annual']) {
-      await stripe.products.create({
+      await stripeClient.products.create({
         name: `Pro - ${usage} - ${period} Subscription`,
         id: `pro-${usage}-${period}`,
       })
