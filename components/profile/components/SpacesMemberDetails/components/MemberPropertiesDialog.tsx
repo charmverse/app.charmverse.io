@@ -1,23 +1,26 @@
 import { useTheme } from '@emotion/react';
-import { Box, Dialog, DialogContent, Divider, Stack, useMediaQuery } from '@mui/material';
+import { Box, DialogContent, Divider, Stack, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
+import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
 
-import { NftsList } from '../../MemberMiniProfile/BlockchainData/NftsList';
-import { OrgsList } from '../../MemberMiniProfile/BlockchainData/OrgsList';
-import { PoapsList } from '../../MemberMiniProfile/BlockchainData/PoapsList';
+import { NftsList } from '../../MemberMiniProfile/components/NftsList';
+import { OrgsList } from '../../MemberMiniProfile/components/OrgsList';
+import { PoapsList } from '../../MemberMiniProfile/components/PoapsList';
 
 type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
@@ -125,7 +128,7 @@ export function MemberProperties({ spaceId, updateMemberPropertyValues, showBloc
   );
 }
 
-export function MemberPropertiesPopup({
+export function MemberPropertiesDialog({
   children,
   memberId,
   spaceId,
@@ -151,7 +154,7 @@ export function MemberPropertiesPopup({
   );
 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
   const { mutateMembers } = useMembers();
 
   function onClickClose() {
@@ -161,22 +164,30 @@ export function MemberPropertiesPopup({
     mutate();
   }
 
+  if (!spaceId) {
+    return null;
+  }
+
   return (
-    <Dialog open={!!spaceId} onClose={onClickClose} fullScreen={fullScreen} fullWidth>
-      {!data || isFetchingSpaceProperties || isLoading ? (
-        <DialogContent>
-          <LoadingComponent isLoading />
-        </DialogContent>
-      ) : (
-        <>
-          <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
-            {title}
-          </DialogTitle>
-          <DialogContent dividers sx={{ pb: 6 }}>
-            {children}
-          </DialogContent>
-        </>
-      )}
+    <Dialog onClose={onClickClose}>
+      <ScrollableWindow>
+        <Container fullWidth={fullWidth}>
+          {!data || isFetchingSpaceProperties || isLoading ? (
+            <DialogContent>
+              <LoadingComponent isLoading />
+            </DialogContent>
+          ) : (
+            <>
+              <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
+                {title}
+              </DialogTitle>
+              <DialogContent dividers sx={{ pb: 6 }}>
+                {children}
+              </DialogContent>
+            </>
+          )}
+        </Container>
+      </ScrollableWindow>
     </Dialog>
   );
 }

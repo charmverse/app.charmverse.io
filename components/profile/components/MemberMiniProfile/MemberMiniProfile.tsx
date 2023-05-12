@@ -1,9 +1,13 @@
-import { Box, Dialog, DialogContent, Stack, Typography, useMediaQuery } from '@mui/material';
+import styled from '@emotion/styled';
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import { Box, DialogContent, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
@@ -18,15 +22,19 @@ import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
-import { MemberProperties, MemberPropertiesPopup } from '../SpacesMemberDetails/components/MemberPropertiesPopup';
+import { MemberProperties, MemberPropertiesDialog } from '../SpacesMemberDetails/components/MemberPropertiesDialog';
 import UserDetailsMini from '../UserDetails/UserDetailsMini';
 
-import { NftsList } from './BlockchainData/NftsList';
-import { OrgsList } from './BlockchainData/OrgsList';
-import { PoapsList } from './BlockchainData/PoapsList';
+import { NftsList } from './components/NftsList';
+import { OrgsList } from './components/OrgsList';
+import { PoapsList } from './components/PoapsList';
 
 type Step = 'email_step' | 'profile_step';
 
+const ContentContainer = styled(Container)`
+  width: 100%;
+  margin-bottom: 0;
+`;
 function CurrentMemberProfile({
   currentUser,
   title = 'Edit your profile',
@@ -63,7 +71,7 @@ function CurrentMemberProfile({
   }
 
   return (
-    <MemberPropertiesPopup memberId={currentUser.id} onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
+    <MemberPropertiesDialog memberId={currentUser.id} onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
       {currentStep === 'email_step' ? (
         <MemberEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
@@ -84,7 +92,7 @@ function CurrentMemberProfile({
           />
         </>
       ) : null}
-    </MemberPropertiesPopup>
+    </MemberPropertiesDialog>
   );
 }
 
@@ -100,7 +108,7 @@ function MemberProfile({
   onClose: VoidFunction;
 }) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
   const { user: currentUser } = useUser();
   const currentSpace = useCurrentSpace();
 
@@ -124,48 +132,52 @@ function MemberProfile({
   }
 
   return (
-    <Dialog open onClose={onClose} fullScreen={fullScreen}>
+    <Dialog
+      onClose={onClose}
+      fullWidth={fullWidth}
+      toolbar={
+        <Button
+          size='small'
+          color='secondary'
+          href={`/u/${user?.path}`}
+          onClick={onClose}
+          variant='text'
+          target='_blank'
+          startIcon={<OpenInFullIcon fontSize='small' />}
+        >
+          View full profile
+        </Button>
+      }
+    >
       {isFetchingUser || !user || member.id !== user.id ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
       ) : (
-        <>
-          <DialogTitle
-            sx={{ '&&': { px: 2, py: 2 }, display: 'flex', justifyContent: 'space-between' }}
-            onClose={onClose}
-          >
-            <Stack display='flex' flexDirection='row' width='100%' alignItems='center' justifyContent='space-between'>
-              <Typography variant='h6'>{member.username}'s profile</Typography>
-              <Button
-                onClick={onClose}
-                href={`/u/${user.path}`}
-                color='secondary'
-                variant='outlined'
-                sx={{
-                  mx: 1
-                }}
-              >
-                View full profile
-              </Button>
-            </Stack>
-          </DialogTitle>
-          <DialogContent dividers>
-            <UserDetailsMini user={user} readOnly />
-            <Legend mt={4}>Member details</Legend>
-            {currentSpacePropertyValues && (
-              <Box my={3}>
-                <MemberPropertiesRenderer properties={currentSpacePropertyValues.properties} />
+        <ContentContainer top={20}>
+          <UserDetailsMini user={user} readOnly />
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <Legend mt={4} mb={3}>
+                {currentSpace?.name} details
+              </Legend>
+              <MemberPropertiesRenderer properties={currentSpacePropertyValues?.properties ?? []} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <Legend mt={4} mb={3}>
+                  &nbsp;
+                </Legend>
               </Box>
-            )}
-
-            <Stack gap={3}>
-              <NftsList memberId={user.id} readOnly />
-              <OrgsList memberId={user.id} readOnly />
-              <PoapsList memberId={user.id} />
-            </Stack>
-          </DialogContent>
-        </>
+              <Stack gap={3}>
+                <Divider sx={{ display: { xs: 'block', md: 'none' } }} />
+                <NftsList memberId={user.id} readOnly />
+                <OrgsList memberId={user.id} readOnly />
+                <PoapsList memberId={user.id} />
+              </Stack>
+            </Grid>
+          </Grid>
+        </ContentContainer>
       )}
     </Dialog>
   );

@@ -55,7 +55,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
         (isFetchingOrgs ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
             {pinnedOrgs
               .sort((org1, org2) => (org1.name > org2.name ? 1 : -1))
               .map((pinnedOrg) => {
@@ -78,7 +78,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                 );
               })}
             {currentUser?.id === memberId && emptyOrgsCount !== 0 ? (
-              <Tooltip title='Add upto 5 orgs'>
+              <Tooltip title='Add up to 5 orgs'>
                 <div>
                   <NonPinnedItem
                     onClick={() => {

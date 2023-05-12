@@ -5,8 +5,8 @@ import { useState } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import {
   MemberProperties,
-  MemberPropertiesPopup
-} from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
+  MemberPropertiesDialog
+} from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesDialog';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import Legend from 'components/settings/Legend';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
@@ -52,14 +52,14 @@ export function SpacesMemberDetails({ memberId }: Props) {
       ))}
 
       {editSpaceId && (
-        <MemberPropertiesPopup
+        <MemberPropertiesDialog
           title='Edit space profile'
           onClose={() => setEditSpaceId(null)}
           memberId={memberId}
           spaceId={editSpaceId}
         >
           <MemberProperties memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={updateSpaceValues} />
-        </MemberPropertiesPopup>
+        </MemberPropertiesDialog>
       )}
     </Box>
   );

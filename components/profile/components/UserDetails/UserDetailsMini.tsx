@@ -59,7 +59,7 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
-    <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3} sx={sx}>
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={sx}>
       <Avatar name={user.username} image={user.avatar} variant='circular' canSetNft isNft={hasNftAvatar(user)} />
       <Grid container direction='column' spacing={0.5}>
         <Grid item>

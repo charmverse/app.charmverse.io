@@ -48,7 +48,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
