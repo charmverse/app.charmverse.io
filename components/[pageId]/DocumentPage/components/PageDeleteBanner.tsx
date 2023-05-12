@@ -36,7 +36,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
     if (space) {
       await router.push(
         `/${router.query.domain}/${
-          Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path
+          Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path
         }`
       );
       await charmClient.deletePage(pageId);

@@ -90,7 +90,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
-      (p) => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board')
+      (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board')
     ).length;
 
     if (page && user && currentSpace) {

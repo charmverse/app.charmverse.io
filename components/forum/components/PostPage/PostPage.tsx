@@ -10,7 +10,7 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { CommentSort } from 'components/common/comments/CommentSort';

@@ -7,27 +7,32 @@ import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/com
 import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(listPostCommentsHandler).use(requireUser).post(createPostCommentHandler);
+handler
+  .use(
+    providePermissionClients({
+      key: 'postId',
+      location: 'query',
+      resourceIdType: 'post'
+    })
+  )
+  .get(listPostCommentsHandler)
+  .use(requireUser)
+  .post(createPostCommentHandler);
 
 async function listPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
   const { postId } = req.query as any as { postId: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await getPermissionsClient({
+  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
     resourceId: postId,
-    resourceIdType: 'post'
-  }).then(({ forum }) =>
-    forum.computePostPermissions({
-      resourceId: postId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissions.view_post) {
     throw new ActionNotPermittedError(`You cannot view this post`);
@@ -52,15 +57,10 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PostNotFoundError(postId);
   }
 
-  const permissions = await getPermissionsClient({
+  const permissions = await req.basePermissionsClient.forum.computePostPermissions({
     resourceId: postId,
-    resourceIdType: 'post'
-  }).then(({ forum }) =>
-    forum.computePostPermissions({
-      resourceId: postId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissions.add_comment) {
     throw new ActionNotPermittedError(`You cannot view this post`);

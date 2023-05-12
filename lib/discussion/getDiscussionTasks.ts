@@ -4,8 +4,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
-import { getUserProposalsBySpace } from 'lib/proposal/getProposalsBySpace';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
 import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
@@ -629,21 +628,19 @@ export async function getProposalDiscussionTasks({
   spaceRecord,
   username
 }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-  let proposals: ProposalDiscussionNotificationsContext['proposals'] = [];
+  const proposals: ProposalDiscussionNotificationsContext['proposals'] = [];
   for (const spaceId of spaceIds) {
-    const accessibleCategories = await getAccessibleProposalCategories({
-      userId,
-      spaceId
-    });
+    const userProposals = (await getPermissionsClient({ resourceId: spaceId, resourceIdType: 'space' }).then(
+      ({ client }) =>
+        client.proposals.getAccessibleProposals({
+          userId,
+          spaceId,
+          includePage: true,
+          onlyAssigned: true
+        })
+    )) as ProposalWithCommentsAndUsers[];
 
-    const userProposals = (await getUserProposalsBySpace({
-      spaceId,
-      userId,
-      categoryIds: accessibleCategories.map((c) => c.id),
-      includePage: true
-    })) as ProposalWithCommentsAndUsers[];
-
-    proposals = [...proposals, ...userProposals];
+    proposals.push(...userProposals);
   }
 
   const context: ProposalDiscussionNotificationsContext = { userId, username, spaceRecord, proposals };

@@ -29,8 +29,8 @@ const StyledMenuButton = styled(ListItemButton, { shouldForwardProp: (prop) => p
   }
 
   ${(props) => props.theme.breakpoints.down('md')} {
-    min-width: 38px;
-    min-height: 40px;
+    min-width: 40px;
+    min-height: 46px;
     justify-content: center;
   }
 `;

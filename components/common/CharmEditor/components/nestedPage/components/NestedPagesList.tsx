@@ -34,7 +34,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     () =>
       Object.values(pages)
         .filter(isTruthy)
-        .filter((page) => page.deletedAt === null && linkablePageTypes.includes(page.type)),
+        .filter((page) => !page.deletedAt && linkablePageTypes.includes(page.type)),
     [pages]
   );
 

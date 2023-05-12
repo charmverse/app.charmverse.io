@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
@@ -16,6 +15,7 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
@@ -35,11 +35,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import ProposalProperties from './components/ProposalProperties';
-
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
+import { ProposalProperties } from './components/ProposalProperties';
 
 export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props} />)<{
   top: number;
@@ -234,6 +230,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{
                     minHeight: proposalId ? '100px' : 'unset'
@@ -293,6 +290,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           pageId={page.id}
                           proposalId={proposalId}
                           pagePermissions={pagePermissions}
+                          snapshotProposalId={page.snapshotProposalId}
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}

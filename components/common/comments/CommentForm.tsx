@@ -2,7 +2,7 @@ import { Stack, Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';

@@ -8,7 +8,6 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
@@ -42,7 +41,7 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
     const computed = await getPermissionsClient({
       resourceId: postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: postId,
         userId
@@ -97,10 +96,15 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     : null;
   // User must be proposal author or a space admin to create a poll
   if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
-    const permissions = await computeProposalPermissions({
+    const permissions = await getPermissionsClient({
       resourceId: existingPage.proposalId,
-      userId
-    });
+      resourceIdType: 'proposal'
+    }).then(({ client }) =>
+      client.proposals.computeProposalPermissions({
+        resourceId: existingPage.proposalId as string,
+        userId
+      })
+    );
 
     if (!permissions.create_vote) {
       throw new UnauthorisedActionError(

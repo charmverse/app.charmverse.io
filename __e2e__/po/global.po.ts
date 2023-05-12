@@ -15,6 +15,10 @@ export class GlobalPage {
     this.openAsPageButton = page.locator('data-test=open-as-page');
   }
 
+  async goToHomePage(domain?: string) {
+    await this.page.goto(`${baseUrl}${domain ? `/${domain}` : ''}`);
+  }
+
   getSidebarLink(path: string) {
     return this.page.locator(`data-test=sidebar-link-${path}`);
   }

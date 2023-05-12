@@ -34,7 +34,7 @@ export async function deletePostComment({
   if (postComment.post.category) {
     trackUserAction('delete_comment', {
       categoryName: postComment.post.category.name,
-      commentedOn: postComment.parentId === null ? 'post' : 'comment',
+      commentedOn: !postComment.parentId ? 'post' : 'comment',
       postId: postComment.post.id,
       resourceId: commentId,
       spaceId: postComment.post.spaceId,

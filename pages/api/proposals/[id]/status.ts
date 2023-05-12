@@ -4,8 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';

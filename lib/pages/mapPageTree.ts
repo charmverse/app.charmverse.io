@@ -65,7 +65,7 @@ export function reducePagesToPageTree<T extends PageNode = PageNode>({
       parentNode.children = sortNodes(parentNode.children);
     }
     // If it's a root page always show it
-    else if (node.parentId === null && !rootPageIds && includableNode(node)) {
+    else if (!node.parentId && !rootPageIds && includableNode(node)) {
       roots.push(node);
     }
     // parent may be undefined if user has no access to it

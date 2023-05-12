@@ -170,7 +170,7 @@ describe('computeUserPagePermissions', () => {
         resourceId: inexistentPageId,
         userId: user.id
       })
-    ).rejects.toBeInstanceOf(PageNotFoundError);
+    ).rejects.toMatchObject(new PageNotFoundError(inexistentPageId));
   });
 
   it('should return only public permissions if no user is provided', async () => {
