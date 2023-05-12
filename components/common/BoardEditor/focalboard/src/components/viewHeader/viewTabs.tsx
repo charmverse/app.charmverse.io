@@ -27,6 +27,8 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
+import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -228,11 +230,16 @@ function ViewTabs(props: ViewTabsProps) {
     setViewMenuAnchorEl(null);
     const nextViewId = viewIds.find((viewId) => viewId !== dropdownView.id);
     await mutator.deleteBlock(dropdownView, 'delete view');
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: viewIds.filter((viewId) => viewId !== dropdownView.id) } },
+      publishIncrementalUpdate
+    );
     onDeleteView?.(dropdownView.id);
     if (nextViewId) {
       showView(nextViewId);
     }
-  }, [viewIds, dropdownView, showView]);
+  }, [viewIds, dropdownView, showView, board.id]);
 
   function resyncGoogleFormData() {
     if (dropdownView) {
