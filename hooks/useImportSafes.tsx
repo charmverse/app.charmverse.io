@@ -15,9 +15,12 @@ export default function useImportSafes() {
   const { showMessage } = useSnackbar();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
-  const getWalletName = (address: string) => {
-    return data?.find((wallet) => wallet.address === address)?.name;
-  };
+  const getWalletDetails = useCallback(
+    (address: string) => {
+      return data?.find((wallet) => wallet.address === address);
+    },
+    [data]
+  );
 
   const importSafes = useCallback(async () => {
     if (gnosisSigner && user) {
@@ -26,7 +29,7 @@ export default function useImportSafes() {
         const safesCount = await importSafesFromWallet({
           signer: gnosisSigner,
           addresses: user.wallets.map((w) => w.address),
-          getWalletName
+          getWalletDetails
         });
 
         if (!safesCount) {
@@ -41,7 +44,7 @@ export default function useImportSafes() {
         setIsLoadingSafes(false);
       }
     }
-  }, [gnosisSigner, user]);
+  }, [gnosisSigner, user, getWalletDetails]);
 
   return { isLoadingSafes, importSafes };
 }
