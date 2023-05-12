@@ -57,12 +57,13 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
+  const notifications: (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[] = [];
+
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
-  const notifications = await activeUsersWithSafes.reduce(async (acc, user) => {
+  for (const user of activeUsersWithSafes) {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const accPromise = await acc;
     const discussionTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
@@ -105,21 +106,18 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
         forumTasks.unmarked.length
     });
 
-    return [
-      ...accPromise,
-      {
-        user: user as PendingTasksProps['user'],
-        totalTasks,
-        // Get only the unmarked discussion tasks
-        discussionTasks: discussionTasks.unmarked,
-        voteTasks: voteTasksNotSent,
-        proposalTasks,
-        unmarkedWorkspaceEvents,
-        bountyTasks: bountyTasks.unmarked,
-        forumTasks: forumTasks.unmarked
-      }
-    ];
-  }, Promise.resolve([] as (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]));
+    notifications.push({
+      user: user as PendingTasksProps['user'],
+      totalTasks,
+      // Get only the unmarked discussion tasks
+      discussionTasks: discussionTasks.unmarked,
+      voteTasks: voteTasksNotSent,
+      proposalTasks,
+      unmarkedWorkspaceEvents,
+      bountyTasks: bountyTasks.unmarked,
+      forumTasks: forumTasks.unmarked
+    });
+  }
 
   return notifications.filter((notification) => notification.totalTasks > 0);
 }
