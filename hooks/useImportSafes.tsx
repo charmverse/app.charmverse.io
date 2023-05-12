@@ -26,15 +26,11 @@ export default function useImportSafes() {
     if (gnosisSigner && user) {
       setIsLoadingSafes(true);
       try {
-        const safesCount = await importSafesFromWallet({
+        await importSafesFromWallet({
           signer: gnosisSigner,
           addresses: user.wallets.map((w) => w.address),
           getWalletDetails
         });
-
-        if (!safesCount) {
-          showMessage('You do not have any gnosis wallets', 'warning');
-        }
         await mutate();
       } catch (e) {
         log.error('Error importing safes', e);
