@@ -39,26 +39,31 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
 
   useEffect(() => {
     function handleUpdateEvent(value: WebSocketPayload<'pages_meta_updated'>) {
-      mutate((_page): PageWithContent | undefined => {
-        if (_page) {
-          for (let i = 0; i < value.length; i++) {
-            if (value[i].id === pageWithContent?.id) {
-              return {
-                ..._page,
-                ...(value[i] as PageMeta)
-              };
+      mutate(
+        (_page): PageWithContent | undefined => {
+          if (_page) {
+            for (let i = 0; i < value.length; i++) {
+              if (value[i].id === _page.id) {
+                return {
+                  ..._page,
+                  ...(value[i] as PageMeta)
+                };
+              }
             }
           }
+          return _page;
+        },
+        {
+          revalidate: false
         }
-        return _page;
-      });
+      );
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
     };
-  }, []);
+  }, [mutate]);
 
   if (pageWithContent) {
     return {
