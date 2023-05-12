@@ -6,7 +6,8 @@ import {
   ContentCopy as DuplicateIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { Typography, Box } from '@mui/material';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Typography, Box, Stack } from '@mui/material';
 import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -33,6 +34,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 
+import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import AddViewMenu from '../addViewMenu';
@@ -70,6 +72,38 @@ interface ViewTabsProps {
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
+}
+
+function ViewMenuItem({
+  view,
+  onClick,
+  onDrop,
+  href
+}: {
+  href: string;
+  onDrop: (currentView: BoardView, droppedView: BoardView) => void;
+  view: BoardView;
+  onClick: VoidFunction;
+}) {
+  const [isDragging, isOver, columnRef] = useSortable('view', view, true, onDrop);
+  return (
+    <Stack
+      ref={columnRef}
+      sx={{
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row'
+      }}
+    >
+      <MenuItem onClick={onClick} href={href} component={Link} key={view.id} dense className={isOver ? 'dragover' : ''}>
+        <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+        <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+      </MenuItem>
+    </Stack>
+  );
 }
 
 function ViewTabs(props: ViewTabsProps) {
@@ -319,20 +353,17 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       <Menu {...showViewsMenuState}>
-        {restViews.map((view) => (
-          <MenuItem
+        {views.map((view) => (
+          <ViewMenuItem
+            view={view}
+            key={view.id}
+            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
             onClick={() => {
               showView(view.id);
               showViewsMenuState.onClose();
             }}
-            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
-            component={Link}
-            key={view.id}
-            dense
-          >
-            <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-            <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-          </MenuItem>
+            onDrop={(currentView, droppedView) => {}}
+          />
         ))}
         <Divider sx={{ my: 1 }} />
         <Box pl='14px'>
