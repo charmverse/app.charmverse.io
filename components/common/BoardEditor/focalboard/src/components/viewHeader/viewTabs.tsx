@@ -72,6 +72,7 @@ interface ViewTabsProps {
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
+  viewIds: string[];
 }
 
 function ViewMenuItem({
@@ -81,7 +82,7 @@ function ViewMenuItem({
   href
 }: {
   href: string;
-  onDrop: (currentView: BoardView, droppedView: BoardView) => void;
+  onDrop: (currentView: BoardView, dropzoneView: BoardView) => void;
   view: BoardView;
   onClick: VoidFunction;
 }) {
@@ -97,7 +98,15 @@ function ViewMenuItem({
         flexDirection: 'row'
       }}
     >
-      <MenuItem onClick={onClick} href={href} component={Link} key={view.id} dense className={isOver ? 'dragover' : ''}>
+      <MenuItem
+        onClick={onClick}
+        href={href}
+        component={Link}
+        key={view.id}
+        dense
+        className={isOver ? 'dragover' : ''}
+        sx={{ width: '100%' }}
+      >
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
         <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
@@ -129,6 +138,8 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
+  const viewIds = props.viewIds.length !== 0 ? props.viewIds : views.map((view) => view.id);
+
   // Find the index of the current view
   const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
@@ -142,6 +153,12 @@ function ViewTabs(props: ViewTabsProps) {
     restViews = restViews.filter((restView) => restView.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
+
+  const viewsRecord = viewsProp.reduce((acc, view) => {
+    acc[view.id] = view;
+    return acc;
+  }, {} as Record<string, BoardView>);
+
   // make sure active view id is visible or the value for Tabs will be invalid
   // during transition between boards, there is a period where activeView has not caught up with the new views
   const activeShowViewId =
@@ -242,6 +259,10 @@ function ViewTabs(props: ViewTabsProps) {
       mutator.changeTitle(dropdownView.id, dropdownView.title, form.title);
       renameViewPopupState.close();
     }
+  }
+
+  async function reorderViews(droppedView: BoardView, dropzoneView: BoardView) {
+    await mutator.changeBoardViewsOrder(board.id, viewIds, droppedView, dropzoneView);
   }
 
   const duplicateViewText = intl.formatMessage({
@@ -353,18 +374,21 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       <Menu {...showViewsMenuState}>
-        {views.map((view) => (
-          <ViewMenuItem
-            view={view}
-            key={view.id}
-            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
-            onClick={() => {
-              showView(view.id);
-              showViewsMenuState.onClose();
-            }}
-            onDrop={(currentView, droppedView) => {}}
-          />
-        ))}
+        {viewIds.map(
+          (viewId) =>
+            viewsRecord[viewId] && (
+              <ViewMenuItem
+                view={viewsRecord[viewId]}
+                key={viewsRecord[viewId].id}
+                href={disableUpdatingUrl ? '' : getViewUrl(viewsRecord[viewId].id)}
+                onClick={() => {
+                  showView(viewsRecord[viewId].id);
+                  showViewsMenuState.onClose();
+                }}
+                onDrop={reorderViews}
+              />
+            )
+        )}
         <Divider sx={{ my: 1 }} />
         <Box pl='14px'>
           {activeView && (
