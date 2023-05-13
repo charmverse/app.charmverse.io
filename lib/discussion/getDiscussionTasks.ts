@@ -587,7 +587,7 @@ async function getPageMentions({
   }
 
   for (const spaceId of spaceIds) {
-    const pages = await prisma.page.findMany({
+    let pages = await prisma.page.findMany({
       where: {
         spaceId,
         deletedAt: null
@@ -603,11 +603,11 @@ async function getPageMentions({
         spaceId: true
       }
     });
-    for (let page of pages) {
+    for (const page of pages) {
       extractMentionsFromPage(page);
-      // Make page eligible for garbage collection
-      page = null as any;
     }
+    // Make page eligible for garbage collection
+    pages = null as any;
   }
 
   return {
@@ -618,7 +618,6 @@ async function getPageMentions({
 }
 
 // utils
-
 function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
