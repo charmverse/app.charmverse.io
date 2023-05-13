@@ -16,17 +16,17 @@ import { updateProfileItem } from './utils';
 
 const totalShownOrgs = 5;
 
-type Props = { memberId: string; readOnly?: boolean };
+type Props = { userId: string; readOnly?: boolean };
 
-export function OrgsList({ memberId, readOnly = false }: Props) {
+export function OrgsList({ userId, readOnly = false }: Props) {
   const { user: currentUser } = useUser();
   const {
     data: orgs = [],
     mutate: mutateOrgs,
     isLoading: isFetchingOrgs,
     error
-  } = useSWRImmutable(`/orgs/${memberId}`, () => {
-    return charmClient.profile.getOrgs(memberId);
+  } = useSWRImmutable(`/orgs/${userId}`, () => {
+    return charmClient.profile.getOrgs(userId);
   });
 
   const pinnedOrgs = orgs.filter((org) => org.isPinned);
@@ -73,7 +73,7 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
                   </ProfileItemContainer>
                 );
               })}
-            {currentUser?.id === memberId && emptyOrgsCount !== 0 ? (
+            {currentUser?.id === userId && emptyOrgsCount !== 0 ? (
               <Tooltip title='Add up to 5 orgs'>
                 <div>
                   <NonPinnedItem

@@ -13,13 +13,13 @@ import AggregatedData from './components/AggregatedData';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
-import type { UserDetailsProps } from './components/UserDetails/UserDetails';
-import UserDetails from './components/UserDetails/UserDetails';
-import { UserDetailsMini } from './components/UserDetails/UserDetailsMini';
+import type { UserDetailsProps } from './components/UserDetails/UserDetailsForm';
+import { UserDetailsForm } from './components/UserDetails/UserDetailsForm';
+import { UserDetailsReadonly } from './components/UserDetails/UserDetailsReadonly';
 import { isPublicUser } from './components/UserDetails/utils';
-import { UserSpaceDetails } from './components/UserSpaceDetails/UserSpaceDetails';
+import { UserSpacesList } from './components/UserSpacesList/UserSpacesList';
 
-export function PublicProfile(props: UserDetailsProps) {
+export function PublicProfile(props: UserDetailsProps & { readOnly?: boolean }) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
@@ -157,8 +157,8 @@ export function PublicProfile(props: UserDetailsProps) {
   const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
     <Box>
-      {readOnly ? <UserDetailsMini {...props} /> : <UserDetails {...props} />}
-      <UserSpaceDetails memberId={user.id} />
+      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsForm {...props} />}
+      <UserSpacesList userId={user.id} />
       {readOnly && (
         <AggregatedData
           totalBounties={data?.bounties}

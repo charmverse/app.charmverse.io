@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 
-import type { UserDetailsProps } from '../UserDetails';
+import type { UserDetailsProps } from '../UserDetailsForm';
 
 export const useUserDetails = ({ updateUser }: Pick<UserDetailsProps, 'updateUser'> = {}) => {
   const [isSaving, setIsSaving] = useState(false);

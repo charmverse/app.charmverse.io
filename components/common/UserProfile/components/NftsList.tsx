@@ -16,9 +16,9 @@ import { updateProfileItem } from './utils';
 
 const totalShownNfts = 5;
 
-type Props = { memberId: string; readOnly?: boolean };
+type Props = { userId: string; readOnly?: boolean };
 
-export function NftsList({ memberId, readOnly = false }: Props) {
+export function NftsList({ userId, readOnly = false }: Props) {
   const { user: currentUser } = useUser();
   const [showingNftGallery, setIsShowingNftGallery] = useState(false);
   const {
@@ -26,8 +26,8 @@ export function NftsList({ memberId, readOnly = false }: Props) {
     mutate: mutateNfts,
     isLoading: isFetchingNfts,
     error
-  } = useSWRImmutable(`/nfts/${memberId}`, () => {
-    return charmClient.blockchain.listNFTs(memberId);
+  } = useSWRImmutable(`/nfts/${userId}`, () => {
+    return charmClient.blockchain.listNFTs(userId);
   });
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
@@ -67,7 +67,7 @@ export function NftsList({ memberId, readOnly = false }: Props) {
                   </ProfileItemContainer>
                 );
               })}
-            {currentUser?.id === memberId && emptyNftsCount !== 0 ? (
+            {currentUser?.id === userId && emptyNftsCount !== 0 ? (
               <Tooltip title='Add upto 5 NFTs'>
                 <div>
                   <NonPinnedItem

@@ -9,18 +9,18 @@ import { UserProfileDialog } from 'components/common/UserProfile/UserProfileDial
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 
-import { SpaceDetailsAccordion } from './components/SpaceDetailsAccordion';
+import { UserSpaceListItem } from './components/UserSpaceListItem';
 
 type Props = {
-  memberId: string;
+  userId: string;
 };
 
-export function UserSpaceDetails({ memberId }: Props) {
-  const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
+export function UserSpacesList({ userId }: Props) {
+  const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(userId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
   const { query } = useRouter();
   const { user } = useUser();
-  const readOnly = memberId !== user?.id;
+  const readOnly = userId !== user?.id;
 
   const expandedWorkspaceIndex = memberPropertyValues.findIndex((mpv) => mpv.spaceId === query.workspace);
 
@@ -39,7 +39,7 @@ export function UserSpaceDetails({ memberId }: Props) {
       <Legend noBorder>My Charmverse Spaces</Legend>
       <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (
-        <SpaceDetailsAccordion
+        <UserSpaceListItem
           key={pv.spaceId}
           spaceName={pv.spaceName}
           spaceImage={pv.spaceImage}
@@ -52,11 +52,7 @@ export function UserSpaceDetails({ memberId }: Props) {
 
       {editSpaceId && (
         <UserProfileDialog title='Edit space profile' onClose={() => setEditSpaceId(null)}>
-          <MemberPropertiesForm
-            memberId={memberId}
-            spaceId={editSpaceId}
-            updateMemberPropertyValues={updateSpaceValues}
-          />
+          <MemberPropertiesForm userId={userId} spaceId={editSpaceId} updateMemberPropertyValues={updateSpaceValues} />
         </UserProfileDialog>
       )}
     </Box>

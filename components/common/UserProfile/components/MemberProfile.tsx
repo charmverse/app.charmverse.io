@@ -7,7 +7,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
-import { UserDetailsMini } from 'components/u/components/UserDetails/UserDetailsMini';
+import { UserDetailsReadonly } from 'components/u/components/UserDetails/UserDetailsReadonly';
 import type { Member } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
@@ -60,7 +60,7 @@ export function MemberProfile({
       }
     >
       <ContentContainer top={20}>
-        <UserDetailsMini user={member} readOnly />
+        <UserDetailsReadonly user={member} />
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <Legend mt={4} mb={3}>
@@ -76,9 +76,9 @@ export function MemberProfile({
             </Box>
             <Stack gap={3}>
               <Divider sx={{ display: { xs: 'block', md: 'none' } }} />
-              <NftsList memberId={member.id} readOnly />
-              <OrgsList memberId={member.id} readOnly />
-              <PoapsList memberId={member.id} />
+              <NftsList userId={member.id} readOnly />
+              <OrgsList userId={member.id} readOnly />
+              <PoapsList userId={member.id} />
             </Stack>
           </Grid>
         </Grid>

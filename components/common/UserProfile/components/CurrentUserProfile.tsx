@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import Legend from 'components/settings/Legend';
-import UserDetails from 'components/u/components/UserDetails/UserDetails';
+import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { LoggedInUser } from 'models';
@@ -53,7 +53,7 @@ export function CurrentUserProfile({
         <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
         <>
-          <UserDetails
+          <UserDetailsForm
             sx={{
               mt: 0
             }}
@@ -62,7 +62,7 @@ export function CurrentUserProfile({
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            memberId={currentUser.id}
+            userId={currentUser.id}
             spaceId={currentSpace.id}
             updateMemberPropertyValues={updateSpaceValues}
             showBlockchainData

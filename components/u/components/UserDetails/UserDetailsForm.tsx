@@ -38,7 +38,6 @@ import { useUserDetails } from './hooks/useUserDetails';
 import { isPublicUser } from './utils';
 
 export interface UserDetailsProps {
-  readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
   sx?: SxProps<Theme>;
@@ -50,23 +49,20 @@ const StyledStack = styled(Stack)`
 
 function EditIconContainer({
   children,
-  readOnly,
   onClick,
   ...props
-}: { children: ReactNode; readOnly?: boolean; onClick: IconButtonProps['onClick'] } & IconButtonProps) {
+}: { children: ReactNode; onClick: IconButtonProps['onClick'] } & IconButtonProps) {
   return (
     <StyledStack direction='row' spacing={1} alignItems='center'>
       {children}
-      {!readOnly && (
-        <IconButton onClick={onClick} {...props} className='icons'>
-          <EditIcon fontSize='small' />
-        </IconButton>
-      )}
+      <IconButton onClick={onClick} {...props} className='icons'>
+        <EditIcon fontSize='small' />
+      </IconButton>
     </StyledStack>
   );
 }
 
-function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps) {
   const { user: currentUser } = useUser();
   const { mutateMembers } = useMembers();
 
@@ -117,7 +113,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     await mutateMembers();
   };
 
-  const disabled = readOnly ?? isLoading ?? isPublic;
+  const disabled = isLoading ?? isPublic;
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path;
@@ -131,7 +127,6 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             name={user?.username || ''}
             image={user?.avatar}
             updateAvatar={updateProfileAvatar}
-            editable={!readOnly}
             variant='circular'
             canSetNft
             isSaving={isSavingAvatar}
@@ -139,34 +134,32 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           />
         </Grid>
         <Grid item width='100%'>
-          <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
+          <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
             {user && !isPublic && <IdentityIcon type={user.identityType as IdentityType} />}
             <Typography variant='h1' noWrap>
               {shortWalletAddress(user.username)}
             </Typography>
           </EditIconContainer>
         </Grid>
-        {!readOnly && (
-          <Grid item width='100%'>
-            <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
-              <Typography noWrap>
-                {hostname}/u/
-                <Link external href={userLink} target='_blank'>
-                  {userPath}
-                </Link>
-              </Typography>
-              <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
-                <Box sx={{ display: 'grid' }}>
-                  <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
-                    <IconButton>
-                      <ContentCopyIcon fontSize='small' />
-                    </IconButton>
-                  </CopyToClipboard>
-                </Box>
-              </Tooltip>
-            </EditIconContainer>
-          </Grid>
-        )}
+        <Grid item width='100%'>
+          <EditIconContainer onClick={userPathModalState.open}>
+            <Typography noWrap>
+              {hostname}/u/
+              <Link external href={userLink} target='_blank'>
+                {userPath}
+              </Link>
+            </Typography>
+            <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
+              <Box sx={{ display: 'grid' }}>
+                <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
+                  <IconButton>
+                    <ContentCopyIcon fontSize='small' />
+                  </IconButton>
+                </CopyToClipboard>
+              </Box>
+            </Tooltip>
+          </EditIconContainer>
+        </Grid>
 
         {!userDetails && isLoading ? (
           <Box display='flex' gap={1} flexDirection='column' ml={2} mt={2}>
@@ -216,5 +209,3 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     </>
   );
 }
-
-export default UserDetails;

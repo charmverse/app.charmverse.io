@@ -19,18 +19,18 @@ type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   showBlockchainData?: boolean;
   spaceId: string;
-  memberId: string;
+  userId: string;
 };
 
 export function MemberPropertiesForm({
   spaceId,
   updateMemberPropertyValues,
   showBlockchainData = false,
-  memberId
+  userId
 }: Props) {
   const { data: properties = [], mutate } = useSWR(
-    spaceId ? `members/${memberId}/values/${spaceId}` : null,
-    () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
+    spaceId ? `members/${userId}/values/${spaceId}` : null,
+    () => charmClient.members.getSpacePropertyValues(userId, spaceId || ''),
     { revalidateOnMount: true }
   );
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
@@ -117,9 +117,9 @@ export function MemberPropertiesForm({
               mt: 3
             }}
           />
-          <NftsList memberId={memberId} />
-          <OrgsList memberId={memberId} />
-          <PoapsList memberId={memberId} />
+          <NftsList userId={userId} />
+          <OrgsList userId={userId} />
+          <PoapsList userId={userId} />
         </Stack>
       )}
     </Box>

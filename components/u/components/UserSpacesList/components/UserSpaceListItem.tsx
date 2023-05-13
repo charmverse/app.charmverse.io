@@ -23,7 +23,7 @@ const StyledAccordionSummary = styled(AccordionSummary)`
   ${!isTouchScreen() && hoverIconsStyle()}
 `;
 
-export function SpaceDetailsAccordion({
+export function UserSpaceListItem({
   spaceName,
   properties,
   spaceImage,
