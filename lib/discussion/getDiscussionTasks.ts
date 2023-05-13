@@ -603,8 +603,10 @@ async function getPageMentions({
         spaceId: true
       }
     });
-    for (const page of pages) {
+    for (let page of pages) {
       extractMentionsFromPage(page);
+      // Make page eligible for garbage collection
+      page = null as any;
     }
   }
 
