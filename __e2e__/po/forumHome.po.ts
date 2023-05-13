@@ -46,7 +46,7 @@ export class ForumHomePage {
     this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> input');
     this.closeModalButton = page.locator('data-test=close-modal');
     this.postDialog = page.locator('data-test=dialog');
-    this.postDialogCloseButton = page.locator('data-test=close-dialog');
+    this.postDialogCloseButton = page.locator('data-test=close-modal');
     this.postDialogContextMenu = page.locator('data-test=header--show-page-actions');
     this.postDialogDeleteButton = page.locator('data-test=header--delete-current-page');
     this.categoryDescriptionInput = page.locator('data-test=category-description-input').locator('textarea').first();
