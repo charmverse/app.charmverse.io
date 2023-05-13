@@ -20,14 +20,12 @@ export function UserProfileDialogGlobal() {
     return null;
   }
 
-  const isOnboarding = !user.email;
-
   // Show the selected member profile
   if (member) {
     if (member.id === user.id) {
       return <CurrentUserProfile key={user.id} currentUser={user} onClose={hideUserProfile} />;
     }
-    return <MemberProfile key={user.id} isOnboarding={isOnboarding} member={member} onClose={hideUserProfile} />;
+    return <MemberProfile key={user.id} member={member} space={space} onClose={hideUserProfile} />;
   }
 
   // Show member profile for onboarding

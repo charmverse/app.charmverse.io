@@ -10,21 +10,29 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import type { PublicUserFields } from 'components/u/components/UserDetails/utils';
 import { isPublicUser } from 'components/u/components/UserDetails/utils';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import type { Social } from '../../interfaces';
 
 import { SocialIcons } from './SocialIcons';
 
-interface UserDetailsMiniProps {
+type UserFields = {
+  id: string;
+  path: string;
+  avatar?: string | null;
+  username: string;
+  profile?: any;
+} & PublicUserFields;
+
+type UserDetailsMiniProps = {
   readOnly?: boolean;
-  user: PublicUser | LoggedInUser;
+  user: UserFields;
   sx?: SxProps<Theme>;
-}
+};
 
 function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
   const { user: currentUser } = useUser();
