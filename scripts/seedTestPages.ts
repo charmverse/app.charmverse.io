@@ -216,7 +216,7 @@ async function cleanSpacePages({ spaceDomain }: { spaceDomain: string }) {
 //   process.exit(1)
 // })
 
-seedTestPages({ spaceDomain: 'changing-floorprice-porpoise', pagesToCreate: 60000, perBatch: 1000, nestedPercent: 92 })
+seedTestPages({ spaceDomain: 'deliberate-peach-barnacle', pagesToCreate: 10000, perBatch: 1000, nestedPercent: 92 })
   .then(() => {
     console.log('Done');
     process.exit(0);
