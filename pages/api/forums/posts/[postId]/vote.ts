@@ -4,11 +4,21 @@ import nc from 'next-connect';
 
 import { voteForumPost } from 'lib/forums/posts/voteForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(voteForumPostHandler);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'postId',
+      location: 'query',
+      resourceIdType: 'post'
+    })
+  )
+  .put(voteForumPostHandler);
 
 async function voteForumPostHandler(req: NextApiRequest, res: NextApiResponse) {
   const { postId } = req.query as any as { postId: string };

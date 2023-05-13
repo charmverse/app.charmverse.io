@@ -100,6 +100,14 @@ export class ForumHomePage {
     return this.page.locator(`data-test=open-category-permissions-dialog-${categoryId}`);
   }
 
+  getPostVoteLocators(postId: string) {
+    return {
+      upvote: this.getPostCardLocator(postId).locator('data-test=upvote-post'),
+      downvote: this.getPostCardLocator(postId).locator('data-test=upvote-post'),
+      score: this.getPostCardLocator(postId).locator('data-test=post-score')
+    };
+  }
+
   async submitNewCategory(): Promise<PostCategory> {
     this.confirmNewCategoryButton.click();
     const response = await this.page.waitForResponse('**/api/spaces/*/post-categories');
