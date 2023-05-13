@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -549,6 +549,8 @@ async function getBoardPersonPropertyMentions({
   };
 }
 
+type PageToExtractMentionsFrom = Pick<Page, 'bountyId' | 'content' | 'id' | 'path' | 'title' | 'createdBy' | 'spaceId'>;
+
 async function getPageMentions({
   userId,
   username,
@@ -556,28 +558,10 @@ async function getPageMentions({
   spaceIds
 }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   // Get all the pages of all the spaces this user is part of
-  const pages = await prisma.page.findMany({
-    where: {
-      spaceId: {
-        in: spaceIds
-      },
-      deletedAt: null
-    },
-    select: {
-      bountyId: true,
-      content: true,
-      id: true,
-      path: true,
-      title: true,
-      createdBy: true,
-      spaceId: true
-    }
-  });
-
   const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
-  for (const page of pages) {
+  function extractMentionsFromPage(page: PageToExtractMentionsFrom) {
     const content = page.content as PageContent;
     if (content) {
       const extractedMentions = extractMentions(content, username);
@@ -602,6 +586,30 @@ async function getPageMentions({
     }
   }
 
+  for (const spaceId of spaceIds) {
+    let pages = await prisma.page.findMany({
+      where: {
+        spaceId,
+        deletedAt: null
+      },
+      // This query will return a huge amount of content is user is part of alot of spaces, we need to split it up
+      select: {
+        bountyId: true,
+        content: true,
+        id: true,
+        path: true,
+        title: true,
+        createdBy: true,
+        spaceId: true
+      }
+    });
+    for (const page of pages) {
+      extractMentionsFromPage(page);
+    }
+    // Make page eligible for garbage collection
+    pages = null as any;
+  }
+
   return {
     mentions,
     discussionUserIds,
@@ -610,7 +618,6 @@ async function getPageMentions({
 }
 
 // utils
-
 function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
