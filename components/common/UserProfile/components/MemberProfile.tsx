@@ -68,7 +68,6 @@ export function MemberProfile({
             size='small'
             color='secondary'
             href={`/u/${member.path || member.id}`}
-            onClick={onClose}
             variant='text'
             target='_blank'
             startIcon={<OpenInFullIcon fontSize='small' />}

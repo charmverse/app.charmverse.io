@@ -7,7 +7,7 @@ type IContext = {
   completeOnboarding(): Promise<void>;
 };
 
-export function useOnboarding({ spaceId, user }: { spaceId?: string; user?: LoggedInUser }): IContext {
+export function useOnboarding({ spaceId, user }: { spaceId?: string; user: LoggedInUser | null }): IContext {
   const { members, mutateMembers, isValidating } = useMembers();
   const userId = user?.id;
 
