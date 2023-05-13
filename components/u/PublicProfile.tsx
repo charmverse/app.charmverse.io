@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { Collectable } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 import { transformPoap } from 'lib/blockchain/transformPoap';
 
@@ -36,16 +36,16 @@ export function PublicProfile(props: UserDetailsProps) {
     data: poapData,
     mutate: mutatePoaps,
     isValidating: isPoapDataValidating
-  } = useSWRImmutable(`/poaps/${user.id}/${isPublic}`, () => {
-    return isPublic ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps(user.id);
+  } = useSWRImmutable(`/poaps/${user.id}`, () => {
+    return charmClient.getUserPoaps(user.id);
   });
 
   const {
     data: nftData,
     mutate: mutateNfts,
     isValidating: isNftDataValidating
-  } = useSWRImmutable(`/nfts/${user.id}/${isPublic}`, () => {
-    return isPublic ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
+  } = useSWRImmutable(`/nfts/${user.id}`, () => {
+    return charmClient.blockchain.listNFTs(user.id);
   });
 
   const isLoading =

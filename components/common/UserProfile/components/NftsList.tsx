@@ -37,10 +37,6 @@ export function NftsList({ memberId, readOnly = false }: Props) {
     setIsShowingNftGallery(false);
   }
 
-  if (currentUser?.id !== memberId && pinnedNfts.length === 0) {
-    return null;
-  }
-
   return (
     <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>

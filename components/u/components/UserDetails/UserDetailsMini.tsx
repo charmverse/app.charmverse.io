@@ -11,7 +11,6 @@ import Link from 'components/common/Link';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import type { PublicUserFields } from 'components/u/components/UserDetails/utils';
-import { isPublicUser } from 'components/u/components/UserDetails/utils';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -35,10 +34,9 @@ type UserDetailsMiniProps = {
 
 export function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
   const { user: currentUser } = useUser();
-  const isPublic = isPublicUser(user, currentUser);
 
   const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
-    return isPublic ? user.profile : charmClient.getUserDetails();
+    return user.profile || (currentUser?.id === user.id && charmClient.getUserDetails());
   });
 
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);

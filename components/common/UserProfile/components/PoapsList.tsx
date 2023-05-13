@@ -15,13 +15,8 @@ export function PoapsList({ memberId }: { memberId: string }) {
   } = useSWRImmutable(`/poaps/${memberId}`, () => {
     return charmClient.getUserPoaps(memberId);
   });
-  const { user: currentUser } = useUser();
 
   const sortedPoapData = poaps.sort((p1, p2) => (p1.created > p2.created ? -1 : 1));
-
-  if (currentUser?.id !== memberId && poaps.length === 0) {
-    return null;
-  }
 
   return (
     <Stack gap={1} data-test='member-profile-poap-list'>

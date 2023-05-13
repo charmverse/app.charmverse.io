@@ -19,7 +19,6 @@ import { PoapsList } from './PoapsList';
 
 const ContentContainer = styled(Container)`
   width: 100%;
-  margin-bottom: 0;
 `;
 
 export function MemberProfile({

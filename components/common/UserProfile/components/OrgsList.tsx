@@ -39,10 +39,6 @@ export function OrgsList({ memberId, readOnly = false }: Props) {
     setIsShowingOrgsGallery(false);
   }
 
-  if (currentUser?.id !== memberId && pinnedOrgs.length === 0) {
-    return null;
-  }
-
   return (
     <Stack gap={1} data-test='member-profile-org-list'>
       <Typography variant='h6'>Organizations</Typography>
