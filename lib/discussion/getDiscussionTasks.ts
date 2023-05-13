@@ -563,6 +563,8 @@ async function getPageMentions({
       },
       deletedAt: null
     },
+    // This query will return a huge amount of content is user is part of alot of spaces, we need to split it up
+    take: 1000,
     select: {
       bountyId: true,
       content: true,
