@@ -14,7 +14,6 @@ import type { PublicUserFields } from 'components/u/components/UserDetails/utils
 import { isPublicUser } from 'components/u/components/UserDetails/utils';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import type { Social } from '../../interfaces';
 
@@ -34,7 +33,7 @@ type UserDetailsMiniProps = {
   sx?: SxProps<Theme>;
 };
 
-function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
+export function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
   const { user: currentUser } = useUser();
   const isPublic = isPublicUser(user, currentUser);
 
@@ -125,5 +124,3 @@ function UserDetailsMini({ readOnly, user, sx = {} }: UserDetailsMiniProps) {
     </Stack>
   );
 }
-
-export default UserDetailsMini;

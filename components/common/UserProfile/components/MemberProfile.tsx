@@ -2,15 +2,12 @@ import styled from '@emotion/styled';
 import OpenInFullIcon from '@mui/icons-material/Launch';
 import { Box, Divider, Grid, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
-import UserDetailsMini from 'components/u/components/UserDetails/UserDetailsMini';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { UserDetailsMini } from 'components/u/components/UserDetails/UserDetailsMini';
 import type { Member } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';

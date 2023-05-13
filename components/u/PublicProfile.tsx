@@ -4,7 +4,6 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
-import { UserSpaceDetails } from 'components/u/components/UserSpaceDetails/UserSpaceDetails';
 import { useUser } from 'hooks/useUser';
 import type { Collectable, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
@@ -16,8 +15,9 @@ import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import type { UserDetailsProps } from './components/UserDetails/UserDetails';
 import UserDetails from './components/UserDetails/UserDetails';
-import UserDetailsMini from './components/UserDetails/UserDetailsMini';
+import { UserDetailsMini } from './components/UserDetails/UserDetailsMini';
 import { isPublicUser } from './components/UserDetails/utils';
+import { UserSpaceDetails } from './components/UserSpaceDetails/UserSpaceDetails';
 
 export function PublicProfile(props: UserDetailsProps) {
   const { user, readOnly } = props;
