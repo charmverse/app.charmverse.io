@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberPropertiesDialog } from 'components/common/MemberProfile/components/MemberPropertiesDialog';
-import { MemberPropertiesForm } from 'components/common/MemberProfile/components/MemberPropertiesForm';
-import { useMemberPropertyValues } from 'components/common/MemberProfile/hooks/useMemberPropertyValues';
+import { MemberPropertiesForm } from 'components/common/UserProfile/components/MemberPropertiesForm';
+import { useMemberPropertyValues } from 'components/common/UserProfile/hooks/useMemberPropertyValues';
+import { UserProfileDialog } from 'components/common/UserProfile/UserProfileDialog';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 
@@ -51,13 +51,13 @@ export function UserSpaceDetails({ memberId }: Props) {
       ))}
 
       {editSpaceId && (
-        <MemberPropertiesDialog title='Edit space profile' onClose={() => setEditSpaceId(null)} spaceId={editSpaceId}>
+        <UserProfileDialog title='Edit space profile' onClose={() => setEditSpaceId(null)}>
           <MemberPropertiesForm
             memberId={memberId}
             spaceId={editSpaceId}
             updateMemberPropertyValues={updateSpaceValues}
           />
-        </MemberPropertiesDialog>
+        </UserProfileDialog>
       )}
     </Box>
   );

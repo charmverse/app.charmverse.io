@@ -1,7 +1,6 @@
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
-import { MemberDialogGlobal } from 'components/common/MemberProfile/MemberDialogGlobal';
-import { MemberDialogOnboarding } from 'components/common/MemberProfile/MemberDialogOnboarding';
 import Snackbar from 'components/common/Snackbar';
+import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 
 import useDatadogLogger from './hooks/useDatadogLogger';
@@ -16,8 +15,7 @@ export function GlobalComponents() {
   return (
     <>
       <HexagonalAvatarMask id='hexagon-avatar' />
-      <MemberDialogOnboarding />
-      <MemberDialogGlobal />
+      <UserProfileDialogGlobal />
       <Snackbar />
     </>
   );

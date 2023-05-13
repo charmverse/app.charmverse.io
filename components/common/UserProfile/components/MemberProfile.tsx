@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import OpenInFullIcon from '@mui/icons-material/Launch';
 import { Box, DialogContent, Divider, Grid, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,105 +10,33 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
-import UserDetails from 'components/u/components/UserDetails/UserDetails';
 import UserDetailsMini from 'components/u/components/UserDetails/UserDetailsMini';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import type { LoggedInUser } from 'models';
 
-import { MemberProperties } from './components/MemberProperties';
-import { MemberPropertiesDialog } from './components/MemberPropertiesDialog';
-import { MemberPropertiesForm } from './components/MemberPropertiesForm';
-import { NftsList } from './components/NftsList';
-import { OnboardingEmailForm } from './components/OnboardingEmailForm';
-import { OrgsList } from './components/OrgsList';
-import { PoapsList } from './components/PoapsList';
-import { useMemberPropertyValues } from './hooks/useMemberPropertyValues';
+import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
 
-type Step = 'email_step' | 'profile_step';
+import { MemberProperties } from './MemberProperties';
+import { NftsList } from './NftsList';
+import { OrgsList } from './OrgsList';
+import { PoapsList } from './PoapsList';
 
 const ContentContainer = styled(Container)`
   width: 100%;
   margin-bottom: 0;
 `;
 
-function CurrentMemberProfile({
-  currentUser,
-  title = 'Edit your profile',
-  onClose,
-  isOnboarding = false
-}: {
-  title?: string;
-  onClose: VoidFunction;
-  currentUser: LoggedInUser;
-  isOnboarding?: boolean;
-}) {
-  const { setUser } = useUser();
-  const currentSpace = useCurrentSpace();
-  const { updateSpaceValues } = useMemberPropertyValues(currentUser.id);
-
-  const [currentStep, setCurrentStep] = useState<Step>(isOnboarding ? 'email_step' : 'profile_step');
-
-  function goNextStep() {
-    setCurrentStep('profile_step');
-  }
-
-  if (!currentSpace) {
-    return null;
-  }
-
-  let customTitle = title;
-
-  if (isOnboarding) {
-    if (currentStep === 'email_step') {
-      customTitle = 'Welcome to CharmVerse';
-    } else if (currentStep === 'profile_step') {
-      customTitle = `Welcome to ${currentSpace.domain}. Set up your profile`;
-    }
-  }
-
-  return (
-    <MemberPropertiesDialog onClose={onClose} spaceId={currentSpace.id} title={customTitle}>
-      {currentStep === 'email_step' ? (
-        <OnboardingEmailForm onClick={goNextStep} />
-      ) : currentStep === 'profile_step' ? (
-        <>
-          <UserDetails
-            sx={{
-              mt: 0
-            }}
-            user={currentUser}
-            updateUser={setUser}
-          />
-          <Legend mt={4}>Member details</Legend>
-          <MemberPropertiesForm
-            memberId={currentUser.id}
-            spaceId={currentSpace.id}
-            updateMemberPropertyValues={updateSpaceValues}
-            showBlockchainData
-          />
-        </>
-      ) : null}
-    </MemberPropertiesDialog>
-  );
-}
-
-function MemberProfile({
+export function MemberProfile({
   isOnboarding,
-  title,
   member,
   onClose
 }: {
   isOnboarding?: boolean;
-  title?: string;
   member: Member;
   onClose: VoidFunction;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
-  const { user: currentUser } = useUser();
   const currentSpace = useCurrentSpace();
 
   const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
@@ -121,7 +48,7 @@ function MemberProfile({
     charmClient.getUserByPath(member.id)
   );
 
-  if (!currentSpace || !currentUser) {
+  if (!currentSpace) {
     return null;
   }
 
@@ -129,12 +56,6 @@ function MemberProfile({
 
   if (isLoading && isOnboarding) {
     return null;
-  }
-
-  if (member.id === currentUser.id) {
-    return (
-      <CurrentMemberProfile isOnboarding={isOnboarding} currentUser={currentUser} onClose={onClose} title={title} />
-    );
   }
 
   return (
@@ -146,7 +67,7 @@ function MemberProfile({
           <Button
             size='small'
             color='secondary'
-            href={`/u/${user?.path}`}
+            href={`/u/${member.path || member.id}`}
             onClick={onClose}
             variant='text'
             target='_blank'
@@ -189,25 +110,4 @@ function MemberProfile({
       )}
     </Dialog>
   );
-}
-
-export function MemberDialog({
-  memberId,
-  onClose,
-  title,
-  isOnboarding
-}: {
-  title?: string;
-  memberId: string;
-  onClose: VoidFunction;
-  isOnboarding?: boolean;
-}) {
-  const { getMemberById } = useMembers();
-  const member = getMemberById(memberId);
-
-  if (!member) {
-    return null;
-  }
-
-  return <MemberProfile isOnboarding={isOnboarding} title={title} member={member} onClose={onClose} />;
 }

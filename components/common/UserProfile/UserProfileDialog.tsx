@@ -1,35 +1,36 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { DialogContent, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import { DialogTitle } from 'components/common/Modal';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
 
-const ContentContainer = styled(Container)`
-  margin-bottom: 0;
+const ContentContainer = styled(Container)``;
+
+const StyledDialog = styled(Dialog)<{ fluidSize?: boolean }>`
+  ${(props) =>
+    props.fluidSize
+      ? `.dialog {
+          width: auto;
+          height: auto;
+        }`
+      : ''}
 `;
 
-const StyledDialog = styled(Dialog)`
-  .dialog {
-    width: auto;
-    height: auto;
-  }
-`;
-
-export function MemberPropertiesDialog({
+export function UserProfileDialog({
   children,
-  spaceId,
   onClose,
-  title
+  title,
+  fluidSize
 }: {
-  spaceId: string | null;
   onClose: VoidFunction;
   title: string;
   children?: ReactNode;
+  fluidSize?: boolean;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
@@ -41,20 +42,12 @@ export function MemberPropertiesDialog({
     mutateMembers();
   }
 
-  if (!spaceId) {
-    return null;
-  }
-
   return (
-    <StyledDialog onClose={onClickClose}>
+    <StyledDialog toolbar={<div />} fluidSize={fluidSize} onClose={onClickClose}>
       <ScrollableWindow>
-        <ContentContainer fullWidth={fullWidth}>
-          <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
-            {title}
-          </DialogTitle>
-          <DialogContent dividers sx={{ pb: 6 }}>
-            {children}
-          </DialogContent>
+        <ContentContainer fullWidth={fullWidth} top={0}>
+          <Legend>{title}</Legend>
+          {children}
         </ContentContainer>
       </ScrollableWindow>
     </StyledDialog>

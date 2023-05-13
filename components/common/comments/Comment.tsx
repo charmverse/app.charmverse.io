@@ -14,8 +14,8 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCha
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
-import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
 import UserDisplay from 'components/common/UserDisplay';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
@@ -68,7 +68,7 @@ export function Comment({
     rawText: comment.contentText
   });
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -152,7 +152,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showMemberProfile(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >

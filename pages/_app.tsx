@@ -20,11 +20,11 @@ import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { MemberProfileProvider } from 'components/common/MemberProfile/hooks/useMemberProfile';
 import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
+import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
@@ -216,9 +216,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                           <BountiesProvider>
                             <PaymentMethodsProvider>
                               <PagesProvider>
-                                <MemberProfileProvider>
+                                <UserProfileProvider>
                                   <PageTitleProvider>{children}</PageTitleProvider>
-                                </MemberProfileProvider>
+                                </UserProfileProvider>
                               </PagesProvider>
                             </PaymentMethodsProvider>
                           </BountiesProvider>

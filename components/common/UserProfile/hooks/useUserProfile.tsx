@@ -4,36 +4,36 @@ import { createContext, useContext, useMemo, useState } from 'react';
 interface Context {
   memberId: string | null;
   setMemberId: Dispatch<SetStateAction<string | null>>;
-  showMemberProfile: (memberId: string) => void;
-  hideMemberProfile: VoidFunction;
+  showUserProfile: (memberId: string) => void;
+  hideUserProfile: VoidFunction;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
   memberId: null,
   setMemberId: () => {},
-  showMemberProfile: () => {},
-  hideMemberProfile: () => {}
+  showUserProfile: () => {},
+  hideUserProfile: () => {}
 });
 
-export const useMemberProfile = () => useContext(ContextElement);
+export const useUserProfile = () => useContext(ContextElement);
 
-export function MemberProfileProvider({ children }: { children: ReactNode }) {
+export function UserProfileProvider({ children }: { children: ReactNode }) {
   const [memberId, setMemberId] = useState<string | null>(null);
 
-  function hideMemberProfile() {
+  function hideUserProfile() {
     setMemberId(null);
   }
 
-  function showMemberProfile(newMemberProfileId: string) {
-    setMemberId(newMemberProfileId);
+  function showUserProfile(newUserProfileId: string) {
+    setMemberId(newUserProfileId);
   }
 
   const value = useMemo(
     () => ({
       memberId,
       setMemberId,
-      showMemberProfile,
-      hideMemberProfile
+      showUserProfile,
+      hideUserProfile
     }),
     [memberId]
   );

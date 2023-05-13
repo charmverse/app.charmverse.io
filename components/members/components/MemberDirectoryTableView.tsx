@@ -18,7 +18,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { DiscordSocialIcon } from 'components/u/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -46,7 +46,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { user } = useUser();
   const { properties = [] } = useMemberProperties();
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -67,7 +67,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              showMemberProfile(member.id);
+              showUserProfile(member.id);
             }}
             style={{
               opacity: 1
@@ -171,7 +171,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                       {content}
                     </Link>
                   ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => showMemberProfile(member.id)}>
+                    <Box sx={{ cursor: 'pointer' }} onClick={() => showUserProfile(member.id)}>
                       {content}
                     </Box>
                   )}

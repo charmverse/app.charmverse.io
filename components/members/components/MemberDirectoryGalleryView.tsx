@@ -8,7 +8,7 @@ import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useMemberProfile } from 'components/common/MemberProfile/hooks/useMemberProfile';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { SocialIcons } from 'components/u/components/UserDetails/SocialIcons';
 import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -47,14 +47,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    showMemberProfile(member.id);
+    showUserProfile(member.id);
   }
 
   const social = (member.profile?.social as Social) ?? {};

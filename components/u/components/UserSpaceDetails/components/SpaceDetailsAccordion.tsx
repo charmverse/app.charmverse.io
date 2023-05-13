@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { MemberProperties } from 'components/common/MemberProfile/components/MemberProperties';
+import { MemberProperties } from 'components/common/UserProfile/components/MemberProperties';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
