@@ -91,7 +91,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: template ?? 'nft_community',
+    template: internalTemplate,
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);

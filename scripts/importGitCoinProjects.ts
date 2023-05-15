@@ -88,7 +88,7 @@ async function importGitCoinProjects() {
           spaceData,
           userId: adminUserId,
           extraAdmins: [...extraAdmins, botUser.id],
-          spaceTemplate: 'gitcoin',
+          spaceTemplate: 'templateGitcoin',
           skipTracking: true
         });
         console.log('🟢 Created space for project', i, space.id);
