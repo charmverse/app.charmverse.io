@@ -163,7 +163,7 @@ export async function createWorkspace({
     const staticTemplate = staticSpaceTemplates.find((template) => template.id === spaceTemplate);
 
     if (staticTemplate) {
-      const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${staticTemplate}.json`));
+      const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${staticTemplate.id}.json`));
       const dataToImport: WorkspaceExport = JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
       await importWorkspacePages({
