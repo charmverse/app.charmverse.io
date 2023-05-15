@@ -102,7 +102,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
           name: watchName,
           spaceImage: watchSpaceImage
         },
-        createSpaceTemplate: watchSpaceTemplate
+        spaceTemplate: watchSpaceTemplate
       })
         .then((_space) => {
           setNewSpace(_space);
@@ -134,7 +134,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     try {
       setSaveError(null);
       const space = await createNewSpace({
-        createSpaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
+        spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
         spaceData: {
           name: values.name,
           spaceImage: values.spaceImage

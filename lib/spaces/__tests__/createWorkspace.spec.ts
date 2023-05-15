@@ -261,7 +261,7 @@ describe('createWorkspace', () => {
     for (const options of spaceCreateTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        createSpaceTemplate: options,
+        spaceTemplate: options,
         spaceData: {
           name: `Name-${v4()}`
         }
