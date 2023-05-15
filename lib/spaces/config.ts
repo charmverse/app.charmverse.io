@@ -51,4 +51,5 @@ export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), .
 
 export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
 export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
+// Include private templates, like gitcoin
 export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | 'templateGitcoin';
