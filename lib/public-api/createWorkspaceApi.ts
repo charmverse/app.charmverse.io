@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 
 import { baseUrl } from 'config/constants';

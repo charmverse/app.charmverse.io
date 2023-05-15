@@ -1,6 +1,7 @@
 import type { PermissionsClient } from '@charmverse/core';
-import { PermissionsApiClient, prisma } from '@charmverse/core';
+import { PermissionsApiClient } from '@charmverse/core';
 import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma';
 import type { PremiumPermissionsClient } from '@charmverse/core/shared';
 import {
   ProposalCategoryPermissionNotFoundError,

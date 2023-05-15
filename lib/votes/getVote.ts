@@ -1,5 +1,4 @@
-import { prisma } from '@charmverse/core';
-import { VoteStatus } from '@charmverse/core/prisma';
+import { prisma, VoteStatus } from '@charmverse/core/prisma';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';

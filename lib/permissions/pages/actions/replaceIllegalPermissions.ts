@@ -1,7 +1,11 @@
-import type { OptionalTransaction, TransactionClient } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
-import type { PagePermission, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma';
+import type {
+  OptionalPrismaTransaction,
+  PrismaTransactionClient,
+  PagePermission,
+  Prisma
+} from '@charmverse/core/prisma';
 
 import type {
   IPageWithPermissions,
@@ -246,7 +250,7 @@ export function generateReplaceIllegalPermissions({ parents, targetPage }: Targe
 export async function replaceIllegalPermissions({
   pageId,
   tx
-}: { pageId: string } & OptionalTransaction): Promise<
+}: { pageId: string } & OptionalPrismaTransaction): Promise<
   IPageWithPermissions &
     PageNodeWithChildren<PageNodeWithPermissions> & { tree: TargetPageTree<PageNodeWithPermissions> }
 > {
@@ -257,7 +261,7 @@ export async function replaceIllegalPermissions({
   return txHandler(tx);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  async function txHandler(tx: TransactionClient) {
+  async function txHandler(tx: PrismaTransactionClient) {
     const { parents, targetPage } = await resolvePageTree({ pageId, tx });
 
     const args = generateReplaceIllegalPermissions({ parents, targetPage });

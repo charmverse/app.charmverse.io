@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Page, Space } from '@charmverse/core/prisma';
 
 import type { PageLink } from '../interfaces';

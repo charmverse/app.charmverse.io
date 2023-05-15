@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

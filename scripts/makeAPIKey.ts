@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 // use this file and run against production to generate api keys
 

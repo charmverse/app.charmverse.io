@@ -1,4 +1,5 @@
-import { InvalidInputError, prisma } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import { unassignRole } from 'lib/roles';

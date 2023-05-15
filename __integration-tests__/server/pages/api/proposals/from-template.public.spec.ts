@@ -1,8 +1,8 @@
-import { generateUserAndSpace, prisma, testUtilsMembers, testUtilsUser } from '@charmverse/core';
+import { generateUserAndSpace, testUtilsMembers, testUtilsUser } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Page, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateProposalCategory } from 'testing/utils/proposals';

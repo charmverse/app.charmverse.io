@@ -1,7 +1,5 @@
-import type { OptionalTransaction, TransactionClient } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
-import type { Page, Prisma } from '@charmverse/core/prisma';
-import { PagePermissionLevel } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient, Prisma } from '@charmverse/core/prisma';
+import { prisma, PagePermissionLevel } from '@charmverse/core/prisma';
 
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
@@ -127,7 +125,7 @@ async function validateInheritanceRelationship(
   permissionIdToInheritFrom: string,
   targetPageId: string,
   resolvedPageTree: TargetPageTreeWithFlatChildren<PageNodeWithPermissions>,
-  tx: TransactionClient
+  tx: PrismaTransactionClient
 ): Promise<boolean> {
   const sourcePermission = await tx.pagePermission.findUnique({
     where: {
@@ -159,7 +157,11 @@ async function validateInheritanceRelationship(
   return canInherit;
 }
 
-async function validatePermissionToCreate(pageId: string, permission: IPagePermissionToCreate, tx: TransactionClient) {
+async function validatePermissionToCreate(
+  pageId: string,
+  permission: IPagePermissionToCreate,
+  tx: PrismaTransactionClient
+) {
   // This in enforced by tx. For readability, we add this condition here
   if (!permission.permissionLevel || !PagePermissionLevel[permission.permissionLevel]) {
     throw new InvalidPermissionLevelError(permission.permissionLevel);
@@ -227,7 +229,7 @@ export async function upsertPermission(
   pageId: string,
   permission: IPagePermissionToCreate | string,
   resolvedPageTree?: TargetPageTreeWithFlatChildren<PageNodeWithPermissions>,
-  tx?: TransactionClient
+  tx?: PrismaTransactionClient
 ): Promise<IPagePermissionWithSource> {
   if (!tx) {
     return prisma.$transaction(txHandler);
@@ -236,7 +238,7 @@ export async function upsertPermission(
   return txHandler(tx);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  async function txHandler(tx: TransactionClient) {
+  async function txHandler(tx: PrismaTransactionClient) {
     // Pre-compute this only once
     resolvedPageTree = (resolvedPageTree ??
       (await resolvePageTree({

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { SuperApiToken } from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import request from 'supertest';

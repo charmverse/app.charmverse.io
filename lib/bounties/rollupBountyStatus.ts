@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma';
 
 import { submissionsCapReached } from 'lib/applications/shared';

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';

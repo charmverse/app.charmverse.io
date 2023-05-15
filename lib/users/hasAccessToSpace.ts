@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { SpaceRole } from '@charmverse/core/prisma';
 
 import type { SystemError } from 'lib/utilities/errors';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';

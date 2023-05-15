@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Block } from '@charmverse/core/prisma';
 
 import { DatabasePageNotFoundError } from 'lib/public-api';

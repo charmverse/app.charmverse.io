@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';

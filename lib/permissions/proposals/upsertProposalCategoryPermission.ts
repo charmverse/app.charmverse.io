@@ -1,7 +1,7 @@
 import type { AssignableProposalCategoryPermissionGroups, AssignedProposalCategoryPermission } from '@charmverse/core';
-import { prisma, proposalCategoryPermissionGroups } from '@charmverse/core';
+import { proposalCategoryPermissionGroups } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
-import { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
+import { ProposalCategoryPermissionLevel, prisma } from '@charmverse/core/prisma';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';

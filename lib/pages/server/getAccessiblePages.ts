@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 
 import { checkSpaceSpaceSubscriptionInfo } from 'lib/permissions/api/routers';

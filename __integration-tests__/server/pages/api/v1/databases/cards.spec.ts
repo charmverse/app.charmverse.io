@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space, User, Page, SpaceApiToken } from '@charmverse/core/prisma';
 import type { Response } from 'supertest';
 import request from 'supertest';

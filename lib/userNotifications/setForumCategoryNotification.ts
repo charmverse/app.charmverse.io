@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { UserSpaceNotificationSettings } from '@charmverse/core/prisma';
 
 import { getSavedOrDefaultSettings } from './spaceNotifications';

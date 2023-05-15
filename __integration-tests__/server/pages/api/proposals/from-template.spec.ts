@@ -1,4 +1,5 @@
-import { prisma, testUtilsMembers, testUtilsUser } from '@charmverse/core';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Page, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { PostCommentUpDownVote, Space, User } from '@charmverse/core/prisma';
 
 import { createPostComment } from 'lib/forums/comments/createPostComment';

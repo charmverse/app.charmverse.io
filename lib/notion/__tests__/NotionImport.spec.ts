@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

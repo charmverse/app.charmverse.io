@@ -1,4 +1,5 @@
-import { generateCategoryIdQuery, prisma } from '@charmverse/core';
+import { generateCategoryIdQuery } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import type { ProposalWithCommentsAndUsers, ProposalWithUsers } from './interface';
 

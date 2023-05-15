@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Prisma } from '@charmverse/core/prisma';
 
 import type { PaginatedResponse } from 'lib/public-api';

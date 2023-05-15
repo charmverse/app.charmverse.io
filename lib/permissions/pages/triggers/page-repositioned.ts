@@ -1,5 +1,5 @@
-import type { TransactionClient } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma';
 
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions, PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
@@ -19,7 +19,7 @@ import {
  */
 export async function setupPermissionsAfterPageRepositioned(
   pageId: string | IPageWithPermissions,
-  tx?: TransactionClient
+  tx?: PrismaTransactionClient
 ): Promise<IPageWithPermissions> {
   if (!tx) {
     return prisma.$transaction(txHandler);
@@ -28,7 +28,7 @@ export async function setupPermissionsAfterPageRepositioned(
   return txHandler(tx);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  async function txHandler(tx: TransactionClient) {
+  async function txHandler(tx: PrismaTransactionClient) {
     const page =
       typeof pageId === 'string'
         ? await tx.page.findUnique({

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 

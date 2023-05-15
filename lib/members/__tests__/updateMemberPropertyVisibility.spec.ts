@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { MemberProperty, Space } from '@charmverse/core/prisma';
 
 import { UndesirableOperationError } from 'lib/utilities/errors';

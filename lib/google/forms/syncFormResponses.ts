@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';

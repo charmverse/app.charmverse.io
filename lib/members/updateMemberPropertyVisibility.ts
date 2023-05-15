@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { NotFoundError } from 'lib/middleware';
 import { UndesirableOperationError } from 'lib/utilities/errors';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/prisma';
 import type { NextApiRequest } from 'next';
 import { v4 } from 'uuid';

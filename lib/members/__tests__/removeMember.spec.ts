@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { generatePage } from '__e2e__/utils/pages';
 
 import { InvalidStateError } from 'lib/middleware';

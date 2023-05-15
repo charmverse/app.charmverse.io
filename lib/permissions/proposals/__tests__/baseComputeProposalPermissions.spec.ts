@@ -1,5 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core';
-import { prisma, proposalOperations, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import { proposalOperations, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { upsertPermission } from '../lib/permissions/pages';
 
 /**

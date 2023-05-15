@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Bounty, Role, Space, User } from '@charmverse/core/prisma';
 
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';

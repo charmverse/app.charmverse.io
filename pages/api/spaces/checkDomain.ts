@@ -1,5 +1,4 @@
-import { prisma } from '@charmverse/core';
-import { Prisma, Space } from '@charmverse/core/prisma';
+import { prisma, Prisma, Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

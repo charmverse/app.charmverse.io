@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { v4, validate } from 'uuid';
 

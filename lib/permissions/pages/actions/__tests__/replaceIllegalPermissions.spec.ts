@@ -1,6 +1,6 @@
 /* eslint-disable camelcase, @typescript-eslint/no-non-null-assertion */
 
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

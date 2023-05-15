@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

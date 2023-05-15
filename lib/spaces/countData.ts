@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 

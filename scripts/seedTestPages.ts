@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
@@ -6,13 +6,11 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
-
 type PageSeedInput = {
   page: Prisma.PageCreateManyInput;
   permissions: Prisma.PagePermissionCreateManyInput[];
-  diffs: Prisma.PageDiffCreateManyInput[] 
-}
-
+  diffs: Prisma.PageDiffCreateManyInput[];
+};
 
 const defaultBatchSize = 1000;
 
@@ -21,7 +19,7 @@ const defaultBatchSize = 1000;
  * https://app.charmverse.io/charmverse/page-8095374127900168
  *
  * @perBatch Default 1000. Prisma chokes if creating too many pages. This allows you to tweak how the job will be split.
- * 
+ *
  * @nestedPercent The percentage of pages that should have a parent. This is a number between 0 and 100. Defaults to 30
  */
 export async function seedTestPages({
@@ -35,7 +33,7 @@ export async function seedTestPages({
   pagesToCreate: number;
   nestedPercent?: number;
   createDiffs?: boolean;
-  perBatch?: number
+  perBatch?: number;
 }) {
   const space = await prisma.space.findUnique({
     where: {
@@ -72,7 +70,7 @@ export async function seedTestPages({
         userId: space.createdBy,
         permissionLevel: 'full_access'
       }
-    ]
+    ];
 
     const diffs: Prisma.PageDiffCreateManyInput[] = [];
 
@@ -91,36 +89,37 @@ export async function seedTestPages({
       page,
       diffs,
       permissions: permissionInputs
-    })
+    });
   }
 
   console.log('Pages to create', seedInputs.length, 'Permissions to create', seedInputs.length * 2);
 
-
   const totalPages = seedInputs.length;
 
-  await prisma.$transaction( async(tx) => {
-    for (let i = 0; i < totalPages; i+= perBatch) {
+  await prisma.$transaction(
+    async (tx) => {
+      for (let i = 0; i < totalPages; i += perBatch) {
+        console.log(`Processing pages ${i + 1} - ${i + perBatch} / ${totalPages}`);
 
-      console.log(`Processing pages ${i + 1} - ${i + perBatch} / ${totalPages}`)
+        const toProcess = seedInputs.slice(i, i + perBatch);
+        await tx.page.createMany({
+          data: toProcess.map((seed) => seed.page)
+        }),
+          await tx.pagePermission.createMany({
+            data: toProcess.flatMap((seed) => seed.permissions)
+          });
 
-      const toProcess = seedInputs.slice(i, i + perBatch);
-      await tx.page.createMany({
-        data: toProcess.map(seed => seed.page)
-      }),
-      await tx.pagePermission.createMany({
-        data: toProcess.flatMap(seed => seed.permissions)
-      })
-      
-      if (createDiffs) {
-        await tx.pageDiff.createMany({
-          data: toProcess.flatMap(seed => seed.diffs)
-        })
+        if (createDiffs) {
+          await tx.pageDiff.createMany({
+            data: toProcess.flatMap((seed) => seed.diffs)
+          });
+        }
       }
-    }
 
-  // Long 10 minute timeout to leave space for generating data
-  }, {timeout: 600000});
+      // Long 10 minute timeout to leave space for generating data
+    },
+    { timeout: 600000 }
+  );
 
   console.log('Created ', totalPages, ' pages');
 }

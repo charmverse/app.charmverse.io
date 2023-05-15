@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { getLogger } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma';
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import * as lit from 'lit-js-sdk';
 

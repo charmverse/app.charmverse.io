@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { PagePermissionLevel, Space } from '@charmverse/core/prisma';
 
 import { SpaceNotFoundError } from 'lib/public-api';

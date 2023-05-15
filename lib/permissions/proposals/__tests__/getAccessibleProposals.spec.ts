@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { getAccessibleProposals } from '../getAccessibleProposals';

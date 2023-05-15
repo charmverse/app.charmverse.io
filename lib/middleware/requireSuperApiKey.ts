@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { SuperApiToken } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Post } from '@charmverse/core/prisma';
 
 import { createProposal } from 'lib/proposal/createProposal';

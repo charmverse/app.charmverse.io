@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Post, Prisma } from '@charmverse/core/prisma';
 import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 
 const concurrent = 3;

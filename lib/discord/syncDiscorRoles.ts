@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma';
 
 import { getGuildRoles } from 'lib/collabland/collablandClient';
 import { findOrCreateRoles } from 'lib/roles/createRoles';

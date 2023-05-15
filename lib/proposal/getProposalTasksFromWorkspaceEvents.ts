@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Page, ProposalStatus, Space, WorkspaceEvent } from '@charmverse/core/prisma';
 
 import type { ProposalWithUsers } from './interface';

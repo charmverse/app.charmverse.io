@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import log from 'loglevel';
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';

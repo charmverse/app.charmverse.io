@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Role } from '@charmverse/core/prisma';
 import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';

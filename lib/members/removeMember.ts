@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';

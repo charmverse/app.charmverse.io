@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { GoogleAccount, Prisma, User, UserWallet } from '@charmverse/core/prisma';
 
 import type { UserProfile } from 'lib/public-api/interfaces';

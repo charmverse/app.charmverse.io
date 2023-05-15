@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 
 import { WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
 

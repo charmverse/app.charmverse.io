@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { PagePermission } from '@charmverse/core/prisma';
 
 import { flattenTree } from 'lib/pages/mapPageTree';

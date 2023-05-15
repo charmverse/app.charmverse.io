@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 export function generateSuperApiToken({ name, token }: { name?: string; token?: string }) {

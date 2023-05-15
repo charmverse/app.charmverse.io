@@ -1,6 +1,5 @@
-import { prisma } from '@charmverse/core';
-import type { TransactionClient } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient, Prisma } from '@charmverse/core/prisma';
 import { validate } from 'uuid';
 
 import type { PageMeta } from '../interfaces';
@@ -50,7 +49,7 @@ export function pageMetaSelect() {
 export async function getPageMeta(
   pageIdOrPath: string,
   spaceId?: string,
-  tx: TransactionClient = prisma
+  tx: PrismaTransactionClient = prisma
 ): Promise<PageMeta | null> {
   const isValidUUid = validate(pageIdOrPath);
 

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';

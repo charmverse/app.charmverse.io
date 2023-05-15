@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma';
 import type { Space, User } from '@charmverse/core/prisma';
 import { test as base, expect } from '@playwright/test';
 import type { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
