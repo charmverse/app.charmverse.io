@@ -2,9 +2,10 @@ import type { Space } from '@charmverse/core/prisma';
 import { Divider, InputLabel, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { capitalize } from 'lodash';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -18,9 +19,8 @@ import { CheckoutForm } from './CheckoutForm';
 
 const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string;
 
-const stripePromise = loadStripe(stripePublicKey);
-
 export function SubscriptionSettings({ space }: { space: Space }) {
+  const stripePromise = useRef<Promise<Stripe | null>>(loadStripe(stripePublicKey));
   const {
     data: spaceSubscription = null,
     isLoading,
@@ -65,8 +65,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           </Stack>
         )}
         <Divider sx={{ mb: 1 }} />
-        {showCheckoutForm && stripePromise ? (
-          <Elements stripe={stripePromise}>
+        {showCheckoutForm && stripePromise.current ? (
+          <Elements stripe={stripePromise.current}>
             <CheckoutForm
               spaceSubscription={spaceSubscription}
               refetch={refetchSpaceSubscription}
