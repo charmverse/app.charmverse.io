@@ -1,5 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
-import { v4 as uuid } from 'uuid';
+
+import { getPagePath } from 'lib/pages/utils';
 
 export function untitledPage({ userId, spaceId }: { userId: string; spaceId: string }): Partial<Page> {
   return {
@@ -10,7 +11,7 @@ export function untitledPage({ userId, spaceId }: { userId: string; spaceId: str
       content: []
     },
     contentText: '',
-    path: uuid(),
+    path: getPagePath(),
     title: '',
     type: 'page',
     updatedAt: new Date(),
