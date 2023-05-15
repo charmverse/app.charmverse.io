@@ -85,6 +85,7 @@ export async function getSpaceMembers({
           avatar: userData.avatar || undefined,
           avatarTokenId: userData.avatarTokenId || undefined,
           username,
+          path: userData.path,
           onboarded: spaceRole.onboarded,
           isAdmin: spaceRole.isAdmin,
           isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,

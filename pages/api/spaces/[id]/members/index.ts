@@ -39,6 +39,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       id: sr.user.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      path: 'not-found',
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],

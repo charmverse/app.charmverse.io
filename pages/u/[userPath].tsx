@@ -12,7 +12,7 @@ import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import NexusLayout from 'components/common/PageLayout/NexusLayout';
-import { PublicProfile } from 'components/profile/PublicProfile';
+import { PublicProfile } from 'components/u/PublicProfile';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { isUUID } from 'lib/utilities/strings';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
