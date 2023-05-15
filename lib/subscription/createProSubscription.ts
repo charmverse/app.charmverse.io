@@ -34,7 +34,8 @@ export async function createProSubscription({
     where: { id: spaceId },
     select: {
       subscriptionId: true,
-      domain: true
+      domain: true,
+      id: true
     }
   });
 
@@ -60,7 +61,8 @@ export async function createProSubscription({
     metadata: {
       usage,
       period,
-      tier: 'pro'
+      tier: 'pro',
+      spaceId: space.id
     },
 
     customer: customer.id,
