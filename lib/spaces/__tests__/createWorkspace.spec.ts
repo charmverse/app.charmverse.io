@@ -13,7 +13,7 @@ import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalC
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
-import { spaceCreateTemplates } from '../config';
+import { staticSpaceTemplates } from '../config';
 import type { SpaceCreateInput } from '../createSpace';
 import { createWorkspace } from '../createSpace';
 
@@ -258,10 +258,10 @@ describe('createWorkspace', () => {
   });
 
   it('should always include the getting started page when creating a space', async () => {
-    for (const options of spaceCreateTemplates) {
+    for (const template of staticSpaceTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        spaceTemplate: options,
+        spaceTemplate: template.id,
         spaceData: {
           name: `Name-${v4()}`
         }

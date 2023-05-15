@@ -45,10 +45,10 @@ export const staticSpaceTemplates = [
   }
 ] as const;
 
-export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
-export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
-
 const dynamicTemplateIds = ['default', 'importNotion', 'importMarkdown'] as const;
 
 export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), ...dynamicTemplateIds];
+
+export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
+export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
 export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | 'templateGitcoin';
