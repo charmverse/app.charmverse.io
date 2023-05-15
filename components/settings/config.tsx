@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentInd';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -24,6 +25,15 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <AttachMoneyIcon fontSize='small' />, path: 'subscription', label: 'Subscription' }
 ];
+
+export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
+  const spaceTier = space.paidTier;
+  if (spaceTier === 'free') {
+    return SETTINGS_TABS;
+  } else {
+    return SETTINGS_TABS.filter((tab) => tab.path !== 'subscription');
+  }
+}
 
 export const accountSettingsSections = ['account', 'profile'] as const;
 
