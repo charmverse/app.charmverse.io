@@ -3,21 +3,32 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
+import { LoginPageView } from 'components/login/LoginPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import { sortNodes } from 'lib/pages/mapPageTree';
 
 // Redirect users to an initial page
 export default function RedirectToMainPage() {
   const router = useRouter();
+  const { user, isLoaded } = useUser();
   const space = useCurrentSpace();
   const { pages, loadingPages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? typeof window !== 'undefined' && localStorage.getItem(defaultPageKey) : null;
   const staticCommonPages = ['bounties', 'members', 'proposals'];
 
+  // Non-logged in users should see the login page
+  const returnUrl = router.query.returnUrl as string | undefined;
+  const showLogin = (isLoaded && !user) || returnUrl;
+
   useEffect(() => {
+    if (showLogin) {
+      return;
+    }
+
     const isCommonDefaultPage = defaultPage && staticCommonPages.some((page) => defaultPage.includes(`/${page}`));
     const isDynamicDefaultPage =
       !isCommonDefaultPage &&
@@ -44,6 +55,10 @@ export default function RedirectToMainPage() {
       }
     }
   }, [space, loadingPages, pages]);
+
+  if (showLogin) {
+    return <LoginPageView />;
+  }
 
   return null;
 }
