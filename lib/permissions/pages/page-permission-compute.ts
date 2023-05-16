@@ -1,6 +1,6 @@
 import type { PermissionFilteringPolicyFnInput } from '@charmverse/core';
 import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
-import type { PagePermission, Prisma } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -10,83 +10,9 @@ import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
-import type { IPagePermissionFlags, IPagePermissionUserRequest, PageOperationType } from './page-permission-interfaces';
+import type { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 import { permissionTemplates } from './page-permission-mapping';
 import { computePagePermissionsUsingProposalPermissions } from './pagePermissionsWithComputeProposalPermissions';
-
-/**
- * Nested query to get the space role a user has in the space that owns this page
- */
-function pageWithSpaceRoleQuery(request: IPagePermissionUserRequest): Prisma.PageFindFirstArgs {
-  return {
-    where: {
-      id: request.pageId
-    },
-    select: {
-      space: {
-        select: {
-          spaceRoles: {
-            where: {
-              userId: request.userId
-            }
-          }
-        }
-      }
-    }
-  };
-}
-
-/**
- * Get all permissions applicable to a user for a specific page
- */
-function permissionsQuery(request: IPagePermissionUserRequest): Prisma.PagePermissionFindManyArgs {
-  // Allows anonymous queries for only public permissions
-  if (!request.userId) {
-    return {
-      where: {
-        pageId: request.pageId,
-        public: true
-      }
-    };
-  }
-
-  return {
-    where: {
-      OR: [
-        {
-          userId: request.userId,
-          pageId: request.pageId
-        },
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId: request.userId
-                }
-              }
-            }
-          },
-          pageId: request.pageId
-        },
-        {
-          space: {
-            spaceRoles: {
-              some: {
-                userId: request.userId
-              }
-            }
-          },
-          pageId: request.pageId
-        },
-        {
-          public: true,
-          pageId: request.pageId
-        }
-      ]
-    }
-  };
-}
 
 type PageInDb = {
   id: string;

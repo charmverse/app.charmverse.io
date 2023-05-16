@@ -19,6 +19,7 @@ export interface IChainDetails {
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
+  shortName: string;
 }
 
 // Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services
@@ -410,6 +411,9 @@ export function getChainExplorerLink(
 
     case '80001':
       return `https://mumbai.polygonscan.com/${path}/${transactionOrContractId}`;
+
+    case '10':
+      return `https://optimistic.etherscan.io/${path}/${transactionOrContractId}`;
 
     default:
       return '';

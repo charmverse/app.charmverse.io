@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 
 type Props = {
-  postIdOrPath: string;
+  postIdOrPath?: string;
   spaceDomain?: string;
   isNewPost?: boolean;
 };
@@ -14,7 +14,7 @@ export function usePostPermissions({ postIdOrPath, spaceDomain, isNewPost }: Pro
     !postIdOrPath ? null : `compute-post-category-permissions-${postIdOrPath}${spaceDomain ?? ''}`,
     () =>
       charmClient.permissions.forum.computePostPermissions({
-        postIdOrPath,
+        postIdOrPath: postIdOrPath!,
         spaceDomain
       })
   );

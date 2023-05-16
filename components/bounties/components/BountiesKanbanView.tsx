@@ -19,7 +19,7 @@ interface Props {
   publicMode?: boolean;
 }
 
-export default function BountiesKanbanView({ bounties, publicMode }: Props) {
+export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
   const { setBounties, refreshBounty } = useBounties();
@@ -82,12 +82,9 @@ export default function BountiesKanbanView({ bounties, publicMode }: Props) {
         {bountyStatuses.map((bountyStatus) => (
           <div className='octo-board-column' key={bountyStatus}>
             {bountiesGroupedByStatus[bountyStatus]
-              .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
+              .filter((bounty) => Boolean(pages[bounty.page?.id]) && !pages[bounty.page.id]?.deletedAt)
               .map((bounty) => (
                 <BountyKanbanCard
-                  onDuplicate={(duplicatePageResponse) => {
-                    refreshBounty(duplicatePageResponse.rootPageId);
-                  }}
                   onDelete={onClickDelete}
                   readOnly={!!publicMode}
                   key={bounty.id}

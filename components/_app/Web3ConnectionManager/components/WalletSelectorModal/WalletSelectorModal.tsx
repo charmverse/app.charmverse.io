@@ -4,7 +4,6 @@ import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Alert from '@mui/material/Alert';
-import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
@@ -88,6 +87,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
 
   async function handleUnstoppableDomainsLogin() {
+    const UAuth = (await import('@uauth/js')).default;
     const uauth = new UAuth({
       clientID,
       redirectUri,

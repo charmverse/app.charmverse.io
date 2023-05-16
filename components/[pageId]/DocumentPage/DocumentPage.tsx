@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
@@ -16,6 +15,7 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
@@ -28,19 +28,16 @@ import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import ProposalProperties from './components/ProposalProperties';
+import { ProposalProperties } from './components/ProposalProperties';
 
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
-
-export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props} />)<{
+export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
   top: number;
   fullWidth?: boolean;
 }>`
@@ -51,7 +48,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
@@ -197,7 +194,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
           }
         }}
       >
-        <div ref={printRef} className='document-print-container'>
+        <div ref={printRef} className={`document-print-container ${fontClassName}`}>
           <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
             <div ref={containerRef}>
               <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
@@ -233,6 +230,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{
                     minHeight: proposalId ? '100px' : 'unset'
@@ -292,6 +290,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           pageId={page.id}
                           proposalId={proposalId}
                           pagePermissions={pagePermissions}
+                          snapshotProposalId={page.snapshotProposalId}
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}

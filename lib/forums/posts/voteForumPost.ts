@@ -5,7 +5,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 import { PostNotFoundError } from './errors';
 
-type PostVote = {
+export type PostVote = {
   postId: string;
   userId: string;
   upvoted: boolean | null;

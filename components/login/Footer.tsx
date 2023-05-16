@@ -52,6 +52,9 @@ export default function Footer() {
         <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
             <LinkHeader>Links</LinkHeader>
+            <StyledLink href='https://charmverse.io' target='_blank'>
+              What is CharmVerse?
+            </StyledLink>
             <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
               Privacy Policy
             </StyledLink>

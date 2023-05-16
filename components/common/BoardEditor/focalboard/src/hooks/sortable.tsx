@@ -43,13 +43,13 @@ function useSortableBase<T>(
   return [isDragging, isOver, drag, drop, preview];
 }
 
-export function useSortable<T>(
+export function useSortable<T, E = HTMLDivElement>(
   itemType: string,
   item: T,
   enabled: boolean,
   handler: (src: T, st: T) => void
-): [boolean, boolean, React.RefObject<HTMLDivElement>] {
-  const ref = useRef<HTMLDivElement>(null);
+): [boolean, boolean, React.RefObject<E>] {
+  const ref = useRef<E>(null);
   const [isDragging, isOver, drag, drop] = useSortableBase(itemType, item, enabled, handler);
   drop(drag(ref));
   return [isDragging, isOver, ref];

@@ -6,12 +6,8 @@ import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import {
-  checkSpacePermissionsEngine,
-  getPermissionsClient,
-  premiumPermissionsApiClient
-} from 'lib/permissions/api/routers';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
@@ -20,23 +16,34 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .get(requireKeys<ListForumPostsRequest>(['spaceId'], 'query'), getPosts)
-  .post(requireUser, requireKeys<CreateForumPostInput>(['categoryId'], 'body'), createForumPostController);
+  .get(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'query',
+      resourceIdType: 'space'
+    }),
+    getPosts
+  )
+  .post(
+    requireUser,
+    providePermissionClients({
+      key: 'categoryId',
+      location: 'body',
+      resourceIdType: 'postCategory'
+    }),
+    createForumPostController
+  );
 
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
   const userId = req.session.user?.id as string | undefined;
 
-  const shouldApplyPermissions =
-    (await checkSpacePermissionsEngine({
-      resourceId: postQuery.spaceId,
-      resourceIdType: 'space'
-    })) === 'private';
+  const shouldApplyPermissions = req.spacePermissionsEngine === 'premium';
 
   if (shouldApplyPermissions) {
     // Apply permissions to what we are searching for
     postQuery.categoryId = (
-      await premiumPermissionsApiClient.forum.mutatePostCategorySearch({
+      await req.premiumPermissionsClient.forum.mutatePostCategorySearch({
         spaceId: postQuery.spaceId,
         categoryId: postQuery.categoryId,
         userId
@@ -54,15 +61,10 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const categoryId = (req.body as CreateForumPostInput).categoryId;
 
-  const permissions = await getPermissionsClient({
+  const permissions = await req.basePermissionsClient.forum.computePostCategoryPermissions({
     resourceId: categoryId,
-    resourceIdType: 'postCategory'
-  }).then((client) =>
-    client.forum.computePostCategoryPermissions({
-      resourceId: categoryId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissions.create_post) {
     throw new ActionNotPermittedError(`You do not have permissions to create a post`);

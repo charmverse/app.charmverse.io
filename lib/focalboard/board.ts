@@ -45,6 +45,7 @@ export type BoardFields = {
   isTemplate?: boolean;
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
+  viewIds: string[];
 };
 
 type Board = Block & {
@@ -101,6 +102,7 @@ function createBoard({
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
+      viewIds: block?.fields?.viewIds ?? [],
       ...block?.fields,
       cardProperties
     }

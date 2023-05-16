@@ -3,7 +3,7 @@ services:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
-      com.datadoghq.tags.service: "${SERVICE_NAME}"
+      com.datadoghq.tags.service: '${SERVICE_NAME}'
     volumes:
       - $PWD/.env:/app/.env
     ports:
@@ -36,14 +36,24 @@ services:
   prd-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+      ]
     profiles:
       - prd-webapp
 
   stg-webapp:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000']
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+      ]
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
@@ -109,6 +119,7 @@ services:
       DD_APM_ENABLED: 'true'
       DD_APM_NON_LOCAL_TRAFFIC: 'true'
       DD_ENV: '${SERVICE_ENV:-tst}'
+      DD_SERVICE: '${SERVICE_NAME}'
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:

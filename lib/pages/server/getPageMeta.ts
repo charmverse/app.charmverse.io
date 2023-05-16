@@ -26,7 +26,6 @@ export function pageMetaSelect() {
     parentId: true,
     path: true,
     proposalId: true,
-    snapshotProposalId: true,
     title: true,
     spaceId: true,
     updatedAt: true,

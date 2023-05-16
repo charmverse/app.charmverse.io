@@ -265,7 +265,7 @@ class CharmClient {
     return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateMyGnosisSafe(wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
+  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
     return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 

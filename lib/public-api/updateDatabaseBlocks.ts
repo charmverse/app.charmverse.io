@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core';
-import type { Block } from '@prisma/client';
+import type { Block } from '@charmverse/core/prisma';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';

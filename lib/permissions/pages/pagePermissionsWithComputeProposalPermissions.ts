@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core';
 
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-
+import { getPermissionsClient } from '../api';
 import type { PermissionCompute } from '../interfaces';
 
 import { AllowedPagePermissions } from './available-page-permissions.class';
@@ -14,10 +13,13 @@ export async function computePagePermissionsUsingProposalPermissions({
   resourceId,
   userId
 }: PermissionCompute): Promise<IPagePermissionFlags> {
-  const proposalPermissions = await computeProposalPermissions({
-    resourceId,
-    userId
-  });
+  const proposalPermissions = await getPermissionsClient({ resourceId, resourceIdType: 'proposal' }).then(
+    ({ client }) =>
+      client.proposals.computeProposalPermissions({
+        resourceId,
+        userId
+      })
+  );
 
   const permissions = new AllowedPagePermissions();
 

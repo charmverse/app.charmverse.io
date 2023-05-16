@@ -1,7 +1,7 @@
 import type { Typeform } from '@typeform/api-client';
 import { v4 } from 'uuid';
 
-import { createBoardPropertyOptions } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { createBoardPropertyOptions } from 'components/common/PageActions/utils/databasePageOptions';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 

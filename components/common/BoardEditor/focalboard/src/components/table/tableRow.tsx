@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import { PageActionsMenu } from 'components/common/PageActionsMenu';
+import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
@@ -209,7 +209,7 @@ function TableRow(props: Props) {
           </div>
         );
       })}
-      {cardPage && !props.readOnly && (
+      {!props.readOnly && (
         <PageActionsMenu
           onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}

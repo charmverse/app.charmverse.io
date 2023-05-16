@@ -1,17 +1,16 @@
 import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/prisma';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 let space: Space;
 let user: User;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: false });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
 
   space = generated.space;
   user = generated.user;
@@ -19,11 +18,11 @@ beforeAll(async () => {
 
 describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal', () => {
   it('should return computed permissions for a user, and respond 200', async () => {
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
       userId: user.id,
@@ -31,7 +30,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       proposalStatus: 'draft'
     });
 
-    const role = await generateRole({
+    const role = await testUtilsMembers.generateRole({
       createdBy: user.id,
       spaceId: space.id,
       assigneeUserIds: [user.id]
@@ -45,7 +44,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await computeProposalPermissions({
+    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -62,17 +61,17 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
   });
 
   it('should support proposal path + domain as a resource ID for requesting permissions compute, and respond 200', async () => {
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
       userId: user.id
     });
 
-    const role = await generateRole({
+    const role = await testUtilsMembers.generateRole({
       createdBy: user.id,
       spaceId: space.id,
       assigneeUserIds: [user.id]
@@ -86,7 +85,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await computeProposalPermissions({
+    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -103,11 +102,11 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
   });
 
   it('should return computed permissions for a non user, and respond 200', async () => {
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
       userId: user.id
@@ -120,7 +119,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
     });
 
     // Non logged in user test case
-    const publicComputed = await computeProposalPermissions({
+    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: undefined
     });

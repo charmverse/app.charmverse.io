@@ -14,7 +14,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ConnectSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/ConnectSnapshot';
+import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
 import ImportContent from 'components/settings/workspace/ImportContent';

@@ -1,8 +1,8 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {

@@ -191,8 +191,10 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }
 
-  const hasValue = !!value && (typeof value === 'string' || Array.isArray(value) ? value.length !== 0 : value);
-
+  const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);
+  const hasArrayValue = Array.isArray(value) && value.length > 0;
+  const hasStringValue = !Array.isArray(value) && !!value;
+  const hasValue = hasCardValue || hasArrayValue || hasStringValue;
   if (!hasValue && props.readOnly && displayType !== 'details') {
     return null;
   }
@@ -204,7 +206,6 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
-
   return propertyValueElement;
 }
 

@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import type { LoggedInUser } from 'models';
 
-type IContext = {
+export type IContext = {
   user: LoggedInUser | null;
   setUser: (user: LoggedInUser | any) => void;
   updateUser: (user: Partial<LoggedInUser>) => void;
