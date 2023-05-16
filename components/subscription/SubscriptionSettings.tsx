@@ -5,7 +5,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { capitalize } from 'lodash';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -33,6 +33,19 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const { members } = useMembers();
+
+  useEffect(() => {
+    charmClient.track.trackAction('view_subscription', {
+      spaceId: space.id
+    });
+  }, []);
+
+  function handleShowCheckoutForm() {
+    setShowCheckoutForm(true);
+    charmClient.track.trackAction('initiate_subscription', {
+      spaceId: space.id
+    });
+  }
 
   if (isLoading) {
     return <LoadingComponent label='Fetching your space subscription' />;
@@ -86,7 +99,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               sx={{
                 width: 'fit-content'
               }}
-              onClick={() => setShowCheckoutForm(true)}
+              onClick={handleShowCheckoutForm}
             >
               Upgrade
             </Button>

@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core';
 import type Stripe from 'stripe';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import type { SubscriptionPeriod, SubscriptionUsage } from './constants';

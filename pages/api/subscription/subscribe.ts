@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type {
@@ -28,6 +29,18 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     billingEmail,
     fullName,
     streetAddress
+  });
+
+  trackUserAction('checkout_subscription', {
+    userId: req.session.user.id,
+    spaceId,
+    billingEmail,
+    fullName,
+    streetAddress,
+    usage,
+    period,
+    tier: 'pro',
+    result: paymentIntentStatus === 'succeeded' ? 'success' : 'failure'
   });
 
   res.status(200).json({
