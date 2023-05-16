@@ -56,7 +56,7 @@ services:
       ]
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
-      - PERMISSIONS_API_URL="http://permissions-api"
+      - PERMISSIONS_API_URL="http://permissions-api:3001"
     profiles:
       - stg-webapp
 
@@ -105,7 +105,6 @@ services:
       - '.env'
     environment:
       - HOST=permissions-api
-      - PORT=80
     profiles:
       - stg-webapp
 
