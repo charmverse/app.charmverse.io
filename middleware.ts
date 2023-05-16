@@ -2,10 +2,9 @@ import { log } from '@charmverse/core/log';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+import { DOMAIN_BLACKLIST } from 'lib/spaces/constants';
 import { getSpaceDomainFromUrlPath } from 'lib/utilities/getSpaceDomainFromUrlPath';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
-
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 

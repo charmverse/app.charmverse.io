@@ -1,6 +1,6 @@
 import { string } from 'yup';
 
-import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+import { DOMAIN_BLACKLIST } from 'lib/spaces/constants';
 
 export const domainSchema = string()
   .ensure()
