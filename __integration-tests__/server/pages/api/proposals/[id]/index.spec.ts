@@ -1,12 +1,14 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateSpaceUser, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
+import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateRole } from 'testing/setupDatabase';
 
 let author: User;
 let reviewer: User;
@@ -92,11 +94,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
-    const role = await testUtilsMembers.generateRole({
-      spaceId: adminSpace.id,
-      createdBy: adminUser.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
       spaceId: adminSpace.id,
@@ -109,10 +106,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
         {
           group: 'user',
           id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
         }
       ]
     };
@@ -126,8 +119,8 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     ).body as PageWithProposal;
 
     // Make sure update went through
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
+
+    expect(updated.proposal?.reviewers).toHaveLength(1);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
@@ -171,7 +164,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
-  it('should fail to update a proposal if the user is an admin', async () => {
+  it('should allow an admin to update any discussion stage proposal', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
@@ -180,7 +173,8 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      categoryId: proposalCategory.id,
+      proposalStatus: 'discussion'
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -197,6 +191,87 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .put(`/api/proposals/${page.proposalId}`)
       .set('Cookie', adminCookie)
       .send(updateContent)
+      .expect(200);
+  });
+
+  // This test is important so that it does not damage any existing proposals from before migrating our proposal system
+  // We should only use reviewer pool logic for new proposal reviewers
+  it('should fail to assign a new non-authorized user or role as a reviewer for a proposal', async () => {
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const adminCookie = await loginUser(adminUser.id);
+
+    const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
+
+    const userWithRole = await generateSpaceUser({
+      spaceId: adminSpace.id
+    });
+
+    const roleWithoutAccess = await generateRole({
+      createdBy: adminUser.id,
+      spaceId: adminSpace.id,
+      assigneeUserIds: [userWithRole.id]
+    });
+
+    // This role can only create pages but not review proposals
+    await addSpaceOperations({
+      forSpaceId: adminSpace.id,
+      roleId: roleWithoutAccess.id,
+      operations: ['createPage']
+    });
+
+    const { page } = await testUtilsProposals.generateProposal({
+      userId: proposalAuthor.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id,
+      proposalStatus: 'discussion',
+      reviewers: [{ group: 'user', id: userWithRole.id }]
+    });
+
+    const reviewerUserUpdate: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [
+        {
+          group: 'user',
+          id: userWithRole.id
+        }
+      ]
+    };
+
+    // Disallowed reviewer, but already exists so we expect a 200
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(reviewerUserUpdate)
+      .expect(200);
+
+    await prisma.proposalReviewer.deleteMany({
+      where: {
+        proposalId: page.proposalId as string
+      }
+    });
+
+    // The reviewer doesn't exist anymore. This request should now be a 401
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(reviewerUserUpdate)
+      .expect(401);
+
+    const reviewerRoleUpdate: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [
+        {
+          group: 'role',
+          id: roleWithoutAccess.id
+        }
+      ]
+    };
+
+    // Same as above, but test with a role
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(reviewerRoleUpdate)
       .expect(401);
   });
 
