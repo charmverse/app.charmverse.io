@@ -1,3 +1,4 @@
+import type { SpaceSubscription } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -23,7 +24,6 @@ import {
   type SubscriptionUsage
 } from 'lib/subscription/constants';
 import type { PaymentDetails } from 'lib/subscription/createProSubscription';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -96,7 +96,7 @@ export function CheckoutForm({
   useEffect(() => {
     if (spaceSubscription) {
       setPeriod(spaceSubscription.period);
-      setUsage(spaceSubscription.usage);
+      setUsage(spaceSubscription.usage as SubscriptionUsage);
     }
   }, [spaceSubscription]);
 

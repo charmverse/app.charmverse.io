@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core';
 import type Stripe from 'stripe';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import type { SubscriptionPeriod, SubscriptionUsage } from './constants';
@@ -42,17 +41,27 @@ export async function createProSubscription({
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
-      subscriptionId: true,
       domain: true,
-      id: true
+      id: true,
+      spaceSubscription: {
+        where: {
+          active: true
+        },
+        take: 1,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }
     }
   });
+
+  const activeSpaceSubscription = space?.spaceSubscription[0];
 
   if (!space) {
     throw new NotFoundError('Space not found');
   }
 
-  if (space.subscriptionId) {
+  if (activeSpaceSubscription) {
     throw new InvalidStateError('Space already has a subscription');
   }
 
@@ -105,7 +114,16 @@ export async function createProSubscription({
       id: spaceId
     },
     data: {
-      subscriptionId: subscription.id,
+      spaceSubscription: {
+        create: {
+          active: true,
+          customerId: customer.id,
+          subscriptionId: subscription.id,
+          period,
+          productId: product.id,
+          usage
+        }
+      },
       paidTier: 'pro'
     }
   });
