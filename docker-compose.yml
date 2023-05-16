@@ -56,6 +56,7 @@ services:
       ]
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
+      - PERMISSIONS_API_URL="http://permissions-api"
     profiles:
       - stg-webapp
 
@@ -92,8 +93,6 @@ services:
 
   permissions-api:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
-    ports:
-      - '80:3001'
     command:
       [
         'sh',
@@ -104,6 +103,9 @@ services:
       - $PWD/.env:/app/.env
     env_file:
       - '.env'
+    environment:
+      - HOST=permissions-api
+      - PORT=80
     profiles:
       - stg-webapp
 
