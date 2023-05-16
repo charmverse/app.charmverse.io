@@ -28,11 +28,11 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
 
 export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
   const spaceTier = space.paidTier;
-  if (spaceTier === 'free') {
-    return SETTINGS_TABS;
-  } else {
-    return SETTINGS_TABS.filter((tab) => tab.path !== 'subscription');
-  }
+  return SETTINGS_TABS.map((settingsTab) =>
+    settingsTab.path === 'subscription'
+      ? { ...settingsTab, label: spaceTier === 'free' ? 'Upgrade' : 'Plans & Billings' }
+      : settingsTab
+  );
 }
 
 export const accountSettingsSections = ['account', 'profile'] as const;

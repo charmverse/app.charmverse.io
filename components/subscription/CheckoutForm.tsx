@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { Divider, FormControlLabel, List, ListItemText, Typography } from '@mui/material';
+import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
@@ -20,6 +20,7 @@ import {
   type SubscriptionPeriod,
   type SubscriptionUsage
 } from 'lib/subscription/constants';
+import type { PaymentDetails } from 'lib/subscription/createProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 const StyledList = styled(List)`
@@ -29,6 +30,16 @@ const StyledList = styled(List)`
 
 const StyledListItemText = styled(ListItemText)`
   display: list-item;
+`;
+
+const StyledCardElementContainer = styled(Box)`
+  padding: ${({ theme }) => theme.spacing(1, 1.5)};
+  border: ${({ theme }) => `1px solid ${theme.palette.background.dark}`};
+  border-radius: 4px;
+  &:hover {
+    border: ${({ theme }) => `1px solid ${theme.palette.text.primary}`};
+  }
+  background-color: var(--input-bg);
 `;
 
 export function CheckoutForm({
@@ -42,6 +53,12 @@ export function CheckoutForm({
 }) {
   const stripe = useStripe();
   const elements = useElements();
+
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
+    fullName: '',
+    billingEmail: '',
+    streetAddress: ''
+  });
 
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -66,8 +83,13 @@ export function CheckoutForm({
   }, [spaceSubscription]);
 
   const cardError = cardEvent.cardNumber?.error || cardEvent.cvc?.error || cardEvent.expiry?.error;
-  const cardComplete = cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete;
-  const cardEmpty = cardEvent.cardNumber?.empty || cardEvent.cvc?.empty || cardEvent.expiry?.empty;
+  const cardComplete =
+    cardEvent.cardNumber?.complete &&
+    cardEvent.cvc?.complete &&
+    cardEvent.expiry?.complete &&
+    paymentDetails.fullName &&
+    paymentDetails.billingEmail &&
+    paymentDetails.streetAddress;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -95,7 +117,10 @@ export function CheckoutForm({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
           period,
-          usage
+          usage,
+          fullName: paymentDetails.fullName,
+          billingEmail: paymentDetails.billingEmail,
+          streetAddress: paymentDetails.streetAddress
         });
 
         if (clientSecret && paymentIntentStatus !== 'succeeded') {
@@ -117,8 +142,6 @@ export function CheckoutForm({
     await refetch();
     onCancel();
   };
-
-  const theme = useTheme();
 
   return (
     <Stack onSubmit={createSubscription} gap={1}>
@@ -168,13 +191,7 @@ export function CheckoutForm({
       <Stack display='flex' mb={2} flexDirection='row' gap={1}>
         <Stack gap={0.5} flexGrow={1}>
           <InputLabel>Card number</InputLabel>
-          <Box
-            sx={{
-              p: 1,
-              backgroundColor: 'background.light',
-              border: `2px solid ${theme.palette.background.dark}`
-            }}
-          >
+          <StyledCardElementContainer>
             <CardNumberElement
               options={{
                 disabled: isProcessing,
@@ -187,17 +204,11 @@ export function CheckoutForm({
                 })
               }
             />
-          </Box>
+          </StyledCardElementContainer>
         </Stack>
         <Stack gap={0.5} flexGrow={0.25}>
           <InputLabel>Expiry Date</InputLabel>
-          <Box
-            sx={{
-              p: 1,
-              backgroundColor: 'background.light',
-              border: `2px solid ${theme.palette.background.dark}`
-            }}
-          >
+          <StyledCardElementContainer>
             <CardExpiryElement
               options={{
                 disabled: isProcessing,
@@ -210,17 +221,11 @@ export function CheckoutForm({
                 })
               }
             />
-          </Box>
+          </StyledCardElementContainer>
         </Stack>
         <Stack gap={0.5} flexGrow={0.25}>
           <InputLabel>CVC</InputLabel>
-          <Box
-            sx={{
-              p: 1,
-              backgroundColor: 'background.light',
-              border: `2px solid ${theme.palette.background.dark}`
-            }}
-          >
+          <StyledCardElementContainer>
             <CardCvcElement
               options={{
                 disabled: isProcessing,
@@ -233,8 +238,46 @@ export function CheckoutForm({
                 })
               }
             />
-          </Box>
+          </StyledCardElementContainer>
         </Stack>
+      </Stack>
+      <Stack display='flex' flexDirection='row' gap={1}>
+        <Stack gap={0.5} flexGrow={1}>
+          <InputLabel>Full Name</InputLabel>
+          <TextField
+            value={paymentDetails.fullName}
+            onChange={(e) => {
+              setPaymentDetails({
+                ...paymentDetails,
+                fullName: e.target.value
+              });
+            }}
+          />
+        </Stack>
+        <Stack gap={0.5} flexGrow={1}>
+          <InputLabel>Billing Email</InputLabel>
+          <TextField
+            value={paymentDetails.billingEmail}
+            onChange={(e) => {
+              setPaymentDetails({
+                ...paymentDetails,
+                billingEmail: e.target.value
+              });
+            }}
+          />
+        </Stack>
+      </Stack>
+      <Stack gap={0.5}>
+        <InputLabel>Street Address</InputLabel>
+        <TextField
+          value={paymentDetails.streetAddress}
+          onChange={(e) => {
+            setPaymentDetails({
+              ...paymentDetails,
+              streetAddress: e.target.value
+            });
+          }}
+        />
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>
@@ -249,7 +292,7 @@ export function CheckoutForm({
           onClick={createSubscription}
           sx={{ width: 'fit-content' }}
           loading={isProcessing}
-          disabled={cardError || !cardComplete || cardEmpty || isProcessing || !stripe || !elements || !space}
+          disabled={cardError || !cardComplete || isProcessing || !stripe || !elements || !space}
         >
           {isProcessing ? 'Processing ... ' : 'Upgrade'}
         </Button>

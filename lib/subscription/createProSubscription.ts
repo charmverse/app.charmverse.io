@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core';
+import { capitalize } from 'lodash';
 import type Stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
@@ -7,7 +8,13 @@ import type { SubscriptionPeriod, SubscriptionUsage } from './constants';
 import { SUBSCRIPTION_USAGE_RECORD } from './constants';
 import { stripeClient } from './stripe';
 
-export type CreateProSubscriptionRequest = {
+export type PaymentDetails = {
+  fullName: string;
+  billingEmail: string;
+  streetAddress: string;
+};
+
+export type CreateProSubscriptionRequest = PaymentDetails & {
   spaceId: string;
   paymentMethodId: string;
   usage: SubscriptionUsage;
@@ -23,13 +30,15 @@ export async function createProSubscription({
   paymentMethodId,
   spaceId,
   period,
-  usage
+  usage,
+  billingEmail,
+  fullName
 }: {
   usage: SubscriptionUsage;
   paymentMethodId: string;
   spaceId: string;
   period: SubscriptionPeriod;
-}) {
+} & PaymentDetails) {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
@@ -49,12 +58,16 @@ export async function createProSubscription({
 
   // Create a customer
   const customer = await stripeClient.customers.create({
-    name: `${space.domain} - ${spaceId}`,
+    name: fullName,
     payment_method: paymentMethodId,
-    invoice_settings: { default_payment_method: paymentMethodId }
+    invoice_settings: { default_payment_method: paymentMethodId },
+    email: billingEmail
   });
 
   const product = await stripeClient.products.retrieve(`pro-${usage}-${period}`);
+
+  // In cent so multiplying by 100
+  const amount = SUBSCRIPTION_USAGE_RECORD[usage].pricing[period] * (period === 'monthly' ? 1 : 12) * 100;
 
   // Create a subscription
   const subscription = await stripeClient.subscriptions.create({
@@ -64,14 +77,13 @@ export async function createProSubscription({
       tier: 'pro',
       spaceId: space.id
     },
-
     customer: customer.id,
     items: [
       {
         price_data: {
           currency: 'USD',
           product: product.id,
-          unit_amount: SUBSCRIPTION_USAGE_RECORD[usage].pricing[period] * (period === 'monthly' ? 1 : 12) * 100,
+          unit_amount: amount,
           recurring: {
             interval: period === 'monthly' ? 'month' : 'year'
           }
@@ -84,6 +96,16 @@ export async function createProSubscription({
     },
     expand: ['latest_invoice.payment_intent']
   });
+
+  const invoice = await stripeClient.invoices.create({
+    customer: customer.id,
+    description: `Invoice for ${capitalize(period)} Community Subscription`,
+    currency: 'usd',
+    subscription: subscription.id,
+    days_until_due: period === 'monthly' ? 30 : 365
+  });
+
+  await stripeClient.invoices.sendInvoice(invoice.id);
 
   await prisma.space.update({
     where: {

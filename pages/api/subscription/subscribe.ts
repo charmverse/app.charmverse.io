@@ -17,13 +17,17 @@ handler
   .post(createPaymentSubscription);
 
 async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
-  const { period, usage, paymentMethodId, spaceId } = req.body as CreateProSubscriptionRequest;
+  const { period, usage, paymentMethodId, spaceId, billingEmail, fullName, streetAddress } =
+    req.body as CreateProSubscriptionRequest;
 
   const { clientSecret, paymentIntentStatus } = await createProSubscription({
     paymentMethodId,
     spaceId,
     period,
-    usage
+    usage,
+    billingEmail,
+    fullName,
+    streetAddress
   });
 
   res.status(200).json({
