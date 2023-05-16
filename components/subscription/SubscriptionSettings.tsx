@@ -10,6 +10,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
@@ -41,8 +42,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     <Stack>
       <Stack gap={1}>
         <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
-          Space subscription
+          {spaceSubscription === null ? 'Upgrade to Community' : 'Space subscription'}
         </Legend>
+        <Typography>
+          More blocks, user roles, guests, custom domains and more.{' '}
+          <Link href='https://charmverse.io/pricing' target='_blank'>
+            Read about all the benefits
+          </Link>
+        </Typography>
         <Stack>
           <InputLabel>Current tier</InputLabel>
           <Typography>{capitalize(spaceSubscription?.tier ?? 'free')}</Typography>

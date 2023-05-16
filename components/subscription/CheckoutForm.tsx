@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
@@ -8,7 +8,9 @@ import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useS
 import type { StripeElementChangeEvent } from '@stripe/stripe-js';
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import type { KeyedMutator } from 'swr';
+import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -34,13 +36,21 @@ const StyledListItemText = styled(ListItemText)`
 
 const StyledCardElementContainer = styled(Box)`
   padding: ${({ theme }) => theme.spacing(1, 1.5)};
-  border: ${({ theme }) => `1px solid ${theme.palette.background.dark}`};
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   &:hover {
     border: ${({ theme }) => `1px solid ${theme.palette.text.primary}`};
   }
   background-color: var(--input-bg);
 `;
+
+const schema = () => {
+  return yup.object({
+    billingEmail: yup.string().email().required(),
+    streetAddress: yup.string(),
+    fullName: yup.string().required()
+  });
+};
 
 export function CheckoutForm({
   onCancel,
@@ -54,10 +64,18 @@ export function CheckoutForm({
   const stripe = useStripe();
   const elements = useElements();
 
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    fullName: '',
-    billingEmail: '',
-    streetAddress: ''
+  const {
+    register,
+    getValues,
+    formState: { errors, isValid }
+  } = useForm<PaymentDetails>({
+    mode: 'onChange',
+    defaultValues: {
+      fullName: '',
+      billingEmail: '',
+      streetAddress: ''
+    },
+    resolver: yupResolver(schema())
   });
 
   const space = useCurrentSpace();
@@ -82,14 +100,14 @@ export function CheckoutForm({
     }
   }, [spaceSubscription]);
 
-  const cardError = cardEvent.cardNumber?.error || cardEvent.cvc?.error || cardEvent.expiry?.error;
+  const cardError =
+    cardEvent.cardNumber?.error ||
+    cardEvent.cvc?.error ||
+    cardEvent.expiry?.error ||
+    errors.billingEmail ||
+    errors.fullName;
   const cardComplete =
-    cardEvent.cardNumber?.complete &&
-    cardEvent.cvc?.complete &&
-    cardEvent.expiry?.complete &&
-    paymentDetails.fullName &&
-    paymentDetails.billingEmail &&
-    paymentDetails.streetAddress;
+    cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete && isValid;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -113,6 +131,7 @@ export function CheckoutForm({
       });
 
       if (paymentMethod.paymentMethod) {
+        const paymentDetails = getValues();
         const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription({
           spaceId: space.id,
           paymentMethodId: paymentMethod.paymentMethod.id,
@@ -123,14 +142,18 @@ export function CheckoutForm({
           streetAddress: paymentDetails.streetAddress
         });
 
-        if (clientSecret && paymentIntentStatus !== 'succeeded') {
-          const { error } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: paymentMethod.paymentMethod.id
-          });
-          if (error) {
-            showMessage('Payment failed! Please try again', 'error');
+        if (clientSecret) {
+          if (paymentIntentStatus !== 'succeeded') {
+            const { error } = await stripe.confirmCardPayment(clientSecret, {
+              payment_method: paymentMethod.paymentMethod.id
+            });
+            if (error) {
+              showMessage('Payment failed! Please try again', 'error');
+            } else {
+              showMessage('Payment successful! Community subscription active.', 'success');
+            }
           } else {
-            showMessage('Payment successful! Subscription active.', 'success');
+            showMessage('Payment successful! Community subscription active.', 'success');
           }
         }
       }
@@ -244,40 +267,16 @@ export function CheckoutForm({
       <Stack display='flex' flexDirection='row' gap={1}>
         <Stack gap={0.5} flexGrow={1}>
           <InputLabel>Full Name</InputLabel>
-          <TextField
-            value={paymentDetails.fullName}
-            onChange={(e) => {
-              setPaymentDetails({
-                ...paymentDetails,
-                fullName: e.target.value
-              });
-            }}
-          />
+          <TextField disabled={isProcessing} {...register('fullName')} />
         </Stack>
         <Stack gap={0.5} flexGrow={1}>
           <InputLabel>Billing Email</InputLabel>
-          <TextField
-            value={paymentDetails.billingEmail}
-            onChange={(e) => {
-              setPaymentDetails({
-                ...paymentDetails,
-                billingEmail: e.target.value
-              });
-            }}
-          />
+          <TextField disabled={isProcessing} {...register('billingEmail')} />
         </Stack>
       </Stack>
       <Stack gap={0.5}>
         <InputLabel>Street Address</InputLabel>
-        <TextField
-          value={paymentDetails.streetAddress}
-          onChange={(e) => {
-            setPaymentDetails({
-              ...paymentDetails,
-              streetAddress: e.target.value
-            });
-          }}
-        />
+        <TextField disabled={isProcessing} {...register('streetAddress')} />
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>

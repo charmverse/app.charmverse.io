@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core';
-import { capitalize } from 'lodash';
 import type Stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
@@ -97,15 +96,8 @@ export async function createProSubscription({
     expand: ['latest_invoice.payment_intent']
   });
 
-  const invoice = await stripeClient.invoices.create({
-    customer: customer.id,
-    description: `Invoice for ${capitalize(period)} Community Subscription`,
-    currency: 'usd',
-    subscription: subscription.id,
-    days_until_due: period === 'monthly' ? 30 : 365
-  });
-
-  await stripeClient.invoices.sendInvoice(invoice.id);
+  const invoice = subscription.latest_invoice as Stripe.Invoice;
+  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
 
   await prisma.space.update({
     where: {
@@ -116,8 +108,6 @@ export async function createProSubscription({
       paidTier: 'pro'
     }
   });
-
-  const paymentIntent = (subscription.latest_invoice as Stripe.Invoice).payment_intent as Stripe.PaymentIntent;
 
   return {
     paymentIntentStatus: paymentIntent?.status ?? null,
