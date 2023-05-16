@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
-import type { PrismaTransactionClient, Prisma } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';

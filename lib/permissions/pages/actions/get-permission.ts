@@ -1,4 +1,4 @@
-import type { PrismaTransactionClient } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { IPagePermissionWithSource } from '../page-permission-interfaces';

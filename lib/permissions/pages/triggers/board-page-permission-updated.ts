@@ -1,4 +1,5 @@
-import type { OptionalPrismaTransaction, PagePermission, Prisma, PrismaPromise } from '@charmverse/core/prisma';
+import type { PagePermission, Prisma, PrismaPromise } from '@charmverse/core/prisma';
+import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { flattenTree } from 'lib/pages/mapPageTree';

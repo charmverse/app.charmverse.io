@@ -1,4 +1,5 @@
-import type { OptionalPrismaTransaction, Prisma } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
+import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from 'lib/utilities/errors';
