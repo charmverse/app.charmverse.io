@@ -18,7 +18,6 @@ export async function middleware(req: NextRequest) {
   // Skip api routes
   if (url.pathname.includes('/api/')) return;
   // Skip public pages
-  // console.log('🔥nexturl:', req.nextUrl);
   const isPublicPage = DOMAIN_BLACKLIST.some((page) => url.pathname.startsWith(`/${page}`));
   // console.log('isPublicPage:', isPublicPage);
   if (isPublicPage) return;
