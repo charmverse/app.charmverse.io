@@ -13,6 +13,7 @@ import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
+import type { SubscriptionUsage } from 'lib/subscription/constants';
 import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/constants';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -69,7 +70,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           <>
             <Stack>
               <InputLabel>Current tier</InputLabel>
-              <Typography>{capitalize(spaceSubscription?.tier ?? 'free')}</Typography>
+              <Typography>{spaceSubscription ? 'Pro' : 'Free'}</Typography>
             </Stack>
             {spaceSubscription?.period && (
               <Stack>
@@ -81,9 +82,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               <Stack>
                 <InputLabel>Usage</InputLabel>
                 <Stack>
-                  <Typography>Blocks: 0/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage].totalBlocks}</Typography>
                   <Typography>
-                    Members: {members.length}/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage].totalActiveUsers}
+                    Blocks: 0/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage as SubscriptionUsage].totalBlocks}
+                  </Typography>
+                  <Typography>
+                    Members: {members.length}/
+                    {SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage as SubscriptionUsage].totalActiveUsers}
                   </Typography>
                 </Stack>
               </Stack>

@@ -114,21 +114,24 @@ export async function createProSubscription({
       id: spaceId
     },
     data: {
-      spaceSubscription: {
-        create: {
-          active: true,
-          customerId: customer.id,
-          subscriptionId: subscription.id,
-          period,
-          productId: product.id,
-          usage
-        }
-      },
       paidTier: 'pro'
     }
   });
 
+  const spaceSubscription = await prisma.spaceSubscription.create({
+    data: {
+      active: true,
+      customerId: customer.id,
+      subscriptionId: subscription.id,
+      period,
+      productId: product.id,
+      usage,
+      spaceId: space.id
+    }
+  });
+
   return {
+    subscriptionId: spaceSubscription.id,
     paymentIntentStatus: paymentIntent?.status ?? null,
     clientSecret: paymentIntent?.client_secret ?? null
   };

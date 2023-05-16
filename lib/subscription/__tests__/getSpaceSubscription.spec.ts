@@ -1,17 +1,9 @@
 import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { getSpaceSubscription } from '../getSpaceSubscription';
-import { stripeClient } from '../stripe';
-
-jest.mock('../stripe', () => ({
-  stripeClient: {
-    subscriptions: {
-      retrieve: jest.fn()
-    }
-  }
-}));
 
 describe('getSpaceSubscription', () => {
   it(`Should return null if space subscription doesn't exist`, async () => {
@@ -27,35 +19,22 @@ describe('getSpaceSubscription', () => {
 
     const subscriptionId = v4();
 
-    await prisma.space.update({
-      data: {
-        subscriptionId
-      },
-      where: {
-        id: space.id
-      }
+    await addSpaceSubscription({
+      spaceId: space.id,
+      usage: 1,
+      subscriptionId,
+      period: 'monthly'
     });
-
-    const retrieveSubscriptionsMockFn = jest.fn().mockResolvedValue({
-      metadata: {
-        usage: 1,
-        period: 'monthly',
-        tier: 'pro',
-        spaceId: space.id
-      }
-    });
-
-    (stripeClient.subscriptions.retrieve as jest.Mock<any, any>) = retrieveSubscriptionsMockFn;
 
     const spaceSubscription = await getSpaceSubscription({ spaceId: space.id });
 
-    expect(retrieveSubscriptionsMockFn).toHaveBeenCalledWith(subscriptionId);
-
-    expect(spaceSubscription).toStrictEqual({
-      usage: 1,
-      period: 'monthly',
-      tier: 'pro',
-      spaceId: space.id
-    });
+    expect(spaceSubscription).toMatchObject(
+      expect.objectContaining({
+        usage: 1,
+        subscriptionId,
+        period: 'monthly',
+        spaceId: space.id
+      })
+    );
   });
 });

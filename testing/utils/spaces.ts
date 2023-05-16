@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core';
+import type { SpaceSubscription } from '@charmverse/core/dist/cjs/prisma';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
@@ -79,4 +80,28 @@ export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, s
   }
 
   return space;
+}
+
+export async function addSpaceSubscription({
+  spaceId,
+  active = true,
+  customerId = v4(),
+  period = 'monthly',
+  productId = v4(),
+  subscriptionId = v4(),
+  usage = 1
+}: { spaceId: string } & Partial<Omit<SpaceSubscription, 'spaceId'>>) {
+  const spaceSubscription = await prisma.spaceSubscription.create({
+    data: {
+      spaceId,
+      active,
+      customerId,
+      period,
+      usage,
+      productId,
+      subscriptionId
+    }
+  });
+
+  return spaceSubscription;
 }

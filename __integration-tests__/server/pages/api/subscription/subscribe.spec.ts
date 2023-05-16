@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { addSpaceSubscription } from 'testing/utils/spaces';
 
 describe('POST /api/subscription/subscribe - Create subscription for space', () => {
   it('should throw error if the user is not an admin and return 401', async () => {
@@ -20,7 +21,10 @@ describe('POST /api/subscription/subscribe - Create subscription for space', () 
         paymentMethodId,
         spaceId: space.id,
         period: 'monthly',
-        usage: 1
+        usage: 1,
+        billingEmail: 'test@gmail.com',
+        fullName: 'John Doe',
+        streetAddress: '123 Main St'
       })
       .expect(401);
   });
@@ -29,13 +33,8 @@ describe('POST /api/subscription/subscribe - Create subscription for space', () 
     const { space, user } = await generateUserAndSpaceWithApiToken({});
     const userCookie = await loginUser(user.id);
 
-    await prisma.space.update({
-      data: {
-        subscriptionId: v4()
-      },
-      where: {
-        id: space.id
-      }
+    await addSpaceSubscription({
+      spaceId: space.id
     });
 
     const paymentMethodId = v4();
@@ -47,7 +46,10 @@ describe('POST /api/subscription/subscribe - Create subscription for space', () 
         paymentMethodId,
         spaceId: space.id,
         period: 'monthly',
-        usage: 1
+        usage: 1,
+        billingEmail: 'test@gmail.com',
+        fullName: 'John Doe',
+        streetAddress: '123 Main St'
       })
       .expect(400);
   });

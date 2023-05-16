@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { SUBSCRIPTION_USAGE_RECORD } from '../constants';
 import { createProSubscription } from '../createProSubscription';
@@ -25,7 +26,7 @@ jest.mock('../stripe', () => ({
 }));
 
 describe('createProSubscription', () => {
-  it('should successfully create pro subscription for space and return client secret', async () => {
+  it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
     const paymentMethodId = v4();
@@ -60,13 +61,17 @@ describe('createProSubscription', () => {
       paymentMethodId,
       period: 'monthly',
       spaceId: space.id,
-      usage: 1
+      usage: 1,
+      billingEmail: 'test@gmail.com',
+      fullName: 'John Doe',
+      streetAddress: '123 Main St'
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
-      name: `${space.domain} - ${space.id}`,
+      name: `John Doe`,
       payment_method: paymentMethodId,
-      invoice_settings: { default_payment_method: paymentMethodId }
+      invoice_settings: { default_payment_method: paymentMethodId },
+      email: 'test@gmail.com'
     });
 
     expect(retrieveProductsMockFn).toHaveBeenCalledWith(`pro-1-monthly`);
@@ -99,36 +104,24 @@ describe('createProSubscription', () => {
     });
 
     expect(
-      await prisma.space.findUniqueOrThrow({
+      await prisma.spaceSubscription.findFirstOrThrow({
         where: {
-          id: space.id
-        },
-        select: {
-          subscriptionId: true,
-          paidTier: true
+          spaceId: space.id,
+          active: true,
+          customerId,
+          subscriptionId,
+          productId,
+          period: 'monthly',
+          usage: 1
         }
       })
-    ).toStrictEqual({
-      subscriptionId,
-      paidTier: 'pro'
-    });
+    ).not.toBeFalsy();
 
     expect(paymentIntentStatus).toStrictEqual('succeeded');
     expect(clientSecret).toStrictEqual(client_secret);
   });
 
   it("should throw error if space doesn't exist", async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
-
-    await prisma.space.update({
-      data: {
-        subscriptionId: v4()
-      },
-      where: {
-        id: space.id
-      }
-    });
-
     const paymentMethodId = v4();
 
     await expect(
@@ -136,21 +129,19 @@ describe('createProSubscription', () => {
         paymentMethodId,
         period: 'monthly',
         spaceId: v4(),
-        usage: 1
+        usage: 1,
+        billingEmail: 'test@gmail.com',
+        fullName: 'John Doe',
+        streetAddress: '123 Main St'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it('should throw error if space already has a subscription', async () => {
+  it('should throw error if space already has an active subscription', async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
-    await prisma.space.update({
-      data: {
-        subscriptionId: v4()
-      },
-      where: {
-        id: space.id
-      }
+    await addSpaceSubscription({
+      spaceId: space.id
     });
 
     const paymentMethodId = v4();
@@ -160,7 +151,10 @@ describe('createProSubscription', () => {
         paymentMethodId,
         period: 'monthly',
         spaceId: space.id,
-        usage: 1
+        usage: 1,
+        billingEmail: 'test@gmail.com',
+        fullName: 'John Doe',
+        streetAddress: '123 Main St'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
