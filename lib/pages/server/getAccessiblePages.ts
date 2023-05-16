@@ -9,15 +9,6 @@ import type { IPageWithPermissions, PageMeta, PageNodeWithPermissions } from '..
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>;
 type PageFieldsWithoutContent = Record<keyof PageMeta, true>;
-type PagesRequest = {
-  spaceId: string;
-  userId?: string;
-  archived?: boolean;
-  pageIds?: string[];
-  search?: string;
-  limit?: number;
-};
-
 /**
  * Utility for getting permissions of a page
  * @returns
