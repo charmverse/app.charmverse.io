@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { customAlphabet } from 'nanoid';
 import fs from 'node:fs/promises';
 

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Page, PagePermission, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';

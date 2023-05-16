@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { createUserFromWallet } from 'lib/users/createUser';
 import { DisabledAccountError } from 'lib/utilities/errors';

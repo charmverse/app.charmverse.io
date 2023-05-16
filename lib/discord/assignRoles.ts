@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from './getDiscordAccount';
 

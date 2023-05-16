@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { CommunityDetails } from 'components/u/components/CommunityRow';
 import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';

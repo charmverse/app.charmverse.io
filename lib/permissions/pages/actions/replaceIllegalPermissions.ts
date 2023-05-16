@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
 import type {
   OptionalPrismaTransaction,
   PrismaTransactionClient,
   PagePermission,
   Prisma
 } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type {
   IPageWithPermissions,

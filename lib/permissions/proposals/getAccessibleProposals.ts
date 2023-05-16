@@ -1,7 +1,7 @@
 import type { ListProposalsRequest, ProposalWithCommentsAndUsers, ProposalWithUsers } from '@charmverse/core';
 import { generateCategoryIdQuery, hasAccessToSpace } from '@charmverse/core';
 import type { Prisma, ProposalStatus, SpaceRole } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import uniqBy from 'lodash/uniqBy';
 
 function isReviewerOrAuthorQuery({

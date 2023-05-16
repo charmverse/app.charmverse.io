@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { ProposalCategory, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import type { PageWithProposal } from 'lib/pages';

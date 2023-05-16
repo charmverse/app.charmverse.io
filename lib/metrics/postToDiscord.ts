@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
 import type { Bounty, Page, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
 import { isProdEnv, isTestEnv } from 'config/constants';

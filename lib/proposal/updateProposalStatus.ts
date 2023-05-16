@@ -1,5 +1,6 @@
 import type { WorkspaceEvent } from '@charmverse/core/prisma';
-import { prisma, ProposalStatus } from '@charmverse/core/prisma';
+import { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';

@@ -1,6 +1,6 @@
 // mock the db file with a prisma client that we can disconnect from the db after tests are run
 // testing git diff
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 afterAll(() => {
   prisma.$disconnect();

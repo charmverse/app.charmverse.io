@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { UserSpaceNotificationSettings } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export type ClientUserSpaceNotifications = {
   forums: {

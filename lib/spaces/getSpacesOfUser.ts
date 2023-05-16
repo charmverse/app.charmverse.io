@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 // Get a count of all the space an user is part of
 export function getSpacesOfUser(userId: string) {

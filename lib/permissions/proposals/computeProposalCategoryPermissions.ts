@@ -1,7 +1,7 @@
 import type { PermissionCompute, ProposalCategoryPermissionFlags } from '@charmverse/core';
 import { AvailableProposalCategoryPermissions } from '@charmverse/core';
 import type { SpaceRole } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { ProposalCategoryNotFoundError } from 'lib/proposal/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
 import type { Page, PageDiff } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';

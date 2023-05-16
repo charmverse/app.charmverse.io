@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';

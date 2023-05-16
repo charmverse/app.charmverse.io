@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
 import type { User, UserWallet } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { uniqBy } from 'lodash';
 
 import { getENSDetails } from 'lib/blockchain';

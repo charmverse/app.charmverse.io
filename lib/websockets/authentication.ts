@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 

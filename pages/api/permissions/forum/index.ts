@@ -1,5 +1,5 @@
 import type { AssignedPostCategoryPermission } from '@charmverse/core';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

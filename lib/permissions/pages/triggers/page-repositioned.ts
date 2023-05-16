@@ -1,5 +1,5 @@
 import type { PrismaTransactionClient } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions, PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';

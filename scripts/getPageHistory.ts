@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { fancyTrim } from 'lib/utilities/strings';
 
 const spaceDomain = 'charmverse';

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { InviteLink, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 export type InviteLinkPopulated = InviteLink & { space: Space };

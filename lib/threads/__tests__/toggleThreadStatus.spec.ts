@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';

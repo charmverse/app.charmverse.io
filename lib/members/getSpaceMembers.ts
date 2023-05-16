@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { MemberProperty } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getMemberSearchValue } from 'lib/members/getMemberSearchValue';

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 type GetVisiblePropertiesProps = {
   spaceId: string | string[];

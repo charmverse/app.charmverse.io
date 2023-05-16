@@ -1,6 +1,6 @@
 import { truncate } from 'fs/promises';
 
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';

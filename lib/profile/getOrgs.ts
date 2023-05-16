@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';

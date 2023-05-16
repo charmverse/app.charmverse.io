@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Space, SpaceRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 

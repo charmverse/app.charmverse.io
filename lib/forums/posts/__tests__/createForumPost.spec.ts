@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Post, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { doc, poll } from 'testing/prosemirror';

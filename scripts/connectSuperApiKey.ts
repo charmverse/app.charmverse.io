@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function enableSpaceAccess(spaceId: string, tokenName: string) {
   const token = await prisma.superApiToken.findUniqueOrThrow({

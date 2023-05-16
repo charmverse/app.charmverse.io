@@ -1,5 +1,6 @@
 import type { Transaction } from '@charmverse/core/prisma';
-import { prisma, ApplicationStatus } from '@charmverse/core/prisma';
+import { ApplicationStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import type { SafeTxStatusDetails } from 'lib/gnosis/getSafeTxStatus';

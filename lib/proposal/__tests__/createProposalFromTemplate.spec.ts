@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken, generateSpaceUser } from 'testing/setupDatabase';

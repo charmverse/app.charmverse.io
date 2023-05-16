@@ -1,6 +1,6 @@
 import type { ProposalCategoryWithPermissions, SpaceResourcesRequest } from '@charmverse/core';
 import { stringUtils, hasAccessToSpace } from '@charmverse/core';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 

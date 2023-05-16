@@ -6,7 +6,7 @@ import {
   buildComputePermissionsWithPermissionFilteringPolicies
 } from '@charmverse/core';
 import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';

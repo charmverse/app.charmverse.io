@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';

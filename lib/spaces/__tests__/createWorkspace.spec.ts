@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core/prisma';
 import type {
   PostCategoryPermission,
   ProposalCategoryPermission,
@@ -6,6 +5,7 @@ import type {
   SpaceRole,
   User
 } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';

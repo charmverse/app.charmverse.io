@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { prisma, Prisma } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getClient } from './authClient';
 import { decryptToken, encryptToken } from './token';

@@ -1,6 +1,6 @@
 import type { Node } from '@bangle.dev/pm';
 import { getLogger } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 

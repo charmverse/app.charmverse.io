@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma';
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
