@@ -1,4 +1,5 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { generateSpaceUser, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';

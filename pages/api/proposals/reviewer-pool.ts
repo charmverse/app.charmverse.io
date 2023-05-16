@@ -1,5 +1,6 @@
 import type { ProposalReviewerPool, Resource } from '@charmverse/core';
 import { ProposalNotFoundError, hasAccessToSpace } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
