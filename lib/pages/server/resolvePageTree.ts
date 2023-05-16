@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
-import type { OptionalTransaction } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 
@@ -79,13 +79,13 @@ export async function resolvePageTree({
 }: PageTreeResolveInput & {
   flattenChildren?: undefined | false;
   fullPage?: false | undefined;
-} & OptionalTransaction): Promise<TargetPageTree<PageNodeWithPermissions>>;
+} & OptionalPrismaTransaction): Promise<TargetPageTree<PageNodeWithPermissions>>;
 export async function resolvePageTree({
   pageId,
   flattenChildren,
   fullPage,
   pageNodes
-}: PageTreeResolveInput & { flattenChildren: true; fullPage?: false | undefined } & OptionalTransaction): Promise<
+}: PageTreeResolveInput & { flattenChildren: true; fullPage?: false | undefined } & OptionalPrismaTransaction): Promise<
   TargetPageTreeWithFlatChildren<PageNodeWithPermissions>
 >;
 // Full pages
@@ -94,7 +94,7 @@ export async function resolvePageTree({
   flattenChildren,
   fullPage,
   pageNodes
-}: PageTreeResolveInput & { flattenChildren?: undefined | false; fullPage: true } & OptionalTransaction): Promise<
+}: PageTreeResolveInput & { flattenChildren?: undefined | false; fullPage: true } & OptionalPrismaTransaction): Promise<
   TargetPageTree<IPageWithPermissions>
 >;
 export async function resolvePageTree({
@@ -102,7 +102,7 @@ export async function resolvePageTree({
   flattenChildren,
   fullPage,
   pageNodes
-}: PageTreeResolveInput & { flattenChildren: true; fullPage: true } & OptionalTransaction): Promise<
+}: PageTreeResolveInput & { flattenChildren: true; fullPage: true } & OptionalPrismaTransaction): Promise<
   TargetPageTreeWithFlatChildren<IPageWithPermissions>
 >;
 export async function resolvePageTree({
@@ -112,7 +112,7 @@ export async function resolvePageTree({
   fullPage,
   pageNodes,
   tx = prisma
-}: PageTreeResolveInput & OptionalTransaction): Promise<
+}: PageTreeResolveInput & OptionalPrismaTransaction): Promise<
   TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>
 > {
   const pageWithSpaceIdOnly = pageNodes
@@ -199,7 +199,7 @@ export async function multiResolvePageTree<F extends boolean | undefined>({
   flattenChildren,
   fullPage,
   tx = prisma
-}: MultiPageTreeResolveInput<F> & OptionalTransaction): Promise<MultiPageTreeResolveOutput<F>> {
+}: MultiPageTreeResolveInput<F> & OptionalPrismaTransaction): Promise<MultiPageTreeResolveOutput<F>> {
   const pagesWithSpaceIds = (
     await tx.page.findMany({
       where: {

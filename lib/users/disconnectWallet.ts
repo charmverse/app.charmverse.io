@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 

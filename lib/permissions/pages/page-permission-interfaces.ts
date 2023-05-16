@@ -5,7 +5,6 @@ import type {
   PageOperations as PageOperationEnum,
   Role,
   Space,
-  User,
   Page
 } from '@charmverse/core/prisma';
 

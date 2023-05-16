@@ -1,5 +1,6 @@
 import type { ProposalReviewerPool, Resource } from '@charmverse/core';
-import { ProposalNotFoundError, prisma } from '@charmverse/core';
+import { ProposalNotFoundError } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getProposalReviewerPool({ resourceId }: Resource): Promise<ProposalReviewerPool> {
   const proposal = await prisma.proposal.findUnique({

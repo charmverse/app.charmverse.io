@@ -34,7 +34,7 @@ export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> & {
   avatar?: string;
   isBot?: boolean;
-  path?: string;
+  path: string;
   deletedAt?: Date;
   avatarTokenId?: string;
   isAdmin?: boolean;

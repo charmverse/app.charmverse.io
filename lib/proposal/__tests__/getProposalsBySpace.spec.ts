@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
