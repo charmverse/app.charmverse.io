@@ -105,5 +105,6 @@ export function getDefaultWorkspaceUrl(spaces: Space[]) {
 
   const isValidDefaultWorkspace =
     !!defaultWorkspace && spaces.some((space) => defaultWorkspace.startsWith(`/${space.domain}`));
-  return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;
+
+  return isValidDefaultWorkspace ? `/${defaultWorkspace}` : `/${spaces[0].domain}`;
 }
