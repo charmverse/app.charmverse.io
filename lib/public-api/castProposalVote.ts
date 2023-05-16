@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';

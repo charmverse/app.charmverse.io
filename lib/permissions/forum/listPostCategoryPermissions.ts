@@ -1,4 +1,6 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core';
+
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -6,7 +8,6 @@ import { isUUID } from 'lib/utilities/strings';
 
 import type { PermissionCompute } from '../interfaces';
 
-import type { AssignedPostCategoryPermission } from './interfaces';
 import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 
 export async function listPostCategoryPermissions({

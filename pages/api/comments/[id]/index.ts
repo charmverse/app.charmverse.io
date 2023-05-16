@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { deleteComment, updateComment } from 'lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { PageContent } from 'lib/prosemirror/interfaces';

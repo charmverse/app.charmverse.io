@@ -1,13 +1,13 @@
-import type { WorkspaceEvent } from '@prisma/client';
-import { ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { WorkspaceEvent } from '@charmverse/core/prisma';
+import { ProposalStatus } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import { computeProposalFlowFlags } from './computeProposalFlowFlags';
 import type { ProposalWithUsers } from './interface';
 
 export async function updateProposalStatus({
@@ -27,26 +27,14 @@ export async function updateProposalStatus({
   } else if (!proposalId) {
     throw new InvalidInputError('Please provide a valid proposalId');
   }
-  // const proposal = (await prisma.proposal.findUnique({
-  //   where: {
-  //     id: proposalId
-  //   },
-  //   include: {
-  //     category: true,
-  //     authors: true,
-  //     reviewers: true,
-  //     page: {
-  //       select: {
-  //         snapshotProposalId: true
-  //       }
-  //     }
-  //   }
-  // })) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
 
-  const statusFlow = await computeProposalFlowFlags({
-    proposalId,
-    userId
-  });
+  const statusFlow = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(
+    ({ client }) =>
+      client.proposals.computeProposalFlowPermissions({
+        resourceId: proposalId,
+        userId
+      })
+  );
 
   if (!statusFlow[newStatus]) {
     throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);

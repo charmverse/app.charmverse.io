@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { InvalidStateError } from 'lib/middleware';
 
 import type { ProposalReviewerInput, ProposalWithUsers } from './interface';

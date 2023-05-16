@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { PageNotFoundError } from 'lib/pages/server';
 import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 

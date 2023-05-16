@@ -1,8 +1,8 @@
-import type { SpaceRole, SpaceRoleToRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';

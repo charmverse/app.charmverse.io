@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { UpdateCommentInput } from 'lib/comments';
 
 export async function updatePageComment({

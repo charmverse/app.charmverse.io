@@ -1,16 +1,17 @@
 /* eslint-disable max-len */
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import type { Page } from '@prisma/client';
-import dynamic from 'next/dynamic';
+import { Box } from '@mui/material';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import type { Board } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -22,36 +23,41 @@ import Editable from '../widgets/editable';
 
 import BlockIconSelector from './blockIconSelector';
 
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
+const BoardTitleEditable = styled(Editable)`
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 32px;
+  flex-grow: 1;
+  width: 100%;
+`;
 
-const StyledEditable = styled(Editable)`
-  font-size: 22px !important;
+const InlineBoardTitleEditable = styled(BoardTitleEditable)`
+  font-size: 22px;
 `;
 
 type ViewTitleInlineProps = {
-  board: Board;
+  pageTitle: string;
   readOnly: boolean;
   setPage: (page: Partial<Page>) => void;
 };
 
 type ViewTitleProps = ViewTitleInlineProps & {
   pageIcon?: string | null;
+  board: Board;
 };
 
+// NOTE: This is actually the title of the board, not a particular view
 function ViewTitle(props: ViewTitleProps) {
-  const { board, pageIcon } = props;
+  const { board, pageTitle, pageIcon } = props;
 
-  const [title, setTitle] = useState(board.title);
+  const [title, setTitle] = useState(pageTitle);
   const onEditTitleSave = useCallback(() => {
-    mutator.changeTitle(board.id, board.title, title);
     props.setPage({ title });
-  }, [board.id, board.title, title]);
+  }, [pageTitle, title]);
   const onEditTitleCancel = useCallback(() => {
-    setTitle(board.title);
-    props.setPage({ title: board.title });
-  }, [board.title]);
+    setTitle(pageTitle);
+    props.setPage({ title: pageTitle });
+  }, [pageTitle]);
   const onDescriptionChange = useCallback(
     (text: PageContent) => mutator.changeDescription(board.id, board.fields.description, text),
     [board.id, board.fields.description]
@@ -59,7 +65,7 @@ function ViewTitle(props: ViewTitleProps) {
   const onAddRandomIcon = useCallback(() => {
     const newIcon = BlockIcons.shared.randomIcon();
     props.setPage({ icon: newIcon });
-  }, [board.id]);
+  }, []);
   const setRandomHeaderImage = useCallback(
     (headerImage?: string | null) => {
       const newHeaderImage = headerImage ?? randomBannerImage();
@@ -137,10 +143,9 @@ function ViewTitle(props: ViewTitleProps) {
         )}
       </div>
 
-      <div className='title' data-test='board-title'>
+      <Box mb={2} data-test='board-title'>
         <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
-        <Editable
-          className='title'
+        <BoardTitleEditable
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}
           onChange={(newTitle) => setTitle(newTitle)}
@@ -150,13 +155,13 @@ function ViewTitle(props: ViewTitleProps) {
           readOnly={props.readOnly}
           spellCheck={true}
         />
-      </div>
+      </Box>
 
       {board.fields.showDescription && (
         <div className='description'>
           <CharmEditor
             disablePageSpecificFeatures
-            isContentControlled={true}
+            isContentControlled
             content={board.fields.description}
             onContentChange={(content: ICharmEditorOutput) => {
               onDescriptionChange(content.doc);
@@ -171,13 +176,12 @@ function ViewTitle(props: ViewTitleProps) {
 }
 
 export function InlineViewTitle(props: ViewTitleInlineProps) {
-  const { board } = props;
+  const { pageTitle } = props;
 
-  const [title, setTitle] = useState(board.title);
+  const [title, setTitle] = useState(pageTitle);
   const onEditTitleSave = useCallback(() => {
-    mutator.changeTitle(board.id, board.title, title);
     props.setPage({ title });
-  }, [board.id, board.title, title]);
+  }, [title]);
 
   // cancel key events, such as "Delete" or "Backspace" so that prosemiror doesnt pick them up on inline dbs
   function cancelEvent(e: KeyboardEvent<HTMLDivElement>) {
@@ -185,9 +189,8 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
   }
 
   return (
-    <div onKeyDown={cancelEvent}>
-      <StyledEditable
-        className='title'
+    <Box mb={1} onKeyDown={cancelEvent}>
+      <InlineBoardTitleEditable
         value={title}
         placeholderText='Untitled'
         onChange={(newTitle) => setTitle(newTitle)}
@@ -196,7 +199,7 @@ export function InlineViewTitle(props: ViewTitleInlineProps) {
         readOnly={props.readOnly}
         spellCheck={true}
       />
-    </div>
+    </Box>
   );
 }
 

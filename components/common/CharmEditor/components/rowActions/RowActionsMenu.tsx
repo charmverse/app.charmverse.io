@@ -1,6 +1,7 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
@@ -11,10 +12,8 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import log from 'lib/log';
 import type { PagesMap } from 'lib/pages';
 
 import type { PluginState } from './rowActions';
@@ -33,9 +32,7 @@ const menuPosition: Partial<MenuProps> = {
 function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
-  const { currentPageId } = useCurrentPage();
   const { deletePage, pages } = usePages();
-  const currentPage = pages[currentPageId];
   const currentSpace = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
@@ -109,7 +106,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   async function duplicateRow() {
     const node = _getNode();
     const tr = view.state.tr;
-    if (node?.node.type.name === 'page' && currentPage) {
+    if (node?.node.type.name === 'page') {
       if (currentSpace && node?.node.attrs.id) {
         const { rootPageId } = await charmClient.pages.duplicatePage({
           pageId: node?.node.attrs.id

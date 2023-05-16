@@ -59,7 +59,7 @@ export function BoldButton({ hints = ['Bold', boldKeys.toggleBold], children = <
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsBoldActive()(view.state)}
       isDisabled={!view.editable || !toggleBold()(view.state)}
@@ -79,7 +79,7 @@ export function InlineActionButton({
 }: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey; enable: boolean }) {
   const view = useEditorViewContext();
 
-  const onMouseDown = useCallback(
+  const onClick = useCallback(
     (e: any) => {
       e.preventDefault();
       const command = filter(
@@ -103,7 +103,7 @@ export function InlineActionButton({
 
   return (
     <MenuButton
-      onMouseDown={onMouseDown}
+      onClick={onClick}
       hints={hints}
       // Figure out when the button will be disabled
       isDisabled={!enable}
@@ -152,7 +152,7 @@ export function StrikeButton({
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsStrikeActive()(view.state)}
       isDisabled={!view.editable || !toggleStrike()(view.state)}
@@ -178,7 +178,7 @@ export function UnderlineButton({
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsUnderlineActive()(view.state)}
       isDisabled={!view.editable || !toggleUnderline()(view.state)}
@@ -208,7 +208,7 @@ export function CalloutButton({
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={blockquote.commands.queryIsBlockquoteActive()(view.state)}
       isDisabled={!view.editable || !blockquote.commands.wrapInBlockquote()(view.state)}
@@ -233,7 +233,7 @@ export function ItalicButton({ hints = ['Italic', italicKeys.toggleItalic], chil
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsItalicActive()(view.state)}
       isDisabled={!view.editable || !toggleItalic()(view.state)}
@@ -257,7 +257,7 @@ export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <Und
     [view]
   );
   return (
-    <MenuButton onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !undo()(view.state)}>
+    <MenuButton onClick={onSelect} hints={hints} isDisabled={!view.editable || !undo()(view.state)}>
       {children}
     </MenuButton>
   );
@@ -265,7 +265,7 @@ export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <Und
 
 export function CodeButton({
   hints = ['Code', codeKeys.toggleCode],
-  children = <CodeIcon fontSize={16} />
+  children = <CodeIcon fontSize={{ xs: 20, md: 16 }} />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -281,7 +281,7 @@ export function CodeButton({
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsCodeActive()(view.state)}
       isDisabled={!view.editable || !toggleCode()(view.state)}
@@ -311,7 +311,7 @@ export function HeadingButton({
   );
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsHeadingActive(level)(view.state)}
       isDisabled={!view.editable || !toggleHeading(level)(view.state)}
@@ -340,7 +340,7 @@ export function ParagraphButton({
 
   return (
     <MenuButton
-      onMouseDown={onSelect}
+      onClick={onSelect}
       hints={hints}
       isActive={queryIsTopLevelParagraph()(view.state)}
       isDisabled={!view.editable || !convertToParagraph()(view.state)}
@@ -357,7 +357,7 @@ export function FloatingLinkButton({
 }: ButtonProps & { menuKey: PluginKey }) {
   const view = useEditorViewContext();
 
-  const onMouseDown = useCallback(
+  const onClick = useCallback(
     (e: any) => {
       e.preventDefault();
       const command = filter(
@@ -381,7 +381,7 @@ export function FloatingLinkButton({
 
   return (
     <MenuButton
-      onMouseDown={onMouseDown}
+      onClick={onClick}
       hints={hints}
       isActive={queryIsLinkActive()(view.state)}
       isDisabled={!view.editable || !createLink('')(view.state)}

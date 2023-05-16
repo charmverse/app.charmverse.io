@@ -1,6 +1,5 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
-
-import { prisma } from 'db';
 
 import { generateUser } from '../users';
 

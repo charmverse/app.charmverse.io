@@ -10,7 +10,7 @@ function CreatedBy(props: Props) {
   const member = getMemberById(props.userId);
 
   return member ? (
-    <div style={{ width: 'fit-content' }} className='UserProperty readonly octo-propertyvalue'>
+    <div style={{ width: 'fit-content' }} className=' readonly octo-propertyvalue'>
       <UserDisplay user={member} avatarSize='xSmall' fontSize='small' />
     </div>
   ) : null;

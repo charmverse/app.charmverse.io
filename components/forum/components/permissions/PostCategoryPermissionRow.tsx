@@ -1,18 +1,18 @@
 /* eslint-disable camelcase */
+import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
+import type { PostCategoryPermissionAssignment } from '@charmverse/core/shared';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { PostCategoryPermissionLevel } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import { postCategoryPermissionLabels } from './shared';
+import { forumMemberPermissionOptions, postCategoryPermissionLabels } from './shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
@@ -23,7 +23,7 @@ type Props = {
   postCategoryId: string;
   canEdit: boolean;
   disabledTooltip?: string;
-  updatePermission: (newPermission: PostCategoryPermissionInput & { id?: string }) => void;
+  updatePermission: (newPermission: PostCategoryPermissionAssignment & { id?: string }) => void;
   deletePermission: (permissionId: string) => void;
 };
 
@@ -42,14 +42,12 @@ export function PostCategoryRolePermissionRow({
   const roles = useRoles();
   const space = useCurrentSpace();
 
-  const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
-
-  const { full_access, view } = postCategoryPermissionLabels;
+  const defaultExists = !!defaultPermissionLevel;
+  const usingDefault = defaultExists && defaultPermissionLevel === permissionLevel;
 
   const friendlyLabels = {
-    full_access,
-    view,
-    delete: (defaultPermissionLevel ? (
+    ...forumMemberPermissionOptions,
+    delete: (assignee.group !== 'space' && defaultExists ? (
       <em>Default: {postCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
       'Remove'
@@ -58,7 +56,7 @@ export function PostCategoryRolePermissionRow({
   };
 
   // remove delete option if there is no existing permission
-  if (!existingPermissionId) {
+  if (!existingPermissionId && !defaultExists) {
     delete friendlyLabels.delete;
   }
 
@@ -83,13 +81,13 @@ export function PostCategoryRolePermissionRow({
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>
       <Typography variant='body2'>{label || assigneeName}</Typography>
-      <div style={{ width: '150px', textAlign: 'left' }}>
+      <div style={{ width: '180px', textAlign: 'left' }}>
         <Tooltip title={tooltip}>
           <span>
             <SmallSelect
               disabled={!canEdit}
               data-test={assignee.group === 'space' ? 'category-space-permission' : null}
-              sx={{ opacity: usingDefault ? 0.5 : 1 }}
+              sx={{ opacity: !permissionLevel || usingDefault ? 0.5 : 1 }}
               renderValue={(value) => friendlyLabels[value as keyof typeof friendlyLabels]}
               onChange={handleUpdate as (opt: string) => void}
               keyAndLabel={friendlyLabels}

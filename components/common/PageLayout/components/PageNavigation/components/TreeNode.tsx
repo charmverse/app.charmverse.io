@@ -1,6 +1,6 @@
+import type { Page } from '@charmverse/core/prisma';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import type { Page } from '@prisma/client';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 

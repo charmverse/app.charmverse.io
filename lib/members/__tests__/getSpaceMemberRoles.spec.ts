@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 
 import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
 import { assignRole } from 'lib/roles';

@@ -1,21 +1,20 @@
+import type { PermissionCompute, PostPermissionFlags } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
-import type { AvailablePostPermissionFlags } from 'lib/permissions/forum/interfaces';
-import type { PermissionCompute } from 'lib/permissions/interfaces';
+import { onError, onNoMatch } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
+handler.post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailablePostPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<PostPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
   let resourceId = input.resourceId;
@@ -45,10 +44,13 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Avai
     }
   }
 
-  const permissions = await computePostPermissions({
-    resourceId,
-    userId: req.session.user?.id
-  });
+  const permissions = await getPermissionsClient({ resourceId, resourceIdType: 'post' }).then(({ client }) =>
+    client.forum.computePostPermissions({
+      resourceId,
+      userId: req.session.user?.id
+    })
+  );
+
   res.status(200).json(permissions);
 }
 

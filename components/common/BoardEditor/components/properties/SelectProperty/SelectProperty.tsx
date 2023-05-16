@@ -20,7 +20,6 @@ const SelectPreviewContainer = styled(Stack, {
   shouldForwardProp: (prop: string) => prop !== 'displayType'
 })<ContainerProps>`
   justify-content: center;
-
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   transition: background-color 0.2s ease-in-out;
 
@@ -88,6 +87,7 @@ type Props = {
   onCreateOption?: (option: IPropertyOption) => void;
   onUpdateOption?: (option: IPropertyOption) => void;
   onDeleteOption?: (option: IPropertyOption) => void;
+  wrapColumn?: boolean;
 };
 
 export function SelectProperty({
@@ -100,7 +100,8 @@ export function SelectProperty({
   onUpdateOption,
   onDeleteOption,
   onCreateOption,
-  displayType
+  displayType,
+  wrapColumn
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -154,6 +155,8 @@ export function SelectProperty({
     return (
       <SelectPreviewContainer onClick={onEdit} displayType={displayType}>
         <SelectPreview
+          sx={{ height: '100%' }}
+          wrapColumn={wrapColumn}
           value={selectValue}
           options={selectOptions}
           size='small'

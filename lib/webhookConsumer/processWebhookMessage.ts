@@ -78,7 +78,7 @@ export async function processWebhookMessage(message: WebhookMessage): Promise<We
   if (!data?.event || !messageHandlers[data?.event] || !data?.payload) {
     // we cannot process this message, just remove from queue
     return {
-      success: false,
+      success: true,
       message: `Unsupported message type or payload: ${data?.event || 'undefined'}`
     };
   }
@@ -87,7 +87,7 @@ export async function processWebhookMessage(message: WebhookMessage): Promise<We
   const hasPermission = await verifyWebhookMessagePermission(message);
   if (!hasPermission) {
     return {
-      success: false,
+      success: true,
       message: 'Webhook message without permission to be parsed.'
     };
   }

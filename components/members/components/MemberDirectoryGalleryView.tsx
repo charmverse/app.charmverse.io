@@ -1,16 +1,16 @@
+import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import type { Social } from 'components/profile/interfaces';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { SocialIcons } from 'components/u/components/UserDetails/SocialIcons';
+import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -47,14 +47,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    showMemberProfile(member.id);
+    showUserProfile(member.id);
   }
 
   const social = (member.profile?.social as Social) ?? {};
@@ -190,6 +190,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
               return memberProperty ? (
                 <SelectPreview
                   size='small'
+                  wrapColumn
                   options={property.options as SelectOptionType[]}
                   value={memberProperty.value as string | string[]}
                   name={property.name}

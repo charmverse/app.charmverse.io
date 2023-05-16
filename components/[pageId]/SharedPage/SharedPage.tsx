@@ -13,8 +13,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { BountyWithDetails } from 'lib/bounties';
-import type { PublicPageResponse } from 'lib/pages';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
 
 type Props = {
   publicPage: PublicPageResponse;
@@ -25,7 +24,7 @@ export function SharedPage({ publicPage }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
-  // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
+
   const basePageId = publicPage?.page?.id || '';
 
   const { setBounties, loadingBounties } = useBounties();
@@ -86,8 +85,8 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   return currentPage.type.match(/board/) ? (
-    <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
+    <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} />
+    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
   );
 }

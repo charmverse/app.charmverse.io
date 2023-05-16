@@ -1,6 +1,0 @@
--- AlterTable
-ALTER TABLE "Vote" ADD COLUMN     "postId" UUID,
-ALTER COLUMN "pageId" DROP NOT NULL;
-
--- AddForeignKey
-ALTER TABLE "Vote" ADD CONSTRAINT "Vote_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,7 +1,7 @@
-import type { Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateCommentWithThreadAndPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -35,8 +35,7 @@ describe('addComment', () => {
 
     expect(newComment.content).toBe(newCommentMessage);
 
-    expect(newComment.user).toBeDefined();
-    expect(newComment.user.id).toBe(user.id);
+    expect(newComment.userId).toBe(user.id);
   });
 
   it('should fail if the comment content is empty', async () => {

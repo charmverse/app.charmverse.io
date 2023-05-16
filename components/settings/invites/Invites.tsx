@@ -1,5 +1,5 @@
+import type { Space } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
-import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 

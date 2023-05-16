@@ -7,7 +7,7 @@ import type {
   Space,
   User,
   Page
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 
 import type { UserPermissionFlags } from '../interfaces';
 

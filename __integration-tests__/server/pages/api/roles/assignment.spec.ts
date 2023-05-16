@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { prisma } from '@charmverse/core';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

@@ -1,8 +1,8 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
 import { baseUrl } from 'testing/mockApiCall';
 import {

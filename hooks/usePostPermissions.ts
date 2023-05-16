@@ -1,10 +1,10 @@
+import { AvailablePostPermissions } from '@charmverse/core/shared';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AvailablePostPermissions } from 'lib/permissions/forum/availablePostPermissions.class';
 
 type Props = {
-  postIdOrPath: string;
+  postIdOrPath?: string;
   spaceDomain?: string;
   isNewPost?: boolean;
 };
@@ -14,7 +14,7 @@ export function usePostPermissions({ postIdOrPath, spaceDomain, isNewPost }: Pro
     !postIdOrPath ? null : `compute-post-category-permissions-${postIdOrPath}${spaceDomain ?? ''}`,
     () =>
       charmClient.permissions.forum.computePostPermissions({
-        postIdOrPath,
+        postIdOrPath: postIdOrPath!,
         spaceDomain
       })
   );

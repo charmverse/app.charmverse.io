@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 async function init() {
   const profileItems = await prisma.profileItem.findMany({

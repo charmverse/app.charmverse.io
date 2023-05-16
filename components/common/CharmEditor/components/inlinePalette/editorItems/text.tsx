@@ -1,6 +1,7 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
+import type { PageType, SpaceOperation } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -12,7 +13,6 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import type { PageType, SpaceOperation } from '@prisma/client';
 import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
 

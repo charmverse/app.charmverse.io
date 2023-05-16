@@ -2,12 +2,9 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
-import { useCurrentPage } from './useCurrentPage';
-
-export function useApiPageKeys() {
-  const { currentPageId } = useCurrentPage();
-  const { data, isLoading } = useSWR(currentPageId ? `/api/api-page-key?pageId=${currentPageId}` : null, () =>
-    charmClient.getApiPageKeys({ pageId: currentPageId })
+export function useApiPageKeys(pageId: string | undefined) {
+  const { data, isLoading } = useSWR(pageId ? `/api/api-page-key?pageId=${pageId}` : null, () =>
+    charmClient.getApiPageKeys({ pageId: pageId! })
   );
 
   return { keys: data, isLoadingKeys: isLoading };

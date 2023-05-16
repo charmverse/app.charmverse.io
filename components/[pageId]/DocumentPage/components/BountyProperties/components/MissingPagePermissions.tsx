@@ -1,6 +1,6 @@
+import type { BountyPermissionLevel } from '@charmverse/core/prisma';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import type { BountyPermissionLevel } from '@prisma/client';
 
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';

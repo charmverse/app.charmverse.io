@@ -110,6 +110,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
+        viewIds={activeBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -129,7 +130,7 @@ function ViewHeader(props: Props) {
       <div className='octo-spacer' />
 
       <Box
-        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1!important' : 'initial!important' }}
+        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1 !important' : undefined }}
         className='view-actions'
       >
         {!props.readOnly && activeView && (
@@ -156,14 +157,12 @@ function ViewHeader(props: Props) {
             </Button>
             <Popover
               {...bindPopover(viewFilterPopup)}
-              PaperProps={{
-                sx: {
-                  overflow: 'visible'
-                }
-              }}
               anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'left'
+              }}
+              sx={{
+                overflow: 'auto'
               }}
             >
               <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />

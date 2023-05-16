@@ -5,10 +5,9 @@ import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { tooltipPlacement } from '@bangle.dev/tooltip';
 import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey, Selection } from 'prosemirror-state';
-
-import log from 'lib/log';
 
 import { triggerInputRule } from './trigger-input-rule';
 
@@ -35,8 +34,10 @@ export const defaultKeys = {
 function specFactory({
   markName,
   trigger,
-  markColor
+  markColor,
+  excludes
 }: {
+  excludes?: string;
   markName: string;
   trigger?: string;
   markColor?: string;
@@ -45,8 +46,8 @@ function specFactory({
     name: markName,
     type: 'mark',
     schema: {
+      excludes,
       inclusive: true,
-      excludes: '_',
       group: 'suggestTriggerMarks',
       parseDOM: [{ tag: `span[data-${markName}]` }],
       toDOM: (mark) => {

@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import { getPOAPs } from 'lib/blockchain/poaps';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

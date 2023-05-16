@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 
 export async function removeSpaceMemberDiscord({
@@ -9,6 +10,9 @@ export async function removeSpaceMemberDiscord({
   discordServerId: string;
 }) {
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+  if (!spacesData) {
+    return;
+  }
 
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>

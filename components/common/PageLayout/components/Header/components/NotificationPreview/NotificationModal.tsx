@@ -74,6 +74,12 @@ export function NotificationModal() {
       fullWidth
       maxWidth='lg'
       contentSx={{ padding: 0 }}
+      PaperProps={{
+        sx: {
+          background: (theme) =>
+            theme.palette.mode === 'dark' ? 'var(--background-dark)' : 'var(--background-default)'
+        }
+      }}
     >
       <Box
         display='flex'
@@ -133,7 +139,7 @@ export function NotificationModal() {
                 pt={{ xs: 1, md: 3 }}
               >
                 <Typography variant={isMobile ? 'h6' : 'h5'} textTransform='capitalize' fontWeight={700}>
-                  {`${notificationDisplayType} Notifications`}
+                  {`${notificationDisplayType || 'All'} Notifications`}
                 </Typography>
                 <Box display='flex' alignItems='center' gap={{ sm: 2, xs: 1 }}>
                   {notificationDisplayType && hasUnreadNotifications[notificationDisplayType] && (

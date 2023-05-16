@@ -1,10 +1,10 @@
-import type { Block } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Block } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { BlockTypes } from 'lib/focalboard/block';
-import log from 'lib/log';
 import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';

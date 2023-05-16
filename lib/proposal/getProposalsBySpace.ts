@@ -1,7 +1,6 @@
-import { prisma } from 'db';
+import { generateCategoryIdQuery, prisma } from '@charmverse/core';
 
 import type { ProposalWithCommentsAndUsers, ProposalWithUsers } from './interface';
-import { generateCategoryIdQuery } from './utils';
 
 export type ListProposalsRequest = {
   spaceId: string;

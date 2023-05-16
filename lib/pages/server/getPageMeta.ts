@@ -1,8 +1,7 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { TransactionClient } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
 import { validate } from 'uuid';
-
-import type { TransactionClient } from 'db';
-import { prisma } from 'db';
 
 import type { PageMeta } from '../interfaces';
 
@@ -27,7 +26,6 @@ export function pageMetaSelect() {
     parentId: true,
     path: true,
     proposalId: true,
-    snapshotProposalId: true,
     title: true,
     spaceId: true,
     updatedAt: true,

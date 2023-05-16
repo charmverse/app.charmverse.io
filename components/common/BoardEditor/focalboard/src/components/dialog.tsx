@@ -38,7 +38,7 @@ function FBDialog(props: Props) {
               {toolsMenu}
               {!props.hideCloseButton && (
                 <IconButton size='small' onClick={props.onClose}>
-                  <CloseIcon data-test='close-dialog' color='secondary' fontSize='small' />
+                  <CloseIcon data-test='close-modal' color='secondary' fontSize='small' />
                 </IconButton>
               )}
             </div>

@@ -1,10 +1,7 @@
-import type { CSSObject } from '@emotion/serialize';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { MenuItem, Menu } from '@mui/material';
+import type { MouseEvent } from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
-import Select, { components } from 'react-select';
-
-import { getSelectBaseStyle } from '../../theme';
 
 type Option = {
   label: string;
@@ -164,58 +161,14 @@ function generateTypesByOption(): Map<string, string[]> {
   return mapping;
 }
 
-const baseStyles = getSelectBaseStyle();
-
-const styles = {
-  ...baseStyles,
-  dropdownIndicator: (provided: CSSObject): CSSObject => ({
-    ...baseStyles.dropdownIndicator(provided),
-    pointerEvents: 'none'
-  }),
-  control: (): CSSObject => ({
-    border: 0,
-    width: '100%',
-    margin: '0',
-    display: 'flex',
-    flexDirection: 'row'
-  }),
-  menu: (provided: CSSObject): CSSObject => ({
-    ...provided,
-    minWidth: '100%',
-    width: 'max-content',
-    background: 'rgb(var(--center-channel-bg-rgb))',
-    left: '0',
-    marginBottom: '0'
-  }),
-  singleValue: (provided: CSSObject): CSSObject => ({
-    ...baseStyles.singleValue(provided),
-    opacity: '0.8',
-    fontSize: '12px',
-    right: '0',
-    textTransform: 'uppercase'
-  }),
-  valueContainer: (provided: CSSObject): CSSObject => ({
-    ...baseStyles.valueContainer(provided),
-    display: 'none',
-    pointerEvents: 'none'
-  })
-};
-
-const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator(props) {
-  return (
-    <components.DropdownIndicator {...props}>
-      <ExpandLessIcon fontSize='small' />
-    </components.DropdownIndicator>
-  );
-};
-
 // Calculation option props shared by all implementations of calculation options
 type CommonCalculationOptionProps = {
   value: string;
-  menuOpen: boolean;
   onClose?: () => void;
-  components?: { [key: string]: (props: any) => JSX.Element };
-  onChange: (data: any) => void;
+  onChange?: (data: any) => void;
+  anchorEl: HTMLElement | null;
+  menuOpen: boolean;
+  menuItemComponent?: (props: { data: any; onClick: (e: MouseEvent) => void }) => JSX.Element;
 };
 
 // Props used by the base calculation option component
@@ -226,35 +179,53 @@ type BaseCalculationOptionProps = CommonCalculationOptionProps & {
 function CalculationOptions(props: BaseCalculationOptionProps): JSX.Element {
   const intl = useIntl();
 
+  function handleMenuItemClick(event: MouseEvent, value: string) {
+    if (props.onChange) {
+      props.onChange(value);
+    }
+    if (props.onClose) {
+      props.onClose();
+    }
+  }
+
   return (
-    <Select
-      styles={styles}
-      value={Options[props.value]}
-      isMulti={false}
-      isClearable={true}
-      name='calculation_options'
-      className='CalculationOptions'
-      classNamePrefix='CalculationOptions'
-      options={props.options}
-      menuPlacement='auto'
-      isSearchable={false}
-      components={{ DropdownIndicator, ...(props.components || {}) }}
-      defaultMenuIsOpen={props.menuOpen}
-      autoFocus={true}
-      formatOptionLabel={(option: Option, meta) => {
-        return meta.context === 'menu' ? optionLabelString(option, intl) : optionDisplayNameString(option, intl);
+    <Menu
+      anchorEl={props.anchorEl}
+      open={props.menuOpen}
+      anchorOrigin={{
+        horizontal: 'center',
+        vertical: 'top'
       }}
-      onMenuClose={() => {
+      transformOrigin={{
+        horizontal: 'center',
+        vertical: 'bottom'
+      }}
+      autoFocus={true}
+      onClose={() => {
         if (props.onClose) {
           props.onClose();
         }
       }}
-      onChange={(item) => {
-        if (item?.value) {
-          props.onChange(item.value);
-        }
-      }}
-    />
+    >
+      {props.options.map((option) =>
+        props.menuItemComponent ? (
+          <props.menuItemComponent
+            key={option.value}
+            data={option}
+            onClick={(event) => handleMenuItemClick(event, option.value)}
+          />
+        ) : (
+          <MenuItem
+            key={option.value}
+            selected={props.value === option.value}
+            value={option.value}
+            onClick={(event) => handleMenuItemClick(event, option.value)}
+          >
+            {optionLabelString(option, intl)}
+          </MenuItem>
+        )
+      )}
+    </Menu>
   );
 }
 

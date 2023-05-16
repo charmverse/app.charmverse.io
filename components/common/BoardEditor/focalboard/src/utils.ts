@@ -1,4 +1,5 @@
 /* eslint-disable no-plusplus */
+import { log } from '@charmverse/core/log';
 import { DateTime } from 'luxon';
 import { marked } from 'marked';
 import type { IntlShape } from 'react-intl';
@@ -8,7 +9,6 @@ import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
-import log from 'lib/log';
 
 import { createCommentBlock } from './blocks/commentBlock';
 import type { IAppWindow } from './types';

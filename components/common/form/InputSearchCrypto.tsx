@@ -1,7 +1,7 @@
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
-import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { CryptoCurrencies } from 'connectors';
 import uniq from 'lodash/uniq';

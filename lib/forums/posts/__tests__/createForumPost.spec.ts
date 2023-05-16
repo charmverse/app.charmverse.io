@@ -1,6 +1,6 @@
-import type { Post, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Post, Space, User } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { doc, poll } from 'testing/prosemirror';
 import { generateUserAndSpace, createVote } from 'testing/setupDatabase';

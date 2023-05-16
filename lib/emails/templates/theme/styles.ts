@@ -1,4 +1,3 @@
-import { fontFamily } from 'theme';
 import { blackColor, blueColor, greyColor, greyColor2, lightGreyColor } from 'theme/colors';
 
 export const css = `
@@ -59,7 +58,7 @@ export const css = `
   a.button, .button a {
     border: none;
     color: #111;
-    font-family: ${fontFamily} !important;
+    font-family: var(--font-family-default) !important;
     font-size: 18px !important;
     font-weight: 600 !important;
     padding: 10px 30px !important;

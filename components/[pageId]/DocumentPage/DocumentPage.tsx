@@ -1,47 +1,43 @@
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { Page } from '@prisma/client';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
+import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { ProposalBanner } from 'components/common/ProposalBanner';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
+import type { PageWithContent } from 'lib/pages/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import ProposalProperties from './components/ProposalProperties';
+import { ProposalProperties } from './components/ProposalProperties';
 
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
-
-export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props} />)<{
+export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
   top: number;
   fullWidth?: boolean;
 }>`
@@ -52,7 +48,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
@@ -78,28 +74,25 @@ const StyledBannerContainer = styled.div<{ showPageActionSidebar: boolean }>(
 );
 
 export interface DocumentPageProps {
-  page: PageMeta;
-  setPage: (p: Partial<Page>) => void;
+  page: PageWithContent;
+  refreshPage: () => Promise<any>;
+  savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
 }
 
-function DocumentPage({ page, setPage, insideModal, readOnly = false }: DocumentPageProps) {
-  const { pages } = usePages();
+function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = false }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  // For post we would artificially construct the permissions
-  const { permissions: pagePermissions, refresh: refreshPagePermissions } = usePagePermissions({
-    pageIdOrPath: page.id
-  });
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
-  const { editMode, setPageProps } = useCharmEditor();
+  const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
   const [containerRef, { width: containerWidth }] = useElementSize();
 
+  const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
@@ -121,9 +114,19 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
     }
   }, [page.bountyId]);
 
-  const cannotComment = readOnly || !pagePermissions?.comment;
+  // keep a ref in sync for printing
+  const printRef = useRef(null);
+  useEffect(() => {
+    if (printRef?.current !== _printRef?.current) {
+      setPageProps({
+        printRef
+      });
+    }
+  }, [printRef, _printRef]);
 
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions?.comment;
+  const cannotComment = readOnly || !pagePermissions.comment;
+
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
@@ -170,6 +173,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
   const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
@@ -190,23 +194,24 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
           }
         }}
       >
-        <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
-          <div ref={containerRef}>
-            <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
-            {/* temporary? disable editing of page meta data when in suggestion mode */}
-            {page.headerImage && (
-              <PageBanner
-                headerImage={page.headerImage}
-                readOnly={readOnly || !!enableSuggestingMode}
-                setPage={setPage}
-              />
-            )}
-            <Container
-              data-test='page-charmeditor'
-              top={pageTop}
-              fullWidth={isSmallScreen || (page.fullWidth ?? false)}
-            >
-              {pagePermissions && (
+        <div ref={printRef} className={`document-print-container ${fontClassName}`}>
+          <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
+            <div ref={containerRef}>
+              <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
+              {/* temporary? disable editing of page meta data when in suggestion mode */}
+              {page.headerImage && (
+                <PageBanner
+                  headerImage={page.headerImage}
+                  readOnly={readOnly || !!enableSuggestingMode}
+                  setPage={savePage}
+                />
+              )}
+              <Container
+                data-test='page-charmeditor'
+                className={fontFamilyClassName}
+                top={pageTop}
+                fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+              >
                 <CharmEditor
                   placeholderText={
                     page.type === 'bounty' || page.type === 'bounty_template'
@@ -214,8 +219,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                       : undefined
                   }
                   key={page.id + editMode + String(pagePermissions?.edit_content)}
-                  // content={pageDetails?.content as PageContent}
-                  // onContentChange={updatePageContent}
+                  content={page.content as PageContent}
                   readOnly={readOnly}
                   autoFocus={false}
                   pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
@@ -226,6 +230,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{
                     minHeight: proposalId ? '100px' : 'unset'
@@ -241,15 +246,15 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                     title={page.title}
                     updatedAt={page.updatedAt.toString()}
                     readOnly={readOnly || !!enableSuggestingMode}
-                    setPage={setPage}
+                    setPage={savePage}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
-                    <Box my={2}>
+                    <Box my={2} className='font-family-default'>
                       <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
                     </Box>
                   )}
                   {page.type === 'proposal' && !isLoading && pageVote && (
-                    <Box my={2}>
+                    <Box my={2} className='font-family-default'>
                       <VoteDetail
                         cancelVote={cancelVote}
                         deleteVote={deleteVote}
@@ -262,7 +267,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                       />
                     </Box>
                   )}
-                  <div className='focalboard-body'>
+                  <div className='focalboard-body font-family-default'>
                     <div className='CardDetail content'>
                       {/* Property list */}
                       {card && board && (
@@ -285,7 +290,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                           pageId={page.id}
                           proposalId={proposalId}
                           pagePermissions={pagePermissions}
-                          refreshPagePermissions={refreshPagePermissions}
+                          snapshotProposalId={page.snapshotProposalId}
+                          refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
                         />
@@ -299,7 +305,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                           refreshBountyPermissions={refreshBountyPermissions}
                         />
                       )}
-                      {page.type === 'card' && (
+                      {(page.type === 'card' || page.type === 'card_synced') && (
                         <CommentsList
                           comments={comments}
                           rootId={card?.rootId ?? page.id}
@@ -310,12 +316,12 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false }: Document
                     </div>
                   </div>
                 </CharmEditor>
-              )}
 
-              {pagePermissions && proposalId && <PageComments page={page} permissions={pagePermissions} />}
-            </Container>
-          </div>
-        </ScrollContainer>
+                {proposalId && <PageComments page={page} permissions={pagePermissions} />}
+              </Container>
+            </div>
+          </ScrollContainer>
+        </div>
       </ScrollableWindow>
     </>
   );

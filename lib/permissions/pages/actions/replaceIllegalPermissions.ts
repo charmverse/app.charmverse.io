@@ -1,8 +1,8 @@
-import type { PagePermission, Prisma } from '@prisma/client';
+import type { OptionalTransaction, TransactionClient } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 
-import type { OptionalTransaction, TransactionClient } from 'db';
-import { prisma } from 'db';
-import log from 'lib/log';
 import type {
   IPageWithPermissions,
   PageNodeWithChildren,
@@ -10,9 +10,8 @@ import type {
   TargetPageTree
 } from 'lib/pages/interfaces';
 import { flattenTree } from 'lib/pages/mapPageTree';
-import { getPage } from 'lib/pages/server';
+import { getPage } from 'lib/pages/server/getPage';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { isTruthy } from 'lib/utilities/types';
 
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 import { hasSameOrMorePermissions } from './has-same-or-more-permissions';

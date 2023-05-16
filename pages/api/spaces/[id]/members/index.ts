@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { Member } from 'lib/members/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -39,6 +39,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       id: sr.user.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      path: 'not-found',
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],

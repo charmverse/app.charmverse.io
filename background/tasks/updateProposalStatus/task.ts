@@ -1,5 +1,6 @@
-import { prisma } from 'db';
-import log from 'lib/log';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+
 import { count } from 'lib/metrics';
 
 export async function task() {

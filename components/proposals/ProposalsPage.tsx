@@ -7,7 +7,7 @@ import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -114,7 +114,7 @@ export function ProposalsPage() {
             </Grid>
           )}
         </Grid>
-        <PageDialogGlobalModal />
+        <PageDialogGlobal />
       </PageDialogProvider>
     </CenteredPageContent>
   );

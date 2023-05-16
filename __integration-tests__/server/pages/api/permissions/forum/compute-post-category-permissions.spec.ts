@@ -1,4 +1,4 @@
-import type { PostCategoryPermission } from '@prisma/client';
+import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';

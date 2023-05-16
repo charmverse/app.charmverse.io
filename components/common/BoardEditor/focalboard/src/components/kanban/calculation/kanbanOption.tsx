@@ -1,4 +1,5 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Box } from '@mui/material';
 import { useState } from 'react';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -63,9 +64,9 @@ function Option(props: { data: OptionProps }): JSX.Element {
         });
       }}
     >
-      <span>
+      <Box display='flex' alignItems='center'>
         {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
-      </span>
+      </Box>
 
       {submenu && props.data.value !== 'count' && (
         <div className='dropdown-submenu' style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}>

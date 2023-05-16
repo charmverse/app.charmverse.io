@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { uid } from 'lib/utilities/strings';
 
 async function init() {

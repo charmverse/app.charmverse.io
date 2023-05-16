@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useMembers } from 'hooks/useMembers';
 
-export function useFilteredMembers(searchQuery: string) {
+export function useFilteredMembers(searchQuery: string, includeGuestsAndBots = false) {
   const { members } = useMembers();
 
   const filteredMembers = useMemo(() => {
@@ -12,6 +12,9 @@ export function useFilteredMembers(searchQuery: string) {
     }
 
     return members.filter((member) => {
+      if ((member.isBot || member.isGuest) && !includeGuestsAndBots) {
+        return false;
+      }
       if (member.searchValue?.includes(query)) {
         return true;
       }

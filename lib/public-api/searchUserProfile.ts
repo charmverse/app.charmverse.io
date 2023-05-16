@@ -1,6 +1,6 @@
-import type { GoogleAccount, User, UserWallet } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { GoogleAccount, Prisma, User, UserWallet } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
@@ -24,6 +24,11 @@ export async function searchUserProfile({
       })
     | null = null;
 
+  const relationships = {
+    wallets: true,
+    googleAccounts: true
+  } satisfies Prisma.UserInclude;
+
   if (email) {
     user = await prisma.user.findFirst({
       where: {
@@ -32,16 +37,19 @@ export async function searchUserProfile({
           { OR: [{ email }, { googleAccounts: { some: { email } } }] }
         ]
       },
-      include: { wallets: true, googleAccounts: true }
+      include: relationships
     });
   }
 
   if (wallet) {
     user = await prisma.user.findFirst({
       where: {
-        AND: [{ spaceRoles: { some: { spaceId: { in: spaceIds } } } }, { wallets: { some: { address: wallet } } }]
+        AND: [
+          { spaceRoles: { some: { spaceId: { in: spaceIds } } } },
+          { wallets: { some: { address: wallet.toLowerCase() } } }
+        ]
       },
-      include: { wallets: true, googleAccounts: true }
+      include: relationships
     });
   }
 
@@ -53,7 +61,7 @@ export async function searchUserProfile({
     }
   }
 
-  const profile = {
+  const profile: UserProfile = {
     id: user.id,
     avatar: user.avatar || '',
     wallet: wallet || user.wallets[0]?.address || '',

@@ -1,8 +1,9 @@
+import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core';
+import type { ProposalCategory } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { ProposalCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
@@ -12,10 +13,6 @@ import Loader from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type {
-  AssignedProposalCategoryPermission,
-  AvailableProposalCategoryPermissionFlags
-} from 'lib/permissions/proposals/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 import { ProposalCategoryPermissionsAddRoles } from './ProposalCategoryPermissionAddRolesDialog';
@@ -29,7 +26,7 @@ import type { BulkRoleProposalCategoryPermissionUpsert } from './shared';
  */
 type Props = {
   proposalCategory: ProposalCategory;
-  permissions: AvailableProposalCategoryPermissionFlags;
+  permissions: ProposalCategoryPermissionFlags;
 };
 function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
   const { data, mutate: mutatePermissions } = useSWR(

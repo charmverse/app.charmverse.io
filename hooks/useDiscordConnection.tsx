@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
-import log from 'lib/log';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 

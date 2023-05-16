@@ -1,3 +1,4 @@
+import type { VoteContext, VoteStatus } from '@charmverse/core/prisma';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
@@ -7,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import type { VoteContext, VoteStatus } from '@prisma/client';
 import { bindMenu, bindPopover, anchorRef, usePopupState } from 'material-ui-popup-state/hooks';
 
 import ConfirmDeadlinePopover from 'components/common/CharmEditor/components/inlineVote/components/ConfirmDeadlinePopover';

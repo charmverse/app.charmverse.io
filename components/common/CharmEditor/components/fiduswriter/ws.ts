@@ -1,8 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
-import log from 'lib/log';
 import type {
   ClientMessage,
   ClientRestartMessage,
@@ -229,12 +229,25 @@ export class WebSocketConnector {
     this.socket.on('connect_error', (error) => {
       const errorType = (error as any).type as string;
       if (errorType === 'TransportError') {
+        // ..... TODO HERE
         // server is probably restarting
+        log.warn(`[ws${namespace}] Connection error`, {
+          error,
+          errorType,
+          client: this.messages.client,
+          server: this.messages.server,
+          toSend: this.messagesToSend.length
+        });
+        // if no messages, then we never made a connection
+        if (this.messages.client === 0 && this.messages.server === 0) {
+          this.onError(new Error('Error connecting to document server'));
+        }
       } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
       } else {
         log.error(`[ws${namespace}] Connection error`, {
           error,
+          errorType,
           client: this.messages.client,
           server: this.messages.server,
           toSend: this.messagesToSend.length

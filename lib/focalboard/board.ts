@@ -6,7 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
-type PropertyType =
+export type PropertyType =
   | 'text'
   | 'number'
   | 'select'
@@ -35,6 +35,7 @@ interface IPropertyTemplate {
   name: string;
   type: PropertyType;
   options: IPropertyOption[];
+  description?: string;
 }
 
 export type BoardFields = {
@@ -44,6 +45,7 @@ export type BoardFields = {
   isTemplate?: boolean;
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
+  viewIds: string[];
 };
 
 type Board = Block & {
@@ -57,9 +59,7 @@ function createBoard({
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {
-        id: o.id,
-        name: o.name,
-        type: o.type,
+        ...o,
         options: o.options ? o.options.map((option) => ({ ...option })) : []
       };
     }) ?? [];
@@ -102,6 +102,7 @@ function createBoard({
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
+      viewIds: block?.fields?.viewIds ?? [],
       ...block?.fields,
       cardProperties
     }
@@ -115,4 +116,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };

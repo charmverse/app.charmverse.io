@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/prisma';
 
 export type GettingStartedPage = Pick<
   Page,

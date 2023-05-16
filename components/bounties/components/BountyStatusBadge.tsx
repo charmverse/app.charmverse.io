@@ -1,3 +1,4 @@
+import type { Bounty, BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -13,7 +14,6 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { Stack } from '@mui/system';
-import type { Bounty, BountyStatus } from '@prisma/client';
 import millify from 'millify';
 import Link from 'next/link';
 import type { ReactNode } from 'react';

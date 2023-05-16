@@ -1,14 +1,14 @@
+import type { Bounty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { Bounty } from '@prisma/client';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { PageActions } from 'components/common/PageActions';
+import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { usePageDetails } from 'hooks/usePageDetails';
-import type { DuplicatePageResponse, PageMeta } from 'lib/pages';
+import { usePage } from 'hooks/usePage';
+import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -38,17 +38,14 @@ interface Props {
   readOnly?: boolean;
   bounty: Bounty;
   page: PageMeta;
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
-export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete, onDuplicate }: Props) {
-  const { pageDetails } = usePageDetails(bountyPage?.id);
+export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete }: Props) {
+  const { page } = usePage({ pageIdOrPath: bountyPage?.id });
 
   return bountyPage ? (
     <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
-      {!readOnly && (
-        <PageActions onDuplicate={onDuplicate} page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />
-      )}
+      {!readOnly && <KanbanPageActionsMenuButton page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />
@@ -68,7 +65,7 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
         justifyContent='space-between'
       >
         <Typography paragraph={true} noWrap>
-          {fancyTrim(pageDetails?.contentText, 50)}
+          {fancyTrim(page?.contentText, 50)}
         </Typography>
         <BountyStatusBadge bounty={bounty} truncate />
       </Box>

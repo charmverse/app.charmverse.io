@@ -1,6 +1,6 @@
+import type { MemberPropertyType } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Menu, MenuItem, Stack, TextField } from '@mui/material';
-import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 

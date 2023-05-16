@@ -1,6 +1,6 @@
-import type { SpaceRole } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { SpaceRole } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 
 import type { RoleAssignment } from './interfaces';

@@ -1,10 +1,10 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';

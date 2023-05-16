@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { TokenGateJwtResult } from 'lib/token-gates/interfaces';
 
 type UpdateUserTokenGatesProps = { tokenGates: TokenGateJwtResult[]; spaceId: string; userId: string };

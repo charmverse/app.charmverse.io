@@ -1,8 +1,8 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';

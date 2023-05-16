@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { prisma } from 'db';
 import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
 

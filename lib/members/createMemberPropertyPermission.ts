@@ -1,6 +1,6 @@
-import { MemberPropertyPermissionLevel } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { MemberPropertyPermissionLevel } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type { CreateMemberPropertyPermissionInput } from 'lib/members/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 

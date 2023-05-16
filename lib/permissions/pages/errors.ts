@@ -1,4 +1,4 @@
-import { PagePermissionLevel } from '@prisma/client';
+import { PagePermissionLevel } from '@charmverse/core/prisma';
 
 import { SystemError } from 'lib/utilities/errors';
 

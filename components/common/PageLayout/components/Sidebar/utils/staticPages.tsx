@@ -1,4 +1,4 @@
-import type { Feature } from '@prisma/client';
+import type { Feature } from '@charmverse/core/prisma';
 
 export enum StaticPagesPath {
   members = 'members',

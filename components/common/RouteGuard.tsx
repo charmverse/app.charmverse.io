@@ -1,5 +1,6 @@
 import type { UrlObject } from 'url';
 
+import { log } from '@charmverse/core/log';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
@@ -8,12 +9,11 @@ import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
-const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate'];
+const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -104,7 +104,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         return {
           authorized: false,
           redirect: {
-            pathname: spaces.length !== 0 ? `/${spaces[0].domain}` : '/signup'
+            pathname: spaces.length !== 0 ? `/${spaces[0].domain}` : '/createSpace'
           }
         };
       }

@@ -1,26 +1,21 @@
-import type { Post, PostOperation } from '@prisma/client';
+import {
+  defaultPostPolicies,
+  hasAccessToSpace,
+  postResolver,
+  prisma,
+  AvailablePostPermissions,
+  buildComputePermissionsWithPermissionFilteringPolicies
+} from '@charmverse/core';
+import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core';
 
-import { prisma } from 'db';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
 import { isUUID } from 'lib/utilities/strings';
-
-import type { PermissionFilteringPolicyFnInput } from '../buildComputePermissionsWithPermissionFilteringPolicies';
-import { buildComputePermissionsWithPermissionFilteringPolicies } from '../buildComputePermissionsWithPermissionFilteringPolicies';
-import { filterApplicablePermissions } from '../filterApplicablePermissions';
-import type { PermissionCompute } from '../interfaces';
-
-import { AvailablePostPermissions } from './availablePostPermissions.class';
-import { hasSpaceWideModerateForumsPermission } from './hasSpaceWideModerateForumsPermission';
-import type { AvailablePostPermissionFlags } from './interfaces';
-import { postPermissionsMapping } from './mapping';
 
 export async function baseComputePostPermissions({
   resourceId,
   userId
-}: PermissionCompute): Promise<AvailablePostPermissionFlags> {
+}: PermissionCompute): Promise<PostPermissionFlags> {
   if (!isUUID(resourceId)) {
     throw new InvalidInputError(`Invalid post ID: ${resourceId}`);
   }
@@ -49,108 +44,23 @@ export async function baseComputePostPermissions({
     permissions.addPermissions(['edit_post', 'delete_post', 'view_post']);
   }
 
+  // Provide admins with full access
   if (isAdmin) {
     return permissions.full;
+    // Always allow space members to interact with posts
+  } else if (spaceRole) {
+    permissions.addPermissions(['view_post', 'add_comment', 'upvote', 'downvote']);
+  } else {
+    permissions.addPermissions(['view_post']);
   }
-
-  const hasSpaceWideModerate = await hasSpaceWideModerateForumsPermission({
-    spaceId: post.spaceId,
-    userId
-  });
-
-  if (hasSpaceWideModerate) {
-    permissions.addPermissions(postPermissionsMapping.moderator);
-    return permissions.operationFlags;
-  }
-
-  // User doesnt not have admin or space-wide moderator override. Apply normal permissions resolution
-  const postCategoryPermissions = await prisma.postCategoryPermission.findMany({
-    where: {
-      postCategoryId: post.categoryId
-    }
-  });
-
-  const applicablePermissions = await filterApplicablePermissions({
-    permissions: postCategoryPermissions,
-    resourceSpaceId: post.spaceId,
-    // Treat user as a guest if they are not a full member of the space
-    userId: !spaceRole || spaceRole?.isGuest ? undefined : userId
-  });
-  applicablePermissions.forEach((permission) => {
-    permissions.addPermissions(postPermissionsMapping[permission.permissionLevel]);
-  });
 
   return permissions.operationFlags;
 }
-
-type PostResource = Pick<Post, 'id' | 'spaceId' | 'createdBy' | 'proposalId' | 'isDraft'>;
-type PostPolicyInput = PermissionFilteringPolicyFnInput<PostResource, AvailablePostPermissionFlags>;
-
-async function convertedToProposalPolicy({ resource, flags }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
-  const newPermissions = { ...flags };
-
-  if (!resource.proposalId) {
-    return newPermissions;
-  }
-
-  const allowedOperations: PostOperation[] = ['view_post', 'delete_post'];
-
-  typedKeys(flags).forEach((flag) => {
-    if (!allowedOperations.includes(flag)) {
-      newPermissions[flag] = false;
-    }
-  });
-
-  return newPermissions;
-}
-
-async function onlyEditableByAuthor({
-  resource,
-  flags,
-  userId
-}: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
-  const newPermissions = {
-    ...flags,
-    edit_post: resource.createdBy === userId
-  };
-
-  return newPermissions;
-}
-
-async function draftPostPolicy({ resource, flags, userId }: PostPolicyInput): Promise<AvailablePostPermissionFlags> {
-  const newPermissions = {
-    edit_post: userId && resource.isDraft ? resource.createdBy === userId : flags.edit_post,
-    pin_post: userId && resource.isDraft ? false : flags.pin_post,
-    lock_post: userId && resource.isDraft ? false : flags.lock_post,
-    delete_comments: resource.isDraft ? false : flags.delete_comments,
-    add_comment: resource.isDraft ? false : flags.add_comment,
-    upvote: resource.isDraft ? false : flags.upvote,
-    downvote: resource.isDraft ? false : flags.downvote,
-    delete_post: userId && resource.isDraft ? resource.createdBy === userId : flags.delete_post,
-    view_post: userId && resource.isDraft ? resource.createdBy === userId : flags.view_post
-  };
-
-  return newPermissions;
-}
-
-function postResolver({ resourceId }: { resourceId: string }) {
-  return prisma.post.findUnique({
-    where: { id: resourceId },
-    select: {
-      id: true,
-      spaceId: true,
-      createdBy: true,
-      proposalId: true,
-      isDraft: true
-    }
-  }) as Promise<PostResource>;
-}
-
 export const computePostPermissions = buildComputePermissionsWithPermissionFilteringPolicies<
   PostResource,
-  AvailablePostPermissionFlags
+  PostPermissionFlags
 >({
   resolver: postResolver,
   computeFn: baseComputePostPermissions,
-  policies: [onlyEditableByAuthor, convertedToProposalPolicy, draftPostPolicy]
+  policies: [...defaultPostPolicies]
 });

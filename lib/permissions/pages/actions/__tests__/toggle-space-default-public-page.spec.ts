@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';

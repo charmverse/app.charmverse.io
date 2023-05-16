@@ -1,6 +1,6 @@
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import CheckIcon from '@mui/icons-material/Check';
 import { Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
-import type { ProposalStatus } from '@prisma/client';
 import { Fragment } from 'react';
 
 import {

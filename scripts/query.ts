@@ -1,6 +1,6 @@
-import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 import { customAlphabet } from 'nanoid';
+import fs from 'node:fs/promises';
 
 import * as opts from 'nanoid-dictionary';
 console.log(opts)
@@ -15,15 +15,21 @@ function uid2 () {
  */
 
 async function search() {
-  const uids = new Set();
-  const uid2s = new Set();
-  for (let i = 0; i < 10000; i++) {
-    uids.add(uid());
-  }
-  for (let i = 0; i < 10000; i++) {
-    uid2s.add(uid2());
-  }
-  console.log(uids.size, uid2s.size)
+  const page = await prisma.page.findFirst({
+    where: {
+      path: `page-12890905063646585`
+    },
+    include: {
+      author: true,
+      diffs: {
+        orderBy: {
+          version: 'asc'
+        }
+      }
+    }
+  })
+
+  await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2))
 }
 
-search();
+search().then(() => console.log('Done'));

@@ -1,21 +1,23 @@
+import { prisma } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.put(updateProposalController).get(getProposalController);
+handler
+  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
+  .put(updateProposalController)
+  .get(getProposalController);
 
 async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
   const proposalId = req.query.id as string;
@@ -35,13 +37,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-
   const computed = await computeUserPagePermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
   });
-
   if (computed.read !== true) {
     throw new NotFoundError();
   }
@@ -89,7 +89,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new AdministratorOnlyError();
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await computeProposalPermissions({
+  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });

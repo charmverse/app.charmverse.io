@@ -16,13 +16,14 @@ type Props = {
   value: string;
   menuOpen: boolean;
   onMenuClose: () => void;
-  onMenuOpen: () => void;
+  onMenuOpen: (element: HTMLElement) => void;
   onChange: (value: string) => void;
   cards: readonly Card[];
   property: IPropertyTemplate;
   hovered: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   optionsComponent: React.ComponentType<CommonCalculationOptionProps>;
+  anchorEl: HTMLElement | null;
 };
 
 function Calculation(props: Props): JSX.Element {
@@ -36,6 +37,7 @@ function Calculation(props: Props): JSX.Element {
       menuOpen={props.menuOpen}
       onClose={props.onMenuClose}
       onChange={props.onChange}
+      anchorEl={props.anchorEl}
     />
   );
 
@@ -48,12 +50,12 @@ function Calculation(props: Props): JSX.Element {
         props.hovered ? 'hovered' : ''
       }`}
       style={props.style}
-      onClick={() => (props.menuOpen ? props.onMenuClose() : props.onMenuOpen())}
+      onClick={(e) => (props.menuOpen ? props.onMenuClose() : props.onMenuOpen(e.currentTarget))}
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
-      onBlur={props.onMenuClose}
+      // onBlur={props.onMenuClose}
     >
-      {props.menuOpen && <div>{option}</div>}
+      <div>{option}</div>
 
       <span className='calculationLabel'>{optionDisplayNameString(valueOption!, intl)}</span>
 

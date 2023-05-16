@@ -1,4 +1,4 @@
-import type { BountyPermission } from '@prisma/client';
+import type { BountyPermission } from '@charmverse/core/prisma';
 
 import type { TargetPermissionGroup } from '../interfaces';
 

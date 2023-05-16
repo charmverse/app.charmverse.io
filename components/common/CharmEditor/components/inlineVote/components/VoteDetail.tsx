@@ -1,4 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import {
@@ -17,7 +18,6 @@ import {
   Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import type { UserVote } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';

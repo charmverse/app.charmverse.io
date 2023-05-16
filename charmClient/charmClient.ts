@@ -13,7 +13,7 @@ import type {
   UserGnosisSafe,
   UserWallet,
   ApiPageKey
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
@@ -262,7 +262,7 @@ class CharmClient {
     return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateMyGnosisSafe(wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
+  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
     return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 

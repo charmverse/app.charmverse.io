@@ -1,5 +1,6 @@
+import { prisma } from '@charmverse/core';
+
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 
 import type { BountyEntity, CommentEntity, PostEntity, ProposalEntity, SpaceEntity, UserEntity } from './interfaces';
 

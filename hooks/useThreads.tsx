@@ -5,8 +5,9 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useMembers } from 'hooks/useMembers';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithCommentsAndAuthors, ThreadWithComments } from 'lib/threads/interfaces';
 
 type IContext = {
   isValidating: boolean;
@@ -17,7 +18,7 @@ type IContext = {
   deleteComment: (threadId: string, commentId: string) => Promise<void>;
   resolveThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
-  refetchThreads: KeyedMutator<ThreadWithCommentsAndAuthors[]>;
+  refetchThreads: KeyedMutator<ThreadWithComments[]>;
 };
 
 export const ThreadsContext = createContext<Readonly<IContext>>({
@@ -32,17 +33,38 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
   refetchThreads: undefined as any
 });
 
+type CommentThreadsMap = Record<string, ThreadWithCommentsAndAuthors | undefined>;
+
 export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
-  const [threads, setThreads] = useState<Record<string, ThreadWithCommentsAndAuthors | undefined>>({});
+  const [threads, setThreads] = useState<CommentThreadsMap>({});
+  const { members } = useMembers();
 
   const { data, isValidating, mutate } = useSWR(
     () => (currentPageId ? `pages/${currentPageId}/threads` : null),
     () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
   );
+
+  function populateThreads(_threads: ThreadWithComments[]): CommentThreadsMap {
+    const threadsandAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
+      const newThread: ThreadWithCommentsAndAuthors = {
+        ...thread,
+        comments: thread.comments.map((comment) => ({
+          ...comment,
+          user: members.find((m) => m.id === comment.userId) || ({} as any)
+        }))
+      };
+      acc[thread.id] = newThread;
+      return acc;
+    }, {});
+    return threadsandAuthors;
+  }
+
   useEffect(() => {
-    setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
+    if (data) {
+      setThreads(populateThreads(data));
+    }
   }, [data]);
 
   async function addComment(threadId: string, commentContent: PageContent) {
@@ -54,12 +76,13 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       });
 
       setThreads((_threads) => {
+        thread.comments.push({
+          ...comment,
+          user: members.find((m) => m.id === comment.userId) || ({} as any)
+        });
         return {
           ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: [...thread.comments, comment]
-          }
+          [thread.id]: thread
         };
       });
     }

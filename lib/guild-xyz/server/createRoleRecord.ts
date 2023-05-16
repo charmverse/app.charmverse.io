@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function createRoleRecord(spaceId: string) {
   const rolesImportedFromGuild = await prisma.role.findMany({

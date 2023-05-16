@@ -17,6 +17,7 @@ export function TableCalculationOptions(
       menuOpen={props.menuOpen}
       onClose={props.onClose}
       onChange={props.onChange}
+      anchorEl={props.anchorEl}
       options={options}
     />
   );

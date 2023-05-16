@@ -1,7 +1,7 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { uid } from 'lib/utilities/strings';
 
 import { createWorkspaceApi } from '../createWorkspaceApi';

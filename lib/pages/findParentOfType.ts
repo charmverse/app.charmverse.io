@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { PageNode, PagesMap, TargetPageTree } from './interfaces';
 

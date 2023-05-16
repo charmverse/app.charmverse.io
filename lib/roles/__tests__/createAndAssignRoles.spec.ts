@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

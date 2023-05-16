@@ -3,11 +3,15 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
+import type { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
+
+export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
+
 type IContext = {
   open: boolean;
   activePath: string;
   onClose: () => any;
-  onClick: (path?: string) => void;
+  onClick: (path?: SettingsPath, section?: string) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
@@ -22,9 +26,15 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
 
-  const onClick = (_path?: string) => {
+  const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
     settingsModalState.open();
+    setTimeout(() => {
+      if (_section) {
+        const domSection = document.getElementById(_section);
+        domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
   };
 
   const onClose = () => {

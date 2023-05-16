@@ -1,20 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
+import { superApiHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceResponseBody, CreateWorkspaceRequestBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { spaceInternalTemplateMapping } from 'lib/spaces/config';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = superApiHandler();
 
-handler
-  .use(requireSuperApiKey)
-  .use(requireKeys([{ key: 'name', truthy: true }], 'body'))
-  .post(createSpace);
+handler.use(requireKeys([{ key: 'name', truthy: true }], 'body')).post(createSpace);
 
 /**
  * @swagger

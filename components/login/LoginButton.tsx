@@ -1,3 +1,4 @@
+import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
@@ -6,7 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import SvgIcon from '@mui/material/SvgIcon';
-import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
@@ -73,7 +73,7 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       justifyContent={{ xs: 'center', md: 'flex-start' }}
       py={{ xs: 2, md: 0 }}
     >
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' primary>
+      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' color='primary'>
         Sign up
       </StyledButton>
       <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>

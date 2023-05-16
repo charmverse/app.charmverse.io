@@ -1,6 +1,6 @@
-import type { PageType, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PageType, Prisma } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 
 type CurrentPageData = {

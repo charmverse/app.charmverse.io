@@ -33,7 +33,7 @@ export class CdkDeployStack extends Stack {
     });
 
     // Make sure that Elastic Beanstalk app exists before creating an app version
-    appVersionProps.addDependsOn(ebApp);
+    appVersionProps.addDependency(ebApp);
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -92,6 +92,12 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
         value: 't3.micro'
+      },
+      {
+        // ALB health check
+        namespace: 'aws:elasticbeanstalk:application',
+        optionName: 'Application Healthcheck URL',
+        value: '/api/health'
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',

@@ -1,4 +1,4 @@
-import type { PageComment, User } from '@prisma/client';
+import type { PageComment, User } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

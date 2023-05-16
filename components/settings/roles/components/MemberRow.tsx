@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -13,7 +14,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import log from 'lib/log';
 import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
@@ -216,7 +216,7 @@ function MemberActions({
                   {action === 'removeFromSpace' && (
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                      primary='Remove from team'
+                      primary='Remove from space'
                     />
                   )}
                   {action === activeRoleAction && (

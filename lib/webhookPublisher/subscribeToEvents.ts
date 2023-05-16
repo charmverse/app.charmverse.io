@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
 
 export function createSigningSecret() {

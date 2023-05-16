@@ -1,4 +1,6 @@
-// import type { Block } from '@prisma/client';
+// import type { Block } from '@charmverse/core/prisma';
+
+import type { Page } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta } from 'lib/pages';
@@ -32,7 +34,8 @@ type BlocksDeleted = {
 
 type PagesMetaUpdated = {
   type: 'pages_meta_updated';
-  payload: (Partial<PageMeta> & ResourceWithSpaceId)[];
+  // we use the full Page interface so that we can pass other fields for individual page views
+  payload: (Partial<Page> & ResourceWithSpaceId)[];
 };
 
 type PagesCreated = {

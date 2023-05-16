@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -51,20 +51,20 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
         .expect(201)
     ).body;
 
-    const childWithPermissions = (
-      await request(baseUrl)
-        .put(`/api/pages/${childPage.id}`)
-        .set('Cookie', cookie)
-        .send({
-          id: childPage.id,
-          parentId: null
-        })
-        .expect(200)
-    ).body as IPageWithPermissions;
+    await request(baseUrl)
+      .put(`/api/pages/${childPage.id}`)
+      .set('Cookie', cookie)
+      .send({
+        id: childPage.id,
+        parentId: null
+      })
+      .expect(200);
+
+    const childWithPermissions = await getPage(childPage.id);
 
     // Base space permission plus createdBy user full access permission
-    expect(childWithPermissions.permissions.length).toBe(2);
-    expect(childWithPermissions.permissions.every((perm) => perm.inheritedFromPermission === null)).toBe(true);
+    expect(childWithPermissions?.permissions.length).toBe(2);
+    expect(childWithPermissions?.permissions.every((perm) => perm.inheritedFromPermission === null)).toBe(true);
   });
 
   it('should update the children to inherit from the new root page instead of the old root page', async () => {

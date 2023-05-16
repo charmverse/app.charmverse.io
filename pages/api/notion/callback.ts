@@ -1,7 +1,7 @@
+import { log } from '@charmverse/core/log';
 import Cookies from 'cookies';
 import nc from 'next-connect';
 
-import log from 'lib/log';
 import { onError, onNoMatch } from 'lib/middleware';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 

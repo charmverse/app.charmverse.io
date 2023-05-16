@@ -1,9 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { injected } from 'connectors';
 import { useEffect } from 'react';
-
-import log from 'lib/log';
 
 type WindowType = Window & typeof globalThis & { ethereum: Web3Provider };
 

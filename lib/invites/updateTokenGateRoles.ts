@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function updateInviteLinkRoles(roleIds: string[], inviteLinkId: string) {
   const roleIdsSet = new Set(roleIds);

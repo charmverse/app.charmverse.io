@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { getUserProfile } from 'lib/users/getUser';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import { matchWalletAddress } from 'lib/utilities/strings';

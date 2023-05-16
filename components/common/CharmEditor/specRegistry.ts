@@ -33,7 +33,7 @@ import * as quote from './components/quote';
 import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
+import { spec as tableSpec } from './components/table/table';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
@@ -54,7 +54,6 @@ export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   mentionSpecs(), // NO
-  inlineComment.spec(),
   inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
@@ -82,12 +81,14 @@ export const specRegistry = new SpecRegistry([
   nestedPageSpec(), // NO
   quote.spec(), // OK
   tabIndent.spec(),
-  table.spec(), // OK - only for text content
+  tableSpec(), // OK - only for text content
   disclosure.spec(),
   inlineDatabase.spec(),
   deletion,
   insertion,
   formatChange,
+  // This should be below text format and track specs
+  inlineComment.spec(),
   video.spec(),
   textColor.spec(),
   nft.spec(),

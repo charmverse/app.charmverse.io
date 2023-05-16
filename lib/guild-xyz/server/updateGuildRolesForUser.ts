@@ -1,7 +1,6 @@
-import type { Role, SpaceRole } from '@prisma/client';
-
-import { prisma } from 'db';
-import log from 'lib/log';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Role, SpaceRole } from '@charmverse/core/prisma';
 
 import { getGuildRoleIds } from '../getGuildRoleIds';
 

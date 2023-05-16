@@ -91,8 +91,9 @@ function CardDetailProperty({
         flexDirection: 'row',
         // Allow dragging past left border
         paddingLeft: '150px',
-        position: 'relative',
-        right: '150px'
+        marginLeft: '-150px !important'
+        // position: 'relative',
+        // right: '150px'
       }}
       className='octo-propertyrow'
     >
@@ -209,7 +210,7 @@ function CardDetailProperties(props: Props) {
 
     // if no card has this value set delete the property directly without warning
     if (affectsNumOfCards === '0') {
-      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName);
+      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
       return;
     }
 
@@ -256,7 +257,7 @@ function CardDetailProperties(props: Props) {
       onConfirm: async () => {
         setShowConfirmationDialog(false);
         try {
-          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName);
+          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }

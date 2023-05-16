@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/prisma';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
@@ -34,7 +34,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     () =>
       Object.values(pages)
         .filter(isTruthy)
-        .filter((page) => page.deletedAt === null && linkablePageTypes.includes(page.type)),
+        .filter((page) => !page.deletedAt && linkablePageTypes.includes(page.type)),
     [pages]
   );
 

@@ -1,6 +1,7 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+
 import { getGuildRoles } from 'lib/collabland/collablandClient';
-import log from 'lib/log';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 
 type Props = {

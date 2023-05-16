@@ -1,7 +1,7 @@
-import type { BountyStatus, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { BountyStatus, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
@@ -20,7 +20,7 @@ export async function createBounty({
   status = 'suggestion',
   chainId = 1,
   linkedPageId,
-  approveSubmitters = true,
+  approveSubmitters = false,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',

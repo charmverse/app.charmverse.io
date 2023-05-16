@@ -32,3 +32,8 @@ export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
 export const googleOAuthClientIdSensitive =
   process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE;
 export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;
+
+// Permissions API
+export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://localhost:3001';
+export const permissionsApiAuthKey = process.env.PERMISSIONS_API_AUTH_KEY ?? 'key';
+export const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';

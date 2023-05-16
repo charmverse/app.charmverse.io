@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { getPostCategoryPath } from './getPostCategoryPath';

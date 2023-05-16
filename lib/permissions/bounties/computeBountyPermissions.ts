@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import type { PermissionComputeRequest } from '../interfaces';

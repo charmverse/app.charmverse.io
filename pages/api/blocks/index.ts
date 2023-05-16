@@ -1,9 +1,8 @@
-import type { Block, Prisma } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Block, Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
 import {
   ActionNotPermittedError,
@@ -14,6 +13,7 @@ import {
   requireUser
 } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
@@ -47,10 +47,11 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     if (!pageId) {
       throw new InvalidStateError('invalid referrer url');
     }
-    const pageIdIsUUID = validate(pageId);
-    const page = pageIdIsUUID
-      ? await prisma.page.findUnique({ where: { id: pageId } })
-      : await prisma.page.findFirst({ where: { spaceId: req.query.spaceId as string, path: pageId } });
+    const searchQuery = generatePageQuery({
+      pageIdOrPath: pageId,
+      spaceIdOrDomain: req.query.spaceId as string
+    });
+    const page = await prisma.page.findFirst({ where: searchQuery });
     if (!page) {
       throw new NotFoundError('page not found');
     }

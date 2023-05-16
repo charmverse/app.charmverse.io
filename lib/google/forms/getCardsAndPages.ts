@@ -1,5 +1,5 @@
+import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
-import type { PagePermission, Prisma } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { blockToPrisma } from 'lib/focalboard/block';

@@ -1,4 +1,4 @@
-import type { Bounty, Space, User } from '@prisma/client';
+import type { Bounty, Space, User } from '@charmverse/core/prisma';
 
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,5 +1,5 @@
-import type { PagePermissionLevel, Space, User } from '@prisma/client';
-import { PageOperations } from '@prisma/client';
+import type { PagePermissionLevel, Space, User } from '@charmverse/core/prisma';
+import { PageOperations } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { PageNotFoundError } from 'lib/pages/server';
@@ -170,7 +170,7 @@ describe('computeUserPagePermissions', () => {
         resourceId: inexistentPageId,
         userId: user.id
       })
-    ).rejects.toBeInstanceOf(PageNotFoundError);
+    ).rejects.toMatchObject(new PageNotFoundError(inexistentPageId));
   });
 
   it('should return only public permissions if no user is provided', async () => {

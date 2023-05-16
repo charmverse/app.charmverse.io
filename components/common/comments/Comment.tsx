@@ -8,14 +8,14 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
@@ -68,7 +68,7 @@ export function Comment({
     rawText: comment.contentText
   });
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -128,7 +128,8 @@ export function Comment({
       focusOnInit: true,
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
-      content: commentEditContent.doc
+      content: commentEditContent.doc,
+      isContentControlled: true
     };
 
     if (!inlineCharmEditor) {
@@ -151,7 +152,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showMemberProfile(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >
@@ -222,6 +223,7 @@ export function Comment({
               readOnly
               key={isEditingComment.toString()}
               content={commentContent.doc}
+              isContentControlled
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (

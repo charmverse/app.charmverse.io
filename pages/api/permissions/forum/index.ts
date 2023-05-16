@@ -1,12 +1,11 @@
+import { prisma } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePostCategoryPermissions } from 'lib/permissions/forum/computePostCategoryPermissions';
-import { deletePostCategoryPermission } from 'lib/permissions/forum/deletePostCategoryPermission';
-import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -15,8 +14,22 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .delete(requireKeys<PermissionToDelete>(['permissionId'], 'body'), removePostCategoryPermission)
-  .post(upsertPostCategoryPermissionController);
+  .delete(
+    requirePaidPermissionsSubscription({
+      key: 'permissionId',
+      location: 'body',
+      resourceIdType: 'postCategoryPermission'
+    }),
+    removePostCategoryPermission
+  )
+  .post(
+    requirePaidPermissionsSubscription({
+      key: 'postCategoryId',
+      location: 'body',
+      resourceIdType: 'postCategory'
+    }),
+    upsertPostCategoryPermissionController
+  );
 
 async function upsertPostCategoryPermissionController(
   req: NextApiRequest,
@@ -24,7 +37,7 @@ async function upsertPostCategoryPermissionController(
 ) {
   const input = req.body as AssignedPostCategoryPermission;
 
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await premiumPermissionsApiClient.forum.computePostCategoryPermissions({
     resourceId: input.postCategoryId,
     userId: req.session.user.id
   });
@@ -33,7 +46,7 @@ async function upsertPostCategoryPermissionController(
     throw new ActionNotPermittedError('You cannot manage permissions for this category.');
   }
 
-  const newPermission = await upsertPostCategoryPermission(input);
+  const newPermission = await premiumPermissionsApiClient.forum.upsertPostCategoryPermission(input);
 
   res.status(201).json(newPermission);
 }
@@ -55,7 +68,7 @@ async function removePostCategoryPermission(req: NextApiRequest, res: NextApiRes
     throw new DataNotFoundError('Post category not found');
   }
 
-  const permissions = await computePostCategoryPermissions({
+  const permissions = await premiumPermissionsApiClient.forum.computePostCategoryPermissions({
     resourceId: postCategory.id,
     userId: req.session.user.id
   });
@@ -64,7 +77,7 @@ async function removePostCategoryPermission(req: NextApiRequest, res: NextApiRes
     throw new ActionNotPermittedError('You cannot manage permissions for this category.');
   }
 
-  await deletePostCategoryPermission({ permissionId });
+  await premiumPermissionsApiClient.forum.deletePostCategoryPermission({ permissionId });
 
   res.status(200).json({ success: true });
 }

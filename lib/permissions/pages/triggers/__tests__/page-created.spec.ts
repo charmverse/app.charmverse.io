@@ -1,7 +1,7 @@
-import type { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PagePermission, PagePermissionLevel, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { PageNotFoundError } from 'lib/pages/server';
 import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
@@ -36,11 +36,12 @@ beforeAll(async () => {
 
 describe('setupPermissionsAfterPageCreated', () => {
   it("should fail if the page doesn't exist", async () => {
+    const id = v4();
     try {
-      await setupPermissionsAfterPageCreated(v4());
+      await setupPermissionsAfterPageCreated(id);
       throw new ExpectedAnError();
     } catch (err) {
-      expect(err).toBeInstanceOf(PageNotFoundError);
+      expect(err).toMatchObject(new PageNotFoundError(id));
     }
   });
 

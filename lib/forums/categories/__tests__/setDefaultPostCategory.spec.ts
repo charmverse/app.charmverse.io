@@ -1,6 +1,6 @@
-import type { Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Space } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

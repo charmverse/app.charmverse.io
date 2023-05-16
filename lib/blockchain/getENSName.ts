@@ -1,7 +1,7 @@
+import { log } from '@charmverse/core/log';
 import { ethers } from 'ethers';
 
 import { isTestEnv } from 'config/constants';
-import log from 'lib/log';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;

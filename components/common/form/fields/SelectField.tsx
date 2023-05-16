@@ -152,6 +152,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               {...params}
               size='small'
               placeholder={!selectedOptions.length ? placeholder : undefined}
+              error={!!inputProps.error}
             />
           )}
           getOptionLabel={(option: SelectOptionType) => {

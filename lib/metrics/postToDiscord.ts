@@ -1,9 +1,9 @@
-import type { Bounty, Page, Space } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import type { Bounty, Page, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import { isProdEnv, isTestEnv } from 'config/constants';
-import { prisma } from 'db';
-import log from 'lib/log';
 
 /**
  * Full JSON body available here

@@ -1,10 +1,10 @@
+import { BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
-import { BountyStatus } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
@@ -12,15 +12,15 @@ import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import Link from 'components/common/Link';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { isTruthy } from 'lib/utilities/types';
 
-import BountiesKanbanView from './components/BountiesKanbanView';
-import BountiesGalleryView from './components/BountyGalleryView';
-import MultiPaymentModal from './components/MultiPaymentModal';
+import { BountiesKanbanView } from './components/BountiesKanbanView';
+import { BountiesGalleryView } from './components/BountyGalleryView';
+import { MultiPaymentModal } from './components/MultiPaymentModal';
 import { NewBountyButton } from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
@@ -47,13 +47,8 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const space = useCurrentSpace();
   const router = useRouter();
-  const [currentView, setCurrentView] = useState<(typeof views)[0]>(
-    views.find((view) => view.view === router.query.view) ?? views[0]
-  );
 
-  useEffect(() => {
-    setCurrentView(views.find((view) => view.view === router.query.view) ?? views[0]);
-  }, [router.query.view]);
+  const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
@@ -150,7 +145,6 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
                             )
                           }
                           onClick={() => {
-                            setCurrentView({ label, view });
                             router.push(`/${space?.domain}/bounties?view=${view}`);
                           }}
                           variant='text'
@@ -193,7 +187,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
           )}
         </div>
       </div>
-      <PageDialogGlobalModal />
+      <PageDialogGlobal />
     </PageDialogProvider>
   );
 }

@@ -1,5 +1,6 @@
+import { log } from '@charmverse/core/log';
+
 import { processMessages } from 'lib/aws/webhookSqs';
-import log from 'lib/log';
 import { processWebhookMessage } from 'lib/webhookConsumer/processWebhookMessage';
 
 export async function task() {

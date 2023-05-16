@@ -1,8 +1,8 @@
-import type { Block } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { Block } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
 import { requireUser } from 'lib/middleware/requireUser';
 import { computeUserPagePermissions } from 'lib/permissions/pages';

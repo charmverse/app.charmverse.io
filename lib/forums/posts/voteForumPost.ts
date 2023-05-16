@@ -1,10 +1,11 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 import { PostNotFoundError } from './errors';
 
-type PostVote = {
+export type PostVote = {
   postId: string;
   userId: string;
   upvoted: boolean | null;

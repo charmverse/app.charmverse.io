@@ -39,6 +39,7 @@ interface Props {
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
+  pageId?: string;
 }
 
 export const StyledSidebar = styled.div`
@@ -171,6 +172,7 @@ function ViewSidebar(props: Props) {
               goBack={goBack}
               onSelect={selectViewSource}
               closeSidebar={props.closeSidebar}
+              pageId={props.pageId}
             />
           )}
         </StyledSidebar>

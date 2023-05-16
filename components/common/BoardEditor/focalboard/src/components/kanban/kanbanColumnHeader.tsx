@@ -33,8 +33,9 @@ type Props = {
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void;
   calculationMenuOpen: boolean;
-  onCalculationMenuOpen: () => void;
+  onCalculationMenuOpen: (anchorEl: HTMLElement) => void;
   onCalculationMenuClose: () => void;
+  anchorEl: HTMLElement | null;
 };
 
 const defaultCalculation = 'count';
@@ -141,6 +142,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
         onMenuOpen={props.onCalculationMenuOpen}
         cardProperties={board.fields.cardProperties}
         readOnly={props.readOnly}
+        anchorEl={props.anchorEl}
         onChange={(data: { calculation: string; propertyId: string }) => {
           if (data.calculation === calculationValue && data.propertyId === calculationProperty.id) {
             return;

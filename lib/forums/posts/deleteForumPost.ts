@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function deleteForumPost(pageId: string) {
   return prisma.post.update({

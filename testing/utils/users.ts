@@ -1,6 +1,6 @@
-import type { User } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { User } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';
 

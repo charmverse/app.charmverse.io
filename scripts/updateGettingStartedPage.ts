@@ -1,4 +1,4 @@
-import { prisma } from "db";
+import { prisma } from '@charmverse/core';
 import { PageNotFoundError } from "lib/pages/server";
 import { InvalidInputError } from "lib/utilities/errors";
 import type { GettingStartedPage } from "seedData/gettingStartedPage";

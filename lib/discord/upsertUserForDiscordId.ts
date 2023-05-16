@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';

@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { AddWalletStep } from 'components/integrations/components/AddWalletStep';
@@ -15,6 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -41,6 +41,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
+  const isUserWalletActive = user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
 
   const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
     '/profile/add-wallets',
@@ -119,7 +120,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   return (
     <Modal
       open={isOpen}
-      onClose={close}
+      onClose={isUserWalletActive ? close : undefined}
       title={!identityToAdd ? 'Add an account' : modalTitles[identityToAdd]}
       aria-labelledby='Conect an account modal'
       size='600px'

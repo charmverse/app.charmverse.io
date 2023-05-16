@@ -1,13 +1,14 @@
-import type { ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
+
 type ProposalAuthor = {
   userId: string;
   address?: string;
@@ -104,7 +105,7 @@ export interface PublicApiProposal {
   url: string;
 }
 
-handler.use(requireApiKey).get(listProposals);
+handler.get(listProposals);
 
 /**
  * @swagger

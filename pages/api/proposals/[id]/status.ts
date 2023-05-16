@@ -1,11 +1,10 @@
-import type { ProposalStatus } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';

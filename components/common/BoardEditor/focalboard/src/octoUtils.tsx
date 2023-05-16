@@ -181,23 +181,6 @@ class OctoUtils {
     const newSourceBlock = newBlocks.find((block) => block.id === newSourceBlockId)!;
     return [newBlocks, newSourceBlock, idMap];
   }
-
-  static filterConditionDisplayString(filterCondition: FilterCondition, intl: IntlShape): string {
-    switch (filterCondition) {
-      case 'includes':
-        return intl.formatMessage({ id: 'Filter.includes', defaultMessage: 'includes' });
-      case 'notIncludes':
-        return intl.formatMessage({ id: 'Filter.not-includes', defaultMessage: "doesn't include" });
-      case 'isEmpty':
-        return intl.formatMessage({ id: 'Filter.is-empty', defaultMessage: 'is empty' });
-      case 'isNotEmpty':
-        return intl.formatMessage({ id: 'Filter.is-not-empty', defaultMessage: 'is not empty' });
-      default: {
-        Utils.assertFailure();
-        return '(unknown)';
-      }
-    }
-  }
 }
 
 export { OctoUtils };

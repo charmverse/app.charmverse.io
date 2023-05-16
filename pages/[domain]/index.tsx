@@ -1,4 +1,4 @@
-import type { Page } from '@prisma/client';
+import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 

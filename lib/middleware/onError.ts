@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import log from 'lib/log';
 import { UnknownError } from 'lib/middleware';
 import { SystemError } from 'lib/utilities/errors';
 

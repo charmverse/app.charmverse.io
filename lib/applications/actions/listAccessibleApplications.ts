@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { generateAccessibleBountiesQuery } from 'lib/bounties';
 
 import type { ApplicationWithTransactions } from '../interfaces';

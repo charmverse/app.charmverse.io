@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { getNFTs } from 'lib/blockchain/nfts';
 
 export const supportedMainnets = [1, 137, 42161] as const;

@@ -1,6 +1,5 @@
+import { log } from '@charmverse/core/log';
 import StatsD from 'hot-shots';
-
-import log from 'lib/log';
 
 const dogstatsd = new StatsD({
   prefix: 'charm.',

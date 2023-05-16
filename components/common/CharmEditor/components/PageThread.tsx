@@ -27,13 +27,12 @@ import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { CommentWithUser } from 'lib/comments/interfaces';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
@@ -236,6 +235,7 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
+  permissions?: IPagePermissionFlags;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -278,17 +278,15 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
 );
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
-  ({ showFindButton = false, threadId, inline = false }, ref) => {
+  ({ showFindButton = false, threadId, inline = false, permissions }, ref) => {
     showFindButton = showFindButton ?? !inline;
     const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
     const { user } = useUser();
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
-    const { currentPageId } = useCurrentPage();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 
-    const { permissions } = usePagePermissions({ pageIdOrPath: currentPageId });
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));

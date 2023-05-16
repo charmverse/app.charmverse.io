@@ -7,6 +7,8 @@ declare module 'iron-session' {
     user: { id: string };
     // Used when we have a non signed in user
     anonymousUserId?: string;
+    // Used when logged is as a different user
+    isRemote?: boolean;
   }
 }
 

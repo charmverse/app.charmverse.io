@@ -1,6 +1,5 @@
-import type { Feature, Space } from '@prisma/client';
-
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+import type { Feature, Space } from '@charmverse/core/prisma';
 
 export type SpaceHiddenFeatures = {
   spaceId: string;

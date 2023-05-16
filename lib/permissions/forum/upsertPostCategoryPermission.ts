@@ -1,33 +1,43 @@
-import type { Prisma } from '@prisma/client';
-import { PostCategoryPermissionLevel } from '@prisma/client';
-
-import { prisma } from 'db';
+import type {
+  PostCategoryPermissionAssignment,
+  AssignedPostCategoryPermission,
+  AssignablePostCategoryPermissionGroups,
+  AssignablePermissionGroups
+} from '@charmverse/core';
 import {
+  SystemError,
+  prisma,
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
-  UndesirableOperationError
-} from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
+  UndesirableOperationError,
+  stringUtils
+} from '@charmverse/core';
+import type { Prisma } from '@charmverse/core/prisma';
+import { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 
-import { AssignmentNotPermittedError } from '../errors';
-
-import type { AssignablePostCategoryPermissionGroups, AssignedPostCategoryPermission } from './interfaces';
-import { postCategoryPermissionGroups } from './interfaces';
 import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 
-export type PostCategoryPermissionInput<
-  T extends AssignablePostCategoryPermissionGroups = AssignablePostCategoryPermissionGroups
-> = Pick<AssignedPostCategoryPermission<T>, 'assignee' | 'permissionLevel' | 'postCategoryId'>;
+// Temporary - We will delete this file once all dependencies have been eliminated
+const postCategoryPermissionGroups: AssignablePermissionGroups[] = ['role', 'space', 'public'];
 
+class AssignmentNotPermittedError extends SystemError {
+  constructor(group: AssignablePermissionGroups) {
+    super({
+      errorType: 'Invalid input',
+      message: `This permission assignment to ${group} is invalid or unauthorised`,
+      severity: 'warning'
+    });
+  }
+}
 export async function upsertPostCategoryPermission<
   T extends AssignablePostCategoryPermissionGroups = AssignablePostCategoryPermissionGroups
 >({
   assignee,
   permissionLevel,
   postCategoryId
-}: PostCategoryPermissionInput<T>): Promise<AssignedPostCategoryPermission<T>> {
-  if (!isUUID(postCategoryId)) {
+}: PostCategoryPermissionAssignment<T>): Promise<AssignedPostCategoryPermission<T>> {
+  if (!stringUtils.isUUID(postCategoryId)) {
     throw new InvalidInputError('Valid post category ID is required');
   }
 

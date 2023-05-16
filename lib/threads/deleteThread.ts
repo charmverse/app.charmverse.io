@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 export async function deleteThread(threadId: string): Promise<true> {

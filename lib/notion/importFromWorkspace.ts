@@ -1,4 +1,4 @@
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
 
 import { NotionImporter } from './NotionImporter/NotionImporter';
 

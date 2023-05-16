@@ -1,3 +1,5 @@
+import type { ProposalFlowPermissionFlags } from '@charmverse/core';
+import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -13,7 +15,6 @@ import {
   Box
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
@@ -21,11 +22,8 @@ import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
-import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useUser } from 'hooks/useUser';
+import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -99,8 +97,9 @@ interface CreateVoteModalProps {
   open?: boolean;
   pageId?: string;
   postId?: string;
+  snapshotProposalId: string | null;
   proposal?: ProposalWithUsers;
-  proposalFlowFlags?: ProposalFlowFlags;
+  proposalFlowFlags?: ProposalFlowPermissionFlags;
 }
 
 export function CreateVoteModal({
@@ -110,6 +109,7 @@ export function CreateVoteModal({
   onPublishToSnapshot = () => null,
   pageId,
   postId,
+  snapshotProposalId,
   proposal,
   proposalFlowFlags
 }: CreateVoteModalProps) {
@@ -309,6 +309,7 @@ export function CreateVoteModal({
                     )}
                     onPublish={onPublishToSnapshot}
                     pageId={proposal.id}
+                    snapshotProposalId={snapshotProposalId}
                   />
                 </div>
               </Tooltip>

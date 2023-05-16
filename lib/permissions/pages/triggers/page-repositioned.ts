@@ -1,5 +1,6 @@
-import type { TransactionClient } from 'db';
-import { prisma } from 'db';
+import type { TransactionClient } from '@charmverse/core';
+import { prisma } from '@charmverse/core';
+
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions, PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
 import { getPage, PageNotFoundError } from 'lib/pages/server';

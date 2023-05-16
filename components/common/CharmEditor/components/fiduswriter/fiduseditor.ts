@@ -1,8 +1,8 @@
 import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import log from 'lib/log';
 import type {
   ClientSubscribeMessage,
   SocketMessage,

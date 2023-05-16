@@ -1,9 +1,9 @@
+import { getLogger } from '@charmverse/core/log';
 import { RateLimit } from 'async-sema';
 
 import fetch from 'adapters/http/fetch.server';
 import { COLLABLAND_API_URL } from 'lib/collabland/config';
 import type { CollablandUserResult } from 'lib/collabland/interfaces';
-import { getLogger } from 'lib/log/prefix';
 import type { ExternalRole } from 'lib/roles';
 
 const log = getLogger('collabland-client');

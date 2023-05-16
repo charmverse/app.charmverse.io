@@ -1,7 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { jwtVerify } from 'jose';
-
-import log from 'lib/log';
 
 export const webhookChecker = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {

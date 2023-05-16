@@ -1,9 +1,9 @@
+import type { PostCategory } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/system/Box';
-import type { PostCategory } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

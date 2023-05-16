@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function updateTokenGateRoles(roleIds: string[], tokenGateId: string) {
   const roleIdsSet = new Set(roleIds);

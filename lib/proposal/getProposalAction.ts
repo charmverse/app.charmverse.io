@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import type { ProposalTask } from './getProposalTasks';
 

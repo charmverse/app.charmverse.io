@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import { useVotes } from 'hooks/useVotes';
 import type { ExtendedVote } from 'lib/votes/interfaces';
@@ -19,6 +18,8 @@ export function PollNodeView({
   postId,
   readOnly,
   updateAttrs,
+  pagePermissions,
+  snapshotProposalId,
   selected,
   deleteNode
 }: CharmNodeViewProps) {
@@ -27,9 +28,6 @@ export function PollNodeView({
 
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
-  const { permissions: pagePermissions } = usePagePermissions({
-    pageIdOrPath: pollId ? votes[pollId]?.pageId : (null as any)
-  });
   const postPermissions = usePostPermissions({
     postIdOrPath: pollId ? votes[pollId]?.postId : (null as any)
   });
@@ -63,6 +61,7 @@ export function PollNodeView({
           onCreateVote={onCreateVote}
           pageId={pageId}
           postId={postId}
+          snapshotProposalId={snapshotProposalId || null}
         />
         <div
           onClick={(e) => {

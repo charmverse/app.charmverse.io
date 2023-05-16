@@ -1,8 +1,9 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
+
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import { filterApplicablePermissions } from '../filterApplicablePermissions';
-import type { PermissionCompute, PermissionComputeRequest } from '../interfaces';
+import type { PermissionCompute } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';

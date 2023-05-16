@@ -1,6 +1,6 @@
-import type { PageComment } from '@prisma/client';
+import { prisma } from '@charmverse/core';
+import type { PageComment } from '@charmverse/core/prisma';
 
-import { prisma } from 'db';
 import { PageCommentNotFoundError } from 'lib/pages/comments/errors';
 
 export async function getPageComment(commentId: string): Promise<PageComment> {

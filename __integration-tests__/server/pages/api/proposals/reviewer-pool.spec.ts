@@ -1,4 +1,4 @@
-import type { Role, Space, User } from '@prisma/client';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';

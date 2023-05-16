@@ -9,6 +9,11 @@ runs:
       with:
         node-version: 18
 
+    
+    - name: Create .env.test.local file
+      shell: bash
+      run: cp .env.test.local.example .env.test.local
+
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v3
@@ -21,8 +26,3 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    # Build prisma types which are cached inside of node_modules
-    - name: Build Prisma types
-      shell: bash
-      if: steps.cache_node_modules.outputs.cache-hit != 'true'
-      run: npm run build:prisma

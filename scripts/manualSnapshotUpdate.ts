@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core';
 
 export async function updateSnapshot(proposalId: string, snapshotProposalId: string) {
   return prisma.page.update({
