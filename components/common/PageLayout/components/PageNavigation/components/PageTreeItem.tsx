@@ -47,6 +47,7 @@ interface PageTreeItemProps {
   label: string;
   pageType: PageType;
   pageId: string;
+  pagePath: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
   onClick?: () => void;
@@ -297,6 +298,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     label,
     pageType,
     pageId,
+    pagePath,
     hasSelectedChildView,
     onClick
   } = props;
@@ -373,7 +375,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={href} />}
+        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
