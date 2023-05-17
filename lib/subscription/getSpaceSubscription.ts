@@ -6,9 +6,9 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
       id: spaceId
     },
     select: {
-      spaceSubscription: {
+      stripeSubscription: {
         where: {
-          active: true
+          deletedAt: null
         },
         take: 1,
         orderBy: {
@@ -18,7 +18,7 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
     }
   });
 
-  const activeSpaceSubscription = space?.spaceSubscription[0];
+  const activeSpaceSubscription = space?.stripeSubscription[0];
 
   if (!activeSpaceSubscription) {
     return null;

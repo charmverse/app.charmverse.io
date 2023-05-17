@@ -21,7 +21,9 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   const { period, usage, paymentMethodId, spaceId, billingEmail, fullName, streetAddress } =
     req.body as CreateProSubscriptionRequest;
 
+  const userId = req.session.user.id;
   const { clientSecret, paymentIntentStatus } = await createProSubscription({
+    userId,
     paymentMethodId,
     spaceId,
     period,
@@ -32,7 +34,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   });
 
   trackUserAction('checkout_subscription', {
-    userId: req.session.user.id,
+    userId,
     spaceId,
     billingEmail,
     fullName,

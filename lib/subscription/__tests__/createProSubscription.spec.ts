@@ -27,7 +27,7 @@ jest.mock('../stripe', () => ({
 
 describe('createProSubscription', () => {
   it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpaceWithApiToken();
 
     const paymentMethodId = v4();
     const subscriptionId = v4();
@@ -64,7 +64,8 @@ describe('createProSubscription', () => {
       usage: 1,
       billingEmail: 'test@gmail.com',
       fullName: 'John Doe',
-      streetAddress: '123 Main St'
+      streetAddress: '123 Main St',
+      userId: user.id
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
@@ -104,15 +105,13 @@ describe('createProSubscription', () => {
     });
 
     expect(
-      await prisma.spaceSubscription.findFirstOrThrow({
+      await prisma.stripeSubscription.findFirstOrThrow({
         where: {
           spaceId: space.id,
-          active: true,
           customerId,
           subscriptionId,
           productId,
-          period: 'monthly',
-          usage: 1
+          period: 'monthly'
         }
       })
     ).not.toBeFalsy();
@@ -132,16 +131,18 @@ describe('createProSubscription', () => {
         usage: 1,
         billingEmail: 'test@gmail.com',
         fullName: 'John Doe',
-        streetAddress: '123 Main St'
+        streetAddress: '123 Main St',
+        userId: v4()
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw error if space already has an active subscription', async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpaceWithApiToken();
 
     await addSpaceSubscription({
-      spaceId: space.id
+      spaceId: space.id,
+      createdBy: user.id
     });
 
     const paymentMethodId = v4();
@@ -154,7 +155,8 @@ describe('createProSubscription', () => {
         usage: 1,
         billingEmail: 'test@gmail.com',
         fullName: 'John Doe',
-        streetAddress: '123 Main St'
+        streetAddress: '123 Main St',
+        userId: v4()
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

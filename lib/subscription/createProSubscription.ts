@@ -31,8 +31,10 @@ export async function createProSubscription({
   period,
   usage,
   billingEmail,
-  fullName
+  fullName,
+  userId
 }: {
+  userId: string;
   usage: SubscriptionUsage;
   paymentMethodId: string;
   spaceId: string;
@@ -43,9 +45,9 @@ export async function createProSubscription({
     select: {
       domain: true,
       id: true,
-      spaceSubscription: {
+      stripeSubscription: {
         where: {
-          active: true
+          deletedAt: null
         },
         take: 1,
         orderBy: {
@@ -55,7 +57,7 @@ export async function createProSubscription({
     }
   });
 
-  const activeSpaceSubscription = space?.spaceSubscription[0];
+  const activeSpaceSubscription = space?.stripeSubscription[0];
 
   if (!space) {
     throw new NotFoundError('Space not found');
@@ -109,26 +111,34 @@ export async function createProSubscription({
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
 
-  await prisma.space.update({
-    where: {
-      id: spaceId
-    },
-    data: {
-      paidTier: 'pro'
-    }
-  });
-
-  const spaceSubscription = await prisma.spaceSubscription.create({
-    data: {
-      active: true,
-      customerId: customer.id,
-      subscriptionId: subscription.id,
-      period,
-      productId: product.id,
-      usage,
-      spaceId: space.id
-    }
-  });
+  const [spaceSubscription] = await prisma.$transaction([
+    prisma.stripeSubscription.create({
+      data: {
+        createdBy: userId,
+        customerId: customer.id,
+        subscriptionId: subscription.id,
+        period,
+        productId: product.id,
+        spaceId: space.id,
+        stripePayment: {
+          create: {
+            amount,
+            currency: 'USD',
+            paymentId: paymentIntent.id,
+            status: paymentIntent.status === 'succeeded' ? 'success' : 'fail'
+          }
+        }
+      }
+    }),
+    prisma.space.update({
+      where: {
+        id: spaceId
+      },
+      data: {
+        paidTier: 'pro'
+      }
+    })
+  ]);
 
   return {
     subscriptionId: spaceSubscription.id,

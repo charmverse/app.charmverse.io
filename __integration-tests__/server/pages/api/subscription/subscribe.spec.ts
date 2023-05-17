@@ -34,7 +34,8 @@ describe('POST /api/subscription/subscribe - Create subscription for space', () 
     const userCookie = await loginUser(user.id);
 
     await addSpaceSubscription({
-      spaceId: space.id
+      spaceId: space.id,
+      createdBy: user.id
     });
 
     const paymentMethodId = v4();

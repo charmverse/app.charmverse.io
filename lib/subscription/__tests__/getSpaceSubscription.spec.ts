@@ -15,14 +15,14 @@ describe('getSpaceSubscription', () => {
   });
 
   it(`Should return space subscription metadata`, async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpaceWithApiToken();
 
     const subscriptionId = v4();
 
     await addSpaceSubscription({
       spaceId: space.id,
-      usage: 1,
       subscriptionId,
+      createdBy: user.id,
       period: 'monthly'
     });
 

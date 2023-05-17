@@ -1,4 +1,4 @@
-import type { SpaceSubscription } from '@charmverse/core/prisma';
+import type { StripeSubscription } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -18,7 +18,7 @@ handler
   )
   .get(getSpaceSubscriptionController);
 
-async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
+async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<StripeSubscription | null>) {
   const { id: spaceId } = req.query as { id: string };
 
   const spaceSubscription = await getSpaceSubscription({
