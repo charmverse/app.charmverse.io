@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateSnapshot(proposalId: string, snapshotProposalId: string) {
   return prisma.page.update({

@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core';
 import type {
   PostCategoryPermission,
   ProposalCategoryPermission,
@@ -6,6 +5,7 @@ import type {
   SpaceRole,
   User
 } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
@@ -13,7 +13,7 @@ import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalC
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
-import { spaceCreateTemplates } from '../config';
+import { staticSpaceTemplates } from '../config';
 import type { SpaceCreateInput } from '../createSpace';
 import { createWorkspace } from '../createSpace';
 
@@ -258,10 +258,10 @@ describe('createWorkspace', () => {
   });
 
   it('should always include the getting started page when creating a space', async () => {
-    for (const options of spaceCreateTemplates) {
+    for (const template of staticSpaceTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        createSpaceTemplate: options,
+        spaceTemplate: template.id,
         spaceData: {
           name: `Name-${v4()}`
         }

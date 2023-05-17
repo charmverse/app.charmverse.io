@@ -34,6 +34,6 @@ export const googleOAuthClientIdSensitive =
 export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;
 
 // Permissions API
-export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://localhost:3001';
+export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://127.0.0.1:3001';
 export const permissionsApiAuthKey = process.env.PERMISSIONS_API_AUTH_KEY ?? 'key';
 export const webhookBaseUrl = 'https://app.charmverse.io/api/v1/webhooks/addToDatabase';

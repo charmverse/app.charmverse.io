@@ -3,9 +3,9 @@ import {
   AvailableProposalPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
   getDefaultProposalPermissionPolicies,
-  isProposalAuthor,
-  prisma
+  isProposalAuthor
 } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';

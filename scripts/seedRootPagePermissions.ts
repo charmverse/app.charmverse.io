@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { Prisma } from '@charmverse/core/prisma';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { pageStubToCreate } from 'testing/generatePageStub';

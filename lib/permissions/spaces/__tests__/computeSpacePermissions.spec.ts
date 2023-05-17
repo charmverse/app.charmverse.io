@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import type { Space, SpacePermission } from '@charmverse/core/prisma';
 import { SpaceOperation } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { assignRole } from 'lib/roles';
 import { typedKeys } from 'lib/utilities/objects';
