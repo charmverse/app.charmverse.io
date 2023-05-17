@@ -1,4 +1,4 @@
-import type { SpaceSubscription } from '@charmverse/core/prisma';
+import type { StripeSubscription } from '@charmverse/core/dist/cjs/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -57,9 +57,9 @@ export function CheckoutForm({
   refetch,
   spaceSubscription
 }: {
-  spaceSubscription: null | SpaceSubscription;
+  spaceSubscription: null | StripeSubscription;
   onCancel: VoidFunction;
-  refetch: KeyedMutator<SpaceSubscription | null>;
+  refetch: KeyedMutator<StripeSubscription | null>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -96,7 +96,7 @@ export function CheckoutForm({
   useEffect(() => {
     if (spaceSubscription) {
       setPeriod(spaceSubscription.period);
-      setUsage(spaceSubscription.usage as SubscriptionUsage);
+      // setUsage(spaceSubscription.usage as SubscriptionUsage);
     }
   }, [spaceSubscription]);
 
@@ -295,7 +295,13 @@ export function CheckoutForm({
         >
           {isProcessing ? 'Processing ... ' : 'Upgrade'}
         </Button>
-        <Button onClick={onCancel} sx={{ width: 'fit-content' }} color='secondary' variant='outlined'>
+        <Button
+          disabled={isProcessing}
+          onClick={onCancel}
+          sx={{ width: 'fit-content' }}
+          color='secondary'
+          variant='outlined'
+        >
           Cancel
         </Button>
       </Stack>

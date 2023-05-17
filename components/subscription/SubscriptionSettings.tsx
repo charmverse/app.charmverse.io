@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Divider, InputLabel, Skeleton, Typography } from '@mui/material';
+import { Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
@@ -12,6 +12,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import type { SubscriptionUsage } from 'lib/subscription/constants';
 import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/constants';
@@ -29,6 +30,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   } = useSWR(`${space.id}-subscription`, () => {
     return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
   });
+
+  const isAdmin = useIsAdmin();
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
@@ -103,14 +106,19 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               </Elements>
             ) : (
               <Stack flexDirection='row' gap={1}>
-                <Button
-                  sx={{
-                    width: 'fit-content'
-                  }}
-                  onClick={handleShowCheckoutForm}
-                >
-                  Upgrade
-                </Button>
+                <Tooltip title={!isAdmin ? 'Only admin is able to upgrade space subscription' : ''}>
+                  <div>
+                    <Button
+                      disabled={!isAdmin}
+                      sx={{
+                        width: 'fit-content'
+                      }}
+                      onClick={handleShowCheckoutForm}
+                    >
+                      Upgrade
+                    </Button>
+                  </div>
+                </Tooltip>
                 {spaceSubscription !== null && (
                   <Button
                     onClick={() => {
