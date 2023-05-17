@@ -1,20 +1,19 @@
-import { prisma } from '@charmverse/core';
-import { PageNotFoundError } from "lib/pages/server";
-import { InvalidInputError } from "lib/utilities/errors";
-import type { GettingStartedPage } from "seedData/gettingStartedPage";
-import { gettingStartedPage} from 'seedData/gettingStartedPage';
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import {execSync} from 'node:child_process'
+import { prisma } from '@charmverse/core/prisma-client';
+import { PageNotFoundError } from 'lib/pages/server';
+import { InvalidInputError } from 'lib/utilities/errors';
+import type { GettingStartedPage } from 'seedData/gettingStartedPage';
+import { gettingStartedPage } from 'seedData/gettingStartedPage';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 /**
  * Use this script to update the default Getting Started page for spaces.
- * @docs https://app.charmverse.io/charmverse/page-22634121121754958 
+ * @docs https://app.charmverse.io/charmverse/page-22634121121754958
  */
-async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: string, pagePath: string}) {
-
+async function updateGettingStartedPage({ spaceDomain, pagePath }: { spaceDomain: string; pagePath: string }) {
   if (!spaceDomain || !pagePath) {
-    throw new InvalidInputError('You must provide a space domain and page path.')
+    throw new InvalidInputError('You must provide a space domain and page path.');
   }
 
   const page = await prisma.page.findFirst({
@@ -22,7 +21,7 @@ async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: s
       path: pagePath,
       space: {
         domain: spaceDomain
-      },
+      }
     },
     select: {
       icon: true,
@@ -33,12 +32,12 @@ async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: s
   });
 
   if (!page) {
-    throw new PageNotFoundError(`${spaceDomain}/${pagePath}`)
+    throw new PageNotFoundError(`${spaceDomain}/${pagePath}`);
   }
 
   const gettingStartedFile = path.join(path.resolve(), 'seedData', 'gettingStartedPage.ts');
 
-  const fileContent = await fs.readFile(gettingStartedFile, 'utf-8')
+  const fileContent = await fs.readFile(gettingStartedFile, 'utf-8');
 
   // Get any code and assertions written before the export of the getting started page
   const fileContentPre = fileContent.split('export const')[0].trim();
@@ -47,13 +46,17 @@ async function updateGettingStartedPage({spaceDomain, pagePath}: {spaceDomain: s
     // Keep the manually assigned fields so we have a single place to set things like page index and version
     ...gettingStartedPage,
     ...page
-  }
+  };
 
-  const {content, contentText, ...pageWithoutContent} = newGettingStartedPage;
-  console.log('pageWithoutContent', pageWithoutContent)
+  const { content, contentText, ...pageWithoutContent } = newGettingStartedPage;
+  console.log('pageWithoutContent', pageWithoutContent);
 
   // Construct the updated code for this page
-  const newContent = `${fileContentPre}\r\n\r\nexport const gettingStartedPage: GettingStartedPage = ${JSON.stringify(newGettingStartedPage, null, 2)};`
+  const newContent = `${fileContentPre}\r\n\r\nexport const gettingStartedPage: GettingStartedPage = ${JSON.stringify(
+    newGettingStartedPage,
+    null,
+    2
+  )};`;
 
   await fs.writeFile(gettingStartedFile, newContent, 'utf-8');
 

@@ -1,7 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { prisma } from '@charmverse/core';
 import type {
   Block,
   Bounty,
@@ -13,6 +12,7 @@ import type {
   Vote,
   VoteOptions
 } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
 import type { PageNodeWithChildren } from 'lib/pages';

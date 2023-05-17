@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
-import type { StripePayment, StripeSubscription } from '@charmverse/core/dist/cjs/prisma';
+import type { StripePayment, StripeSubscription } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';

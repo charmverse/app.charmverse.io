@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { SuperApiToken } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import request from 'supertest';
 import { v4 } from 'uuid';

@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 
-import type { TransactionClient } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages/server';
 
@@ -14,7 +14,7 @@ import { PermissionNotFoundError } from '../errors';
 
 export async function setupPermissionsAfterPagePermissionAdded(
   permissionId: string,
-  transaction?: TransactionClient
+  transaction?: PrismaTransactionClient
 ): Promise<boolean> {
   if (!transaction) {
     return prisma.$transaction(txHandler);
@@ -22,7 +22,7 @@ export async function setupPermissionsAfterPagePermissionAdded(
 
   return txHandler(transaction);
 
-  async function txHandler(tx: TransactionClient) {
+  async function txHandler(tx: PrismaTransactionClient) {
     const foundPermission = await getPagePermission(permissionId, tx);
 
     if (!foundPermission) {
