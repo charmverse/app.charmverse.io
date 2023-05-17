@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Space, SpaceOperation, SpacePermission } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Page, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import { upsertPermission } from 'lib/permissions/pages';

@@ -1,6 +1,7 @@
 import type { PermissionFilteringPolicyFnInput } from '@charmverse/core';
-import { buildComputePermissionsWithPermissionFilteringPolicies, prisma } from '@charmverse/core';
+import { buildComputePermissionsWithPermissionFilteringPolicies } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

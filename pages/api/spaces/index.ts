@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -63,7 +63,7 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const space = await createWorkspace({
     spaceData: data.spaceData,
-    createSpaceTemplate: data.createSpaceTemplate,
+    spaceTemplate: data.spaceTemplate,
     userId
   });
 

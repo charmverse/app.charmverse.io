@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { expect, test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';

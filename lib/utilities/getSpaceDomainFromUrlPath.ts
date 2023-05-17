@@ -1,4 +1,4 @@
-import { DOMAIN_BLACKLIST } from 'lib/spaces/constants';
+import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 
 export function getSpaceDomainFromUrlPath(path?: string) {
   if (!path) {

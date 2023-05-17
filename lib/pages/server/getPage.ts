@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
-import type { TransactionClient } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
 import type { IPageWithPermissions } from '../interfaces';
@@ -8,7 +8,7 @@ import type { IPageWithPermissions } from '../interfaces';
 export async function getPage(
   pageIdOrPath: string,
   spaceId?: string,
-  tx: TransactionClient = prisma
+  tx: PrismaTransactionClient = prisma
 ): Promise<IPageWithPermissions | null> {
   const isValidUUid = validate(pageIdOrPath);
 

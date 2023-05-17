@@ -288,7 +288,7 @@ export function DocumentPageActionList({
           redirect
         />
       )}
-      <CopyPageLinkAction path={router.asPath} onComplete={onComplete} />
+      <CopyPageLinkAction path={`/${page.path}`} onComplete={onComplete} />
 
       <Divider sx={{ my: '0 !important' }} />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Post, PostCategory } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 

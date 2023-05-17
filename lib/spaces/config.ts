@@ -1,40 +1,55 @@
-import { typedKeys } from 'lib/utilities/objects';
+export const DOMAIN_BLACKLIST = [
+  'api',
+  'api-docs',
+  'authenticate',
+  'createSpace',
+  'invite',
+  'login',
+  'images',
+  'join',
+  'share',
+  'signup',
+  'u'
+];
 
-export enum SpaceTemplate {
-  impact_community,
-  hackathon,
-  creator,
-  nft_community,
-  nounish_dao
-}
-
-export const spaceTemplateLabelMapping = {
-  templateNftCommunity: 'NFT Community',
-  templateCreator: 'Creator',
-  templateHackathon: 'Hackathon',
-  templateNounishDAO: 'Nounish DAO',
-  templateImpactCommunity: 'Impact Community'
-};
-
-const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
-
-export const spaceInternalTemplateMapping: Record<keyof typeof SpaceTemplate, keyof typeof spaceTemplateLabelMapping> =
+export const staticSpaceTemplates = [
   {
-    creator: 'templateCreator',
-    hackathon: 'templateHackathon',
-    impact_community: 'templateImpactCommunity',
-    nft_community: 'templateNftCommunity',
-    nounish_dao: 'templateNounishDAO'
-  };
+    id: 'templateNftCommunity',
+    name: 'NFT Community',
+    apiName: 'nft_community'
+  },
+  {
+    id: 'templateCreator',
+    name: 'Creator',
+    apiName: 'creator'
+  },
+  {
+    id: 'templateHackathon',
+    name: 'Hackathon',
+    apiName: 'hackathon'
+  },
+  {
+    id: 'templateNounishDAO',
+    name: 'Nounish DAO',
+    apiName: 'nounish_dao'
+  },
+  {
+    id: 'templateImpactCommunity',
+    name: 'Impact Community',
+    apiName: 'impact_community'
+  },
+  {
+    id: 'templateGrantRecipient',
+    name: 'Grant Recipient',
+    apiName: 'grant_recipient'
+  }
+] as const;
 
-export type SpaceTemplateType = keyof typeof SpaceTemplate;
+const dynamicTemplateIds = ['default', 'importNotion', 'importMarkdown'] as const;
 
-export const spaceCreateTemplates = [...typedKeys(spaceInternalTemplateMapping), ...staticTemplateOptions];
+export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), ...dynamicTemplateIds];
 
-export type SpaceCreateTemplate = (typeof spaceCreateTemplates)[number];
-
-// templates that will not appear in the template picker
-export type PrivateTemplate = 'gitcoin';
-export const privateTemplateMapping: Record<PrivateTemplate, string> = {
-  gitcoin: 'templateGitcoin'
-};
+export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
+export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
+// Include private templates, like gitcoin
+export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | 'templateGitcoin';

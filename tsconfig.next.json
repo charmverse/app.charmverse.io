@@ -10,6 +10,9 @@
       "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/esm/prisma"
       ],
+      "@charmverse/core/prisma-client": [
+        "node_modules/@charmverse/core/dist/esm/prisma-client"
+      ],
       "@charmverse/core/shared": [
         "node_modules/@charmverse/core/dist/esm/shared"
       ],
