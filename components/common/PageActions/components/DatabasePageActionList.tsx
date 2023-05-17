@@ -207,7 +207,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
         pageType={boardPage?.type}
         pagePermissions={pagePermissions}
       />
-      <CopyPageLinkAction path={window.location.href} onComplete={onComplete} />
+      <CopyPageLinkAction path={`/${boardPage?.path}`} onComplete={onComplete} />
       <Divider />
       <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>

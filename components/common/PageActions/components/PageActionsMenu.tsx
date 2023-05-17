@@ -97,7 +97,7 @@ export function PageActionsMenu({
           pagePermissions={pagePermissions}
         />
       )}
-      <CopyPageLinkAction path={getPageLink()} />
+      <CopyPageLinkAction path={`/${page.path}`} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>
