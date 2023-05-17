@@ -404,13 +404,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
   }
 
-  function getAbsolutePath() {
-    if (typeof window !== 'undefined') {
-      return window.location.origin + pagePath;
-    }
-    return '';
-  }
-
   return (
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
@@ -430,7 +423,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
       />
-      <CopyPageLinkAction path={getAbsolutePath()} onComplete={closeMenu} />
+      <CopyPageLinkAction path={pagePath} onComplete={closeMenu} />
     </>
   );
 }
