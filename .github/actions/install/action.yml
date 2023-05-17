@@ -26,9 +26,9 @@ runs:
       run: npm ci --no-audit --no-fund
 
     # Include this step to deploy and test a different branch of core
+    # 1. Set the webapp branch
+    # 2. Set core branch
     - name: Install special core library
       shell: bash
-      # 1. Set the webapp branch
-      if: github.ref_name == 'page-views'
-      # 2. Set core branch
+      if: github.head_ref == 'page-views'
       run: npm install github:charmverse/core#page-views
