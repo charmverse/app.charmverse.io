@@ -53,25 +53,27 @@ async function recordDatabaseEvent(event: EventInput, userId?: string) {
   if (event.event === 'page_view') {
     const typedEvent = event as PageEventMap['page_view'];
     // ignore non-document pages (bounties list or forum feed page, etc)
-    if (typedEvent.spaceId && typedEvent.pageId) {
-      await prisma.pageAction.create({
+    if (typedEvent.spaceId) {
+      await prisma.userSpaceAction.create({
         data: {
+          action: 'view_page',
           createdBy: userId,
-          pageId: typedEvent.pageId!,
+          pageId: typedEvent.pageId,
           spaceId: typedEvent.spaceId!,
-          type: 'view'
+          pageType: typedEvent.type
         }
       });
     }
   }
   if (event.event === 'load_post_page') {
     const typedEvent = event as ForumEventMap['load_post_page'];
-    await prisma.postAction.create({
+    await prisma.userSpaceAction.create({
       data: {
+        action: 'view_page',
         createdBy: userId,
         postId: typedEvent.resourceId,
         spaceId: typedEvent.spaceId,
-        type: 'view'
+        pageType: 'post'
       }
     });
   }
