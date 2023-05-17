@@ -106,20 +106,22 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               </Elements>
             ) : (
               <Stack flexDirection='row' gap={1}>
-                <Tooltip title={!isAdmin ? 'Only admin is able to upgrade space subscription' : ''}>
-                  <div>
-                    <Button
-                      disabled={!isAdmin}
-                      sx={{
-                        width: 'fit-content'
-                      }}
-                      onClick={handleShowCheckoutForm}
-                    >
-                      Upgrade
-                    </Button>
-                  </div>
-                </Tooltip>
-                {spaceSubscription !== null && (
+                {spaceSubscription === null && (
+                  <Tooltip title={!isAdmin ? 'Only admin is able to upgrade space subscription' : ''}>
+                    <div>
+                      <Button
+                        disabled={!isAdmin}
+                        sx={{
+                          width: 'fit-content'
+                        }}
+                        onClick={handleShowCheckoutForm}
+                      >
+                        Upgrade
+                      </Button>
+                    </div>
+                  </Tooltip>
+                )}
+                {/* {spaceSubscription !== null && (
                   <Button
                     onClick={() => {
                       setShowCheckoutForm(false);
@@ -129,7 +131,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
                   >
                     Cancel Plan
                   </Button>
-                )}
+                )} */}
               </Stack>
             )}
           </>
