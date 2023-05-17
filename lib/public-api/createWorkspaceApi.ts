@@ -8,6 +8,7 @@ import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDisco
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import type { Space } from 'lib/public-api/interfaces';
+import { staticSpaceTemplates } from 'lib/spaces/config';
 import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
@@ -66,12 +67,14 @@ export async function createWorkspaceApi({
     superApiTokenId: superApiToken?.id
   };
 
+  const internalTemplate = staticSpaceTemplates.find((tpl) => tpl.apiName === template)?.id ?? 'templateNftCommunity';
+
   const space = await createWorkspace({
     spaceData,
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    createSpaceTemplate: template ?? 'nft_community'
+    spaceTemplate: internalTemplate
   });
 
   // create roles from discord
@@ -88,7 +91,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: template ?? 'nft_community',
+    template: internalTemplate,
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);

@@ -63,7 +63,7 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
 
   const space = await createWorkspace({
     spaceData: data.spaceData,
-    createSpaceTemplate: data.createSpaceTemplate,
+    spaceTemplate: data.spaceTemplate,
     userId
   });
 

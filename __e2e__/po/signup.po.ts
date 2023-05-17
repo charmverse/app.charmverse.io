@@ -2,7 +2,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
 
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import type { SpaceTemplateType } from 'lib/spaces/config';
 
 // capture actions on the pages in signup flow
 export class SignUpPage {
@@ -19,7 +19,7 @@ export class SignUpPage {
     await this.page.waitForURL('**/createSpace');
   }
 
-  async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceCreateTemplate) {
+  async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceTemplateType) {
     await this.page.click(`data-test=space-template-${spaceTemplateOption}`);
   }
 
