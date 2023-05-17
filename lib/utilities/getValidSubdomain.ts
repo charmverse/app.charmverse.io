@@ -6,12 +6,21 @@ export function getValidSubdomain(host?: string | null) {
     host = window.location.host;
   }
 
+  if (isLocalhostAlias(host)) {
+    return null;
+  }
+
   if (host && host.includes('.')) {
     const candidate = host.split('.')[0];
-    if (candidate && !candidate.includes('localhost')) {
+    if (candidate) {
       // Valid candidate
       subdomain = candidate;
     }
   }
+
   return subdomain;
+}
+
+export function isLocalhostAlias(host?: string | null) {
+  return host?.includes('localhost') || host?.includes('127.0.0.1');
 }
