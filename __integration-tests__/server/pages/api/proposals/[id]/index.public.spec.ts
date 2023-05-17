@@ -119,6 +119,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     ]);
   });
 
+  // This is achieved currently by the fact the we check new reviewers against proposal reviewer pool, and in public mode, the role ids are always empty
   it('should throw an error if trying to assign a role as a reviewer', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
