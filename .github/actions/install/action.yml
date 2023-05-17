@@ -29,6 +29,6 @@ runs:
     - name: Install special core library
       shell: bash
       # 1. Set the webapp branch
-      if: github.ref == 'page-views'
+      if: github.ref_name == 'page-views'
       # 2. Set core branch
       run: npm install github:charmverse/core#page-views
