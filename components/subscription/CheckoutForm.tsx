@@ -5,8 +5,15 @@ import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import { Box, Stack, styled } from '@mui/system';
-import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { StripeElementChangeEvent } from '@stripe/stripe-js';
+import {
+  AddressElement,
+  CardCvcElement,
+  CardExpiryElement,
+  CardNumberElement,
+  useElements,
+  useStripe
+} from '@stripe/react-stripe-js';
+import type { StripeAddressElementChangeEvent, StripeElementChangeEvent } from '@stripe/stripe-js';
 import log from 'loglevel';
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -19,9 +26,10 @@ import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
-import type { SubscriptionProductId, type SubscriptionPeriod } from 'lib/subscription/constants';
+import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
 import type { PaymentDetails } from 'lib/subscription/createProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import { isTruthy } from 'lib/utilities/types';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -45,7 +53,6 @@ const StyledCardElementContainer = styled(Box)`
 const schema = () => {
   return yup.object({
     billingEmail: yup.string().email().required(),
-    streetAddress: yup.string(),
     fullName: yup.string().required()
   });
 };
@@ -65,13 +72,21 @@ export function CheckoutForm({
   const {
     register,
     getValues,
+    setValue,
     formState: { errors, isValid }
   } = useForm<PaymentDetails>({
     mode: 'onChange',
     defaultValues: {
       fullName: '',
       billingEmail: '',
-      streetAddress: ''
+      billingAddress: {
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: ''
+      }
     },
     resolver: yupResolver(schema())
   });
@@ -85,7 +100,9 @@ export function CheckoutForm({
     cardNumber: StripeElementChangeEvent | null;
     cvc: StripeElementChangeEvent | null;
     expiry: StripeElementChangeEvent | null;
+    address: StripeAddressElementChangeEvent | null;
   }>({
+    address: null,
     expiry: null,
     cvc: null,
     cardNumber: null
@@ -104,8 +121,8 @@ export function CheckoutForm({
     cardEvent.expiry?.error ||
     errors.billingEmail ||
     errors.fullName;
-  const cardComplete =
-    cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete && isValid;
+
+  const cardComplete = cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -116,8 +133,9 @@ export function CheckoutForm({
     }
 
     const cardNumberElement = elements?.getElement('cardNumber');
+    const cardAddressElement = elements?.getElement('address');
 
-    if (!cardNumberElement) {
+    if (!cardNumberElement || !cardAddressElement) {
       return;
     }
 
@@ -127,7 +145,7 @@ export function CheckoutForm({
       period,
       fullName: paymentDetails.fullName,
       billingEmail: paymentDetails.billingEmail,
-      streetAddress: paymentDetails.streetAddress
+      billingAddress: paymentDetails.billingAddress
     };
 
     try {
@@ -146,7 +164,7 @@ export function CheckoutForm({
             productId,
             fullName: paymentDetails.fullName,
             billingEmail: paymentDetails.billingEmail,
-            streetAddress: paymentDetails.streetAddress
+            billingAddress: (await cardAddressElement.getValue()).value.address
           }
         );
 
@@ -282,19 +300,18 @@ export function CheckoutForm({
           </StyledCardElementContainer>
         </Stack>
       </Stack>
-      <Stack display='flex' flexDirection='row' gap={1}>
-        <Stack gap={0.5} flexGrow={1}>
-          <InputLabel>Full Name</InputLabel>
-          <TextField disabled={isProcessing} {...register('fullName')} />
-        </Stack>
-        <Stack gap={0.5} flexGrow={1}>
-          <InputLabel>Billing Email</InputLabel>
-          <TextField disabled={isProcessing} {...register('billingEmail')} />
-        </Stack>
-      </Stack>
+      <AddressElement
+        options={{
+          mode: 'billing'
+        }}
+        onChange={(event) => {
+          setValue('fullName', [event.value.firstName, event.value.lastName].filter(isTruthy).join(' '));
+          setValue('billingAddress', event.value.address);
+        }}
+      />
       <Stack gap={0.5}>
-        <InputLabel>Street Address</InputLabel>
-        <TextField disabled={isProcessing} {...register('streetAddress')} />
+        <InputLabel>Billing Email</InputLabel>
+        <TextField disabled={isProcessing} {...register('billingEmail')} />
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>

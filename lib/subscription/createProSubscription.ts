@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';
 import stripe from 'stripe';
@@ -12,7 +13,7 @@ import { stripeClient } from './stripe';
 export type PaymentDetails = {
   fullName: string;
   billingEmail: string;
-  streetAddress: string;
+  billingAddress: StripeAddressElementChangeEvent['value']['address'];
 };
 
 export type CreateProSubscriptionRequest = PaymentDetails & {
@@ -29,6 +30,7 @@ export type CreateProSubscriptionResponse = {
 };
 
 export async function createProSubscription({
+  billingAddress,
   paymentMethodId,
   spaceId,
   period,
@@ -80,6 +82,10 @@ export async function createProSubscription({
     existingCustomer.data.length !== 0
       ? existingCustomer.data[0]
       : await stripeClient.customers.create({
+          address: {
+            ...billingAddress,
+            line2: billingAddress.line2 ?? undefined
+          },
           name: fullName,
           payment_method: paymentMethodId,
           invoice_settings: { default_payment_method: paymentMethodId },
