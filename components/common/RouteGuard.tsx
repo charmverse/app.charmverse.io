@@ -74,8 +74,12 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         return pathElem;
       })[0] ?? '/';
 
+    const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath);
+    // special case, when visiting main app url on space subdomain
+    const isSpaceSubdomainPath = firstPathSegment === '/' && spaceDomain;
+
     // condition: public page
-    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasSharedPageAccess) {
+    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
