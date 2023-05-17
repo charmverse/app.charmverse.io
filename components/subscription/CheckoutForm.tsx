@@ -26,6 +26,8 @@ import {
 } from 'lib/subscription/constants';
 import type { PaymentDetails } from 'lib/subscription/createProSubscription';
 
+import { Coinbase } from './Coinbase';
+
 const StyledList = styled(List)`
   list-style-type: disc;
   padding-inline-start: 40px;
@@ -78,6 +80,8 @@ export function CheckoutForm({
     },
     resolver: yupResolver(schema())
   });
+
+  const billingDetails = getValues();
 
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -325,6 +329,18 @@ export function CheckoutForm({
         >
           Cancel
         </Button>
+        {space && (
+          <Coinbase
+            space={space}
+            period={period}
+            usage={usage}
+            billing={{
+              fullName: billingDetails.fullName,
+              billingEmail: billingDetails.billingEmail,
+              streetAddress: billingDetails.streetAddress
+            }}
+          />
+        )}
       </Stack>
     </Stack>
   );
