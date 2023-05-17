@@ -425,7 +425,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
       />
-      <CopyPageLinkAction path={pagePath} onComplete={closeMenu} />
+      <CopyPageLinkAction path={`/${pagePath}`} onComplete={closeMenu} />
     </>
   );
 }
