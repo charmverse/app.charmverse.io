@@ -14,7 +14,8 @@ import { stripeClient } from '../stripe';
 jest.mock('../stripe', () => ({
   stripeClient: {
     customers: {
-      create: jest.fn()
+      create: jest.fn(),
+      list: jest.fn()
     },
     products: {
       retrieve: jest.fn()
@@ -43,6 +44,10 @@ describe('createProSubscription', () => {
       id: productId
     });
 
+    const listCustomersMockFn = jest.fn().mockResolvedValue({
+      data: []
+    });
+
     const createSubscriptionsMockFn = jest.fn().mockResolvedValue({
       id: subscriptionId,
       latest_invoice: {
@@ -56,6 +61,7 @@ describe('createProSubscription', () => {
     (stripeClient.customers.create as jest.Mock<any, any>) = createCustomersMockFn;
     (stripeClient.products.retrieve as jest.Mock<any, any>) = retrieveProductsMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
+    (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
 
     const { clientSecret, paymentIntentStatus } = await createProSubscription({
       paymentMethodId,

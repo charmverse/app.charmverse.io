@@ -70,13 +70,21 @@ export async function createProSubscription({
     throw new InvalidStateError('Space already has a subscription');
   }
 
-  // Create a customer
-  const customer = await stripeClient.customers.create({
-    name: fullName,
-    payment_method: paymentMethodId,
-    invoice_settings: { default_payment_method: paymentMethodId },
-    email: billingEmail
+  // Find an existing customer, otherwise create it
+  const existingCustomer = await stripeClient.customers.list({
+    email: billingEmail,
+    limit: 1
   });
+
+  const customer =
+    existingCustomer.data.length !== 0
+      ? existingCustomer.data[0]
+      : await stripeClient.customers.create({
+          name: fullName,
+          payment_method: paymentMethodId,
+          invoice_settings: { default_payment_method: paymentMethodId },
+          email: billingEmail
+        });
 
   const product = await stripeClient.products.retrieve(`pro-${usage}-${period}`);
 
