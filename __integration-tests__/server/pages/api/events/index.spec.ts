@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { baseUrl } from 'config/constants';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import type { EventInput } from 'pages/api/events/index';
+import { loginAnonymousUser } from 'testing/mockApiCall';
 import { createMockSpace } from 'testing/mocks/user';
 
 describe('POST /api/events - Analytics endpoint', () => {
@@ -17,6 +18,8 @@ describe('POST /api/events - Analytics endpoint', () => {
       userId: uuid(),
       spaceId: space.id
     };
+
+    await loginAnonymousUser('abc');
 
     await request(baseUrl).post('/api/events').send(event).expect(200);
 
