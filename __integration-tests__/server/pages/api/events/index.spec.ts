@@ -19,9 +19,9 @@ describe('POST /api/events - Analytics endpoint', () => {
       spaceId: space.id
     };
 
-    await loginAnonymousUser('abc');
+    const sessionCookie = await loginAnonymousUser('abc');
 
-    await request(baseUrl).post('/api/events').send(event).expect(200);
+    await request(baseUrl).post('/api/events').set('Cookie', sessionCookie).send(event).expect(200);
 
     const dbAction = await prisma.userSpaceAction.findFirst({
       where: { spaceId: space.id }
