@@ -21,6 +21,14 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
+      # Include this step to deploy and test a different branch of core
+      - name: Install special core library
+        shell: bash
+        # 1. Set the webapp branch
+        if: github.ref == 'refs/heads/page-views'
+        # 2. Set core branch
+        run: npm install github:charmverse/core#page-views
+
       - name: Build app
         uses: ./.github/actions/build
         with:
