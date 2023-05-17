@@ -102,7 +102,11 @@ export function getSpaceUrl(domain: string) {
   if (subdomain === domain) return '/';
 
   // replace old subdomain with desired one
-  return window?.origin.replace(`${subdomain}.`, `${domain}.`) || `/${domain}`;
+  if (typeof window !== 'undefined') {
+    return window?.origin.replace(`${subdomain}.`, `${domain}.`);
+  }
+
+  return `/${domain}`;
 }
 
 export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
