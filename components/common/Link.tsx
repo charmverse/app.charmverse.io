@@ -101,5 +101,22 @@ export function getSpaceUrl(domain: string) {
   if (!subdomain) return `/${domain}`;
   if (subdomain === domain) return '/';
 
-  return window?.origin.replace(`/${subdomain}`, `/${domain}`) || `/${domain}`;
+  // replace old subdomain with desired one
+  return window?.origin.replace(`${subdomain}.`, `${domain}.`) || `/${domain}`;
+}
+
+export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
+  const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
+  const subdomain = getValidSubdomain();
+
+  if (typeof window !== 'undefined') {
+    const origin =
+      subdomain && subdomain !== spaceDomain
+        ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
+        : window.location.origin;
+
+    return origin + getSubdomainPath(absolutePath);
+  }
+
+  return absolutePath;
 }

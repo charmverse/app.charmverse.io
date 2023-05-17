@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
+import { getSpaceUrl } from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
@@ -20,7 +21,7 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
-        <Button variant='text' href={`/${spaces[0]?.domain}`} endIcon={<NavigateNextIcon />}>
+        <Button variant='text' href={getSpaceUrl(spaces[0]?.domain)} endIcon={<NavigateNextIcon />}>
           Go to my space
         </Button>
       )}
