@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { ProposalCategory, ProposalReviewer, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
@@ -96,10 +96,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
         {
           group: 'user',
           id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
         }
       ]
     };
@@ -113,9 +109,53 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     ).body as PageWithProposal;
 
     // Make sure update went through
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>([
+      {
+        id: expect.any(String),
+        proposalId: page.proposalId as string,
+        userId: adminUser.id,
+        roleId: null
+      }
+    ]);
+  });
+
+  it('should throw an error if trying to assign a role as a reviewer', async () => {
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      spacePaidTier: 'free'
+    });
+    const adminCookie = await loginUser(adminUser.id);
+
+    const role = await testUtilsMembers.generateRole({
+      spaceId: adminSpace.id,
+      createdBy: adminUser.id
+    });
+
+    const { page } = await testUtilsProposals.generateProposal({
+      userId: adminUser.id,
+      spaceId: adminSpace.id,
+      categoryId: proposalCategory.id
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      authors: [adminUser.id],
+      reviewers: [
+        {
+          group: 'user',
+          id: adminUser.id
+        },
+        {
+          group: 'role',
+          id: role.id
+        }
+      ]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(401);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
