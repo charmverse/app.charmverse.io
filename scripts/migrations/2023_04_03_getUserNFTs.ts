@@ -1,14 +1,14 @@
-import { getUserNFTs} from 'lib/profile/getUserNFTs';
-import { prisma } from '@charmverse/core';
-import { uniq } from 'lodash'
+import { getUserNFTs } from 'lib/profile/getUserNFTs';
+import { prisma } from '@charmverse/core/prisma-client';
+import { uniq } from 'lodash';
 
-async function init () {
+async function init() {
   const user = await prisma.profileItem.findMany({
     where: {
       type: 'nft'
     }
-  })
-  console.log('updating profile items:', user.length)
+  });
+  console.log('updating profile items:', user.length);
 
   for (let item of user) {
     if (!item.id.includes(item.userId)) {
@@ -22,10 +22,10 @@ async function init () {
       });
     }
     if (user.indexOf(item) % 100 === 0) {
-      console.log(user.indexOf(item))
+      console.log(user.indexOf(item));
     }
   }
-  console.log('done')
+  console.log('done');
 }
 
 init();

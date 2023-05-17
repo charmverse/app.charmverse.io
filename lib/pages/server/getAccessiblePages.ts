@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PageOperations, Prisma, SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { checkSpaceSpaceSubscriptionInfo } from 'lib/permissions/api/routers';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';

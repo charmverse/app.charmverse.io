@@ -1,6 +1,6 @@
-import type { OptionalTransaction } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
 import type { PagePermission, Prisma, PrismaPromise } from '@charmverse/core/prisma';
+import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
@@ -18,7 +18,7 @@ export async function generateboardPagePermissionUpdated({
   boardId,
   permissionId,
   tx = prisma
-}: BoardPagePermissionUpdated & OptionalTransaction): Promise<{
+}: BoardPagePermissionUpdated & OptionalPrismaTransaction): Promise<{
   updateManyArgs?: Prisma.PagePermissionUpdateManyArgs;
   createManyArgs?: Prisma.PagePermissionCreateManyArgs;
 }> {
@@ -120,7 +120,7 @@ export async function boardPagePermissionUpdated({
   boardId,
   permissionId,
   tx
-}: BoardPagePermissionUpdated & OptionalTransaction): Promise<true> {
+}: BoardPagePermissionUpdated & OptionalPrismaTransaction): Promise<true> {
   const args = await generateboardPagePermissionUpdated({ boardId, permissionId, tx });
 
   if (tx) {

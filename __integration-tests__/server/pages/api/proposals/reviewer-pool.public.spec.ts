@@ -2,7 +2,7 @@ import type { ProposalReviewerPool } from '@charmverse/core';
 import type { Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -16,7 +16,7 @@ let proposal: Proposal;
 let role: Role;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: false });
+  const generated = await generateUserAndSpace({ isAdmin: false, paidTier: 'free' });
   space = generated.space;
   user = generated.user;
   const proposalCategory = await generateProposalCategory({
@@ -34,7 +34,7 @@ beforeAll(async () => {
   });
 });
 
-describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
+describe('GET /api/proposals/reviewer-pool - Return eligible reviewers - public space', () => {
   it('should return eligible reviewers if user is a space member and respond with 200', async () => {
     const nonAdminCookie = await loginUser(user.id);
 
@@ -46,7 +46,7 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
         .expect(200)
     ).body as ProposalReviewerPool;
 
-    const computed = await premiumPermissionsApiClient.proposals.getProposalReviewerPool({
+    const computed = await publicPermissionsClient.proposals.getProposalReviewerPool({
       resourceId: proposal.id
     });
 

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { shortWalletAddress } from 'lib/utilities/strings';
 

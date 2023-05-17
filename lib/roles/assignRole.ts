@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { SpaceRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
