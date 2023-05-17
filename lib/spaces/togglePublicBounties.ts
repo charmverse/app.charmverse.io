@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4, validate } from 'uuid';
 
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
