@@ -11,7 +11,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-type EventInput = MixpanelEvent & {
+export type EventInput<T = MixpanelEvent> = T & {
   event: MixpanelEventName;
 } & Partial<MixpanelTrackBase>;
 
