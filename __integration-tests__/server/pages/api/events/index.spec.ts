@@ -11,7 +11,11 @@ import { createMockSpace } from 'testing/mocks/user';
 
 describe('POST /api/events - Analytics endpoint', () => {
   it('should create a user space action', async () => {
-    const space = await createMockSpace();
+    const space = await prisma.space.create({
+      data: {
+        ...createMockSpace()
+      }
+    });
     const event: EventInput<PageEventMap['page_view']> = {
       event: 'page_view',
       type: 'settings',
