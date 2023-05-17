@@ -5,6 +5,7 @@ import NextLink from 'next/link';
 import type { MouseEvent } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',
@@ -53,7 +54,7 @@ export default function Link({ external, href, onClick, children, color = 'prima
     </StyledMuiLink>
   ) : (
     <StyledMuiLink
-      href={href}
+      href={getSubdomainPath(href)}
       // @ts-ignore
       component={NextLink}
       onClick={onClick}
@@ -82,4 +83,23 @@ export function PageLink({ bountyId, pageId, ...props }: PageLinkProps) {
   }
 
   return <Link onClick={onClickInternalLink} {...props} />;
+}
+
+export function getSubdomainPath(path: string) {
+  const subdomain = getValidSubdomain();
+  if (!subdomain) return path;
+
+  if (path.startsWith(`/${subdomain}`)) {
+    return path.replace(`/${subdomain}`, '');
+  }
+
+  return path;
+}
+
+export function getSpaceUrl(domain: string) {
+  const subdomain = getValidSubdomain();
+  if (!subdomain) return `/${domain}`;
+  if (subdomain === domain) return '/';
+
+  return window?.origin.replace(`/${subdomain}`, `/${domain}`) || `/${domain}`;
 }
