@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core';
-import type Stripe from 'stripe';
+import log from 'loglevel';
+import type { Stripe } from 'stripe';
+import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
@@ -23,6 +25,7 @@ export type CreateProSubscriptionRequest = PaymentDetails & {
 export type CreateProSubscriptionResponse = {
   clientSecret: string | null;
   paymentIntentStatus: Stripe.PaymentIntent.Status | null;
+  subscriptionId: string | null;
 };
 
 export async function createProSubscription({
@@ -39,7 +42,7 @@ export async function createProSubscription({
   paymentMethodId: string;
   spaceId: string;
   period: SubscriptionPeriod;
-} & PaymentDetails) {
+} & PaymentDetails): Promise<CreateProSubscriptionResponse> {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
@@ -80,69 +83,85 @@ export async function createProSubscription({
   // In cent so multiplying by 100
   const amount = SUBSCRIPTION_USAGE_RECORD[usage].pricing[period] * (period === 'monthly' ? 1 : 12) * 100;
 
-  // Create a subscription
-  const subscription = await stripeClient.subscriptions.create({
-    metadata: {
-      usage,
-      period,
-      tier: 'pro',
-      spaceId: space.id
-    },
-    customer: customer.id,
-    items: [
-      {
-        price_data: {
-          currency: 'USD',
-          product: product.id,
-          unit_amount: amount,
-          recurring: {
-            interval: period === 'monthly' ? 'month' : 'year'
-          }
-        }
-      }
-    ],
-    payment_settings: {
-      payment_method_types: ['card'],
-      save_default_payment_method: 'on_subscription'
-    },
-    expand: ['latest_invoice.payment_intent']
-  });
-
-  const invoice = subscription.latest_invoice as Stripe.Invoice;
-  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
-
-  const [spaceSubscription] = await prisma.$transaction([
-    prisma.stripeSubscription.create({
-      data: {
-        createdBy: userId,
-        customerId: customer.id,
-        subscriptionId: subscription.id,
+  try {
+    // Create a subscription
+    const subscription = await stripeClient.subscriptions.create({
+      metadata: {
+        usage,
         period,
-        productId: product.id,
-        spaceId: space.id,
-        stripePayment: {
-          create: {
-            amount,
+        tier: 'pro',
+        spaceId: space.id
+      },
+      customer: customer.id,
+      items: [
+        {
+          price_data: {
             currency: 'USD',
-            paymentId: paymentIntent.id,
-            status: paymentIntent.status === 'succeeded' ? 'success' : 'fail'
+            product: product.id,
+            unit_amount: amount,
+            recurring: {
+              interval: period === 'monthly' ? 'month' : 'year'
+            }
           }
         }
-      }
-    }),
-    prisma.space.update({
-      where: {
-        id: spaceId
+      ],
+      payment_settings: {
+        payment_method_types: ['card'],
+        save_default_payment_method: 'on_subscription'
       },
-      data: {
-        paidTier: 'pro'
-      }
-    })
-  ]);
+      expand: ['latest_invoice.payment_intent']
+    });
 
-  return {
-    subscriptionId: spaceSubscription.id,
-    paymentIntentStatus: paymentIntent?.status ?? null,
-    clientSecret: paymentIntent?.client_secret ?? null
-  };
+    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+
+    const [spaceSubscription] = await prisma.$transaction([
+      prisma.stripeSubscription.create({
+        data: {
+          createdBy: userId,
+          customerId: customer.id,
+          subscriptionId: subscription.id,
+          period,
+          productId: product.id,
+          spaceId: space.id,
+          stripePayment: {
+            create: {
+              amount,
+              currency: 'USD',
+              paymentId: paymentIntent.id,
+              status: paymentIntent.status === 'succeeded' ? 'success' : 'fail'
+            }
+          }
+        }
+      }),
+      prisma.space.update({
+        where: {
+          id: spaceId
+        },
+        data: {
+          paidTier: 'pro'
+        }
+      })
+    ]);
+
+    return {
+      subscriptionId: spaceSubscription.id,
+      paymentIntentStatus: paymentIntent?.status ?? null,
+      clientSecret: paymentIntent?.client_secret ?? null
+    };
+  } catch (err: any) {
+    log.error(`[stripe]: Failed to create subscription. ${err.message}`, {
+      spaceId,
+      period,
+      fullName,
+      billingEmail,
+      errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
+      errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
+    });
+    return {
+      clientSecret: null,
+      paymentIntentStatus: null,
+      subscriptionId: null
+    };
+  }
 }

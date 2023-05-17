@@ -7,6 +7,7 @@ import Switch from '@mui/material/Switch';
 import { Box, Stack, styled } from '@mui/system';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { StripeElementChangeEvent } from '@stripe/stripe-js';
+import log from 'loglevel';
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -123,6 +124,15 @@ export function CheckoutForm({
       return;
     }
 
+    const paymentDetails = getValues();
+    const paymentErrorMetadata = {
+      spaceId: space.id,
+      period,
+      fullName: paymentDetails.fullName,
+      billingEmail: paymentDetails.billingEmail,
+      streetAddress: paymentDetails.streetAddress
+    };
+
     try {
       setIsProcessing(true);
       const paymentMethod = await stripe.createPaymentMethod({
@@ -131,24 +141,30 @@ export function CheckoutForm({
       });
 
       if (paymentMethod.paymentMethod) {
-        const paymentDetails = getValues();
-        const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription({
-          spaceId: space.id,
-          paymentMethodId: paymentMethod.paymentMethod.id,
-          period,
-          usage,
-          fullName: paymentDetails.fullName,
-          billingEmail: paymentDetails.billingEmail,
-          streetAddress: paymentDetails.streetAddress
-        });
+        const { clientSecret, paymentIntentStatus, subscriptionId } = await charmClient.subscription.createSubscription(
+          {
+            spaceId: space.id,
+            paymentMethodId: paymentMethod.paymentMethod.id,
+            period,
+            usage,
+            fullName: paymentDetails.fullName,
+            billingEmail: paymentDetails.billingEmail,
+            streetAddress: paymentDetails.streetAddress
+          }
+        );
 
-        if (clientSecret) {
+        if (clientSecret && subscriptionId && paymentIntentStatus) {
           if (paymentIntentStatus !== 'succeeded') {
             const { error } = await stripe.confirmCardPayment(clientSecret, {
               payment_method: paymentMethod.paymentMethod.id
             });
             if (error) {
               showMessage('Payment failed! Please try again', 'error');
+              log.error(`[stripe]: Payment failed. ${error.message}`, {
+                ...paymentErrorMetadata,
+                errorType: error.type,
+                errorCode: error.code
+              });
             } else {
               showMessage('Payment successful! Community subscription active.', 'success');
             }
@@ -157,8 +173,13 @@ export function CheckoutForm({
           }
         }
       }
-    } catch (err) {
+    } catch (error: any) {
       showMessage('Payment failed! Please try again', 'error');
+      log.error(`[stripe]: Payment failed. ${error.message}`, {
+        ...paymentErrorMetadata,
+        errorType: error.type,
+        errorCode: error.code
+      });
     }
 
     setIsProcessing(false);

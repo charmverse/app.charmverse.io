@@ -22,7 +22,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     req.body as CreateProSubscriptionRequest;
 
   const userId = req.session.user.id;
-  const { clientSecret, paymentIntentStatus } = await createProSubscription({
+  const { clientSecret, paymentIntentStatus, subscriptionId } = await createProSubscription({
     userId,
     paymentMethodId,
     spaceId,
@@ -47,7 +47,8 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   res.status(200).json({
     paymentIntentStatus,
-    clientSecret
+    clientSecret,
+    subscriptionId
   });
 }
 
