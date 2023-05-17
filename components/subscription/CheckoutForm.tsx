@@ -18,13 +18,10 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import {
-  SUBSCRIPTION_USAGE,
-  SUBSCRIPTION_USAGE_RECORD,
-  type SubscriptionPeriod,
-  type SubscriptionUsage
-} from 'lib/subscription/constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
+import type { SubscriptionProductId, type SubscriptionPeriod } from 'lib/subscription/constants';
 import type { PaymentDetails } from 'lib/subscription/createProSubscription';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -58,9 +55,9 @@ export function CheckoutForm({
   refetch,
   spaceSubscription
 }: {
-  spaceSubscription: null | StripeSubscription;
+  spaceSubscription: null | SpaceSubscription;
   onCancel: VoidFunction;
-  refetch: KeyedMutator<StripeSubscription | null>;
+  refetch: KeyedMutator<SpaceSubscription | null>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -83,7 +80,7 @@ export function CheckoutForm({
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
-  const [usage, setUsage] = useState<SubscriptionUsage>(1);
+  const [productId, setProductId] = useState<SubscriptionProductId>('community_5k');
   const [cardEvent, setCardEvent] = useState<{
     cardNumber: StripeElementChangeEvent | null;
     cvc: StripeElementChangeEvent | null;
@@ -97,7 +94,7 @@ export function CheckoutForm({
   useEffect(() => {
     if (spaceSubscription) {
       setPeriod(spaceSubscription.period);
-      // setUsage(spaceSubscription.usage as SubscriptionUsage);
+      setProductId(spaceSubscription.productId);
     }
   }, [spaceSubscription]);
 
@@ -146,7 +143,7 @@ export function CheckoutForm({
             spaceId: space.id,
             paymentMethodId: paymentMethod.paymentMethod.id,
             period,
-            usage,
+            productId,
             fullName: paymentDetails.fullName,
             billingEmail: paymentDetails.billingEmail,
             streetAddress: paymentDetails.streetAddress
@@ -199,17 +196,17 @@ export function CheckoutForm({
           <Slider
             disabled={isProcessing}
             size='small'
-            aria-label='usage'
+            aria-label='Product Id'
             valueLabelDisplay='off'
-            value={usage}
-            marks={SUBSCRIPTION_USAGE.map((_usage) => ({
-              value: _usage,
-              label: `$${SUBSCRIPTION_USAGE_RECORD[_usage].pricing[period]}/${period === 'annual' ? 'yr' : 'mo'}`
+            value={SUBSCRIPTION_PRODUCT_IDS.indexOf(productId)}
+            marks={SUBSCRIPTION_PRODUCT_IDS.map((_productId, index) => ({
+              value: index,
+              label: `$${SUBSCRIPTION_PRODUCTS_RECORD[_productId].pricing[period]}/${period === 'annual' ? 'yr' : 'mo'}`
             }))}
-            min={SUBSCRIPTION_USAGE[0]}
-            max={SUBSCRIPTION_USAGE[SUBSCRIPTION_USAGE.length - 1]}
+            min={0}
+            max={SUBSCRIPTION_PRODUCT_IDS.length - 1}
             onChange={(_, value) => {
-              setUsage(value as SubscriptionUsage);
+              setProductId(SUBSCRIPTION_PRODUCT_IDS[value as number]);
             }}
           />
         </Box>
@@ -301,10 +298,12 @@ export function CheckoutForm({
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>
-      <Typography>Paid plan: ${SUBSCRIPTION_USAGE_RECORD[usage].pricing[period]}/mo</Typography>
+      <Typography>Paid plan: ${SUBSCRIPTION_PRODUCTS_RECORD[productId].pricing[period]}/mo</Typography>
       <StyledList>
-        <StyledListItemText>{SUBSCRIPTION_USAGE_RECORD[usage].totalBlocks} blocks</StyledListItemText>
-        <StyledListItemText>{SUBSCRIPTION_USAGE_RECORD[usage].totalActiveUsers} Active users</StyledListItemText>
+        <StyledListItemText>{SUBSCRIPTION_PRODUCTS_RECORD[productId].blockLimit} blocks</StyledListItemText>
+        <StyledListItemText>
+          {SUBSCRIPTION_PRODUCTS_RECORD[productId].monthlyActiveUserLimit} Active users
+        </StyledListItemText>
         <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
       </StyledList>
       <Stack gap={1} display='flex' flexDirection='row'>

@@ -1,10 +1,9 @@
-import type { SpaceSubscription } from '@charmverse/core/prisma';
-
 import * as http from 'adapters/http';
 import type {
   CreateProSubscriptionRequest,
   CreateProSubscriptionResponse
 } from 'lib/subscription/createProSubscription';
+import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 export class SubscriptionApi {
   createSubscription(payload: CreateProSubscriptionRequest) {

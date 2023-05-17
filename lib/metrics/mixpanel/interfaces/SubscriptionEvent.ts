@@ -1,4 +1,4 @@
-import type { SubscriptionPeriod, SubscriptionUsage } from 'lib/subscription/constants';
+import type { SubscriptionPeriod, SubscriptionProductId } from 'lib/subscription/constants';
 
 import type { BaseEvent } from './BaseEvent';
 
@@ -9,7 +9,7 @@ export type CheckoutSubscriptionEvent = BaseEvent & {
   fullName: string;
   billingEmail: string;
   streetAddress: string;
-  usage: SubscriptionUsage;
+  productId: SubscriptionProductId;
   period: SubscriptionPeriod;
   tier: 'pro';
   result: 'success' | 'failure';

@@ -14,8 +14,7 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import type { SubscriptionUsage } from 'lib/subscription/constants';
-import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
 
 import { CheckoutForm } from './CheckoutForm';
 
@@ -81,16 +80,16 @@ export function SubscriptionSettings({ space }: { space: Space }) {
                 <Typography>{capitalize(spaceSubscription.period)}</Typography>
               </Stack>
             )}
-            {spaceSubscription?.usage && (
+            {spaceSubscription?.productId && (
               <Stack>
-                <InputLabel>Usage</InputLabel>
+                <InputLabel>Plan</InputLabel>
                 <Stack>
                   <Typography>
-                    Blocks: 0/{SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage as SubscriptionUsage].totalBlocks}
+                    Blocks: 0/{SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].blockLimit}
                   </Typography>
                   <Typography>
                     Members: {members.length}/
-                    {SUBSCRIPTION_USAGE_RECORD[spaceSubscription.usage as SubscriptionUsage].totalActiveUsers}
+                    {SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].monthlyActiveUserLimit}
                   </Typography>
                 </Stack>
               </Stack>

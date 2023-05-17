@@ -1,14 +1,12 @@
 import { stripeClient } from 'lib/subscription/stripe';
-import { SUBSCRIPTION_USAGE_RECORD } from 'lib/subscription/utils';
+import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
 
 async function createStripeProducts() {
-  for (const usage of Object.keys(SUBSCRIPTION_USAGE_RECORD)) {
-    for (const period of ["monthly", 'annual']) {
-      await stripeClient.products.create({
-        name: `Pro - ${usage} - ${period} Subscription`,
-        id: `pro-${usage}-${period}`,
-      })
-    }
+  for (const subscriptionProduct of Object.values(SUBSCRIPTION_PRODUCTS_RECORD)) {
+    await stripeClient.products.create({
+      name: subscriptionProduct.name,
+      id: subscriptionProduct.id,
+    })
   }
 }
 

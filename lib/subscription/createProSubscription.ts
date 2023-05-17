@@ -1,12 +1,12 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';
 import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
-import type { SubscriptionPeriod, SubscriptionUsage } from './constants';
-import { SUBSCRIPTION_USAGE_RECORD } from './constants';
+import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD } from './constants';
 import { stripeClient } from './stripe';
 
 export type PaymentDetails = {
@@ -18,7 +18,7 @@ export type PaymentDetails = {
 export type CreateProSubscriptionRequest = PaymentDetails & {
   spaceId: string;
   paymentMethodId: string;
-  usage: SubscriptionUsage;
+  productId: SubscriptionProductId;
   period: SubscriptionPeriod;
 };
 
@@ -32,13 +32,13 @@ export async function createProSubscription({
   paymentMethodId,
   spaceId,
   period,
-  usage,
+  productId,
   billingEmail,
   fullName,
   userId
 }: {
   userId: string;
-  usage: SubscriptionUsage;
+  productId: SubscriptionProductId;
   paymentMethodId: string;
   spaceId: string;
   period: SubscriptionPeriod;
@@ -86,16 +86,16 @@ export async function createProSubscription({
           email: billingEmail
         });
 
-  const product = await stripeClient.products.retrieve(`pro-${usage}-${period}`);
+  const product = await stripeClient.products.retrieve(productId);
 
   // In cent so multiplying by 100
-  const amount = SUBSCRIPTION_USAGE_RECORD[usage].pricing[period] * (period === 'monthly' ? 1 : 12) * 100;
+  const amount = SUBSCRIPTION_PRODUCTS_RECORD[productId].pricing[period] * (period === 'monthly' ? 1 : 12) * 100;
 
   try {
     // Create a subscription
     const subscription = await stripeClient.subscriptions.create({
       metadata: {
-        usage,
+        productId,
         period,
         tier: 'pro',
         spaceId: space.id

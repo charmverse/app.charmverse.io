@@ -1,53 +1,85 @@
-export const SUBSCRIPTION_USAGE = [1, 2, 3, 4, 5] as const;
-export type SubscriptionUsage = (typeof SUBSCRIPTION_USAGE)[number];
+import type { SubscriptionTier } from '@charmverse/core/src/prisma-client';
+
+export const SUBSCRIPTION_PRODUCT_IDS = [
+  'community_5k',
+  'community_10k',
+  'community_25k',
+  'community_50k',
+  'community_100k'
+] as const;
+export type SubscriptionProductId = (typeof SUBSCRIPTION_PRODUCT_IDS)[number];
 
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
-export const SUBSCRIPTION_USAGE_RECORD: Record<
-  SubscriptionUsage,
+export const SUBSCRIPTION_PRODUCTS_RECORD: Record<
+  SubscriptionProductId,
   {
-    totalBlocks: number;
-    totalActiveUsers: number;
+    id: string;
+    name: string;
+    tier: SubscriptionTier;
+    blockLimit: number;
+    monthlyActiveUserLimit: number;
+    guestLimit: number;
     pricing: Record<SubscriptionPeriod, number>;
   }
 > = {
-  '1': {
-    totalBlocks: 5000,
-    totalActiveUsers: 25,
+  community_5k: {
+    id: 'community_5k',
+    tier: 'pro',
+    name: 'CharmVerse Community: 5,000 blocks',
+    guestLimit: 25,
+    blockLimit: 5000,
+    monthlyActiveUserLimit: 25,
     pricing: {
       annual: 8,
       monthly: 10
     }
   },
-  '2': {
-    totalBlocks: 10000,
-    totalActiveUsers: 35,
+  community_10k: {
+    id: 'community_10k',
+    tier: 'pro',
+    name: 'CharmVerse Community: 10,000 blocks',
+    guestLimit: 50,
+    blockLimit: 10000,
+    monthlyActiveUserLimit: 50,
     pricing: {
-      annual: 18,
+      annual: 16,
       monthly: 20
     }
   },
-  '3': {
-    totalBlocks: 25000,
-    totalActiveUsers: 50,
+  community_25k: {
+    id: 'community_25k',
+    tier: 'pro',
+    name: 'CharmVerse Community: 25,000 blocks',
+    guestLimit: 75,
+    blockLimit: 25000,
+    monthlyActiveUserLimit: 75,
     pricing: {
-      annual: 28,
+      annual: 24,
       monthly: 30
     }
   },
-  '4': {
-    totalBlocks: 35000,
-    totalActiveUsers: 75,
+  community_50k: {
+    id: 'community_50k',
+    tier: 'pro',
+    name: 'CharmVerse Community: 50,000 blocks',
+    guestLimit: 100,
+    blockLimit: 50000,
+    monthlyActiveUserLimit: 100,
     pricing: {
-      annual: 38,
+      annual: 32,
       monthly: 40
     }
   },
-  '5': {
-    totalBlocks: 100000,
-    totalActiveUsers: 100,
+  community_100k: {
+    id: 'community_100k',
+    tier: 'pro',
+    name: 'CharmVerse Community: 100,000 blocks',
+    guestLimit: 150,
+    blockLimit: 100000,
+    monthlyActiveUserLimit: 150,
     pricing: {
-      annual: 48,
+      annual: 40,
       monthly: 50
     }
   }

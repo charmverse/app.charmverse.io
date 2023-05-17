@@ -1,4 +1,9 @@
-import { prisma } from '@charmverse/core';
+import type { StripeSubscription } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { SubscriptionProductId } from './constants';
+
+export type SpaceSubscription = Omit<StripeSubscription, 'productId'> & { productId: SubscriptionProductId };
 
 export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
   const space = await prisma.space.findUniqueOrThrow({
@@ -24,5 +29,5 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
     return null;
   }
 
-  return activeSpaceSubscription;
+  return activeSpaceSubscription as SpaceSubscription;
 }

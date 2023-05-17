@@ -18,7 +18,7 @@ handler
   .post(createPaymentSubscription);
 
 async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
-  const { period, usage, paymentMethodId, spaceId, billingEmail, fullName, streetAddress } =
+  const { period, productId, paymentMethodId, spaceId, billingEmail, fullName, streetAddress } =
     req.body as CreateProSubscriptionRequest;
 
   const userId = req.session.user.id;
@@ -27,7 +27,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     paymentMethodId,
     spaceId,
     period,
-    usage,
+    productId,
     billingEmail,
     fullName,
     streetAddress
@@ -39,7 +39,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     billingEmail,
     fullName,
     streetAddress,
-    usage,
+    productId,
     period,
     tier: 'pro',
     result: paymentIntentStatus === 'succeeded' ? 'success' : 'failure'
