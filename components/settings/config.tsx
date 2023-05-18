@@ -27,10 +27,11 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
 ];
 
 export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
-  const spaceTier = space.paidTier;
-  return SETTINGS_TABS.map((settingsTab) =>
+  return SETTINGS_TABS.filter((settingsTab) =>
+    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') : true
+  ).map((settingsTab) =>
     settingsTab.path === 'subscription'
-      ? { ...settingsTab, label: spaceTier === 'free' ? 'Upgrade' : 'Plans & Billings' }
+      ? { ...settingsTab, label: space.paidTier === 'free' ? 'Upgrade' : 'Plans & Billings' }
       : settingsTab
   );
 }
