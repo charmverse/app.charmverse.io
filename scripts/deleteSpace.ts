@@ -1,8 +1,6 @@
-import { stringUtils } from "@charmverse/core"
-import { Space, prisma } from "@charmverse/core/prisma-client"
+import { stringUtils } from "@charmverse/core";
+import { Space, prisma } from "@charmverse/core/prisma-client";
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import { stdin } from "node:process";
 import * as readline from "node:readline";
 import { v4 } from "uuid";
 
