@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core';
 import { testUtilsUser, testUtilsPages } from '@charmverse/core/test';
 
 import { createPage, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -66,6 +67,10 @@ describe('getAccessiblePages - public space', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(pageToFind.id);
+  });
+
+  it('should throw an error if no space ID is provided', async () => {
+    await expect(getAccessiblePages({ spaceId: undefined as any })).rejects.toBeInstanceOf(InvalidInputError);
   });
 });
 
