@@ -1,7 +1,6 @@
 import { stringUtils } from "@charmverse/core";
 import { Space, prisma } from "@charmverse/core/prisma-client";
 import * as readline from "node:readline";
-import { v4 } from "uuid";
 
 // Terminal color codes
 // https://stackoverflow.com/a/41407246
@@ -84,7 +83,7 @@ async function confirmDeleteSpace({spaceId}: {spaceId: string}) {
     }
   })
 
-  console.log('🗑️  Deleted space');
+  console.log('\r\n🗑️  Deleted space');
 }
 
 async function deleteSpace({spaceIdOrDomain}: {spaceIdOrDomain: string}) {
