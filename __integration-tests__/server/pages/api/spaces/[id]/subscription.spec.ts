@@ -1,9 +1,11 @@
 /* eslint-disable camelcase */
 
 import request from 'supertest';
+import { v4 } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { addSpaceSubscription } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
 describe('GET /api/spaces/[id]/subscription - Get subscription for a space', () => {
@@ -23,5 +25,48 @@ describe('GET /api/spaces/[id]/subscription - Get subscription for a space', () 
       await request(baseUrl).get(`/api/spaces/${space.id}/subscription`).set('Cookie', userCookie).expect(200)
     ).body;
     expect(response).toBeNull();
+  });
+});
+
+describe('POST /api/spaces/[id]/subscription - Create subscription for space', () => {
+  it('should throw error if the user is not an admin and return 401', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken({}, false);
+    const userCookie = await loginUser(user.id);
+
+    const paymentMethodId = v4();
+
+    await request(baseUrl)
+      .post(`/api/spaces/${space.id}/subscription`)
+      .set('Cookie', userCookie)
+      .send({
+        paymentMethodId,
+        period: 'monthly',
+        billingEmail: 'test@gmail.com',
+        productId: 'community_5k'
+      })
+      .expect(401);
+  });
+
+  it('should throw error if the space already has a subscription and return 400', async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken({});
+    const userCookie = await loginUser(user.id);
+
+    await addSpaceSubscription({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    const paymentMethodId = v4();
+
+    await request(baseUrl)
+      .post(`/api/spaces/${space.id}/subscription`)
+      .set('Cookie', userCookie)
+      .send({
+        paymentMethodId,
+        period: 'monthly',
+        billingEmail: 'test@gmail.com',
+        productId: 'community_5k'
+      })
+      .expect(400);
   });
 });

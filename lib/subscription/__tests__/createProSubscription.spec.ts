@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
 
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
-import { SUBSCRIPTION_USAGE_RECORD } from '../constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD } from '../constants';
 import { createProSubscription } from '../createProSubscription';
 import { stripeClient } from '../stripe';
 
@@ -67,11 +67,9 @@ describe('createProSubscription', () => {
       paymentMethodId,
       period: 'monthly',
       spaceId: space.id,
-      usage: 1,
-      billingEmail: 'test@gmail.com',
-      fullName: 'John Doe',
-      streetAddress: '123 Main St',
-      userId: user.id
+      productId: 'community_5k',
+      userId: user.id,
+      billingEmail: 'test@gmail.com'
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
@@ -81,7 +79,7 @@ describe('createProSubscription', () => {
       email: 'test@gmail.com'
     });
 
-    expect(retrieveProductsMockFn).toHaveBeenCalledWith(`pro-1-monthly`);
+    expect(retrieveProductsMockFn).toHaveBeenCalledWith(`community_5k`);
 
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
       metadata: {
@@ -96,7 +94,7 @@ describe('createProSubscription', () => {
           price_data: {
             currency: 'USD',
             product: productId,
-            unit_amount: SUBSCRIPTION_USAGE_RECORD[1].pricing.monthly * 100,
+            unit_amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
             recurring: {
               interval: 'month'
             }
@@ -134,10 +132,8 @@ describe('createProSubscription', () => {
         paymentMethodId,
         period: 'monthly',
         spaceId: v4(),
-        usage: 1,
+        productId: 'community_5k',
         billingEmail: 'test@gmail.com',
-        fullName: 'John Doe',
-        streetAddress: '123 Main St',
         userId: v4()
       })
     ).rejects.toBeInstanceOf(NotFoundError);
@@ -158,10 +154,8 @@ describe('createProSubscription', () => {
         paymentMethodId,
         period: 'monthly',
         spaceId: space.id,
-        usage: 1,
+        productId: 'community_5k',
         billingEmail: 'test@gmail.com',
-        fullName: 'John Doe',
-        streetAddress: '123 Main St',
         userId: v4()
       })
     ).rejects.toBeInstanceOf(InvalidStateError);

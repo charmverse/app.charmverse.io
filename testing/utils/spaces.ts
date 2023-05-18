@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
+import type { SubscriptionProductId } from 'lib/subscription/constants';
 import type { LoggedInUser } from 'models';
 
 /**
@@ -86,7 +87,7 @@ export async function addSpaceSubscription({
   spaceId,
   customerId = v4(),
   period = 'monthly',
-  productId = v4(),
+  productId = 'community_5k',
   subscriptionId = v4(),
   createdBy,
   deletedAt = null,
@@ -94,8 +95,9 @@ export async function addSpaceSubscription({
   currency = 'USD',
   paymentId = v4(),
   status = 'success'
-}: { spaceId: string; createdBy: string } & Partial<Omit<StripeSubscription, 'spaceId' | 'createdBy'>> &
-  Partial<StripePayment>) {
+}: { spaceId: string; createdBy: string } & Partial<Omit<StripeSubscription, 'spaceId' | 'createdBy' | 'productId'>> &
+  Partial<StripePayment> &
+  Partial<{ productId: SubscriptionProductId }>) {
   const spaceSubscription = await prisma.stripeSubscription.create({
     data: {
       deletedAt,

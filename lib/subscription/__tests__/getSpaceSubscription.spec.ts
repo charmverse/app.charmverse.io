@@ -23,17 +23,18 @@ describe('getSpaceSubscription', () => {
       spaceId: space.id,
       subscriptionId,
       createdBy: user.id,
-      period: 'monthly'
+      period: 'monthly',
+      productId: 'community_5k'
     });
 
     const spaceSubscription = await getSpaceSubscription({ spaceId: space.id });
 
     expect(spaceSubscription).toMatchObject(
       expect.objectContaining({
-        usage: 1,
         subscriptionId,
         period: 'monthly',
-        spaceId: space.id
+        spaceId: space.id,
+        productId: 'community_5k'
       })
     );
   });
