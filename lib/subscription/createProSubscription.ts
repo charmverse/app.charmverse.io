@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';
 import stripe from 'stripe';
@@ -10,17 +9,12 @@ import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
 import { SUBSCRIPTION_PRODUCTS_RECORD } from './constants';
 import { stripeClient } from './stripe';
 
-export type PaymentDetails = {
-  fullName: string;
-  billingEmail: string;
-  billingAddress: StripeAddressElementChangeEvent['value']['address'];
-};
-
-export type CreateProSubscriptionRequest = PaymentDetails & {
+export type CreateProSubscriptionRequest = {
   spaceId: string;
   paymentMethodId: string;
   productId: SubscriptionProductId;
   period: SubscriptionPeriod;
+  billingEmail: string;
 };
 
 export type CreateProSubscriptionResponse = {
@@ -30,13 +24,11 @@ export type CreateProSubscriptionResponse = {
 };
 
 export async function createProSubscription({
-  billingAddress,
   paymentMethodId,
   spaceId,
   period,
   productId,
   billingEmail,
-  fullName,
   userId
 }: {
   userId: string;
@@ -44,12 +36,14 @@ export async function createProSubscription({
   paymentMethodId: string;
   spaceId: string;
   period: SubscriptionPeriod;
-} & PaymentDetails): Promise<CreateProSubscriptionResponse> {
+  billingEmail: string;
+}): Promise<CreateProSubscriptionResponse> {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
       domain: true,
       id: true,
+      name: true,
       stripeSubscription: {
         where: {
           deletedAt: null
@@ -82,11 +76,11 @@ export async function createProSubscription({
     existingCustomer.data.length !== 0
       ? existingCustomer.data[0]
       : await stripeClient.customers.create({
-          address: {
-            ...billingAddress,
-            line2: billingAddress.line2 ?? undefined
+          metadata: {
+            spaceDomain: space.domain,
+            spaceId: space.id
           },
-          name: fullName,
+          name: space.name,
           payment_method: paymentMethodId,
           invoice_settings: { default_payment_method: paymentMethodId },
           email: billingEmail
@@ -167,7 +161,6 @@ export async function createProSubscription({
     log.error(`[stripe]: Failed to create subscription. ${err.message}`, {
       spaceId,
       period,
-      fullName,
       billingEmail,
       errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
       errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined

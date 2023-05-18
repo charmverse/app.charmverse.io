@@ -1,4 +1,3 @@
-import type { StripeSubscription } from '@charmverse/core/dist/cjs/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -27,9 +26,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
 import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
-import type { PaymentDetails } from 'lib/subscription/createProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import { isTruthy } from 'lib/utilities/types';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -52,8 +49,7 @@ const StyledCardElementContainer = styled(Box)`
 
 const schema = () => {
   return yup.object({
-    billingEmail: yup.string().email().required(),
-    fullName: yup.string().required()
+    billingEmail: yup.string().email().required()
   });
 };
 
@@ -72,21 +68,11 @@ export function CheckoutForm({
   const {
     register,
     getValues,
-    setValue,
-    formState: { errors, isValid }
-  } = useForm<PaymentDetails>({
+    formState: { errors }
+  } = useForm<{ billingEmail: string }>({
     mode: 'onChange',
     defaultValues: {
-      fullName: '',
-      billingEmail: '',
-      billingAddress: {
-        line1: '',
-        line2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: ''
-      }
+      billingEmail: ''
     },
     resolver: yupResolver(schema())
   });
@@ -116,13 +102,13 @@ export function CheckoutForm({
   }, [spaceSubscription]);
 
   const cardError =
-    cardEvent.cardNumber?.error ||
-    cardEvent.cvc?.error ||
-    cardEvent.expiry?.error ||
-    errors.billingEmail ||
-    errors.fullName;
+    cardEvent.cardNumber?.error || cardEvent.cvc?.error || cardEvent.expiry?.error || errors.billingEmail;
 
-  const cardComplete = cardEvent.cardNumber?.complete && cardEvent.cvc?.complete && cardEvent.expiry?.complete;
+  const cardComplete =
+    cardEvent.cardNumber?.complete &&
+    cardEvent.cvc?.complete &&
+    cardEvent.expiry?.complete &&
+    cardEvent.address?.complete;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -140,17 +126,26 @@ export function CheckoutForm({
     }
 
     const paymentDetails = getValues();
+
     const paymentErrorMetadata = {
       spaceId: space.id,
       period,
-      fullName: paymentDetails.fullName,
-      billingEmail: paymentDetails.billingEmail,
-      billingAddress: paymentDetails.billingAddress
+      billingEmail: paymentDetails.billingEmail
     };
 
     try {
       setIsProcessing(true);
       const paymentMethod = await stripe.createPaymentMethod({
+        billing_details: {
+          email: paymentDetails.billingEmail,
+          address: cardEvent.address
+            ? {
+                ...cardEvent.address.value.address,
+                line2: cardEvent.address.value.address.line2 ?? undefined
+              }
+            : undefined,
+          name: cardEvent.address?.value.name
+        },
         card: cardNumberElement,
         type: 'card'
       });
@@ -162,15 +157,14 @@ export function CheckoutForm({
             paymentMethodId: paymentMethod.paymentMethod.id,
             period,
             productId,
-            fullName: paymentDetails.fullName,
-            billingEmail: paymentDetails.billingEmail,
-            billingAddress: (await cardAddressElement.getValue()).value.address
+            billingEmail: paymentDetails.billingEmail
           }
         );
 
         if (clientSecret && subscriptionId && paymentIntentStatus) {
           if (paymentIntentStatus !== 'succeeded') {
             const { error } = await stripe.confirmCardPayment(clientSecret, {
+              receipt_email: paymentDetails.billingEmail,
               payment_method: paymentMethod.paymentMethod.id
             });
             if (error) {
@@ -304,10 +298,12 @@ export function CheckoutForm({
         options={{
           mode: 'billing'
         }}
-        onChange={(event) => {
-          setValue('fullName', [event.value.firstName, event.value.lastName].filter(isTruthy).join(' '));
-          setValue('billingAddress', event.value.address);
-        }}
+        onChange={(e) =>
+          setCardEvent({
+            ...cardEvent,
+            address: e
+          })
+        }
       />
       <Stack gap={0.5}>
         <InputLabel>Billing Email</InputLabel>
