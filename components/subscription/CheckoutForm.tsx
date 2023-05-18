@@ -135,7 +135,7 @@ export function CheckoutForm({
 
     try {
       setIsProcessing(true);
-      const paymentMethod = await stripe.createPaymentMethod({
+      const { error: createPaymentMethodError, paymentMethod } = await stripe.createPaymentMethod({
         billing_details: {
           email: paymentDetails.billingEmail,
           address: cardEvent.address
@@ -144,17 +144,24 @@ export function CheckoutForm({
                 line2: cardEvent.address.value.address.line2 ?? undefined
               }
             : undefined,
-          name: cardEvent.address?.value.name
+          name: cardEvent.address?.value.name,
+          phone: cardEvent.address?.value.phone
         },
         card: cardNumberElement,
         type: 'card'
       });
 
-      if (paymentMethod.paymentMethod) {
+      if (createPaymentMethodError) {
+        log.error(`[stripe]: Failed to create payment method. ${createPaymentMethodError.message}`, {
+          ...paymentErrorMetadata,
+          errorType: createPaymentMethodError.type,
+          errorCode: createPaymentMethodError.code
+        });
+      } else if (paymentMethod) {
         const { clientSecret, paymentIntentStatus, subscriptionId } = await charmClient.subscription.createSubscription(
+          space.id,
           {
-            spaceId: space.id,
-            paymentMethodId: paymentMethod.paymentMethod.id,
+            paymentMethodId: paymentMethod.id,
             period,
             productId,
             billingEmail: paymentDetails.billingEmail
@@ -163,16 +170,16 @@ export function CheckoutForm({
 
         if (clientSecret && subscriptionId && paymentIntentStatus) {
           if (paymentIntentStatus !== 'succeeded') {
-            const { error } = await stripe.confirmCardPayment(clientSecret, {
+            const { error: confirmCardPaymentError } = await stripe.confirmCardPayment(clientSecret, {
               receipt_email: paymentDetails.billingEmail,
-              payment_method: paymentMethod.paymentMethod.id
+              payment_method: paymentMethod.id
             });
-            if (error) {
+            if (confirmCardPaymentError) {
               showMessage('Payment failed! Please try again', 'error');
-              log.error(`[stripe]: Payment failed. ${error.message}`, {
+              log.error(`[stripe]: Failed to confirm card payment. ${confirmCardPaymentError.message}`, {
                 ...paymentErrorMetadata,
-                errorType: error.type,
-                errorCode: error.code
+                errorType: confirmCardPaymentError.type,
+                errorCode: confirmCardPaymentError.code
               });
             } else {
               showMessage('Payment successful! Community subscription active.', 'success');

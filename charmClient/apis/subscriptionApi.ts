@@ -6,8 +6,8 @@ import type {
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 export class SubscriptionApi {
-  createSubscription(payload: CreateProSubscriptionRequest) {
-    return http.POST<CreateProSubscriptionResponse>('/api/subscription/subscribe', payload);
+  createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
+    return http.POST<CreateProSubscriptionResponse>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {

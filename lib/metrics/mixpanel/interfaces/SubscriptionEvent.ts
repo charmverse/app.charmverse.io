@@ -6,9 +6,7 @@ export type ViewSubscriptionEvent = BaseEvent;
 export type InitiateSubscriptionEvent = BaseEvent;
 
 export type CheckoutSubscriptionEvent = BaseEvent & {
-  fullName: string;
   billingEmail: string;
-  streetAddress: string;
   productId: SubscriptionProductId;
   period: SubscriptionPeriod;
   tier: 'pro';

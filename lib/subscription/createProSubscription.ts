@@ -10,7 +10,6 @@ import { SUBSCRIPTION_PRODUCTS_RECORD } from './constants';
 import { stripeClient } from './stripe';
 
 export type CreateProSubscriptionRequest = {
-  spaceId: string;
   paymentMethodId: string;
   productId: SubscriptionProductId;
   period: SubscriptionPeriod;
