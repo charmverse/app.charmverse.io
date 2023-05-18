@@ -5,7 +5,7 @@ import type {
 } from '@charmverse/core';
 
 import * as http from 'adapters/http';
-import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
+import type { PermissionCompute, PermissionResource } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {
@@ -29,7 +29,7 @@ export class ProposalPermissionsApi {
   }
 
   deleteProposalCategoryPermission(permissionId: string) {
-    return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionToDelete);
+    return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionResource);
   }
 
   listProposalCategoryPermissions(resourceId: string) {

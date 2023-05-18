@@ -10,7 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import type {
   IPagePermissionRequest,
   IPagePermissionToCreate,
-  IPagePermissionToDelete,
+  IPagePermissionResource,
   IPagePermissionWithAssignee,
   IPagePermissionWithSource
 } from 'lib/permissions/pages';
@@ -150,7 +150,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
 }
 
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as IPagePermissionToDelete;
+  const { permissionId } = req.body as IPagePermissionResource;
 
   const permission = await getPagePermission(permissionId);
 

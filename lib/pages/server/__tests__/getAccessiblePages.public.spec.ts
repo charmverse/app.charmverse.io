@@ -1,4 +1,4 @@
-import { testUtilsUser } from '@charmverse/core';
+import { testUtilsUser, testUtilsPages } from '@charmverse/core/test';
 
 import { createPage, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -87,6 +87,21 @@ describe('getAccessiblePages - public space search', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(pageToFind.id);
+  });
+
+  it('Should return a page based on a match on nested content', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+
+    // Page without any permission
+    const pageToFind = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Searched page',
+      contentText: 'Specific content'
+    });
+
+    const pages = await getAccessiblePages({ userId: user.id, spaceId: space.id, search: 'Specific' });
+    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
 
   it('should return a page when keywords are not adjacent', async () => {

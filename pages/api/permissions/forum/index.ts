@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import type { PermissionToDelete } from 'lib/permissions/interfaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -52,7 +52,7 @@ async function upsertPostCategoryPermissionController(
 }
 
 async function removePostCategoryPermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as PermissionToDelete;
+  const { permissionId } = req.body as PermissionResource;
 
   const postCategory = await prisma.postCategory.findFirst({
     where: {
