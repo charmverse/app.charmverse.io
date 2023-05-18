@@ -185,6 +185,7 @@ function DraggableTreeNode({
       href={`${pathPrefix}/${item.path}${
         item.type.includes('board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
       }`}
+      pagePath={item.path}
       isActive={isActive}
       isAdjacent={isAdjacentActive}
       isEmptyContent={item.isEmptyContent}

@@ -47,6 +47,7 @@ interface PageTreeItemProps {
   label: string;
   pageType: PageType;
   pageId: string;
+  pagePath: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
   onClick?: () => void;
@@ -297,6 +298,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     label,
     pageType,
     pageId,
+    pagePath,
     hasSelectedChildView,
     onClick
   } = props;
@@ -373,7 +375,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={href} />}
+        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
@@ -404,13 +406,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
   }
 
-  function getAbsolutePath() {
-    if (typeof window !== 'undefined') {
-      return window.location.origin + pagePath;
-    }
-    return '';
-  }
-
   return (
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
@@ -430,7 +425,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
       />
-      <CopyPageLinkAction path={getAbsolutePath()} onComplete={closeMenu} />
+      <CopyPageLinkAction path={`/${pagePath}`} onComplete={closeMenu} />
     </>
   );
 }
