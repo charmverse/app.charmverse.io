@@ -76,7 +76,6 @@ export async function createProSubscription({
       ? existingCustomer.data[0]
       : await stripeClient.customers.create({
           metadata: {
-            spaceDomain: space.domain,
             spaceId: space.id
           },
           name: space.name,

@@ -35,6 +35,7 @@ describe('createProSubscription', () => {
     const client_secret = v4();
     const customerId = v4();
     const productId = v4();
+    const paymentId = v4();
 
     const createCustomersMockFn = jest.fn().mockResolvedValue({
       id: customerId
@@ -53,7 +54,8 @@ describe('createProSubscription', () => {
       latest_invoice: {
         payment_intent: {
           client_secret,
-          status: 'succeeded'
+          status: 'succeeded',
+          id: paymentId
         }
       }
     });
@@ -73,10 +75,13 @@ describe('createProSubscription', () => {
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
-      name: `John Doe`,
+      name: space.name,
       payment_method: paymentMethodId,
       invoice_settings: { default_payment_method: paymentMethodId },
-      email: 'test@gmail.com'
+      email: 'test@gmail.com',
+      metadata: {
+        spaceId: space.id
+      }
     });
 
     expect(retrieveProductsMockFn).toHaveBeenCalledWith(`community_5k`);
@@ -85,8 +90,8 @@ describe('createProSubscription', () => {
       metadata: {
         tier: 'pro',
         period: 'monthly',
-        usage: 1,
-        spaceId: space.id
+        spaceId: space.id,
+        productId: 'community_5k'
       },
       customer: customerId,
       items: [
@@ -116,6 +121,17 @@ describe('createProSubscription', () => {
           subscriptionId,
           productId,
           period: 'monthly'
+        }
+      })
+    ).not.toBeFalsy();
+
+    expect(
+      await prisma.stripePayment.findFirstOrThrow({
+        where: {
+          amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
+          currency: 'USD',
+          paymentId,
+          status: 'success'
         }
       })
     ).not.toBeFalsy();
