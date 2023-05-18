@@ -7,6 +7,8 @@ import NextLink from 'next/link';
 import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
 import { forwardRef } from 'react';
 
+import { getSubdomainPath } from 'components/common/Link';
+
 const StyledButton = styled(Button)`
   white-space: nowrap;
 `;
@@ -62,7 +64,7 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
       <MuiLink
         component={NextLink}
         color={props.color === 'inherit' ? 'inherit !important' : undefined}
-        href={href}
+        href={getSubdomainPath(href)}
         target={target}
         id={id}
         onClick={mouseOnClick}
