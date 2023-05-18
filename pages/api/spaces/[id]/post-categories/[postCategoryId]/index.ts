@@ -5,27 +5,32 @@ import nc from 'next-connect';
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updatePostCategoryController).delete(deletePostCategoryController);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'postCategoryId',
+      location: 'query',
+      resourceIdType: 'postCategory'
+    })
+  )
+  .put(updatePostCategoryController)
+  .delete(deletePostCategoryController);
 
 async function updatePostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategoryWithPermissions>) {
   const { postCategoryId } = req.query as { postCategoryId: string };
 
   const userId = req.session.user.id;
 
-  const permissions = await getPermissionsClient({
+  const permissions = await req.basePermissionsClient.forum.computePostCategoryPermissions({
     resourceId: postCategoryId,
-    resourceIdType: 'postCategory'
-  }).then(({ forum }) =>
-    forum.computePostCategoryPermissions({
-      resourceId: postCategoryId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissions.edit_category) {
     throw new ActionNotPermittedError(`You cannot edit this category`);
@@ -37,15 +42,10 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;
 
-  const permissions = await getPermissionsClient({
+  const permissions = await req.basePermissionsClient.forum.computePostCategoryPermissions({
     resourceId: postCategoryId as string,
-    resourceIdType: 'postCategory'
-  }).then(({ forum }) =>
-    forum.computePostCategoryPermissions({
-      resourceId: postCategoryId as string,
-      userId: req.session.user.id
-    })
-  );
+    userId: req.session.user.id
+  });
 
   if (!permissions.delete_category) {
     throw new ActionNotPermittedError(`You cannot delete this forum category`);

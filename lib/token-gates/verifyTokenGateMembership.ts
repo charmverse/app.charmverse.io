@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { getLogger } from '@charmverse/core/log';
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import * as lit from '@lit-protocol/lit-node-client';
 
 const log = getLogger('tg-verification');

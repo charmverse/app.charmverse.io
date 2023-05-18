@@ -21,7 +21,7 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
+import { useUserDetails } from 'components/u/components/UserDetails/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';

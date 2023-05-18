@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { TokenGate } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { AccsDefaultParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 

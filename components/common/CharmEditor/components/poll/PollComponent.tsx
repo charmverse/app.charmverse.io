@@ -19,6 +19,7 @@ export function PollNodeView({
   readOnly,
   updateAttrs,
   pagePermissions,
+  snapshotProposalId,
   selected,
   deleteNode
 }: CharmNodeViewProps) {
@@ -60,6 +61,7 @@ export function PollNodeView({
           onCreateVote={onCreateVote}
           pageId={pageId}
           postId={postId}
+          snapshotProposalId={snapshotProposalId || null}
         />
         <div
           onClick={(e) => {

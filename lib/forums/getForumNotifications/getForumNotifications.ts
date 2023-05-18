@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Post, PostComment, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { TaskUser } from 'lib/discussion/interfaces';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
@@ -83,7 +83,7 @@ export async function getForumNotifications(userId: string): Promise<ForumTasksG
     const visiblePostCategories = await getPermissionsClient({
       resourceId: spaceRole.spaceId,
       resourceIdType: 'space'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.getPermissionedCategories({
         postCategories,
         userId

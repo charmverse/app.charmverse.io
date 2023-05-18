@@ -75,6 +75,7 @@ export function FullPageActionsMenuButton({ page, post, insideModal, onDelete }:
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
         onDelete={onDelete}
+        undoEditorChanges={undoEditorChanges}
       />
     );
   } else if (isBasePageDatabase && page) {

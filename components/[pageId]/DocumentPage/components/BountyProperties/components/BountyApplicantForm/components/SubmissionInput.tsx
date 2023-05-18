@@ -192,10 +192,7 @@ export default function SubmissionInput({
             )}
 
             {!readOnly && (
-              <Grid item display='flex' gap={1}>
-                <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
-                  {submission?.submission ? 'Update' : 'Submit'}
-                </Button>
+              <Grid item display='flex' gap={1} justifyContent='flex-end'>
                 {!submission?.submission && !alwaysExpanded && (
                   <Button
                     onClick={() => {
@@ -207,6 +204,9 @@ export default function SubmissionInput({
                     Cancel
                   </Button>
                 )}
+                <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
+                  {submission?.submission ? 'Update' : 'Submit'}
+                </Button>
               </Grid>
             )}
 

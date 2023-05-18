@@ -177,7 +177,7 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) {
     const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }
@@ -262,7 +262,7 @@ class CharmClient {
     return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateMyGnosisSafe(wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
+  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
     return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 

@@ -23,7 +23,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
@@ -42,14 +41,14 @@ async function getSnapshotClient() {
 
 interface Props {
   onSubmit: () => void;
-  page: PageMeta;
+  pageId: string;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
 
 const MIN_VOTING_OPTIONS = 2;
 
-export default function PublishingForm({ onSubmit, page }: Props) {
+export function PublishingForm({ onSubmit, pageId }: Props) {
   const { account, library } = useWeb3AuthSig();
 
   const space = useCurrentSpace();
@@ -91,7 +90,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
-  }, [space, snapshotSpace, page]);
+  }, [space, snapshotSpace, pageId]);
 
   async function setCurrentBlockNumberAsDefault() {
     if (snapshotSpace) {
@@ -111,7 +110,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
    */
   async function checkMarkdownLength(): Promise<string | null> {
     try {
-      const pageWithDetails = await charmClient.pages.getPage(page.id);
+      const pageWithDetails = await charmClient.pages.getPage(pageId);
       const content = await generateMarkdown({
         content: pageWithDetails.content,
         generatorOptions: {
@@ -202,7 +201,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     setPublishing(true);
 
     try {
-      const pageWithDetails = await charmClient.pages.getPage(page.id);
+      const pageWithDetails = await charmClient.pages.getPage(pageId);
 
       const content = await generateMarkdown({
         content: pageWithDetails.content,
@@ -231,7 +230,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
       const proposalParams: any = {
         space: space?.snapshotDomain as any,
         type: snapshotVoteMode,
-        title: page.title,
+        title: pageWithDetails.title,
         body: content,
         choices: votingOptions,
         start,
@@ -255,14 +254,14 @@ export default function PublishingForm({ onSubmit, page }: Props) {
         proposalParams
       )) as SnapshotReceipt;
 
-      const updatedPage = await charmClient.updatePageSnapshotData(page.id, {
+      const updatedPage = await charmClient.updatePageSnapshotData(pageId, {
         snapshotProposalId: receipt.id
       });
 
       mutatePage(updatedPage);
       charmClient.track.trackAction('new_vote_created', {
         platform: 'snapshot',
-        pageId: page.id,
+        pageId,
         resourceId: receipt.id,
         spaceId: space?.id || ''
       });

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { Prisma } from '@charmverse/core/prisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
@@ -6,20 +6,34 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
+type PageSeedInput = {
+  page: Prisma.PageCreateManyInput;
+  permissions: Prisma.PagePermissionCreateManyInput[];
+  diffs: Prisma.PageDiffCreateManyInput[];
+};
+
+const defaultBatchSize = 1000;
+
 /**
  * See this doc for usage instructions
  * https://app.charmverse.io/charmverse/page-8095374127900168
+ *
+ * @perBatch Default 1000. Prisma chokes if creating too many pages. This allows you to tweak how the job will be split.
  *
  * @nestedPercent The percentage of pages that should have a parent. This is a number between 0 and 100. Defaults to 30
  */
 export async function seedTestPages({
   spaceDomain,
   nestedPercent = 50,
-  pagesToCreate
+  pagesToCreate,
+  createDiffs,
+  perBatch = defaultBatchSize
 }: {
   spaceDomain: string;
   pagesToCreate: number;
   nestedPercent?: number;
+  createDiffs?: boolean;
+  perBatch?: number;
 }) {
   const space = await prisma.space.findUnique({
     where: {
@@ -31,67 +45,83 @@ export async function seedTestPages({
     throw new DataNotFoundError(`Space with domain ${spaceDomain} not found`);
   }
 
-  const pageInputs: Prisma.PageCreateManyInput[] = [];
+  const seedInputs: PageSeedInput[] = [];
 
   for (let pageCount = 0; pageCount < pagesToCreate; pageCount++) {
     const page = pageStubToCreate({ spaceId: space.id, createdBy: space.createdBy, title: `Page ${pageCount + 1}` });
 
     const assignParent = Math.random() * 100 < nestedPercent;
 
-    if (pageInputs.length > 0 && assignParent) {
+    if (seedInputs.length > 0 && assignParent) {
       // Get a random page
-      const parentPage = pageInputs[Math.floor(Math.random() * pageInputs.length)];
+      const parentPage = seedInputs[Math.floor(Math.random() * seedInputs.length)];
 
-      page.parentId = parentPage.id;
+      page.parentId = parentPage.page.id;
     }
 
-    pageInputs.push(page);
+    const permissionInputs: Prisma.PagePermissionCreateManyInput[] = [
+      {
+        pageId: page.id as string,
+        spaceId: space.id,
+        permissionLevel: 'full_access'
+      },
+      {
+        pageId: page.id as string,
+        userId: space.createdBy,
+        permissionLevel: 'full_access'
+      }
+    ];
+
+    const diffs: Prisma.PageDiffCreateManyInput[] = [];
+
+    if (createDiffs) {
+      const diff = generateFirstDiff({
+        createdBy: page.createdBy,
+        content: page.content
+      });
+      diffs.push({
+        ...diff,
+        pageId: page.id
+      } as Prisma.PageDiffCreateManyInput);
+    }
+
+    seedInputs.push({
+      page,
+      diffs,
+      permissions: permissionInputs
+    });
   }
 
-  const permissionInputs: Prisma.PagePermissionCreateManyInput[] = pageInputs.map((p) => ({
-    pageId: p.id as string,
-    spaceId: space.id,
-    permissionLevel: 'full_access'
-  }));
+  console.log('Pages to create', seedInputs.length, 'Permissions to create', seedInputs.length * 2);
 
-  console.log('Pages to create', pageInputs.length);
+  const totalPages = seedInputs.length;
 
-  pageInputs.forEach((i) => {
-    permissionInputs.push({
-      pageId: i.id as string,
-      userId: space.createdBy,
-      permissionLevel: 'full_access'
-    });
-  });
+  await prisma.$transaction(
+    async (tx) => {
+      for (let i = 0; i < totalPages; i += perBatch) {
+        console.log(`Processing pages ${i + 1} - ${i + perBatch} / ${totalPages}`);
 
-  console.log('Permission inputs', permissionInputs.length);
+        const toProcess = seedInputs.slice(i, i + perBatch);
+        await tx.page.createMany({
+          data: toProcess.map((seed) => seed.page)
+        }),
+          await tx.pagePermission.createMany({
+            data: toProcess.flatMap((seed) => seed.permissions)
+          });
 
-  const pageDiffs: Prisma.PageDiffCreateManyInput[] = pageInputs
-    .filter((p) => !!p.content)
-    .map((p) => {
-      const diff = generateFirstDiff({
-        createdBy: p.createdBy,
-        content: p.content
-      });
-      return {
-        ...diff,
-        pageId: p.id
-      } as Prisma.PageDiffCreateManyInput;
-    });
+        if (createDiffs) {
+          await tx.pageDiff.createMany({
+            data: toProcess.flatMap((seed) => seed.diffs)
+          });
+        }
+      }
 
-  await prisma.$transaction([
-    prisma.page.createMany({
-      data: pageInputs
-    }),
-    prisma.pagePermission.createMany({
-      data: permissionInputs
-    }),
-    prisma.pageDiff.createMany({
-      data: pageDiffs
-    })
-  ]);
+      // Long 10 minute timeout to leave space for generating data
+    },
+    { timeout: 600000 }
+  );
 
-  console.log('Created ', pageInputs.length, ' pages');
+  console.log('Created ', totalPages, ' pages');
 }
 
 export async function seedTestBoards({
@@ -185,7 +215,7 @@ async function cleanSpacePages({ spaceDomain }: { spaceDomain: string }) {
 //   process.exit(1)
 // })
 
-seedTestPages({ spaceDomain: 'prospective-decentralized-hummingbird', pagesToCreate: 15000, nestedPercent: 92 })
+seedTestPages({ spaceDomain: 'deliberate-peach-barnacle', pagesToCreate: 10000, perBatch: 1000, nestedPercent: 92 })
   .then(() => {
     console.log('Done');
     process.exit(0);

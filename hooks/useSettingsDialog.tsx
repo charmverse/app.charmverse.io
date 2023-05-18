@@ -11,7 +11,7 @@ type IContext = {
   open: boolean;
   activePath: string;
   onClose: () => any;
-  onClick: (path?: SettingsPath) => void;
+  onClick: (path?: SettingsPath, section?: string) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
@@ -26,9 +26,15 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
 
-  const onClick = (_path?: string) => {
+  const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
     settingsModalState.open();
+    setTimeout(() => {
+      if (_section) {
+        const domSection = document.getElementById(_section);
+        domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
   };
 
   const onClose = () => {

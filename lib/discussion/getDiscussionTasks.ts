@@ -1,11 +1,10 @@
-import { prisma } from '@charmverse/core';
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Page, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { getAccessibleProposalCategories } from 'lib/permissions/proposals/getAccessibleProposalCategories';
-import { getUserProposalsBySpace } from 'lib/proposal/getProposalsBySpace';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
 import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
@@ -550,6 +549,8 @@ async function getBoardPersonPropertyMentions({
   };
 }
 
+type PageToExtractMentionsFrom = Pick<Page, 'bountyId' | 'content' | 'id' | 'path' | 'title' | 'createdBy' | 'spaceId'>;
+
 async function getPageMentions({
   userId,
   username,
@@ -557,28 +558,10 @@ async function getPageMentions({
   spaceIds
 }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   // Get all the pages of all the spaces this user is part of
-  const pages = await prisma.page.findMany({
-    where: {
-      spaceId: {
-        in: spaceIds
-      },
-      deletedAt: null
-    },
-    select: {
-      bountyId: true,
-      content: true,
-      id: true,
-      path: true,
-      title: true,
-      createdBy: true,
-      spaceId: true
-    }
-  });
-
   const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
 
-  for (const page of pages) {
+  function extractMentionsFromPage(page: PageToExtractMentionsFrom) {
     const content = page.content as PageContent;
     if (content) {
       const extractedMentions = extractMentions(content, username);
@@ -603,6 +586,30 @@ async function getPageMentions({
     }
   }
 
+  for (const spaceId of spaceIds) {
+    let pages = await prisma.page.findMany({
+      where: {
+        spaceId,
+        deletedAt: null
+      },
+      // This query will return a huge amount of content is user is part of alot of spaces, we need to split it up
+      select: {
+        bountyId: true,
+        content: true,
+        id: true,
+        path: true,
+        title: true,
+        createdBy: true,
+        spaceId: true
+      }
+    });
+    for (const page of pages) {
+      extractMentionsFromPage(page);
+    }
+    // Make page eligible for garbage collection
+    pages = null as any;
+  }
+
   return {
     mentions,
     discussionUserIds,
@@ -611,7 +618,6 @@ async function getPageMentions({
 }
 
 // utils
-
 function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
@@ -629,21 +635,19 @@ export async function getProposalDiscussionTasks({
   spaceRecord,
   username
 }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-  let proposals: ProposalDiscussionNotificationsContext['proposals'] = [];
+  const proposals: ProposalDiscussionNotificationsContext['proposals'] = [];
   for (const spaceId of spaceIds) {
-    const accessibleCategories = await getAccessibleProposalCategories({
-      userId,
-      spaceId
-    });
+    const userProposals = (await getPermissionsClient({ resourceId: spaceId, resourceIdType: 'space' }).then(
+      ({ client }) =>
+        client.proposals.getAccessibleProposals({
+          userId,
+          spaceId,
+          includePage: true,
+          onlyAssigned: true
+        })
+    )) as ProposalWithCommentsAndUsers[];
 
-    const userProposals = (await getUserProposalsBySpace({
-      spaceId,
-      userId,
-      categoryIds: accessibleCategories.map((c) => c.id),
-      includePage: true
-    })) as ProposalWithCommentsAndUsers[];
-
-    proposals = [...proposals, ...userProposals];
+    proposals.push(...userProposals);
   }
 
   const context: ProposalDiscussionNotificationsContext = { userId, username, spaceRecord, proposals };

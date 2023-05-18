@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { UserVote } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -68,7 +68,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
     const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: vote.postId as string,
         userId

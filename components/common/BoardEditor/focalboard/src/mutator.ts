@@ -763,6 +763,32 @@ class Mutator {
     );
   }
 
+  async changeBoardViewsOrder(
+    boardId: string,
+    currentViewIds: string[],
+    droppedView: BoardView,
+    dropzoneView: BoardView
+  ) {
+    const tempViewIds = [...currentViewIds];
+    const droppedViewIndex = tempViewIds.indexOf(droppedView.id);
+    const dropzoneViewIndex = tempViewIds.indexOf(dropzoneView.id);
+    tempViewIds.splice(dropzoneViewIndex, 0, tempViewIds.splice(droppedViewIndex, 1)[0]);
+
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(boardId, { updatedFields: { viewIds: tempViewIds } }, publishIncrementalUpdate);
+      },
+      async () => {
+        await charmClient.patchBlock(
+          boardId,
+          { updatedFields: { visiblePropertyIds: currentViewIds } },
+          publishIncrementalUpdate
+        );
+      },
+      "change board's views order"
+    );
+  }
+
   async changeViewVisiblePropertiesOrder(
     viewId: string,
     visiblePropertyIds: string[],

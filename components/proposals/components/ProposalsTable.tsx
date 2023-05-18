@@ -88,7 +88,7 @@ export function ProposalsTable({
         const proposalPage = pages[proposal.id];
         return proposalPage ? (
           <GridContainer key={proposal.id}>
-            <Grid item xs={6} md={5} sx={{ cursor: 'pointer' }}>
+            <Grid data-test={`proposal-row-${proposal.id}`} item xs={6} md={5} sx={{ cursor: 'pointer' }}>
               <Box
                 display='flex'
                 alignItems='center'
@@ -105,7 +105,13 @@ export function ProposalsTable({
                     </Typography>
                   </div>
                 </Box>
-                <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>
+                <Button
+                  data-test={`open-proposal-${proposal.id}`}
+                  className='show-on-hover'
+                  color='secondary'
+                  variant='outlined'
+                  size='small'
+                >
                   Open
                 </Button>
               </Box>

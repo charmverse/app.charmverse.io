@@ -42,6 +42,9 @@
       "adapters/*": [
         "./adapters/*"
       ],
+      "connectors/*": [
+        "./connectors/*"
+      ],
       "components/*": [
         "./components/*"
       ],
@@ -69,11 +72,17 @@
       "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/cjs/prisma",
       ],
+      "@charmverse/core/prisma-client": [
+        "node_modules/@charmverse/core/dist/cjs/prisma-client"
+      ],
       "@charmverse/core/shared": [
         "node_modules/@charmverse/core/dist/cjs/shared",
       ],
       "@charmverse/core/log": [
         "node_modules/@charmverse/core/dist/cjs/lib/log",
+      ],
+      "@charmverse/core/test": [
+        "node_modules/@charmverse/core/dist/cjs/lib/testing/index"
       ]
     }
   },

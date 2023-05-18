@@ -8,6 +8,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
+import * as table from '@skiff-org/prosemirror-tables';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
@@ -81,7 +82,6 @@ import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
 import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
 import * as trailingNode from './components/trailingNode';
@@ -387,6 +387,7 @@ interface CharmEditorProps {
   postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
+  snapshotProposalId?: string | null;
   pagePermissions?: IPagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
@@ -412,6 +413,7 @@ function CharmEditor({
   postId,
   containerWidth,
   pageType,
+  snapshotProposalId,
   pagePermissions,
   placeholderText,
   focusOnInit,
@@ -584,6 +586,7 @@ function CharmEditor({
           pageId,
           pagePermissions,
           postId,
+          snapshotProposalId,
           readOnly,
           deleteNode: () => {
             const view = props.view;

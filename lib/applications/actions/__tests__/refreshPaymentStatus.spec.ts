@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { User, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
@@ -67,8 +67,9 @@ describe('refreshPaymentStatus', () => {
     expect(res.updated).toBe(true);
     expect(bounty?.status).toBe('complete');
     expect(transaction.transactionId).toBe('0x123');
-    // do not update transactionId if it was not sent yet
-    expect(updatedTransaction?.transactionId).toBe('0x123');
+    // safeTxHash should be present, transactionid should be updated with one from blockchain
+    expect(updatedTransaction?.safeTxHash).toBe('0x123');
+    expect(updatedTransaction?.transactionId).toBe('0x456');
   });
 
   it('should update status to cancelled if tx was found but it was cancelled', async () => {

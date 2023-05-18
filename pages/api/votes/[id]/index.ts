@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Vote } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -61,7 +61,7 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
     const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: vote.postId as string,
         userId
@@ -123,7 +123,7 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
     const postPermissions = await getPermissionsClient({
       resourceId: vote.postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: vote.postId as string,
         userId

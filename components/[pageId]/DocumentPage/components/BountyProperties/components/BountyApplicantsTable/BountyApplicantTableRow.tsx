@@ -200,20 +200,7 @@ export default function BountyApplicantTableRow({
                     </Typography>
                   </Box> */}
                   {showAcceptSubmission && (
-                    <Box display='flex' gap={1} mb={3}>
-                      <Button
-                        color='primary'
-                        disabled={submission.status === 'inProgress'}
-                        onClick={() => {
-                          setReviewDecision({
-                            decision: 'approve',
-                            submissionId: submission.id,
-                            userId: user?.id as string
-                          });
-                        }}
-                      >
-                        Approve submission
-                      </Button>
+                    <Box display='flex' gap={1} mb={3} justifyContent='flex-end'>
                       <Button
                         color='error'
                         variant='outlined'
@@ -227,6 +214,19 @@ export default function BountyApplicantTableRow({
                         }
                       >
                         Reject
+                      </Button>
+                      <Button
+                        color='primary'
+                        disabled={submission.status === 'inProgress'}
+                        onClick={() => {
+                          setReviewDecision({
+                            decision: 'approve',
+                            submissionId: submission.id,
+                            userId: user?.id as string
+                          });
+                        }}
+                      >
+                        Approve submission
                       </Button>
                     </Box>
                   )}
@@ -261,7 +261,11 @@ export default function BountyApplicantTableRow({
                 </Alert>
               )}
 
-              <Box display='flex' gap={2} mt={3}>
+              <Box display='flex' gap={2} mt={3} justifyContent='flex-end'>
+                <Button variant='outlined' color='secondary' onClick={cancel}>
+                  Cancel
+                </Button>
+
                 {reviewDecision?.decision === 'approve' && (
                   <Button
                     color='primary'
@@ -276,10 +280,6 @@ export default function BountyApplicantTableRow({
                     Reject submission
                   </Button>
                 )}
-
-                <Button variant='outlined' color='secondary' onClick={cancel}>
-                  Cancel
-                </Button>
               </Box>
             </Modal>
           </Collapse>

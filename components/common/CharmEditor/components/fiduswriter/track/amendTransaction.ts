@@ -1,5 +1,5 @@
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
-import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping } from '@bangle.dev/pm';
+import { AddMarkStep, Mapping, RemoveMarkStep, ReplaceAroundStep, ReplaceStep, Slice } from '@bangle.dev/pm';
 import { CellSelection } from '@skiff-org/prosemirror-tables';
 import { Selection, TextSelection } from 'prosemirror-state';
 
@@ -195,9 +195,11 @@ export function amendTransaction(tr: Transaction, state: EditorState, editor: Fi
     !tr.docChanged ||
     !tr.steps.length ||
     ((tr as any).meta &&
-      (!Object.keys((tr as any).meta).every(
+      (!Object.entries((tr as any).meta).every(
         // Only replace TRs that have no metadata or only inputType metadata
-        (metadata) => ['inputType', 'uiEvent', 'paste'].includes(metadata)
+        ([key, value]) =>
+          ['inputType', 'uiEvent', 'paste', 'suggestTooltipFeature'].includes(key) ||
+          ['@', ':'].includes((value as any).text)
       ) ||
         // don't replace history TRs
         ['historyUndo', 'historyRedo'].includes(tr.getMeta('inputType'))))
@@ -206,7 +208,6 @@ export function amendTransaction(tr: Transaction, state: EditorState, editor: Fi
     // are footnote creations, history or fixing IDs. Give up.
     return tr;
   } else {
-    // console.log('track transaction', tr);
     return trackedTransaction(
       tr,
       state,
@@ -233,6 +234,7 @@ export function trackedTransaction(
   const cellDeleteTr =
     ['deleteContentBackward', 'deleteContentForward'].includes(tr.getMeta('inputType')) &&
     state.selection instanceof CellSelection;
+
   tr.steps.forEach((originalStep, originalStepIndex) => {
     const step = originalStep.map(map);
     const doc = newTr.doc;

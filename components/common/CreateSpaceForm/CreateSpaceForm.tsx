@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import { IconButton, InputAdornment, Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -24,8 +24,8 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import { spaceCreateTemplates } from 'lib/spaces/config';
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import { spaceTemplateIds } from 'lib/spaces/config';
+import type { SpaceTemplateType } from 'lib/spaces/config';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
@@ -36,7 +36,7 @@ import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.mixed<SpaceCreateTemplate>().oneOf(spaceCreateTemplates).default('default')
+  spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -102,7 +102,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
           name: watchName,
           spaceImage: watchSpaceImage
         },
-        createSpaceTemplate: watchSpaceTemplate
+        spaceTemplate: watchSpaceTemplate
       })
         .then((_space) => {
           setNewSpace(_space);
@@ -134,7 +134,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     try {
       setSaveError(null);
       const space = await createNewSpace({
-        createSpaceTemplate: values.spaceTemplateOption as SpaceCreateTemplate,
+        spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
         spaceData: {
           name: values.name,
           spaceImage: values.spaceImage
@@ -143,7 +143,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
 
       setNewSpace(space);
 
-      if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'importNotion') {
+      if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
         const notionUrl = generateNotionImportRedirectUrl({
           origin: window?.location.origin,
           spaceDomain: space.domain
@@ -151,7 +151,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
 
         router.push(notionUrl);
         // We want to make the user import markdown after creating the space
-      } else if ((values.spaceTemplateOption as SpaceCreateTemplate) !== 'importMarkdown') {
+      } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
         // Give time for spaces hook to update so user doesn't end up on Routeguard
         setTimeout(() => {
           router.push(`/${space.domain}`);
@@ -168,7 +168,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     setValue('name', name);
   }
 
-  function handleNewSpaceTemplate(value: SpaceCreateTemplate) {
+  function handleNewSpaceTemplate(value: SpaceTemplateType) {
     setValue('spaceTemplateOption', value);
     setStep('create_space');
   }

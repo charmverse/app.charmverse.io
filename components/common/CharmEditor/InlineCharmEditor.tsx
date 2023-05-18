@@ -7,11 +7,11 @@ import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';

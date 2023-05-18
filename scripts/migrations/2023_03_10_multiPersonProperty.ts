@@ -1,15 +1,18 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { BoardFields } from 'lib/focalboard/board';
 import { CardFields } from 'lib/focalboard/card';
 
 async function multiPersonProperty() {
-  const boardPersonPropertyRecord: Record<string, {
-    boardId: string
-    personPropertyId: string
-  }> = {}
+  const boardPersonPropertyRecord: Record<
+    string,
+    {
+      boardId: string;
+      personPropertyId: string;
+    }
+  > = {};
   const boards = await prisma.block.findMany({
     where: {
-      type: "board"
+      type: 'board'
     },
     select: {
       fields: true,
@@ -17,34 +20,36 @@ async function multiPersonProperty() {
     }
   });
 
-  boards.forEach(board => {
-    const boardPersonProperty = (board.fields as unknown as BoardFields).cardProperties.find(cardProperty => cardProperty.type === "person")
+  boards.forEach((board) => {
+    const boardPersonProperty = (board.fields as unknown as BoardFields).cardProperties.find(
+      (cardProperty) => cardProperty.type === 'person'
+    );
     if (boardPersonProperty) {
       boardPersonPropertyRecord[board.id] = {
         boardId: board.id,
         personPropertyId: boardPersonProperty.id
-      }
+      };
     }
-  })
+  });
 
   const cards = await prisma.block.findMany({
     where: {
-      type: "card"
+      type: 'card'
     },
     select: {
       parentId: true,
       fields: true,
       id: true
     }
-  })
+  });
 
   for (const card of cards) {
     const boardPersonProperty = boardPersonPropertyRecord[card.parentId];
     if (boardPersonProperty) {
-      const cardFields = (card.fields as CardFields);
+      const cardFields = card.fields as CardFields;
       const currentPersonPropertyValue = cardFields.properties[boardPersonProperty.personPropertyId];
-      if (typeof currentPersonPropertyValue === "string") {
-        cardFields.properties[boardPersonProperty.personPropertyId] = [currentPersonPropertyValue]
+      if (typeof currentPersonPropertyValue === 'string') {
+        cardFields.properties[boardPersonProperty.personPropertyId] = [currentPersonPropertyValue];
         await prisma.block.update({
           where: {
             id: card.id
@@ -52,7 +57,7 @@ async function multiPersonProperty() {
           data: {
             fields: cardFields
           }
-        })
+        });
       }
     }
   }

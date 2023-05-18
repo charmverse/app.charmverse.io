@@ -4,7 +4,6 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
-import { getCurrentBoard } from './boards';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 
 import type { RootState } from './index';

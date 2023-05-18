@@ -1,12 +1,14 @@
+import type {
+  ProposalCategoryWithPermissions,
+  ProposalFlowPermissionFlags,
+  ProposalReviewerPool
+} from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
-import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -71,11 +73,11 @@ export class ProposalsApi {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
 
-  computeProposalFlowFlags(proposalId: string) {
-    return http.GET<ProposalFlowFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
+  computeProposalFlowPermissions(proposalId: string) {
+    return http.GET<ProposalFlowPermissionFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
   }
 
-  getReviewerPool(spaceId: string) {
-    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?spaceId=${spaceId}`);
+  getReviewerPool(proposalId: string) {
+    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?resourceId=${proposalId}`);
   }
 }

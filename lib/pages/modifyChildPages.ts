@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { resolvePageTree } from './server';
 
@@ -46,7 +46,9 @@ export async function modifyChildPages(parentId: string, userId: string, action:
             {
               id: {
                 in: modifiedChildPageIds
-              },
+              }
+            },
+            {
               parentId: {
                 in: modifiedChildPageIds
               }

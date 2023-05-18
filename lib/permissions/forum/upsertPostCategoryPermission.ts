@@ -6,7 +6,6 @@ import type {
 } from '@charmverse/core';
 import {
   SystemError,
-  prisma,
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
@@ -15,6 +14,7 @@ import {
 } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
 import { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 

@@ -1,9 +1,9 @@
+import type { ProposalFlowPermissionFlags } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';
 
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import {
   proposalStatusDetails,
@@ -12,7 +12,7 @@ import {
 } from 'lib/proposal/proposalStatusTransition';
 
 type Props = {
-  proposalFlowFlags?: ProposalFlowFlags;
+  proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposal?: ProposalWithUsers;
   openVoteModal: () => void;
   updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;

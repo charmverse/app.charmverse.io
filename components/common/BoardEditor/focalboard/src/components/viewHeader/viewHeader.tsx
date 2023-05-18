@@ -110,6 +110,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
+        viewIds={activeBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}

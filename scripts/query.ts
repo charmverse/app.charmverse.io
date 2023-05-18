@@ -1,13 +1,13 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { customAlphabet } from 'nanoid';
 import fs from 'node:fs/promises';
 
 import * as opts from 'nanoid-dictionary';
-console.log(opts)
-function uid( ) {
-  return Math.round(Date.now() + Math.random() * 1000).toString(36)
+console.log(opts);
+function uid() {
+  return Math.round(Date.now() + Math.random() * 1000).toString(36);
 }
-function uid2 () {
+function uid2() {
   return customAlphabet(opts.lowercase + opts.numbers, 8)();
 }
 /**
@@ -27,9 +27,9 @@ async function search() {
         }
       }
     }
-  })
+  });
 
-  await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2))
+  await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2));
 }
 
 search().then(() => console.log('Done'));

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PaymentMethod } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,11 +17,13 @@ handler
 
 async function updateSafe(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as any as PaymentMethod;
+  const { name, isHidden } = req.body;
+  const userId = req.session.user.id;
 
   const wallet = await prisma.userGnosisSafe.findFirst({
     where: {
       id,
-      userId: req.session.user.id
+      userId
     }
   });
 
@@ -31,10 +33,12 @@ async function updateSafe(req: NextApiRequest, res: NextApiResponse) {
 
   await prisma.userGnosisSafe.update({
     where: {
-      id
+      id,
+      userId
     },
     data: {
-      name: req.body.name
+      name,
+      isHidden
     }
   });
   return res.status(200).end();

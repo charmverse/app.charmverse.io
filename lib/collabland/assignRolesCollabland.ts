@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateCollablandRoles } from 'lib/collabland/findOrCreateCollablandRoles';
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
@@ -14,6 +14,10 @@ export async function assignRolesCollabland({
 }) {
   const roleIdsToAdd = Array.isArray(roles) ? roles : [roles];
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+
+  if (!spacesData) {
+    return;
+  }
 
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>

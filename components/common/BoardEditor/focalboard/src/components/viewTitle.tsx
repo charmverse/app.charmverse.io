@@ -6,12 +6,12 @@ import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box } from '@mui/material';
-import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import type { Board } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -22,10 +22,6 @@ import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
 
 import BlockIconSelector from './blockIconSelector';
-
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
 
 const BoardTitleEditable = styled(Editable)`
   font-size: 32px;

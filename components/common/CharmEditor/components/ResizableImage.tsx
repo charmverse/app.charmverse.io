@@ -239,7 +239,7 @@ function getFileBinary(src: string): File | null {
 
 export function spec() {
   // this is a dummy marker to let us know to show the image selector
-  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image' });
+  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image', excludes: '_' });
   tooltipSpec.schema.inclusive = false;
   return [tooltipSpec, imageSpec()];
 }

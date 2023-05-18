@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { AccsRegularParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';

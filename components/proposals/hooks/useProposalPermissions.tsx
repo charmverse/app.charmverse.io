@@ -1,7 +1,7 @@
+import { AvailableProposalPermissions } from '@charmverse/core/shared';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AvailableProposalPermissions } from 'lib/permissions/proposals/availableProposalPermissions.class';
 
 type Props = {
   proposalIdOrPath: string;

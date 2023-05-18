@@ -1,10 +1,9 @@
+import { isProposalAuthor } from '@charmverse/core';
 import type { ProposalCategory, Space, User, Role } from '@charmverse/core/prisma';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';
 import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
-
-import { isProposalAuthor } from '../isProposalAuthor';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;

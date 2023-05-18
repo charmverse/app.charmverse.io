@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -111,8 +111,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const hasNewParentPage =
-    updateContent.parentId !== page.parentId &&
-    (typeof updateContent.parentId === 'string' || updateContent.parentId === null);
+    updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || !updateContent.parentId);
 
   // Only perform validation if repositioning below another page
   if (hasNewParentPage && typeof updateContent.parentId === 'string') {

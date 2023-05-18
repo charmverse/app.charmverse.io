@@ -10,7 +10,9 @@ import { memo } from 'react';
 import { documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
-import { usePageFromPath } from 'hooks/usePageFromPath';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePage } from 'hooks/usePage';
+import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useUser } from 'hooks/useUser';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
@@ -36,13 +38,17 @@ type HeaderProps = {
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { user } = useUser();
+  const basePageId = usePageIdFromPath();
+  const currentSpace = useCurrentSpace();
+  const { page: basePage } = usePage({
+    pageIdOrPath: currentSpace ? basePageId : undefined,
+    spaceId: currentSpace?.id
+  });
 
-  const basePage = usePageFromPath();
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
   const isBountyBoard = router.route === '/[domain]/bounties';
   const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
-
   return (
     <StyledToolbar variant='dense'>
       <IconButton
@@ -69,7 +75,11 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+          <PageTitleWithBreadcrumbs
+            pageId={basePage?.id}
+            pageType={basePage?.type}
+            spaceDomain={currentSpace?.domain}
+          />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
@@ -79,7 +89,14 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
             <>
               {isBasePageDocument && <DocumentParticipants />}
               {isBasePageDocument && <EditingModeToggle />}
-              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
+              {!basePage?.deletedAt && (
+                <ShareButton
+                  headerHeight={headerHeight}
+                  pageId={basePage.id}
+                  pageType={basePage.type}
+                  proposalId={basePage.proposalId}
+                />
+              )}
             </>
           )}
 
