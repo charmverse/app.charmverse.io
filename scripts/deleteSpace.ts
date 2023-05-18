@@ -1,23 +1,24 @@
 import { stringUtils } from "@charmverse/core";
 import { Space, prisma } from "@charmverse/core/prisma-client";
-import * as fs from 'node:fs/promises';
 import * as readline from "node:readline";
 import { v4 } from "uuid";
 
-function getDeletionKeyPath() {
-  return `${__dirname}/spaceDeletionKey.txt`
-}
+// Terminal color codes
+// https://stackoverflow.com/a/41407246
+const bright = "\x1b[1m"
+const reset = "\x1b[0m"
+const textRed = "\x1b[31m"
+const textBlue = "\x1b[34m"
 
-
-const reader = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 
 async function awaitInput(): Promise<string> {
   return new Promise((resolve, reject) => {
-    reader.question(`Please enter the deletion key found in ${getDeletionKeyPath()}:\r\n`, (key) => {
+    const reader = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    reader.question(`\r\nPlease type ${bright}confirm: ${reset}`, (key) => {
       resolve(key)
       reader.close();
     });
@@ -29,8 +30,6 @@ async function awaitInput(): Promise<string> {
 
 
 async function verifySpace({spaceIdOrDomain}: {spaceIdOrDomain: string}): Promise<Space> {
-
-  await fs.rm(getDeletionKeyPath()).then(() => console.log('Deleted key file')).catch(err => console.log('No file to cleanup'))
 
   if (!spaceIdOrDomain || typeof spaceIdOrDomain !== 'string') {
     throw new Error(`Spacedomain is required`)
@@ -56,23 +55,27 @@ async function verifySpace({spaceIdOrDomain}: {spaceIdOrDomain: string}): Promis
     }
   });
 
-  console.log(`Will \x1b[31m delete `, pages, ' pages from \x1b[34m space', space.name, '\x1b[0m with \x1b[34m domain', space.domain, '\x1b[0m')
+  const users = await prisma.spaceRole.count({
+    where: {
+      spaceId: space.id
+    }
+  })
 
-  const deletionKey = v4();
-
-  await fs.writeFile(getDeletionKeyPath(), deletionKey)
+  console.log(`\r\n${textRed}⚠️ This will delete the entire space!${reset}\r\n`);
+  console.log(`Space name: ${space.name}`);
+  console.log(`Domain: ${textBlue} ${space.domain}${reset}\r\n`)
+  console.log(pages, 'pages');
+  console.log(users, 'memberships');
 
   return space;
 }
 
 async function confirmDeleteSpace({spaceId}: {spaceId: string}) {
 
-  const deletionKeyValue = await fs.readFile(getDeletionKeyPath(), 'utf8')
-
   const key = await awaitInput();
 
-  if (!stringUtils.isUUID(key) || !stringUtils.isUUID(deletionKeyValue) || key !== deletionKeyValue) {
-    throw new Error('Cannot delete space. Deletion key not valid')
+  if (key !== 'confirm') {
+    throw new Error('Cannot delete space. Deletion not confirmed')
   }
 
   await prisma.space.delete({
@@ -81,7 +84,7 @@ async function confirmDeleteSpace({spaceId}: {spaceId: string}) {
     }
   })
 
-  await fs.rm(getDeletionKeyPath()).then(() => console.log('Deleted key file')).catch(err => console.log('No file to cleanup'))
+  console.log('🗑️  Deleted space');
 }
 
 async function deleteSpace({spaceIdOrDomain}: {spaceIdOrDomain: string}) {
@@ -90,4 +93,4 @@ async function deleteSpace({spaceIdOrDomain}: {spaceIdOrDomain: string}) {
 }
 
 
-deleteSpace({spaceIdOrDomain: 'strategic-moccasin-earwig'}).then(() => console.log('done'))
+deleteSpace({spaceIdOrDomain: 'final-ivory-ptarmigan'}).then(() => console.log('done'))
