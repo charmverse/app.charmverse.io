@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import charmClient from 'charmClient';
+import { getAbsolutePath } from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
@@ -77,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
+      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }
