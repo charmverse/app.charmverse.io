@@ -33,7 +33,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     },
     {
       shouldRetryOnError: false,
-      revalidateOnMount: false,
       revalidateOnFocus: false
     }
   );

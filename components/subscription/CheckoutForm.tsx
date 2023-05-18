@@ -48,9 +48,11 @@ const StyledCardElementContainer = styled(Box)`
 `;
 
 const schema = () => {
-  return yup.object({
-    billingEmail: yup.string().email().required()
-  });
+  return yup
+    .object({
+      billingEmail: yup.string().email().required()
+    })
+    .strict();
 };
 
 export function CheckoutForm({
@@ -68,6 +70,7 @@ export function CheckoutForm({
   const {
     register,
     getValues,
+    watch,
     formState: { errors }
   } = useForm<{ billingEmail: string }>({
     mode: 'onChange',
@@ -76,6 +79,8 @@ export function CheckoutForm({
     },
     resolver: yupResolver(schema())
   });
+
+  const billingEmail = watch('billingEmail');
 
   const space = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -102,7 +107,11 @@ export function CheckoutForm({
   }, [spaceSubscription]);
 
   const cardError =
-    cardEvent.cardNumber?.error || cardEvent.cvc?.error || cardEvent.expiry?.error || errors.billingEmail;
+    cardEvent.cardNumber?.error ||
+    cardEvent.cvc?.error ||
+    cardEvent.expiry?.error ||
+    errors.billingEmail ||
+    billingEmail.length === 0;
 
   const cardComplete =
     cardEvent.cardNumber?.complete &&
