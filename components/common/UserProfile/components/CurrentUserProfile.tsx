@@ -27,7 +27,7 @@ export function CurrentUserProfile({
   const currentSpace = useCurrentSpace();
   const { updateSpaceValues } = useMemberPropertyValues(currentUser.id);
 
-  const [currentStep, setCurrentStep] = useState<Step>(isOnboarding ? 'email_step' : 'profile_step');
+  const [currentStep, setCurrentStep] = useState<Step>(!currentUser.email ? 'email_step' : 'profile_step');
 
   function goNextStep() {
     setCurrentStep('profile_step');
@@ -43,7 +43,7 @@ export function CurrentUserProfile({
     if (currentStep === 'email_step') {
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
-      title = `Welcome to ${currentSpace.domain}. Set up your profile`;
+      title = `Welcome to ${currentSpace.domain}! Set up your profile`;
     }
   }
 
