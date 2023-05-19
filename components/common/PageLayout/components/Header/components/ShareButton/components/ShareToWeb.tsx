@@ -14,11 +14,12 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import charmClient from 'charmClient';
-import Link, { getAbsolutePath } from 'components/common/Link';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;

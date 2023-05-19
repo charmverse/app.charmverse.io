@@ -6,7 +6,7 @@ import NextLink from 'next/link';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { getSpaceUrl } from 'components/common/Link';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 import WorkspaceAvatar from './WorkspaceAvatar';
 

@@ -1,3 +1,5 @@
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
   if (typeof navigator === 'undefined') {
@@ -209,4 +211,44 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
     domElement.style.removeProperty('background-color');
     postHighlight?.();
   }, 1000);
+}
+
+export function getSubdomainPath(path: string) {
+  const subdomain = getValidSubdomain();
+  if (!subdomain) return path;
+
+  if (path.startsWith(`/${subdomain}`)) {
+    return path.replace(`/${subdomain}`, '');
+  }
+
+  return path;
+}
+
+export function getSpaceUrl(domain: string) {
+  const subdomain = getValidSubdomain();
+  if (!subdomain) return `/${domain}`;
+  if (subdomain === domain) return '/';
+
+  // replace old subdomain with desired one
+  if (typeof window !== 'undefined') {
+    return window?.origin.replace(`${subdomain}.`, `${domain}.`);
+  }
+
+  return `/${domain}`;
+}
+
+export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
+  const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
+  const subdomain = getValidSubdomain();
+
+  if (typeof window !== 'undefined') {
+    const origin =
+      subdomain && subdomain !== spaceDomain
+        ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
+        : window.location.origin;
+
+    return origin + getSubdomainPath(absolutePath);
+  }
+
+  return absolutePath;
 }

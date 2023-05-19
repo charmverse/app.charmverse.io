@@ -5,6 +5,7 @@ import NextLink from 'next/link';
 import type { MouseEvent } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { getSubdomainPath } from 'lib/utilities/browser';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const hoverStyle: { [key: string]: string } = {
@@ -83,44 +84,4 @@ export function PageLink({ bountyId, pageId, ...props }: PageLinkProps) {
   }
 
   return <Link onClick={onClickInternalLink} {...props} />;
-}
-
-export function getSubdomainPath(path: string) {
-  const subdomain = getValidSubdomain();
-  if (!subdomain) return path;
-
-  if (path.startsWith(`/${subdomain}`)) {
-    return path.replace(`/${subdomain}`, '');
-  }
-
-  return path;
-}
-
-export function getSpaceUrl(domain: string) {
-  const subdomain = getValidSubdomain();
-  if (!subdomain) return `/${domain}`;
-  if (subdomain === domain) return '/';
-
-  // replace old subdomain with desired one
-  if (typeof window !== 'undefined') {
-    return window?.origin.replace(`${subdomain}.`, `${domain}.`);
-  }
-
-  return `/${domain}`;
-}
-
-export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
-  const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
-  const subdomain = getValidSubdomain();
-
-  if (typeof window !== 'undefined') {
-    const origin =
-      subdomain && subdomain !== spaceDomain
-        ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
-        : window.location.origin;
-
-    return origin + getSubdomainPath(absolutePath);
-  }
-
-  return absolutePath;
 }

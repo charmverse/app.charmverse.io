@@ -3,8 +3,8 @@ import { MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useRouter } from 'next/router';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { getAbsolutePath } from 'components/common/Link';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 export function CopyPageLinkAction({ path, onComplete }: { path: string; onComplete?: VoidFunction }) {
   const { showMessage } = useSnackbar();

@@ -7,7 +7,7 @@ import NextLink from 'next/link';
 import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
 import { forwardRef } from 'react';
 
-import { getSubdomainPath } from 'components/common/Link';
+import { getSubdomainPath } from 'lib/utilities/browser';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
