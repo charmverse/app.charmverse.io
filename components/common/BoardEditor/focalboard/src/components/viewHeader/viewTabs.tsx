@@ -146,7 +146,7 @@ function ViewTab({
       onClick={onClick}
       variant='text'
       size='small'
-      id={view.id}
+      data-view-id={view.id}
       sx={{
         p: 0,
         overflow: 'unset',
@@ -157,7 +157,6 @@ function ViewTab({
         // The tab indicator is not shown anymore since its located in a separate component
         borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
       }}
-      value={view.id}
       label={
         <StyledTabContent
           color={isActive ? 'textPrimary' : 'secondary'}
@@ -227,8 +226,8 @@ function ViewTabs(props: ViewTabsProps) {
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     event.preventDefault();
-    const viewId = event.currentTarget.id;
-    const view = viewsRecord[viewId];
+    const viewId = event.currentTarget.dataset.viewId;
+    const view = viewId && viewsRecord[viewId];
     if (!view) {
       return;
     }
