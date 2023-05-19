@@ -12,11 +12,10 @@ import Button from 'components/common/Button';
 import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
 import { ApiSettings } from 'components/settings/api/Api';
 import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/config';
-import { ACCOUNT_TABS, getSettingsTabs } from 'components/settings/config';
+import { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
 import Invites from 'components/settings/invites/Invites';
 import { RoleSettings } from 'components/settings/roles/RoleSettings';
 import SpaceSettings from 'components/settings/workspace/Space';
-import { SubscriptionSettings } from 'components/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -32,41 +31,30 @@ interface TabPanelProps extends BoxProps {
   value: string;
 }
 
-function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
+function TabView(props: { space?: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
 
-  const settingsTab = getSettingsTabs(space).find((settingTab) => settingTab.path === tab.path);
-  const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
-
-  if (!settingsTab && !accountsTab) {
-    return null;
-  }
-
-  if (tab.path === 'space' && space) {
+  if (tab.path === SETTINGS_TABS[0].path && space) {
     return <SpaceSettings space={space} />;
   }
 
-  if (tab.path === 'roles' && space) {
+  if (tab.path === SETTINGS_TABS[1].path && space) {
     return <RoleSettings space={space} />;
   }
 
-  if (tab.path === 'invites' && space) {
+  if (tab.path === SETTINGS_TABS[2].path && space) {
     return <Invites space={space} />;
   }
 
-  if (tab.path === 'api' && space) {
+  if (tab.path === SETTINGS_TABS[3].path && space) {
     return <ApiSettings space={space} />;
   }
 
-  if (tab.path === 'subscription' && space) {
-    return <SubscriptionSettings space={space} />;
-  }
-
-  if (tab.path === 'account') {
+  if (tab.path === ACCOUNT_TABS[0].path) {
     return <IntegrationSettings />;
   }
 
-  if (tab.path === 'profile') {
+  if (tab.path === ACCOUNT_TABS[1].path) {
     return <ProfileSettings />;
   }
 
@@ -91,6 +79,7 @@ function TabPanel(props: TabPanelProps) {
 
 export function SpaceSettingsDialog() {
   const currentSpace = useCurrentSpace();
+
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
@@ -143,7 +132,7 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs(currentSpace).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <SidebarLink
                 data-test={`space-settings-tab-${tab.path}`}
                 key={tab.path}
@@ -176,17 +165,16 @@ export function SpaceSettingsDialog() {
             </Box>
           )}
           {currentSpace &&
-            getSettingsTabs(currentSpace).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>
             ))}
-          {currentSpace &&
-            ACCOUNT_TABS.map((tab) => (
-              <TabPanel key={tab.path} value={activePath} index={tab.path}>
-                <TabView tab={tab} space={currentSpace} />
-              </TabPanel>
-            ))}
+          {ACCOUNT_TABS.map((tab) => (
+            <TabPanel key={tab.path} value={activePath} index={tab.path}>
+              <TabView tab={tab} />
+            </TabPanel>
+          ))}
         </Box>
         {isMobile ? (
           <Button

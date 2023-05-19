@@ -3,7 +3,6 @@ import type { ForumEventMap } from './ForumEvent';
 import type { PageEventMap } from './PageEvent';
 import type { ProposalEventMap } from './ProposalEvent';
 import type { SettingEventMap } from './SettingEvent';
-import type { SubscriptionEventMap } from './SubscriptionEvent';
 import type { UserEventMap } from './UserEvent';
 
 export interface MixpanelTrackBase {
@@ -25,7 +24,6 @@ export type MixpanelEventMap = UserEventMap &
   PageEventMap &
   BountyEventMap &
   SettingEventMap &
-  ForumEventMap &
-  SubscriptionEventMap;
+  ForumEventMap;
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;

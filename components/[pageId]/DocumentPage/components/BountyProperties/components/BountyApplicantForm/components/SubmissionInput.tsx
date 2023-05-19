@@ -84,6 +84,8 @@ export default function SubmissionInput({
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
+  //  const defaultWalletAddress = submission.walletAddress ?? ;
+
   async function onSubmit(values: FormValues) {
     setFormError(null);
     let application: Application;

@@ -20,6 +20,7 @@ handler.use(requireUser).post(createUploadEndpoint);
 
 async function createUploadEndpoint(req: NextApiRequest, res: NextApiResponse<CreateUploadResponse>) {
   const result = await createUpload();
+
   res.status(200).json(result);
 }
 
