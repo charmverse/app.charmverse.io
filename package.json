@@ -26,7 +26,7 @@
     "prisma:reset": "cd node_modules/@charmverse/core && npm run prisma:reset",
     "prisma:dev": "cd node_modules/@charmverse/core && npm run prisma:migrate",
     "prisma:deploy": "cd node_modules/@charmverse/core && npm run prisma:deploy",
-    "debug:e2e": "dotenv -e .env.test.local -- npx playwright test __e2e__/proposals/viewProposal.spec.ts --headed --timeout=0",
+    "debug:e2e": "dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
     "postinstall": "patch-package && cd node_modules/@charmverse/core && npm run postinstall",
     "migrate:test": "dotenv -e .env.test.local -- npx prisma migrate deploy",
     "notifications:debug": "ts-node --transpileOnly ./scripts/readNotifications.ts",
