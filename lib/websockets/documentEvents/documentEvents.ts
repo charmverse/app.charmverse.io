@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeUserPagePermissions } from 'lib/permissions/pages/computePagePermissions';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';

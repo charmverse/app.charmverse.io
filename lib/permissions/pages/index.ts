@@ -1,4 +1,4 @@
-export * from './page-permission-compute';
+export * from './computePagePermissions';
 export * from './page-permission-interfaces';
 export * from './page-permission-mapping';
 export * from './triggers';

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeUserPagePermissions } from 'lib/permissions/pages/computePagePermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { deleteThread } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';

@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeUserPagePermissions } from 'lib/permissions/pages/computePagePermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';

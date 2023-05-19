@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeUserPagePermissions } from 'lib/permissions/pages/computePagePermissions';
 import type { IPagePermissionUserRequest } from 'lib/permissions/pages/page-permission-interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 

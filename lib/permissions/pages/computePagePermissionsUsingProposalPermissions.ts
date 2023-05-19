@@ -1,9 +1,8 @@
-import type { PagePermissionFlags } from '@charmverse/core';
 import { AvailablePagePermissions } from '@charmverse/core';
+import type { PagePermissionFlags, PermissionCompute } from '@charmverse/core';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { PermissionCompute } from '../interfaces';
-import { computeProposalPermissions } from '../proposals/computeProposalPermissions';
+import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 
 /**
  * @resourceId - The id of the proposal (usually the same as page id)
