@@ -226,12 +226,12 @@ function ViewTabs(props: ViewTabsProps) {
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     event.preventDefault();
-    const viewId = event.currentTarget.dataset.viewId;
+    const selectedViewId = event.currentTarget.dataset.viewId;
     const view = viewId && viewsRecord[viewId];
     if (!view) {
       return;
     }
-    if (view && !readOnly && event.currentTarget.id === activeView?.id) {
+    if (view && !readOnly && selectedViewId === activeView?.id) {
       setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
