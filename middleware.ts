@@ -12,7 +12,7 @@ const PUBLIC_FILE = /\.(.*)$/; // Files
 export async function middleware(req: NextRequest) {
   if (isTestEnv) {
     // Skip middleware in tests
-    return NextResponse.next();
+    return;
   }
 
   // Clone the URL
@@ -49,6 +49,4 @@ export async function middleware(req: NextRequest) {
     url.pathname = `/${subdomain}${url.pathname}`;
     return NextResponse.rewrite(url);
   }
-
-  return NextResponse.next();
 }
