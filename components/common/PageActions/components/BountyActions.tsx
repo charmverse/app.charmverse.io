@@ -6,6 +6,7 @@ import { useSWRConfig } from 'swr';
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { paidBountyStatuses } from 'lib/bounties/constants';
 
 export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick?: VoidFunction }) {
   const { refreshBounty, bounties } = useBounties();
@@ -17,13 +18,10 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     return null;
   }
 
-  const isMarkBountyPaidButtonDisabled =
-    (bounty?.applications.length === 0 ||
-      !bounty?.applications.every(
-        (application) =>
-          application.status === 'paid' || application.status === 'complete' || application.status !== 'rejected'
-      )) ??
-    true;
+  const isMarkBountyPaidEnabled =
+    bounty.status !== 'paid' &&
+    bounty.applications.length > 0 &&
+    bounty.applications.every((application) => !paidBountyStatuses.includes(application.status));
 
   const isMarkBountyCompletedButtonDisabled =
     (bounty?.status === 'complete' || (bounty?.status !== 'inProgress' && bounty?.status !== 'open')) ?? true;
@@ -55,9 +53,15 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
 
   return (
     <>
-      <Tooltip title={isMarkBountyPaidButtonDisabled ? `You don't have permission to mark this bounty as paid` : ''}>
+      <Tooltip
+        title={
+          !isMarkBountyPaidEnabled
+            ? `All applications must be completed or marked as paid to mark this bounty as paid`
+            : ''
+        }
+      >
         <div>
-          <MenuItem dense onClick={markBountyAsPaid} disabled={isMarkBountyPaidButtonDisabled}>
+          <MenuItem dense onClick={markBountyAsPaid} disabled={!isMarkBountyPaidEnabled}>
             <PaidIcon
               sx={{
                 mr: 1
