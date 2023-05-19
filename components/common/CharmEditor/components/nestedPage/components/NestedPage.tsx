@@ -4,10 +4,12 @@ import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+import type { PageMeta } from 'lib/pages/interfaces';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -42,20 +44,20 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
   const space = useCurrentSpace();
   const { pages } = usePages();
   const { categories } = useForumCategories();
-  const nestedPage = pages[node.attrs.id];
-  const nestedStaticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
-  const nestedCategories = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
+  const documentPage = pages[node.attrs.id];
+  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
 
-  const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
+  const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
 
   const pageTitle =
-    (nestedPage || nestedStaticPage)?.title || (nestedCategories ? `Forum > ${nestedCategories?.name}` : '');
-  const pageId = nestedPage?.id || nestedStaticPage?.path || nestedCategories?.id;
+    (documentPage || staticPage)?.title || (forumCategoryPage ? `Forum > ${forumCategoryPage?.name}` : '');
+  const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
 
-  const pagePath = nestedPage ? `${space?.domain}/${nestedPage.path}` : '';
-  const staticPath = nestedStaticPage ? `${space?.domain}/${nestedStaticPage.path}` : '';
-  const categoriesPath = nestedCategories ? `${space?.domain}/forum/${nestedCategories.path}` : '';
-  const appPath = pagePath || staticPath || categoriesPath;
+  const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
+  const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';
+  const categoryPath = forumCategoryPage ? `${space?.domain}/forum/${forumCategoryPage.path}` : '';
+  const appPath = pagePath || staticPath || categoryPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
@@ -72,21 +74,43 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-type={node.attrs.type}
     >
       <div>
-        {nestedStaticPage ? (
-          <PageIcon icon={null} pageType={nestedStaticPage.path} />
-        ) : nestedPage ? (
-          <PageIcon
-            isLinkedPage={isLinkedPage}
-            isEditorEmpty={!nestedPage.hasContent}
-            icon={nestedPage.icon}
-            pageType={nestedPage.type}
-          />
-        ) : (
-          <NoAccessPageIcon />
-        )}
-        {nestedCategories && <PageIcon icon={null} pageType='forum_category' />}
+        <LinkIcon
+          isLinkedPage={isLinkedPage}
+          documentPage={documentPage}
+          staticPage={staticPage}
+          isCategoryPage={!!forumCategoryPage}
+        />
       </div>
       <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
     </NestedPageContainer>
   );
+}
+
+function LinkIcon({
+  isLinkedPage,
+  documentPage,
+  staticPage,
+  isCategoryPage
+}: {
+  isLinkedPage: boolean;
+  documentPage?: PageMeta;
+  staticPage?: StaticPage;
+  isCategoryPage: boolean;
+}) {
+  if (staticPage) {
+    return <PageIcon pageType={staticPage.path} />;
+  } else if (isCategoryPage) {
+    return <PageIcon pageType='forum_category' />;
+  } else if (documentPage) {
+    return (
+      <PageIcon
+        isLinkedPage={isLinkedPage}
+        isEditorEmpty={!documentPage.hasContent}
+        icon={documentPage.icon}
+        pageType={documentPage.type}
+      />
+    );
+  } else {
+    return <NoAccessPageIcon />;
+  }
 }

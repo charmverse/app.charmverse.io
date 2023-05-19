@@ -9,13 +9,13 @@ export enum StaticPagesPath {
 
 export type StaticPagesType = keyof typeof StaticPagesPath;
 
-export type StaticPagesList = {
+export type StaticPage = {
   path: StaticPagesType;
   title: string;
   feature: Feature;
 };
 
-export const STATIC_PAGES: StaticPagesList[] = [
+export const STATIC_PAGES: StaticPage[] = [
   { path: 'members', title: 'Member Directory', feature: 'member_directory' },
   { path: 'proposals', title: 'Proposals', feature: 'proposals' },
   { path: 'bounties', title: 'Bounties', feature: 'bounties' },
