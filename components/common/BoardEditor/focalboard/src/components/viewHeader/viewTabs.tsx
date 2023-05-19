@@ -155,7 +155,7 @@ function ViewTab({
         backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
         flexDirection: 'row',
         // The tab indicator is not shown anymore since its located in a separate component
-        borderBottom: isActive ? `1.5px solid ${theme.palette.text.primary}` : ''
+        borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
       }}
       value={view.id}
       label={
@@ -219,14 +219,6 @@ function ViewTabs(props: ViewTabsProps) {
     restViewIds = restViewIds.filter((viewId) => viewId !== activeView?.id);
     restViewIds.unshift(replacedViewId);
   }
-
-  // make sure active view id is visible or the value for Tabs will be invalid
-  // during transition between boards, there is a period where activeView has not caught up with the new views
-  const activeShowViewId =
-    shownViewIds.find((viewId) => viewId === activeView?.id || viewId === router.query.viewId) ??
-    // check viewId by the query, there is a period where activeView has not caught up
-    shownViewIds[0] ??
-    false;
 
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
     defaultValues: { title: dropdownView?.title || '' }
@@ -359,7 +351,7 @@ function ViewTabs(props: ViewTabsProps) {
         textColor='primary'
         indicatorColor='secondary'
         value={false} // use false to disable the indicator
-        sx={{ minHeight: 0, mb: '-6px' }}
+        sx={{ minHeight: 0, mb: '-5px' }}
       >
         {shownViewIds
           .map((viewId) => {
