@@ -14,8 +14,8 @@ type GetOrganizationsResponse = ApiResponse<{
   resources: DeepDaoOrganizationDetails[];
 }>;
 
-export const { DEEPDAO_API_KEY, DEEPDAO_BASE_URL } = process.env;
-
+export const { DEEPDAO_API_KEY } = process.env;
+export const DEEPDAO_BASE_URL = 'https://api.deepdao.io';
 export async function getParticipationScore(
   address: string,
   apiToken = DEEPDAO_API_KEY
@@ -44,7 +44,7 @@ function _requestGET<T>(endpoint: string, { apiToken = DEEPDAO_API_KEY }: { apiT
   if (isTestEnv) {
     return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, { method: 'GET' });
   }
-  if (!apiToken || !DEEPDAO_BASE_URL) {
+  if (!apiToken) {
     log.debug('Skip request: No API Key or URL for DeepDAO');
     return Promise.resolve(null);
   }
