@@ -123,7 +123,7 @@ function ViewMenuItem({
   );
 }
 
-function ShownViewMenuItem({
+function ViewTab({
   view,
   onClick,
   onDrop,
@@ -358,22 +358,25 @@ function ViewTabs(props: ViewTabsProps) {
         key={viewsProp[0]?.id}
         textColor='primary'
         indicatorColor='secondary'
-        value={activeShowViewId}
+        value={false} // use false to disable the indicator
         sx={{ minHeight: 0, mb: '-6px' }}
       >
         {shownViewIds
           .map((viewId) => {
             const view = viewsRecord[viewId];
-            return view ? (
-              <ShownViewMenuItem
-                onClick={handleViewClick}
-                onDrop={reorderViews}
-                view={view}
-                isActive={activeView?.id === view.id}
-                key={view.id}
-                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
-              />
-            ) : null;
+            if (view) {
+              return (
+                <ViewTab
+                  onClick={handleViewClick}
+                  onDrop={reorderViews}
+                  view={view}
+                  isActive={activeView?.id === view.id}
+                  key={view.id}
+                  href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+                />
+              );
+            }
+            return null;
           })
           .filter(isTruthy)}
         {restViewIds.length !== 0 && (
