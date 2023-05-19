@@ -53,7 +53,7 @@ class CardFilter {
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
-    const filterValue = filter.values[0]?.toLowerCase() ?? '';
+    const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
 
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
