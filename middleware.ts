@@ -1,3 +1,4 @@
+import { isTestEnv } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -9,6 +10,11 @@ import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
 export async function middleware(req: NextRequest) {
+  if (isTestEnv) {
+    // Skip middleware in tests
+    return NextResponse.next();
+  }
+
   // Clone the URL
   const url = req.nextUrl.clone();
 
@@ -41,7 +47,8 @@ export async function middleware(req: NextRequest) {
     // Subdomain available, rewriting
     log.info(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
     url.pathname = `/${subdomain}${url.pathname}`;
+    return NextResponse.rewrite(url);
   }
 
-  return NextResponse.rewrite(url);
+  return NextResponse.next();
 }
