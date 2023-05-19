@@ -227,7 +227,7 @@ function ViewTabs(props: ViewTabsProps) {
     event.stopPropagation();
     event.preventDefault();
     const selectedViewId = event.currentTarget.dataset.viewId;
-    const view = viewId && viewsRecord[viewId];
+    const view = selectedViewId && viewsRecord[selectedViewId];
     if (!view) {
       return;
     }
@@ -235,7 +235,7 @@ function ViewTabs(props: ViewTabsProps) {
       setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
-      showView(viewId);
+      showView(selectedViewId);
     }
   }
 
