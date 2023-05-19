@@ -9,11 +9,10 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
-import { computeUserPagePermissions, setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -22,7 +21,15 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(createPageHandler).delete(deletePages);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'spaceId'
+    })
+  )
+  .post(createPageHandler)
+  .delete(deletePages);
 
 async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
