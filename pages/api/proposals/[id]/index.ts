@@ -115,7 +115,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
       const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
         resourceId: proposal.id
       });
-      for (const reviewer of reviewers) {
+      for (const reviewer of newReviewers) {
         if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
           const role = await prisma.role.findUnique({
             where: {
