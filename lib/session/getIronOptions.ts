@@ -2,15 +2,10 @@ import type { IncomingMessage } from 'http';
 
 import type { IronSessionOptions } from 'iron-session';
 
-import { baseUrl, cookieName, isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { baseUrl, cookieName } from 'config/constants';
 import { authSecret } from 'lib/session/config';
+import { getCookieDomain } from 'lib/session/getCookieDomain';
 import { isLocalhostAlias } from 'lib/utilities/getValidSubdomain';
-
-const cookieDomains = {
-  dev: 'local.io',
-  staging: 'charmverse.co',
-  prod: 'charmverse.io'
-};
 
 export function getIronOptions(req?: IncomingMessage): IronSessionOptions {
   const ironOptions: IronSessionOptions = {
@@ -24,18 +19,4 @@ export function getIronOptions(req?: IncomingMessage): IronSessionOptions {
     }
   };
   return ironOptions;
-}
-
-function getCookieDomain() {
-  if (isDevEnv) {
-    return cookieDomains.dev;
-  }
-
-  if (isStagingEnv) {
-    return cookieDomains.staging;
-  }
-
-  if (isProdEnv) {
-    return cookieDomains.prod;
-  }
 }
