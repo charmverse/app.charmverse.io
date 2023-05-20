@@ -21,7 +21,7 @@ export default function LoginPage() {
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded, logoutUser } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
   const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
@@ -82,6 +82,8 @@ export default function LoginPage() {
         redirectToDefaultPage();
       } else {
         setShowLogin(true);
+        // make sure to remove user cookies
+        logoutUser();
       }
     }
   }, [isDataLoaded, isLoggedIn, user]);
