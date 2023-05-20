@@ -234,6 +234,11 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
         {
           group: 'user',
           id: userWithRole.id
+        },
+        // New valid reviewer being adding in, admins can always be reviewers
+        {
+          group: 'user',
+          id: adminUser.id
         }
       ]
     };
