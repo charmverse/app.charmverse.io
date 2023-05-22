@@ -18,14 +18,12 @@ export async function computeSpacePermissions({
     return allowedOperations.empty;
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { spaceRole, isAdmin } = await hasAccessToSpace({
     userId,
-    spaceId: resourceId,
-    adminOnly: false,
-    disallowGuest: true
+    spaceId: resourceId
   });
 
-  if (error) {
+  if (!spaceRole) {
     // Returns all permissions as false since user is not space member
     return allowedOperations.empty;
   }
@@ -34,21 +32,7 @@ export async function computeSpacePermissions({
     return allowedOperations.full;
   }
 
-  // Rollup space permissions
-  const spacePermissions = await prisma.spacePermission.findMany({
-    where: {
-      forSpaceId: resourceId
-    }
-  });
+  allowedOperations.addPermissions(['createBounty', 'createPage', 'reviewProposals']);
 
-  const applicablePermissions = await filterApplicablePermissions({
-    permissions: spacePermissions,
-    resourceSpaceId: resourceId,
-    userId
-  });
-
-  applicablePermissions.forEach((permission) => {
-    allowedOperations.addPermissions(permission.operations);
-  });
   return allowedOperations.operationFlags;
 }
