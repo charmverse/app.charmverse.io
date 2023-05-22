@@ -11,7 +11,7 @@ handler.post(logout);
 
 async function logout(req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
   req.session.destroy();
-  removeOldCookieFromResponse(req, res);
+  await removeOldCookieFromResponse(req, res, false);
 
   res.send({ ok: true });
 }
