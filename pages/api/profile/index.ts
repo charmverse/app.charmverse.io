@@ -65,7 +65,8 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
     await req.session.save();
   }
 
-  removeOldCookieFromResponse(req, res);
+  await removeOldCookieFromResponse(req, res, false);
+
   return res.status(404).json({ error: 'No user found' });
 }
 
@@ -85,7 +86,7 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
   }
 
   res.setHeader('Cache-Control', 'no-store');
-  removeOldCookieFromResponse(req, res);
+  await removeOldCookieFromResponse(req, res, true);
 
   return res.status(200).json(profile);
 }

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { cookieName } from 'config/constants';
 import { isLocalhostAlias } from 'lib/utilities/getValidSubdomain';
 
-export function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiResponse) {
+export async function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiResponse, keepSession?: boolean) {
   if (isLocalhostAlias(req.headers.host)) {
     return;
   }
@@ -16,4 +16,8 @@ export function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiRes
     // remove old non cross-domain cookie
     `${cookieName}=; Max-Age=0; Path=/; HttpOnly;`
   ]);
+
+  if (keepSession) {
+    await req.session.save();
+  }
 }
