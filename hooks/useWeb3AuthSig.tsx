@@ -176,7 +176,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const storedSignature = getStoredSignature(account);
 
       if (storedSignature) {
-        if (storedSignature.address === account) {
+        if (lowerCaseEqual(storedSignature.address, account)) {
           log.debug('Logging user in with previous wallet signature');
           loginFromWeb3Account(storedSignature).catch((e) => {
             setSignature(null);
