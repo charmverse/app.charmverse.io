@@ -57,17 +57,16 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     }
   }
 
+  const disabledMarkBountyPaidTooltipMessage = !bountyPermissions?.userPermissions.mark_paid
+    ? "You don't have permission to mark this bounty as paid"
+    : `All applications must be completed or marked as paid to mark this bounty as paid`;
+  const disabledMarkBountyCompletedTooltipMessage = !bountyPermissions?.userPermissions.lock
+    ? `You don't have permission to mark this bounty as complete`
+    : 'This bounty cannot be marked as complete';
+
   return (
     <>
-      <Tooltip
-        title={
-          !isMarkBountyPaidEnabled
-            ? !bountyPermissions?.userPermissions.mark_paid
-              ? "You don't have permission to mark this bounty as paid"
-              : `All applications must be completed or marked as paid to mark this bounty as paid`
-            : ''
-        }
-      >
+      <Tooltip title={!isMarkBountyPaidEnabled ? disabledMarkBountyPaidTooltipMessage : ''}>
         <div>
           <MenuItem dense onClick={markBountyAsPaid} disabled={!isMarkBountyPaidEnabled}>
             <PaidIcon
@@ -80,15 +79,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
           </MenuItem>
         </div>
       </Tooltip>
-      <Tooltip
-        title={
-          !isMarkBountyCompletedEnabled
-            ? !bountyPermissions?.userPermissions.lock
-              ? `You don't have permission to mark this bounty as complete`
-              : 'This bounty cannot be marked as complete'
-            : ''
-        }
-      >
+      <Tooltip title={!isMarkBountyCompletedEnabled ? disabledMarkBountyCompletedTooltipMessage : ''}>
         <div>
           <MenuItem dense onClick={closeBounty} disabled={!isMarkBountyCompletedEnabled}>
             <CheckCircleOutlinedIcon
