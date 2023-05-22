@@ -11,12 +11,12 @@ import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
+import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import type { LoggedInUser } from 'models';
-import { removeOldCookieFromResponse } from 'pages/api/session/removeOldCookie';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
