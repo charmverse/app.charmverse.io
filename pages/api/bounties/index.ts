@@ -7,15 +7,32 @@ import { createBounty, listAvailableBounties } from 'lib/bounties';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getBounties).use(requireUser).post(createBountyController);
+handler
+  .get(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'query',
+      resourceIdType: 'space'
+    }),
+    getBounties
+  )
+  .use(requireUser)
+  .post(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'body',
+      resourceIdType: 'space'
+    }),
+    createBountyController
+  );
 
 async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
@@ -49,7 +66,7 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
       throw error;
     }
   } else {
-    const userPermissions = await computeSpacePermissions({
+    const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
       resourceId: spaceId as string,
       userId
     });
