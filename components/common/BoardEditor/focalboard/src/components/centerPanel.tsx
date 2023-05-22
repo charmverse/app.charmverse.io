@@ -499,7 +499,12 @@ function CenterPanel(props: Props) {
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
-          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+          <PageWebhookBanner
+            key={key.apiKey}
+            type={key.type}
+            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            noBg={isEmbedded}
+          />
         ) : null
       )}
       <div
