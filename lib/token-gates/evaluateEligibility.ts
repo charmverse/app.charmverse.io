@@ -19,11 +19,9 @@ export async function evalueTokenGateEligibility({
   userId
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
-    if (process.env.ENABLE_LIT) {
-      await litClient.connect().catch((err) => {
-        log.debug('Error connecting to lit node', err);
-      });
-    }
+    await litClient.connect().catch((err) => {
+      log.debug('Error connecting to lit node', err);
+    });
   }
 
   const validUuid = validate(spaceIdOrDomain);

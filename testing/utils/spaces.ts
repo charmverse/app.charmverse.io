@@ -1,7 +1,9 @@
+import type { StripePayment, StripeSubscription } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
+import type { SubscriptionProductId } from 'lib/subscription/constants';
 import type { LoggedInUser } from 'models';
 
 /**
@@ -79,4 +81,42 @@ export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, s
   }
 
   return space;
+}
+
+export async function addSpaceSubscription({
+  spaceId,
+  customerId = v4(),
+  period = 'monthly',
+  productId = 'community_5k',
+  subscriptionId = v4(),
+  createdBy,
+  deletedAt = null,
+  amount = 100,
+  currency = 'USD',
+  paymentId = v4(),
+  status = 'success'
+}: { spaceId: string; createdBy: string } & Partial<Omit<StripeSubscription, 'spaceId' | 'createdBy' | 'productId'>> &
+  Partial<StripePayment> &
+  Partial<{ productId: SubscriptionProductId }>) {
+  const spaceSubscription = await prisma.stripeSubscription.create({
+    data: {
+      deletedAt,
+      spaceId,
+      customerId,
+      period,
+      productId,
+      createdBy,
+      subscriptionId,
+      stripePayment: {
+        create: {
+          amount,
+          currency,
+          paymentId,
+          status
+        }
+      }
+    }
+  });
+
+  return spaceSubscription;
 }

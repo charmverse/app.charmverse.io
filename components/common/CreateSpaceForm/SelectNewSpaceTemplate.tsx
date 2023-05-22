@@ -6,16 +6,16 @@ import Grid from '@mui/material/Grid';
 import { MdOutlineBuild } from 'react-icons/md';
 import { SiHackthebox, SiNotion } from 'react-icons/si';
 import { SlBadge, SlTrophy } from 'react-icons/sl';
+import { TfiWrite } from 'react-icons/tfi';
 
-import { spaceInternalTemplateMapping, spaceTemplateLabelMapping } from 'lib/spaces/config';
-import type { SpaceCreateTemplate, SpaceTemplateType } from 'lib/spaces/config';
-import { typedKeys } from 'lib/utilities/objects';
+import { staticSpaceTemplates } from 'lib/spaces/config';
+import type { SpaceTemplateType, StaticSpaceTemplateType } from 'lib/spaces/config';
 import NounsIcon from 'public/images/logos/noggles/noggles.svg';
 
 import { TemplateOption } from './TemplateOption';
 
 type SelectNewSpaceTemplateProps = {
-  onSelect: (value: SpaceCreateTemplate) => void;
+  onSelect: (value: SpaceTemplateType) => void;
 };
 
 const fontSize = 24;
@@ -29,12 +29,13 @@ const ScrollContainer = styled.div`
   margin: 0 -32px;
 `;
 
-const templateIcon: Record<SpaceTemplateType, React.ReactNode> = {
-  creator: <EmojiObjectsIcon htmlColor='var(--primary-color)' sx={{ fontSize }} />,
-  nft_community: <SlBadge color='var(--primary-color)' size={fontSize} />,
-  hackathon: <SlTrophy color='var(--primary-color)' size={fontSize} />,
-  nounish_dao: <SvgIcon component={NounsIcon} sx={{ color: 'var(--primary-color)' }} inheritViewBox />,
-  impact_community: <SiHackthebox color='var(--primary-color)' size={fontSize} />
+const templateIcon: Record<StaticSpaceTemplateType, React.ReactNode> = {
+  templateCreator: <EmojiObjectsIcon htmlColor='var(--primary-color)' sx={{ fontSize }} />,
+  templateNftCommunity: <SlBadge color='var(--primary-color)' size={fontSize} />,
+  templateHackathon: <SlTrophy color='var(--primary-color)' size={fontSize} />,
+  templateNounishDAO: <SvgIcon component={NounsIcon} sx={{ color: 'var(--primary-color)' }} inheritViewBox />,
+  templateImpactCommunity: <SiHackthebox color='var(--primary-color)' size={fontSize} />,
+  templateGrantRecipient: <TfiWrite color='var(--primary-color)' size={fontSize} />
 };
 
 export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps) {
@@ -55,13 +56,13 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           </Typography>
         </Grid>
 
-        {typedKeys(spaceInternalTemplateMapping).map((template) => (
-          <Grid item key={template}>
+        {staticSpaceTemplates.map((template) => (
+          <Grid item key={template.id}>
             <TemplateOption
               data-test={`space-template-${template}`}
-              onClick={() => onSelect(template)}
-              label={spaceTemplateLabelMapping[spaceInternalTemplateMapping[template]]}
-              icon={templateIcon[template]}
+              onClick={() => onSelect(template.id)}
+              label={template.name}
+              icon={templateIcon[template.id]}
             />
           </Grid>
         ))}

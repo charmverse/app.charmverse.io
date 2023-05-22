@@ -7,10 +7,7 @@ import { useMemo } from 'react';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type {
-  StaticPagesList,
-  StaticPagesType
-} from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { StaticPage, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import type { PageMeta } from 'lib/pages';
 
 export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
@@ -21,7 +18,7 @@ interface Props {
   activeItemIndex?: number;
   activePageId?: string;
   pages: PageMeta[];
-  staticPages?: StaticPagesList[];
+  staticPages?: StaticPage[];
   forumCategories?: PostCategoryWithPermissions[];
   onSelectPage: (pageId: string, type: AllPagesProp['type'], path: string) => void;
   emptyText?: string;

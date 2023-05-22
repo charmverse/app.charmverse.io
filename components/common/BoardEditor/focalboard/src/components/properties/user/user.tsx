@@ -20,7 +20,7 @@ type Props = {
 };
 
 const StyledUserPropertyContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'hideInput'
+  shouldForwardProp: (prop) => prop !== 'hideInput' && prop !== 'hideOverflow'
 })<{
   hideOverflow: boolean;
   hideInput?: boolean;

@@ -1,6 +1,6 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
-import type { SpaceTemplateType } from 'lib/spaces/config';
+import type { APISpaceTemplateType } from 'lib/spaces/config';
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -327,7 +327,7 @@ export interface CreateWorkspaceRequestBody {
   adminUsername?: string;
   webhookUrl?: string;
   avatar?: string;
-  template?: SpaceTemplateType;
+  template?: APISpaceTemplateType;
 }
 
 /**

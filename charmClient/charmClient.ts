@@ -1,4 +1,5 @@
 import type {
+  ApiPageKey,
   Block,
   FavoritePage,
   InviteLink,
@@ -11,14 +12,13 @@ import type {
   User,
   UserDetails,
   UserGnosisSafe,
-  UserWallet,
-  ApiPageKey
+  UserWallet
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
+import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -61,6 +61,7 @@ import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
+import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
 import { TokenGatesApi } from './apis/tokenGates';
@@ -117,6 +118,8 @@ class CharmClient {
   votes = new VotesApi();
 
   tokenGates = new TokenGatesApi();
+
+  subscription = new SubscriptionApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
@@ -177,7 +180,7 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
+  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) {
     const space = await http.POST<Space>('/api/spaces', spaceOptions);
     return space;
   }

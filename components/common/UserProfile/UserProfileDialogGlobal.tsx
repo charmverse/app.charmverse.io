@@ -32,7 +32,7 @@ export function UserProfileDialogGlobal() {
   if (showOnboardingFlow) {
     return (
       <div data-test='member-onboarding-form'>
-        <CurrentUserProfile key={user.id} isOnboarding={!user.email} currentUser={user} onClose={completeOnboarding} />
+        <CurrentUserProfile key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />
       </div>
     );
   }

@@ -36,12 +36,8 @@ export function SharedPage({ publicPage }: Props) {
     }
   }, [publicPage, loadingBounties]);
 
-  async function onLoad() {
-    if (!publicPage) {
-      return;
-    }
-
-    const { page: rootPage, cards, boards, views } = publicPage;
+  async function onLoad(_publicPage: PublicPageResponse) {
+    const { page: rootPage, cards, boards, views } = _publicPage;
 
     charmClient.track.trackAction('page_view', {
       type: rootPage.type,
@@ -66,13 +62,13 @@ export function SharedPage({ publicPage }: Props) {
 
   useEffect(() => {
     if (publicPage) {
-      onLoad();
+      onLoad(publicPage);
     }
 
     return () => {
       setCurrentPageId('');
     };
-  }, [publicPage]);
+  }, [publicPage?.page.id]);
 
   const currentPage = pages?.[basePageId];
 
