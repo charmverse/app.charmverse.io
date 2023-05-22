@@ -25,13 +25,15 @@ handler
   .use(requireUser)
   .use(
     providePermissionClients({
-      key: 'spaceId'
+      key: 'spaceId',
+      location: 'body',
+      resourceIdType: 'space'
     })
   )
   .post(createPageHandler)
   .delete(deletePages);
 
-async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
@@ -48,7 +50,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   // When creating a nested page, check that a user can edit the parent page
   if (data.parentId) {
-    const permissions = await computeUserPagePermissions({
+    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
       resourceId: data.parentId,
       userId
     });
