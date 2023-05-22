@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
@@ -82,11 +83,7 @@ export async function loginWithGoogle({
       }
     }
 
-    if (emailAccount) {
-      if (emailAccount.user.deletedAt) {
-        throw new DisabledAccountError(`This account has been disabled`);
-      }
-
+    if (emailAccount && !emailAccount.user.deletedAt) {
       if (emailAccount.name !== displayName || emailAccount.avatarUrl !== avatarUrl) {
         trackUserAction('sign_in', { userId: emailAccount.userId, identityType: 'Google' });
 
