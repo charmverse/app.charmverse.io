@@ -13,6 +13,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import type { SystemError } from 'lib/utilities/errors';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
@@ -182,7 +183,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         setSignature(null);
         setStoredAccount(null);
         // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
-        if (user) {
+        // Also only trigger logout from web3AuthSig if wallet is the only way of connecting
+        if (user && account && user.wallets.length > 0 && countConnectableIdentities(user) === 1) {
           logoutUser();
         }
       }
