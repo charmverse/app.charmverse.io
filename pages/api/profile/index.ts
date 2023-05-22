@@ -16,6 +16,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import type { LoggedInUser } from 'models';
+import { removeOldCookieFromResponse } from 'pages/api/session/removeOldCookie';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -82,6 +83,7 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
   }
 
   res.setHeader('Cache-Control', 'no-store');
+  removeOldCookieFromResponse(req, res);
 
   return res.status(200).json(profile);
 }
