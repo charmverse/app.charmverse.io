@@ -4,17 +4,13 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { includePagePermissions } from 'lib/pages/server';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import { paidBountyStatuses } from './constants';
 import { getBountyOrThrow } from './getBounty';
 
 export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (
-    bounty.applications.some(
-      (application) =>
-        application.status !== 'paid' && application.status !== 'complete' && application.status !== 'rejected'
-    )
-  ) {
+  if (!bounty.applications.every((application) => paidBountyStatuses.includes(application.status))) {
     throw new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid');
   }
 
