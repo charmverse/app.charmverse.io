@@ -27,7 +27,7 @@ export function BountyActions({ bountyId, onClick }: { bountyId: string; onClick
     bountyPermissions?.userPermissions.mark_paid &&
     bounty.status !== 'paid' &&
     bounty.applications.length > 0 &&
-    bounty.applications.every((application) => !paidBountyStatuses.includes(application.status));
+    bounty.applications.every((application) => paidBountyStatuses.includes(application.status));
 
   const isMarkBountyCompletedEnabled =
     bountyPermissions?.userPermissions.lock && (bounty?.status === 'inProgress' || bounty.status === 'open');
