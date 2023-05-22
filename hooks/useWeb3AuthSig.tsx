@@ -184,7 +184,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         setStoredAccount(null);
         // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
         // Also only trigger logout from web3AuthSig if wallet is the only way of connecting
-        if (user && account && user.wallets.length > 0 && countConnectableIdentities(user) === 1) {
+        if (user && account && user.wallets.length > 0 && countConnectableIdentities(user) === user.wallets.length) {
           logoutUser();
         }
       }
