@@ -525,10 +525,9 @@ export const backspaceKeyCommand =
           isEmptySelectionAtStart,
 
           // list items might have multiple paragraphs; only do this at the first one
-          isFirstChildOfParent,
-          canOutdent(type)
+          isFirstChildOfParent
         ],
-        chainCommands(deletePreviousEmptyListItem(type), outdentList(type))
+        deletePreviousEmptyListItem(type)
       ),
 
       // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
@@ -729,17 +728,34 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
       ({ listItem } = state.schema.nodes);
     }
     const $cut = findCutBefore($from);
-    if (!$cut || !$cut.nodeBefore || !($cut.nodeBefore.type === listItem)) {
-      return false;
-    }
-
-    const previousListItemEmpty = $cut.nodeBefore.childCount === 1 && $cut.nodeBefore.firstChild!.nodeSize <= 2;
-    if (previousListItemEmpty) {
-      const { tr } = state;
-      if (dispatch) {
-        dispatch(tr.delete($cut.pos - $cut.nodeBefore.nodeSize, $from.pos).scrollIntoView());
+    const parentListItemPos = $from.doc.resolve($from.before($from.depth));
+    if (
+      parentListItemPos.node().type === listItem &&
+      parentListItemPos.node().content.childCount === 2 &&
+      $from.node().type.name === 'paragraph'
+    ) {
+      try {
+        const childList = parentListItemPos.node().child(1);
+        const { tr } = state;
+        if (dispatch) {
+          dispatch(
+            tr.replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
+          );
+        }
+        return true;
+      } catch (_) {
+        return false;
       }
-      return true;
+    } else if ($cut && $cut.nodeBefore) {
+      const previousListItemEmpty = $cut.nodeBefore.childCount === 1 && $cut.nodeBefore.firstChild!.nodeSize <= 2;
+      if (previousListItemEmpty) {
+        const { tr } = state;
+        if (dispatch) {
+          dispatch(tr.delete($cut.pos - $cut.nodeBefore.nodeSize, $from.pos).scrollIntoView());
+        }
+        return true;
+      }
+      return false;
     }
     return false;
   };
