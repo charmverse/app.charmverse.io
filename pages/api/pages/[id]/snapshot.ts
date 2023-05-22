@@ -1,11 +1,12 @@
+import type { PageMeta } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -15,10 +16,17 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys<Page>(['snapshotProposalId'], 'body'))
   .put(recordSnapshotInfo);
 
-async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const { snapshotProposalId } = req.body;
 
   const pageId = req.query.id as string;

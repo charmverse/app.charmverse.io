@@ -13,7 +13,6 @@ import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -59,7 +58,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
       throw new UnauthorisedActionError('You do not have permissions to create a page.');
     }
   } else {
-    const permissions = await computeSpacePermissions({
+    const permissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
       resourceId: spaceId,
       userId
     });
@@ -83,7 +82,12 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   });
 
   try {
-    await setupPermissionsAfterPageCreated(page.id);
+    if (req.spacePermissionsEngine === 'premium') {
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+        event: 'created',
+        pageId: page.id
+      });
+    }
 
     const pageWithPermissions = await getPage(page.id);
 
@@ -129,7 +133,7 @@ async function deletePages(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
   for (const pageId of pageIds) {
-    const permissions = await computeUserPagePermissions({
+    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
       resourceId: pageId,
       userId
     });

@@ -6,13 +6,13 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
@@ -21,7 +21,13 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireKeys(['id'], 'query'))
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .get(getPageRoute)
   // Only require user on update and delete
   .use(requireUser)
@@ -44,7 +50,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   }
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: page.id,
     userId
   });
@@ -61,7 +67,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -142,8 +148,11 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
     page.spaceId
   );
 
-  if (hasNewParentPage) {
-    await setupPermissionsAfterPageRepositioned(pageId);
+  if (hasNewParentPage && req.spacePermissionsEngine === 'premium') {
+    await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+      event: 'repositioned',
+      pageId
+    });
   }
 
   return res.status(200).end();
@@ -162,7 +171,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     }
   });
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

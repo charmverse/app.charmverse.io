@@ -1,9 +1,6 @@
-import type { PermissionsClient } from '@charmverse/core';
-import { PermissionsApiClient } from '@charmverse/core';
-import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
-import type { PremiumPermissionsClient } from '@charmverse/core/shared';
 import {
+  PermissionsApiClient,
+  PageNotFoundError,
   ProposalCategoryPermissionNotFoundError,
   stringUtils,
   InvalidInputError,
@@ -11,7 +8,10 @@ import {
   PostNotFoundError,
   ProposalNotFoundError,
   ProposalCategoryNotFoundError
-} from '@charmverse/core/shared';
+} from '@charmverse/core';
+import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core';
+import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { SpaceNotFoundError } from 'lib/public-api/errors';
@@ -188,6 +188,58 @@ export async function isProposalCategorySpaceOptedIn({ resourceId }: Resource): 
 
   return getEngine(proposalCategory.space);
 }
+export async function isPageSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const page = await prisma.page.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(resourceId);
+  }
+
+  return getEngine(page.space);
+}
+export async function isPagePermissionSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const pagePermission = await prisma.pagePermission.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      page: {
+        select: {
+          space: {
+            select: {
+              id: true,
+              paidTier: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (!pagePermission) {
+    throw new ProposalCategoryPermissionNotFoundError(resourceId);
+  }
+
+  return getEngine(pagePermission.page.space);
+}
 
 export async function isProposalCategoryPermissionSpaceOptedIn({
   resourceId
@@ -227,7 +279,9 @@ export type ResourceIdEntity =
   | 'postCategoryPermission'
   | 'proposal'
   | 'proposalCategory'
-  | 'proposalCategoryPermission';
+  | 'proposalCategoryPermission'
+  | 'page'
+  | 'pagePermission';
 
 export type GetPermissionClient = {
   resourceId: string;
@@ -253,6 +307,10 @@ export async function checkSpaceSpaceSubscriptionInfo({
       ? isProposalCategorySpaceOptedIn
       : resourceIdType === 'proposalCategoryPermission'
       ? isProposalCategoryPermissionSpaceOptedIn
+      : resourceIdType === 'page'
+      ? isPageSpaceOptedIn
+      : resourceIdType === 'pagePermission'
+      ? isPagePermissionSpaceOptedIn
       : null;
 
   if (!engineResolver) {
