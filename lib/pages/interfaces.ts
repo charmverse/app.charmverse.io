@@ -1,20 +1,24 @@
+import type {
+  PageMeta,
+  PageNode,
+  PageNodeWithChildren,
+  PagePermissionFlags,
+  PageWithPermissions
+} from '@charmverse/core';
 import type { Page, PagePermission, Space } from '@charmverse/core/prisma';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
 };
 
-export interface PageWithChildren extends IPageWithPermissions {
-  children: PageWithChildren[];
-}
+export type PageWithChildren = PageNodeWithChildren<PageWithPermissions>;
 
 export interface ModifyChildPagesResponse {
   pageIds: string[];
@@ -51,7 +55,7 @@ export type PageWithContent = PageMeta &
     | 'type'
     | 'updatedAt'
     | 'updatedBy'
-  > & { permissionFlags: IPagePermissionFlags };
+  > & { permissionFlags: PagePermissionFlags };
 
 export type PageDetails = {
   id: string;

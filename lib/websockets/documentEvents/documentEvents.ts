@@ -1,11 +1,11 @@
 import type { Node } from '@bangle.dev/pm';
+import type { PagePermissionFlags } from '@charmverse/core';
 import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages/computePagePermissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
@@ -31,7 +31,7 @@ const log = getLogger('ws-docs');
 type SocketSessionData = AuthenticatedSocketData & {
   documentId?: string;
   isOwner?: boolean;
-  permissions: Partial<IPagePermissionFlags>;
+  permissions: Partial<PagePermissionFlags>;
 };
 
 type DocumentRoom = {
@@ -227,10 +227,13 @@ export class DocumentEventHandler {
       if (!isValidPageId) {
         throw new Error(`Invalid page id: ${pageId}`);
       }
-      const permissions = await computeUserPagePermissions({
-        resourceId: pageId,
-        userId
-      });
+      const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(
+        ({ client }) =>
+          client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId
+          })
+      );
 
       if (permissions.edit_content !== true && permissions.comment !== true) {
         this.sendError('You do not have permission to edit this page');

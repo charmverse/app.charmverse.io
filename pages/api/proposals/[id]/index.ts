@@ -5,7 +5,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -39,7 +38,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const computed = await computeUserPagePermissions({
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
