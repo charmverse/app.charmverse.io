@@ -727,31 +727,29 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
     if (!listItem) {
       ({ listItem } = state.schema.nodes);
     }
-    const $cut = findCutBefore($from);
     const parentListItemPos = $from.doc.resolve($from.before($from.depth));
-    if (
-      parentListItemPos.node().type === listItem &&
-      parentListItemPos.node().content.childCount === 2 &&
-      $from.node().type.name === 'paragraph'
-    ) {
-      try {
-        const childList = parentListItemPos.node().child(1);
-        const { tr } = state;
-        if (dispatch) {
-          dispatch(
-            tr.replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
-          );
+    if (parentListItemPos.node().type === listItem && $from.node().type.name === 'paragraph') {
+      const listItemChildCount = parentListItemPos.node().content.childCount;
+      // Contains text paragraph along with list, move the list's list item and replace it with the list item
+      if (listItemChildCount === 2) {
+        try {
+          const childList = parentListItemPos.node().child(1);
+          const { tr } = state;
+          if (dispatch) {
+            dispatch(
+              tr.replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
+            );
+          }
+          return true;
+        } catch (_) {
+          return false;
         }
-        return true;
-      } catch (_) {
-        return false;
       }
-    } else if ($cut && $cut.nodeBefore) {
-      const previousListItemEmpty = $cut.nodeBefore.childCount === 1 && $cut.nodeBefore.firstChild!.nodeSize <= 2;
-      if (previousListItemEmpty) {
+      // Contains no nested children only paragraph for the text, remove the whole list item
+      else if (listItemChildCount === 1) {
         const { tr } = state;
         if (dispatch) {
-          dispatch(tr.delete($cut.pos - $cut.nodeBefore.nodeSize, $from.pos).scrollIntoView());
+          dispatch(tr.delete(parentListItemPos.start() - 1, parentListItemPos.end()).scrollIntoView());
         }
         return true;
       }
