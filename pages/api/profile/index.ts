@@ -64,6 +64,8 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
     req.session.anonymousUserId = v4();
     await req.session.save();
   }
+
+  removeOldCookieFromResponse(req, res);
   return res.status(404).json({ error: 'No user found' });
 }
 
