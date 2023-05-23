@@ -4,6 +4,7 @@ import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
 import { appEnv, isDevEnv } from 'config/constants';
+import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 
 import app from './server/app';
@@ -13,6 +14,7 @@ const port = process.env.PORT || 3001;
 const server = createServer(app.callback());
 
 const io = new Server(server, {
+  ...config,
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
