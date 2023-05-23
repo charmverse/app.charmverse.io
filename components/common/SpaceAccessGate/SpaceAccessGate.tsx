@@ -30,7 +30,7 @@ export function SpaceAccessGate({
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
-  const { loginFromWeb3Account } = useWeb3AuthSig();
+  const { account, loginFromWeb3Account } = useWeb3AuthSig();
 
   const discordGate = useDiscordGate({
     joinType,
@@ -45,6 +45,7 @@ export function SpaceAccessGate({
   });
 
   const tokenGate = useTokenGates({
+    account,
     autoVerify: true,
     joinType,
     space,
