@@ -24,7 +24,8 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
 
     # before we process the secrets, 
     # lets get any non-secret env variables from ebstalk_env_file and append it to the $APP_STAGING_DIR/.env file
-    grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" $ebstalk_env_file >> $APP_STAGING_DIR/.env
+    #   returns true when there are no non-mustached lines so the script doesn't quit with -e option set
+    grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" $ebstalk_env_file >> $APP_STAGING_DIR/.env || true
 
     # Now start processing secrets
     secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
