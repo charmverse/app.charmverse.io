@@ -168,6 +168,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     // Case 3: user is switching wallets
     else if (
       account &&
+      // storedAccount means they logged in with a different wallet previously
+      storedAccount &&
       user &&
       // Only apply the following logic to users that have at least 1 wallet
       user?.wallets.length > 0 &&
@@ -176,20 +178,18 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const storedSignature = getStoredSignature(account);
 
       if (storedSignature) {
-        if (lowerCaseEqual(storedSignature.address, account)) {
-          log.debug('Logging user in with previous wallet signature');
-          loginFromWeb3Account(storedSignature).catch((e) => {
-            setSignature(null);
-            setStoredAccount(null);
-            logoutUser();
-          });
-          // user is currently signed in to a different wallet, log them out
-        } else if (walletAuthSignature) {
-          log.debug('Logging out user due to wallet switch');
+        log.debug('Logging user in with previous wallet signature');
+        loginFromWeb3Account(storedSignature).catch((e) => {
           setSignature(null);
           setStoredAccount(null);
           logoutUser();
-        }
+        });
+        // user is currently signed in to a different wallet, log them out
+      } else {
+        log.debug('Logging out user due to wallet switch');
+        setSignature(null);
+        setStoredAccount(null);
+        logoutUser();
       }
     }
   }, [account, !!user, isConnectingIdentity, accountUpdatePaused]);
