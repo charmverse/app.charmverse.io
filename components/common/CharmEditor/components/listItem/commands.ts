@@ -1,4 +1,3 @@
-import type { Command, EditorState, Node, NodeRange, NodeType, ResolvedPos, Schema, Transaction } from '@bangle.dev/pm';
 import {
   autoJoin,
   chainCommands,
@@ -13,6 +12,7 @@ import {
   TextSelection,
   wrapInList as pmWrapInList
 } from '@bangle.dev/pm';
+import type { Command, EditorState, Node, NodeRange, NodeType, ResolvedPos, Schema, Transaction } from '@bangle.dev/pm';
 import type { MoveDirection } from '@bangle.dev/pm-commands';
 import {
   compose,
@@ -728,10 +728,11 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
       ({ listItem } = state.schema.nodes);
     }
     const parentListItemPos = $from.doc.resolve($from.before($from.depth));
-    if (parentListItemPos.node().type === listItem && $from.node().type.name === 'paragraph') {
+    const parentListItem = parentListItemPos.node();
+    if (parentListItem.type === listItem && $from.node().type.name === 'paragraph') {
       const listItemChildCount = parentListItemPos.node().content.childCount;
       // Contains text paragraph along with list, move the list's list item and replace it with the list item
-      if (listItemChildCount === 2) {
+      if (listItemChildCount >= 2) {
         try {
           const childList = parentListItemPos.node().child(1);
           const { tr } = state;
@@ -744,16 +745,20 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
         } catch (_) {
           return false;
         }
-      }
-      // Contains no nested children only paragraph for the text, remove the whole list item
-      else if (listItemChildCount === 1) {
+      } else {
+        // Contains no nested children only paragraph for the text, remove the whole list item
+        // Cursor is at the start of the list item, convert the list item to a paragraph node (contains non empty paragraph)
         const { tr } = state;
-        if (dispatch) {
-          dispatch(tr.delete(parentListItemPos.start() - 1, parentListItemPos.end()).scrollIntoView());
+        const selection = new NodeSelection(parentListItemPos);
+        const range = selection.$from.blockRange(selection.$to);
+        if (dispatch && range) {
+          const target = liftTarget(range);
+          if (target !== null) {
+            dispatch(tr.lift(range, target));
+          }
         }
         return true;
       }
-      return false;
     }
     return false;
   };
