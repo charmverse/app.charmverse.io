@@ -11,7 +11,13 @@ import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
-type Props = { autoVerify?: boolean; joinType?: TokenGateJoinType; space: SpaceWithGates; onSuccess?: () => void };
+type Props = {
+  account?: string | null;
+  autoVerify?: boolean;
+  joinType?: TokenGateJoinType;
+  space: SpaceWithGates;
+  onSuccess?: () => void;
+};
 
 export type TokenGateState = {
   isEnabled: boolean;
@@ -25,6 +31,7 @@ export type TokenGateState = {
 };
 
 export function useTokenGates({
+  account,
   autoVerify = false,
   space,
   joinType = 'token_gate',
@@ -42,14 +49,14 @@ export function useTokenGates({
   // Token gates with those that succeedeed first
 
   useEffect(() => {
-    if (autoVerify) {
-      const signature = getStoredSignature();
+    if (autoVerify && account) {
+      const signature = getStoredSignature(account);
 
       if (user && !!signature && user.wallets.some((wallet) => lowerCaseEqual(wallet.address, signature.address))) {
         evaluateEligibility(signature);
       }
     }
-  }, [user]);
+  }, [user, account]);
 
   async function evaluateEligibility(authSig: AuthSig) {
     // Reset the current state
