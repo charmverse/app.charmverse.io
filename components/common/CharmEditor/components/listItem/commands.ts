@@ -738,7 +738,9 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
           const { tr } = state;
           if (dispatch) {
             dispatch(
-              tr.replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
+              tr
+                .replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
+                .setSelection(Selection.near(tr.doc.resolve($from.pos - 2), -1))
             );
           }
           return true;
