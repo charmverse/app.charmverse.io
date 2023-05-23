@@ -8,7 +8,7 @@ type IContext = {
 };
 
 export function useOnboarding({ spaceId, user }: { spaceId?: string; user: LoggedInUser | null }): IContext {
-  const { members, mutateMembers, isValidating } = useMembers();
+  const { members, mutateMembers, isValidating: isLoadingMembersForSpace } = useMembers();
   const userId = user?.id;
 
   async function completeOnboarding() {
@@ -20,12 +20,8 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
     }
   }
 
-  const userIsCurrentSpaceMember = !!user?.spaceRoles.some((sr) => sr.spaceId === spaceId);
-  const showOnboardingFlow =
-    userIsCurrentSpaceMember &&
-    !isValidating &&
-    members.length > 0 &&
-    !members.find((member) => member.id === userId)?.onboarded;
+  const spaceMember = members.find((member) => member.id === userId);
+  const showOnboardingFlow = !isLoadingMembersForSpace && !!spaceMember && spaceMember.onboarded === false;
 
   return {
     showOnboardingFlow,

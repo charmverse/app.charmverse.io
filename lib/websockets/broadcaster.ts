@@ -6,17 +6,18 @@ import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
-import { authOnConnect } from 'lib/websockets/authentication';
-import { DocumentEventHandler } from 'lib/websockets/documentEvents';
-import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
 
+import { authOnConnect } from './authentication';
+import { config } from './config';
+import { DocumentEventHandler } from './documentEvents';
 import type { ServerMessage } from './interfaces';
+import { SpaceEventHandler } from './spaceEvents';
 
 export class WebsocketBroadcaster {
   sockets: Record<string, Socket> = {};
 
   // Server will be set after the first request
-  private io: Server = new Server();
+  private io: Server = new Server(config);
 
   // Only called once in the app lifecycle once the server is initialised
   async bindServer(io: Server): Promise<void> {
@@ -63,7 +64,7 @@ export class WebsocketBroadcaster {
     io.of('/ceditor')
       .use(authOnConnect)
       .on('connect', (socket) => {
-        log.debug('[ws] Web socket namepsace /editor connected');
+        log.debug('[ws] Web socket namepsace /editor connected', { userId: socket.data.user.id });
         new DocumentEventHandler(socket).init();
       });
   }

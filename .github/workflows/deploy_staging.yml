@@ -48,10 +48,13 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
-          sed -i 's/production/staging/g' .ebextensions_websockets/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions_websockets/00_env_vars.config
+          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
+
+          for conf_file in $ebextension_files $ebstalk_apps_env_files; do 
+            sed -i 's/prd/stg/g' $conf_file
+            sed -i 's/production/staging/g' $conf_file 
+          done
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master

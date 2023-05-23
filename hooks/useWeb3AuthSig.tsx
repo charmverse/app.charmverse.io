@@ -29,7 +29,7 @@ type IContext = {
   chainId: any;
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
-  getStoredSignature: () => AuthSig | null;
+  getStoredSignature: (account: string) => AuthSig | null;
   logoutWallet: () => void;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
   // Which tool is providing the web3 connection ie. Metamask∂, WalletConnect, etc.
@@ -88,17 +88,13 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
-  const { user, setUser, logoutUser, isLoaded } = useUser();
+  const { user, setUser, logoutUser } = useUser();
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
 
-  function getStoredSignature(): AuthSig | null {
-    if (!account) {
-      return null;
-    }
-
-    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`);
+  function getStoredSignature(_account: string): AuthSig | null {
+    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${_account}`);
 
     if (stored) {
       try {
@@ -119,7 +115,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? (getStoredSignature() as AuthSig);
+    let signature = authSig ?? (account ? (getStoredSignature(account) as AuthSig) : null);
 
     if (!signature) {
       signature = await sign();
@@ -157,37 +153,46 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   // Only expose account if current user and account match up
   useEffect(() => {
+    const userOwnsAddress = user?.wallets.some((w) => lowerCaseEqual(w.address, account));
+    // Case 1: user is connecting wallets
     if (isConnectingIdentity) {
       // Don't update new values
-    } else if (account && (user?.wallets.some((w) => lowerCaseEqual(w.address, account)) || accountUpdatePaused)) {
+    }
+    // Case 2: user is logged in and account is linked to user or user is adding a new wallet
+    else if (account && (userOwnsAddress || accountUpdatePaused)) {
       setStoredAccount(account.toLowerCase());
 
-      const storedWalletSignature = getStoredSignature();
+      const storedWalletSignature = getStoredSignature(account);
       setSignature(storedWalletSignature);
-    } else if (
-      isLoaded &&
+    }
+    // Case 3: user is switching wallets
+    else if (
       account &&
+      // storedAccount means they logged in with a different wallet previously
+      storedAccount &&
+      user &&
       // Only apply the following logic to users that have at least 1 wallet
-      (!user || (!!user?.wallets.length && !user?.wallets.some((w) => lowerCaseEqual(w.address, account))))
+      user?.wallets.length > 0 &&
+      !userOwnsAddress
     ) {
-      const storedSignature = getStoredSignature();
+      const storedSignature = getStoredSignature(account);
 
-      if (storedSignature && storedSignature.address === account) {
+      if (storedSignature) {
+        log.debug('Logging user in with previous wallet signature');
         loginFromWeb3Account(storedSignature).catch((e) => {
           setSignature(null);
           setStoredAccount(null);
           logoutUser();
         });
+        // user is currently signed in to a different wallet, log them out
       } else {
+        log.debug('Logging out user due to wallet switch');
         setSignature(null);
         setStoredAccount(null);
-        // We should only logout if there is a user. The logout function triggers a wipe of the SWR cache, and this was having undesirable effects for people with a connected wallet but no user account
-        if (user) {
-          logoutUser();
-        }
+        logoutUser();
       }
     }
-  }, [account, user, isConnectingIdentity, isLoaded, accountUpdatePaused]);
+  }, [account, !!user, isConnectingIdentity, accountUpdatePaused]);
 
   async function sign(): Promise<AuthSig> {
     if (!account) {

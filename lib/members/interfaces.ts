@@ -44,7 +44,7 @@ export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> &
   profile?: UserDetails;
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
-  onboarded?: boolean;
+  onboarded: boolean;
   searchValue: string;
 };
 
