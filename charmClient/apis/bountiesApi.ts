@@ -128,4 +128,8 @@ export class BountiesApi {
   refreshApplicationStatus(applicationId: string) {
     return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
   }
+
+  isBountyEditable(bountyId: string) {
+    return http.GET<{ editable: boolean }>(`/api/bounties/${bountyId}/is-editable`);
+  }
 }
