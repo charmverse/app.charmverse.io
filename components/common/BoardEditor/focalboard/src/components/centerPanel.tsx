@@ -503,7 +503,12 @@ function CenterPanel(props: Props) {
             key={key.apiKey}
             type={key.type}
             url={`${webhookBaseUrl}/${key?.apiKey}`}
-            noBg={isEmbedded}
+            sx={{
+              ...(isEmbedded && {
+                border: (theme) => `2px solid ${theme.palette.text.primary}`,
+                backgroundColor: 'transparent !important'
+              })
+            }}
           />
         ) : null
       )}
