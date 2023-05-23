@@ -729,19 +729,27 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
     }
     const parentListItemPos = $from.doc.resolve($from.before($from.depth));
     const parentListItem = parentListItemPos.node();
+    const paragraphNode = $from.node();
     if (parentListItem.type === listItem && $from.node().type.name === 'paragraph') {
       const listItemChildCount = parentListItemPos.node().content.childCount;
       // Contains text paragraph along with list, move the list's list item and replace it with the list item
       if (listItemChildCount >= 2) {
         try {
-          const childList = parentListItemPos.node().child(1);
-          const { tr } = state;
+          const childListItems = parentListItemPos.node().child(1)?.content;
+          let { tr } = state;
+          const parentListItemStart = parentListItemPos.start();
           if (dispatch) {
-            dispatch(
-              tr
-                .replace(parentListItemPos.start() - 1, parentListItemPos.end(), new Slice(childList.content, 0, 0))
-                .setSelection(Selection.near(tr.doc.resolve($from.pos - 2), -1))
+            tr = tr.replace(parentListItemStart - 1, parentListItemPos.end(), new Slice(childListItems, 0, 0));
+            const orderedListPos = tr.doc.resolve(parentListItemStart - 1);
+            const orderedListNode = orderedListPos.node();
+
+            tr = tr.replace(
+              orderedListPos.start() - 1,
+              orderedListPos.end(),
+              new Slice(Fragment.fromArray([paragraphNode, orderedListNode]), 0, 0)
             );
+
+            dispatch(tr.setSelection(Selection.near(tr.doc.resolve(orderedListPos.start()), -1)));
           }
           return true;
         } catch (_) {
