@@ -11,29 +11,19 @@ import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge'
 import Button from 'components/common/Button';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
-import type { PagePermissionMeta } from 'lib/permissions/interfaces';
+import type { BountyWithDetails } from 'lib/bounties';
 
 /**
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
   bounty: BountyWithDetails;
-  bountyPermissions?: Partial<BountyPermissions>;
-  pagePermissions?: PagePermissionMeta[];
   pageId: string;
   readOnly?: boolean;
   refreshPermissions: () => void;
 }
 
-export function BountyPropertiesHeader({
-  readOnly = false,
-  bounty,
-  bountyPermissions,
-  pagePermissions,
-  pageId,
-  refreshPermissions
-}: Props) {
+export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refreshPermissions }: Props) {
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);

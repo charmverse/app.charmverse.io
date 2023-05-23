@@ -540,8 +540,6 @@ export default function BountyProperties(props: {
       <Divider />
       <BountyPropertiesHeader
         bounty={currentBounty}
-        bountyPermissions={bountyPermissions}
-        pagePermissions={bountyPagePermissions}
         pageId={pageId}
         readOnly={readOnly}
         refreshPermissions={refreshPermissions}
