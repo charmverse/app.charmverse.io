@@ -22,6 +22,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          CORE_BRANCH: "feat/page-permissions" 
 
       - name: Build app
         uses: ./.github/actions/build
@@ -36,6 +38,8 @@ jobs:
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          CORE_BRANCH: "feat/page-permissions" 
+          API_BRANCH: "feat/page-permissions" 
 
   test:
     name: Tests
