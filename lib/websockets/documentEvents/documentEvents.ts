@@ -78,6 +78,7 @@ export class DocumentEventHandler {
     const session = this.getSession();
     const docRoom = docRooms.get(session.documentId);
     return {
+      socketId: this.id,
       userId: session.user?.id,
       pageId: session.documentId,
       pageVersion: docRoom?.doc.version,
