@@ -102,6 +102,8 @@
     "@guildxyz/sdk": "^1.1.1",
     "@hookform/resolvers": "^2.8.8",
     "@koa/router": "^10.1.1",
+    "@loop-crypto/loop-checkout-widget": "^0.1.6",
+    "@loop-crypto/loop-sdk": "^0.2.0",
     "@material-ui/pickers": "^3.3.10",
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.11.0",
