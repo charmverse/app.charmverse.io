@@ -5,16 +5,16 @@
 # SECRETS_NAMESPACE="/io.cv.app/$SECRETS_ENV"
 APP_STAGING_DIR="/var/app/staging"              # this is where amazon puts app to be deployed
 
-if ! env_file_grep=$(grep "EBSTALK_ENV_FILE:" $APP_STAGING_DIR/.env) && {
+! env_file_grep=$(grep "EBSTALK_ENV_FILE" $APP_STAGING_DIR/.env) && {
     echo "No EBSTALK_ENV_FILE to process, exiting $0"
     exit 0
 }
 
-if [[ $env_file_grep =~ '^EBSTALK_ENV_FILE=(.+)$' ]]; then
+if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
     ebstalk_env_file="$APP_STAGING_DIR/.ebstalk.apps.env/${BASH_REMATCH[1]}"
 
-    ! -f ($ebstalk_env_file) && {
-        echo "Cannot find and process env file $APP_STAGING_DIR/.ebstalk.apps.env/$ebstalk_env_file"
+    ! [ -f "$ebstalk_env_file" ] && {
+        echo "Cannot find and process env file $ebstalk_env_file"
         exit 1
     }
 
@@ -41,18 +41,18 @@ if [[ $env_file_grep =~ '^EBSTALK_ENV_FILE=(.+)$' ]]; then
                 secret_version_option="--version-id $secret_version"
             fi
 
-            export secret_value=$(aws secretsmanager get-secret-value  \
-                                        --region us-east-1             \
-                                        --secret-id "$secret_name"     \
-                                        --query "SecretString"         \
-                                        $secret_version_option
-                           | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
+            secret_value=$(aws secretsmanager get-secret-value     \
+                                    --region us-east-1             \
+                                    --secret-id "$secret_name"     \
+                                    --query "SecretString"         \
+                                    $secret_version_option         \
+                       | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
 
             [ -z "$secret_value" ] && {
                 echo "$secret_name or $secret_json_key not found."
                 secret_value="SECRET_NOT_FOUND"
             }
-            echo "$env_var_name=\"$secret_value\"" >> .env
+            echo "$env_var_name=\"$secret_value\"" >> $APP_STAGING_DIR/.env
         }
 
     done
