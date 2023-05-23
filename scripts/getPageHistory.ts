@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { fancyTrim } from 'lib/utilities/strings';
 
-const spaceDomain = 'superseed-test-5';
-const pagePath = 'page-8649583367437599';
+const spaceDomain = 'charmverse';
+const pagePath = 'page-24404801619516814';
 const maxContentSize = 150;
-const maxRows = 300;
-const minVersion = 1700;
+const maxRows = 200;
 
 // Restrict results to a specific date range, or leave empty to get the entire history
 const minimumDiffDate: Date | null = null;
@@ -47,7 +46,7 @@ async function exec() {
   });
 
   const sortedDiffs = page.diffs
-    .filter((diff) => diff.createdAt >= startDate && diff.createdAt <= endDate && diff.version >= minVersion)
+    .filter((diff) => diff.createdAt >= startDate && diff.createdAt <= endDate)
     .sort((a, b) => a.version - b.version)
     .slice(0, maxRows);
   const dateRange = `${page.diffs[0].createdAt.toLocaleString()} to ${page.diffs[
@@ -58,7 +57,6 @@ async function exec() {
   console.log('Page History');
   console.log('Page Title: ' + page.title);
   console.log('Page Id: ' + page.id);
-  console.log('Latest version: ' + page.version);
   console.log('Date Range: ' + dateRange);
   console.log('------------------------------------');
   const tableData = sortedDiffs
