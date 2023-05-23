@@ -1,9 +1,8 @@
+import type { PageMeta } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
 import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
-
-import type { PageMeta } from '../interfaces';
 
 export function pageMetaSelect() {
   return {

@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -12,7 +13,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { PageMeta } from 'lib/pages';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {

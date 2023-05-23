@@ -1,6 +1,7 @@
+import type { PageNode, TargetPageTree } from '@charmverse/core';
 import type { PageType } from '@charmverse/core/prisma';
 
-import type { PageNode, PagesMap, TargetPageTree } from './interfaces';
+import type { PagesMap } from './interfaces';
 
 export interface FindParentOfTypeOptions<P extends PageNode> {
   pageType: PageType | PageType[];

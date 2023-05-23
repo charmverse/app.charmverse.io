@@ -1,13 +1,54 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissions } from 'lib/pages/server';
-import { accessiblePagesByPermissionsQuery } from 'lib/permissions/pages/accessiblePagesByPermissionsQuery';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
+export function accessiblePagesByPermissionsQuery({
+  spaceId,
+  userId
+}: {
+  spaceId: string;
+  userId: string;
+}): Prisma.PagePermissionListRelationFilter {
+  return {
+    some: {
+      OR: [
+        {
+          role: {
+            spaceRolesToRole: {
+              some: {
+                spaceRole: {
+                  userId,
+                  spaceId
+                }
+              }
+            }
+          }
+        },
+        {
+          userId
+        },
+        {
+          space: {
+            spaceRoles: {
+              some: {
+                userId,
+                spaceId
+              }
+            }
+          }
+        },
+        {
+          public: true
+        }
+      ]
+    }
+  };
+}
 export function generateAccessibleBountiesQuery({ userId, spaceId }: { userId: string; spaceId: string }) {
   return [
     {
@@ -103,7 +144,13 @@ export async function listAvailableBounties({
           include: {
             applications: true,
             page: {
-              include: includePagePermissions()
+              include: {
+                permissions: {
+                  include: {
+                    sourcePermission: true
+                  }
+                }
+              }
             }
           }
         }) as Promise<BountyWithDetails[]>);

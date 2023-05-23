@@ -1,10 +1,11 @@
+import type { PagePermissionFlags } from '@charmverse/core';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { List, Switch, ListItemText, ListItemButton } from '@mui/material';
+import { List, ListItemButton, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -20,8 +21,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PageWithContent, PageUpdates } from 'lib/pages';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { fontClassName } from 'theme/fonts';
 
 import { exportMarkdown } from '../utils/exportMarkdown';
@@ -99,7 +99,7 @@ type Props = {
   insideModal?: boolean;
   onComplete: VoidFunction;
   page: PageActionMeta;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
 };

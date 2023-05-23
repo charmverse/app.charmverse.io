@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -6,7 +7,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta, PagesMap } from 'lib/pages';
+import type { PagesMap } from 'lib/pages';
 
 import { Constants } from '../constants';
 import { Utils } from '../utils';

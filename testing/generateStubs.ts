@@ -1,9 +1,9 @@
+import type { PageNode } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { SubmissionContent } from 'lib/applications/interfaces';
-import type { PageNode } from 'lib/pages';
 import { getPagePath } from 'lib/pages/utils';
 
 export function generatePageToCreateStub({

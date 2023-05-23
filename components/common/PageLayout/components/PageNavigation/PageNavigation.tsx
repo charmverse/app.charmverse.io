@@ -1,3 +1,5 @@
+import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core';
+import { isParentNode, mapPageTree, sortNodes } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
@@ -15,16 +17,15 @@ import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput, PageMeta, PageNodeWithChildren, PagesMap } from 'lib/pages';
+import type { NewPageInput, PagesMap } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
-import { isParentNode, mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-function mapPageToMenuNode(page: IPageWithPermissions): MenuNode {
+function mapPageToMenuNode(page: PageWithPermissions): MenuNode {
   return {
     id: page.id,
     title: page.title,
@@ -42,7 +43,7 @@ function mapPageToMenuNode(page: IPageWithPermissions): MenuNode {
 
 export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
   return Object.values(pageMap)
-    .filter((page): page is IPageWithPermissions =>
+    .filter((page): page is PageWithPermissions =>
       isTruthy(
         page &&
           (page.type === 'board' ||
@@ -79,7 +80,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const pagesArray: MenuNode[] = isFavorites
     ? Object.values(pages)
-        .filter((page): page is IPageWithPermissions => isTruthy(page))
+        .filter((page): page is PageWithPermissions => isTruthy(page))
         .map(mapPageToMenuNode)
     : filterVisiblePages(pages);
 

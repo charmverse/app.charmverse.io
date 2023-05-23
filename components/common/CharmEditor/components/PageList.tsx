@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategoryWithPermissions, PageMeta } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -8,7 +8,6 @@ import { useMemo } from 'react';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import type { StaticPage, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
-import type { PageMeta } from 'lib/pages';
 
 export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
   type: Page['type'] | StaticPagesType | 'forum_category';

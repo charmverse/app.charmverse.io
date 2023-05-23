@@ -1,3 +1,4 @@
+import type { AssignedPagePermission } from '@charmverse/core';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
@@ -18,7 +19,6 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -46,7 +46,7 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 
 interface Props {
   pageId: string;
-  pagePermissions: IPagePermissionWithAssignee[];
+  pagePermissions: AssignedPagePermission[];
   refreshPermissions: () => void;
 }
 
@@ -61,7 +61,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
   const { pages } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
   const space = useCurrentSpace();
-  const publicPermission = pagePermissions.find((publicPerm) => publicPerm.public === true) ?? null;
+  const publicPermission = pagePermissions.find((publicPerm) => publicPerm.assignee.group === 'public') ?? null;
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const currentPage = pages[pageId];
@@ -79,8 +79,12 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
     } else {
       await charmClient.createPermission({
         pageId,
-        permissionLevel: 'view',
-        public: true
+        permission: {
+          permissionLevel: 'view',
+          assignee: {
+            group: 'public'
+          }
+        }
       });
     }
     refreshPermissions();

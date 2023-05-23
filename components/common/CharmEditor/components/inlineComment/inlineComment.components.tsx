@@ -1,5 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { selectionTooltip } from '@bangle.dev/tooltip';
+import type { PagePermissionFlags } from '@charmverse/core';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
@@ -11,11 +12,9 @@ import { createPortal } from 'react-dom';
 
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -49,7 +48,7 @@ export default function InlineCommentThread({
   permissions
 }: {
   pluginKey: PluginKey<InlineCommentPluginState>;
-  permissions?: IPagePermissionFlags;
+  permissions?: PagePermissionFlags;
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;

@@ -1,9 +1,10 @@
+import type { PageMeta } from '@charmverse/core';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
-import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
+import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useWebSocketClient } from './useWebSocketClient';

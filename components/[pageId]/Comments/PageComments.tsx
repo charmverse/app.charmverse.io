@@ -1,3 +1,4 @@
+import type { PagePermissionFlags } from '@charmverse/core';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
@@ -11,11 +12,10 @@ import { useProposalDetails } from 'components/proposals/hooks/useProposalDetail
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 type Props = {
   page: Pick<PageWithContent, 'type' | 'id'>;
-  permissions: IPagePermissionFlags;
+  permissions: PagePermissionFlags;
 };
 
 export function PageComments({ page, permissions }: Props) {

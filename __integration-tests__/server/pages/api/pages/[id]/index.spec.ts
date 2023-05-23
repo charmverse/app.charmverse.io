@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import type { PageWithPermissions } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import type { IPageWithPermissions } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
@@ -122,7 +122,7 @@ describe('PUT /api/pages/{id} - update page', () => {
 
     const body = (
       await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(200)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {

@@ -1,3 +1,4 @@
+import { AvailablePagePermissions } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
@@ -14,7 +15,6 @@ import Button from 'components/common/Button';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
@@ -36,7 +36,7 @@ export function PageDialog(props: Props) {
 
   const { updatePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const pagePermissions = page?.permissionFlags || new AllowedPagePermissions().full;
+  const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
 

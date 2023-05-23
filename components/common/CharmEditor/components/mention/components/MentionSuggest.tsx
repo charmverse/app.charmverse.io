@@ -1,4 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import type { PageMeta } from '@charmverse/core';
 import { Divider, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect } from 'react';
@@ -7,7 +8,6 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { sanitizeForRegex } from 'lib/utilities/strings';
 

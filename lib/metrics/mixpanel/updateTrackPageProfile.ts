@@ -1,6 +1,6 @@
+import type { PageWithPermissions } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPage } from 'lib/pages/server';
 
 import { mixpanel } from './mixpanel';
@@ -17,7 +17,7 @@ export async function updateTrackPageProfile(pageId: string) {
   }
 }
 
-export function getTrackPageProfile(page: IPageWithPermissions) {
+export function getTrackPageProfile(page: PageWithPermissions) {
   const isPublic = page.permissions.some((p) => p.public);
 
   return {

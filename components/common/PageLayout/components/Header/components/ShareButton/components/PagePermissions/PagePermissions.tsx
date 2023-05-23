@@ -1,4 +1,5 @@
-import type { PageType } from '@charmverse/core/prisma';
+import type { AssignablePagePermissionGroups, AssignedPagePermission, TargetPermissionGroup } from '@charmverse/core';
+import type { PageType, Role } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Button, Chip, Tooltip } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -15,17 +16,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
+import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
-import type {
-  IPagePermissionWithAssignee,
-  PagePermissionLevelType
-} from 'lib/permissions/pages/page-permission-interfaces';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import type { ApplicablePagePermissionLevel } from 'lib/permissions/pages/labels';
+import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
-const permissionDisplayOrder = ['space', 'role', 'user'];
+const permissionDisplayOrder: AssignablePagePermissionGroups[] = ['space', 'role', 'user'];
 
 const StyledInput = styled(Input)`
   padding-right: 0;
@@ -53,30 +52,41 @@ const StyledInput = styled(Input)`
  * @sideEffect Removes the permission from currrent space from the list so it can be handled in its own row
  * @param pagePermissions
  */
-function sortPagePermissions(
-  pagePermissions: IPagePermissionWithAssignee[],
-  members: Pick<Member, 'id' | 'isGuest' | 'username'>[]
-): (IPagePermissionWithAssignee & { displayName: string; isGuest?: boolean })[] {
+function sortPagePermissions({
+  members,
+  pagePermissions,
+  roles
+}: {
+  pagePermissions: AssignedPagePermission[];
+  members: Pick<Member, 'id' | 'isGuest' | 'username'>[];
+  roles: Pick<Role, 'id' | 'name'>[];
+}): (AssignedPagePermission & { displayName: string; isGuest?: boolean })[] {
   const sortedPermissions = pagePermissions
     .filter((permission) => {
-      return !permission.spaceId && !permission.public;
+      return permission.assignee.group === 'role' || permission.assignee.group === 'user';
     })
     .map((permission) => {
-      const permissionSource = permission.userId ? 'user' : 'role';
-      const member = members.find((m) => m.id === permission.userId);
+      const member =
+        permission.assignee.group === 'user'
+          ? members.find((m) => m.id === (permission.assignee as TargetPermissionGroup<'user'>).id)
+          : null;
+      const role =
+        permission.assignee.group === 'role'
+          ? roles.find((r) => r.id === (permission.assignee as TargetPermissionGroup<'role'>).id)
+          : null;
 
-      const permissionDisplayName = (permissionSource === 'user' ? member?.username : permission.role?.name) || '';
+      const userName = permission.assignee.group === 'user' ? member?.username : role?.name;
 
       return {
         ...permission,
-        permissionSource,
-        displayName: permissionDisplayName,
+        group: permission.assignee.group,
+        displayName: userName ?? role?.name ?? 'Unknown',
         isGuest: member?.isGuest
       };
     })
     .sort((a, b) => {
-      const aPermission = permissionDisplayOrder.indexOf(a.permissionSource);
-      const bPermission = permissionDisplayOrder.indexOf(b.permissionSource);
+      const aPermission = permissionDisplayOrder.indexOf(a.group);
+      const bPermission = permissionDisplayOrder.indexOf(b.group);
 
       if (aPermission < bPermission) {
         return -1;
@@ -94,7 +104,7 @@ interface Props {
   pageId: string;
   pageType: PageType;
   refreshPermissions: () => void;
-  pagePermissions: IPagePermissionWithAssignee[];
+  pagePermissions: AssignedPagePermission[];
   proposalId?: string;
 }
 
@@ -102,9 +112,12 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
   const { pages } = usePages();
   const space = useCurrentSpace();
   const { members, mutateMembers } = useMembers();
+  const { roles } = useRoles();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
-  const spaceLevelPermission = pagePermissions.find((permission) => space && permission.spaceId === space?.id);
+  const spaceLevelPermission = pagePermissions.find(
+    (permission) => space && permission.assignee.group === 'space' && permission.assignee.id === space?.id
+  );
   const { permissions: userPagePermissions } = usePagePermissions({
     pageIdOrPath: pageId
   });
@@ -113,7 +126,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
     refreshPermissions();
   }, [pageId]);
 
-  async function updateSpacePagePermissionLevel(permissionLevel: PagePermissionLevelType | 'delete') {
+  async function updateSpacePagePermissionLevel(permissionLevel: ApplicablePagePermissionLevel | 'delete') {
     if (permissionLevel === 'delete') {
       if (spaceLevelPermission) {
         await charmClient.deletePermission(spaceLevelPermission.id);
@@ -122,16 +135,21 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId,
-        permissionLevel,
-        spaceId: space.id
+        permission: {
+          permissionLevel,
+          assignee: {
+            group: 'space',
+            id: space.id
+          }
+        }
       });
     }
     await refreshPermissions();
   }
 
   async function updatePagePermissionLevel(
-    permission: IPagePermissionWithAssignee,
-    permissionLevel: PagePermissionLevelType | 'delete'
+    permission: AssignedPagePermission,
+    permissionLevel: ApplicablePagePermissionLevel | 'delete'
   ) {
     if (permissionLevel === 'delete') {
       await charmClient.deletePermission(permission.id);
@@ -139,19 +157,20 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId: permission.pageId,
-        permissionLevel,
-        roleId: permission.roleId,
-        userId: permission.userId
+        permission: {
+          permissionLevel,
+          assignee: permission.assignee
+        }
       });
     }
     await refreshPermissions();
   }
 
-  const sortedPermissions = sortPagePermissions(pagePermissions, members);
+  const sortedPermissions = sortPagePermissions({ pagePermissions, members, roles: roles ?? [] });
 
   // Remove proposal editor as it is not selectable
   // eslint-disable-next-line camelcase
-  const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
+  const { custom, proposal_editor, ...permissionsWithoutCustom } = pagePermissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
   const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });
@@ -180,7 +199,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
             {canEdit ? (
               <SmallSelect
                 renderValue={(value) => permissionsWithoutCustom[value as string] || 'No access'}
-                onChange={(level) => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
+                onChange={(level) => updateSpacePagePermissionLevel(level as ApplicablePagePermissionLevel)}
                 keyAndLabel={permissionsWithRemove as Record<string, string>}
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
@@ -226,13 +245,13 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
                 {canEdit ? (
                   <SmallSelect
                     renderValue={(value) => permissionsWithoutCustom[value as string]}
-                    onChange={(level) => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
+                    onChange={(level) => updatePagePermissionLevel(permission, level as ApplicablePagePermissionLevel)}
                     keyAndLabel={permissionsWithRemove as Record<string, string>}
                     defaultValue={permission.permissionLevel}
                   />
                 ) : (
                   <Typography color='secondary' variant='caption'>
-                    {permissionLevels[permission.permissionLevel]}
+                    {pagePermissionLevels[permission.permissionLevel as ApplicablePagePermissionLevel]}
                   </Typography>
                 )}
               </div>

@@ -1,4 +1,5 @@
 import type { SpaceOperation } from '@charmverse/core/prisma';
+import { AvailableSpacePermissions } from '@charmverse/core/shared';
 import type { PostCategoryPermissionAssignment } from '@charmverse/core/shared';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
 import type { ChangeEvent } from 'react';
@@ -19,7 +20,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
-import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 
 /**

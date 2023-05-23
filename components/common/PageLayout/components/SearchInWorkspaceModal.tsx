@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -18,7 +19,6 @@ import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 enum ResultType {

@@ -1,3 +1,4 @@
+import type { PublicBountyToggle } from '@charmverse/core';
 import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
@@ -16,7 +17,6 @@ import type {
   BountyWithDetails
 } from 'lib/bounties';
 import type { Resource } from 'lib/permissions/interfaces';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { TransactionCreationData } from 'lib/transactions/interface';
 
 export class BountiesApi {
