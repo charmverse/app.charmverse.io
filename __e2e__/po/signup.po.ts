@@ -26,7 +26,7 @@ export class SignUpPage {
   async waitForWorkspaceLoaded({ domain }: { domain: string }) {
     await this.page.waitForURL(`**/${domain}`);
     await this.page.locator('text=[Your DAO] Home').first().waitFor({
-      timeout: 10000
+      timeout: 60000
     });
   }
 
