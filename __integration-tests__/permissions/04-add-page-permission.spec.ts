@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PagePermission, Space, User } from '@charmverse/core/prisma';
+import type { PagePermissionAssignment, PageWithPermissions } from '@charmverse/core';
+import type { PagePermission, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
-import type { IPagePermissionToCreate } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -36,17 +34,16 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
-    const permissionToCreate: IPagePermissionToCreate = {
+    const permissionToCreate: PagePermissionAssignment = {
       pageId: rootPage.id,
-      permissionLevel: 'editor',
-      userId: user.id
+      permission: { assignee: { group: 'user', id: user.id }, permissionLevel: 'editor' }
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToCreate).expect(201);
 
-    const rootPageWithPermissions = (await getPage(rootPage.id)) as IPageWithPermissions;
+    const rootPageWithPermissions = (await getPage(rootPage.id)) as PageWithPermissions;
 
     expect(rootPageWithPermissions.permissions.length).toBe(2);
 
@@ -69,7 +66,7 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -83,7 +80,7 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -97,12 +94,11 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
-    const permissionToUpsert: IPagePermissionToCreate = {
+    const permissionToUpsert: PagePermissionAssignment = {
       pageId: rootPage.id,
-      permissionLevel: 'view',
-      userId: user.id
+      permission: { assignee: { group: 'user', id: user.id }, permissionLevel: 'view' }
     };
 
     const newPermission = (
@@ -112,7 +108,7 @@ describe('POST /api/permissions - add new permission', () => {
     const childPageList = (await Promise.all([
       getPage(childPage.id),
       getPage(nestedChildPage.id)
-    ])) as IPageWithPermissions[];
+    ])) as PageWithPermissions[];
 
     childPageList.forEach((childPageWithPermissions) => {
       expect(childPageWithPermissions.permissions.length).toBe(2);
@@ -142,7 +138,7 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -156,7 +152,7 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -170,7 +166,7 @@ describe('POST /api/permissions - add new permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     // Delete all child page permissions
     await Promise.all(
@@ -186,10 +182,9 @@ describe('POST /api/permissions - add new permission', () => {
     );
 
     // Add a new page level permission
-    const permissionToUpsert: IPagePermissionToCreate = {
+    const permissionToUpsert: PagePermissionAssignment = {
       pageId: rootPage.id,
-      permissionLevel: 'view',
-      userId: user.id
+      permission: { assignee: { group: 'user', id: user.id }, permissionLevel: 'view' }
     };
 
     const newPermission = (
@@ -199,7 +194,7 @@ describe('POST /api/permissions - add new permission', () => {
     const childPageList = (await Promise.all([
       getPage(childPage.id),
       getPage(nestedChildPage.id)
-    ])) as IPageWithPermissions[];
+    ])) as PageWithPermissions[];
 
     childPageList.forEach((childPageWithPermissions) => {
       // No new permissions should have been inherited
