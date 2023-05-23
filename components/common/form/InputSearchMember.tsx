@@ -87,6 +87,7 @@ export function InputSearchMemberBase({
         <UserDisplay
           {...(_props as any)}
           user={user}
+          avatarSize='small'
           avatarIcon={user.id === 'email' ? <EmailIcon fontSize='large' /> : undefined}
         />
       )}
@@ -105,7 +106,6 @@ export function InputSearchMemberBase({
           inputRef={inputRef}
         />
       )}
-      filterOptions={filterOptions}
       {...props}
     />
   );

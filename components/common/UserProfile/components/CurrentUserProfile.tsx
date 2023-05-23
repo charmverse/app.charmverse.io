@@ -43,7 +43,7 @@ export function CurrentUserProfile({
     if (currentStep === 'email_step') {
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
-      title = `Welcome to ${currentSpace.domain}! Set up your profile`;
+      title = `Welcome to ${currentSpace.name}! Set up your profile`;
     }
   }
 

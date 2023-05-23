@@ -7,7 +7,11 @@ type UserData = User & {
   discordUser: DiscordUser | null;
 };
 
-export function getMemberSearchValue(userData: UserData, memberProperties: Record<string, string>): string {
+export function getMemberSearchValue(
+  userData: UserData,
+  memberProperties: Record<string, string>,
+  username: string
+): string {
   const { profile, memberPropertyValues = [], telegramUser, discordUser } = userData;
 
   const discordAccountString =
@@ -34,7 +38,7 @@ export function getMemberSearchValue(userData: UserData, memberProperties: Recor
   // all socials
   const socialsString = profile?.social ? Object.values(profile.social).join(' ') : '';
 
-  return `${userDetailsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
+  return `${userDetailsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString} ${username}`
     .toLowerCase()
     .replace(/\s\s+/g, ' ');
 }

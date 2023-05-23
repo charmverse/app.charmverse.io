@@ -92,7 +92,7 @@ export async function getSpaceMembers({
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap),
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
           roles
         };
       })
