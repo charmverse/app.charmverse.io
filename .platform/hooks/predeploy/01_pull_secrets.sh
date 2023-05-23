@@ -24,28 +24,29 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
 
     # before we process the secrets, 
     # lets get any non-secret env variables from ebstalk_env_file and append it to the $APP_STAGING_DIR/.env file
-    grep -v "pull:secretsmanager" $ebstalk_env_file > $APP_STAGING_DIR/.env    
-    secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
+    grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" $ebstalk_env_file >> $APP_STAGING_DIR/.env
 
+    # Now start processing secrets
+    secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
     # looping through secrets requested in .env file
     grep "pull:secretsmanager" $ebstalk_env_file | while read -r line; do
         [[ $line =~ $secrets_pattern ]] && { 
             export env_var_name=${BASH_REMATCH[1]}
             secret_name=${BASH_REMATCH[2]}
             secret_json_key=${BASH_REMATCH[3]}
-            secret_version=${BASH_REMATCH[4]}
+            secret_version=${BASH_REMATCH[4]:-AWSCURRENT}
 
-            if [[ ${secret_version:-AWSCURRENT} =~ ^AWS ]]; then 
-                secret_version_option="--version-stage $secret_version"
+            if [[ $secret_version =~ ^AWS ]]; then 
+                secret_version_option=(--version-stage "$secret_version")
             else
-                secret_version_option="--version-id $secret_version"
+                secret_version_option=(--version-id "$secret_version")
             fi
 
             secret_value=$(aws secretsmanager get-secret-value     \
                                     --region us-east-1             \
                                     --secret-id "$secret_name"     \
                                     --query "SecretString"         \
-                                    $secret_version_option         \
+                                    "${secret_version_option[@]}"  \
                        | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
 
             [ -z "$secret_value" ] && {
