@@ -10,8 +10,8 @@ on:
     branches: ["**"]
 
 env:
-  SELECTED_CORE_BRANCH: main
-  SELECTED_API_BRANCH: main
+  SELECTED_CORE_BRANCH: feat/page-permissions
+  SELECTED_API_BRANCH: feat/page-permissions
 
 jobs:
   build-test-env:
@@ -31,6 +31,14 @@ jobs:
           echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
           echo -e "API Branch: $API_BRANCH /// Core Branch: $CORE_BRANCH"
 
+      - name: Show branches
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Set desired branch names here
+        run: echo -e "Branches api / $API_BRANCH /// core / $CORE_BRANCH"
+
 
       # We might even delete this step since CI seems to work without it
       - name: Provision API key
@@ -45,20 +53,20 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          CORE_BRANCH: ${{env.CORE_BRANCH}}
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
-          CORE_BRANCH: ${{env.CORE_BRANCH}}
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
-          CORE_BRANCH: ${{env.CORE_BRANCH}} 
-          API_BRANCH: ${{env.API_BRANCH}}
+          CORE_BRANCH: ${{ env.CORE_BRANCH }} 
+          API_BRANCH: ${{ env.API_BRANCH }}
 
   test:
     name: Tests
