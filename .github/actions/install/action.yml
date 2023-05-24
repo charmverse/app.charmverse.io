@@ -8,6 +8,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set cache key name
+      shell: bash
+      run: echo -e "CACHE_KEY=${{inputs.CORE_BRANCH}}" | sed "s/\///g" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
@@ -23,7 +27,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./node_modules
-    key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.CORE_BRANCH.split('/').join('') }}
+      key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{env.CACHE_KEY}}
 
 
     - name: Install npm dependencies
