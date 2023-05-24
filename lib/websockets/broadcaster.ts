@@ -22,7 +22,6 @@ export class WebsocketBroadcaster {
   // Only called once in the app lifecycle once the server is initialised
   async bindServer(io: Server): Promise<void> {
     this.io = io;
-
     if (redisClient) {
       const pubClient = redisClient;
       const subClient = pubClient.duplicate();
@@ -67,6 +66,10 @@ export class WebsocketBroadcaster {
         log.debug('[ws] Web socket namepsace /editor connected', { userId: socket.data.user.id });
         new DocumentEventHandler(socket).init();
       });
+
+    // close on shutdown
+    process.on('SIGINT', this.close.bind(this));
+    process.on('SIGTERM', this.close.bind(this));
   }
 
   broadcastToAll(message: ServerMessage): void {
@@ -105,5 +108,10 @@ export class WebsocketBroadcaster {
     socket.join([roomId]);
 
     this.sockets[userId] = socket;
+  }
+
+  close() {
+    log.info('[server] Closing Next.js Websocket server...');
+    this.io.close();
   }
 }
