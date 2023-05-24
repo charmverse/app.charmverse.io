@@ -58,6 +58,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+          with:
+          CORE_BRANCH: "feat/page-permissions" 
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -108,6 +110,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          CORE_BRANCH: "feat/page-permissions" 
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -121,6 +125,8 @@ jobs:
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          CORE_BRANCH: "feat/page-permissions" 
+          API_BRANCH: "feat/page-permissions" 
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
