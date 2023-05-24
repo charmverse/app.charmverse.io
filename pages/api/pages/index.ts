@@ -82,12 +82,10 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   });
 
   try {
-    if (req.spacePermissionsEngine === 'premium') {
-      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
-        event: 'created',
-        pageId: page.id
-      });
-    }
+    await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+      event: 'created',
+      pageId: page.id
+    });
 
     const pageWithPermissions = await getPage(page.id);
 

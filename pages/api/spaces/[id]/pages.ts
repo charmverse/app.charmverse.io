@@ -55,12 +55,10 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
         }) as Prisma.PageUncheckedCreateInput
       });
 
-      if (req.spacePermissionsEngine === 'premium') {
-        await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
-          event: 'created',
-          pageId: createdPage.id
-        });
-      }
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+        event: 'created',
+        pageId: createdPage.id
+      });
 
       createdPages.push(createdPage);
       log.warn(`Created default first page for space ${spaceId}`, { spaceId, userId });

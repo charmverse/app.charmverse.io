@@ -48,11 +48,9 @@ export async function disconnectProposalChildren({ pageId }: { pageId: string })
       }
     });
 
-    if (page.space.paidTier !== 'free') {
-      await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
-        event: 'repositioned',
-        pageId: subPage.id
-      });
-    }
+    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+      event: 'repositioned',
+      pageId: subPage.id
+    });
   }
 }

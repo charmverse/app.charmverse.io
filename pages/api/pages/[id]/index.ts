@@ -148,7 +148,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
     page.spaceId
   );
 
-  if (hasNewParentPage && req.spacePermissionsEngine === 'premium') {
+  if (hasNewParentPage) {
     await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
       event: 'repositioned',
       pageId

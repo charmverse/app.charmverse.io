@@ -66,17 +66,10 @@ export async function createPrismaPage({
   // eslint-disable-next-line
   let page = await createPage({ data: pageCreateInput });
 
-  const spaceInfo = await checkSpaceSpaceSubscriptionInfo({
-    resourceId: spaceId,
-    resourceIdType: 'space'
+  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+    event: 'created',
+    pageId: page.id
   });
-
-  if (spaceInfo.tier === 'free') {
-    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
-      event: 'created',
-      pageId: page.id
-    });
-  }
 
   return page;
 }

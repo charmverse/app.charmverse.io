@@ -86,9 +86,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
         });
       }
 
-      if (req.spacePermissionsEngine === 'premium') {
-        await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({ event: 'repositioned', pageId });
-      }
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({ event: 'repositioned', pageId });
     }
   }
 
