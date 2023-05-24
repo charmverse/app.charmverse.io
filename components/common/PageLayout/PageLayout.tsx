@@ -197,7 +197,11 @@ function PageLayout({ children }: PageLayoutProps) {
   }
 
   if (!showSpaceMemberView) {
-    return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
+    return (
+      <SharedPageLayout basePageId={publicPage?.page?.id} basePageType={publicPage?.page?.type}>
+        {children || null}
+      </SharedPageLayout>
+    );
   }
 
   return (
