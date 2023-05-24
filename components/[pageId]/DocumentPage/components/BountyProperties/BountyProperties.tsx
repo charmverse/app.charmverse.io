@@ -457,7 +457,7 @@ export default function BountyProperties(props: {
                   await refreshBountyPermissions(currentBounty.id);
                 }
               }}
-              filter={{ mode: 'exclude', userIds: assignedRoleSubmitters }}
+              filterSelectedOptions={true}
               showWarningOnNoRoles={true}
               disabled={readOnly}
               readOnly={readOnly}
