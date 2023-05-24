@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
 import type { Page, WorkspaceEvent } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import { v4 } from 'uuid';
