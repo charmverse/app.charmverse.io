@@ -4,8 +4,8 @@ import type { IronSessionOptions } from 'iron-session';
 
 import { baseUrl, cookieName } from 'config/constants';
 import { authSecret } from 'lib/session/config';
-import { getCookieDomain } from 'lib/session/getCookieDomain';
-import { isLocalhostAlias } from 'lib/utilities/getValidSubdomain';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 export function getIronOptions(req?: IncomingMessage): IronSessionOptions {
   const ironOptions: IronSessionOptions = {
@@ -15,7 +15,7 @@ export function getIronOptions(req?: IncomingMessage): IronSessionOptions {
       sameSite: 'strict' as const,
       // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
       secure: typeof baseUrl === 'string' && baseUrl.includes('https'),
-      domain: isLocalhostAlias(req?.headers.host) ? undefined : getCookieDomain()
+      domain: isLocalhostAlias(req?.headers.host) ? undefined : getAppApexDomain()
     }
   };
   return ironOptions;

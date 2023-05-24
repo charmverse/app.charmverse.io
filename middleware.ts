@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 
 import { isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { getSpaceDomainFromUrlPath } from 'lib/utilities/getSpaceDomainFromUrlPath';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 // RegExp for public files
@@ -28,7 +29,8 @@ export async function middleware(req: NextRequest) {
   if (isPublicPage) return;
 
   const host = req.headers.get('host');
-  const subdomain = getValidSubdomain(host);
+  const customDomain = getValidCustomDomain(host);
+  const subdomain = customDomain ? null : getValidSubdomain(host);
   const spaceDomainFromPath = getSpaceDomainFromUrlPath(url.pathname);
 
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
@@ -40,13 +42,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Skip main app url (TODO: verify this logic)
-  if (subdomain === 'app') return;
-
-  if (subdomain) {
+  const rewriteDomain = customDomain || subdomain;
+  if (rewriteDomain) {
     // Subdomain available, rewriting
-    log.info(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
-    url.pathname = `/${subdomain}${url.pathname}`;
+    log.info(`>>> Rewriting: ${url.pathname} to /${rewriteDomain}${url.pathname}`);
+    url.pathname = `/${rewriteDomain}${url.pathname}`;
     return NextResponse.rewrite(url);
   }
 }
