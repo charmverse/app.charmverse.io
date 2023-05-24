@@ -21,6 +21,16 @@ inputs:
 runs:
   using: 'composite'
   steps:
+
+    - name: Set cache key name
+      shell: bash
+      env:
+        CORE_BRANCH: ${{ inputs.CORE_BRANCH }}
+        API_BRANCH: ${{ inputs.API_BRANCH }}
+      run: |
+        echo "CORE_CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+        echo "API_CACHE_KEY=$(echo $API_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
       with:
         repository: charmverse/permissions.charmverse.io
@@ -34,7 +44,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./${{inputs.API_FOLDER}}/node_modules
-        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}-${{ inputs.CORE_BRANCH}}-${{ inputs.API_BRANCH }}
+        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}-${{ env.CORE_CACHE_KEY}}-${{ env.API_CACHE_KEY }}
 
     - name: Install npm dependencies
       shell: bash
@@ -63,7 +73,7 @@ runs:
           .env.test.local
 
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}-${{ inputs.CORE_BRANCH}}-${{ inputs.API_BRANCH }}
+        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}-${{ env.CORE_CACHE_KEY}}-${{ env.API_CACHE_KEY }}
 
     - name: Build
       shell: bash

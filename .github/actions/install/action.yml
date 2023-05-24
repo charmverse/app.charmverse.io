@@ -10,7 +10,9 @@ runs:
   steps:
     - name: Set cache key name
       shell: bash
-      run: echo -e "CACHE_KEY=${{inputs.CORE_BRANCH}}" | sed "s/\///g" >> $GITHUB_ENV
+      env:
+        CORE_BRANCH: ${{ inputs.CORE_BRANCH }}
+      run: echo "CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
 
     - uses: actions/checkout@v3
 
