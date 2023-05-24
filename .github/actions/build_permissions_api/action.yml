@@ -46,7 +46,7 @@ runs:
     - name: Install core repo
       shell: bash
       if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true' && inputs.CORE_BRANCH != 'main'
-      run: echo -e "Installing custom core branch" && pwd && npm i github:charmverse/core@${{ inputs.CORE_BRANCH }}
+      run: echo -e "Installing custom core branch" && pwd && npm i "github:charmverse/core#${{ inputs.CORE_BRANCH }}"
       working-directory: ./${{inputs.API_FOLDER}}
 
     #### ---- Start the build process
