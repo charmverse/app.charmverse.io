@@ -2,8 +2,9 @@ import type { Space } from '@charmverse/core/prisma';
 
 export function filterSpaceByDomain(spaces: Space[], domainOrCustomDomain: string) {
   if (!domainOrCustomDomain) {
-    return spaces[0];
+    return;
   }
+
   const isCustomDomain = domainOrCustomDomain.includes('.');
 
   const space = spaces.find((s) => {

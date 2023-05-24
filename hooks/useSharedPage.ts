@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 const BOUNTIES_PATH = '/[domain]/bounties';
 const DOCUMENT_PATH = '/[domain]/[pageId]';
@@ -19,7 +20,7 @@ export const useSharedPage = () => {
 
   const { spaces, isLoaded: spacesLoaded } = useSpaces();
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
-  const loadedSpace = spaces.find((s) => s.domain === spaceDomain);
+  const loadedSpace = filterSpaceByDomain(spaces, spaceDomain || '');
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
 
   const pageKey = useMemo(() => {
