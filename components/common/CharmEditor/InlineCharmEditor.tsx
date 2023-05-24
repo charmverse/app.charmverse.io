@@ -15,6 +15,7 @@ import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/reac
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
+import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
@@ -235,7 +236,7 @@ export default function CharmEditor({
         }
       }}
     >
-      <floatingMenu.FloatingMenu inline pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {currentSpace && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}

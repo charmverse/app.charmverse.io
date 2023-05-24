@@ -1,7 +1,6 @@
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
