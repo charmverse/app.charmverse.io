@@ -1,3 +1,4 @@
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
@@ -213,8 +214,21 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
   }, 1000);
 }
 
-export function getSubdomainPath(path: string) {
+export function getSubdomainPath(path: string, config?: { domain: string; customDomain: string | null }) {
   const subdomain = getValidSubdomain();
+  const customDomain = getValidCustomDomain();
+
+  if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
+    // remove space domain from path for custom domain
+    if (path.startsWith(`/${config.domain}`)) {
+      return path.replace(`/${config.domain}`, '');
+    }
+
+    if (path.startsWith(`/${config.customDomain}`)) {
+      return path.replace(`/${config.customDomain}`, '');
+    }
+  }
+
   if (!subdomain) return path;
 
   if (path.startsWith(`/${subdomain}`)) {

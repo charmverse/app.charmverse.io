@@ -5,8 +5,8 @@ import NextLink from 'next/link';
 import type { MouseEvent } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSubdomainPath } from 'lib/utilities/browser';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',
@@ -41,6 +41,8 @@ interface Props extends Omit<LinkProps, 'href'> {
 }
 
 export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
+  const currentSpace = useCurrentSpace();
+
   if (!href) {
     return (
       <div className={restProps.className} onClick={onClick} data-test={restProps['data-test']}>
@@ -55,7 +57,7 @@ export default function Link({ external, href, onClick, children, color = 'prima
     </StyledMuiLink>
   ) : (
     <StyledMuiLink
-      href={getSubdomainPath(href)}
+      href={getSubdomainPath(href, currentSpace ?? undefined)}
       // @ts-ignore
       component={NextLink}
       onClick={onClick}

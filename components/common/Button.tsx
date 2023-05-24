@@ -7,6 +7,7 @@ import NextLink from 'next/link';
 import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
 import { forwardRef } from 'react';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSubdomainPath } from 'lib/utilities/browser';
 
 const StyledButton = styled(Button)`
@@ -49,6 +50,8 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
 
 // make sure teh id prop is on the same element as onClick
 const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
+  const currentSpace = useCurrentSpace();
+
   const { href, external, children, id, onClick, target, 'data-test': dataTest, ...props } = _props;
   if (href && !_props.disabled) {
     if (external) {
@@ -64,7 +67,7 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
       <MuiLink
         component={NextLink}
         color={props.color === 'inherit' ? 'inherit !important' : undefined}
-        href={getSubdomainPath(href)}
+        href={getSubdomainPath(href, currentSpace ?? undefined)}
         target={target}
         id={id}
         onClick={mouseOnClick}

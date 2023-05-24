@@ -9,6 +9,7 @@ import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { sortNodes } from 'lib/pages/mapPageTree';
+import { getSubdomainPath } from 'lib/utilities/browser';
 
 // Redirect users to an initial page
 export default function RedirectToMainPage() {
@@ -48,10 +49,11 @@ export default function RedirectToMainPage() {
 
       // make sure this page is part of this space in case user is navigating to a new space
       if (firstPage && space && firstPage?.spaceId === space.id) {
-        const redirectPath = `/${space.domain}/${firstPage.path}`;
+        const redirectPath = getSubdomainPath(`/${space.domain}/${firstPage.path}`, space ?? undefined);
         router.push(redirectPath);
       } else if (space && sortedPages.length === 0) {
-        router.push(`/${space.domain}/members`);
+        const redirectPath = getSubdomainPath(`/${space.domain}/members`, space ?? undefined);
+        router.push(redirectPath);
       }
     }
   }, [space, loadingPages, pages]);

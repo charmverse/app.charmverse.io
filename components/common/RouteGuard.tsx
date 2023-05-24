@@ -9,6 +9,7 @@ import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
@@ -73,17 +74,27 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         // Only get segments that evaluate to some value
         return pathElem;
       })[0] ?? '/';
-
     const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath);
     // special case, when visiting main app url on space subdomain
-    const isSpaceSubdomainPath = firstPathSegment === '/' && spaceDomain;
+    const isSpaceSubdomainPath = firstPathSegment === '/' && !!spaceDomain;
 
     // condition: public page
     if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
       return { authorized: true };
     }
+
+    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
+      return { authorized: true };
+    }
+
     // condition: no user session and no wallet address
     else if (!user) {
+      // condition: space subdomain / custom domain main path
+      // do not redirect - it will display login
+      if (isSpaceSubdomainPath) {
+        return { authorized: true };
+      }
+
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
@@ -94,7 +105,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       };
     }
     // condition: trying to access a space without access
-    else if (hasSpaceDomain && !spaces.some((s) => s.domain === spaceDomain)) {
+    else if (hasSpaceDomain && !filterSpaceByDomain(spaces, spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
       if (authorizedSpaceDomainRef.current === spaceDomain) {
         authorizedSpaceDomainRef.current = '';
