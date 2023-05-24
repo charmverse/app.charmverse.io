@@ -26,10 +26,6 @@ const config = {
   compiler: {
     styledComponents: true
   },
-  experimental: {
-    esmExternals: false
-    //    externalDir: true
-  },
   transpilePackages: esmModules,
   modularizeImports: {
     '@mui/material': {
