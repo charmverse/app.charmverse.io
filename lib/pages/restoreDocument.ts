@@ -92,7 +92,7 @@ export async function restoreDocument({ pageId, version }: RestoreInput): Promis
     return updated;
   });
 
-  log.debug(`Rebuilt document with ${pageWithDiffs.diffs} steps`);
+  log.debug(`Rebuilt document with ${pageWithDiffs.diffs.length} steps`);
 
   return pageAfterUpdate;
 }

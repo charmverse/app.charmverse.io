@@ -2,7 +2,7 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -36,6 +36,7 @@ export default function JoinWorkspace() {
   const router = useRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
+  const [isRouterReady, setRouterReady] = useState(false);
   const {
     data: spaceFromPath,
     isLoading: isSpaceLoading,
@@ -49,6 +50,13 @@ export default function JoinWorkspace() {
     }
   }, [spaces]);
 
+  useEffect(() => {
+    // isReady should only be used conditionally inside a useEffect()
+    if (router.isReady) {
+      setRouterReady(true);
+    }
+  }, [router.isReady]);
+
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
   return (
@@ -59,7 +67,7 @@ export default function JoinWorkspace() {
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
-        {router.isReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
+        {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href='/createSpace'>Create a space</AlternateRouteButton>
     </Box>
