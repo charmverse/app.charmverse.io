@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bangle.dev/markdown/dist/index.js b/node_modules/@bangle.dev/markdown/dist/index.js
+index fe219e1..ee59569 100644
+--- a/node_modules/@bangle.dev/markdown/dist/index.js
++++ b/node_modules/@bangle.dev/markdown/dist/index.js
+@@ -1,7 +1,7 @@
+ import markdownIt from 'markdown-it';
+ import { MarkdownParser, MarkdownSerializer } from 'prosemirror-markdown';
+ import { SpecRegistry } from '@bangle.dev/core';
+-import Token from 'markdown-it/lib/token';
++import Token from 'markdown-it/lib/token.js';
+ import { assertNotUndefined } from '@bangle.dev/utils';
+ 
+ /**
