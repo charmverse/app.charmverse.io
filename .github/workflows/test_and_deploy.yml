@@ -14,6 +14,11 @@ jobs:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
+
+      # We might even delete this step since CI seems to work without it
+      - name: Provision API key
+        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
+
       - uses: actions/checkout@v3
 
       - name: Debug
@@ -29,10 +34,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
-
-      # We might even delete this step since CI seems to work without it
-      - name: Provision API key
-        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
 
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
