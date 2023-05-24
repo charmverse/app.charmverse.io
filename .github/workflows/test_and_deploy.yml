@@ -59,7 +59,7 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
-          with:
+        with:
           CORE_BRANCH: "feat/page-permissions" 
 
       - name: Restore app from cache
