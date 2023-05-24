@@ -73,7 +73,10 @@ runs:
       shell: bash
       env:
         CORE_BRANCH: ${{ inputs.CORE_BRANCH }}
-      run: echo "CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+      run:  |
+        echo -e "Received for build: $CORE_BRANCH"
+        echo "CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+      
 
     - name: Cache build
       id: cache_build
@@ -84,7 +87,7 @@ runs:
           .env.test.local
           dist
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}-${{env.CACHE_KEY}}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}-${{ env.CACHE_KEY }}
 
     - name: Build
       shell: bash
