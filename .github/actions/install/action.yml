@@ -33,4 +33,4 @@ runs:
     - name: Install custom core branch
       shell: bash
       if: inputs.CORE_BRANCH != 'main'
-      run: npm i "@charmverse/core@${{ inputs.CORE_BRANCH }}"
+      run: npm i "github:charmverse/core@${{ inputs.CORE_BRANCH }}"
