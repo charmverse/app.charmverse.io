@@ -13,7 +13,21 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
+    env:
+      CORE_BRANCH: "main"
+      API_BRANCH_BRANCH: "main"
     steps:
+      # Check if we should set custom branches
+      - name: Set core and API dependencies
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Set desired branch names here
+        run: |
+          echo "CORE_BRANCH=feat/page-permissions" >> $GITHUB_ENV
+          echo "API_BRANCH=feat/page-permissions" >> $GITHUB_ENV
+
 
       # We might even delete this step since CI seems to work without it
       - name: Provision API key
@@ -28,20 +42,20 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          CORE_BRANCH: "feat/page-permissions" 
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
-          CORE_BRANCH: "feat/page-permissions" 
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
 
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
-          CORE_BRANCH: "feat/page-permissions" 
-          API_BRANCH: "feat/page-permissions" 
+          CORE_BRANCH: ${{env.CORE_BRANCH}} 
+          API_BRANCH: ${{env.CORE_BRANCH}}
 
   test:
     name: Tests
@@ -113,7 +127,7 @@ jobs:
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
         with:
-          CORE_BRANCH: "feat/page-permissions" 
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -127,8 +141,8 @@ jobs:
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
-          CORE_BRANCH: "feat/page-permissions" 
-          API_BRANCH: "feat/page-permissions" 
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
+          API_BRANCH: ${{env.API_BRANCH}}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
