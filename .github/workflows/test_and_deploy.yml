@@ -9,11 +9,40 @@ on:
   pull_request:
     branches: ["**"]
 
+env:
+  SELECTED_CORE_BRANCH: feat/page-permissions
+  SELECTED_API_BRANCH: feat/page-permissions
+
 jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
+      # Check if we should set custom branches
+      - name: Set core and API dependencies
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Set desired branch names here
+        run: |
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
+          echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
+          echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
+
+      - name: Show branches
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Confirm which custom branches will be used for app
+        run: echo -e "Branches api / $API_BRANCH /// core / $CORE_BRANCH"
+
+
+      # We might even delete this step since CI seems to work without it
+      - name: Provision API key
+        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
+
       - uses: actions/checkout@v3
 
       - name: Debug
@@ -22,20 +51,21 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
-
-      # We might even delete this step since CI seems to work without it
-      - name: Provision API key
-        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          CORE_BRANCH: ${{ env.CORE_BRANCH }} 
+          API_BRANCH: ${{ env.API_BRANCH }}
 
   test:
     name: Tests
@@ -49,15 +79,30 @@ jobs:
           - test_name: 'Type check and lint'
             test_command: 'npm run typecheck && npm run lint'
     steps:
+      # Check if we should set custom branches
+      - name: Set core and API dependencies
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Set desired branch names here
+        run: |
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
+          echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
+          echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
+
       - uses: actions/checkout@v3
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -99,10 +144,24 @@ jobs:
           - test_name: 'Browser e2e test'
             test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:e2e:ci'
     steps:
+      # Check if we should set custom branches
+      - name: Set core and API dependencies
+        if: |
+          (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
+          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
+        shell: bash
+        # Set desired branch names here
+        run: |
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
+          echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
+          echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
+
       - uses: actions/checkout@v3
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -111,11 +170,14 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
+          CORE_BRANCH: ${{ env.CORE_BRANCH }}
 
       - name: Restore permissions API from cache
         uses: ./.github/actions/build_permissions_api
         with:
           GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          CORE_BRANCH: ${{env.CORE_BRANCH}}
+          API_BRANCH: ${{env.API_BRANCH}}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}

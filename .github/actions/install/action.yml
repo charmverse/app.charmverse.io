@@ -1,8 +1,19 @@
 name: "Install dependencies"
 
+inputs:
+  CORE_BRANCH:
+    required: false
+    default: "main"
+
 runs:
   using: "composite"
   steps:
+    - name: Set cache key name
+      shell: bash
+      env:
+        CORE_BRANCH: ${{ inputs.CORE_BRANCH }}
+      run: echo "CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
@@ -18,9 +29,15 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./node_modules
-        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{env.CACHE_KEY}}
+
 
     - name: Install npm dependencies
       shell: bash
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
+
+    - name: Install custom core branch
+      shell: bash
+      if: inputs.CORE_BRANCH != 'main'
+      run: npm i "github:charmverse/core#${{ inputs.CORE_BRANCH }}"

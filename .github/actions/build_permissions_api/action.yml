@@ -11,14 +11,30 @@ inputs:
   NODE_ENV:
     description: 'Set node env for context and build'
     required: false
+  CORE_BRANCH:
+    required: false
+    default: "main"
+  API_BRANCH:
+    required: false
+    default: "main"
 
 runs:
   using: 'composite'
   steps:
+
+    - name: Set cache key name
+      shell: bash
+      env:
+        CORE_BRANCH: ${{ inputs.CORE_BRANCH }}
+        API_BRANCH: ${{ inputs.API_BRANCH }}
+      run: |
+        echo "CORE_CACHE_KEY=$(echo $CORE_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+        echo "API_CACHE_KEY=$(echo $API_BRANCH | sed 's/\///g')" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
       with:
         repository: charmverse/permissions.charmverse.io
-        ref: main
+        ref: ${{ inputs.API_BRANCH }}
         path: ${{inputs.API_FOLDER}}
         ssh-key: ${{ inputs.GITHUB_SSH_KEY }}
 
@@ -28,12 +44,19 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./${{inputs.API_FOLDER}}/node_modules
-        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}
+        key: nodemodules-permissions-cache-${{ hashFiles(format('{0}/package-lock.json', inputs.API_FOLDER)) }}-${{ env.CORE_CACHE_KEY}}-${{ env.API_CACHE_KEY }}
 
     - name: Install npm dependencies
       shell: bash
       if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true'
       run: echo -e "Install path" && pwd && npm ci --no-audit --no-fund
+      working-directory: ./${{inputs.API_FOLDER}}
+
+    # Add custom core branch to the permissions API
+    - name: Install core repo
+      shell: bash
+      if: steps.cache_permissions_node_modules.outputs.cache-hit != 'true' && inputs.CORE_BRANCH != 'main'
+      run: echo -e "Installing custom core branch" && pwd && npm i "github:charmverse/core#${{ inputs.CORE_BRANCH }}"
       working-directory: ./${{inputs.API_FOLDER}}
 
     #### ---- Start the build process
@@ -50,7 +73,7 @@ runs:
           .env.test.local
 
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}
+        key: permissions-${{ runner.os }}-${{ hashFiles(format('{0}/**/*.[jt]s', inputs.API_FOLDER), format('!{0}/node_modules', inputs.API_FOLDER)) }}-${{ env.CORE_CACHE_KEY}}-${{ env.API_CACHE_KEY }}
 
     - name: Build
       shell: bash
