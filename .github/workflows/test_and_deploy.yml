@@ -29,14 +29,13 @@ jobs:
           echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
           echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
           echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
-          echo -e "API Branch: $API_BRANCH /// Core Branch: $CORE_BRANCH"
 
       - name: Show branches
         if: |
           (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
           (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'custom-branch'))
         shell: bash
-        # Set desired branch names here
+        # Confirm which custom branches will be used for app
         run: echo -e "Branches api / $API_BRANCH /// core / $CORE_BRANCH"
 
 
@@ -80,7 +79,7 @@ jobs:
           - test_name: 'Type check and lint'
             test_command: 'npm run typecheck && npm run lint'
     steps:
-       # Check if we should set custom branches
+      # Check if we should set custom branches
       - name: Set core and API dependencies
         if: |
           (github.event.action == 'labeled' && github.event.label.name == 'custom-branch') ||
@@ -88,10 +87,9 @@ jobs:
         shell: bash
         # Set desired branch names here
         run: |
-          echo -e "Setting up branches"
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
           echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
           echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
-          echo -e "API Branch: $API_BRANCH /// Core Branch: $CORE_BRANCH"
 
       - uses: actions/checkout@v3
 
@@ -154,10 +152,9 @@ jobs:
         shell: bash
         # Set desired branch names here
         run: |
-          echo -e "Setting up branches"
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
           echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
           echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
-          echo -e "API Branch: $API_BRANCH /// Core Branch: $CORE_BRANCH"
 
       - uses: actions/checkout@v3
 
