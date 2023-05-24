@@ -208,7 +208,7 @@ export default function BountyProperties(props: {
 
   async function confirmNewBounty() {
     if (currentBounty) {
-      const createdBounty = await charmClient.bounties.createBounty({ linkedPageId: pageId, ...currentBounty });
+      const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
     }
   }
