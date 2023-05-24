@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./node_modules
-      key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{env.CACHE_KEY}}
+        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{env.CACHE_KEY}}
 
 
     - name: Install npm dependencies
