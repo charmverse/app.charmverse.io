@@ -499,7 +499,17 @@ function CenterPanel(props: Props) {
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
-          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+          <PageWebhookBanner
+            key={key.apiKey}
+            type={key.type}
+            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            sx={{
+              ...(isEmbedded && {
+                border: (theme) => `2px solid ${theme.palette.text.primary}`,
+                backgroundColor: 'transparent !important'
+              })
+            }}
+          />
         ) : null
       )}
       <div

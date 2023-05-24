@@ -3,7 +3,6 @@ import { Alert, Autocomplete, TextField } from '@mui/material';
 import type { ComponentProps } from 'react';
 
 import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -39,9 +38,7 @@ function InputSearchRoleBase({
   ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
-  const space = useCurrentSpace();
   const { onClick } = useSettingsDialog();
-
   const defaultRole =
     typeof defaultValue === 'string'
       ? roles?.find((role) => {
@@ -67,7 +64,7 @@ function InputSearchRoleBase({
 
   return (
     <Autocomplete<ReducedRole>
-      defaultValue={defaultRole as any}
+      value={defaultRole as any}
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
@@ -76,7 +73,7 @@ function InputSearchRoleBase({
       // @ts-ignore - not sure why this fails
       options={filteredRoles}
       autoHighlight
-      getOptionLabel={(role) => role.name}
+      getOptionLabel={(role) => role?.name}
       renderOption={(_props, role) => <li {..._props}>{role.name}</li>}
       renderInput={(params) => (
         <TextField

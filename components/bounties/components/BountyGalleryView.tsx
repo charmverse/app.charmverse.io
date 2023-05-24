@@ -23,9 +23,9 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
   const filteredBounties = bounties
     .filter((bounty) => bounty.status === 'open')
     .sort((b1, b2) => (b1.updatedAt > b2.updatedAt ? -1 : 1));
-  function onClickDelete(bountyId: string) {
-    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
-    deletePage({ pageId: bountyId });
+  function onClickDelete(pageId: string) {
+    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
+    deletePage({ pageId });
   }
 
   function onClose() {
@@ -57,7 +57,7 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
             key={bounty.id}
             bounty={bounty}
             onClick={() => {
-              openPage(bounty.id);
+              openPage(bounty.page.id);
             }}
             readOnly={!!publicMode}
             page={pages[bounty.page.id] as PageMeta}
