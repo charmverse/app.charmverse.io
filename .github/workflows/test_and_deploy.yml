@@ -10,8 +10,8 @@ on:
     branches: ["**"]
 
 env:
-  SELECTED_CORE_BRANCH: "main"
-  SELECTED_API_BRANCH: "main"
+  SELECTED_CORE_BRANCH: main
+  SELECTED_API_BRANCH: main
 
 jobs:
   build-test-env:
@@ -26,7 +26,7 @@ jobs:
         shell: bash
         # Set desired branch names here
         run: |
-          echo -e "Setting up branches"
+          echo -e "Setting up branches with core: $SELECTED_CORE_BRANCH and api: $SELECTED_CORE_BRANCH"
           echo "CORE_BRANCH=$SELECTED_CORE_BRANCH" >> $GITHUB_ENV
           echo "API_BRANCH=$SELECTED_API_BRANCH" >> $GITHUB_ENV
           echo -e "API Branch: $API_BRANCH /// Core Branch: $CORE_BRANCH"
