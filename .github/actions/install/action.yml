@@ -23,7 +23,8 @@ runs:
       uses: actions/cache@v3
       with:
         path: ./node_modules
-        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{  ${inputs.CORE_BRANCH//\//}) }}
+    key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.CORE_BRANCH.split('/').join('') }}
+
 
     - name: Install npm dependencies
       shell: bash
