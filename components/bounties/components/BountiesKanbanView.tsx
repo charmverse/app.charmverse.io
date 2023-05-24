@@ -91,7 +91,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
                   bounty={bounty}
                   page={pages[bounty.page.id] as PageMeta}
                   onClick={() => {
-                    openPage(bounty.id);
+                    openPage(bounty.page.id);
                   }}
                 />
               ))}
