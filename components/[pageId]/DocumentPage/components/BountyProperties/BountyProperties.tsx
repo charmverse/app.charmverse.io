@@ -22,7 +22,6 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
-import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import type {
@@ -63,7 +62,6 @@ export default function BountyProperties(props: {
   const [capSubmissions, setCapSubmissions] = useState(false);
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { mutatePage, pages } = usePages();
   const isRewardAmountInvalid = useMemo(
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
     [isAmountInputEmpty, currentBounty]
@@ -94,8 +92,6 @@ export default function BountyProperties(props: {
   }, [!!currentBounty]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
-
-  const bountyPage = pages[pageId];
 
   const bountyPermissions = permissions?.bountyPermissions || currentBounty?.permissions;
 
@@ -213,7 +209,6 @@ export default function BountyProperties(props: {
     if (currentBounty) {
       const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      mutatePage({ id: pageId, bountyId: createdBounty.id });
       cancelDraftBounty();
     }
   }
@@ -636,7 +631,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {!isSpaceMember && bountyPage && <BountySignupButton bountyPage={bountyPage} />}
+      {!isSpaceMember && <BountySignupButton pageId={pageId} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />
