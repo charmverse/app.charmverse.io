@@ -209,7 +209,6 @@ export default function BountyProperties(props: {
     if (currentBounty) {
       const createdBounty = await charmClient.bounties.createBounty({ linkedPageId: pageId, ...currentBounty });
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      // cancelDraftBounty();
     }
   }
 
