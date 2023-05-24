@@ -10,19 +10,17 @@ import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGa
 import { WalletSign } from 'components/login/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
-  pageId: string;
+  pagePath: string;
 }
 
-export function BountySignupButton({ pageId }: Props) {
+export function BountySignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
-  const { pages } = usePages();
   const space = useCurrentSpace();
   const { data: spaceWithGates } = useSWR(space ? `spaceByDomain/${space.domain}` : null, () =>
     charmClient.spaces.searchByDomain(space!.domain)
@@ -32,7 +30,6 @@ export function BountySignupButton({ pageId }: Props) {
 
   const { isSpaceMember } = useIsSpaceMember();
   const showSignup = isUserLoaded && (!user || !isSpaceMember);
-  const bountyPage = pages[pageId];
 
   function loginUser() {
     if (
@@ -81,7 +78,7 @@ export function BountySignupButton({ pageId }: Props) {
           spaceWithGates && (
             <SpaceAccessGate
               onSuccess={() => {
-                window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage?.path}`;
+                window.location.href = `${window.location.origin}/${space?.domain}/${pagePath}`;
               }}
               space={spaceWithGates}
               joinType='public_bounty_token_gate'

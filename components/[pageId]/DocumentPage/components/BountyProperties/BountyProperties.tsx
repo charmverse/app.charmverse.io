@@ -48,6 +48,7 @@ export default function BountyProperties(props: {
   readOnly?: boolean;
   bountyId: string | null;
   pageId: string;
+  pagePath: string;
   permissions: AssignedBountyPermissions | null;
   refreshBountyPermissions: (bountyId: string) => void;
 }) {
@@ -634,7 +635,7 @@ export default function BountyProperties(props: {
         )
       }
 
-      {!isSpaceMember && <BountySignupButton pageId={pageId} />}
+      {!isSpaceMember && <BountySignupButton pagePath={props.pagePath} />}
 
       {permissions?.userPermissions?.review && currentBounty.status !== 'suggestion' && !draftBounty && (
         <BountyApplicantsTable bounty={currentBounty} permissions={permissions} />
