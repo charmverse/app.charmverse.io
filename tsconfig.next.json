@@ -17,7 +17,25 @@
         "node_modules/@charmverse/core/dist/esm/shared"
       ],
       "@charmverse/core/log": [
-        "node_modules/@charmverse/core/dist/esm/lib/log",
+        "node_modules/@charmverse/core/dist/esm/lib/log"
+      ],
+      // "@skiff-org/prosemirror-tables": [
+      //   "node_modules/@skiff-org/prosemirror-tables/dist/index.es.js"
+      // ],
+      "prosemirror-model": [
+        "node_modules/prosemirror-model/dist/index.js"
+      ],
+      "prosemirror-view": [
+        "node_modules/prosemirror-view/dist/index.js"
+      ],
+      "prosemirror-state": [
+        "node_modules/prosemirror-state/dist/index.js"
+      ],
+      "prosemirror-transform": [
+        "node_modules/prosemirror-transform/dist/index.js"
+      ],
+      "prosemirror-utils": [
+        "node_modules/prosemirror-utils/dist/index.js"
       ]
     }
   }

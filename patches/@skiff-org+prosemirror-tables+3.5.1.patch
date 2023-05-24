@@ -1,8 +1,16 @@
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-index aefc8ee..56b87fe 100644
+index aefc8ee..a6c3444 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-@@ -8,9 +8,11 @@ import { Transform } from 'prosemirror-transform';
+@@ -1,16 +1,18 @@
+ import { Selection, SelectionRange, TextSelection, NodeSelection, PluginKey, Plugin } from 'prosemirror-state';
+ import { Fragment, Slice } from 'prosemirror-model';
+ import { keydownHandler } from 'prosemirror-keymap';
+-import { findParentNodeOfTypeClosestToPos, findParentNodeOfType } from 'prosemirror-utils';
++import { findParentNodeOfTypeClosestToPos, findParentNodeOfType } from 'prosemirror-utils-bangle';
+ import { Decoration, DecorationSet } from 'prosemirror-view';
+ import { createHash } from 'crypto';
+ import { Transform } from 'prosemirror-transform';
  import { splitBlockKeepMarks } from 'prosemirror-commands';
  import { MenuItem as MenuItem$1, Dropdown, renderGrouped } from 'prosemirror-menu';
  import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
@@ -410,10 +418,18 @@ index aefc8ee..56b87fe 100644
  
    _createClass(TableFiltersMenuView, [{
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-index 8ab5414..930a158 100644
+index 8ab5414..2c232f3 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
-@@ -12,9 +12,10 @@ var prosemirrorTransform = require('prosemirror-transform');
+@@ -5,16 +5,17 @@ Object.defineProperty(exports, '__esModule', { value: true });
+ var prosemirrorState = require('prosemirror-state');
+ var prosemirrorModel = require('prosemirror-model');
+ var prosemirrorKeymap = require('prosemirror-keymap');
+-var prosemirrorUtils = require('prosemirror-utils');
++var prosemirrorUtils = require('prosemirror-utils-bangle');
+ var prosemirrorView = require('prosemirror-view');
+ var crypto = require('crypto');
+ var prosemirrorTransform = require('prosemirror-transform');
  var prosemirrorCommands = require('prosemirror-commands');
  var prosemirrorMenu = require('prosemirror-menu');
  var React = require('react');

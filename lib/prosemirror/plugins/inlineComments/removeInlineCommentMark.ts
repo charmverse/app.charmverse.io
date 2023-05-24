@@ -1,6 +1,6 @@
 import type { EditorView, Mark, MarkType } from '@bangle.dev/pm';
-import type { NodeWithPos } from 'prosemirror-utils';
-import { findChildrenByMark } from 'prosemirror-utils';
+import type { NodeWithPos } from 'prosemirror-utils-bangle';
+import { findChildrenByMark } from 'prosemirror-utils-bangle';
 
 import { isTruthy } from 'lib/utilities/types';
 

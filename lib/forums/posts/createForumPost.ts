@@ -1,6 +1,6 @@
 import type { Post, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { findChildren } from 'prosemirror-utils';
+import { findChildren } from 'prosemirror-utils-bangle';
 import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

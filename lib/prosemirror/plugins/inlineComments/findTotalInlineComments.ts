@@ -1,5 +1,5 @@
 import type { MarkType, Node, Schema } from '@bangle.dev/pm';
-import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
+import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils-bangle';
 
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 

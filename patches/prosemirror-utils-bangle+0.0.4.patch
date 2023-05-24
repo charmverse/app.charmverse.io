@@ -1,0 +1,59 @@
+diff --git a/node_modules/prosemirror-utils-bangle/src/helpers.js b/node_modules/prosemirror-utils-bangle/src/helpers.js
+index 74824e7..20f0d49 100644
+--- a/node_modules/prosemirror-utils-bangle/src/helpers.js
++++ b/node_modules/prosemirror-utils-bangle/src/helpers.js
+@@ -1,7 +1,7 @@
+ import { NodeSelection } from 'prosemirror-state';
+ import { Fragment, Node as PMNode } from 'prosemirror-model';
+-import { setTextSelection } from './transforms';
+-import { findParentNodeClosestToPos } from './selection';
++import { setTextSelection } from './transforms.js';
++import { findParentNodeClosestToPos } from './selection.js';
+ 
+ // :: (selection: Selection) → boolean
+ // Checks if current selection is a `NodeSelection`.
+diff --git a/node_modules/prosemirror-utils-bangle/src/index.js b/node_modules/prosemirror-utils-bangle/src/index.js
+index cc877b8..151a09c 100644
+--- a/node_modules/prosemirror-utils-bangle/src/index.js
++++ b/node_modules/prosemirror-utils-bangle/src/index.js
+@@ -1,4 +1,4 @@
+-export * from './selection';
+-export * from './node';
+-export * from './transforms';
+-export { isNodeSelection, canInsert } from './helpers';
++export * from './selection.js';
++export * from './node.js';
++export * from './transforms.js';
++export { isNodeSelection, canInsert } from './helpers.js';
+diff --git a/node_modules/prosemirror-utils-bangle/src/selection.js b/node_modules/prosemirror-utils-bangle/src/selection.js
+index b232282..df4697c 100644
+--- a/node_modules/prosemirror-utils-bangle/src/selection.js
++++ b/node_modules/prosemirror-utils-bangle/src/selection.js
+@@ -1,5 +1,5 @@
+ import { Selection } from 'prosemirror-state';
+-import { equalNodeType, isNodeSelection } from './helpers';
++import { equalNodeType, isNodeSelection } from './helpers.js';
+ 
+ // :: (predicate: (node: ProseMirrorNode) → boolean) → (selection: Selection) → ?{pos: number, start: number, depth: number, node: ProseMirrorNode}
+ // Iterates over parent nodes, returning the closest node and its start position `predicate` returns truthy for. `start` points to the start position of the node, `pos` points directly before the node.
+diff --git a/node_modules/prosemirror-utils-bangle/src/transforms.js b/node_modules/prosemirror-utils-bangle/src/transforms.js
+index 98115ad..7c65dba 100644
+--- a/node_modules/prosemirror-utils-bangle/src/transforms.js
++++ b/node_modules/prosemirror-utils-bangle/src/transforms.js
+@@ -1,6 +1,6 @@
+ import { NodeSelection, Selection } from 'prosemirror-state';
+ import { Fragment } from 'prosemirror-model';
+-import { findParentNodeOfType, findPositionOfNodeBefore } from './selection';
++import { findParentNodeOfType, findPositionOfNodeBefore } from './selection.js';
+ import {
+   cloneTr,
+   isNodeSelection,
+@@ -8,7 +8,7 @@ import {
+   removeNodeAtPos,
+   canInsert,
+   isEmptyParagraph
+-} from './helpers';
++} from './helpers.js';
+ 
+ // :: (nodeType: union<NodeType, [NodeType]>) → (tr: Transaction) → Transaction
+ // Returns a new transaction that removes a node of a given `nodeType`. It will return an original transaction if parent node hasn't been found.

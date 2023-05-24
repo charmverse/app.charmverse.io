@@ -1,5 +1,5 @@
 import type { Node } from 'prosemirror-model';
-import { findChildren } from 'prosemirror-utils';
+import { findChildren } from 'prosemirror-utils-bangle';
 
 import { getNodeFromJson } from './getNodeFromJson';
 import type { PageContent } from './interfaces';
