@@ -34,7 +34,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) 
 }
 
 async function createBountyController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
-  const { spaceId, status, pageId } = req.body as BountyCreationData;
+  const { spaceId, status, linkedPageId } = req.body as BountyCreationData;
 
   const { id: userId } = req.session.user;
 
@@ -64,13 +64,15 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
     createdBy: req.session.user.id
   });
 
-  relay.broadcast(
-    {
-      type: 'pages_meta_updated',
-      payload: [{ bountyId: createdBounty.id, spaceId: createdBounty.spaceId, id: pageId }]
-    },
-    createdBounty.spaceId
-  );
+  if (linkedPageId) {
+    relay.broadcast(
+      {
+        type: 'pages_meta_updated',
+        payload: [{ bountyId: createdBounty.id, spaceId: createdBounty.spaceId, id: linkedPageId }]
+      },
+      createdBounty.spaceId
+    );
+  }
 
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {

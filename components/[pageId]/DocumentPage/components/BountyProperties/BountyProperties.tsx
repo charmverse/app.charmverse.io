@@ -207,9 +207,9 @@ export default function BountyProperties(props: {
 
   async function confirmNewBounty() {
     if (currentBounty) {
-      const createdBounty = await charmClient.bounties.createBounty(currentBounty);
+      const createdBounty = await charmClient.bounties.createBounty({ linkedPageId: pageId, ...currentBounty });
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      cancelDraftBounty();
+      // cancelDraftBounty();
     }
   }
 
@@ -226,8 +226,12 @@ export default function BountyProperties(props: {
   }, [currentBounty?.chainId, currentBounty?.rewardToken]);
 
   useEffect(() => {
-    setCurrentBounty((draftBounty as BountyWithDetails) || bountyFromContext);
+    setCurrentBounty(bountyFromContext || (draftBounty as BountyWithDetails));
+    if (bountyFromContext && draftBounty) {
+      cancelDraftBounty();
+    }
   }, [draftBounty, bountyFromContext]);
+
   const bountyProperties = (
     <>
       <div
@@ -595,7 +599,7 @@ export default function BountyProperties(props: {
 
       {bountyProperties}
 
-      {draftBounty && (
+      {draftBounty && !bountyFromContext && (
         <Box display='flex' gap={2} my={2}>
           <CharmButton color='primary' onClick={confirmNewBounty}>
             Confirm new bounty
