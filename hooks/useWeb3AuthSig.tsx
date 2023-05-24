@@ -94,7 +94,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
 
   function getStoredSignature(_account: string): AuthSig | null {
-    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${_account}`);
+    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${getAddress(_account)}`);
 
     if (stored) {
       try {
@@ -115,7 +115,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? (account ? (getStoredSignature(account) as AuthSig) : null);
+    let signature = authSig ?? (account ? getStoredSignature(account) : null);
 
     if (!signature) {
       signature = await sign();
@@ -176,7 +176,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       !userOwnsAddress
     ) {
       const storedSignature = getStoredSignature(account);
-
       if (storedSignature) {
         log.debug('Logging user in with previous wallet signature');
         loginFromWeb3Account(storedSignature).catch((e) => {
