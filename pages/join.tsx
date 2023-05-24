@@ -13,6 +13,7 @@ import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useSpaces } from 'hooks/useSpaces';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
@@ -44,7 +45,7 @@ export default function JoinWorkspace() {
   } = useSWR(domain ? `space/${domain}` : null, () => charmClient.spaces.searchByDomain(stripUrlParts(domain || '')));
 
   useEffect(() => {
-    const connectedSpace = spaces.find((_space) => _space.domain === router.query.domain);
+    const connectedSpace = filterSpaceByDomain(spaces, domain);
     if (connectedSpace) {
       router.push(`/${connectedSpace.domain}`);
     }
