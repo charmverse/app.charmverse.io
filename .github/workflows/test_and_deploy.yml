@@ -34,6 +34,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
+          CORE_BRANCH: "feat/page-permissions" 
 
       - name: Build and install API
         uses: ./.github/actions/build_permissions_api
@@ -65,6 +66,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: "test"
+          CORE_BRANCH: "feat/page-permissions" 
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}

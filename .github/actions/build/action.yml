@@ -52,6 +52,10 @@ inputs:
   NEXT_PUBLIC_STRIPE_PUBLIC_KEY:
     description: "..."
     required: false
+  CORE_BRANCH:
+    description: "..."
+    required: false
+    default: "main"
 
 runs:
   using: "composite"
@@ -73,7 +77,7 @@ runs:
           .env.test.local
           dist
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dont_cache') }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}-${{inputs.CORE_BRANCH}}
 
     - name: Build
       shell: bash
