@@ -1,8 +1,8 @@
-import { isTestEnv } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getSpaceDomainFromUrlPath } from 'lib/utilities/getSpaceDomainFromUrlPath';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
