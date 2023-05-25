@@ -1,7 +1,11 @@
 import { log } from '@charmverse/core/log'
 import { User as CharmverseUser, Post as CharmversePost, PostCategory, PostComment, PostTag, prisma } from '@charmverse/core/prisma-client'
 import fetch from "adapters/http/fetch.server"
-// import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
+import { htmlToText } from 'html-to-text'
+import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt()
 
 type User = {
   id: number
@@ -293,7 +297,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       }
       
       // Replacing the html tags to get the raw text
-      const content = rootPost.cooked.replace(/<[^>]*>/g, "");
+      const content = parseMarkdown(md.render(rootPost.cooked));
       
       const topicAuthor = await fetchAndStoreUser({
         userId: rootPost.user_id,
@@ -310,7 +314,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           path: topic.slug,
           categoryId: postCategoriesRecord[topic.category_id].id,
           spaceId,
-          contentText: content,
+          contentText: htmlToText(rootPost.cooked),
           content: {
             type: 'doc',
             content: [
@@ -340,7 +344,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         }
 
         // Write regex to remove all html tags and just get the text
-        const content = topicPost.cooked.replace(/<[^>]*>/g, "");
+        const content = parseMarkdown(md.render(rootPost.cooked))
         const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
         const postAuthor = await fetchAndStoreUser({
@@ -354,19 +358,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
 
         const postComment = await prisma.postComment.create({
           data: {
-            content: {
-              type: 'doc',
-              content: [
-                {
-                  type: "paragraph",
-                  content: [{
-                    type: 'text',
-                    text: content
-                  }]
-                }
-              ]
-            },
-            contentText: content,
+            content,
+            contentText: htmlToText(rootPost.cooked),
             parentId: topicPost.reply_to_post_number === null ? null : parentPost ? commentRecord[parentPost.id]?.id : null,
             postId: post.id,
             createdBy: postAuthor.id
