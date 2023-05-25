@@ -381,8 +381,17 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const view = createTableView(board);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const _board = {
+      // use parentBoard props like id and rootId by default
+      ...board,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || board.fields
+    };
+    const view = createTableView(_board);
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;

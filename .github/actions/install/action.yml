@@ -24,3 +24,11 @@ runs:
       shell: bash
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
+
+    # Include this step to deploy and test a different branch of core
+    - name: Install special core library
+      shell: bash
+      # 1. Set the webapp branch
+      if: github.head_ref == 'replace-me'
+      # 2. Set core branch
+      run: npm install github:charmverse/core#replace-me

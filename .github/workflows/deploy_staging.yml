@@ -1,4 +1,4 @@
-name: "Deploy to staging"
+name: 'Deploy to staging'
 
 on:
   pull_request:
@@ -24,7 +24,8 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "staging"
+          NEXT_PUBLIC_APP_ENV: 'staging'
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
           # NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co' - disabled so that each instance uses its own socket router by default
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
@@ -51,9 +52,9 @@ jobs:
           ebextension_files=$(ls .ebextensions*/00_env_vars.config)
           ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
 
-          for conf_file in $ebextension_files $ebstalk_apps_env_files; do 
+          for conf_file in $ebextension_files $ebstalk_apps_env_files; do
             sed -i 's/prd/stg/g' $conf_file
-            sed -i 's/production/staging/g' $conf_file 
+            sed -i 's/production/staging/g' $conf_file
           done
 
       - name: Set the docker compose env variables
