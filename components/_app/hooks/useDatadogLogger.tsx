@@ -10,8 +10,6 @@ const DD_SERVICE = 'webapp-browser';
 
 const env = isStagingEnv ? 'stg' : isProdEnv ? 'prd' : 'dev';
 
-console.log({ token: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN, isProdEnv, isStagingEnv });
-
 export default function useDatadogLogger() {
   const { user } = useUser();
 
