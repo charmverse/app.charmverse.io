@@ -2,7 +2,7 @@ import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
 
-import { isProdEnv } from 'config/constants';
+import { isProdEnv, isStagingEnv } from 'config/constants';
 
 import { useUser } from '../../../hooks/useUser';
 
@@ -16,7 +16,7 @@ export default function useDatadogLogger() {
 
   // Load DD_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && isProdEnv) {
+    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && (isProdEnv || isStagingEnv)) {
       datadogLogs.init({
         clientToken: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN,
         site: DD_SITE,
@@ -56,7 +56,7 @@ export default function useDatadogLogger() {
 
   // Load the user id for DD_LOGS & DD_RUM_LOGS
   useEffect(() => {
-    if (user && isProdEnv) {
+    if (user && (isProdEnv || isStagingEnv)) {
       datadogLogs.onReady(() => {
         datadogLogs.setUser({ id: user.id });
       });
