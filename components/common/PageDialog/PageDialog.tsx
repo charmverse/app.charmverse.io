@@ -1,6 +1,6 @@
-import { AvailablePagePermissions } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
+import { AvailablePagePermissions } from '@charmverse/core/shared';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';

@@ -1,6 +1,6 @@
 import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core';
-import { isParentNode, mapPageTree, sortNodes } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
+import { pageTree } from '@charmverse/core/shared';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import { useRouter } from 'next/router';
@@ -89,7 +89,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    const mappedPages = mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const mappedPages = pageTree.mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
     if (isFavorites) {
       return rootPageIds
         ?.map((id) => mappedPages.find((page) => page.id === id))
@@ -102,7 +102,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const isValidDropTarget = useCallback(
     ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => {
       // do not allow to drop parent onto children
-      return droppedItem.id !== targetItem?.id && !isParentNode({ node: droppedItem, child: targetItem, items: pages });
+      return (
+        droppedItem.id !== targetItem?.id &&
+        !pageTree.isParentNode({ node: droppedItem, child: targetItem, items: pages })
+      );
     },
     [pagesArray]
   );
@@ -123,7 +126,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         const unsortedSiblings = Object.values(_pages)
           .filter(isTruthy)
           .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-        const siblings = sortNodes(unsortedSiblings);
+        const siblings = pageTree.sortNodes(unsortedSiblings);
 
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {

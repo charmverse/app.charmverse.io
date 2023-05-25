@@ -1,5 +1,5 @@
-import { pageTree } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
+import { pageTree } from '@charmverse/core/shared';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
