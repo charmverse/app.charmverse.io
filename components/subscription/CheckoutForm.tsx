@@ -1,9 +1,21 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel';
-import Slider from '@mui/material/Slider';
-import Switch from '@mui/material/Switch';
-import { Box, Stack, styled } from '@mui/system';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+  Box,
+  Divider,
+  Drawer,
+  FormControlLabel,
+  IconButton,
+  InputLabel,
+  List,
+  ListItemText,
+  Slider,
+  Stack,
+  Switch,
+  TextField,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/system';
 import {
   AddressElement,
   CardCvcElement,
@@ -14,9 +26,10 @@ import {
 } from '@stripe/react-stripe-js';
 import type { StripeAddressElementChangeEvent, StripeElementChangeEvent } from '@stripe/stripe-js';
 import log from 'loglevel';
-import type { FormEvent } from 'react';
+import type { FormEvent, SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import Iframe from 'react-iframe';
 import type { KeyedMutator } from 'swr';
 import * as yup from 'yup';
 
@@ -24,9 +37,12 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS, loopCheckoutUrl } from 'lib/subscription/constants';
 import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+
+import type { PaymentType } from './PaymentTabs';
+import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -80,6 +96,9 @@ export function CheckoutForm({
     resolver: yupResolver(schema())
   });
 
+  const [paymentType, setPaymentType] = useState<PaymentType>('card');
+  const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);
+
   const billingEmail = watch('billingEmail');
 
   const space = useCurrentSpace();
@@ -98,6 +117,10 @@ export function CheckoutForm({
     cvc: null,
     cardNumber: null
   });
+
+  const changePaymentType = (event: SyntheticEvent, newValue: PaymentType) => {
+    setPaymentType(newValue);
+  };
 
   useEffect(() => {
     if (spaceSubscription) {
@@ -257,74 +280,85 @@ export function CheckoutForm({
           label='Annual'
         />
       </Stack>
-      <Stack display='flex' mb={2} flexDirection='row' gap={1}>
-        <Stack gap={0.5} flexGrow={1}>
-          <InputLabel>Card number</InputLabel>
-          <StyledCardElementContainer>
-            <CardNumberElement
-              options={{
-                disabled: isProcessing,
-                placeholder: '4242 4242 4242 4242'
-              }}
-              onChange={(e) =>
-                setCardEvent({
-                  ...cardEvent,
-                  cardNumber: e
-                })
-              }
-            />
-          </StyledCardElementContainer>
+      <Divider sx={{ mb: 1 }} />
+      <Typography variant='h6'>Payment method</Typography>
+      <PaymentTabs value={paymentType} onChange={changePaymentType} />
+      <PaymentTabPanel value={paymentType} index='card'>
+        <AddressElement
+          options={{
+            mode: 'billing'
+          }}
+          onChange={(e) =>
+            setCardEvent({
+              ...cardEvent,
+              address: e
+            })
+          }
+        />
+        <Stack gap={0.5} my={2}>
+          <InputLabel>Billing Email</InputLabel>
+          <TextField disabled={isProcessing} {...register('billingEmail')} />
         </Stack>
-        <Stack gap={0.5} flexGrow={0.25}>
-          <InputLabel>Expiry Date</InputLabel>
-          <StyledCardElementContainer>
-            <CardExpiryElement
-              options={{
-                disabled: isProcessing,
-                placeholder: '10 / 25'
-              }}
-              onChange={(e) =>
-                setCardEvent({
-                  ...cardEvent,
-                  expiry: e
-                })
-              }
-            />
-          </StyledCardElementContainer>
+        <Stack display='flex' mb={2} flexDirection='row' gap={1}>
+          <Stack gap={0.5} flexGrow={1}>
+            <InputLabel>Card number</InputLabel>
+            <StyledCardElementContainer>
+              <CardNumberElement
+                options={{
+                  disabled: isProcessing,
+                  placeholder: '4242 4242 4242 4242'
+                }}
+                onChange={(e) =>
+                  setCardEvent({
+                    ...cardEvent,
+                    cardNumber: e
+                  })
+                }
+              />
+            </StyledCardElementContainer>
+          </Stack>
+          <Stack gap={0.5} flexGrow={0.25}>
+            <InputLabel>Expiry Date</InputLabel>
+            <StyledCardElementContainer>
+              <CardExpiryElement
+                options={{
+                  disabled: isProcessing,
+                  placeholder: '10 / 25'
+                }}
+                onChange={(e) =>
+                  setCardEvent({
+                    ...cardEvent,
+                    expiry: e
+                  })
+                }
+              />
+            </StyledCardElementContainer>
+          </Stack>
+          <Stack gap={0.5} flexGrow={0.25}>
+            <InputLabel>CVC</InputLabel>
+            <StyledCardElementContainer>
+              <CardCvcElement
+                options={{
+                  disabled: isProcessing,
+                  placeholder: '1234'
+                }}
+                onChange={(e) =>
+                  setCardEvent({
+                    ...cardEvent,
+                    cvc: e
+                  })
+                }
+              />
+            </StyledCardElementContainer>
+          </Stack>
         </Stack>
-        <Stack gap={0.5} flexGrow={0.25}>
-          <InputLabel>CVC</InputLabel>
-          <StyledCardElementContainer>
-            <CardCvcElement
-              options={{
-                disabled: isProcessing,
-                placeholder: '1234'
-              }}
-              onChange={(e) =>
-                setCardEvent({
-                  ...cardEvent,
-                  cvc: e
-                })
-              }
-            />
-          </StyledCardElementContainer>
-        </Stack>
-      </Stack>
-      <AddressElement
-        options={{
-          mode: 'billing'
-        }}
-        onChange={(e) =>
-          setCardEvent({
-            ...cardEvent,
-            address: e
-          })
-        }
-      />
-      <Stack gap={0.5}>
-        <InputLabel>Billing Email</InputLabel>
-        <TextField disabled={isProcessing} {...register('billingEmail')} />
-      </Stack>
+      </PaymentTabPanel>
+      <PaymentTabPanel value={paymentType} index='crypto'>
+        <Typography mb={1}>
+          We accept crypto payments through our partner Loop. After you click Upgrade a popup will appear with
+          instructions on finishing your payment.
+        </Typography>
+      </PaymentTabPanel>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>
       <Typography>Paid plan: ${SUBSCRIPTION_PRODUCTS_RECORD[productId].pricing[period]}/mo</Typography>
@@ -335,25 +369,69 @@ export function CheckoutForm({
         </StyledListItemText>
         <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
       </StyledList>
-      <Stack gap={1} display='flex' flexDirection='row'>
-        <Button
-          onClick={createSubscription}
-          sx={{ width: 'fit-content' }}
-          loading={isProcessing}
-          disabled={cardError || !cardComplete || isProcessing || !stripe || !elements || !space}
+
+      <PaymentTabPanel value={paymentType} index='card'>
+        <Stack gap={1} display='flex' flexDirection='row'>
+          <Button
+            onClick={createSubscription}
+            sx={{ width: 'fit-content' }}
+            loading={isProcessing}
+            disabled={cardError || !cardComplete || isProcessing || !stripe || !elements || !space}
+          >
+            {isProcessing ? 'Processing ... ' : 'Upgrade'}
+          </Button>
+          <Button
+            disabled={isProcessing}
+            onClick={onCancel}
+            sx={{ width: 'fit-content' }}
+            color='secondary'
+            variant='outlined'
+          >
+            Cancel
+          </Button>
+        </Stack>
+      </PaymentTabPanel>
+      <PaymentTabPanel value={paymentType} index='crypto'>
+        <Stack gap={1} display='flex' flexDirection='row'>
+          <Button onClick={() => setCryptoDrawerOpen(true)}>Upgrade</Button>
+          <Button
+            disabled={isProcessing}
+            onClick={onCancel}
+            sx={{ width: 'fit-content' }}
+            color='secondary'
+            variant='outlined'
+          >
+            Cancel
+          </Button>
+        </Stack>
+        <Drawer
+          anchor='right'
+          open={cryptoDrawerOpen}
+          onClose={() => setCryptoDrawerOpen(false)}
+          PaperProps={{
+            sx: {
+              width: {
+                xs: '100%',
+                sm: '400px'
+              }
+            }
+          }}
         >
-          {isProcessing ? 'Processing ... ' : 'Upgrade'}
-        </Button>
-        <Button
-          disabled={isProcessing}
-          onClick={onCancel}
-          sx={{ width: 'fit-content' }}
-          color='secondary'
-          variant='outlined'
-        >
-          Cancel
-        </Button>
-      </Stack>
+          <IconButton
+            onClick={() => setCryptoDrawerOpen(false)}
+            size='small'
+            sx={{ position: 'absolute', right: 5, top: 10, zIndex: 1 }}
+          >
+            <CloseIcon fontSize='small' />
+          </IconButton>
+          <Iframe
+            url={`${loopCheckoutUrl}/600d864b-dd25-4ac6-9a20-0af29528d937/700a3c1d-bd5a-47c8-8bfc-6474039fdedf?embed=true&cartEnabled=false`}
+            position='relative'
+            width='100%'
+            height='100%'
+          />
+        </Drawer>
+      </PaymentTabPanel>
     </Stack>
   );
 }

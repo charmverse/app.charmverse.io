@@ -103,7 +103,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             )}
             <Divider sx={{ mb: 1 }} />
             {showCheckoutForm ? (
-              <Elements stripe={stripePromise}>
+              <Elements
+                stripe={stripePromise}
+                options={{ appearance: { theme: 'stripe', variables: { colorBackground: 'var(--input-bg)' } } }}
+              >
                 <CheckoutForm
                   spaceSubscription={spaceSubscription}
                   refetch={refetchSpaceSubscription}
