@@ -1,4 +1,7 @@
+import { baseUrl } from 'config/constants';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
@@ -170,8 +173,14 @@ export function setCookie({
   expiresInDays: number;
 }) {
   const expires = new Date();
+  const domain = isLocalhostAlias() ? undefined : `Domain=${getAppApexDomain()};`;
+  const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
+
   expires.setDate(expires.getDate() + expiresInDays);
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
+
+  document.cookie = `${name}=${encodeURIComponent(
+    value
+  )}; ${domain} expires=${expires.toUTCString()}; path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {
