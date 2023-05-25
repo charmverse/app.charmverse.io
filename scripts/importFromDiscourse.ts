@@ -1,6 +1,7 @@
-import { User as CharmverseUser, PostCategory, PostComment, PostTag, prisma } from '@charmverse/core/src/prisma-client'
+import { User as CharmverseUser, Post as CharmversePost, PostCategory, PostComment, PostTag, prisma } from '@charmverse/core/prisma-client'
+import { breadcrumbsClasses } from '@mui/material'
 import fetch from "adapters/http/fetch.server"
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
+// import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
 
 type User = {
   id: number
@@ -142,7 +143,7 @@ type Post = {
   user_title: string | null,
   bookmarked: boolean,
   raw: string,
-  actions_summary: { id: number, count: number }[],
+  actions_summary?: { id: number, count: number }[],
   moderator: boolean,
   admin: boolean,
   staff: boolean,
@@ -156,158 +157,245 @@ type Post = {
   wiki: boolean,
 }
 
-export async function importFromDiscourse(community: string, spaceDomain: string) {
-  const space = await prisma.space.findFirstOrThrow({
-    where: {
-      domain: spaceDomain
+type UserAction = {
+  excerpt: string;
+  truncated: boolean;
+  action_type: number;
+  created_at: string;
+  avatar_template: string;
+  acting_avatar_template: string;
+  slug: string;
+  topic_id: number;
+  target_user_id: number;
+  target_name: string;
+  target_username: string;
+  post_number: number;
+  post_id: number;
+  username: string;
+  name: string;
+  user_id: number;
+  acting_username: string;
+  acting_name: string;
+  acting_user_id: number;
+  title: string;
+  deleted: boolean;
+  hidden: boolean;
+  post_type: number;
+  action_code: null | number;
+  category_id: number;
+  closed: boolean;
+  archived: boolean;
+}
+
+async function createCharmverseUser ({avatar_template, community, spaceId, username}: {avatar_template: string, username: string, spaceId: string, community: string}) {
+  const charmverseUser = await prisma.user.create({
+    data: {
+      username: `${username} (Imported)`,
+      path: username.toLowerCase(),
+      avatar: `https://${community}${avatar_template.replace('{size}', '80')}`,
+      isBot: true
     }
   })
 
-  const spaceId = space.id
+  await prisma.spaceRole.create({
+    data: {
+      userId: charmverseUser.id,
+      spaceId
+    }
+  })
+
+  return charmverseUser
+}
+
+export async function importFromDiscourse(community: string, spaceDomain: string) {
+  try {
+    const space = await prisma.space.findFirstOrThrow({
+      where: {
+        domain: spaceDomain
+      }
+    })
   
-  const {category_list: {categories}} = await fetch<{
-    category_list: {
-      categories: Category[]
-    }
-  }>(`https://${community}/categories.json`)
-
-  const {tags} = await fetch<{tags: Tag[]}>(`https://${community}/tags.json`)
-
-  const postTags: PostTag[] = [];
-  const postTagRecord: Record<string, PostTag> = {}
-
-  for (const tag of tags) {
-    const postTag = await prisma.postTag.create({
-      data: {
-        name: tag.name,
-        spaceId
+    const spaceId = space.id
+    
+    const {category_list: {categories}} = await fetch<{
+      category_list: {
+        categories: Category[]
       }
-    })
-    postTags.push(postTag)
-    postTagRecord[tag.id] = postTag
-  }
-
-  const postCategories: PostCategory[] = []
-  const forumCategoriesRecord: Record<string, {
-    charmverse: PostCategory,
-    discourse: Category
-  }> = {}
-
-  for (const category of categories) {
-    const postCategory = await prisma.postCategory.create({
-      data: {
-        name: category.name,
-        spaceId,
-        description: category.description_text,
-        path: category.slug,
-      }
-    })
-    postCategories.push(postCategory)
-    forumCategoriesRecord[category.id] = {
-      charmverse: postCategory,
-      discourse: category
-    }
-    forumCategoriesRecord[postCategory.id] = {
-      charmverse: postCategory,
-      discourse: category
-    }
-  }
-
-  const topics: Topic[] = []
-  const posts: Post[] = []
-  const topicPostRecord: Record<string, Post[]> = {}
-  const discourseUserRecord: Record<string, User> = {};
-  const discourseCharmverseUserRecord: Record<string, CharmverseUser> = {};
-
-  for (const categoryId in forumCategoriesRecord) {
-    const {topic_list: {topics: fetchedTopics, users: fetchedUsers}} = await fetch<{topic_list: {users: User[], topics: Topic[]}}>(`https://${community}/c/${categoryId}.json`);
-    for (const topic of fetchedTopics) {
-      const {post_stream: {posts: fetchedPosts}} = await fetch<{post_stream: {posts: Post[]}}>(`https://${community}/t/${topic.id}.json`)
-      posts.push(...fetchedPosts)
-      topicPostRecord[topic.id] = fetchedPosts
-    }
-
-    topics.push(...fetchedTopics)
-
-    fetchedUsers.forEach(user => {
-      discourseUserRecord[user.id] = user
-    })
-  }
-
-  const users = Object.values(discourseUserRecord)
-  for (const user of users) {
-    const charmverseUser = await prisma.user.create({
-      data: {
-        username: `${user.username} (Imported)`,
-        path: user.username,
-        avatar: user.avatar_template.replace('{size}', '80'),
-        isBot: true
-      }
-    })
-
-    await prisma.spaceRole.create({
-      data: {
-        userId: charmverseUser.id,
-        spaceId
-      }
-    })
-
-    discourseCharmverseUserRecord[user.id] = charmverseUser
-  }
-
-  for (const topic of topics) {
-    const commentRecord: Record<string, PostComment> = {}
-    const topicPosts = topicPostRecord[topic.id]
-    const topicPost = topicPosts[0]
-    const content = parseMarkdown(topicPost.cooked)
-    const post = await prisma.post.create({
-      data: {
-        title: topic.title,
-        path: topic.slug,
-        categoryId: forumCategoriesRecord[topic.category_id].charmverse.id,
-        spaceId,
-        contentText: topicPost.cooked,
-        content,
-        createdBy: discourseCharmverseUserRecord[topicPost.user_id].id,
-        postToPostTags: {
-          createMany: {
-            data: postTags.map(tag => ({postTagId: postTagRecord[tag.id].id}))
-          }
-        }
-      }
-    })
-
-    const totalLikeCounts = topic.like_count
-
-    // Create PostUpDownVote model records based on the total like counts
-    for (let i = 1; i <= totalLikeCounts; i += 1) {
-      await prisma.postUpDownVote.create({
+    }>(`https://${community}/categories.json`)
+  
+    const {tags} = await fetch<{tags: Tag[]}>(`https://${community}/tags.json`)
+  
+    const postTags: PostTag[] = [];
+    const postTagRecord: Record<string, PostTag> = {}
+  
+    for (const tag of tags) {
+      const postTag = await prisma.postTag.create({
         data: {
-          postId: post.id,
-          createdBy: discourseCharmverseUserRecord[topicPost.user_id].id,
-          upvoted: true,
+          name: tag.name,
+          spaceId
         }
       })
+      postTags.push(postTag)
+      postTagRecord[tag.id] = postTag
     }
 
-    for (const topicPost of topicPosts) {
-      if (topicPost.post_number !== 1) {
-        const content = parseMarkdown(topicPost.cooked)
-        const postComment = await prisma.postComment.create({
+    const postCategories: PostCategory[] = []
+    const forumCategoriesRecord: Record<string, PostCategory> = {}
+
+    for (const category of categories) {
+      const postCategory = await prisma.postCategory.create({
+        data: {
+          name: category.name,
+          spaceId,
+          description: category.description_text,
+          path: category.slug,
+        }
+      })
+      postCategories.push(postCategory)
+      forumCategoriesRecord[category.id] = postCategory
+    }
+  
+    const topics: Topic[] = []
+    const posts: Post[] = []
+    const topicPostRecord: Record<string, Post[]> = {}
+    const discourseUserRecord: Record<string, User> = {};
+    const discourseCharmverseUserRecord: Record<string, CharmverseUser> = {};
+    const postRecord: Record<string, CharmversePost> = {};
+    const commentRecord: Record<string, PostComment> = {}
+  
+    for (const categoryId in forumCategoriesRecord) {
+      const {topic_list: {topics: fetchedTopics}} = await fetch<{users: User[], topic_list: {topics: Topic[]}}>(`https://${community}/c/${categoryId}.json`);
+      for (const topic of fetchedTopics) {
+        const {post_stream: {posts: fetchedPosts}} = await fetch<{post_stream: {posts: Post[]}}>(`https://${community}/t/${topic.id}.json`)
+        posts.push(...fetchedPosts)
+        topicPostRecord[topic.id] = fetchedPosts
+      }
+  
+      topics.push(...fetchedTopics)
+    }
+  
+    for (const topic of topics) {
+      const topicPosts = topicPostRecord[topic.id]
+      const topicPost = topicPosts[0]
+      const content = topicPost.cooked;
+      if (!discourseCharmverseUserRecord[topicPost.user_id]) {
+        const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${topicPost.username}.json`)).user
+        discourseCharmverseUserRecord[topicPost.user_id] = await createCharmverseUser({
+          community,
+          spaceId,
+          username: fetchedUser.username,
+          avatar_template: fetchedUser.avatar_template
+        })
+        discourseUserRecord[topicPost.user_id] = fetchedUser
+      }
+      const topicAuthor = discourseCharmverseUserRecord[topicPost.user_id];
+      if (topicAuthor) {
+        const post = await prisma.post.create({
           data: {
-            content,
+            title: topic.title,
+            path: topic.slug,
+            categoryId: forumCategoriesRecord[topic.category_id].id,
+            spaceId,
             contentText: topicPost.cooked,
-            parentId: topicPost.reply_to_post_number === null ? null : commentRecord[topicPost.reply_to_post_number].id,
-            postId: post.id,
-            createdBy: discourseCharmverseUserRecord[topicPost.user_id].id
+            content,
+            createdBy: topicAuthor.id,
+            postToPostTags: {
+              createMany: {
+                data: topic.tags.map(tagId => ({postTagId: postTagRecord[tagId].id}))
+              }
+            }
           }
         })
+    
+        for (const topicPost of topicPosts) {
+          if (topicPost.post_number !== 1) {
+            const content = topicPost.cooked;
+            const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
+            
+            if (!discourseCharmverseUserRecord[topicPost.user_id]) {
+              const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${topicPost.username}.json`)).user
+              discourseCharmverseUserRecord[topicPost.user_id] = await createCharmverseUser({
+                community,
+                spaceId,
+                username: fetchedUser.username,
+                avatar_template: fetchedUser.avatar_template
+              })
+              discourseUserRecord[topicPost.user_id] = fetchedUser
+            }
+            const topicAuthor = discourseCharmverseUserRecord[topicPost.user_id];
 
-        commentRecord[topicPost.post_number] = postComment
-        // Need to create updownvote for each comment, like_count is not available in the topicPost
+            if (topicAuthor) {
+              const postComment = await prisma.postComment.create({
+                data: {
+                  content,
+                  contentText: topicPost.cooked,
+                  parentId: topicPost.reply_to_post_number === null ? null : parentPost ? commentRecord[parentPost.id]?.id : null,
+                  postId: post.id,
+                  createdBy: discourseCharmverseUserRecord[topicPost.user_id].id
+                }
+              })
+      
+              commentRecord[topicPost.id] = postComment
+            }
+          }
+          postRecord[topicPost.id] = post
+        }
       }
     }
+
+    const users = Object.values(discourseUserRecord);
+
+    while (users.length) {
+      const user = users.pop();
+      if (user) {
+        const userActions = await fetch<{user_actions: UserAction[]}>(`https://${community}/user_actions.json?username=${user.username}`)
+        const postLikeUserActions = userActions.user_actions.filter(userAction => userAction.action_type === 2)
+        for (const postLikeUserAction of postLikeUserActions) {
+          const topicPost = topicPostRecord[postLikeUserAction.topic_id]?.find(topicPost => topicPost.id === postLikeUserAction.post_id)
+          const firstPost = topicPostRecord[postLikeUserAction.topic_id]?.find(topicPost => topicPost.post_number === 1)
+          if (topicPost && firstPost) {
+            if (!discourseCharmverseUserRecord[postLikeUserAction.acting_user_id]) {
+              const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${postLikeUserAction.acting_username}.json`)).user
+              discourseCharmverseUserRecord[postLikeUserAction.acting_user_id] = await createCharmverseUser({
+                community,
+                spaceId,
+                username: fetchedUser.username,
+                avatar_template: fetchedUser.avatar_template
+              })
+              discourseUserRecord[postLikeUserAction.acting_user_id] = fetchedUser
+              users.push(fetchedUser)
+            }
+            const topicAuthor = discourseCharmverseUserRecord[postLikeUserAction.acting_user_id];
+            if (topicAuthor) {
+              // Reaction for the first post would be stored in the model postUpDownVote
+              if (topicPost.post_number === 1) {
+                await prisma.postUpDownVote.create({
+                  data: {
+                    postId: postRecord[topicPost.id].id,
+                    createdBy: topicAuthor.id,
+                    upvoted: true,
+                  }
+                })
+              } else {
+                await prisma.postCommentUpDownVote.create({
+                  data: {
+                    postId: postRecord[firstPost.id].id,
+                    commentId: commentRecord[topicPost.id].id,
+                    createdBy: topicAuthor.id,
+                    upvoted: true,
+                  }
+                })
+              }
+            }
+          }
+        }
+      } else {
+        break;
+      }
+    }
+  } catch (err) {
+    console.log(err)
   }
 }
 
-importFromDiscourse("forum.game7.io", "150e54f8-c656-47f5-9caf-699d65829ce4")
+importFromDiscourse("forum.game7.io", "shaky-pumpanddump-crocodile")
