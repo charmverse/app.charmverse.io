@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    // "module": "commonjs",
     "outDir": "dist",
-    "lib": [
-      "es2022"
-    ],
-    "target": "es2022",
+    // "lib": [
+    //   "es2022"
+    // ],
+    // "target": "es2022",
     "isolatedModules": false,
     "noEmit": false
   },

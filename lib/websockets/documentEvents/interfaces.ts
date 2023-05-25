@@ -99,7 +99,7 @@ type ServerConnectionsMessage = {
 export type ServerDocDataMessage = {
   type: 'doc_data';
   doc: { content: Node; v: number };
-  docInfo: { id: string; session_id: string; updated: any; version: number }; // TODO: do we need this?
+  docInfo: { id: string; session_id: string; version: number }; // TODO: do we need this?
   time: number;
   m?: ClientDiffMessage[];
 };

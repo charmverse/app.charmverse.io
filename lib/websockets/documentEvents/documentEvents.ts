@@ -260,10 +260,10 @@ export class DocumentEventHandler {
 
       const docRoom = docRooms.get(pageId);
       if (docRoom && Object.keys(docRoom.participants).length > 0) {
-        log.debug('Join existing document room', { pageId, userId });
+        log.debug('Join existing document room', { pageId, userId, connectionCount });
         docRoom.participants[this.id] = this;
       } else {
-        log.debug('Opening new document room', { pageId, userId });
+        log.debug('Opening new document room', { pageId, userId, connectionCount });
         const page = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
@@ -288,7 +288,7 @@ export class DocumentEventHandler {
       }
 
       this.sendMessage({ type: 'subscribed' });
-      // console.log('connection count on subscription', connectionCount);
+
       if (connectionCount < 1) {
         await this.sendDocument();
         log.debug('Sent document to new subscriber', {
@@ -453,23 +453,18 @@ export class DocumentEventHandler {
       log.error('Cannot send document - session is missing documentId', { session, userId: session.user.id });
       return;
     }
+    const room = this.getDocumentRoomOrThrow();
 
-    const page = await prisma.page.findUniqueOrThrow({
-      where: { id: session.documentId },
-      select: { content: true, updatedAt: true, id: true, version: true }
-    });
-    const content = (page.content as any) || emptyDocument;
     const message: ServerDocDataMessage = {
       type: 'doc_data',
       doc: {
-        content,
-        v: page.version
+        content: room.doc.content,
+        v: room.doc.version
       },
       docInfo: {
-        id: page.id,
+        id: session.documentId,
         session_id: this.id,
-        updated: page.updatedAt,
-        version: page.version
+        version: room.doc.version
       },
       time: Date.now()
     };
