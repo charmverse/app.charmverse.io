@@ -16,6 +16,6 @@
     "next-env.d.ts"
   ],
   "exclude": [
-    "node_modules",
-    "*.svg"]
+    "node_modules"
+  ]
 }

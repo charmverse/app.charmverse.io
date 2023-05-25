@@ -93,12 +93,13 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onError = onError;
+
+    // socket.io client options: https://socket.io/docs/v4/client-options/
     this.socket = io(socketHost, {
       withCredentials: true,
       auth: {
         authToken
       }
-      // path: '/api/socket'
     });
     this.createWSConnection();
   }

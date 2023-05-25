@@ -111,7 +111,7 @@ export class WebsocketBroadcaster {
   }
 
   close() {
-    log.info('[server] Closing Next.js Websocket server...');
+    log.info('[server] Closing Websocket server...');
     this.io.close();
   }
 }
