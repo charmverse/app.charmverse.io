@@ -35,6 +35,7 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
+// Note: the endpoint creates a user when wallet address is provided
 export async function createUser({
   browserPage,
   address

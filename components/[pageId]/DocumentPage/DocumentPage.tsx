@@ -287,6 +287,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         <BountyProperties
                           bountyId={page.bountyId}
                           pageId={page.id}
+                          pagePath={page.path}
                           readOnly={readOnly}
                           permissions={bountyPermissions || null}
                           refreshBountyPermissions={() => refreshBountyPermissions()}
