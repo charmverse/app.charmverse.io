@@ -12,6 +12,7 @@ import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -50,7 +51,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) 
 }
 
 async function createBountyController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
-  const { spaceId, status } = req.body as BountyCreationData;
+  const { spaceId, status, linkedPageId } = req.body as BountyCreationData;
 
   const { id: userId } = req.session.user;
 
@@ -79,6 +80,16 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
     ...req.body,
     createdBy: req.session.user.id
   });
+
+  if (linkedPageId) {
+    relay.broadcast(
+      {
+        type: 'pages_meta_updated',
+        payload: [{ bountyId: createdBounty.id, spaceId: createdBounty.spaceId, id: linkedPageId }]
+      },
+      createdBounty.spaceId
+    );
+  }
 
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {

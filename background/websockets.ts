@@ -39,6 +39,7 @@ log.info(`[server] Websocket server running in ${appEnv} listening to port: ${po
 
 function cleanup() {
   log.info('[server] Closing Websocket server connections...');
+  io.close();
   server.close(() => {
     log.info('[server] Exiting process...');
     process.exit(1);

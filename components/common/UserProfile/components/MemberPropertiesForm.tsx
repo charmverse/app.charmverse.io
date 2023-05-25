@@ -28,22 +28,12 @@ export function MemberPropertiesForm({
   showBlockchainData = false,
   userId
 }: Props) {
-  const { data: properties = [], mutate } = useSWR(
+  const { data: properties, mutate } = useSWR(
     spaceId ? `members/${userId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(userId, spaceId || ''),
     { revalidateOnMount: true }
   );
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
-
-  const defaultValues = useMemo(
-    () =>
-      properties?.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-        acc[prop.memberPropertyId] = prop.value;
-        return acc;
-      }, {}),
-    [properties]
-  );
-
   const {
     control,
     formState: { errors, isDirty },
@@ -75,17 +65,21 @@ export function MemberPropertiesForm({
   );
 
   useEffect(() => {
-    if (defaultValues && isDirty) {
+    if (!properties || isDirty) {
       return;
     }
+    const defaultValues = properties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
+      acc[prop.memberPropertyId] = prop.value;
+      return acc;
+    }, {});
 
     reset(defaultValues);
-  }, [defaultValues, isDirty]);
+  }, [properties, isDirty]);
 
   return (
     <Box>
       <Box display='flex' flexDirection='column'>
-        {properties.map((property) => (
+        {properties?.map((property) => (
           <Controller
             key={property.memberPropertyId}
             name={property.memberPropertyId}

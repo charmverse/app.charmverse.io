@@ -43,7 +43,7 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   try {
     await recordDatabaseEvent(req.body, req.session.user?.id);
   } catch (error) {
-    log.error('Error recording database event', { ...request, error });
+    log.error('Error recording database event', { ...request, error, referer: req.headers.referer });
   }
 
   res.status(200).end();

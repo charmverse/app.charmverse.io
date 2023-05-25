@@ -55,7 +55,11 @@ function BountyKanbanCard({ onDelete, bounty, page: bountyPage, onClick, readOnl
         </Box>
       </Box>
       {onDelete && (
-        <KanbanPageActionsMenuButton page={bountyPage} readOnly={readOnly} onClickDelete={() => onDelete(bounty.id)} />
+        <KanbanPageActionsMenuButton
+          page={bountyPage}
+          readOnly={readOnly}
+          onClickDelete={() => onDelete(bounty.page.id)}
+        />
       )}
     </StyledBox>
   );

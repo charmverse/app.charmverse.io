@@ -16,10 +16,10 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
-  bountyPage: PageMeta;
+  pagePath: string;
 }
 
-export function BountySignupButton({ bountyPage }: Props) {
+export function BountySignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const space = useCurrentSpace();
@@ -79,7 +79,7 @@ export function BountySignupButton({ bountyPage }: Props) {
           spaceWithGates && (
             <SpaceAccessGate
               onSuccess={() => {
-                window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
+                window.location.href = `${window.location.origin}/${space?.domain}/${pagePath}`;
               }}
               space={spaceWithGates}
               joinType='public_bounty_token_gate'

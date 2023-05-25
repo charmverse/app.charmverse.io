@@ -22,12 +22,12 @@ interface Props {
 export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
-  const { setBounties, refreshBounty } = useBounties();
+  const { setBounties } = useBounties();
   const router = useRouter();
 
-  function onClickDelete(bountyId: string) {
-    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
-    deletePage({ pageId: bountyId });
+  function onClickDelete(pageId: string) {
+    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
+    deletePage({ pageId });
   }
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>(
@@ -82,7 +82,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
         {bountyStatuses.map((bountyStatus) => (
           <div className='octo-board-column' key={bountyStatus}>
             {bountiesGroupedByStatus[bountyStatus]
-              .filter((bounty) => Boolean(pages[bounty.page?.id]) && !pages[bounty.page.id]?.deletedAt)
+              .filter((bounty) => Boolean(pages[bounty.page.id]) && !pages[bounty.page.id]?.deletedAt)
               .map((bounty) => (
                 <BountyKanbanCard
                   onDelete={onClickDelete}
@@ -91,7 +91,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
                   bounty={bounty}
                   page={pages[bounty.page.id] as PageMeta}
                   onClick={() => {
-                    openPage(bounty.id);
+                    openPage(bounty.page.id);
                   }}
                 />
               ))}
