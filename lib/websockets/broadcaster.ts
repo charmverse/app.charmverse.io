@@ -66,10 +66,6 @@ export class WebsocketBroadcaster {
         log.debug('[ws] Web socket namepsace /editor connected', { userId: socket.data.user.id });
         new DocumentEventHandler(socket).init();
       });
-
-    // close on shutdown
-    process.on('SIGINT', this.close.bind(this));
-    process.on('SIGTERM', this.close.bind(this));
   }
 
   broadcastToAll(message: ServerMessage): void {

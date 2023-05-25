@@ -18,9 +18,6 @@
       ],
       "@charmverse/core/log": [
         "node_modules/@charmverse/core/dist/esm/lib/log",
-      ],
-      "socket.io": [
-        "node_modules/@charmverse/core/dist/esm/lib/log",
       ]
     }
   }
