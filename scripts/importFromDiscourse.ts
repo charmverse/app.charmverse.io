@@ -277,7 +277,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     for (const topic of topics) {
       const topicPosts = topicPostRecord[topic.id]
       const topicPost = topicPosts[0]
-      const content = topicPost.cooked;
+      const content = topicPost.cooked.replace(/<[^>]*>/g, "");
       if (!discourseCharmverseUserRecord[topicPost.user_id]) {
         const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${topicPost.username}.json`)).user
         discourseCharmverseUserRecord[topicPost.user_id] = await createCharmverseUser({
@@ -296,8 +296,19 @@ export async function importFromDiscourse(community: string, spaceDomain: string
             path: topic.slug,
             categoryId: forumCategoriesRecord[topic.category_id].id,
             spaceId,
-            contentText: topicPost.cooked,
-            content,
+            contentText: content,
+            content: {
+              type: 'doc',
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{
+                    type: 'text',
+                    text: content
+                  }]
+                }
+              ]
+            },
             createdBy: topicAuthor.id,
             postToPostTags: {
               createMany: {
@@ -309,7 +320,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     
         for (const topicPost of topicPosts) {
           if (topicPost.post_number !== 1) {
-            const content = topicPost.cooked;
+            // Write regex to remove all html tags and just get the text
+            const content = topicPost.cooked.replace(/<[^>]*>/g, "");
             const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
             
             if (!discourseCharmverseUserRecord[topicPost.user_id]) {
@@ -327,8 +339,19 @@ export async function importFromDiscourse(community: string, spaceDomain: string
             if (topicAuthor) {
               const postComment = await prisma.postComment.create({
                 data: {
-                  content,
-                  contentText: topicPost.cooked,
+                  content: {
+                    type: 'doc',
+                    content: [
+                      {
+                        type: "paragraph",
+                        content: [{
+                          type: 'text',
+                          text: content
+                        }]
+                      }
+                    ]
+                  },
+                  contentText: content,
                   parentId: topicPost.reply_to_post_number === null ? null : parentPost ? commentRecord[parentPost.id]?.id : null,
                   postId: post.id,
                   createdBy: discourseCharmverseUserRecord[topicPost.user_id].id
