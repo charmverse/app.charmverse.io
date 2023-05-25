@@ -12,6 +12,7 @@ import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -21,6 +22,9 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getPageRoute)
+  // Only require user on update and delete
+  .use(requireUser)
   .use(
     providePermissionClients({
       key: 'id',
@@ -28,9 +32,6 @@ handler
       resourceIdType: 'page'
     })
   )
-  .get(getPageRoute)
-  // Only require user on update and delete
-  .use(requireUser)
   .put(updatePageHandler)
   .delete(deletePage);
 
@@ -50,10 +51,17 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   }
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: page.id,
-    userId
-  });
+  const permissions = await getPermissionsClient({ resourceId: page.spaceId, resourceIdType: 'space' }).then(
+    ({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: page.id,
+        userId
+      })
+  );
+
+  if (!permissions.read) {
+    throw new ActionNotPermittedError('You do not have permissions to view this page');
+  }
 
   const result: PageWithContent = {
     ...page,

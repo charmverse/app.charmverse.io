@@ -13,6 +13,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -22,14 +23,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(
+  .post(
     providePermissionClients({
       key: 'spaceId',
       location: 'body',
       resourceIdType: 'space'
-    })
+    }),
+    createPageHandler
   )
-  .post(createPageHandler)
   .delete(deletePages);
 
 async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>) {
@@ -82,7 +83,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   });
 
   try {
-    await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
       event: 'created',
       pageId: page.id
     });
