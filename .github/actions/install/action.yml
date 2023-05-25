@@ -29,6 +29,6 @@ runs:
     - name: Install special core library
       shell: bash
       # 1. Set the webapp branch
-      if: github.head_ref == 'browser-logs'
+      if: github.head_ref == 'replace-me'
       # 2. Set core branch
-      run: npm install github:charmverse/core#browser-logs
+      run: npm install github:charmverse/core#replace-me
