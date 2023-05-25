@@ -21,7 +21,7 @@ handler
 
 async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
   const body = req.body as Pick<ListProposalsRequest, 'categoryIds'>;
-  const { id: userId } = req.session.user;
+  const userId = req.session.user?.id;
   const spaceId = req.query.id as string;
 
   const proposals = await req.basePermissionsClient.proposals.getAccessibleProposals({
