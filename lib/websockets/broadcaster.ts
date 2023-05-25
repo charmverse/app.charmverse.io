@@ -49,12 +49,14 @@ export class WebsocketBroadcaster {
       // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
       // so we only need to keep track of the number of clients connected to the root namespace
       log.debug('[ws] Web socket connected', {
+        socketId: socket.id,
         // clientCount: io.engine.clientsCount,
         clientCount: io.of('/').sockets.size
       });
 
       socket.on('disconnect', () => {
         log.debug('[ws] Web socket disconnected', {
+          socketId: socket.id,
           clientCount: io.of('/').sockets.size
         });
       });
@@ -63,7 +65,7 @@ export class WebsocketBroadcaster {
     io.of('/ceditor')
       .use(authOnConnect)
       .on('connect', (socket) => {
-        log.debug('[ws] Web socket namepsace /editor connected', { userId: socket.data.user.id });
+        log.debug('[ws] Web socket namespace /editor connected', { socketId: socket.id, userId: socket.data.user.id });
         new DocumentEventHandler(socket).init();
       });
   }

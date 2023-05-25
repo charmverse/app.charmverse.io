@@ -154,7 +154,7 @@ export class DocumentEventHandler {
       return;
     } else if (message.c < this.messages.client + 1) {
       // Receive a message already received at least once. Ignore.
-      log.debug(`Ignore duplicate ${message.type} message from client`, {
+      log.debug(`Ignore duplicate message from client`, {
         ...logData,
         message
       });
@@ -402,7 +402,7 @@ export class DocumentEventHandler {
           await this.sendMessage(newMessage);
         }
       } else {
-        log.debug('Client is too far behind. Resend document', logMeta);
+        log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
         await this.unfixable();
       }
     } else {
