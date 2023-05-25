@@ -3,7 +3,7 @@ import { InvalidInputError, stringUtils } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { getPermissionsClient } from './routers';
+import { getPermissionsClient, premiumPermissionsApiClient } from './routers';
 import type { PermissionsEngine, ResourceIdEntity } from './routers';
 
 declare module 'http' {
@@ -43,11 +43,10 @@ export function providePermissionClients({ key, location, resourceIdType }: Midd
       resourceIdType
     });
 
+    // Provide different base client based on space paid tier
     req.basePermissionsClient = clientWithInfo.client;
-
-    if (clientWithInfo.type === 'premium') {
-      req.premiumPermissionsClient = clientWithInfo.client as PremiumPermissionsClient;
-    }
+    // Always provide premium client
+    req.premiumPermissionsClient = premiumPermissionsApiClient;
 
     req.spacePermissionsEngine = clientWithInfo.type;
 

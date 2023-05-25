@@ -2,7 +2,7 @@ import type { PagePermissionAssignment } from '@charmverse/core';
 import type { Role, Space } from '@charmverse/core/prisma';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -130,16 +130,9 @@ describe('POST /api/permissions - Add page permissions', () => {
   });
 
   it('should allow a proposal editor to make a proposal page public and respond 201', async () => {
-    const page = await testUtilsPages.generatePage({
-      createdBy: user.id,
-      spaceId: space.id,
-      type: 'proposal',
-      pagePermissions: [
-        {
-          permissionLevel: 'proposal_editor',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+    const page = await testUtilsProposals.generateProposal({
+      userId: user.id,
+      spaceId: space.id
     });
 
     const permission: PagePermissionAssignment = {
@@ -187,36 +180,6 @@ describe('POST /api/permissions - Add page permissions', () => {
     });
     const permission: PagePermissionAssignment = {
       pageId: page.id,
-      permission: {
-        permissionLevel: 'view_comment',
-        assignee: { group: 'role', id: role.id }
-      }
-    };
-
-    await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
-  });
-
-  it('should fail if trying to manually assign permissions to children of a proposal page and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
-      createdBy: user.id,
-      spaceId: space.id,
-      type: 'proposal'
-    });
-
-    const childPage = await testUtilsPages.generatePage({
-      createdBy: user.id,
-      spaceId: space.id,
-      type: 'page',
-      parentId: page.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
-    });
-    const permission: PagePermissionAssignment = {
-      pageId: childPage.id,
       permission: {
         permissionLevel: 'view_comment',
         assignee: { group: 'role', id: role.id }

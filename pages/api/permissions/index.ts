@@ -54,6 +54,8 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     userId: req.session.user.id
   });
 
+  console.log({ computedPermissions });
+
   if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');
   } else if (permissionData.assignee.group !== 'public' && computedPermissions.grant_permissions !== true) {
@@ -79,6 +81,10 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     throw new DataNotFoundError('Page not found');
   }
 
+  if (page.type === 'proposal' && permissionData.assignee.group !== 'public') {
+    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
+  }
+
   // Usually a userId, but can be an email
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
 
@@ -97,10 +103,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     spaceDomain = addGuestResult.spaceDomain;
 
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
-  }
-
-  if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
-    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
   }
 
   const createdPermission = await req.premiumPermissionsClient.pages.upsertPagePermission({
