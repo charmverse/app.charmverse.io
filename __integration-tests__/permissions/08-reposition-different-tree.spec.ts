@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PagePermissionAssignment, PagePermissionWithSource, PageWithPermissions } from '@charmverse/core';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PagePermissionWithSource,
+  PageWithPermissions
+} from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
@@ -52,7 +57,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
     // Add permission on child page which will inherit downwards
     const createdRootPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToAdd).expect(201)
-    ).body as PagePermissionWithSource;
+    ).body as AssignedPagePermission;
 
     rootPage = (await getPage(rootPage.id)) as PageWithPermissions;
 
@@ -140,7 +145,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
     // Add permission on child page which will inherit downwards
     const createdRootPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToAdd).expect(201)
-    ).body as PagePermissionWithSource;
+    ).body as AssignedPagePermission;
 
     oldRootPage = (await getPage(oldRootPage.id)) as PageWithPermissions;
 

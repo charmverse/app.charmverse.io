@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PagePermissionAssignment, PageWithPermissions } from '@charmverse/core';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PageWithPermissions,
+  TargetPermissionGroup
+} from '@charmverse/core';
 import type { PagePermission, Space } from '@charmverse/core/prisma';
+import { testUtilsPages } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
@@ -103,11 +109,11 @@ describe('POST /api/permissions - add new permission', () => {
 
     const newPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    ).body as AssignedPagePermission;
 
     const childPageList = (await Promise.all([
-      getPage(childPage.id),
-      getPage(nestedChildPage.id)
+      testUtilsPages.getPageWithPermissions(childPage.id),
+      testUtilsPages.getPageWithPermissions(nestedChildPage.id)
     ])) as PageWithPermissions[];
 
     childPageList.forEach((childPageWithPermissions) => {
@@ -116,7 +122,7 @@ describe('POST /api/permissions - add new permission', () => {
       // Ensure inheritance happened correctly
       const childInheritedPermissions = childPageWithPermissions.permissions.some((perm) => {
         return (
-          perm.userId === newPermission.userId &&
+          perm.userId === (newPermission.assignee as TargetPermissionGroup<'user'>).id &&
           perm.permissionLevel === newPermission.permissionLevel &&
           perm.inheritedFromPermission === newPermission.id
         );
@@ -186,10 +192,7 @@ describe('POST /api/permissions - add new permission', () => {
       pageId: rootPage.id,
       permission: { assignee: { group: 'user', id: user.id }, permissionLevel: 'view' }
     };
-
-    const newPermission = (
-      await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201);
 
     const childPageList = (await Promise.all([
       getPage(childPage.id),

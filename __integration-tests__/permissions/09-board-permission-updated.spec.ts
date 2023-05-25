@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PagePermissionAssignment, PageWithPermissions } from '@charmverse/core';
+import type { AssignedPagePermission, PagePermissionAssignment, PageWithPermissions } from '@charmverse/core';
 import type { PagePermission, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
@@ -84,7 +84,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
 
     const createdPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    ).body as AssignedPagePermission;
 
     const childrenWithPermissions = await Promise.all(
       [childCard1, childCard2, childCard3, nestedChildCardPage].map((card) => {
@@ -194,7 +194,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
 
     const createdPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    ).body as AssignedPagePermission;
 
     const childrenWithPermissions = await Promise.all(
       [childCard1, childCard2, childCard3, nestedChildCardPage].map((card) => {

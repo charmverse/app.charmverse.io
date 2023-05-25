@@ -7,6 +7,7 @@ import nc from 'next-connect';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { PagePermissionAssignmentByValues } from 'lib/utilities/errors';
@@ -18,10 +19,19 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   //  .use(requireSpaceMembership)
-  .get(findPagePermissions)
-  .delete(removePagePermission)
+  .get(
+    requirePaidPermissionsSubscription({ key: 'pageId', location: 'query', resourceIdType: 'page' }),
+    findPagePermissions
+  )
+  .delete(
+    requirePaidPermissionsSubscription({ key: 'permissionId', location: 'body', resourceIdType: 'pagePermission' }),
+    removePagePermission
+  )
   .use(requireKeys(['pageId'], 'body'))
-  .post(addPagePermission);
+  .post(
+    requirePaidPermissionsSubscription({ key: 'pageId', location: 'body', resourceIdType: 'page' }),
+    addPagePermission
+  );
 
 async function findPagePermissions(req: NextApiRequest, res: NextApiResponse<AssignedPagePermission[]>) {
   const { pageId } = req.query;
@@ -92,13 +102,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
     throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
   }
-
-  // Count before and after permissions so we don't trigger the event unless necessary
-  const permissionsBefore = await prisma.pagePermission.count({
-    where: {
-      pageId
-    }
-  });
 
   const createdPermission = await req.premiumPermissionsClient.pages.upsertPagePermission({
     pageId,
