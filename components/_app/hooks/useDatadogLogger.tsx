@@ -3,13 +3,12 @@ import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
-
-import { useUser } from '../../../hooks/useUser';
+import { useUser } from 'hooks/useUser';
 
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'webapp-browser';
 
-const env = process.env.NODE_ENV === 'production' ? 'prd' : 'dev';
+const env = isStagingEnv ? 'stg' : isProdEnv ? 'prd' : 'dev';
 
 export default function useDatadogLogger() {
   const { user } = useUser();
@@ -22,10 +21,9 @@ export default function useDatadogLogger() {
         site: DD_SITE,
         service: DD_SERVICE,
         forwardErrorsToLogs: true,
-        sampleRate: 100,
+        sessionSampleRate: 100,
         env,
-        version: process.env.NEXT_PUBLIC_BUILD_ID,
-        forwardConsoleLogs: ['error']
+        version: process.env.NEXT_PUBLIC_BUILD_ID
       });
     }
   }, []);
