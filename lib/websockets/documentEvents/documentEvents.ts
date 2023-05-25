@@ -23,7 +23,8 @@ import type {
   ClientCheckVersionMessage,
   ClientDiffMessage,
   ClientSelectionMessage,
-  ServerMessage
+  ServerMessage,
+  PatchError
 } from './interfaces';
 
 const log = getLogger('ws-docs');
@@ -371,7 +372,7 @@ export class DocumentEventHandler {
         } catch (error) {
           log.error('Error applying steps to node', { error, ds: message.ds, ...logMeta });
           this.unfixable();
-          const patchError = { type: 'patch_error' } as const;
+          const patchError: PatchError = { type: 'patch_error' };
           this.sendMessage(patchError);
           // Reset collaboration to avoid any data loss issues.
           this.resetCollaboration(patchError);
@@ -421,10 +422,10 @@ export class DocumentEventHandler {
     } else if (clientV + room.doc.diffs.length >= serverV) {
       const numberDiffs = clientV - serverV;
       log.debug('Resending document diffs', { numberDiffs, ...logData });
-      const messages = room?.doc.diffs.slice(numberDiffs);
+      const messages = room.doc.diffs.slice(numberDiffs);
       this.sendDocument(messages);
     } else {
-      log.warn('User is on a very old version of the document', logData);
+      log.warn('Unfixable: User is on a very old version of the document', logData);
       this.unfixable();
     }
   }
@@ -437,7 +438,7 @@ export class DocumentEventHandler {
     const toSend = this.messages.server - from;
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.warn('Too many messages to resend. Send full document', this.getSessionMeta());
+      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
       this.unfixable();
     } else {
       for (const message of this.messages.lastTen.slice(-toSend)) {
@@ -500,14 +501,14 @@ export class DocumentEventHandler {
     this.sendMessage({ type: 'error', message });
   }
 
-  async resetCollaboration(message: ServerMessage) {
+  async resetCollaboration(message: PatchError) {
     const room = this.getDocumentRoomOrThrow();
 
     log.debug('Resetting collaboration', this.getSessionMeta());
 
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== this.id) {
-        log.warn('Resetting document for client', participant.getSessionMeta());
+        log.warn('Unfixable: Resetting client document after update error', participant.getSessionMeta());
         await participant.unfixable();
         participant.sendMessage(message);
       }

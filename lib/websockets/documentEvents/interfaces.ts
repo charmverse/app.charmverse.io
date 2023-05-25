@@ -114,12 +114,17 @@ export type ServerErrorMessage = {
   message: string;
 };
 
+export type PatchError = {
+  type: 'patch_error';
+};
+
 export type ServerMessage =
   | StandardMessage
   | ServerConnectionsMessage
   | ServerDocDataMessage
   | ServerDiffMessage
   | ServerErrorMessage
+  | PatchError
   | { type: 'subscribed' | 'patch_error' | 'welcome' };
 
 export type SocketMessage = ClientMessage | ServerMessage;
