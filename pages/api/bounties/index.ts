@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
-import { createBounty, listAvailableBounties } from 'lib/bounties';
+import { createBounty } from 'lib/bounties';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -43,7 +43,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) 
   // Session may be undefined as non-logged in users can access this endpoint
   const userId = req.session?.user?.id;
 
-  const bounties = await listAvailableBounties({
+  const bounties = await req.basePermissionsClient.spaces.listAvailableBounties({
     spaceId: spaceId as string,
     userId: publicResourcesOnly ? undefined : userId
   });
