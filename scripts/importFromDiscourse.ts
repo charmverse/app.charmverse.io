@@ -257,25 +257,27 @@ export async function importFromDiscourse(community: string, spaceDomain: string
   
     const topics: Topic[] = []
     const posts: Post[] = []
-    const topicPostsRecord: Record<string, Post[]> = {}
+    const topicPostsRecord: Record<string, Post[]> = {};
+    // Using a record to avoid duplicates
     const discourseUserRecord: Record<string, User> = {};
-    const discourseCharmverseUserRecord: Record<string, CharmverseUser> = {};
+    const userRecord: Record<string, CharmverseUser> = {};
     const postRecord: Record<string, CharmversePost> = {};
-    const commentRecord: Record<string, PostComment> = {}
+    const postCommentRecord: Record<string, PostComment> = {}
 
-    async function fetchAndStoreUser({ userId, username }: {userId: number, username: string}) {
-      if (!discourseCharmverseUserRecord[userId]) {
+    async function fetchAndStoreUser({ userId, username, postFetchUserCb }: {postFetchUserCb?: (fetchedUser: User) => void, userId: number, username: string}) {
+      if (!userRecord[userId]) {
         const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${username}.json`)).user
-        discourseCharmverseUserRecord[userId] = await createCharmverseUser({
+        userRecord[userId] = await createCharmverseUser({
           community,
           spaceId,
           username: fetchedUser.username,
           avatar_template: fetchedUser.avatar_template
         })
         discourseUserRecord[userId] = fetchedUser
+        postFetchUserCb?.(fetchedUser)
       }
 
-      return discourseCharmverseUserRecord[userId]
+      return userRecord[userId]
     }
   
     for (const categoryId in postCategoriesRecord) {
@@ -290,7 +292,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     }
   
     for (const topic of topics) {
-      const topicPosts = topicPostsRecord[topic.id]
+      const topicPosts = topicPostsRecord[topic.id].sort((post1, post2) => post1.post_number - post2.post_number)
       const rootPost = topicPosts.find(post => post.post_number === 1)
       if (!rootPost) {
         continue
@@ -360,13 +362,13 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           data: {
             content,
             contentText: htmlToText(rootPost.cooked),
-            parentId: topicPost.reply_to_post_number === null ? null : parentPost ? commentRecord[parentPost.id]?.id : null,
+            parentId: topicPost.reply_to_post_number === null ? null : parentPost ? postCommentRecord[parentPost.id]?.id : null,
             postId: post.id,
             createdBy: postAuthor.id
           }
         })
 
-        commentRecord[topicPost.id] = postComment
+        postCommentRecord[topicPost.id] = postComment
       }
     }
 
@@ -390,21 +392,12 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           continue
         }
 
-        if (!discourseCharmverseUserRecord[postLikeUserAction.acting_user_id]) {
-          const fetchedUser = (await fetch<{user: User}>(`https://${community}/users/${postLikeUserAction.acting_username}.json`)).user
-          discourseCharmverseUserRecord[postLikeUserAction.acting_user_id] = await createCharmverseUser({
-            community,
-            spaceId,
-            username: fetchedUser.username,
-            avatar_template: fetchedUser.avatar_template
-          })
-          discourseUserRecord[postLikeUserAction.acting_user_id] = fetchedUser
-          users.push(fetchedUser)
-        }
-
         const topicAuthor = await fetchAndStoreUser({
           userId: postLikeUserAction.acting_user_id,
-          username: postLikeUserAction.acting_username
+          username: postLikeUserAction.acting_username,
+          postFetchUserCb(fetchedUser) {
+            users.push(fetchedUser)
+          }
         });
 
         if (!topicAuthor) {
@@ -424,7 +417,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           await prisma.postCommentUpDownVote.create({
             data: {
               postId: postRecord[rootPost.id].id,
-              commentId: commentRecord[childPost.id].id,
+              commentId: postCommentRecord[childPost.id].id,
               createdBy: topicAuthor.id,
               upvoted: true,
             }
