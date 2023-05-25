@@ -327,11 +327,6 @@
     "tsx": "^3.12.6",
     "webpack": "^5.76.0"
   },
-  "_moduleAliases": {
-    "adapters": "dist/adapters",
-    "config": "dist/config",
-    "lib": "dist/lib"
-  },
   "overrides": {
     "@types/react": "^18.0.26",
     "react": "^18.2.0",
