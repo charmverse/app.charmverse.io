@@ -1,4 +1,4 @@
-import { User as CharmverseUser, PostCategory, PostComment, prisma } from '@charmverse/core/src/prisma-client'
+import { User as CharmverseUser, PostCategory, PostComment, PostTag, prisma } from '@charmverse/core/src/prisma-client'
 import fetch from "adapters/http/fetch.server"
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
 
@@ -156,7 +156,15 @@ type Post = {
   wiki: boolean,
 }
 
-export async function importFromDiscourse(community: string, spaceId: string) {
+export async function importFromDiscourse(community: string, spaceDomain: string) {
+  const space = await prisma.space.findFirstOrThrow({
+    where: {
+      domain: spaceDomain
+    }
+  })
+
+  const spaceId = space.id
+  
   const {category_list: {categories}} = await fetch<{
     category_list: {
       categories: Category[]
@@ -164,6 +172,20 @@ export async function importFromDiscourse(community: string, spaceId: string) {
   }>(`https://${community}/categories.json`)
 
   const {tags} = await fetch<{tags: Tag[]}>(`https://${community}/tags.json`)
+
+  const postTags: PostTag[] = [];
+  const postTagRecord: Record<string, PostTag> = {}
+
+  for (const tag of tags) {
+    const postTag = await prisma.postTag.create({
+      data: {
+        name: tag.name,
+        spaceId
+      }
+    })
+    postTags.push(postTag)
+    postTagRecord[tag.id] = postTag
+  }
 
   const postCategories: PostCategory[] = []
   const forumCategoriesRecord: Record<string, {
@@ -246,7 +268,12 @@ export async function importFromDiscourse(community: string, spaceId: string) {
         spaceId,
         contentText: topicPost.cooked,
         content,
-        createdBy: discourseCharmverseUserRecord[topicPost.user_id].id
+        createdBy: discourseCharmverseUserRecord[topicPost.user_id].id,
+        postToPostTags: {
+          createMany: {
+            data: postTags.map(tag => ({postTagId: postTagRecord[tag.id].id}))
+          }
+        }
       }
     })
 
