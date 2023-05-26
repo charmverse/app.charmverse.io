@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log'
-import { User as CharmverseUser, Post as CharmversePost, PostCategory, PostComment, prisma } from '@charmverse/core/prisma-client'
+import { User as CharmverseUser, Post as CharmversePost, PostTag, PostCategory, PostComment, prisma } from '@charmverse/core/prisma-client'
 import fetch from "adapters/http/fetch.server"
 import { htmlToText } from 'html-to-text'
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
@@ -226,7 +226,21 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         categories: Category[]
       }
     }>(`https://${community}/categories.json`)
+    
+    const {tags} = await fetch<{tags: Tag[]}>(`https://${community}/tags.json`)
   
+    const postTagRecord: Record<string, PostTag> = {}
+  
+    for (const tag of tags) {
+      const postTag = await prisma.postTag.create({
+        data: {
+          name: tag.name,
+          spaceId
+        }
+      })
+      postTagRecord[tag.id] = postTag
+    }
+    
     const postCategoriesRecord: Record<string, PostCategory> = {}
 
     for (const category of categories) {
@@ -305,7 +319,12 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           spaceId,
           contentText: htmlToText(rootPost.cooked),
           content,
-          createdBy: topicAuthor.id
+          createdBy: topicAuthor.id,
+          postToPostTags: {
+            createMany: {
+              data: topic.tags.map(tagId => ({postTagId: postTagRecord[tagId].id}))
+            }
+          }
         }
       })
 
