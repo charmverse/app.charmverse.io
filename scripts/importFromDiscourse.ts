@@ -195,7 +195,7 @@ async function createCharmverseUser ({avatar_template, community, spaceId, usern
   const charmverseUser = await prisma.user.create({
     data: {
       username: `${username} (Imported)`,
-      path: `${username.toLowerCase()}-discourse-imported`,
+      path: `${username.toLowerCase()}-v2-discourse-imported`,
       avatar: `https://${community}${avatar_template.replace('{size}', '80')}`,
       isBot: true
     }
@@ -317,7 +317,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         }
 
         // Write regex to remove all html tags and just get the text
-        const content = parseMarkdown(turndownService.turndown(rootPost.cooked))
+        const content = parseMarkdown(turndownService.turndown(topicPost.cooked))
         const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
         const postAuthor = await fetchAndStoreUser({
@@ -332,7 +332,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         const postComment = await prisma.postComment.create({
           data: {
             content,
-            contentText: htmlToText(rootPost.cooked),
+            contentText: htmlToText(topicPost.cooked),
             parentId: topicPost.reply_to_post_number === null ? null : parentPost ? postCommentRecord[parentPost.id]?.id : null,
             postId: post.id,
             createdBy: postAuthor.id
