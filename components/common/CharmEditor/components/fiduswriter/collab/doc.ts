@@ -88,7 +88,7 @@ export class ModCollabDoc {
   receiveDocument(data: ServerDocDataMessage) {
     this.cancelCurrentlyCheckingVersion();
     if (this.mod.editor.docInfo.confirmedDoc) {
-      log.debug('merge document updates');
+      log.debug('merge document updates', { pageId: this.mod.editor.docInfo.id });
       this.merge.adjustDocument(data);
     } else {
       this.loadDocument(data);
@@ -106,9 +106,11 @@ export class ModCollabDoc {
 
     this.mod.editor.clientTimeAdjustment = Date.now() - time;
 
-    this.mod.editor.docInfo = docInfo;
-    this.mod.editor.docInfo.version = doc.v;
-    this.mod.editor.docInfo.updated = new Date();
+    this.mod.editor.docInfo = {
+      ...docInfo,
+      version: doc.v,
+      updated: new Date()
+    };
     const stateDoc = this.mod.editor.schema.nodeFromJSON(doc.content);
 
     const currentPlugins = this.mod.editor.view.state.plugins;

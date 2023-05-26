@@ -32,6 +32,11 @@ export class Merge {
     // Adjust the document when reconnecting after offline and many changes
     // happening on server.
     if (this.mod.editor.docInfo.version < data.doc.v && sendableSteps(this.mod.editor.view.state)) {
+      log.debug('Update document with server changes', {
+        messages: data.m?.length,
+        version: data.doc.v,
+        clientVersion: this.mod.editor.docInfo.version
+      });
       this.mod.doc.receiving = true;
       const confirmedState = EditorState.create({ doc: this.mod.editor.docInfo.confirmedDoc || undefined });
       const unconfirmedTr = confirmedState.tr;
@@ -123,6 +128,10 @@ export class Merge {
       this.mod.doc.receiving = false;
       // this.mod.doc.sendToCollaborators()
     } else if (data.m) {
+      log.debug('Update document with server changes', {
+        messages: data.m.length,
+        version: data.doc.v
+      });
       // There are no local changes, so we can just receive all the remote messages directly
       data.m.forEach((message) => this.mod.doc.receiveDiff(message, true));
     } else {
@@ -189,6 +198,9 @@ export class Merge {
     this.mod.editor.view.dispatch(rebasedTrackedTr);
 
     if (tracked) {
+      log.warn(
+        'Showed alert to user after auto-merge: The document was modified substantially by other users while you were offline'
+      );
       alert(
         'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
       );
