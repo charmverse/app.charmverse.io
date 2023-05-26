@@ -521,7 +521,7 @@ export class DocumentEventHandler {
 
   sendUpdates({ message, senderId }: { message: ClientMessage | ServerMessage; senderId?: string }) {
     const pageId = this.getSession().documentId;
-    log.debug(`Broadcasting message "${message.type}" to room`, { pageId });
+    // log.debug(`Broadcasting message "${message.type}" to room`, { pageId });
     const room = this.getDocumentRoomOrThrow();
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== senderId) {
