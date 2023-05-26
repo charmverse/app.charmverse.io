@@ -198,6 +198,9 @@ export class Merge {
     this.mod.editor.view.dispatch(rebasedTrackedTr);
 
     if (tracked) {
+      log.warn(
+        'Showed alert to user after auto-merge: The document was modified substantially by other users while you were offline'
+      );
       alert(
         'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
       );
