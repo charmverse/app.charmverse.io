@@ -298,7 +298,7 @@
     "@types/redux-mock-store": "^1.0.3",
     "@types/supertest": "^2.0.12",
     "@types/swagger-ui-react": "^4.1.1",
-    "@types/turndown": "file:../../../../../Softwares/nvm/v18.16.0/node_modules/@types/turndown",
+    "@types/turndown": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "aws-cdk-lib": "^2.78.0",
