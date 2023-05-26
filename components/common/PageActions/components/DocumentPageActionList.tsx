@@ -125,7 +125,7 @@ export function DocumentPageActionList({
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
-  const basePageBounty = bounties.find((bounty) => bounty.id === pageId);
+  const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
       id: pageId,
@@ -150,7 +150,7 @@ export function DocumentPageActionList({
       pageId
     });
     if (page?.type === 'bounty') {
-      setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== page.id));
+      setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== page.id));
     }
     onComplete();
     onDelete?.();

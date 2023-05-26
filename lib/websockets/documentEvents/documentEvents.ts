@@ -23,7 +23,8 @@ import type {
   ClientCheckVersionMessage,
   ClientDiffMessage,
   ClientSelectionMessage,
-  ServerMessage
+  ServerMessage,
+  PatchError
 } from './interfaces';
 
 const log = getLogger('ws-docs');
@@ -75,10 +76,15 @@ export class DocumentEventHandler {
   }
 
   getSessionMeta() {
-    const session = this.socket.data as SocketSessionData;
+    const session = this.getSession();
+    const docRoom = docRooms.get(session.documentId);
     return {
+      socketId: this.id,
       userId: session.user?.id,
-      pageId: session.documentId
+      pageId: session.documentId,
+      pageVersion: docRoom?.doc.version,
+      serverMessages: this.messages.server,
+      clientMessages: this.messages.client
     };
   }
 
@@ -136,26 +142,35 @@ export class DocumentEventHandler {
     // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
+      log.debug('Client requested to resend messages', logData);
       await this.resendMessages(message.from);
       return;
     }
 
+    // Verify the order of the message
     if (!('c' in message) || !('s' in message)) {
+      log.warn(`Received invalid message`, { message, ...this.getSessionMeta() });
       this.sendError('Received invalid message');
       return;
     } else if (message.c < this.messages.client + 1) {
       // Receive a message already received at least once. Ignore.
-      log.debug(`Ignore duplicate ${message.type} message from client`, logData);
+      log.debug(`Ignore duplicate message from client`, {
+        ...logData,
+        message
+      });
       return;
     } else if (message.c > this.messages.client + 1) {
-      log.debug('Request resent of lost messages from client', logData);
+      log.warn('Request resent of lost messages from client', {
+        ...logData,
+        message
+      });
       this.sendMessage({ type: 'request_resend', from: this.messages.client });
       return;
     } else if (message.s < this.messages.server) {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.debug('Resend messages to client', logData);
+      log.warn('Resend messages to client', { message, ...logData });
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -168,7 +183,7 @@ export class DocumentEventHandler {
       await this.handleMessage(message);
     } catch (error) {
       log.error('Error handling socket message', {
-        error: (error as any).stack || error,
+        error,
         message,
         ...logData
       });
@@ -180,6 +195,7 @@ export class DocumentEventHandler {
 
     // handle subscription to document
     if (message.type === 'subscribe') {
+      log.debug('Received subscribe event', { pageId: message.roomId, userId: session.user.id });
       await this.subscribeToDoc({ pageId: message.roomId, connectionCount: message.connection });
       return;
     }
@@ -190,7 +206,7 @@ export class DocumentEventHandler {
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.debug('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
+      log.warn('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
       return;
     }
 
@@ -214,14 +230,17 @@ export class DocumentEventHandler {
         break;
 
       default:
-        log.debug(`Unhandled socket message type: "${message.type}"`, message);
+        log.warn(`Unhandled socket message type: "${message.type}"`, {
+          message,
+          pageId: session.documentId,
+          userId: session.user.id
+        });
     }
   }
 
   async subscribeToDoc({ pageId, connectionCount = 0 }: { pageId: string; connectionCount?: number }) {
     try {
       const userId = this.getSession().user.id;
-      log.debug('subscribe event', { pageId, userId });
 
       const isValidPageId = validate(pageId);
       if (!isValidPageId) {
@@ -233,6 +252,7 @@ export class DocumentEventHandler {
       });
 
       if (permissions.edit_content !== true && permissions.comment !== true) {
+        log.warn('Denied permission to user', { permissions, pageId, userId });
         this.sendError('You do not have permission to edit this page');
         return;
       }
@@ -241,10 +261,10 @@ export class DocumentEventHandler {
 
       const docRoom = docRooms.get(pageId);
       if (docRoom && Object.keys(docRoom.participants).length > 0) {
-        log.debug('Join existing document room', { pageId, userId });
+        log.debug('Join existing document room', { pageId, userId, connectionCount });
         docRoom.participants[this.id] = this;
       } else {
-        log.debug('Opening new document room', { pageId, userId });
+        log.debug('Opening new document room', { pageId, userId, connectionCount });
         const page = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
@@ -269,14 +289,18 @@ export class DocumentEventHandler {
       }
 
       this.sendMessage({ type: 'subscribed' });
-      // console.log('connection count on subscription', connectionCount);
+
       if (connectionCount < 1) {
         await this.sendDocument();
-        log.debug('Sent document to new subscriber', { pageId, userId });
+        log.debug('Sent document to new subscriber', {
+          pageId,
+          userId,
+          pageVersion: docRooms.get(pageId)?.doc.version
+        });
       }
       this.handleParticipantUpdate();
     } catch (error) {
-      log.error('Error subscribing user to page', { error });
+      log.error('Error subscribing user to page', { error, pageId, userId: this.getSession().user.id });
       this.sendError('There was an error loading the page! Please try again later.');
     }
   }
@@ -325,7 +349,17 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
-    log.debug('Handling change event', { userId: this.getSession().user.id, pageId: room.doc.id, clientV, serverV });
+    const logMeta = {
+      userId: this.getSession().user.id,
+      pageId: room.doc.id,
+      v: clientV,
+      c: message.c,
+      s: message.s,
+      serverV,
+      serverC: this.messages.client,
+      serverS: this.messages.server
+    };
+    log.debug('Handling change event', logMeta);
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
@@ -336,8 +370,9 @@ export class DocumentEventHandler {
           room.node = updatedNode;
           room.doc.content = updatedNode.toJSON();
         } catch (error) {
+          log.error('Error applying steps to node', { error, ds: message.ds, ...logMeta });
           this.unfixable();
-          const patchError = { type: 'patch_error' } as const;
+          const patchError: PatchError = { type: 'patch_error' };
           this.sendMessage(patchError);
           // Reset collaboration to avoid any data loss issues.
           this.resetCollaboration(patchError);
@@ -355,19 +390,23 @@ export class DocumentEventHandler {
       this.sendUpdatesToOthers(message);
     } else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
-        const numberDiffs = clientV - serverV;
-        log.debug('Client is behind. Resend document diffs', { numberDiffs });
-        const messages = room.doc.diffs.slice(numberDiffs);
+        const diffsToSend = clientV - serverV;
+        log.debug('Client is behind. Resend document diffs', {
+          ...logMeta,
+          roomDiffs: room.doc.diffs.length,
+          diffsToSend
+        });
+        const messages = room.doc.diffs.slice(diffsToSend);
         for (const m of messages) {
           const newMessage = { ...m, server_fix: true };
           await this.sendMessage(newMessage);
         }
       } else {
-        log.debug('Client is too far behind. Resend document');
+        log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
         await this.unfixable();
       }
     } else {
-      log.debug('Ignore message from user with higher document version than server');
+      log.debug('Ignore message from user with higher document version than server', logMeta);
     }
   }
 
@@ -376,16 +415,17 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room?.doc.version;
-    log.debug('Check version of document', { clientV, serverV, userId: session.user.id });
+    const logData = { clientV, serverV, pageId: room?.doc.id, userId: session.user.id };
+    log.debug('Check version of document', logData);
     if (clientV === serverV) {
       this.sendMessage({ type: 'confirm_version', v: clientV });
     } else if (clientV + room.doc.diffs.length >= serverV) {
       const numberDiffs = clientV - serverV;
-      log.debug('Resending document diffs', { numberDiffs, userId: session.user.id });
-      const messages = room?.doc.diffs.slice(numberDiffs);
+      log.debug('Resending document diffs', { numberDiffs, ...logData });
+      const messages = room.doc.diffs.slice(numberDiffs);
       this.sendDocument(messages);
     } else {
-      log.debug('User is on a very old version of the document');
+      log.warn('Unfixable: User is on a very old version of the document', logData);
       this.unfixable();
     }
   }
@@ -396,10 +436,9 @@ export class DocumentEventHandler {
 
   resendMessages(from: number) {
     const toSend = this.messages.server - from;
-    log.debug('Resending messages to user');
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.debug('Too many messages to resend. Send full document');
+      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
       this.unfixable();
     } else {
       for (const message of this.messages.lastTen.slice(-toSend)) {
@@ -412,26 +451,21 @@ export class DocumentEventHandler {
     const session = this.getSession();
 
     if (!session.documentId) {
-      log.error('Cannot send document - session is missing documentId', { session });
+      log.error('Cannot send document - session is missing documentId', { session, userId: session.user.id });
       return;
     }
+    const room = this.getDocumentRoomOrThrow();
 
-    const page = await prisma.page.findUniqueOrThrow({
-      where: { id: session.documentId },
-      select: { content: true, updatedAt: true, id: true, version: true }
-    });
-    const content = (page.content as any) || emptyDocument;
     const message: ServerDocDataMessage = {
       type: 'doc_data',
       doc: {
-        content,
-        v: page.version
+        content: room.doc.content,
+        v: room.doc.version
       },
       docInfo: {
-        id: page.id,
+        id: session.documentId,
         session_id: this.id,
-        updated: page.updatedAt,
-        version: page.version
+        version: room.doc.version
       },
       time: Date.now()
     };
@@ -467,11 +501,14 @@ export class DocumentEventHandler {
     this.sendMessage({ type: 'error', message });
   }
 
-  async resetCollaboration(message: ServerMessage) {
-    log.debug('Resetting collaboration');
+  async resetCollaboration(message: PatchError) {
     const room = this.getDocumentRoomOrThrow();
+
+    log.debug('Resetting collaboration', this.getSessionMeta());
+
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== this.id) {
+        log.warn('Unfixable: Resetting client document after update error', participant.getSessionMeta());
         await participant.unfixable();
         participant.sendMessage(message);
       }
@@ -484,7 +521,7 @@ export class DocumentEventHandler {
 
   sendUpdates({ message, senderId }: { message: ClientMessage | ServerMessage; senderId?: string }) {
     const pageId = this.getSession().documentId;
-    log.debug(`Broadcasting message "${message.type}" to room`, { pageId });
+    // log.debug(`Broadcasting message "${message.type}" to room`, { pageId });
     const room = this.getDocumentRoomOrThrow();
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== senderId) {
@@ -494,7 +531,7 @@ export class DocumentEventHandler {
   }
 
   onClose() {
-    log.debug('Closing collaboration session');
+    log.debug('Closing collaboration session', this.getSessionMeta());
     const room = this.getDocumentRoom();
     if (room) {
       delete room.participants[this.id];

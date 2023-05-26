@@ -381,8 +381,17 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const view = createTableView(board);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const _board = {
+      // use parentBoard props like id and rootId by default
+      ...board,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || board.fields
+    };
+    const view = createTableView(_board);
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -499,7 +508,17 @@ function CenterPanel(props: Props) {
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
-          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+          <PageWebhookBanner
+            key={key.apiKey}
+            type={key.type}
+            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            sx={{
+              ...(isEmbedded && {
+                border: (theme) => `2px solid ${theme.palette.text.primary}`,
+                backgroundColor: 'transparent !important'
+              })
+            }}
+          />
         ) : null
       )}
       <div

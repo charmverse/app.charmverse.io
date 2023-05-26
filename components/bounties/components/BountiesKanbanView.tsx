@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
+import { useOnBountyCardClose } from 'components/bounties/hooks/useOnBountyCardClose';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
@@ -22,12 +23,13 @@ interface Props {
 export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
   const { showPage } = usePageDialog();
-  const { setBounties, refreshBounty } = useBounties();
+  const { setBounties } = useBounties();
   const router = useRouter();
+  const { onClose } = useOnBountyCardClose();
 
-  function onClickDelete(bountyId: string) {
-    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
-    deletePage({ pageId: bountyId });
+  function onClickDelete(pageId: string) {
+    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
+    deletePage({ pageId });
   }
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>(
@@ -43,10 +45,6 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
       suggestion: []
     }
   );
-
-  function onClose() {
-    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
-  }
 
   function openPage(bountyId: string) {
     router.push({
@@ -82,7 +80,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
         {bountyStatuses.map((bountyStatus) => (
           <div className='octo-board-column' key={bountyStatus}>
             {bountiesGroupedByStatus[bountyStatus]
-              .filter((bounty) => Boolean(pages[bounty.page?.id]) && !pages[bounty.page.id]?.deletedAt)
+              .filter((bounty) => Boolean(pages[bounty.page.id]) && !pages[bounty.page.id]?.deletedAt)
               .map((bounty) => (
                 <BountyKanbanCard
                   onDelete={onClickDelete}
@@ -91,7 +89,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
                   bounty={bounty}
                   page={pages[bounty.page.id] as PageMeta}
                   onClick={() => {
-                    openPage(bounty.id);
+                    openPage(bounty.page.id);
                   }}
                 />
               ))}
