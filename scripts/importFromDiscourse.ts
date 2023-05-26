@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log'
-import { User as CharmverseUser, Post as CharmversePost, PostCategory, PostComment, PostTag, prisma } from '@charmverse/core/prisma-client'
+import { User as CharmverseUser, Post as CharmversePost, PostCategory, PostComment, prisma } from '@charmverse/core/prisma-client'
 import fetch from "adapters/http/fetch.server"
 import { htmlToText } from 'html-to-text'
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
-import MarkdownIt from 'markdown-it'
+import TurndownService from 'turndown';
 
-const md = new MarkdownIt()
+const turndownService = new TurndownService();
 
 type User = {
   id: number
@@ -195,7 +195,7 @@ async function createCharmverseUser ({avatar_template, community, spaceId, usern
   const charmverseUser = await prisma.user.create({
     data: {
       username: `${username} (Imported)`,
-      path: username.toLowerCase(),
+      path: `${username.toLowerCase()}-discourse-imported`,
       avatar: `https://${community}${avatar_template.replace('{size}', '80')}`,
       isBot: true
     }
@@ -220,27 +220,13 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     })
   
     const spaceId = space.id
-    
+
     const {category_list: {categories}} = await fetch<{
       category_list: {
         categories: Category[]
       }
     }>(`https://${community}/categories.json`)
   
-    const {tags} = await fetch<{tags: Tag[]}>(`https://${community}/tags.json`)
-  
-    const postTagRecord: Record<string, PostTag> = {}
-  
-    for (const tag of tags) {
-      const postTag = await prisma.postTag.create({
-        data: {
-          name: tag.name,
-          spaceId
-        }
-      })
-      postTagRecord[tag.id] = postTag
-    }
-
     const postCategoriesRecord: Record<string, PostCategory> = {}
 
     for (const category of categories) {
@@ -290,7 +276,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
   
       topics.push(...fetchedTopics)
     }
-  
+    
+    let topicCounter = 0
     for (const topic of topics) {
       const topicPosts = topicPostsRecord[topic.id].sort((post1, post2) => post1.post_number - post2.post_number)
       const rootPost = topicPosts.find(post => post.post_number === 1)
@@ -299,7 +286,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       }
       
       // Replacing the html tags to get the raw text
-      const content = parseMarkdown(md.render(rootPost.cooked));
+      const content = parseMarkdown(turndownService.turndown(rootPost.cooked));
       
       const topicAuthor = await fetchAndStoreUser({
         userId: rootPost.user_id,
@@ -317,24 +304,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           categoryId: postCategoriesRecord[topic.category_id].id,
           spaceId,
           contentText: htmlToText(rootPost.cooked),
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: "paragraph",
-                content: [{
-                  type: 'text',
-                  text: content
-                }]
-              }
-            ]
-          },
-          createdBy: topicAuthor.id,
-          postToPostTags: {
-            createMany: {
-              data: topic.tags.map(tagId => ({postTagId: postTagRecord[tagId].id}))
-            }
-          }
+          content,
+          createdBy: topicAuthor.id
         }
       })
 
@@ -346,7 +317,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         }
 
         // Write regex to remove all html tags and just get the text
-        const content = parseMarkdown(md.render(rootPost.cooked))
+        const content = parseMarkdown(turndownService.turndown(rootPost.cooked))
         const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
         const postAuthor = await fetchAndStoreUser({
@@ -370,10 +341,13 @@ export async function importFromDiscourse(community: string, spaceDomain: string
 
         postCommentRecord[topicPost.id] = postComment
       }
+      topicCounter += 1;
+      console.log(`${topicCounter}/${topics.length} Topics created`)
     }
 
     const users = Object.values(discourseUserRecord);
-
+    let userCounter = 0;
+    let totalUsers = users.length;
     while (users.length) {
       const user = users.pop();
       if (!user) {
@@ -396,6 +370,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           userId: postLikeUserAction.acting_user_id,
           username: postLikeUserAction.acting_username,
           postFetchUserCb(fetchedUser) {
+            totalUsers += 1
             users.push(fetchedUser)
           }
         });
@@ -424,10 +399,12 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           })
         }
       }
+      userCounter += 1;
+      console.log(`${userCounter}/${totalUsers} user actions created`)
     }
   } catch (err) {
     log.error(`[discourse]: ${err}`)
   }
 }
 
-importFromDiscourse("forum.game7.io", "shaky-pumpanddump-crocodile")
+importFromDiscourse("forum.game7.io", "cvt-forum-game7")
