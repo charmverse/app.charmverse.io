@@ -6,6 +6,8 @@ import NextLink from 'next/link';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { getSpaceUrl } from 'lib/utilities/browser';
+
 import WorkspaceAvatar from './WorkspaceAvatar';
 
 interface SpaceListItemProps extends MenuItemProps {
@@ -52,7 +54,7 @@ export default function SpaceListItem({ space, changeOrderHandler, selected, dis
     <MenuItem
       key={space.domain}
       component={NextLink}
-      href={`/${space.domain}`}
+      href={getSpaceUrl(space.domain)}
       sx={{ ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active' }) }}
       ref={ref}
       selected={selected}

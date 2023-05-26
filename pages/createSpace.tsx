@@ -7,10 +7,9 @@ import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceFo
 import Image from 'components/common/Image';
 import { Container } from 'components/login/components/LoginLayout';
 import Footer from 'components/login/Footer';
+import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import { useSpaces } from 'hooks/useSpaces';
 import splashImage from 'public/images/artwork/world.png';
-
-import { getDefaultWorkspaceUrl } from './index';
 
 export default function CreateSpace() {
   const { spaces, isLoaded } = useSpaces();

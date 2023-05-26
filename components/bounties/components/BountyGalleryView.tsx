@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
+import { useOnBountyCardClose } from 'components/bounties/hooks/useOnBountyCardClose';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
@@ -19,17 +20,14 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
+  const { onClose } = useOnBountyCardClose();
 
   const filteredBounties = bounties
     .filter((bounty) => bounty.status === 'open')
     .sort((b1, b2) => (b1.updatedAt > b2.updatedAt ? -1 : 1));
-  function onClickDelete(bountyId: string) {
-    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
-    deletePage({ pageId: bountyId });
-  }
-
-  function onClose() {
-    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
+  function onClickDelete(pageId: string) {
+    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
+    deletePage({ pageId });
   }
 
   function openPage(bountyId: string) {
@@ -57,7 +55,7 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
             key={bounty.id}
             bounty={bounty}
             onClick={() => {
-              openPage(bounty.id);
+              openPage(bounty.page.id);
             }}
             readOnly={!!publicMode}
             page={pages[bounty.page.id] as PageMeta}

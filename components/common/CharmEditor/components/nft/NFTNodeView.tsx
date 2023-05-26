@@ -3,13 +3,14 @@ import { Box } from '@mui/material';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
+import OpenSeaIcon from 'public/images/opensea_logo.svg';
+
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-import { OpenSeaIcon } from './config';
 import type { NodeAttrs } from './nftSpec';
 import { extractAttrsFromUrl } from './nftUtils';
 import { setCSSOverrides } from './styles';

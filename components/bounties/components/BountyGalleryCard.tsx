@@ -45,7 +45,7 @@ export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick,
 
   return bountyPage ? (
     <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
-      {!readOnly && <KanbanPageActionsMenuButton page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />}
+      {!readOnly && <KanbanPageActionsMenuButton page={bountyPage} onClickDelete={() => onDelete(bountyPage.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

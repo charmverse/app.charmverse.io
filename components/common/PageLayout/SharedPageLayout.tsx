@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Head from 'next/head';
@@ -22,6 +23,7 @@ const LayoutContainer = styled.div`
 type Props = {
   children: React.ReactNode;
   basePageId?: string;
+  basePageType?: PageType;
 };
 
 const LogoImage = styled(Image)`
@@ -29,7 +31,7 @@ const LogoImage = styled(Image)`
   filter: ${({ theme }) => (theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)')};
 `;
 
-export function SharedPageLayout({ children, basePageId }: Props) {
+export function SharedPageLayout({ children, basePageId, basePageType }: Props) {
   const logo = darkLogoImage;
 
   return (
@@ -49,7 +51,7 @@ export function SharedPageLayout({ children, basePageId }: Props) {
                 width: '100%'
               }}
             >
-              <PageTitleWithBreadcrumbs pageId={basePageId} />
+              <PageTitleWithBreadcrumbs pageId={basePageId} pageType={basePageType} />
               <Button
                 startIcon={<LogoImage width={32} height={32} src={logo} />}
                 variant='text'

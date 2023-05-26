@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
 import { useRouter } from 'next/router';
@@ -10,6 +9,7 @@ import { mutate } from 'swr';
 
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
@@ -121,7 +121,7 @@ const KanbanCard = React.memo((props: Props) => {
 
   return (
     <>
-      <Link href={fullPageUrl} draggable={false}>
+      <Link href={fullPageUrl} draggable={false} color='inherit'>
         <StyledBox
           ref={props.readOnly ? () => null : cardRef}
           className={className}

@@ -1,6 +1,8 @@
-export function getValidSubdomain(host?: string | null) {
-  let subdomain: string | null = null;
+import { isStagingEnv } from 'config/constants';
+import { getValidDefaultHost } from 'lib/utilities/domains/getValidDefaultHost';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
+export function getValidSubdomain(host?: string | null) {
   if (!host && typeof window !== 'undefined') {
     // On client side, get the host from window
     host = window.location.host;
@@ -10,17 +12,25 @@ export function getValidSubdomain(host?: string | null) {
     return null;
   }
 
-  if (host && host.includes('.')) {
-    const candidate = host.split('.')[0];
+  const defaultHost = getValidDefaultHost(host);
+
+  if (defaultHost && defaultHost.includes('.')) {
+    const candidate = defaultHost.split('.')[0];
+
     if (candidate) {
-      // Valid candidate
-      subdomain = candidate;
+      // default staging subdomain is pr-<pr-number> and it should be skipped
+      if (isStagingEnv && candidate.startsWith('pr-')) {
+        return null;
+      }
+
+      // main app sumbdomain should be skipped
+      if (candidate === 'app') {
+        return null;
+      }
+
+      return candidate;
     }
   }
 
-  return subdomain;
-}
-
-export function isLocalhostAlias(host?: string | null) {
-  return host?.includes('localhost') || host?.includes('127.0.0.1');
+  return null;
 }

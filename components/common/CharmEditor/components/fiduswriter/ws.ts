@@ -36,12 +36,17 @@ type WebSocketConnectorProps = {
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
 };
 
+type ServerToClientEvents = { message: (message: WrappedMessage | RequestResendMessage) => void };
+type ClientToServerEvents = {
+  [event: string]: any;
+};
+
 export interface WebSocketConnector extends WebSocketConnectorProps {}
 
 /* Sets up communicating with server (retrieving document, saving, collaboration, etc.).
  */
 export class WebSocketConnector {
-  socket: Socket<{ message: (message: WrappedMessage | RequestResendMessage) => void }>;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
   // Messages object used to ensure that data is received in right order.
   messages: { server: number; client: number; lastTen: WrappedMessage[] } = {
@@ -93,12 +98,13 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onError = onError;
+
+    // socket.io client options: https://socket.io/docs/v4/client-options/
     this.socket = io(socketHost, {
       withCredentials: true,
       auth: {
         authToken
       }
-      // path: '/api/socket'
     });
     this.createWSConnection();
   }
@@ -319,7 +325,7 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        log.debug(`[ws${namespace}] Sent message`, wrappedMessage);
+        log.debug(`[ws${namespace}] Send message`, wrappedMessage);
         this.socket.emit(socketEvent, wrappedMessage);
         this.setRecentlySentTimer(timer);
       });

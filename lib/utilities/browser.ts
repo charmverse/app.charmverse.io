@@ -1,3 +1,9 @@
+import { baseUrl } from 'config/constants';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
   if (typeof navigator === 'undefined') {
@@ -167,8 +173,14 @@ export function setCookie({
   expiresInDays: number;
 }) {
   const expires = new Date();
+  const domain = isLocalhostAlias() ? undefined : `Domain=${getAppApexDomain()};`;
+  const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
+
   expires.setDate(expires.getDate() + expiresInDays);
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
+
+  document.cookie = `${name}=${encodeURIComponent(
+    value
+  )}; ${domain} expires=${expires.toUTCString()}; path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {
@@ -209,4 +221,57 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
     domElement.style.removeProperty('background-color');
     postHighlight?.();
   }, 1000);
+}
+
+export function getSubdomainPath(path: string, config?: { domain: string; customDomain: string | null }) {
+  const subdomain = getValidSubdomain();
+  const customDomain = getValidCustomDomain();
+
+  if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
+    // remove space domain from path for custom domain
+    if (path.startsWith(`/${config.domain}`)) {
+      return path.replace(`/${config.domain}`, '');
+    }
+
+    if (path.startsWith(`/${config.customDomain}`)) {
+      return path.replace(`/${config.customDomain}`, '');
+    }
+  }
+
+  if (!subdomain) return path;
+
+  if (path.startsWith(`/${subdomain}`)) {
+    return path.replace(`/${subdomain}`, '');
+  }
+
+  return path;
+}
+
+export function getSpaceUrl(domain: string) {
+  const subdomain = getValidSubdomain();
+  if (!subdomain) return `/${domain}`;
+  if (subdomain === domain) return '/';
+
+  // replace old subdomain with desired one
+  if (typeof window !== 'undefined') {
+    return window?.origin.replace(`${subdomain}.`, `${domain}.`);
+  }
+
+  return `/${domain}`;
+}
+
+export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
+  const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
+  const subdomain = getValidSubdomain();
+
+  if (typeof window !== 'undefined') {
+    const origin =
+      subdomain && subdomain !== spaceDomain
+        ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
+        : window.location.origin;
+
+    return origin + getSubdomainPath(absolutePath);
+  }
+
+  return absolutePath;
 }

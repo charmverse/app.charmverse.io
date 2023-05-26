@@ -51,8 +51,10 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
   const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
 
   useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
-  }, []);
+    if (space?.id) {
+      charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'bounties_list' });
+    }
+  }, [space?.id]);
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
