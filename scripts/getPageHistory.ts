@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { fancyTrim } from 'lib/utilities/strings';
 
-const spaceDomain = 'tame-fomo-duck';
-const pagePath = 'page-8649583367437599-restored-1684821513609';
-const maxContentSize = 150;
+const spaceDomain = 'myosinxyz';
+const pagePath = 'page-012379792069703965';
+const maxContentSize = 750;
 const maxRows = 300;
 const minVersion = 0;
 
