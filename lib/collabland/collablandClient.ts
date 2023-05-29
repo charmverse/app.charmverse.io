@@ -109,7 +109,7 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
   });
 }
 
-export async function canJoinSpaceViaDiscord({
+export async function getDiscordUserState({
   discordServerId,
   discordUserId
 }: {
