@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: ['**']
 
+env:
+  SELECTED_API_BRANCH: feat/page-permissions
+
 jobs:
   build-test-env:
     name: Build test env
@@ -28,14 +31,14 @@ jobs:
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
-      # We might even delete this step since CI seems to work without it
-      - name: Provision API key
-        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
+      # # We might even delete this step since CI seems to work without it
+      # - name: Provision API key
+      #   run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
 
-      - name: Build and install API
-        uses: ./.github/actions/build_permissions_api
-        with:
-          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+      # - name: Build and install API
+      #   uses: ./.github/actions/build_permissions_api
+      #   with:
+      #     GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
   test:
     name: Tests
@@ -62,10 +65,35 @@ jobs:
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
 
+  login-to-amazon-ecr:
+    runs-on: ubuntu-latest
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-east-1
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: convert registry variables
+        id: get_docker_user_login
+        run: |
+          registry_in_underscore=$(echo "310849459438.dkr.ecr.us-east-1.amazonaws.com" | sed 's/[.-]/_/g')
+          echo "docker_username=\"docker_username_$registry_in_underscore\"" >> $GITHUB_OUTPUT
+          echo "docker_password=\"docker_password_$registry_in_underscore\"" >> $GITHUB_OUTPUT
+    outputs:
+      registry: ${{ steps.login-ecr.outputs.registry }}
+      docker_username: ${{ steps.login-ecr.outputs.[steps.get_docker_user_login.outputs.docker_username] }} # More information on these outputs can be found below in the 'Docker Credentials' section
+      docker_password: ${{ steps.login-ecr.outputs.[steps.get_docker_user_login.outputs.docker_password] }}
+
   integration-test:
     name: Tests
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: [build-test-env, login-to-amazon-ecr]
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -81,25 +109,35 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+      permissions-api:
+        image: postgres
+        env:
+          HOST: 127.0.0.1
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
+        credentials:
+          username: ${{ needs.login-to-amazon-ecr.outputs.docker_username }}
+          password: ${{ needs.login-to-amazon-ecr.outputs.docker_password }}
+        ports:
+          - 3002:3001
     strategy:
       max-parallel: 5
       fail-fast: false
       matrix:
         include:
           - test_name: 'Basic tests #1'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 1/3'
+            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 1/3'
           - test_name: 'Basic tests #2'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 2/3'
+            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 3/3'
+            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 3/3'
           - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 1/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:server:ci -- --shard 1/2'
           - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 2/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:e2e:ci'
+            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:e2e:ci'
     steps:
       - uses: actions/checkout@v3
 
