@@ -20,6 +20,7 @@ import { InputSearchReviewers } from 'components/common/form/InputSearchReviewer
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -62,6 +63,9 @@ export default function BountyProperties(props: {
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
   const space = useCurrentSpace();
+
+  const { isPublicSpace } = useIsPublicSpace();
+
   const { user } = useUser();
   const isRewardAmountInvalid = useMemo(
     () => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0,
@@ -426,53 +430,56 @@ export default function BountyProperties(props: {
             readOnly={readOnly}
           />
         </div>
-        <div
-          className='octo-propertyrow'
-          style={{
-            height: 'fit-content'
-          }}
-        >
+        {!isPublicSpace && (
           <div
-            className='octo-propertyname octo-propertyname--readonly'
-            style={{ alignSelf: 'baseline', paddingTop: 8 }}
+            className='octo-propertyrow'
+            style={{
+              height: 'fit-content'
+            }}
           >
-            <Button>Applicant role(s)</Button>
-          </div>
-          <div style={{ width: '100%' }}>
-            <InputSearchRoleMultiple
-              disableCloseOnSelect={true}
-              fullWidth
-              defaultValue={assignedRoleSubmitters}
-              onChange={async (roleIds) => {
-                await applyBountyUpdates({
-                  permissions: rollupPermissions({
-                    assignedRoleSubmitters: roleIds,
-                    selectedReviewerRoles,
-                    selectedReviewerUsers,
-                    spaceId: space!.id
-                  })
-                });
-                if (currentBounty?.id) {
-                  await refreshBountyPermissions(currentBounty.id);
-                }
-              }}
-              filterSelectedOptions={true}
-              showWarningOnNoRoles={true}
-              disabled={readOnly}
-              readOnly={readOnly}
-              sx={{
-                width: '100%'
-              }}
-            />
-            {bountyPagePermissions && bountyPermissions && (
-              <MissingPagePermissions
-                target='submitter'
-                bountyPermissions={bountyPermissions}
-                pagePermissions={bountyPagePermissions}
+            <div
+              className='octo-propertyname octo-propertyname--readonly'
+              style={{ alignSelf: 'baseline', paddingTop: 8 }}
+            >
+              <Button>Applicant role(s)</Button>
+            </div>
+            <div style={{ width: '100%' }}>
+              <InputSearchRoleMultiple
+                disableCloseOnSelect={true}
+                fullWidth
+                defaultValue={assignedRoleSubmitters}
+                onChange={async (roleIds) => {
+                  await applyBountyUpdates({
+                    permissions: rollupPermissions({
+                      assignedRoleSubmitters: roleIds,
+                      selectedReviewerRoles,
+                      selectedReviewerUsers,
+                      spaceId: space!.id
+                    })
+                  });
+                  if (currentBounty?.id) {
+                    await refreshBountyPermissions(currentBounty.id);
+                  }
+                }}
+                filterSelectedOptions={true}
+                showWarningOnNoRoles={true}
+                disabled={readOnly}
+                readOnly={readOnly}
+                sx={{
+                  width: '100%'
+                }}
               />
-            )}
+              {bountyPagePermissions && bountyPermissions && (
+                <MissingPagePermissions
+                  target='submitter'
+                  bountyPermissions={bountyPermissions}
+                  pagePermissions={bountyPagePermissions}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
         <div
           className='octo-propertyrow'
           style={{
