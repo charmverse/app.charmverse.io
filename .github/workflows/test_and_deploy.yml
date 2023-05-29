@@ -10,7 +10,7 @@ on:
     branches: ['**']
 
 env:
-  SELECTED_API_BRANCH: feat/page-permissions
+  SELECTED_PERMISSION_API_TAG: pushing-image-per-branch
 
 jobs:
   build-test-env:
@@ -110,7 +110,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       permissions-api:
-        image: postgres
+        image: ${{needs.login-to-amazon-ecr.registry}}/charmverse-permissions-api:${{env.SELECTED_PERMISSION_API_TAG}}
         env:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
