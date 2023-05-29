@@ -202,7 +202,7 @@ describe('computeBountyPermissions - public space', () => {
       mark_paid: true,
       review: true,
       // Everything except working on their own bounty
-      work: true
+      work: false
     });
   });
 });

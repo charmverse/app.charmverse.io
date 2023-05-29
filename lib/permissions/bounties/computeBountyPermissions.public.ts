@@ -25,6 +25,12 @@ export async function computeBountyPermissionsPublic({
   }
 
   if (spaceRole?.isAdmin) {
+    if (
+      bounty.createdBy === userId ||
+      bounty.permissions.some((p) => p.permissionLevel === 'creator' && p.userId === userId)
+    ) {
+      return { ...allowedOperations.full, work: false };
+    }
     return allowedOperations.full;
   }
 
