@@ -215,6 +215,13 @@ async function createCharmverseUser ({avatar_template, community, spaceId, usern
   return charmverseUser
 }
 
+function replaceImgEmojiWithTextVariant(htmlContent: string) {
+  // Replace emoji image tags with their text representation
+  const emojiReplacedMarkdown = emojiConverter.replace_colons(htmlContent.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
+  // Replacing the html tags to get the raw text
+  return parseMarkdown(turndownService.turndown(emojiReplacedMarkdown));
+}
+
 export async function importFromDiscourse(community: string, spaceDomain: string) {
   try {
     const space = await prisma.space.findFirstOrThrow({
@@ -259,9 +266,10 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       postCategoriesRecord[category.id] = postCategory
     }
   
-    const topics: Topic[] = []
-    const posts: Post[] = []
-    const topicPostsRecord: Record<string, Post[]> = {};
+    const topicPostsRecord: Record<string, {
+      topic: Topic,
+      posts: Post[]
+    }> = {};
     // Using a record to avoid duplicates
     const discourseUserRecord: Record<string, User> = {};
     const userRecord: Record<string, CharmverseUser> = {};
@@ -288,25 +296,24 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       const {topic_list: {topics: fetchedTopics}} = await fetch<{users: User[], topic_list: {topics: Topic[]}}>(`https://${community}/c/${categoryId}.json`);
       for (const topic of fetchedTopics) {
         const {post_stream: {posts: fetchedPosts}} = await fetch<{post_stream: {posts: Post[]}}>(`https://${community}/t/${topic.id}.json`)
-        posts.push(...fetchedPosts)
-        topicPostsRecord[topic.id] = fetchedPosts
+        topicPostsRecord[topic.id] = {
+          posts: fetchedPosts,
+          topic
+        }
       }
-  
-      topics.push(...fetchedTopics)
     }
     
     let topicCounter = 0
-    for (const topic of topics) {
-      const topicPosts = topicPostsRecord[topic.id].sort((post1, post2) => post1.post_number - post2.post_number)
-      const rootPost = topicPosts.find(post => post.post_number === 1)
+    const totalTopics = Object.keys(topicPostsRecord).length
+
+    for (const {posts, topic} of Object.values(topicPostsRecord)) {
+      const sortedPosts = posts.sort((post1, post2) => post1.post_number - post2.post_number)
+      const rootPost = sortedPosts.find(post => post.post_number === 1)
       if (!rootPost || topic.id !== 288) {
         continue
       }
       
-      // Replace emoji image tags with their text representation
-      const emojiReplacedMarkdown = emojiConverter.replace_colons(rootPost.cooked.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
-      // Replacing the html tags to get the raw text
-      const topicContent = parseMarkdown(turndownService.turndown(emojiReplacedMarkdown));
+      const topicContent = replaceImgEmojiWithTextVariant(rootPost.cooked);
       
       const topicAuthor = await fetchAndStoreUser({
         userId: rootPost.user_id,
@@ -335,16 +342,15 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       })
 
       postRecord[rootPost.id] = post
-  
-      for (const topicPost of topicPosts) {
+      
+      for (const topicPost of posts) {
         if (topicPost.post_number === 1) {
           continue
         }
 
-        const emojiReplacedMarkdown = emojiConverter.replace_colons(topicPost.cooked.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
-        // Write regex to remove all html tags and just get the text
-        const commentContent = parseMarkdown(turndownService.turndown(emojiReplacedMarkdown))
-        const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
+        const commentContent = replaceImgEmojiWithTextVariant(topicPost.cooked);
+
+        const parentPost = posts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
         const postAuthor = await fetchAndStoreUser({
           userId: topicPost.user_id,
@@ -361,14 +367,15 @@ export async function importFromDiscourse(community: string, spaceDomain: string
             contentText: htmlToText(topicPost.cooked),
             parentId: topicPost.reply_to_post_number === null ? null : parentPost ? postCommentRecord[parentPost.id]?.id : null,
             postId: post.id,
-            createdBy: postAuthor.id
+            createdBy: postAuthor.id,
+            createdAt: new Date(Date.now() + topicPost.post_number)
           }
         })
 
         postCommentRecord[topicPost.id] = postComment
       }
       topicCounter += 1;
-      console.log(`${topicCounter}/${topics.length} topics created`)
+      console.log(`${topicCounter}/${totalTopics} topics created`)
     }
 
     const users = Object.values(discourseUserRecord);
@@ -385,8 +392,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       const postLikeUserActions = userActions.user_actions.filter(userAction => userAction.action_type === 2)
 
       for (const postLikeUserAction of postLikeUserActions) {
-        const childPost = topicPostsRecord[postLikeUserAction.topic_id]?.find(childPost => childPost.id === postLikeUserAction.post_id)
-        const rootPost = topicPostsRecord[postLikeUserAction.topic_id]?.find(topicPost => topicPost.post_number === 1)
+        const childPost = topicPostsRecord[postLikeUserAction.topic_id].posts?.find(childPost => childPost.id === postLikeUserAction.post_id)
+        const rootPost = topicPostsRecord[postLikeUserAction.topic_id].posts?.find(topicPost => topicPost.post_number === 1)
 
         if (!childPost || !rootPost) {
           continue
