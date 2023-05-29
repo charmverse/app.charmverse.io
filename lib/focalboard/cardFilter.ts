@@ -95,7 +95,7 @@ class CardFilter {
             return sourceValue !== '';
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'boolean') {
@@ -109,7 +109,7 @@ class CardFilter {
             return sourceValue !== (filter.values[0] || 'false');
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'number') {
@@ -141,7 +141,7 @@ class CardFilter {
             return Number(sourceValue) !== Number(filterValue);
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'multi_select') {
@@ -162,7 +162,7 @@ class CardFilter {
             return valueArray.length > 0;
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'select') {
@@ -182,7 +182,7 @@ class CardFilter {
             return sourceValue !== '';
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'date') {
@@ -238,7 +238,7 @@ class CardFilter {
             );
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       }

@@ -1,4 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
+import { useTheme } from '@emotion/react';
 import { Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
@@ -14,6 +15,7 @@ import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
+import { inputBackground } from 'theme/colors';
 
 import { CheckoutForm } from './CheckoutForm';
 
@@ -55,6 +57,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       spaceId: space.id
     });
   }
+
+  const theme = useTheme();
 
   return (
     <Stack>
@@ -105,7 +109,32 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             {showCheckoutForm ? (
               <Elements
                 stripe={stripePromise}
-                options={{ appearance: { theme: 'stripe', variables: { colorBackground: 'var(--input-bg)' } } }}
+                options={{
+                  appearance: {
+                    variables: {
+                      colorTextPlaceholder: theme.palette.text.disabled
+                    },
+                    rules: {
+                      '.Label': {
+                        color: theme.palette.text.secondary
+                      },
+                      '.Input:focus': {
+                        boxShadow: `none`,
+                        borderRadius: '2px',
+                        border: `1px solid ${theme.palette.primary.main}`
+                      },
+                      '.Input': {
+                        color: theme.palette.text.primary,
+                        // hex code with opacity channel doesn't work
+                        backgroundColor: theme.palette.mode === 'dark' ? '#252525' : inputBackground,
+                        // css variable doesn't work
+                        border: `1px solid ${
+                          theme.palette.mode === 'dark' ? 'rgba(15, 15, 15, 0.2)' : 'rgba(15, 15, 15, 0.1)'
+                        }`
+                      }
+                    }
+                  }
+                }}
               >
                 <CheckoutForm
                   spaceSubscription={spaceSubscription}

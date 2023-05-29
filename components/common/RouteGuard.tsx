@@ -9,7 +9,7 @@ import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { isSpaceDomain } from 'lib/spaces/utils';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
@@ -23,26 +23,22 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
+  const spaceDomain = (router.query.domain as string) || '';
+  const hasSpaceDomain = !!spaceDomain;
 
-  if (typeof window !== 'undefined') {
-    const pathSegments: string[] = router.asPath
-      .split('?')[0]
-      .split('/')
-      .filter((segment) => !!segment);
-    const firstSegment: string = pathSegments[0];
-    const isDomain: boolean = !!isSpaceDomain(firstSegment);
-    const workspaceDomain = isDomain ? firstSegment : null;
-    const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
+  useEffect(() => {
+    const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
     const defaultWorkspaceKey: string = getKey('last-workspace');
-
-    if (workspaceDomain) {
-      localStorage.setItem(defaultWorkspaceKey, router.asPath);
+    if (spaceDomain) {
+      localStorage.setItem(defaultWorkspaceKey, spaceDomain);
     }
 
-    if (workspaceDomain && pathSegments.length > 1) {
+    // pathname with domain pattern /[domain]/page_path_pattern
+    const hasPageInPath = !!router.pathname.split('/[domain]')[1];
+    if (spaceDomain && hasPageInPath) {
       localStorage.setItem(defaultPageKey, router.asPath);
     }
-  }
+  }, [router.asPath, router.pathname, spaceDomain]);
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -78,15 +74,27 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         // Only get segments that evaluate to some value
         return pathElem;
       })[0] ?? '/';
-
-    const spaceDomain = path.split('/')[1];
+    const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath);
+    // special case, when visiting main app url on space subdomain
+    const isSpaceSubdomainPath = firstPathSegment === '/' && !!spaceDomain;
 
     // condition: public page
-    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasSharedPageAccess) {
+    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
       return { authorized: true };
     }
+
+    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
+      return { authorized: true };
+    }
+
     // condition: no user session and no wallet address
     else if (!user) {
+      // condition: space subdomain / custom domain main path
+      // do not redirect - it will display login
+      if (isSpaceSubdomainPath) {
+        return { authorized: true };
+      }
+
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
@@ -97,7 +105,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       };
     }
     // condition: trying to access a space without access
-    else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
+    else if (hasSpaceDomain && !filterSpaceByDomain(spaces, spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
       if (authorizedSpaceDomainRef.current === spaceDomain) {
         authorizedSpaceDomainRef.current = '';
