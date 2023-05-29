@@ -20,11 +20,13 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 export function CommentForm({
   handleCreateComment,
   initialValue,
-  inlineCharmEditor
+  inlineCharmEditor,
+  disabled
 }: {
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
+  disabled?: boolean;
 }) {
   const { user } = useUser();
   const [postContent, setPostContent] = useState<ICharmEditorOutput>(
@@ -68,10 +70,10 @@ export function CommentForm({
     };
 
     if (!inlineCharmEditor) {
-      return <CharmEditor {...editorCommentProps} />;
+      return <CharmEditor {...editorCommentProps} readOnly={disabled} />;
     }
 
-    return <InlineCharmEditor {...editorCommentProps} />;
+    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} />;
   }, [inlineCharmEditor, postContent, updatePostContent]);
 
   if (!user) {
@@ -89,7 +91,7 @@ export function CommentForm({
         sx={{
           alignSelf: 'flex-end'
         }}
-        disabled={!postContent.rawText}
+        disabled={!postContent.rawText || disabled}
         onClick={createPostComment}
       >
         Comment
