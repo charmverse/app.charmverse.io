@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { typedKeys } from 'lib/utilities/objects';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
@@ -69,7 +70,7 @@ describe('computePostPermissions - base', () => {
     );
   });
 
-  it('should allow space members to view, comment and vote on a post', async () => {
+  it('should provide full permissions to space members', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
     const post = await generateForumPost({
       spaceId: space.id,
@@ -81,14 +82,19 @@ describe('computePostPermissions - base', () => {
       userId: spaceMemberUser.id
     });
 
-    const operations: PostOperation[] = ['view_post', 'upvote', 'downvote', 'add_comment'];
-
-    postOperations.forEach((op) => {
-      if (operations.includes(op)) {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions).toMatchObject<PostPermissionFlags>({
+      // All space members can engage with the post
+      view_post: true,
+      add_comment: true,
+      downvote: true,
+      upvote: true,
+      // Moderator-type permissions are provided to all members
+      delete_comments: true,
+      delete_post: true,
+      lock_post: true,
+      pin_post: true,
+      // Only author gets an edit_post permission
+      edit_post: false
     });
   });
 
@@ -104,16 +110,19 @@ describe('computePostPermissions - base', () => {
       userId: authorUser.id
     });
 
-    const authorOperations: PostOperation[] = ['edit_post', 'delete_post'];
-
-    const combinedOps = [...authorOperations, ...memberOperations];
-
-    postOperations.forEach((op) => {
-      if (combinedOps.includes(op)) {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions).toMatchObject<PostPermissionFlags>({
+      // All space members can engage with the post
+      view_post: true,
+      add_comment: true,
+      downvote: true,
+      upvote: true,
+      // Moderator-type permissions are provided to all members
+      delete_comments: true,
+      delete_post: true,
+      lock_post: true,
+      pin_post: true,
+      // Only author gets an edit_post permission
+      edit_post: true
     });
   });
 
@@ -259,7 +268,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
   });
 
-  it('should return only view_post permissions of a proposal converted post for a regular user', async () => {
+  it('should return only view_post permissions of a post converted to proposal for a regular user', async () => {
     const postCategory = await generatePostCategory({ spaceId: space.id });
 
     const post = await generateForumPost({
@@ -279,12 +288,12 @@ describe('computePostPermissions - with proposal permission filtering policy', (
       userId: spaceMemberUser.id
     });
 
-    postOperationsWithoutEdit.forEach((op) => {
-      if (op === 'view_post') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions.view_post).toBe(true);
+
+    const testedOperations: PostOperation[] = ['add_comment', 'delete_comments', 'upvote', 'downvote'];
+    // Post should now be readonly
+    testedOperations.forEach((op) => {
+      expect(permissions[op]).toBe(false);
     });
   });
 });

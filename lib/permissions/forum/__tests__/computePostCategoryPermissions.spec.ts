@@ -33,31 +33,31 @@ beforeAll(async () => {
 });
 
 describe('computePostCategoryPermissions - public version', () => {
-  it('should return full permissions for the admin', async () => {
-    const permissions = await computePostCategoryPermissions({
+  it('should allow admins and space members to create posts and edit / delete a category', async () => {
+    const adminPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id,
       userId: adminUser.id
     });
 
-    const fullPermissions = new AvailablePostCategoryPermissions().full;
-
-    expect(permissions).toEqual(fullPermissions);
-  });
-
-  it('should only allow space members to create posts', async () => {
-    const permissions = await computePostCategoryPermissions({
+    const memberPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id,
       userId: spaceMemberUser.id
     });
 
-    const createPermissions: PostCategoryPermissionFlags = {
-      ...new AvailablePostCategoryPermissions().empty,
-      create_post: true
-    };
+    expect(adminPermissions).toMatchObject<PostCategoryPermissionFlags>({
+      create_post: true,
+      delete_category: true,
+      edit_category: true,
+      manage_permissions: false
+    });
 
-    expect(permissions).toEqual(createPermissions);
+    expect(memberPermissions).toMatchObject<PostCategoryPermissionFlags>({
+      create_post: true,
+      delete_category: true,
+      edit_category: true,
+      manage_permissions: false
+    });
   });
-
   it('should return empty permissions for people outside the space', async () => {
     const publicPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id

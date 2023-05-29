@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 describe('computeSpacePermissions', () => {
-  it('should return true to all permissions except moderate_forums and create_forum_category for all space members', async () => {
+  it('should return true to all permissions for all space members and admins', async () => {
     const normalSpaceMember = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -28,28 +28,22 @@ describe('computeSpacePermissions', () => {
       userId: normalSpaceMember.id
     });
 
-    expect(normalMemberPermissions).toMatchObject<SpacePermissionFlags>({
-      createBounty: true,
-      createPage: true,
-      reviewProposals: true,
-      createForumCategory: false,
-      moderateForums: false
-    });
-  });
-
-  it('should return full permissions for the space admin user space permissions via their role', async () => {
     const adminPermissions = await computeSpacePermissions({
       resourceId: space.id,
       userId: adminUser.id
     });
 
-    expect(adminPermissions).toMatchObject<SpacePermissionFlags>({
+    const fullPermissions: SpacePermissionFlags = {
       createBounty: true,
-      createForumCategory: true,
       createPage: true,
       reviewProposals: true,
+      createForumCategory: true,
       moderateForums: true
-    });
+    };
+
+    expect(normalMemberPermissions).toMatchObject<SpacePermissionFlags>(fullPermissions);
+
+    expect(adminPermissions).toMatchObject<SpacePermissionFlags>(fullPermissions);
   });
 
   it('should return empty permissions for someone outside the space', async () => {
