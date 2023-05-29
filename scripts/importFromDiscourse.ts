@@ -4,6 +4,10 @@ import fetch from "adapters/http/fetch.server"
 import { htmlToText } from 'html-to-text'
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
 import TurndownService from 'turndown';
+import emoji from "emoji-js"
+
+const emojiConverter = new emoji.EmojiConvertor()
+emojiConverter.replace_mode = 'unified'
 
 const turndownService = new TurndownService();
 
@@ -194,7 +198,7 @@ type UserAction = {
 async function createCharmverseUser ({avatar_template, community, spaceId, username}: {avatar_template: string, username: string, spaceId: string, community: string}) {
   const charmverseUser = await prisma.user.create({
     data: {
-      username: `${username} (Imported)`,
+      username: `${username}-imported`,
       path: `${username.toLowerCase()}-v2-discourse-imported`,
       avatar: `https://${community}${avatar_template.replace('{size}', '80')}`,
       isBot: true
@@ -295,12 +299,14 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     for (const topic of topics) {
       const topicPosts = topicPostsRecord[topic.id].sort((post1, post2) => post1.post_number - post2.post_number)
       const rootPost = topicPosts.find(post => post.post_number === 1)
-      if (!rootPost) {
+      if (!rootPost || topic.id !== 288) {
         continue
       }
       
+      // Replace emoji image tags with their text representation
+      const emojiReplacedMarkdown = emojiConverter.replace_colons(rootPost.cooked.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
       // Replacing the html tags to get the raw text
-      const content = parseMarkdown(turndownService.turndown(rootPost.cooked));
+      const topicContent = parseMarkdown(turndownService.turndown(emojiReplacedMarkdown));
       
       const topicAuthor = await fetchAndStoreUser({
         userId: rootPost.user_id,
@@ -318,7 +324,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           categoryId: postCategoriesRecord[topic.category_id].id,
           spaceId,
           contentText: htmlToText(rootPost.cooked),
-          content,
+          content: topicContent,
           createdBy: topicAuthor.id,
           postToPostTags: {
             createMany: {
@@ -335,8 +341,9 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           continue
         }
 
+        const emojiReplacedMarkdown = emojiConverter.replace_colons(topicPost.cooked.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
         // Write regex to remove all html tags and just get the text
-        const content = parseMarkdown(turndownService.turndown(topicPost.cooked))
+        const commentContent = parseMarkdown(turndownService.turndown(emojiReplacedMarkdown))
         const parentPost = topicPosts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
         const postAuthor = await fetchAndStoreUser({
@@ -350,7 +357,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
 
         const postComment = await prisma.postComment.create({
           data: {
-            content,
+            content: commentContent,
             contentText: htmlToText(topicPost.cooked),
             parentId: topicPost.reply_to_post_number === null ? null : parentPost ? postCommentRecord[parentPost.id]?.id : null,
             postId: post.id,
@@ -361,7 +368,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         postCommentRecord[topicPost.id] = postComment
       }
       topicCounter += 1;
-      console.log(`${topicCounter}/${topics.length} Topics created`)
+      console.log(`${topicCounter}/${topics.length} topics created`)
     }
 
     const users = Object.values(discourseUserRecord);
