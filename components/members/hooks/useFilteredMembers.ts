@@ -7,14 +7,19 @@ export function useFilteredMembers(searchQuery: string, includeGuestsAndBots = f
 
   const filteredMembers = useMemo(() => {
     const query = searchQuery?.toLowerCase()?.trim();
-    if (!query) {
-      return members;
-    }
 
-    return members.filter((member) => {
+    const botFilteredMembers = members.filter((member) => {
       if ((member.isBot || member.isGuest) && !includeGuestsAndBots) {
         return false;
       }
+      return true;
+    });
+
+    if (!query) {
+      return botFilteredMembers;
+    }
+
+    return botFilteredMembers.filter((member) => {
       if (member.searchValue?.includes(query)) {
         return true;
       }
