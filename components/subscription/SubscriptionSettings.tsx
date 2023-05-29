@@ -3,7 +3,6 @@ import { useTheme } from '@emotion/react';
 import { Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import { capitalize } from 'lodash';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -15,13 +14,10 @@ import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
-import { inputBackground, inputBackgroundDarkMode } from 'theme/colors';
+import { inputBackground } from 'theme/colors';
 
 import { CheckoutForm } from './CheckoutForm';
-
-const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string;
-
-const stripePromise = loadStripe(stripePublicKey);
+import { loadStripe } from './loadStripe';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const {
@@ -59,6 +55,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   }
 
   const theme = useTheme();
+
+  const stripePromise = loadStripe();
 
   return (
     <Stack>
