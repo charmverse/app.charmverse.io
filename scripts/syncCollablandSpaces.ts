@@ -34,7 +34,7 @@ export async function syncCollablandSpaces() {
 
   for (const syncUser of usersToSync) {
     const currentRoles = syncUser.spaceRoleToRole.map((r) => r.role);
-    // await syncDiscordUser({ currentRoles, space: syncUser.space, user: syncUser.user });
+    await syncDiscordUser({ currentRoles, space: syncUser.space, user: syncUser.user });
   }
 }
 
