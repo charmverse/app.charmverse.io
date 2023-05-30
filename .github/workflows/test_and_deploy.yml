@@ -133,6 +133,7 @@ jobs:
                      npm run start:prod
 
           docker ps
+          sleep 20
           curl localhost:3002/api/health
 #          echo "registry_in_underscore=$registry_in_underscore" >> $GITHUB_ENV
 
