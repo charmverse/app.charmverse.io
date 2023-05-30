@@ -257,6 +257,12 @@ export function getSpaceUrl(config: { domain: string; customDomain?: string | nu
     return '/';
   }
 
+  // we are on custom domain but we want to redirect to a different space
+  if (customDomain) {
+    // TODO: enable subdomains
+    return getDefaultSpaceUrl({ domain });
+  }
+
   // TODO - redirect to different custom domain
 
   if (!subdomain) return `/${domain}`;
@@ -294,4 +300,29 @@ export function getCustomDomainUrl(customDomain: string, path = '/') {
   const protocol = isDevEnv ? 'http:' : 'https:';
 
   return `${protocol}//${customDomain}${path}`;
+}
+
+export function getDefaultSpaceUrl({
+  domain,
+  path = '/',
+  useSubdomain = false
+}: {
+  domain: string;
+  path?: string;
+  useSubdomain?: boolean;
+}) {
+  let protocol = isDevEnv ? 'http:' : 'https:';
+  const appDomain = getAppApexDomain();
+
+  if (typeof window !== 'undefined') {
+    protocol = window.location.protocol;
+  }
+
+  if (appDomain) {
+    return useSubdomain
+      ? `${protocol}//${domain}.${appDomain}${path}`
+      : `${protocol}//app.${appDomain}/${domain}${path}`;
+  }
+
+  return `/${domain}${path}`;
 }
