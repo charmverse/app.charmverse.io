@@ -72,7 +72,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 // Docs: https://docs.alchemy.com/reference/getnfts
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const res = await GET<AlchemyNftResponse>(url, { owner: address, excludeFilters: ['AIRDROPS', 'SPAM'] });
+  const res = await GET<AlchemyNftResponse>(url, { owner: address });
   return { address, nfts: res.ownedNfts };
 };
 
@@ -80,16 +80,15 @@ export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1
   const promises = addresses.map((address) => getAddressNfts(address, chainId));
 
   const results = await Promise.allSettled(promises);
-  const nfts = results
-    .reduce((acc: AlchemyNft[], res) => {
-      if (res.status === 'fulfilled') {
-        return [...acc, ...res.value.nfts.map((nft) => ({ ...nft, walletAddress: res.value.address }))];
-      } else {
-        return acc;
-      }
-    }, [])
-    // Filter out invalid NFTs
-    .filter((n) => !!n.media?.length && !!n.media[0].gateway && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
+  const nfts = results.reduce((acc: AlchemyNft[], res) => {
+    if (res.status === 'fulfilled') {
+      return [...acc, ...res.value.nfts.map((nft) => ({ ...nft, walletAddress: res.value.address }))];
+    } else {
+      return acc;
+    }
+  }, []);
+  // Filter out invalid NFTs
+  // .filter((n) => !!n.media?.length && !!n.media[0].gateway && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
 
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 
