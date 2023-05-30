@@ -49,6 +49,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     updatedBy: newUserId,
     name: 'Test Space',
     domain: 'test-space',
+    customDomain: null,
     discordServerId: null,
     defaultVotingDuration: null,
     origin: null,

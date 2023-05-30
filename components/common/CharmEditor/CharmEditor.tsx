@@ -52,10 +52,12 @@ import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import { File } from './components/file/File';
 import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
+import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import * as inlineComment from './components/inlineComment';
+import InlineCommentThread from './components/inlineComment/inlineComment.components';
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
@@ -687,7 +689,7 @@ function CharmEditor({
         }
       }}
     >
-      <floatingMenu.FloatingMenu
+      <FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}

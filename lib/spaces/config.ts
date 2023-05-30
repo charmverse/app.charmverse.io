@@ -48,6 +48,7 @@ export const staticSpaceTemplates = [
 const dynamicTemplateIds = ['default', 'importNotion', 'importMarkdown'] as const;
 
 export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), ...dynamicTemplateIds];
+export const spaceTemplateApiNames = [...staticSpaceTemplates.map((tpl) => tpl.apiName)];
 
 export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
 export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];

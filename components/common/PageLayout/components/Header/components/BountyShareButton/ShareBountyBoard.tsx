@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeName } from 'lib/permissions/meta/preset-templates';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -77,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
+      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }
