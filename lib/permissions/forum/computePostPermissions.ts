@@ -4,8 +4,8 @@ import {
   postResolver,
   AvailablePostPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies
-} from '@charmverse/core';
-import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core';
+} from '@charmverse/core/permissions';
+import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core/permissions';
 import { PostOperation, prisma } from '@charmverse/core/prisma-client';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';

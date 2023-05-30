@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';

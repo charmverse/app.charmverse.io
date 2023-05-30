@@ -1,7 +1,6 @@
-import { testUtilsPages } from '@charmverse/core';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { baseUrl } from 'testing/mockApiCall';

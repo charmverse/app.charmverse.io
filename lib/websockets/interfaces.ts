@@ -1,6 +1,6 @@
 // import type { Block } from '@charmverse/core/prisma';
 
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';

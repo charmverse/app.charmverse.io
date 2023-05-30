@@ -1,6 +1,6 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { selectionTooltip } from '@bangle.dev/tooltip';
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';

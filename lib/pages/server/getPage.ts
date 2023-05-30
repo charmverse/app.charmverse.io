@@ -1,4 +1,4 @@
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';

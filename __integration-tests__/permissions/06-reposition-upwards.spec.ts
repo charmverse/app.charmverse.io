@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type {
-  AssignedPagePermission,
-  PagePermissionAssignment,
-  PagePermissionWithSource,
-  PageWithPermissions
-} from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { AssignedPagePermission, PagePermissionAssignment } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 

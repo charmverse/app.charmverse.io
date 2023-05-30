@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Box, CardHeader, Typography } from '@mui/material';
 import { memo } from 'react';

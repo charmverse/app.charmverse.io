@@ -1,5 +1,5 @@
 import type { EditorView } from '@bangle.dev/pm';
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import type { Member } from 'lib/members/interfaces';
 

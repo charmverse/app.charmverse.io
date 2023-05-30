@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Bounty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';

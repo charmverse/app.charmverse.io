@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unused-prop-types */
 import { usePluginState } from '@bangle.dev/react';
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PluginKey } from 'prosemirror-state';
 import reactDOM from 'react-dom';
 

@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';

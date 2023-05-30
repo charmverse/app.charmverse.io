@@ -1,5 +1,5 @@
 /* eslint-disable default-param-last */
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import charmClient from 'charmClient';
 import type { Block, BlockPatch } from 'lib/focalboard/block';

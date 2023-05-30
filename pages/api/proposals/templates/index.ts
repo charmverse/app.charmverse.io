@@ -1,4 +1,4 @@
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

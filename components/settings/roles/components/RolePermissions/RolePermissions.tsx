@@ -1,6 +1,6 @@
+import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
+import { AvailableSpacePermissions } from '@charmverse/core/permissions/flags';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import { AvailableSpacePermissions } from '@charmverse/core/shared';
-import type { PostCategoryPermissionAssignment } from '@charmverse/core/shared';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useReducer, useEffect, useState } from 'react';

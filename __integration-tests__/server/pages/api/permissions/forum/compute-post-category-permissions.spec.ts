@@ -1,4 +1,4 @@
-import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';

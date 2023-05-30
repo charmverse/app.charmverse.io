@@ -1,6 +1,6 @@
 import type { Node } from '@bangle.dev/pm';
-import type { PagePermissionFlags } from '@charmverse/core';
 import { getLogger } from '@charmverse/core/log';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';

@@ -1,4 +1,4 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';

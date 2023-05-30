@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';

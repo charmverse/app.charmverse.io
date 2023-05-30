@@ -1,5 +1,5 @@
-import type { PageWithPermissions } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 
 import { getPage } from 'lib/pages/server';
 

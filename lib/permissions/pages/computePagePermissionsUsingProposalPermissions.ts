@@ -1,5 +1,5 @@
-import { AvailablePagePermissions } from '@charmverse/core';
-import type { PagePermissionFlags, PermissionCompute } from '@charmverse/core';
+import { AvailablePagePermissions } from '@charmverse/core/permissions';
+import type { PagePermissionFlags, PermissionCompute } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';

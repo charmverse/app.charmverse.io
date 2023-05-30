@@ -1,4 +1,5 @@
-import type { PostCategoryWithPermissions, PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';

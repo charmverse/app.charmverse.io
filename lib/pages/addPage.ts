@@ -1,4 +1,4 @@
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';

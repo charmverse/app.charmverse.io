@@ -1,4 +1,4 @@
-import { InsecureOperationError } from '@charmverse/core';
+import { InsecureOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

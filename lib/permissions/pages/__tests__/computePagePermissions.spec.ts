@@ -1,8 +1,9 @@
-import type { PagePermissionFlags } from '@charmverse/core';
-import { objectUtils, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { PageOperations } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { objectUtils } from '@charmverse/core/utilities';
 
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 

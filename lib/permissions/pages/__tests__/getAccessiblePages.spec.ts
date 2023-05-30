@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
 import { createPage } from 'testing/setupDatabase';

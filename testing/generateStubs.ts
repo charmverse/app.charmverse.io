@@ -1,4 +1,4 @@
-import type { PageNode } from '@charmverse/core';
+import type { PageNode } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';

@@ -1,4 +1,4 @@
-import type { PageNode, TargetPageTree } from '@charmverse/core';
+import type { PageNode, TargetPageTree } from '@charmverse/core/pages';
 import type { PageType } from '@charmverse/core/prisma';
 
 import type { PagesMap } from './interfaces';

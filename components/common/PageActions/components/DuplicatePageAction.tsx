@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';

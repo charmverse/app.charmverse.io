@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {

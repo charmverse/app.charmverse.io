@@ -1,4 +1,4 @@
-import type { SpaceDefaultPublicPageToggle } from '@charmverse/core';
+import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

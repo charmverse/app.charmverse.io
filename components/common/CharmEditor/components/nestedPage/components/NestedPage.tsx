@@ -1,5 +1,5 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 

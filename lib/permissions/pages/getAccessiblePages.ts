@@ -1,5 +1,5 @@
-import type { PageMeta, PagesRequest } from '@charmverse/core';
-import { InvalidInputError } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[]> {

@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

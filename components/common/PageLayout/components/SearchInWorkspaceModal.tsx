@@ -1,5 +1,5 @@
-import type { PageMeta } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';

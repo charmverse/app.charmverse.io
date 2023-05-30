@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 

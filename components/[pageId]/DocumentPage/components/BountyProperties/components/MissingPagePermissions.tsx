@@ -1,4 +1,4 @@
-import type { AssignedPagePermission, TargetPermissionGroup } from '@charmverse/core';
+import type { AssignedPagePermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { BountyPermissionLevel } from '@charmverse/core/prisma';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';

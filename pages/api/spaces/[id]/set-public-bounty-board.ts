@@ -1,4 +1,4 @@
-import type { PublicBountyToggle } from '@charmverse/core';
+import type { PublicBountyToggle } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';

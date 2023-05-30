@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { createContext, useContext, useMemo, useState } from 'react';
 import type { Dispatch, ReactNode, SetStateAction, MutableRefObject } from 'react';

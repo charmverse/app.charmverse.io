@@ -1,4 +1,4 @@
-import type { BasePagePermissionsClient } from '@charmverse/core';
+import type { BasePagePermissionsClient } from '@charmverse/core/permissions';
 
 import { computePagePermissions } from './computePagePermissions';
 import { getAccessiblePages } from './getAccessiblePages';

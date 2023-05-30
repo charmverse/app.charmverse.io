@@ -1,11 +1,6 @@
-import type {
-  PageMeta,
-  PageNode,
-  PageNodeWithChildren,
-  PagePermissionFlags,
-  PageWithPermissions
-} from '@charmverse/core';
-import type { Page, PagePermission, Space } from '@charmverse/core/prisma';
+import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { Page, Space } from '@charmverse/core/prisma';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
@@ -70,11 +65,6 @@ export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, 
 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
-
-export interface IPageMetaWithPermissions extends PageMeta {
-  permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
-}
-
 export interface PublicPageResponse {
   page: PageWithContent;
   boardPages: Page[];

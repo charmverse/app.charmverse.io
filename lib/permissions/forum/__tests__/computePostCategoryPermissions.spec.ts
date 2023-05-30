@@ -1,11 +1,11 @@
-import { AvailablePostCategoryPermissions, generatePostCategory } from '@charmverse/core';
-import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
+import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
+import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 
@@ -18,16 +18,16 @@ let otherSpace: Space;
 let otherSpaceAdminUser: User;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: true });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   adminUser = generated.user;
   space = generated.space;
-  spaceMemberUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+  spaceMemberUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
-  const secondGenerated = await generateUserAndSpace({ isAdmin: true });
+  const secondGenerated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   otherSpaceAdminUser = secondGenerated.user;
   otherSpace = secondGenerated.space;
 
-  postCategory = await generatePostCategory({
+  postCategory = await testUtilsForum.generatePostCategory({
     spaceId: space.id
   });
 });

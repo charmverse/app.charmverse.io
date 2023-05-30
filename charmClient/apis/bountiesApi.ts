@@ -1,4 +1,4 @@
-import type { PublicBountyToggle } from '@charmverse/core';
+import type { PublicBountyToggle } from '@charmverse/core/permissions';
 import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';

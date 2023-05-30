@@ -1,12 +1,12 @@
-import type { PagePermissionFlags, PageResource, PermissionCompute } from '@charmverse/core';
+import { PageNotFoundError } from '@charmverse/core/errors';
+import type { PagePermissionFlags, PageResource, PermissionCompute } from '@charmverse/core/permissions';
 import {
   defaultPagePolicies,
   pageResolver,
   AvailablePagePermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
-  PageNotFoundError,
   hasAccessToSpace
-} from '@charmverse/core';
+} from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { computePagePermissionsUsingProposalPermissions } from './computePagePermissionsUsingProposalPermissions';

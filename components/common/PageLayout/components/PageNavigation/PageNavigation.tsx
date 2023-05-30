@@ -1,6 +1,6 @@
-import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core';
+import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
+import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
-import { pageTree } from '@charmverse/core/shared';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import { useRouter } from 'next/router';

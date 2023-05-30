@@ -1,5 +1,5 @@
-import type { PagePermissionFlags } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import UndoIcon from '@mui/icons-material/Undo';

@@ -1,4 +1,4 @@
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PageWithProposal } from 'lib/pages';

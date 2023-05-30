@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { resolvePageTree } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -9,7 +10,6 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { resolvePageTree } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { getPermissionsClient } from 'lib/permissions/api';

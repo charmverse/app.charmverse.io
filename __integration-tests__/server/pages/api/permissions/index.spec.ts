@@ -1,4 +1,4 @@
-import type { PagePermissionAssignment } from '@charmverse/core';
+import type { PagePermissionAssignment } from '@charmverse/core/permissions';
 import type { Role, Space } from '@charmverse/core/prisma';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';

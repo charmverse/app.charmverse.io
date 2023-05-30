@@ -1,9 +1,9 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
-  PageWithPermissions,
   ProposalCategoryWithPermissions,
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
-} from '@charmverse/core';
+} from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';

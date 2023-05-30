@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';

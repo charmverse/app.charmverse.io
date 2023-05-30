@@ -1,4 +1,5 @@
-import type { PostCategoryWithPermissions, PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';

@@ -1,4 +1,8 @@
-import type { AssignedPagePermission, PagePermissionAssignment, TargetPermissionGroup } from '@charmverse/core';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  TargetPermissionGroup
+} from '@charmverse/core/permissions';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';

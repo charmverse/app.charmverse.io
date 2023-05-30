@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';

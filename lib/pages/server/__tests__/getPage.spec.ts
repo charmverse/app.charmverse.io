@@ -1,4 +1,5 @@
-import type { PagePermissionWithSource, PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { PagePermissionWithSource } from '@charmverse/core/permissions';
 import type { Page, PagePermission, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';

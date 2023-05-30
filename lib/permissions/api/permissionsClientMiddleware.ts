@@ -1,5 +1,6 @@
-import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core';
-import { InvalidInputError, stringUtils } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core/permissions';
+import { stringUtils } from '@charmverse/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

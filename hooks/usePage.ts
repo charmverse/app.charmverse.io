@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 

@@ -1,6 +1,6 @@
 import crypto, { randomUUID } from 'node:crypto';
 
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApplicationStatus,
   Block,

@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';

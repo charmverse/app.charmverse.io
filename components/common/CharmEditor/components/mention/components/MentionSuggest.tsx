@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import { Divider, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect } from 'react';

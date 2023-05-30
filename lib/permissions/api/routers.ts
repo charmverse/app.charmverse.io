@@ -1,18 +1,18 @@
 import {
-  PermissionsApiClient,
   PageNotFoundError,
   ProposalCategoryPermissionNotFoundError,
-  stringUtils,
   InvalidInputError,
   PostCategoryNotFoundError,
   PostNotFoundError,
   ProposalNotFoundError,
   ProposalCategoryNotFoundError,
   DataNotFoundError
-} from '@charmverse/core';
-import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core';
+} from '@charmverse/core/errors';
+import { PermissionsApiClient } from '@charmverse/core/permissions';
+import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core/permissions';
 import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { SpaceNotFoundError } from 'lib/public-api/errors';

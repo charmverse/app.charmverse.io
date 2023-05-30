@@ -1,4 +1,4 @@
-import type { PageWithPermissions } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';

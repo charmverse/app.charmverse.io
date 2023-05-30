@@ -1,4 +1,4 @@
-import type { AssignedPagePermission } from '@charmverse/core';
+import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';

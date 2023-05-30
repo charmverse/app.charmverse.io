@@ -1,5 +1,5 @@
-import { AvailablePostCategoryPermissions } from '@charmverse/core';
-import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
+import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';

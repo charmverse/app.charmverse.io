@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { PageNodeWithChildren } from '@charmverse/core';
+import type { PageNodeWithChildren } from '@charmverse/core/pages';
+import { resolvePageTree } from '@charmverse/core/pages';
 import type {
   Block,
   Bounty,
@@ -17,7 +18,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
-import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 

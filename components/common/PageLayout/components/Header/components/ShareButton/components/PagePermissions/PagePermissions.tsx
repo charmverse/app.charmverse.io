@@ -1,4 +1,8 @@
-import type { AssignablePagePermissionGroups, AssignedPagePermission, TargetPermissionGroup } from '@charmverse/core';
+import type {
+  AssignablePagePermissionGroups,
+  AssignedPagePermission,
+  TargetPermissionGroup
+} from '@charmverse/core/permissions';
 import type { PageType, Role } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Button, Chip, Tooltip } from '@mui/material';

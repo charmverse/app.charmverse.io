@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Menu, Popover, Tooltip } from '@mui/material';
 import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';

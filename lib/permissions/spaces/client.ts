@@ -1,4 +1,4 @@
-import type { BaseSpacePermissionsClient } from '@charmverse/core';
+import type { BaseSpacePermissionsClient } from '@charmverse/core/permissions';
 
 import { listAvailableBounties } from 'lib/bounties/listAvailableBounties';
 

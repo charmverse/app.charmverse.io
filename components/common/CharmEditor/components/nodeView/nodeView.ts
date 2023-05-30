@@ -1,5 +1,5 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 
 export type CharmNodeViewProps = {
   pageId?: string;

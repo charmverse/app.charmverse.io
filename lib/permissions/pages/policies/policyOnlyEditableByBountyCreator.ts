@@ -1,5 +1,5 @@
-import type { PagePermissionFlags, PagePolicyInput } from '@charmverse/core';
-import { hasAccessToSpace } from '@charmverse/core';
+import type { PagePermissionFlags, PagePolicyInput } from '@charmverse/core/permissions';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 
 export async function policyOnlyEditableByBountyCreator({
   flags,

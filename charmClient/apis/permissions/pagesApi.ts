@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 
 import * as http from 'adapters/http';
 import type { PermissionCompute } from 'lib/permissions/interfaces';

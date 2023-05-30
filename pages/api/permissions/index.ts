@@ -1,5 +1,10 @@
 /* eslint-disable no-console */
-import type { AssignedPagePermission, PermissionResource, TargetPermissionGroup } from '@charmverse/core';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignmentByValues,
+  PermissionResource,
+  TargetPermissionGroup
+} from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,7 +15,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { PagePermissionAssignmentByValues } from 'lib/utilities/errors';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isValidEmail } from 'lib/utilities/strings';
 

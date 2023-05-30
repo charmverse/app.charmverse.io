@@ -1,7 +1,8 @@
-import type { PageWithPermissions, ProposalWithUsers } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 import type { WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

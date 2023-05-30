@@ -1,12 +1,12 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
   PagePermissionFlags,
   PagePermissionWithSource,
-  PageWithPermissions,
   PermissionCompute,
   SpaceDefaultPublicPageToggle
-} from '@charmverse/core';
+} from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
   Block,

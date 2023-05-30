@@ -1,4 +1,5 @@
-import type { PageMeta, PagePermissionFlags } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
