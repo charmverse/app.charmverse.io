@@ -20,6 +20,8 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
+import { PaidAnnouncementBanner } from '../Banners/PaidAnnouncementBanner';
+
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
@@ -217,6 +219,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
+                    <PaidAnnouncementBanner />
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

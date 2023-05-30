@@ -9,4 +9,5 @@ export const StyledBanner = styled(Box)`
   color: ${({ theme }) => theme.palette.text.primary};
   background-color: var(--bg-blue);
   padding: ${({ theme }) => theme.spacing(1.4)};
+  position: sticky;
 `;
