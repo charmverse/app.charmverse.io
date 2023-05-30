@@ -16,6 +16,11 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-1
+      GITHUB_TOKEN: ${ github.token}
     steps:
       - uses: actions/checkout@v3
 
@@ -30,15 +35,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-
-      # # We might even delete this step since CI seems to work without it
-      # - name: Provision API key
-      #   run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
-
-      # - name: Build and install API
-      #   uses: ./.github/actions/build_permissions_api
-      #   with:
-      #     GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
   test:
     name: Tests
@@ -71,12 +67,12 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: us-east-1
-      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: us-east-1
+          mask-aws-account-id: 'no'
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
