@@ -121,12 +121,13 @@ jobs:
       permissions-api:
         image: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:pushing-image-per-branch
         env:
-          HOST: 127.0.0.1
-          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
+          HOST: localhost
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/charmversetest
         credentials:
           username: ${{ needs.login-to-amazon-ecr.outputs.docker_username }}
           password: ${{ needs.login-to-amazon-ecr.outputs.docker_password }}
         ports:
+          # maps to the runner to port 3002
           - 3002:3001
     strategy:
       max-parallel: 5
@@ -134,15 +135,15 @@ jobs:
       matrix:
         include:
           - test_name: 'Basic tests #1'
-            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 1/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 1/3'
           - test_name: 'Basic tests #2'
-            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 2/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
-            test_command: 'PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:ci -- --shard 3/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 3/3'
           - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:server:ci -- --shard 1/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 1/2'
           - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:server:ci -- --shard 2/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
@@ -161,10 +162,10 @@ jobs:
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
 
-      - name: Restore permissions API from cache
-        uses: ./.github/actions/build_permissions_api
-        with:
-          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+      # - name: Restore permissions API from cache
+      #   uses: ./.github/actions/build_permissions_api
+      #   with:
+      #     GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
