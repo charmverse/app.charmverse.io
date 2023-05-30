@@ -88,15 +88,12 @@ jobs:
         id: get_docker_user_login
         run: |
           registry_in_underscore=$(echo "310849459438.dkr.ecr.us-east-1.amazonaws.com" | sed 's/[.-]/_/g')
-          echo "docker_username=\"docker_username_$registry_in_underscore\"" >> $GITHUB_OUTPUT
-          echo "docker_password=\"docker_password_$registry_in_underscore\"" >> $GITHUB_OUTPUT
-          echo "docker_username_$registry_in_underscore"
-          echo "docker_username_${registry_in_underscore}"
-          echo ${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}
+          echo "docker_username=${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}" >> $GITHUB_OUTPUT
+          echo "docker_password=${{ steps.login-ecr.outputs[format('docker_password_{0}', env.registry_in_underscore)] }}" >> $GITHUB_OUTPUT
     outputs:
       registry: ${{ steps.login-ecr.outputs.registry }}
-      docker_username: ${{ steps.login-ecr.outputs[steps.get_docker_user_login.outputs.docker_username] }} # More information on these outputs can be found below in the 'Docker Credentials' section
-      docker_password: ${{ steps.login-ecr.outputs[steps.get_docker_user_login.outputs.docker_password] }}
+      docker_username: ${{ steps.get_docker_user_login.outputs.docker_username }} # More information on these outputs can be found below in the 'Docker Credentials' section
+      docker_password: ${{ steps.get_docker_user_login.outputs.docker_password }}
 
   integration-test:
     name: Tests
