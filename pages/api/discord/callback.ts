@@ -31,17 +31,18 @@ handler.get(async (req, res) => {
   const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
 
   const tempAuthCode = req.query.code;
+  const domain = isLocalhostAlias(req.headers.host) ? undefined : getAppApexDomain();
   if (req.query.error || typeof tempAuthCode !== 'string') {
     log.warn('Error importing from notion', req.query);
     cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Discord. Please try again', {
       httpOnly: false,
-      sameSite: 'strict'
+      sameSite: 'strict',
+      domain
     });
     res.redirect(`${redirect}?discord=2&type=${type}`);
     return;
   }
 
-  const domain = isLocalhostAlias(req.headers.host) ? undefined : getAppApexDomain();
   cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict', domain });
 
   if (type === 'login') {
