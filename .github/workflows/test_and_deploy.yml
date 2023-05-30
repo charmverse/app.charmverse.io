@@ -87,7 +87,7 @@ jobs:
           echo "docker_password=\"docker_password_$registry_in_underscore\"" >> $GITHUB_OUTPUT
           echo "docker_username_$registry_in_underscore"
           echo "docker_username_${registry_in_underscore}"
-          echo ${{ steps.login-ecr.outputs.[*] }}
+          echo ${{ steps.login-ecr.outputs.[docker_username_310849459438_dkr_ecr_us_east_1_amazonaws_com] }}
     outputs:
       registry: ${{ steps.login-ecr.outputs.registry }}
       docker_username: ${{ steps.login-ecr.outputs[steps.get_docker_user_login.outputs.docker_username] }} # More information on these outputs can be found below in the 'Docker Credentials' section
