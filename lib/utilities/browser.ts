@@ -252,6 +252,10 @@ export function getSpaceUrl(config: { domain: string; customDomain?: string | nu
   const subdomain = getValidSubdomain();
   const customDomain = getValidCustomDomain();
 
+  if (isLocalhostAlias()) {
+    return `/${domain}`;
+  }
+
   // we are on proper space custom domain
   if (customDomain && config.customDomain && customDomain === config.customDomain) {
     return '/';

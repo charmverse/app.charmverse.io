@@ -26,6 +26,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
+import { getSpaceUrl } from 'lib/utilities/browser';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
@@ -154,7 +155,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
       } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
         // Give time for spaces hook to update so user doesn't end up on Routeguard
         setTimeout(() => {
-          router.push(`/${space.domain}`);
+          router.push(getSpaceUrl({ domain: space.domain }));
         }, 200);
       }
     } catch (err) {
