@@ -103,6 +103,7 @@ jobs:
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     env: 
       DOCKER_PASS: ${{ needs.login-to-amazon-ecr.outputs.docker_password }}
+      REGISTRY: ${{ needs.login-to-amazon-ecr.outputs.registry }}
     services:
       postgres:
         image: postgres
