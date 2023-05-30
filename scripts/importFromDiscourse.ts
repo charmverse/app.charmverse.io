@@ -5,6 +5,8 @@ import { htmlToText } from 'html-to-text'
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
 import TurndownService from 'turndown';
 import emoji from "emoji-js"
+import { PremiumPermissionsClient } from '@charmverse/core'
+import { getPermissionsClient } from 'lib/permissions/api'
 
 const emojiConverter = new emoji.EmojiConvertor()
 emojiConverter.replace_mode = 'unified'
@@ -263,6 +265,18 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           path: category.slug,
         }
       })
+
+      const { client, type } = await getPermissionsClient({
+        resourceId: postCategory.id,
+        resourceIdType: 'postCategory'
+      });
+    
+      if (type === 'premium') {
+        await (client as PremiumPermissionsClient).forum.assignDefaultPostCategoryPermissions({
+          resourceId: postCategory.id
+        });
+      }
+
       postCategoriesRecord[category.id] = postCategory
     }
   
@@ -309,7 +323,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     for (const {posts, topic} of Object.values(topicPostsRecord)) {
       const sortedPosts = posts.sort((post1, post2) => post1.post_number - post2.post_number)
       const rootPost = sortedPosts.find(post => post.post_number === 1)
-      if (!rootPost || topic.id !== 288) {
+      if (!rootPost) {
         continue
       }
       
