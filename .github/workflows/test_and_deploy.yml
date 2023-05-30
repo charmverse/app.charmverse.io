@@ -112,13 +112,13 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       permissions-api:
-        image: ${{ jobs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
+        image: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
         env:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
         credentials:
-          username: ${{ jobs.login-to-amazon-ecr.outputs.docker_username }}
-          password: ${{ jobs.login-to-amazon-ecr.outputs.docker_password }}
+          username: bob
+          password: h3lll0nurse
         ports:
           - 3002:3001
     strategy:
