@@ -9,6 +9,8 @@ import {
   renderSuggestionsTooltip
 } from '../@bangle.dev/tooltip/suggest-tooltip';
 
+import { getLinkElement } from './getLinkElement';
+
 export type LinkPluginState = {
   show: boolean;
   href: string | null;
@@ -82,16 +84,7 @@ export function plugins({ key }: { key: PluginKey }) {
               }, 750);
             }
 
-            const target = event.target as HTMLAnchorElement; // span for link
-            const parentElement = target?.parentElement; // anchor for link
-            const hrefElement = parentElement?.classList.contains('charm-link')
-              ? parentElement
-              : target?.classList.contains('charm-link')
-              ? target
-              : // Sometimes, the link text is nested inside a span
-              parentElement?.parentElement?.classList.contains('charm-link')
-              ? parentElement.parentElement
-              : null;
+            const hrefElement = getLinkElement({ htmlElement: event.target as HTMLElement });
 
             if (hrefElement) {
               const href = hrefElement.getAttribute('href');
