@@ -85,7 +85,7 @@ export default function SpaceSettings({ space }: { space: Space }) {
           setTimeout(() => {
             const subdomain = getValidSubdomain();
             if (subdomain) {
-              window.location.href = `${getSpaceUrl(values.domain)}${getSubdomainPath(router.asPath)}`;
+              window.location.href = `${getSpaceUrl({ domain: values.domain })}${getSubdomainPath(router.asPath)}`;
             } else {
               window.location.href = router.asPath.replace(space.domain, values.domain as string);
             }

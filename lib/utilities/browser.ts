@@ -1,4 +1,4 @@
-import { baseUrl } from 'config/constants';
+import { baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
@@ -247,8 +247,18 @@ export function getSubdomainPath(path: string, config?: { domain: string; custom
   return path;
 }
 
-export function getSpaceUrl(domain: string) {
+export function getSpaceUrl(config: { domain: string; customDomain?: string | null }) {
+  const { domain } = config;
   const subdomain = getValidSubdomain();
+  const customDomain = getValidCustomDomain();
+
+  // we are on proper space custom domain
+  if (customDomain && config.customDomain && customDomain === config.customDomain) {
+    return '/';
+  }
+
+  // TODO - redirect to different custom domain
+
   if (!subdomain) return `/${domain}`;
   if (subdomain === domain) return '/';
 
@@ -274,4 +284,14 @@ export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
   }
 
   return absolutePath;
+}
+
+export function getCustomDomainUrl(customDomain: string, path = '/') {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${customDomain}${path}`;
+  }
+
+  const protocol = isDevEnv ? 'http:' : 'https:';
+
+  return `${protocol}//${customDomain}${path}`;
 }
