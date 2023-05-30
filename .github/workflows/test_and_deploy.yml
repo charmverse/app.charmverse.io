@@ -107,6 +107,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          TESTVAR: ${{ needs.login-to-amazon-ecr.outputs.docker_password }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
