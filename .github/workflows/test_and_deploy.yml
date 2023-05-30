@@ -121,8 +121,8 @@ jobs:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
         credentials:
-          username: ${{ env.docker_username }}
-          password: ${{ env.docker_password }}
+          username: $docker_username
+          password: $docker_password
         ports:
           - 3002:3001
     strategy:
