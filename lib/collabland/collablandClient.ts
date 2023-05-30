@@ -17,7 +17,7 @@ const DEFAULT_HEADERS = {
 
 log.debug('Using collabland API URL:', COLLABLAND_API_URL);
 
-const rateLimiter = RateLimit(1); // requests per second
+const rateLimiter = RateLimit(1, { timeUnit: 5000 }); // 1 request per 5s
 
 export interface BountyEventSubject {
   id: string; // discord user id
