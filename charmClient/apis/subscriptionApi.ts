@@ -1,5 +1,9 @@
 import * as http from 'adapters/http';
 import type {
+  CreateCryptoSubscriptionRequest,
+  CreateCryptoSubscriptionResponse
+} from 'lib/subscription/createCryptoSubscription';
+import type {
   CreateProSubscriptionRequest,
   CreateProSubscriptionResponse
 } from 'lib/subscription/createProSubscription';
@@ -12,5 +16,9 @@ export class SubscriptionApi {
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {
     return http.GET<SpaceSubscription | null>(`/api/spaces/${spaceId}/subscription`);
+  }
+
+  createCryptoSubscription(spaceId: string, payload: CreateCryptoSubscriptionRequest) {
+    return http.POST<CreateCryptoSubscriptionResponse>(`/api/spaces/${spaceId}/crypto-subscription`, payload);
   }
 }

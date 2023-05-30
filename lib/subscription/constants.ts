@@ -1,5 +1,7 @@
 import type { SubscriptionTier } from '@charmverse/core/src/prisma-client';
 
+import { isProdEnv } from 'config/constants';
+
 // Stripe Constants
 
 export const SUBSCRIPTION_PRODUCT_IDS = [
@@ -89,5 +91,6 @@ export const SUBSCRIPTION_PRODUCTS_RECORD: Record<
 
 // Loop constants
 
-// For demo https://demo.checkout.loopcrypto.xyz
-export const loopCheckoutUrl = 'https://demo.checkout.loopcrypto.xyz';
+export const loopDemoCheckoutUrl = isProdEnv
+  ? 'https://checkout.loopcrypto.xyz'
+  : 'https://demo.checkout.loopcrypto.xyz';

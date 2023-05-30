@@ -32,14 +32,17 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Iframe from 'react-iframe';
 import type { KeyedMutator } from 'swr';
+import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS, loopCheckoutUrl } from 'lib/subscription/constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
 import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
+import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/createCryptoSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 import type { PaymentType } from './PaymentTabs';
@@ -118,6 +121,29 @@ export function CheckoutForm({
     cvc: null,
     cardNumber: null
   });
+
+  const {
+    data: subscriptionData,
+    trigger: createCryptoSubscription,
+    isMutating: isLoadingCreateSubscriptionIntent
+  } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription-intent`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateCryptoSubscriptionRequest } }>) =>
+      charmClient.subscription.createCryptoSubscription(arg.spaceId, arg.payload),
+    {
+      onError(error) {
+        showMessage('Payment failed! Please try again', 'error');
+        log.error(`[stripe]: Payment failed. ${error.message}`, {
+          errorType: error.type,
+          errorCode: error.code
+        });
+        setCryptoDrawerOpen(false);
+      },
+      async onSuccess() {
+        await refetch();
+      }
+    }
+  );
 
   const changePaymentType = (event: SyntheticEvent, newValue: PaymentType) => {
     setPaymentType(newValue);
@@ -236,6 +262,33 @@ export function CheckoutForm({
     onCancel();
   };
 
+  const startCryptoPayment = async () => {
+    if (!space || !stripe || !elements) {
+      // Stripe.js has not yet loaded.
+      // Make sure to disable form submission until Stripe.js has loaded.
+      return;
+    }
+
+    setCryptoDrawerOpen(true);
+
+    const paymentDetails = getValues();
+    await createCryptoSubscription({
+      spaceId: space.id,
+      payload: {
+        period,
+        productId,
+        billingEmail: paymentDetails.billingEmail,
+        address: cardEvent.address
+          ? {
+              ...cardEvent.address.value.address,
+              line2: cardEvent.address.value.address.line2 ?? undefined
+            }
+          : undefined,
+        name: cardEvent.address?.value.name
+      }
+    });
+  };
+
   const theme = useTheme();
 
   return (
@@ -284,9 +337,10 @@ export function CheckoutForm({
         />
       </Stack>
       <Divider sx={{ mb: 1 }} />
-      <Typography variant='h6'>Payment method</Typography>
-      <PaymentTabs value={paymentType} onChange={changePaymentType} />
-      <PaymentTabPanel value={paymentType} index='card'>
+      <Stack>
+        <Typography variant='h6' mb={1}>
+          Billing Information
+        </Typography>
         <AddressElement
           options={{
             mode: 'billing',
@@ -307,6 +361,11 @@ export function CheckoutForm({
           <InputLabel>Billing Email</InputLabel>
           <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('billingEmail')} />
         </Stack>
+      </Stack>
+      <Divider sx={{ mb: 1 }} />
+      <Typography variant='h6'>Payment method</Typography>
+      <PaymentTabs value={paymentType} onChange={changePaymentType} />
+      <PaymentTabPanel value={paymentType} index='card'>
         <Stack display='flex' mb={1} flexDirection='row' gap={1}>
           <Stack gap={0.5} flexGrow={1}>
             <InputLabel>Card number</InputLabel>
@@ -416,7 +475,9 @@ export function CheckoutForm({
       </PaymentTabPanel>
       <PaymentTabPanel value={paymentType} index='crypto'>
         <Stack gap={1} display='flex' flexDirection='row'>
-          <Button onClick={() => setCryptoDrawerOpen(true)}>Upgrade</Button>
+          <Button onClick={() => startCryptoPayment()} disabled={!cardEvent.address?.complete}>
+            Upgrade
+          </Button>
           <Button
             disabled={isProcessing}
             onClick={onCancel}
@@ -447,12 +508,18 @@ export function CheckoutForm({
           >
             <CloseIcon fontSize='small' />
           </IconButton>
-          <Iframe
-            url={`${loopCheckoutUrl}/600d864b-dd25-4ac6-9a20-0af29528d937/700a3c1d-bd5a-47c8-8bfc-6474039fdedf?embed=true&cartEnabled=false`}
-            position='relative'
-            width='100%'
-            height='100%'
-          />
+          {subscriptionData && (
+            <Iframe
+              loading='lazy'
+              url={`${subscriptionData}?embed=true&cartEnabled=false`}
+              position='relative'
+              width='100%'
+              height='100%'
+            />
+          )}
+          {isLoadingCreateSubscriptionIntent && (
+            <LoadingComponent height='100%' isLoading={isLoadingCreateSubscriptionIntent} />
+          )}
         </Drawer>
       </PaymentTabPanel>
     </Stack>
