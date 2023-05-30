@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, FormControlLabel, List, ListItemText, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -212,6 +213,8 @@ export function CheckoutForm({
     onCancel();
   };
 
+  const theme = useTheme();
+
   return (
     <Stack onSubmit={createSubscription} gap={1}>
       <Stack>
@@ -257,14 +260,19 @@ export function CheckoutForm({
           label='Annual'
         />
       </Stack>
-      <Stack display='flex' mb={2} flexDirection='row' gap={1}>
+      <Stack display='flex' mb={1} flexDirection='row' gap={1}>
         <Stack gap={0.5} flexGrow={1}>
           <InputLabel>Card number</InputLabel>
           <StyledCardElementContainer>
             <CardNumberElement
               options={{
                 disabled: isProcessing,
-                placeholder: '4242 4242 4242 4242'
+                placeholder: '4242 4242 4242 4242',
+                style: {
+                  base: {
+                    color: theme.palette.text.primary
+                  }
+                }
               }}
               onChange={(e) =>
                 setCardEvent({
@@ -281,7 +289,12 @@ export function CheckoutForm({
             <CardExpiryElement
               options={{
                 disabled: isProcessing,
-                placeholder: '10 / 25'
+                placeholder: '10 / 25',
+                style: {
+                  base: {
+                    color: theme.palette.text.primary
+                  }
+                }
               }}
               onChange={(e) =>
                 setCardEvent({
@@ -298,7 +311,12 @@ export function CheckoutForm({
             <CardCvcElement
               options={{
                 disabled: isProcessing,
-                placeholder: '1234'
+                placeholder: '1234',
+                style: {
+                  base: {
+                    color: theme.palette.text.primary
+                  }
+                }
               }}
               onChange={(e) =>
                 setCardEvent({
@@ -312,7 +330,12 @@ export function CheckoutForm({
       </Stack>
       <AddressElement
         options={{
-          mode: 'billing'
+          mode: 'billing',
+          defaultValues: {
+            address: {
+              country: 'US'
+            }
+          }
         }}
         onChange={(e) =>
           setCardEvent({
@@ -323,7 +346,7 @@ export function CheckoutForm({
       />
       <Stack gap={0.5}>
         <InputLabel>Billing Email</InputLabel>
-        <TextField disabled={isProcessing} {...register('billingEmail')} />
+        <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('billingEmail')} />
       </Stack>
       <Divider sx={{ mb: 1 }} />
       <Typography variant='h6'>Order Summary</Typography>

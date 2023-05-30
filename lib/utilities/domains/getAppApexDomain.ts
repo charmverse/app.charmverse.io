@@ -6,7 +6,7 @@ const cookieDomains = {
   prod: 'charmverse.io'
 };
 
-export function getCookieDomain() {
+export function getAppApexDomain() {
   if (isDevEnv) {
     return cookieDomains.dev;
   }

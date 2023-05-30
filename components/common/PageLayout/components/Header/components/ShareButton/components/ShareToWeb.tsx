@@ -19,6 +19,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -109,13 +110,13 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
       currentPage?.type === 'proposal'
     ) {
       const shareLinkToSet =
-        typeof window !== 'undefined' ? `${window.location.origin}/${space?.domain}/${currentPage.path}` : '';
+        typeof window !== 'undefined' ? getAbsolutePath(`/${currentPage.path}`, space?.domain) : '';
       setShareLink(shareLinkToSet);
     } else if (currentPage?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
       const shareLinkToSet =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}`
+          ? getAbsolutePath(`/${currentPage.path}?viewId=${viewIdToProvide}`, space?.domain)
           : '';
       setShareLink(shareLinkToSet);
     }

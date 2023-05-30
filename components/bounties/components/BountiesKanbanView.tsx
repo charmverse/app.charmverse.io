@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
+import { useOnBountyCardClose } from 'components/bounties/hooks/useOnBountyCardClose';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
@@ -24,6 +25,7 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
+  const { onClose } = useOnBountyCardClose();
 
   function onClickDelete(pageId: string) {
     setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
@@ -43,10 +45,6 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
       suggestion: []
     }
   );
-
-  function onClose() {
-    router.push({ pathname: router.pathname, query: { ...router.query, bountyId: undefined } });
-  }
 
   function openPage(bountyId: string) {
     router.push({

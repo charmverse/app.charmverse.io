@@ -525,10 +525,9 @@ export const backspaceKeyCommand =
           isEmptySelectionAtStart,
 
           // list items might have multiple paragraphs; only do this at the first one
-          isFirstChildOfParent,
-          canOutdent(type)
+          isFirstChildOfParent
         ],
-        chainCommands(deletePreviousEmptyListItem(type), outdentList(type))
+        deletePreviousEmptyListItem(type)
       ),
 
       // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join

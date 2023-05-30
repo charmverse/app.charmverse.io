@@ -9,7 +9,10 @@ import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesFo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 import { DisabledAccountError } from 'lib/utilities/errors';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const handler = nc({
   onError,
@@ -24,7 +27,8 @@ handler.get(async (req, res) => {
   // sanitize the redirect path in case of invalid characters
   const redirectPath = (state?.redirect as string) || '/';
   const redirectUrl = new URL(redirectPath, 'https://tacos4everyone.net');
-  const redirect = redirectUrl.pathname + redirectUrl.search;
+  const subdomain = getValidSubdomain(redirectUrl.host);
+  const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
 
   const tempAuthCode = req.query.code;
   if (req.query.error || typeof tempAuthCode !== 'string') {
@@ -37,7 +41,8 @@ handler.get(async (req, res) => {
     return;
   }
 
-  cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict' });
+  const domain = isLocalhostAlias(req.headers.host) ? undefined : getAppApexDomain();
+  cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict', domain });
 
   if (type === 'login') {
     try {

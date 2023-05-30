@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { cookieName } from 'config/constants';
-import { isLocalhostAlias } from 'lib/utilities/getValidSubdomain';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 export async function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiResponse, keepSession?: boolean) {
   if (isLocalhostAlias(req.headers.host)) {
