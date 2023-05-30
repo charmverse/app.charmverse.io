@@ -124,8 +124,8 @@ jobs:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
         credentials:
-          username: ${{ needs.login-to-amazon-ecr.outputs.docker_username }}
-          password: "hello nurse"
+          username: bob
+          password: nancy
         ports:
           - 3002:3001
     strategy:
