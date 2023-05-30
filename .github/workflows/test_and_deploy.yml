@@ -100,7 +100,7 @@ jobs:
       - login-to-amazon-ecr
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     env: 
-      PERMISSIONS_API_IMAGE: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }}
+      PERMISSIONS_API_IMAGE: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
       SELECTED_PERMISSION_API_TAG: $SELECTED_PERMISSION_API_TAG
     services:
       postgres:
