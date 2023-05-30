@@ -133,10 +133,10 @@ jobs:
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      npm run start:prod
 
-          docker ps
-          docker logs permissions-api
-          until curl localhost:3002/api/health; do 
-            echo "permission api not up"
+          until curl localhost:3002/api/health; do
+            docker ps
+            docker logs permissions-api 
+            echo "permission api not up...sleeping"
             sleep 20
           done 
 
