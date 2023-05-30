@@ -87,8 +87,8 @@ jobs:
       - name: convert registry variables
         id: get_docker_user_login
         run: |
-          echo "docker_username=${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}" >> $GITHUB_OUTPUT
-          echo "docker_password=${{ steps.login-ecr.outputs[format('docker_password_{0}', env.registry_in_underscore)] }}" >> $GITHUB_OUTPUT
+          echo "docker_username=${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}" >> $GITHUB_ENV
+          echo "docker_password=${{ steps.login-ecr.outputs[format('docker_password_{0}', env.registry_in_underscore)] }}" >> $GITHUB_ENV
     outputs:
       registry: ${{ steps.login-ecr.outputs.registry }}
       docker_username: ${{ steps.get_docker_user_login.outputs.docker_username }} # More information on these outputs can be found below in the 'Docker Credentials' section
@@ -121,8 +121,8 @@ jobs:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
         credentials:
-          username: ${{ needs.login-to-amazon-ecr.outputs.docker_username }}
-          password: ${{ needs.login-to-amazon-ecr.outputs.docker_password }}
+          username: ${{ env.docker_username }}
+          password: ${{ env.docker_password }}
         ports:
           - 3002:3001
     strategy:
