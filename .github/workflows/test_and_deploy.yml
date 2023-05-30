@@ -112,7 +112,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       permissions-api:
-        image: ${{needs.login-to-amazon-ecr.registry}}/charmverse-permissions-api:${{env.SELECTED_PERMISSION_API_TAG}}
+        image: ${{needs.login-to-amazon-ecr.outputs.registry}}/charmverse-permissions-api:${{env.SELECTED_PERMISSION_API_TAG}}
         env:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
