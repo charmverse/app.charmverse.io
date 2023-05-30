@@ -88,6 +88,7 @@ jobs:
         id: get_docker_user_login
         run: |
           echo "registry=${{ steps.login-ecr.outputs.registry }}" >> "$GITHUB_OUTPUT"
+          echo "${{ steps.login-ecr.outputs.registry }}" | gh secret set aws_registry
           echo "docker_username=${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}" >> "$GITHUB_OUTPUT"
           echo "docker_password=${{ steps.login-ecr.outputs[format('docker_password_{0}', env.registry_in_underscore)] }}" >> "$GITHUB_OUTPUT"
     outputs:
@@ -121,7 +122,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       permissions-api:
-        image: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
+        image: ${{ secrets.aws_registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
         env:
           HOST: 127.0.0.1
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
