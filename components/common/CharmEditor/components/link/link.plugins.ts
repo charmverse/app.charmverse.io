@@ -88,6 +88,9 @@ export function plugins({ key }: { key: PluginKey }) {
               ? parentElement
               : target?.classList.contains('charm-link')
               ? target
+              : // Sometimes, the link text is nested inside a span
+              parentElement?.parentElement?.classList.contains('charm-link')
+              ? parentElement.parentElement
               : null;
 
             if (hrefElement) {
