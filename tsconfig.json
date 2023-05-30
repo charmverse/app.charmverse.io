@@ -99,6 +99,9 @@
       "@charmverse/core/proposals": [
         "node_modules/@charmverse/core/dist/cjs/proposals"
       ],
+      "@charmverse/core/bounties": [
+        "node_modules/@charmverse/core/dist/cjs/bounties"
+      ],
       "@charmverse/core/utilities": [
         "node_modules/@charmverse/core/dist/cjs/utilities"
       ],
