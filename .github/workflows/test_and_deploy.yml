@@ -127,14 +127,18 @@ jobs:
         run: |
           docker run -d -p '3002:3002' \
                      --env-file .env.test.local \
-                     -e HOST=localhost \
-                     -e PORT=3002      \
+                     -e HOST=localhost  \
+                     -e PORT=3002       \
+                     -n permissions-api \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      npm run start:prod
 
           docker ps
-          sleep 20
-          curl localhost:3002/api/health
+          docker logs permissions-api
+          until curl localhost:3002/api/health; do 
+            sleep 20
+          done 
+
 #          echo "registry_in_underscore=$registry_in_underscore" >> $GITHUB_ENV
 
       - name: Restore app from cache
