@@ -125,7 +125,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/charmversetest
         credentials:
           username: bob
-          password: nancy
+          password: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
         ports:
           - 3002:3001
     strategy:
