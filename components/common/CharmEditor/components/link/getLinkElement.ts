@@ -12,6 +12,10 @@ export function getLinkElement({
   htmlElement: HTMLElement;
   ancestors?: number;
 }): HTMLElement | null {
+  if (!htmlElement) {
+    return null;
+  }
+
   const linkClass = 'charm-link';
 
   if (htmlElement.classList.contains(linkClass)) {
