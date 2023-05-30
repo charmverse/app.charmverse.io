@@ -136,6 +136,7 @@ jobs:
           until curl localhost:3002/api/health; do
             docker ps
             docker logs permissions-api 
+            docker inspect permissions-api
             echo "permission api not up...sleeping"
             sleep 20
           done 
