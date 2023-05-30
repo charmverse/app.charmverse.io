@@ -91,6 +91,7 @@ jobs:
       registry: ${{ steps.get_docker_user_login.outputs.registry }}
       docker_username: ${{ steps.get_docker_user_login.outputs.docker_username }} # More information on these outputs can be found below in the 'Docker Credentials' section
       docker_password: ${{ steps.get_docker_user_login.outputs.docker_password }}
+      permissions_image_tag: ${{ env.SELECTED_PERMISSION_API_TAG }}
 
   integration-test:
     name: Tests
@@ -100,7 +101,7 @@ jobs:
       - login-to-amazon-ecr
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     env: 
-      PERMISSIONS_API_IMAGE: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:$SELECTED_PERMISSION_API_TAG
+      PERMISSIONS_API_IMAGE: ${{ needs.login-to-amazon-ecr.outputs.registry }}/charmverse-permissions-api:${{ needs.login-to-amazon-ecr.outputs.permissions_image_tag }}
       SELECTED_PERMISSION_API_TAG: $SELECTED_PERMISSION_API_TAG
     services:
       postgres:
