@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: ['**']
 
+env:
+  SELECTED_PERMISSION_API_TAG: pushing-image-per-branch
+
 jobs:
   build-test-env:
     name: Build test env
@@ -87,19 +90,19 @@ jobs:
       matrix:
         include:
           - test_name: 'Basic tests #1'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 1/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 1/3'
           - test_name: 'Basic tests #2'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 2/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
-            test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 3/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 3/3'
           - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 1/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 1/2'
           - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 2/2'
+            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:e2e:ci'
+            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PERMISSIONS_API_URL=http://127.0.0.1:3002 npm run test:e2e:ci'
     steps:
       - uses: actions/checkout@v3
 
@@ -109,15 +112,33 @@ jobs:
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+          mask-aws-account-id: 'no'
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Run permissions api docker image 
+        id: run_permissions_api
+        run: |
+          docker run -p '3002:3001' \
+                     -e HOST=localhost \
+                     --env-file .env.test.local \
+                     ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
+                     npm run start:prod
+
+          docker ps
+          curl localhost:3002/api/health
+#          echo "registry_in_underscore=$registry_in_underscore" >> $GITHUB_ENV
+
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-
-      - name: Restore permissions API from cache
-        uses: ./.github/actions/build_permissions_api
-        with:
-          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
