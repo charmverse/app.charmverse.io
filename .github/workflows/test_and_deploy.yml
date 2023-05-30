@@ -66,7 +66,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: us-east-1
-      GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
@@ -86,7 +85,6 @@ jobs:
         id: get_docker_user_login
         run: |
           echo "registry=${{ steps.login-ecr.outputs.registry }}" >> "$GITHUB_OUTPUT"
-          echo "${{ steps.login-ecr.outputs.registry }}" | gh secret set aws_registry
           echo "docker_username=${{ steps.login-ecr.outputs[format('docker_username_{0}', env.registry_in_underscore)] }}" >> "$GITHUB_OUTPUT"
           echo "docker_password=${{ steps.login-ecr.outputs[format('docker_password_{0}', env.registry_in_underscore)] }}" >> "$GITHUB_OUTPUT"
     outputs:
