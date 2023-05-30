@@ -3,6 +3,7 @@ import { MarkdownParser } from 'prosemirror-markdown';
 
 import { listIsTight } from 'components/common/CharmEditor/components/listItem/listIsTight';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },
@@ -41,7 +42,7 @@ const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonma
   code_inline: { mark: 'code', noCloseToken: true }
 });
 
-export function parseMarkdown(data: string): any {
+export function parseMarkdown(data: string): PageContent {
   const baseDoc = { type: 'doc', content: [] };
 
   const parsed = (charmParser.parse(data)?.content as any)?.content;
