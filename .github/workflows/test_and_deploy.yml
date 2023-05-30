@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: ["**"]
+    branches: ['**']
 
 jobs:
   build-test-env:
@@ -26,7 +26,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "test"
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       # We might even delete this step since CI seems to work without it
       - name: Provision API key
@@ -57,7 +57,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "test"
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -92,8 +92,10 @@ jobs:
             test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
             test_command: 'PORT=3001 npm run start:api:permissions:ci & npm run test:ci -- --shard 3/3'
-          - test_name: 'Server integration tests'
-            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci &  npm run test:server:ci'
+          - test_name: 'Server integration tests #1'
+            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 1/2'
+          - test_name: 'Server integration tests #2'
+            test_command: 'npm run start:test:ci & PORT=3001 npm run start:api:permissions:ci & npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
@@ -110,7 +112,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "test"
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Restore permissions API from cache
         uses: ./.github/actions/build_permissions_api
@@ -137,7 +139,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: "production"
+          NEXT_PUBLIC_APP_ENV: 'production'
           NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}

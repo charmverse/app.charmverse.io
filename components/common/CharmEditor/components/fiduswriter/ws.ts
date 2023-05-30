@@ -104,7 +104,8 @@ export class WebSocketConnector {
       withCredentials: true,
       auth: {
         authToken
-      }
+      },
+      transports: ['websocket'] // skip long-polling
     });
     this.createWSConnection();
   }

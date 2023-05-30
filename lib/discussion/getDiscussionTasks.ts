@@ -102,8 +102,8 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
     getPageCommentMentions(context),
     getPageMentions(context),
     getCommentBlockMentions(context),
-    getProposalDiscussionTasks(context),
-    getBoardPersonPropertyMentions(context)
+    getProposalDiscussionTasks(context)
+    // getBoardPersonPropertyMentions(context)
   ]).then((results) => {
     // aggregate the results
     return results.reduce(
@@ -464,7 +464,8 @@ async function getPageCommentMentions({
 
 async function getBoardPersonPropertyMentions({
   userId,
-  spaceIds
+  spaceIds,
+  spaceRecord
 }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   const boards = (
     await prisma.block.findMany({
@@ -499,8 +500,14 @@ async function getBoardPersonPropertyMentions({
       }
     },
     include: {
-      page: true,
-      space: true,
+      page: {
+        select: {
+          title: true,
+          id: true,
+          path: true,
+          bountyId: true
+        }
+      },
       user: {
         select: {
           username: true,
@@ -512,21 +519,21 @@ async function getBoardPersonPropertyMentions({
 
   const mentions: GetDiscussionsResponse['mentions'] = [];
   const discussionUserIds: string[] = [];
-
   for (const card of cards) {
     const blockCard = prismaToBlock(card) as Card;
     const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
     const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
-    if (card.page && personPropertyValue.includes(userId) && userId !== card.user.id) {
+    const space = spaceRecord[card.spaceId];
+    if (space && card.page && personPropertyValue.includes(userId) && userId !== card.user.id) {
       discussionUserIds.push(personPropertyId);
       // Need to push author of card to fetch information
       discussionUserIds.push(card.user.id);
       mentions.push({
-        pageId: card.id,
+        pageId: card.page.id,
         spaceId: card.spaceId,
-        spaceDomain: card.space.domain,
+        spaceDomain: space.domain,
         pagePath: card.page.path,
-        spaceName: card.space.name,
+        spaceName: space.name,
         pageTitle: card.page.title || 'Untitled',
         bountyId: card.page.bountyId,
         bountyTitle: card.page.title,
