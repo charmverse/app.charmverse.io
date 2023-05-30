@@ -125,11 +125,11 @@ jobs:
       - name: Run permissions api docker image 
         id: run_permissions_api
         run: |
-          docker run -d -p '3002:3002' \
+          docker run -d --name permissions-api  \
                      --env-file .env.test.local \
+                     -p '3002:3002'     \
                      -e HOST=localhost  \
                      -e PORT=3002       \
-                     -n permissions-api \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      npm run start:prod
 
