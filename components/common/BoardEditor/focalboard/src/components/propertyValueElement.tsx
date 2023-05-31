@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { MountTracker } from 'components/common/Debug/MountTracker';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -116,16 +117,18 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
-      <UserProperty
-        displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-        }}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
-      />
+      <MountTracker name='UserProp' countRenders>
+        <UserProperty
+          displayType={displayType}
+          memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
+          readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+          onChange={(newValue) => {
+            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          }}
+          wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+          showEmptyPlaceholder={displayType === 'details'}
+        />
+      </MountTracker>
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
