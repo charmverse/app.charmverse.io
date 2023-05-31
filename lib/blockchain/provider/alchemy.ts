@@ -94,7 +94,7 @@ export const getAddressNfts = async (address: string, chainId: SupportedChainId 
       ...(filterSpam
         ? {
             spamConfidenceLevel: 'HIGH',
-            excludeFilters: ['AIRDROPS', 'SPAM']
+            excludeFilters: ['SPAM']
           }
         : {})
     }).catch((err) => {
