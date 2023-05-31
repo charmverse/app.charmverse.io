@@ -127,6 +127,7 @@ jobs:
         run: |
           cat /etc/hosts
           host postgres
+          echo "done with looking up postgres host"
           docker run -d --name permissions-api  \
                      -p '3002:3002'     \
                      -e HOST=0.0.0.0    \
