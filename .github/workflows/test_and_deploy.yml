@@ -129,6 +129,7 @@ jobs:
           docker inspect postgres
           docker network ls
           cat /etc/hosts
+          echo "network ${{ job.services.postgres.network }}"
           docker run -d --name permissions-api  \
                      -h permissions-api \
                      -p '3002:3002'     \
