@@ -1,12 +1,23 @@
+import styled from '@emotion/styled';
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import { StyledBanner } from 'components/common/Banners/Banner';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+
+const StyledPageDeleteBanner = styled(Box, {
+  shouldForwardProp: (prop: string) => prop !== 'card'
+})<{ card?: boolean }>`
+  width: 100%;
+  z-index: var(--z-index-appBar);
+  display: flex;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.palette.error.main};
+  padding: ${({ theme }) => theme.spacing(1)};
+`;
 
 export default function PageDeleteBanner({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
@@ -32,8 +43,10 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
     }
   }
 
+  const isShowingCard = new URLSearchParams(window.location.search).get('cardId');
+
   return (
-    <StyledBanner errorBackground>
+    <StyledPageDeleteBanner card={isShowingCard ? isShowingCard !== 'undefined' && isShowingCard.length !== 0 : false}>
       <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
         <div
           style={{
@@ -53,7 +66,6 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             setIsMutating(false);
           }}
           variant='outlined'
-          size='small'
         >
           Restore Page
         </Button>
@@ -67,11 +79,10 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             setIsMutating(false);
           }}
           variant='outlined'
-          size='small'
         >
           Delete permanently
         </Button>
       </Box>
-    </StyledBanner>
+    </StyledPageDeleteBanner>
   );
 }

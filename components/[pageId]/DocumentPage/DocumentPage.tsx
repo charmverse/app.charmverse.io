@@ -1,12 +1,13 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
+import type { Theme } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
+import charmClient from 'charmClient';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -25,6 +26,7 @@ import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
+import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
