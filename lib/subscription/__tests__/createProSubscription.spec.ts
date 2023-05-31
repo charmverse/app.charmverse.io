@@ -35,7 +35,7 @@ describe('createProSubscription', () => {
     const client_secret = v4();
     const customerId = v4();
     const productId = v4();
-    const paymentId = v4();
+    const invoiceId = v4();
 
     const createCustomersMockFn = jest.fn().mockResolvedValue({
       id: customerId
@@ -55,7 +55,7 @@ describe('createProSubscription', () => {
         payment_intent: {
           client_secret,
           status: 'succeeded',
-          id: paymentId
+          id: invoiceId
         }
       }
     });
@@ -130,7 +130,7 @@ describe('createProSubscription', () => {
         where: {
           amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
           currency: 'USD',
-          paymentId,
+          invoiceId,
           status: 'success'
         }
       })

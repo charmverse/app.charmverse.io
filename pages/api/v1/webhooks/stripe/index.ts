@@ -1,5 +1,6 @@
 import { InsecureOperationError } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
@@ -49,18 +50,48 @@ const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void>
     // console.log('event', event);
 
     switch (event.type) {
-      case 'payment_intent.succeeded': {
-        const stripeObject: Stripe.PaymentIntent = event.data.object as Stripe.PaymentIntent;
-        // console.log(`💰 PaymentIntent status: ${stripeObject.status}`);
-        break;
-      }
-      case 'charge.succeeded': {
-        const charge = event.data.object as Stripe.Charge;
-        // console.log(`💵 Charge id: ${charge.id}`);
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        // console.log(`💵 Invoice`, invoice);
+        const subscriptionData = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
+          expand: ['plan', 'latest_invoice.payment_intent']
+        });
+
+        const space = await prisma.space.findUnique({
+          where: { id: subscriptionData.metadata.spaceId }
+        });
+
+        if (!space) {
+          log.warn(`Can't update the user subscription. Space not found for subscription ${subscriptionData.id}`, {
+            invoice
+          });
+          break;
+        }
+
+        await prisma.stripeSubscription.create({
+          data: {
+            createdBy: space.createdBy,
+            customerId: invoice.customer as string,
+            subscriptionId: invoice.subscription as string,
+            // @ts-ignore There is a plan
+            period: subscriptionData.plan.interval as string,
+            // @ts-ignore There is a plan
+            productId: subscriptionData.plan.product as string,
+            spaceId: subscriptionData.metadata.spaceId,
+            stripePayment: {
+              create: {
+                amount: invoice.total,
+                currency: 'USD',
+                invoiceId: invoice.id,
+                status: 'success'
+              }
+            }
+          }
+        });
         break;
       }
       default: {
-        log.warn(`🤷‍♀️ Unhandled event type: ${event.type}`);
+        log.warn(`🤷‍♀️ Unhandled event type in stripe webhook: ${event.type}`);
         break;
       }
     }
@@ -68,7 +99,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void>
     res.status(200).end();
   } catch (err: any) {
     log.warn('Stripe webhook failed to construct event', err);
-    res.status(400).send(encodeURI(`Webhook Error: ${err?.message}`));
+    res.status(400).json(`Webhook Error: ${err?.message}`);
   }
 };
 

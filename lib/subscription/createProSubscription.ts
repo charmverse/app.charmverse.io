@@ -134,7 +134,7 @@ export async function createProSubscription({
             create: {
               amount,
               currency: 'USD',
-              paymentId: paymentIntent.id,
+              invoiceId: invoice.id,
               status: paymentIntent.status === 'succeeded' ? 'success' : 'fail'
             }
           }

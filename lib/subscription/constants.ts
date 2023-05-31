@@ -91,6 +91,4 @@ export const SUBSCRIPTION_PRODUCTS_RECORD: Record<
 
 // Loop constants
 
-export const loopDemoCheckoutUrl = isProdEnv
-  ? 'https://checkout.loopcrypto.xyz'
-  : 'https://demo.checkout.loopcrypto.xyz';
+export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';
