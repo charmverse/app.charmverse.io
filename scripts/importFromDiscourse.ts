@@ -5,7 +5,7 @@ import { htmlToText } from 'html-to-text'
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown'
 import TurndownService from 'turndown';
 import emoji from "emoji-js"
-import { PremiumPermissionsClient } from '@charmverse/core'
+import { PremiumPermissionsClient } from '@charmverse/core/permissions'
 import { getPermissionsClient } from 'lib/permissions/api'
 
 const emojiConverter = new emoji.EmojiConvertor()
