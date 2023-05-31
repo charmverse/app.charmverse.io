@@ -296,6 +296,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     const userRecord: Record<string, CharmverseUser> = {};
     const postRecord: Record<string, CharmversePost> = {};
     const postCommentRecord: Record<string, PostComment> = {}
+    const postLikesRecord: Record<string, {likedUserIds: string[], totalLikes: number}> = {}
 
     async function fetchAndStoreUser({ userId, username, postFetchUserCb }: {postFetchUserCb?: (fetchedUser: User) => void, userId: number, username: string}) {
       if (!userRecord[userId]) {
@@ -341,6 +342,11 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         username: rootPost.username
       })
 
+      postLikesRecord[rootPost.id] = {
+        likedUserIds: [],
+        totalLikes: rootPost.actions_summary?.find(action => action.id === 2)?.count || 0
+      }
+
       if (!topicAuthor) {
         continue
       }
@@ -367,6 +373,11 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       for (const topicPost of posts) {
         if (topicPost.post_number === 1) {
           continue
+        }
+
+        postLikesRecord[topicPost.id] = {
+          likedUserIds: [],
+          totalLikes: topicPost.actions_summary?.find(action => action.id === 2)?.count || 0
         }
 
         const commentContent = preprocessMarkup(topicPost.cooked);
@@ -402,8 +413,9 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     const users = Object.values(discourseUserRecord);
     let userCounter = 0;
     let totalUsers = users.length;
-    while (users.length) {
-      const user = users.pop();
+    
+    while (userCounter < totalUsers) {
+      const user = users[userCounter];
       if (!user) {
         break;
       }
@@ -442,6 +454,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
               upvoted: true,
             }
           })
+          postLikesRecord[rootPost.id].likedUserIds.push(topicAuthor.id)
         } else {
           await prisma.postCommentUpDownVote.create({
             data: {
@@ -451,10 +464,47 @@ export async function importFromDiscourse(community: string, spaceDomain: string
               upvoted: true,
             }
           })
+          postLikesRecord[childPost.id].likedUserIds.push(topicAuthor.id)
         }
       }
       userCounter += 1;
       console.log(`${userCounter}/${totalUsers} user actions created`)
+    }
+
+    for (const [postId, {likedUserIds, totalLikes}] of Object.entries(postLikesRecord)) {
+      const post = postRecord[postId];
+      const postComment = postCommentRecord[postId];
+
+      if (likedUserIds.length === 0) {
+        continue
+      }
+
+      if (likedUserIds.length < totalLikes) {
+        log.warn(`[discourse]: Post:${postId} likes count doesn't match with the number of liked users`)
+        const difference = totalLikes - likedUserIds.length;
+        const usersWhoDidNotLike = users.filter(user => !likedUserIds.includes(userRecord[user.id].id)).slice(0, difference);
+        for (const user of usersWhoDidNotLike) {
+          // If it was a top level post
+          if (post) {
+            await prisma.postUpDownVote.create({
+              data: {
+                postId: post.id,
+                createdBy: userRecord[user.id].id,
+                upvoted: true,
+              }
+            })
+          } else if (postComment) {
+            await prisma.postCommentUpDownVote.create({
+              data: {
+                postId: postComment.postId,
+                commentId: postComment.id,
+                createdBy: userRecord[user.id].id,
+                upvoted: true,
+              }
+            })
+          }
+        }
+      }
     }
   } catch (err) {
     log.error(`[discourse]: ${err}`)
