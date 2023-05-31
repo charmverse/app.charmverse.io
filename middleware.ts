@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -36,7 +36,7 @@ export async function middleware(req: NextRequest) {
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
     const pathWithourSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
-    log.info(`>>> Redirecting: ${url.pathname} to ${pathWithourSpaceDomain}`);
+    console.debug(`>>> Redirecting: ${url.pathname} to ${pathWithourSpaceDomain}`);
     url.pathname = pathWithourSpaceDomain;
 
     return NextResponse.redirect(url);
@@ -45,7 +45,8 @@ export async function middleware(req: NextRequest) {
   const rewriteDomain = customDomain || subdomain;
   if (rewriteDomain) {
     // Subdomain available, rewriting
-    log.info(`>>> Rewriting: ${url.pathname} to /${rewriteDomain}${url.pathname}`);
+
+    console.debug(`>>> Rewriting: ${url.pathname} to /${rewriteDomain}${url.pathname}`);
     url.pathname = `/${rewriteDomain}${url.pathname}`;
     return NextResponse.rewrite(url);
   }
