@@ -10,7 +10,7 @@ on:
     branches: ['**']
 
 env:
-  SELECTED_PERMISSION_API_TAG: pushing-image-per-branch
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
