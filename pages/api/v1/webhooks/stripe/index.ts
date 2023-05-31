@@ -1,9 +1,10 @@
-import { InsecureOperationError } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InsecureOperationError } from '@charmverse/core/shared';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
+import { defaultHandler } from 'lib/public-api/handler';
 import { stripeClient } from 'lib/subscription/stripe';
 
 export const config = {
@@ -12,7 +13,7 @@ export const config = {
   }
 };
 
-const buffer = (req: NextApiRequest) => {
+function buffer(req: NextApiRequest) {
   return new Promise<Buffer>((resolve, reject) => {
     const chunks: Buffer[] = [];
 
@@ -26,9 +27,39 @@ const buffer = (req: NextApiRequest) => {
 
     req.on('error', reject);
   });
-};
+}
 
-const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+const handler = defaultHandler();
+
+// handler.use(requireKeys(['contractAddress', 'event', 'networkId'], 'body')).post(stripePayment);
+handler.post(stripePayment);
+
+/**
+ * @swagger
+ * /stripe:
+ *   post:
+ *     summary: Create/Update a Stripe subscription from an event.
+ *     description: We will receive an event and depending on type we will update the db.
+ *     requestBody:
+ *       content:
+ *          application/json:
+ *             schema:
+ *               oneOf:
+ *                  - type: object
+ *                    properties:
+ *                       [key: string]:
+ *                          type: string
+ *                  - type: string
+ *     responses:
+ *       200:
+ *         description: Update succeeded
+ *         content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Subcsription'
+ */
+
+export async function stripePayment(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers['stripe-signature'] as string | undefined;
 
@@ -47,7 +78,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void>
   try {
     const body = await buffer(req);
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
-    // console.log('event', event);
 
     switch (event.type) {
       case 'invoice.paid': {
@@ -101,6 +131,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void>
     log.warn('Stripe webhook failed to construct event', err);
     res.status(400).json(`Webhook Error: ${err?.message}`);
   }
-};
+}
 
 export default handler;

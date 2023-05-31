@@ -16,18 +16,20 @@ export type CreateCryptoSubscriptionRequest = {
   billingEmail: string;
   name?: string;
   address?: AddressParam;
+  coupon?: string;
 };
 
 export type CreateCryptoSubscriptionResponse = string;
 
 export async function createCryptoSubscription({
-  paymentMethodId,
   spaceId,
+  paymentMethodId,
   period,
   productId,
   billingEmail,
   name,
-  address
+  address,
+  coupon = ''
 }: {
   spaceId: string;
 } & CreateCryptoSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
@@ -68,7 +70,8 @@ export async function createCryptoSubscription({
     productId,
     billingEmail,
     name,
-    address
+    address,
+    coupon
   });
 
   if (!subscriptionData) {

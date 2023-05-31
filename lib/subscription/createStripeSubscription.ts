@@ -15,7 +15,7 @@ export type StripeSubscriptionresponse = {
   invoiceId: string;
   productId: string;
   customerId: string;
-  paymentIntentId: string;
+  paymentIntentId?: string;
 };
 
 export async function createStripeSubscription({
@@ -25,7 +25,8 @@ export async function createStripeSubscription({
   productId,
   billingEmail,
   name,
-  address
+  address,
+  coupon = ''
 }: {
   spaceId: string;
 } & CreateCryptoSubscriptionRequest): Promise<StripeSubscriptionresponse | null> {
@@ -65,8 +66,10 @@ export async function createStripeSubscription({
   const customer =
     existingCustomer ||
     (await stripeClient.customers.create({
-      payment_method: paymentMethodId,
-      invoice_settings: { default_payment_method: paymentMethodId },
+      ...(paymentMethodId && {
+        payment_method: paymentMethodId,
+        invoice_settings: { default_payment_method: paymentMethodId }
+      }),
       metadata: {
         spaceId: space.id
       },
@@ -109,9 +112,10 @@ export async function createStripeSubscription({
           price: productPrice.id
         }
       ],
-      payment_behavior: 'default_incomplete',
+      collection_method: 'send_invoice',
+      days_until_due: 0,
+      coupon,
       payment_settings: {
-        // payment_method_types: ['ach_credit_transfer', 'card', 'cashapp'],
         save_default_payment_method: 'on_subscription'
       },
       expand: ['latest_invoice.payment_intent']
@@ -131,7 +135,7 @@ export async function createStripeSubscription({
   }
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
-  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
 
   return {
     subscriptionId: subscription.id,
@@ -139,6 +143,6 @@ export async function createStripeSubscription({
     productId,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent.id
+    paymentIntentId: paymentIntent?.id
   };
 }

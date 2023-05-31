@@ -22,7 +22,7 @@ async function createCryptoSubscriptionIntent(
   res: NextApiResponse<CreateCryptoSubscriptionResponse>
 ) {
   const { id: spaceId } = req.query as { id: string };
-  const { period, productId, paymentMethodId, billingEmail, name, address } =
+  const { period, productId, paymentMethodId, billingEmail, name, address, coupon } =
     req.body as CreateCryptoSubscriptionRequest;
 
   const subscriptionData = await createCryptoSubscription({
@@ -32,7 +32,8 @@ async function createCryptoSubscriptionIntent(
     productId,
     billingEmail,
     name,
-    address
+    address,
+    coupon
   });
 
   res.status(200).json(subscriptionData);
