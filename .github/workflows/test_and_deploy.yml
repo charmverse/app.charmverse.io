@@ -135,7 +135,7 @@ jobs:
                      -p "3002:3002"     \
                      -e HOST=0.0.0.0    \
                      -e PORT=3002       \
-                     --network "${{ job.services.postgres.network }}"  \  
+                     --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      node --experimental-specifier-resolution=node ./dist/main.js
