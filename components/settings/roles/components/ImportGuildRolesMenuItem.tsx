@@ -1,5 +1,5 @@
-import type { GetGuildsResponse } from '@guildxyz/sdk';
-import { guild, user } from '@guildxyz/sdk';
+import type { GetGuildResponse, GetGuildsResponse } from '@guildxyz/sdk';
+import { guild, user as guildUser } from '@guildxyz/sdk';
 import { Box, MenuItem, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -17,7 +17,7 @@ import GuildsAutocomplete from './GuildsAutocomplete';
 
 export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => void }) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
-  const [guilds, setGuilds] = useState<GetGuildsResponse>([]);
+  const [guilds, setGuilds] = useState<GetGuildResponse[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
@@ -30,7 +30,9 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
     async function main() {
       if (showImportedRolesModal) {
         setFetchingGuilds(true);
-        const guildMembershipsResponses = await Promise.all(addresses.map((address) => user.getMemberships(address)));
+        const guildMembershipsResponses = await Promise.all(
+          addresses.map((address) => guildUser.getMemberships(address))
+        );
         const userGuildIds: number[] = [];
 
         guildMembershipsResponses.forEach((guildMembershipsResponse) => {
@@ -38,7 +40,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
             userGuildIds.push(...guildMembershipsResponse.map((guildMembership) => guildMembership.guildId));
           }
         });
-        const allGuilds = await guild.getAll();
+        const allGuilds = await Promise.all(userGuildIds.map((id) => guild.get(id)));
         setSelectedGuildIds(userGuildIds);
         setGuilds(allGuilds);
         setFetchingGuilds(false);
