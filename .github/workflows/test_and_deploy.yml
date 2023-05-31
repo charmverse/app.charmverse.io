@@ -125,6 +125,7 @@ jobs:
       - name: Run permissions api docker image 
         id: run_permissions_api
         run: |
+          docker inspect postgres
           cat /etc/hosts
           host postgres
           echo "done with looking up postgres host"
