@@ -123,7 +123,7 @@ export function CheckoutForm({
   });
 
   const {
-    data: subscriptionData,
+    data: checkoutUrl,
     trigger: createCryptoSubscription,
     isMutating: isLoadingCreateSubscriptionIntent
   } = useSWRMutation(
@@ -508,15 +508,7 @@ export function CheckoutForm({
           >
             <CloseIcon fontSize='small' />
           </IconButton>
-          {subscriptionData && (
-            <Iframe
-              loading='lazy'
-              url={`${subscriptionData}&embed=true&cartEnabled=false`}
-              position='relative'
-              width='100%'
-              height='100%'
-            />
-          )}
+          {checkoutUrl && <Iframe loading='lazy' url={checkoutUrl} position='relative' width='100%' height='100%' />}
           {isLoadingCreateSubscriptionIntent && (
             <LoadingComponent height='100%' isLoading={isLoadingCreateSubscriptionIntent} />
           )}

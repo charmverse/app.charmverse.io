@@ -112,7 +112,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               create: {
                 amount: invoice.total,
                 currency: 'USD',
-                invoiceId: invoice.id,
+                paymentId: invoice.id,
                 status: 'success'
               }
             }

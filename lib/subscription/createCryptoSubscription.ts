@@ -91,6 +91,6 @@ export async function createCryptoSubscription({
   }
 
   return loopItem.url
-    ? `${loopItem.url}?sub=${subscriptionData.subscriptionId}`
-    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?sub=${subscriptionData.subscriptionId}`;
+    ? `${loopItem.url}?embed=true&cartEnabled=false&sub=${subscriptionData.subscriptionId}`
+    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&sub=${subscriptionData.subscriptionId}`;
 }

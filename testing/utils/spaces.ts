@@ -93,7 +93,7 @@ export async function addSpaceSubscription({
   deletedAt = null,
   amount = 100,
   currency = 'USD',
-  invoiceId = v4(),
+  paymentId = v4(),
   status = 'success'
 }: { spaceId: string; createdBy: string } & Partial<Omit<StripeSubscription, 'spaceId' | 'createdBy' | 'productId'>> &
   Partial<StripePayment> &
@@ -111,7 +111,7 @@ export async function addSpaceSubscription({
         create: {
           amount,
           currency,
-          invoiceId,
+          paymentId,
           status
         }
       }
