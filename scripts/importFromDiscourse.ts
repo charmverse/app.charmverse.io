@@ -197,11 +197,14 @@ type UserAction = {
   archived: boolean;
 }
 
+const usernameSuffix = 'imported'
+const pathSuffix = 'v2-discourse-imported'
+
 async function createCharmverseUser ({avatar_template, community, spaceId, username}: {avatar_template: string, username: string, spaceId: string, community: string}) {
   const charmverseUser = await prisma.user.create({
     data: {
-      username: `${username}-imported`,
-      path: `${username.toLowerCase()}-v2-discourse-imported`,
+      username: `${username}-${usernameSuffix}`,
+      path: `${username.toLowerCase()}-${pathSuffix}`,
       avatar: `https://${community}${avatar_template.replace('{size}', '80')}`,
       isBot: true
     }
@@ -217,11 +220,15 @@ async function createCharmverseUser ({avatar_template, community, spaceId, usern
   return charmverseUser
 }
 
-function replaceImgEmojiWithTextVariant(htmlContent: string) {
+function preprocessMarkup(htmlContent: string) {
   // Replace emoji image tags with their text representation
   const emojiReplacedMarkdown = emojiConverter.replace_colons(htmlContent.replaceAll(/<img.*?title=":(.*?):".*?>/g, ':$1:'))
+  const markdown = turndownService.turndown(emojiReplacedMarkdown)
+  // Update the username and the path of the users
+  const usernameLinkRegex = /(?:(\[@.*?)\](\(\/u\/.*?)\))/g;
+  const usernameReplacedMarkdown = markdown.replaceAll(usernameLinkRegex, `$1-${usernameSuffix}]$2-${pathSuffix})`)
   // Replacing the html tags to get the raw text
-  return parseMarkdown(turndownService.turndown(emojiReplacedMarkdown));
+  return parseMarkdown(usernameReplacedMarkdown);
 }
 
 export async function importFromDiscourse(community: string, spaceDomain: string) {
@@ -327,7 +334,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
         continue
       }
       
-      const topicContent = replaceImgEmojiWithTextVariant(rootPost.cooked);
+      const topicContent = preprocessMarkup(rootPost.cooked);
       
       const topicAuthor = await fetchAndStoreUser({
         userId: rootPost.user_id,
@@ -362,7 +369,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
           continue
         }
 
-        const commentContent = replaceImgEmojiWithTextVariant(topicPost.cooked);
+        const commentContent = preprocessMarkup(topicPost.cooked);
 
         const parentPost = posts.find(_topicPost => _topicPost.post_number === topicPost.reply_to_post_number);
         
