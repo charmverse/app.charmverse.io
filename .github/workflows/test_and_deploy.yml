@@ -128,7 +128,7 @@ jobs:
           docker run -d --name permissions-api  \
                      -p '3002:3002'     \
                      -h permissions-api \
-                     -e HOST=localhost  \
+                     -e HOST=0.0.0.0    \
                      -e PORT=3002       \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
