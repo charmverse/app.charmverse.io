@@ -117,18 +117,16 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
-      <MountTracker name='UserProp' countRenders>
-        <UserProperty
-          displayType={displayType}
-          memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
-          readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
-          onChange={(newValue) => {
-            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-          }}
-          wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
-          showEmptyPlaceholder={displayType === 'details'}
-        />
-      </MountTracker>
+      <UserProperty
+        displayType={displayType}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        onChange={(newValue) => {
+          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+        }}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        showEmptyPlaceholder={displayType === 'details'}
+      />
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
@@ -136,6 +134,7 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = (
         <DateRange
+          wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
