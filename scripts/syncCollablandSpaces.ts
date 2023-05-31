@@ -8,7 +8,8 @@ export async function syncCollablandSpaces() {
     where: {
       // only spaces with discord servers
       space: {
-        discordServerId: { not: null }
+        discordServerId: { not: null },
+        superApiTokenId: '3178aeb1-7b14-4a83-85d3-4bfa3152c998' // collabland
       },
       user: {
         // only users connected to discord
@@ -32,9 +33,12 @@ export async function syncCollablandSpaces() {
 
   console.log('🔥 number of users to sync:', usersToSync.length);
 
+  let processed = 0;
   for (const syncUser of usersToSync) {
     const currentRoles = syncUser.spaceRoleToRole.map((r) => r.role);
     await syncDiscordUser({ currentRoles, space: syncUser.space, user: syncUser.user });
+    processed++;
+    console.log('🔥 processed:', processed);
   }
 }
 
