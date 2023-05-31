@@ -26,9 +26,9 @@ runs:
       run: npm ci --no-audit --no-fund
 
     # Include this step to deploy and test a different branch of core
-    - name: Install special core library
-      shell: bash
-      # 1. Set the webapp branch
-      if: github.head_ref == 'replace-me'
-      # 2. Set core branch
-      run: npm install github:charmverse/core#replace-me
+    # 1. Set the webapp branch
+    # 2. Set core branch
+    # - name: Install special core library
+    #   shell: bash
+    #   if: github.head_ref == 'feat/discourse-import'
+    #   run: npm install github:charmverse/core#feat/discourse-import
