@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import type { CryptoCurrency, IChainDetails } from 'connectors';
-import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
+import type { IChainDetails } from 'connectors';
+import { getChainById } from 'connectors';
 
 import * as http from 'adapters/http';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
@@ -78,10 +78,10 @@ export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getToken
     if (chain) {
       return {
         chain,
-        canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-        tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
+        canonicalLogo: chain.iconUrl,
+        tokenName: chain.nativeCurrency.name,
         tokenSymbol: symbolOrAddress,
-        tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+        tokenLogo: chain.iconUrl,
         isContract: false
       };
     }
@@ -92,12 +92,13 @@ export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getToken
     methods,
     symbolOrAddress
   });
+  const ethChain = getChainById(1)!;
   return {
-    chain: getChainById(1)!,
-    canonicalLogo: TokenLogoPaths.ETH,
-    tokenName: CryptoCurrencyList.ETH,
+    chain: ethChain,
+    canonicalLogo: ethChain.iconUrl,
+    tokenName: ethChain.nativeCurrency.name,
     tokenSymbol: symbolOrAddress,
-    tokenLogo: TokenLogoPaths.ETH,
+    tokenLogo: ethChain.iconUrl,
     isContract: false
   };
 }
@@ -107,7 +108,7 @@ export function getTokenAndChainInfo(paymentMethod: PaymentMethod): TokenAndChai
   if (!chain) {
     throw new Error(`No chain found for chainId: ${paymentMethod.chainId}`);
   }
-  const tokenLogo = paymentMethod.tokenLogo || TokenLogoPaths[paymentMethod.tokenSymbol as CryptoCurrency];
+  const tokenLogo = paymentMethod.tokenLogo || chain.iconUrl;
   return {
     // prefer our standard iconUrl for native tokens that may have been saved to tokenInfo
     canonicalLogo: paymentMethod.contractAddress ? tokenLogo || chain.iconUrl : chain.iconUrl,

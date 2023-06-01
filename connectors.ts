@@ -264,16 +264,6 @@ export function getChainShortname(chainId: string | number): string {
 
 export type CryptoCurrency = (typeof RPC)[Blockchain]['nativeCurrency']['symbol'];
 
-export const CryptoCurrencyList = Object.values(RPC).reduce((acc, chain) => {
-  acc[chain.nativeCurrency.symbol] = chain.nativeCurrency.name;
-  return acc;
-}, {} as Record<CryptoCurrency, string>);
-
-export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
-  acc[chain.nativeCurrency.symbol] = chain.iconUrl;
-  return acc;
-}, {} as Record<CryptoCurrency, string>);
-
 export const CryptoCurrencies = uniqueValues<CryptoCurrency>(
   RPCList.map((chain) => {
     return chain.nativeCurrency.symbol as CryptoCurrency;
