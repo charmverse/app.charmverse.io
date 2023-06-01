@@ -4,7 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { IChainDetails } from 'connectors';
-import { RPCList } from 'connectors';
+import { RPCList, getChainById } from 'connectors';
 import { useEffect, useState } from 'react';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
@@ -26,7 +26,7 @@ export default function InputSearchBlockchain({
 
   useEffect(() => {
     if (defaultChainId && !value) {
-      const chain = RPCList.find((rpc) => rpc.chainId === defaultChainId);
+      const chain = getChainById(defaultChainId);
       if (chain) {
         setValue(chain);
       }
@@ -35,18 +35,14 @@ export default function InputSearchBlockchain({
 
   useEffect(() => {
     if (chainId) {
-      const chain = RPCList.find((rpc) => rpc.chainId === chainId);
+      const chain = getChainById(chainId);
       if (chain) {
         setValue(chain);
       }
     }
   }, [chainId]);
 
-  const defaultValueToAssign = defaultChainId
-    ? RPCList.find((rpc) => {
-        return rpc.chainId === defaultChainId;
-      })
-    : undefined;
+  const defaultValueToAssign = defaultChainId ? getChainById(defaultChainId) : undefined;
 
   return (
     <Autocomplete
