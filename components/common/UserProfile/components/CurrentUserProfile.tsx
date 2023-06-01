@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { Box } from '@mui/material';
+import { useMemo, useState } from 'react';
 
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
+import type { EditableFields } from 'components/u/components/UserDetails/UserDetailsForm';
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
+import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
@@ -23,13 +29,53 @@ export function CurrentUserProfile({
   isOnboarding?: boolean;
 }) {
   const currentSpace = useCurrentSpace();
-  const { updateSpaceValues } = useMemberPropertyValues(currentUser.id);
+  const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+
+  const [userDetails, setUserDetails] = useState<EditableFields>({});
+  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
+  const { mutateMembers } = useMembers();
+
+  function onUserDetailsChange(fields: EditableFields) {
+    setUserDetails((_form) => ({ ..._form, ...fields }));
+  }
+
+  function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
+    setMemberDetails(fields);
+  }
+
+  const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
+
+  async function saveForm() {
+    if (isFormClean) {
+      onClose();
+      return;
+    }
+    if (Object.keys(userDetails).length > 0) {
+      await charmClient.updateUserDetails(userDetails);
+    }
+    if (currentSpace) {
+      await updateSpaceValues(currentSpace.id, memberDetails);
+    }
+    mutateMembers();
+    setUserDetails({});
+    setMemberDetails([]);
+    onClose();
+  }
 
   const [currentStep, setCurrentStep] = useState<Step>(!currentUser.email ? 'email_step' : 'profile_step');
 
   function goNextStep() {
     setCurrentStep('profile_step');
   }
+
+  const memberProperties = useMemo(
+    () =>
+      memberPropertyValues
+        ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
+        .map((mpv) => mpv.properties)
+        .flat(),
+    [currentSpace?.id]
+  );
 
   if (!currentSpace) {
     return null;
@@ -56,14 +102,21 @@ export function CurrentUserProfile({
               mt: 0
             }}
             user={currentUser}
+            onChange={onUserDetailsChange}
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
+            properties={memberProperties}
+            refreshPropertyValues={refreshPropertyValues}
+            onChange={onMemberDetailsChange}
             userId={currentUser.id}
-            spaceId={currentSpace.id}
-            updateMemberPropertyValues={updateSpaceValues}
             showBlockchainData
           />
+          <Box display='flex' justifyContent='flex-end' mt={2}>
+            <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+              Save
+            </Button>
+          </Box>
         </>
       ) : null}
     </UserProfileDialog>

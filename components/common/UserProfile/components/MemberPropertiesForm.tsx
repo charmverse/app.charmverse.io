@@ -1,13 +1,14 @@
 import { Box, Divider, Stack } from '@mui/material';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
-import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-import debounce from 'lib/utilities/debounce';
+import type {
+  MemberPropertyValueType,
+  PropertyValueWithDetails,
+  UpdateMemberPropertyValuePayload
+} from 'lib/members/interfaces';
 
 import { useMutateMemberPropertyValues } from '../hooks/useMutateMemberPropertyValues';
 
@@ -16,24 +17,21 @@ import { OrgsList } from './OrgsList';
 import { PoapsList } from './PoapsList';
 
 type Props = {
-  updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
+  properties?: PropertyValueWithDetails[];
+  onChange: (values: UpdateMemberPropertyValuePayload[]) => void;
   showBlockchainData?: boolean;
-  spaceId: string;
   userId: string;
+  refreshPropertyValues: VoidFunction;
 };
 
 export function MemberPropertiesForm({
-  spaceId,
-  updateMemberPropertyValues,
+  properties,
+  onChange,
   showBlockchainData = false,
-  userId
+  userId,
+  refreshPropertyValues
 }: Props) {
-  const { data: properties, mutate } = useSWR(
-    spaceId ? `members/${userId}/values/${spaceId}` : null,
-    () => charmClient.members.getSpacePropertyValues(userId, spaceId || ''),
-    { revalidateOnMount: true }
-  );
-  const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
+  const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const {
     control,
     formState: { errors, isDirty },
@@ -41,31 +39,18 @@ export function MemberPropertiesForm({
     getValues
   } = useForm({ mode: 'onChange' });
 
-  const onSubmit = useCallback(
-    async (submitData: any) => {
-      if (!spaceId) {
-        return;
-      }
+  function handleOnChange(propertyId: string, option: any) {
+    const submitData = { ...getValues(), [propertyId]: option };
+    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
+      memberPropertyId: key,
+      value: submitData[key]
+    }));
 
-      const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
-        memberPropertyId: key,
-        value: submitData[key]
-      }));
-
-      await updateMemberPropertyValues(spaceId, updateData);
-    },
-    [spaceId]
-  );
-
-  const handleOnChange = useCallback(
-    debounce(async (propertyId: string, option: any) => {
-      await onSubmit({ ...getValues(), [propertyId]: option });
-    }, 300),
-    [onSubmit]
-  );
+    onChange(updateData);
+  }
 
   useEffect(() => {
-    if (!properties || isDirty) {
+    if (!isDirty || !properties) {
       return;
     }
     const defaultValues = properties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
@@ -74,7 +59,7 @@ export function MemberPropertiesForm({
     }, {});
 
     reset(defaultValues);
-  }, [properties, isDirty]);
+  }, [!!properties, isDirty]);
 
   return (
     <Box>

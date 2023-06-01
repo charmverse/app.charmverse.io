@@ -8,18 +8,19 @@ import { useUser } from 'hooks/useUser';
 import type { Collectable } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 import { transformPoap } from 'lib/blockchain/transformPoap';
+import type { LoggedInUser } from 'models';
+import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import AggregatedData from './components/AggregatedData';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
-import type { UserDetailsProps } from './components/UserDetails/UserDetailsForm';
-import { UserDetailsForm } from './components/UserDetails/UserDetailsForm';
+import { UserDetailsFormWithSave } from './components/UserDetails/UserDetailsForm';
 import { UserDetailsReadonly } from './components/UserDetails/UserDetailsReadonly';
 import { isPublicUser } from './components/UserDetails/utils';
 import { UserSpacesList } from './components/UserSpacesList/UserSpacesList';
 
-export function PublicProfile(props: UserDetailsProps & { readOnly?: boolean }) {
+export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly?: boolean }) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
@@ -157,7 +158,7 @@ export function PublicProfile(props: UserDetailsProps & { readOnly?: boolean }) 
   const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
     <Box>
-      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsForm {...props} />}
+      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user} />}
       <UserSpacesList userId={user.id} />
       {readOnly && (
         <AggregatedData

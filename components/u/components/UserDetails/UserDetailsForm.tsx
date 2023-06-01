@@ -14,6 +14,7 @@ import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
@@ -37,9 +38,12 @@ import { useUpdateProfileAvatar } from './hooks/useUpdateProfileAvatar';
 import { useUserDetails } from './hooks/useUserDetails';
 import { isPublicUser } from './utils';
 
+export type EditableFields = Partial<Omit<UserDetailsType, 'id'>>;
+
 export interface UserDetailsProps {
   user: PublicUser | LoggedInUser;
   sx?: SxProps<Theme>;
+  onChange: (user: EditableFields) => void;
 }
 
 const StyledStack = styled(Stack)`
@@ -61,22 +65,12 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   const { user: currentUser } = useUser();
-  const { mutateMembers } = useMembers();
 
   const isPublic = isPublicUser(user, currentUser);
-  const {
-    data: userDetails,
-    mutate,
-    isLoading
-  } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () =>
+  const { data: userDetails, isLoading } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () =>
     isPublic ? user.profile : charmClient.getUserDetails()
-  );
-
-  const { trigger: updateUserDetails } = useSWRMutation(
-    '/api/profile/details',
-    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
   );
 
   const identityTypes = useIdentityTypes();
@@ -94,22 +88,16 @@ export function UserDetailsForm({ user, sx = {} }: UserDetailsProps) {
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const saveDescription = async (_description: string) => {
-    await updateUserDetails({ description: _description });
-    await mutate();
-    await mutateMembers();
+  const setDescription = async (description: string) => {
+    onChange({ description });
   };
 
-  const saveTimezone = async (_timezone: string | null = null) => {
-    await updateUserDetails({ timezone: _timezone });
-    await mutate();
-    await mutateMembers();
+  const setTimezone = async (timezone: string | null = null) => {
+    onChange({ timezone });
   };
 
-  const saveSocial = async (social: Social) => {
-    await updateUserDetails({ social });
-    await mutate();
-    await mutateMembers();
+  const setSocial = async (social: Social) => {
+    onChange({ social });
   };
 
   const disabled = isLoading ?? isPublic;
@@ -173,14 +161,14 @@ export function UserDetailsForm({ user, sx = {} }: UserDetailsProps) {
             <Grid item>
               <UserDescription
                 currentDescription={userDetails?.description}
-                save={saveDescription}
+                save={setDescription}
                 readOnly={disabled}
               />
             </Grid>
             <Grid item>
-              <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={saveTimezone} readOnly={disabled} />
+              <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={setTimezone} readOnly={disabled} />
             </Grid>
-            <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
+            <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
           </>
         )}
       </Grid>
@@ -206,6 +194,39 @@ export function UserDetailsForm({ user, sx = {} }: UserDetailsProps) {
           />
         </>
       )}
+    </>
+  );
+}
+export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>) {
+  const [form, setForm] = useState<EditableFields>({});
+  const { mutateMembers } = useMembers();
+  const { trigger: updateUserDetails } = useSWRMutation(
+    '/api/profile/details',
+    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
+  );
+
+  function onFormChange(fields: EditableFields) {
+    setForm((_form) => ({ ..._form, ...fields }));
+  }
+
+  const isFormClean = Object.keys(form).length === 0;
+
+  async function saveForm() {
+    await updateUserDetails(form);
+    await mutateMembers();
+    setForm({});
+  }
+
+  return (
+    <>
+      <UserDetailsForm user={user} onChange={onFormChange} />
+      <Grid container>
+        <Grid item>
+          <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+            Save
+          </Button>
+        </Grid>
+      </Grid>
     </>
   );
 }
