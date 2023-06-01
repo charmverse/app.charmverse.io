@@ -153,7 +153,7 @@ function UserProperty(props: Props): JSX.Element | null {
   if (props.readOnly || !isOpen) {
     return (
       <div
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', overflow: 'hidden' }}
         onClick={
           !props.readOnly
             ? () => {
@@ -208,7 +208,7 @@ function UserProperty(props: Props): JSX.Element | null {
           placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
           renderTags={() => (
             <MembersDisplay
-              wrapColumn={props.displayType === 'table' ? true : props.wrapColumn ?? false}
+              wrapColumn={true}
               readOnly={props.readOnly}
               clicked={clicked}
               memberIds={memberIds}

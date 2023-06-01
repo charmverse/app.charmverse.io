@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import { MountTracker } from 'components/common/Debug/MountTracker';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -124,7 +123,7 @@ function PropertyValueElement(props: Props) {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        wrapColumn={props.wrapColumn ?? false}
         showEmptyPlaceholder={displayType === 'details'}
       />
     );
