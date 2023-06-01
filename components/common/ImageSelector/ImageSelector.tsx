@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -17,13 +17,15 @@ interface ImageSelectorProps {
   onImageSelect: (imageSrc: string) => void;
   children: ReactNode;
   galleryImages?: { [category: string]: string[] };
+  uploadDisclaimer?: string;
 }
 
 export default function ImageSelector({
   autoOpen = false,
   children,
   galleryImages,
-  onImageSelect
+  onImageSelect,
+  uploadDisclaimer
 }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
@@ -79,6 +81,11 @@ export default function ImageSelector({
                         setIsUploading(false);
                       }}
                     />
+                    {uploadDisclaimer && (
+                      <Typography variant='caption' color='secondary'>
+                        <em>uploadDisclaimer</em>
+                      </Typography>
+                    )}
                   </PimpedButton>
                 </Box>
               ],

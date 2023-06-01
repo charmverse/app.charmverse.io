@@ -89,7 +89,11 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
           }}
           className='page-cover-controls'
         >
-          <ImageSelector galleryImages={bannerImageGroups} onImageSelect={setImage}>
+          <ImageSelector
+            galleryImages={bannerImageGroups}
+            onImageSelect={setImage}
+            uploadDisclaimer='We recommend using an image at least 1500px wide, or a ratio of 1500px x 220px'
+          >
             <ListItem
               button
               disableRipple
