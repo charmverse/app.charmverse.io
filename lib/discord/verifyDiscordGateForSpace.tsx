@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 
-import { canJoinSpaceViaDiscord } from 'lib/collabland/collablandClient';
+import { getDiscordUserState } from 'lib/collabland/collablandClient';
 
 type Props = {
   discordUserId?: string;
@@ -19,7 +19,7 @@ export async function verifyDiscordGateForSpace({ discordUserId, space }: Props)
     };
   }
 
-  const { roles, isVerified } = await canJoinSpaceViaDiscord({ discordServerId, discordUserId });
+  const { roles, isVerified } = await getDiscordUserState({ discordServerId, discordUserId });
 
   return {
     isVerified,

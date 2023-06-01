@@ -1,7 +1,6 @@
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
 import { Autocomplete, Popper, TextField } from '@mui/material';
-import { createFilterOptions } from '@mui/material/Autocomplete';
 import { createRef, useCallback, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -13,8 +12,6 @@ interface IMembersFilter {
   mode: 'include' | 'exclude';
   userIds: string[];
 }
-
-const filterOptions = createFilterOptions<Member>({ stringify: (option) => option.searchValue || option.username });
 
 function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {

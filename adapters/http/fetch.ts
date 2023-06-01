@@ -1,12 +1,17 @@
 type RequestInit = Parameters<typeof fetch>[1];
 
-export function transformResponse(response: Response) {
+export async function transformResponse(response: Response) {
   const contentType = response.headers.get('content-type');
 
   if (response.status >= 400) {
     // necessary to capture the regular response for embedded blocks
     if (contentType?.includes('application/json')) {
-      return response.json().then((json: any) => Promise.reject({ status: response.status, ...json }));
+      try {
+        const jsonResponse = await response.json();
+        return Promise.reject({ status: response.status, ...jsonResponse });
+      } catch (error) {
+        // not valid JSON, content-type is lying!
+      }
     }
     // Note: 401 if user is logged out
     return response.text().then((text) => Promise.reject({ status: response.status, message: text }));
