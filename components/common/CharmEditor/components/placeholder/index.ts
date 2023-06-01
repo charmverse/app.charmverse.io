@@ -7,14 +7,12 @@ import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 // see also: https://discuss.prosemirror.net/t/how-to-input-like-placeholder-behavior/705/24
 export function placeholderPlugin(text: string = "Type '/' for commands") {
   const update = (view: EditorView) => {
-    if (view.editable) {
-      const doc = view.state.doc;
-      const hasContent = !checkIsContentEmpty(doc.toJSON() as any);
-      if (hasContent) {
-        view.dom.removeAttribute('data-placeholder');
-      } else {
-        view.dom.setAttribute('data-placeholder', text);
-      }
+    const doc = view.state.doc;
+    const hasContent = !checkIsContentEmpty(doc.toJSON() as any);
+    if (hasContent) {
+      view.dom.removeAttribute('data-placeholder');
+    } else {
+      view.dom.setAttribute('data-placeholder', text);
     }
   };
 
