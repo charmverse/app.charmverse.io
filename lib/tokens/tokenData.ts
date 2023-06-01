@@ -61,17 +61,13 @@ export function getTokenMetaData({ chainId, contractAddress }: ITokenMetadataReq
 }
 
 type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
-type getTokenAndChainInfoFromPaymentsProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
+type getTokenInfoProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
 
 /**
  * Returns a standardised shape for either a contract address, or a native currency
  * @param methods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
  */
-export function getTokenAndChainInfoFromPayments({
-  chainId = 1,
-  methods,
-  symbolOrAddress
-}: getTokenAndChainInfoFromPaymentsProps): TokenAndChain {
+export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getTokenInfoProps): TokenAndChain {
   const paymentMethod = methods.find(
     (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
   );

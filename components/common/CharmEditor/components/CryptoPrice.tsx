@@ -14,7 +14,7 @@ import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -111,7 +111,7 @@ export function CryptoPrice({
 
     setLoadingState(true);
 
-    const symbol = getTokenAndChainInfoFromPayments({
+    const symbol = getTokenInfo({
       methods: paymentMethods,
       symbolOrAddress: baseCurrency
     }).tokenSymbol;
@@ -179,9 +179,7 @@ export function CryptoPrice({
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              <CoinLogoAndTicker
-                {...getTokenAndChainInfoFromPayments({ methods: paymentMethods, symbolOrAddress: baseCurrency })}
-              />
+              <CoinLogoAndTicker {...getTokenInfo({ methods: paymentMethods, symbolOrAddress: baseCurrency })} />
             </StyledButton>
             <Typography component='span' color='secondary'>
               /
@@ -191,10 +189,7 @@ export function CryptoPrice({
               active={selectionList === 'quote'}
               onClick={() => toggleSelectionList('quote')}
             >
-              {
-                getTokenAndChainInfoFromPayments({ methods: paymentMethods, symbolOrAddress: quoteCurrency })
-                  .tokenSymbol
-              }
+              {getTokenInfo({ methods: paymentMethods, symbolOrAddress: quoteCurrency }).tokenSymbol}
             </StyledButton>
             <IconButton disabled={readOnly} size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />
