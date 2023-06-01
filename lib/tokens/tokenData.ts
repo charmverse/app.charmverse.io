@@ -60,32 +60,13 @@ export function getTokenMetaData({ chainId, contractAddress }: ITokenMetadataReq
   });
 }
 
-/**
- * Returns a standardised shape for either a contract address, or a native currency
- * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
- */
-export function getTokenInfo(paymentMethods: PaymentMethod[], symbolOrAddress: string): TokenInfo {
-  const paymentMethod = paymentMethods.find(
-    (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
-  );
-
-  const tokenLogo = paymentMethod?.tokenLogo || TokenLogoPaths[symbolOrAddress as CryptoCurrency];
-  const tokenSymbol = paymentMethod?.tokenSymbol || symbolOrAddress;
-  const tokenName = paymentMethod?.tokenName || CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
-
-  const tokenInfo: TokenInfo = {
-    tokenName,
-    tokenSymbol,
-    tokenLogo: tokenLogo as string,
-    isContract: !!paymentMethod?.contractAddress
-  };
-
-  return tokenInfo;
-}
-
 type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
 type getTokenAndChainInfoFromPaymentsProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
 
+/**
+ * Returns a standardised shape for either a contract address, or a native currency
+ * @param methods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
+ */
 export function getTokenAndChainInfoFromPayments({
   chainId = 1,
   methods,
