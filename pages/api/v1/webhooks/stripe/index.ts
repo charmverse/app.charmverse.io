@@ -80,19 +80,19 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
 
     switch (event.type) {
-      case 'invoice.paid': {
+      // Invoice created means that the user has a new invoice to pay
+      case 'invoice.finalized': {
         const invoice = event.data.object as Stripe.Invoice;
-        // console.log(`💵 Invoice`, invoice);
-        const subscriptionData = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
           expand: ['plan', 'latest_invoice.payment_intent']
         });
 
         const space = await prisma.space.findUnique({
-          where: { id: subscriptionData.metadata.spaceId }
+          where: { id: stripeSubscription.metadata.spaceId }
         });
 
         if (!space) {
-          log.warn(`Can't update the user subscription. Space not found for subscription ${subscriptionData.id}`, {
+          log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`, {
             invoice
           });
           break;
@@ -100,36 +100,68 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         await prisma.stripeSubscription.create({
           data: {
-            createdBy: space.createdBy,
             customerId: invoice.customer as string,
             subscriptionId: invoice.subscription as string,
             // @ts-ignore There is a plan
-            period: (subscriptionData.plan.interval as string) === 'month' ? 'monthly' : 'annual',
+            period: (stripeSubscription.plan.interval as string) === 'month' ? 'monthly' : 'annual',
             // @ts-ignore There is a plan
-            productId: subscriptionData.plan.product as string,
-            spaceId: subscriptionData.metadata.spaceId,
-            stripePayment: {
-              create: {
-                amount: invoice.total,
-                currency: 'USD',
-                paymentId: invoice.id,
-                status: 'success'
-              }
+            productId: stripeSubscription.plan.product as string,
+            // @ts-ignore There is a plan
+            priceId: stripeSubscription.plan.id as string,
+            spaceId: stripeSubscription.metadata.spaceId,
+            status: 'pending'
+          }
+        });
+
+        log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was finalised`);
+
+        break;
+      }
+
+      // Invoice paid means that the user has paid the invoice using any payment method
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
+          expand: ['plan', 'latest_invoice.payment_intent']
+        });
+
+        const space = await prisma.space.findUnique({
+          where: { id: stripeSubscription.metadata.spaceId }
+        });
+
+        if (!space) {
+          log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`, {
+            invoice
+          });
+          break;
+        }
+
+        await prisma.$transaction([
+          prisma.stripeSubscription.update({
+            where: {
+              subscriptionId: stripeSubscription.id
+            },
+            data: {
+              status: 'active'
             }
-          }
-        });
-        await prisma.space.update({
-          where: {
-            id: space.id
-          },
-          data: {
-            paidTier: 'pro'
-          }
-        });
+          }),
+          prisma.space.update({
+            where: {
+              id: space.id
+            },
+            data: {
+              paidTier: 'pro'
+            }
+          })
+        ]);
+
+        log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid`);
+
         break;
       }
       default: {
-        log.warn(`🤷‍♀️ Unhandled event type in stripe webhook: ${event.type}`);
+        log.warn(`Unhandled event type in stripe webhook: ${event.type}`);
         break;
       }
     }

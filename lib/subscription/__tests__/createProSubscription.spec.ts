@@ -125,17 +125,6 @@ describe('createProSubscription', () => {
       })
     ).not.toBeFalsy();
 
-    expect(
-      await prisma.stripePayment.findFirstOrThrow({
-        where: {
-          amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
-          currency: 'USD',
-          paymentId,
-          status: 'success'
-        }
-      })
-    ).not.toBeFalsy();
-
     expect(paymentIntentStatus).toStrictEqual('succeeded');
     expect(clientSecret).toStrictEqual(client_secret);
   });

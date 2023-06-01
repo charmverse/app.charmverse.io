@@ -26,8 +26,7 @@ export async function createProSubscription({
   spaceId,
   period,
   productId,
-  billingEmail,
-  userId
+  billingEmail
 }: {
   userId: string;
   productId: SubscriptionProductId;
