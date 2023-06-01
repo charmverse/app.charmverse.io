@@ -11,7 +11,7 @@ import { usePage } from 'hooks/usePage';
 import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import BountyStatusBadge from './BountyStatusBadge';
+import { BountyStatusBadge } from './BountyStatusBadge';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })};

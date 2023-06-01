@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import type { CryptoCurrency, IChainDetails } from 'connectors';
-import { TokenLogoPaths, CryptoCurrencyList, getChainById } from 'connectors';
+import type { IChainDetails } from 'connectors';
+import { getChainById, getChainBySymbol } from 'connectors';
 
 import * as http from 'adapters/http';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
@@ -60,64 +60,47 @@ export function getTokenMetaData({ chainId, contractAddress }: ITokenMetadataReq
   });
 }
 
+type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
+type getTokenInfoProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
+
 /**
  * Returns a standardised shape for either a contract address, or a native currency
- * @param paymentMethods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
+ * @param methods Call this function from a component that can access the usePaymentMethods hook which provides available methods to search through
  */
-export function getTokenInfo(paymentMethods: PaymentMethod[], symbolOrAddress: string): TokenInfo {
-  const paymentMethod = paymentMethods.find(
-    (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
-  );
-
-  const tokenLogo = paymentMethod?.tokenLogo || TokenLogoPaths[symbolOrAddress as CryptoCurrency];
-  const tokenSymbol = paymentMethod?.tokenSymbol || symbolOrAddress;
-  const tokenName = paymentMethod?.tokenName || CryptoCurrencyList[symbolOrAddress as CryptoCurrency];
-
-  const tokenInfo: TokenInfo = {
-    tokenName,
-    tokenSymbol,
-    tokenLogo: tokenLogo as string,
-    isContract: !!paymentMethod?.contractAddress
-  };
-
-  return tokenInfo;
-}
-
-type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
-type getTokenAndChainInfoFromPaymentsProps = { chainId: number; methods: PaymentMethod[]; symbolOrAddress: string };
-
-export function getTokenAndChainInfoFromPayments({
-  chainId,
-  methods,
-  symbolOrAddress
-}: getTokenAndChainInfoFromPaymentsProps): TokenAndChain {
+export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getTokenInfoProps): TokenAndChain {
   const paymentMethod = methods.find(
     (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
   );
   if (paymentMethod) {
     return getTokenAndChainInfo(paymentMethod);
-  } else {
-    const chain = getChainById(chainId);
-    if (!chain) {
-      log.error(`No chain found for chainId: ${chainId}, returning ETH defaults`);
-      return {
-        chain: getChainById(1)!,
-        canonicalLogo: TokenLogoPaths.ETH,
-        tokenName: CryptoCurrencyList.ETH,
-        tokenSymbol: symbolOrAddress,
-        tokenLogo: TokenLogoPaths.ETH,
-        isContract: false
-      };
-    }
+  }
+  // Note: getChainBySymbol() is only relied on by CryptoPrice component
+  const chain = getChainBySymbol(symbolOrAddress) || getChainById(chainId);
+  if (chain) {
     return {
       chain,
-      canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-      tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
+      canonicalLogo: chain.iconUrl,
+      tokenName: chain.nativeCurrency.name,
       tokenSymbol: symbolOrAddress,
-      tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+      tokenLogo: chain.iconUrl,
       isContract: false
     };
   }
+  // default to ETH
+  log.error(`No chain found when displaying token information, returning ETH defaults to user`, {
+    chainId,
+    methods,
+    symbolOrAddress
+  });
+  const ethChain = getChainById(1)!;
+  return {
+    chain: ethChain,
+    canonicalLogo: ethChain.iconUrl,
+    tokenName: ethChain.nativeCurrency.name,
+    tokenSymbol: symbolOrAddress,
+    tokenLogo: ethChain.iconUrl,
+    isContract: false
+  };
 }
 
 export function getTokenAndChainInfo(paymentMethod: PaymentMethod): TokenAndChain {
@@ -125,7 +108,7 @@ export function getTokenAndChainInfo(paymentMethod: PaymentMethod): TokenAndChai
   if (!chain) {
     throw new Error(`No chain found for chainId: ${paymentMethod.chainId}`);
   }
-  const tokenLogo = paymentMethod.tokenLogo || TokenLogoPaths[paymentMethod.tokenSymbol as CryptoCurrency];
+  const tokenLogo = paymentMethod.tokenLogo || chain.iconUrl;
   return {
     // prefer our standard iconUrl for native tokens that may have been saved to tokenInfo
     canonicalLogo: paymentMethod.contractAddress ? tokenLogo || chain.iconUrl : chain.iconUrl,
