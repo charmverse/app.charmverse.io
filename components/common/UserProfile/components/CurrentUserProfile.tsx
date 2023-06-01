@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Legend from 'components/settings/Legend';
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
 import type { LoggedInUser } from 'models';
 
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
@@ -23,7 +22,6 @@ export function CurrentUserProfile({
   currentUser: LoggedInUser;
   isOnboarding?: boolean;
 }) {
-  const { setUser } = useUser();
   const currentSpace = useCurrentSpace();
   const { updateSpaceValues } = useMemberPropertyValues(currentUser.id);
 
@@ -58,7 +56,6 @@ export function CurrentUserProfile({
               mt: 0
             }}
             user={currentUser}
-            updateUser={setUser}
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
