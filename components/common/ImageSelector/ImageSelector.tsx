@@ -50,7 +50,10 @@ export default function ImageSelector({
                 <Box
                   key='upload'
                   sx={{
+                    flexDirection: 'column',
                     display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
                     justifyContent: 'center',
                     width: '100%'
                   }}
@@ -81,12 +84,12 @@ export default function ImageSelector({
                         setIsUploading(false);
                       }}
                     />
-                    {uploadDisclaimer && (
-                      <Typography variant='caption' color='secondary'>
-                        <em>uploadDisclaimer</em>
-                      </Typography>
-                    )}
                   </PimpedButton>
+                  {uploadDisclaimer && (
+                    <Typography variant='caption' color='secondary'>
+                      {uploadDisclaimer}
+                    </Typography>
+                  )}
                 </Box>
               ],
               [

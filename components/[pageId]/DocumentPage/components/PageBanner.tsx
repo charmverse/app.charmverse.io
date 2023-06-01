@@ -92,7 +92,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
           <ImageSelector
             galleryImages={bannerImageGroups}
             onImageSelect={setImage}
-            uploadDisclaimer='We recommend using an image at least 1500px wide, or a ratio of 1500px x 220px'
+            uploadDisclaimer='We recommend using an image at least 1500px wide, or a ratio of 1500px by 220px.'
           >
             <ListItem
               button
