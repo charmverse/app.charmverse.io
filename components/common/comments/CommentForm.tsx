@@ -65,17 +65,17 @@ export function CommentForm({
       key: editorKey,
       disableRowHandles: true,
       focusOnInit: true,
-      placeholderText: 'What are your thoughts?',
+      placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
       isContentControlled: true
     };
 
     if (!inlineCharmEditor) {
-      return <CharmEditor {...editorCommentProps} readOnly={disabled} placeholderText={placeholder} />;
+      return <CharmEditor {...editorCommentProps} readOnly={disabled} />;
     }
 
-    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} placeholderText={placeholder} />;
+    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} />;
   }, [inlineCharmEditor, postContent, updatePostContent]);
 
   if (!user) {
