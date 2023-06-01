@@ -62,7 +62,9 @@ export function CurrentUserProfile({
     onClose();
   }
 
-  const [currentStep, setCurrentStep] = useState<Step>(!currentUser.email ? 'email_step' : 'profile_step');
+  const [currentStep, setCurrentStep] = useState<Step>(
+    isOnboarding && !currentUser.email ? 'email_step' : 'profile_step'
+  );
 
   function goNextStep() {
     setCurrentStep('profile_step');
@@ -77,6 +79,7 @@ export function CurrentUserProfile({
     [currentSpace?.id]
   );
 
+  // dont show a modal until the space is loaded at least
   if (!currentSpace) {
     return null;
   }

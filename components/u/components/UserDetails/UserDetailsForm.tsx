@@ -29,7 +29,7 @@ import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { Social } from '../../interfaces';
 import { IdentityIcon } from '../IdentityIcon';
 import IdentityModal from '../IdentityModal';
-import SocialInputs from '../SocialInputs';
+import { SocialInputs } from '../SocialInputs';
 import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
 import UserDescription from '../UserDescription';
 import UserPathModal from '../UserPathModal';
@@ -69,8 +69,10 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   const { user: currentUser } = useUser();
 
   const isPublic = isPublicUser(user, currentUser);
-  const { data: userDetails, isLoading } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () =>
-    isPublic ? user.profile : charmClient.getUserDetails()
+  const { data: userDetails, isLoading } = useSWRImmutable(
+    `/userDetails/${user.id}/${isPublic}`,
+    () => (isPublic ? user.profile : charmClient.getUserDetails()),
+    { revalidateOnMount: true }
   );
 
   const identityTypes = useIdentityTypes();

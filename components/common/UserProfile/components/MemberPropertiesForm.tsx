@@ -34,7 +34,7 @@ export function MemberPropertiesForm({
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const {
     control,
-    formState: { errors, isDirty },
+    formState: { errors },
     reset,
     getValues
   } = useForm({ mode: 'onChange' });
@@ -50,7 +50,7 @@ export function MemberPropertiesForm({
   }
 
   useEffect(() => {
-    if (!isDirty || !properties) {
+    if (!properties) {
       return;
     }
     const defaultValues = properties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
@@ -59,7 +59,7 @@ export function MemberPropertiesForm({
     }, {});
 
     reset(defaultValues);
-  }, [!!properties, isDirty]);
+  }, [!!properties]);
 
   return (
     <Box>
