@@ -99,6 +99,9 @@ export function InputSearchCrypto({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
+          if (!option) {
+            return '';
+          }
           const tokenInfo = getTokenInfo({
             methods: paymentMethods,
             symbolOrAddress: option

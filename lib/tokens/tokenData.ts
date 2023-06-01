@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import type { IChainDetails } from 'connectors';
-import { getChainById } from 'connectors';
+import { getChainById, getChainBySymbol } from 'connectors';
 
 import * as http from 'adapters/http';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
@@ -73,18 +73,18 @@ export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getToken
   );
   if (paymentMethod) {
     return getTokenAndChainInfo(paymentMethod);
-  } else if (chainId) {
-    const chain = getChainById(chainId);
-    if (chain) {
-      return {
-        chain,
-        canonicalLogo: chain.iconUrl,
-        tokenName: chain.nativeCurrency.name,
-        tokenSymbol: symbolOrAddress,
-        tokenLogo: chain.iconUrl,
-        isContract: false
-      };
-    }
+  }
+  // Note: getChainBySymbol() is only relied on by CryptoPrice component
+  const chain = getChainBySymbol(symbolOrAddress) || getChainById(chainId);
+  if (chain) {
+    return {
+      chain,
+      canonicalLogo: chain.iconUrl,
+      tokenName: chain.nativeCurrency.name,
+      tokenSymbol: symbolOrAddress,
+      tokenLogo: chain.iconUrl,
+      isContract: false
+    };
   }
   // default to ETH
   log.error(`No chain found when displaying token information, returning ETH defaults to user`, {

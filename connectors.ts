@@ -296,6 +296,10 @@ export function getChainById(chainId: number): IChainDetails | undefined {
   return RPCList.find((rpc) => rpc.chainId === chainId);
 }
 
+export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined {
+  return RPCList.find((rpc) => rpc.nativeCurrency.symbol === tokenSymbol);
+}
+
 const supportedChains: Blockchain[] = [
   'ETHEREUM',
   'POLYGON',
@@ -338,21 +342,6 @@ const walletLink = new WalletLinkConnector({
   appName: 'CharmVerse.io',
   supportedChainIds
 });
-
-/**
- *
- * @param chainId
- * @returns The native crypto of a chain. If the chain is not found, returns an empty list
- */
-export function getCryptos(chainId: number): (string | CryptoCurrency)[] {
-  const chain = getChainById(chainId);
-
-  if (!chain) {
-    return [];
-  }
-
-  return [chain.nativeCurrency.symbol];
-}
 
 export function getChainExplorerLink(
   chainId: string | number,
