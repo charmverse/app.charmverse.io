@@ -251,18 +251,16 @@ export function charmEditorPlugins({
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
-    filePlugins()
+    filePlugins(),
+    placeholderPlugin(placeholderText)
   ];
 
-  if (!readOnly) {
-    if (!disableRowHandles) {
-      basePlugins.push(
-        rowActions.plugins({
-          key: actionsPluginKey
-        })
-      );
-    }
-    basePlugins.push(placeholderPlugin(placeholderText));
+  if (!readOnly && !disableRowHandles) {
+    basePlugins.push(
+      rowActions.plugins({
+        key: actionsPluginKey
+      })
+    );
   }
 
   if (!disablePageSpecificFeatures) {

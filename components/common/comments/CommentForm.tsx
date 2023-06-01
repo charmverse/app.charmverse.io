@@ -20,11 +20,15 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 export function CommentForm({
   handleCreateComment,
   initialValue,
-  inlineCharmEditor
+  inlineCharmEditor,
+  disabled,
+  placeholder
 }: {
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
+  disabled?: boolean;
+  placeholder?: string;
 }) {
   const { user } = useUser();
   const [postContent, setPostContent] = useState<ICharmEditorOutput>(
@@ -61,17 +65,17 @@ export function CommentForm({
       key: editorKey,
       disableRowHandles: true,
       focusOnInit: true,
-      placeholderText: 'What are your thoughts?',
+      placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
       isContentControlled: true
     };
 
     if (!inlineCharmEditor) {
-      return <CharmEditor {...editorCommentProps} />;
+      return <CharmEditor {...editorCommentProps} readOnly={disabled} />;
     }
 
-    return <InlineCharmEditor {...editorCommentProps} />;
+    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} />;
   }, [inlineCharmEditor, postContent, updatePostContent]);
 
   if (!user) {
@@ -89,7 +93,7 @@ export function CommentForm({
         sx={{
           alignSelf: 'flex-end'
         }}
-        disabled={!postContent.rawText}
+        disabled={!postContent.rawText || disabled}
         onClick={createPostComment}
       >
         Comment
