@@ -1,4 +1,4 @@
-import { pageTree } from '@charmverse/core/pages';
+import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
