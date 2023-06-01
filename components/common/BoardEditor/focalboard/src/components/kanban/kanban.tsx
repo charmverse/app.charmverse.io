@@ -73,7 +73,6 @@ function Kanban(props: Props) {
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
-
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => i) as IPropertyTemplate[];

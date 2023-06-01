@@ -9,7 +9,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import BountyStatusBadge from './BountyStatusBadge';
+import { BountyStatusBadge } from './BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails;

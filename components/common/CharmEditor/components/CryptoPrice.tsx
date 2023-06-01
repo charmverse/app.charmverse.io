@@ -14,7 +14,7 @@ import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo } from 'lib/tokens/tokenData';
+import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -111,7 +111,10 @@ export function CryptoPrice({
 
     setLoadingState(true);
 
-    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
+    const symbol = getTokenAndChainInfoFromPayments({
+      methods: paymentMethods,
+      symbolOrAddress: baseCurrency
+    }).tokenSymbol;
 
     charmClient
       .getPricing(symbol, quoteCurrency)
@@ -176,7 +179,9 @@ export function CryptoPrice({
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
+              <CoinLogoAndTicker
+                {...getTokenAndChainInfoFromPayments({ methods: paymentMethods, symbolOrAddress: baseCurrency })}
+              />
             </StyledButton>
             <Typography component='span' color='secondary'>
               /
@@ -186,7 +191,10 @@ export function CryptoPrice({
               active={selectionList === 'quote'}
               onClick={() => toggleSelectionList('quote')}
             >
-              {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
+              {
+                getTokenAndChainInfoFromPayments({ methods: paymentMethods, symbolOrAddress: quoteCurrency })
+                  .tokenSymbol
+              }
             </StyledButton>
             <IconButton disabled={readOnly} size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />

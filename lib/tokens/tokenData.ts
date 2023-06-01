@@ -84,10 +84,10 @@ export function getTokenInfo(paymentMethods: PaymentMethod[], symbolOrAddress: s
 }
 
 type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
-type getTokenAndChainInfoFromPaymentsProps = { chainId: number; methods: PaymentMethod[]; symbolOrAddress: string };
+type getTokenAndChainInfoFromPaymentsProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
 
 export function getTokenAndChainInfoFromPayments({
-  chainId,
+  chainId = 1,
   methods,
   symbolOrAddress
 }: getTokenAndChainInfoFromPaymentsProps): TokenAndChain {
@@ -96,28 +96,33 @@ export function getTokenAndChainInfoFromPayments({
   );
   if (paymentMethod) {
     return getTokenAndChainInfo(paymentMethod);
-  } else {
+  } else if (chainId) {
     const chain = getChainById(chainId);
-    if (!chain) {
-      log.error(`No chain found for chainId: ${chainId}, returning ETH defaults`);
+    if (chain) {
       return {
-        chain: getChainById(1)!,
-        canonicalLogo: TokenLogoPaths.ETH,
-        tokenName: CryptoCurrencyList.ETH,
+        chain,
+        canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
+        tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
         tokenSymbol: symbolOrAddress,
-        tokenLogo: TokenLogoPaths.ETH,
+        tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
         isContract: false
       };
     }
-    return {
-      chain,
-      canonicalLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-      tokenName: CryptoCurrencyList[symbolOrAddress as CryptoCurrency],
-      tokenSymbol: symbolOrAddress,
-      tokenLogo: TokenLogoPaths[symbolOrAddress as CryptoCurrency],
-      isContract: false
-    };
   }
+  // default to ETH
+  log.error(`No chain found when displaying token information, returning ETH defaults to user`, {
+    chainId,
+    methods,
+    symbolOrAddress
+  });
+  return {
+    chain: getChainById(1)!,
+    canonicalLogo: TokenLogoPaths.ETH,
+    tokenName: CryptoCurrencyList.ETH,
+    tokenSymbol: symbolOrAddress,
+    tokenLogo: TokenLogoPaths.ETH,
+    isContract: false
+  };
 }
 
 export function getTokenAndChainInfo(paymentMethod: PaymentMethod): TokenAndChain {
