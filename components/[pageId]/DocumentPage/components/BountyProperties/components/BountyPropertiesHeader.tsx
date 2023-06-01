@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';

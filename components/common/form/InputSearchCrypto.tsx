@@ -12,7 +12,7 @@ import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
 import Modal from 'components/common/Modal';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 
 export interface IInputSearchCryptoProps
   extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
@@ -99,7 +99,14 @@ export function InputSearchCrypto({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
-          return getTokenInfo(paymentMethods, option).tokenSymbol;
+          if (!option) {
+            return '';
+          }
+          const tokenInfo = getTokenInfo({
+            methods: paymentMethods,
+            symbolOrAddress: option
+          });
+          return tokenInfo.tokenSymbol;
         }}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
@@ -110,9 +117,8 @@ export function InputSearchCrypto({
               </Box>
             );
           }
-          const tokenInfo = getTokenAndChainInfoFromPayments({
+          const tokenInfo = getTokenInfo({
             methods: paymentMethods,
-            chainId: 1,
             symbolOrAddress: option
           });
 
