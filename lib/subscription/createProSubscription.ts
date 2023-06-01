@@ -6,7 +6,6 @@ import stripe from 'stripe';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
-import { SUBSCRIPTION_PRODUCTS_RECORD } from './constants';
 import { stripeClient } from './stripe';
 
 export type CreateProSubscriptionRequest = {
@@ -82,10 +81,24 @@ export async function createProSubscription({
           email: billingEmail
         });
 
-  const product = await stripeClient.products.retrieve(productId);
+  const stripePeriod = period === 'monthly' ? 'month' : 'year';
 
-  // In cent so multiplying by 100
-  const amount = SUBSCRIPTION_PRODUCTS_RECORD[productId].pricing[period] * (period === 'monthly' ? 1 : 12) * 100;
+  // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
+  const { data: prices } = await stripeClient.prices.list({
+    product: productId,
+    type: 'recurring',
+    active: true
+  });
+
+  if (prices?.length === 0) {
+    throw new InvalidStateError(`No prices found in Stripe for the product ${productId}`);
+  }
+
+  const productPrice = prices.find((price) => price.recurring?.interval === stripePeriod);
+
+  if (!productPrice) {
+    throw new InvalidStateError(`No price  ${productId}`);
+  }
 
   try {
     // Create a subscription
@@ -99,14 +112,7 @@ export async function createProSubscription({
       customer: customer.id,
       items: [
         {
-          price_data: {
-            currency: 'USD',
-            product: product.id,
-            unit_amount: amount,
-            recurring: {
-              interval: period === 'monthly' ? 'month' : 'year'
-            }
-          }
+          price: productPrice.id
         }
       ],
       payment_settings: {
