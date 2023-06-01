@@ -7,7 +7,7 @@ import { Skeleton, Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWRImmutable from 'swr/immutable';
@@ -39,7 +39,6 @@ import { isPublicUser } from './utils';
 
 export interface UserDetailsProps {
   user: PublicUser | LoggedInUser;
-  updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
   sx?: SxProps<Theme>;
 }
 
@@ -62,7 +61,7 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ user, sx = {} }: UserDetailsProps) {
   const { user: currentUser } = useUser();
   const { mutateMembers } = useMembers();
 
@@ -88,7 +87,7 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { handleUserUpdate } = useUserDetails({ updateUser });
+  const { saveUser } = useUserDetails();
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
@@ -129,6 +128,7 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
             updateAvatar={updateProfileAvatar}
             variant='circular'
             canSetNft
+            editable={true}
             isSaving={isSavingAvatar}
             isNft={hasNftAvatar(user)}
           />
@@ -190,7 +190,7 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
             save={(username: string, identityType: IdentityType) => {
-              handleUserUpdate({ username, identityType });
+              saveUser({ username, identityType });
             }}
             identityTypes={isPublic ? [] : identityTypes}
             identityType={(user?.identityType || 'Wallet') as IdentityType}
@@ -199,7 +199,7 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
             isOpen={userPathModalState.isOpen}
             close={userPathModalState.close}
             save={(path: string) => {
-              handleUserUpdate({ path });
+              saveUser({ path });
               userPathModalState.close();
             }}
             currentValue={user.path}
