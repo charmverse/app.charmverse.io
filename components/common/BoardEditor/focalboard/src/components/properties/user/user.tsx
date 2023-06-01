@@ -94,7 +94,11 @@ function MembersDisplay({
             flexDirection='row'
             key={user.id}
             gap={0.5}
-            sx={wrapColumn ? { width: '100%', justifyContent: 'space-between' } : { overflowX: 'hidden' }}
+            sx={
+              wrapColumn
+                ? { width: '100%', justifyContent: 'space-between', overflowX: 'hidden' }
+                : { overflowX: 'hidden' }
+            }
             onClick={enableDelete ? () => removeMember(user.id) : undefined}
           >
             <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
