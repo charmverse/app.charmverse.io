@@ -40,7 +40,7 @@ export function CommentVote({ votes, onVote, permissions }: Props) {
 
   return (
     <Box display='flex' alignItems='center' gap={0.5}>
-      <Tooltip title={permissions?.upvote === false ? 'You do not have permissions to upvote this post.' : ''}>
+      <Tooltip title={permissions?.upvote === false ? 'You do not have permissions to upvote this post' : ''}>
         <div>
           <IconButton
             data-test='upvote-post'
