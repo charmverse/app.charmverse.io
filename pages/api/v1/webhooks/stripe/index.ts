@@ -104,7 +104,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             customerId: invoice.customer as string,
             subscriptionId: invoice.subscription as string,
             // @ts-ignore There is a plan
-            period: subscriptionData.plan.interval as string,
+            period: (subscriptionData.plan.interval as string) === 'month' ? 'monthly' : 'annual',
             // @ts-ignore There is a plan
             productId: subscriptionData.plan.product as string,
             spaceId: subscriptionData.metadata.spaceId,
@@ -116,6 +116,14 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
                 status: 'success'
               }
             }
+          }
+        });
+        await prisma.space.update({
+          where: {
+            id: space.id
+          },
+          data: {
+            paidTier: 'pro'
           }
         });
         break;

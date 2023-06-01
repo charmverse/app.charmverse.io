@@ -19,7 +19,6 @@ export type CreateProSubscriptionRequest = {
 export type CreateProSubscriptionResponse = {
   clientSecret: string | null;
   paymentIntentStatus: Stripe.PaymentIntent.Status | null;
-  subscriptionId: string | null;
 };
 
 export async function createProSubscription({
@@ -121,37 +120,7 @@ export async function createProSubscription({
     const invoice = subscription.latest_invoice as Stripe.Invoice;
     const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
 
-    const [spaceSubscription] = await prisma.$transaction([
-      prisma.stripeSubscription.create({
-        data: {
-          createdBy: userId,
-          customerId: customer.id,
-          subscriptionId: subscription.id,
-          period,
-          productId: product.id,
-          spaceId: space.id,
-          stripePayment: {
-            create: {
-              amount,
-              currency: 'USD',
-              paymentId: invoice.id,
-              status: paymentIntent.status === 'succeeded' ? 'success' : 'fail'
-            }
-          }
-        }
-      }),
-      prisma.space.update({
-        where: {
-          id: spaceId
-        },
-        data: {
-          paidTier: 'pro'
-        }
-      })
-    ]);
-
     return {
-      subscriptionId: spaceSubscription.id,
       paymentIntentStatus: paymentIntent?.status ?? null,
       clientSecret: paymentIntent?.client_secret ?? null
     };
@@ -165,8 +134,7 @@ export async function createProSubscription({
     });
     return {
       clientSecret: null,
-      paymentIntentStatus: null,
-      subscriptionId: null
+      paymentIntentStatus: null
     };
   }
 }

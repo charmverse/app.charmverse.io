@@ -217,17 +217,14 @@ export function CheckoutForm({
           errorCode: createPaymentMethodError.code
         });
       } else if (paymentMethod) {
-        const { clientSecret, paymentIntentStatus, subscriptionId } = await charmClient.subscription.createSubscription(
-          space.id,
-          {
-            paymentMethodId: paymentMethod.id,
-            period,
-            productId,
-            billingEmail: paymentDetails.billingEmail
-          }
-        );
+        const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription(space.id, {
+          paymentMethodId: paymentMethod.id,
+          period,
+          productId,
+          billingEmail: paymentDetails.billingEmail
+        });
 
-        if (clientSecret && subscriptionId && paymentIntentStatus) {
+        if (clientSecret && paymentIntentStatus) {
           if (paymentIntentStatus !== 'succeeded') {
             const { error: confirmCardPaymentError } = await stripe.confirmCardPayment(clientSecret, {
               receipt_email: paymentDetails.billingEmail,
@@ -496,7 +493,7 @@ export function CheckoutForm({
             sx: {
               width: {
                 xs: '100%',
-                sm: '400px'
+                sm: '600px'
               }
             }
           }}
