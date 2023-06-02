@@ -153,7 +153,7 @@ function UserProperty(props: Props): JSX.Element | null {
   if (props.readOnly || !isOpen) {
     return (
       <div
-        style={{ width: '100%', height: '100%', overflow: 'hidden' }}
+        style={{ width: '100%', height: '100%', minHeight: '30px', overflow: 'hidden' }}
         onClick={
           !props.readOnly
             ? () => {
