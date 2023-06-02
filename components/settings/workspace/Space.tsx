@@ -151,9 +151,9 @@ export default function SpaceSettings({ space }: { space: Space }) {
           </Grid>
           {isAdmin ? (
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton data-test='submit-space-update' disabled={!isDirty} type='submit'>
+              <Button disableElevation size='large' data-test='submit-space-update' disabled={!isDirty} type='submit'>
                 Save
-              </PrimaryButton>
+              </Button>
               <Button variant='outlined' color='error' onClick={deleteWorkspace}>
                 Delete Space
               </Button>
