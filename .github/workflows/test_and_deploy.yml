@@ -140,7 +140,7 @@ jobs:
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      node --experimental-specifier-resolution=node ./dist/main.js
 
-          until curl localhost:3002/api/health; do
+          until curl localhost:3001/api/health; do
             docker ps
             docker logs permissions-api 
             docker inspect permissions-api
