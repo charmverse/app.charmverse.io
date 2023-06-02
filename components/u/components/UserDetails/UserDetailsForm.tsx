@@ -21,6 +21,7 @@ import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/strings';
@@ -181,12 +182,13 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
     '/api/profile/details',
     (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
   );
+  const isFormClean = Object.keys(form).length === 0;
+
+  usePreventReload(!isFormClean);
 
   function onFormChange(fields: EditableFields) {
     setForm((_form) => ({ ..._form, ...fields }));
   }
-
-  const isFormClean = Object.keys(form).length === 0;
 
   async function saveForm() {
     await updateUserDetails(form);

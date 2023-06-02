@@ -9,6 +9,7 @@ import type { EditableFields } from 'components/u/components/UserDetails/UserDet
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
@@ -47,6 +48,8 @@ export function CurrentUserProfile({
   }
 
   const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
+
+  usePreventReload(!isFormClean);
 
   async function saveForm() {
     if (isFormClean) {
@@ -121,7 +124,7 @@ export function CurrentUserProfile({
             showBlockchainData
           />
           <Box display='flex' justifyContent='flex-end' mt={2}>
-            <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+            <Button disableElevation size='large' onClick={saveForm}>
               Save
             </Button>
           </Box>
