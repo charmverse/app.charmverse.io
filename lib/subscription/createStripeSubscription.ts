@@ -35,16 +35,7 @@ export async function createStripeSubscription({
     select: {
       domain: true,
       id: true,
-      name: true,
-      stripeSubscription: {
-        where: {
-          deletedAt: null
-        },
-        take: 1,
-        orderBy: {
-          createdAt: 'desc'
-        }
-      }
+      name: true
     }
   });
 
@@ -52,17 +43,42 @@ export async function createStripeSubscription({
     throw new NotFoundError('Space not found');
   }
 
-  const activeSpaceSubscription = space.stripeSubscription?.find(
-    (sub) => sub.productId === productId && sub.period === period
-  );
+  const spaceSubscription = await prisma.stripeSubscription.findFirst({
+    where: {
+      spaceId
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  const activeSpaceSubscription =
+    spaceSubscription?.productId === productId &&
+    spaceSubscription.period === period &&
+    spaceSubscription.deletedAt === null;
 
   if (activeSpaceSubscription) {
-    throw new InvalidStateError('Space already has a subscription');
+    throw new InvalidStateError(
+      `Space already has an active subscription with the id ${spaceSubscription.id} with the same product price`
+    );
   }
 
   // Find an existing customer, otherwise create it
-  const existingCustomers = await stripeClient.customers.list({ email: billingEmail });
-  const existingCustomer = existingCustomers?.data.find((customer) => customer.metadata.spaceId === space.id);
+  const existingCustomer = spaceSubscription
+    ? await stripeClient.customers.retrieve(spaceSubscription.customerId)
+    : null;
+
+  if (existingCustomer && !existingCustomer?.deleted) {
+    await stripeClient.customers.update(existingCustomer.id, {
+      metadata: {
+        spaceId: space.id
+      },
+      address,
+      name,
+      email: billingEmail
+    });
+  }
+
   const customer =
     existingCustomer ||
     (await stripeClient.customers.create({
@@ -99,27 +115,68 @@ export async function createStripeSubscription({
 
   let subscription;
   try {
-    subscription = await stripeClient.subscriptions.create({
-      metadata: {
-        productId,
-        period,
-        tier: 'pro',
-        spaceId: space.id
-      },
-      customer: customer.id,
-      items: [
-        {
-          price: productPrice.id
+    // Case if user downgrades or upgrades or user has an expired subscription and purchases again
+    const oldSubscription = await stripeClient.subscriptions.retrieve(spaceSubscription?.subscriptionId || '');
+    if (
+      (spaceSubscription?.productId !== productId || spaceSubscription.period !== period) &&
+      spaceSubscription?.deletedAt === null
+    ) {
+      subscription = await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+        metadata: {
+          productId,
+          period,
+          tier: 'pro',
+          spaceId: space.id
+        },
+        collection_method: 'send_invoice',
+        days_until_due: 0,
+        coupon,
+        payment_settings: {
+          save_default_payment_method: 'on_subscription'
+        },
+        expand: ['latest_invoice.payment_intent'],
+        cancel_at_period_end: false,
+        proration_behavior: 'create_prorations',
+        items: [
+          {
+            id: oldSubscription.items.data[0].id,
+            price: productPrice.id
+          }
+        ]
+      });
+      await prisma.stripeSubscription.update({
+        where: {
+          id: spaceSubscription.id
+        },
+        data: {
+          period,
+          productId,
+          priceId: productPrice.id
         }
-      ],
-      collection_method: 'send_invoice',
-      days_until_due: 0,
-      coupon,
-      payment_settings: {
-        save_default_payment_method: 'on_subscription'
-      },
-      expand: ['latest_invoice.payment_intent']
-    });
+      });
+    } else {
+      subscription = await stripeClient.subscriptions.create({
+        metadata: {
+          productId,
+          period,
+          tier: 'pro',
+          spaceId: space.id
+        },
+        customer: customer.id,
+        items: [
+          {
+            price: productPrice.id
+          }
+        ],
+        collection_method: 'send_invoice',
+        days_until_due: 0,
+        coupon,
+        payment_settings: {
+          save_default_payment_method: 'on_subscription'
+        },
+        expand: ['latest_invoice.payment_intent']
+      });
+    }
   } catch (err: any) {
     log.error(`[stripe]: Failed to create subscription. ${err.message}`, {
       spaceId,
