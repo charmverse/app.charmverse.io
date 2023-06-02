@@ -91,19 +91,19 @@ jobs:
       matrix:
         include:
           - test_name: 'Basic tests #1'
-            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 1/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3001 npm run test:ci -- --shard 1/3'
           - test_name: 'Basic tests #2'
-            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 2/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3001 npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
-            test_command: 'PERMISSIONS_API_URL=http://localhost:3002 npm run test:ci -- --shard 3/3'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3001 npm run test:ci -- --shard 3/3'
           - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 1/2'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3001 npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3001 npm run test:server:ci -- --shard 1/2'
           - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:server:ci -- --shard 2/2'
+            test_command: 'PERMISSIONS_API_URL=http://localhost:3001 npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3001 npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3002 npm run test:e2e:ci'
+            test_command: 'npx playwright install chromium chrome --with-deps; PERMISSIONS_API_URL=http://localhost:3001 npm run start:test:ci & PERMISSIONS_API_URL=http://localhost:3001 npm run test:e2e:ci'
     steps:
       - uses: actions/checkout@v3
 
@@ -132,9 +132,9 @@ jobs:
           echo "network ${{ job.services.postgres.network }}"
           docker run -d --name permissions-api  \
                      -h permissions-api \
-                     -p "3002:3002"     \
+                     -p "3001:3001"     \
                      -e HOST=0.0.0.0    \
-                     -e PORT=3002       \
+                     -e PORT=3001       \
                      --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
@@ -145,10 +145,8 @@ jobs:
             docker logs permissions-api 
             docker inspect permissions-api
             echo "permission api not up...sleeping"
-            sleep 20
+            sleep 10
           done 
-
-#          echo "registry_in_underscore=$registry_in_underscore" >> $GITHUB_ENV
 
       - name: Restore app from cache
         uses: ./.github/actions/build
