@@ -158,7 +158,7 @@ export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly
   const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
     <Box>
-      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user} />}
+      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user as LoggedInUser} />}
       <UserSpacesList userId={user.id} />
       {readOnly && (
         <AggregatedData

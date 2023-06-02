@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
+import { useUser } from 'hooks/useUser';
 import type {
   MemberPropertyValueType,
   PropertyValueWithDetails,
@@ -38,6 +39,7 @@ export function MemberPropertiesForm({
     reset,
     getValues
   } = useForm({ mode: 'onChange' });
+  const { user } = useUser();
 
   function handleOnChange(propertyId: string, option: any) {
     const submitData = { ...getValues(), [propertyId]: option };
@@ -61,6 +63,13 @@ export function MemberPropertiesForm({
     reset(defaultValues);
   }, [!!properties]);
 
+  function getPlaceholder(type: string) {
+    if (type === 'name') {
+      return user?.username;
+    }
+    return undefined;
+  }
+
   return (
     <Box>
       <Box display='flex' flexDirection='column'>
@@ -76,6 +85,7 @@ export function MemberPropertiesForm({
                 type={property.type}
                 label={property.name}
                 options={property.options}
+                placeholder={getPlaceholder(property.type)}
                 error={errors[property.memberPropertyId] as any}
                 onCreateOption={(option) => createOption(property, option)}
                 onUpdateOption={(option) => updateOption(property, option)}
