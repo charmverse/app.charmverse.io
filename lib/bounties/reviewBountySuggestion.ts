@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
+import { includePagePermissions } from 'lib/pages/server';
 import { WrongStateError } from 'lib/utilities/errors';
 
 import { getBountyOrThrow } from './getBounty';
@@ -47,7 +47,7 @@ export async function reviewBountySuggestion({
     include: {
       applications: true,
       page: {
-        include: includePagePermissionsWithSource()
+        include: includePagePermissions()
       }
     }
   }) as Promise<BountyWithDetails>;

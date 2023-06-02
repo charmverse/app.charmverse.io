@@ -1,10 +1,10 @@
 /* eslint-disable react/no-unused-prop-types */
 import { usePluginState } from '@bangle.dev/react';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PluginKey } from 'prosemirror-state';
 import reactDOM from 'react-dom';
 
 import { InlinePalletteFloatingMenu } from 'components/common/CharmEditor/components/inlinePalette/InlinePalletteFloatingMenu';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
@@ -34,7 +34,7 @@ type MenuProps = {
   enableVoting?: boolean;
   pluginKey: PluginKey;
   inline?: boolean;
-  pagePermissions?: PagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags;
   nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
   palettePluginKey?: PluginKey;

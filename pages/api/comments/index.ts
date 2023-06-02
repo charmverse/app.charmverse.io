@@ -6,7 +6,7 @@ import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -32,15 +32,10 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
-  const permissionSet = await getPermissionsClient({
+  const permissionSet = await computeUserPagePermissions({
     resourceId: thread.pageId,
-    resourceIdType: 'page'
-  }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: thread.pageId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();

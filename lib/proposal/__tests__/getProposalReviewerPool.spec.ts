@@ -1,28 +1,30 @@
-import { ProposalNotFoundError } from '@charmverse/core/errors';
-import type { ProposalReviewerPool } from '@charmverse/core/permissions';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { ProposalReviewerPool } from '@charmverse/core';
+import { ProposalNotFoundError, generateSpaceUser } from '@charmverse/core';
 import { v4 } from 'uuid';
+
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 import { getProposalReviewerPool } from '../getProposalReviewerPool';
 
 describe('getProposalReviewerPool', () => {
   it('should return the list of all user IDs in the space and no roles', async () => {
-    const { space, user } = await testUtilsUser.generateUserAndSpace({});
+    const { space, user } = await generateUserAndSpace({});
 
-    const extraUser = await testUtilsUser.generateSpaceUser({
+    const extraUser = await generateSpaceUser({
       spaceId: space.id
     });
 
-    const role = await testUtilsMembers.generateRole({
+    const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
     });
 
-    const category = await testUtilsProposals.generateProposalCategory({
+    const category = await generateProposalCategory({
       spaceId: space.id
     });
 
-    const proposal = await testUtilsProposals.generateProposal({
+    const proposal = await generateProposal({
       categoryId: category.id,
       spaceId: space.id,
       userId: user.id

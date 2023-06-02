@@ -1,6 +1,5 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { ButtonGroup, Typography } from '@mui/material';
+import { ButtonGroup, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
@@ -9,6 +8,7 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
+import type { PageMeta } from 'lib/pages';
 
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';

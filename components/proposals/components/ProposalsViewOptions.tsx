@@ -1,4 +1,4 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';

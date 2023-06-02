@@ -1,27 +1,20 @@
 import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
+import type { PageMeta } from 'lib/pages/server';
+import { getAccessiblePages } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'space'
-    })
-  )
-  .get(getPages);
+handler.get(getPages);
 
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const spaceId = req.query.id as string;
@@ -30,7 +23,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : undefined;
   const search = typeof req.query.search === 'string' ? req.query.search : undefined;
 
-  const accessiblePages = await req.basePermissionsClient.pages.getAccessiblePages({
+  const accessiblePages = await getAccessiblePages({
     spaceId,
     userId,
     archived,
@@ -55,11 +48,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
         }) as Prisma.PageUncheckedCreateInput
       });
 
-      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
-        event: 'created',
-        pageId: createdPage.id
-      });
-
+      await setupPermissionsAfterPageCreated(createdPage.id);
       createdPages.push(createdPage);
       log.warn(`Created default first page for space ${spaceId}`, { spaceId, userId });
     }

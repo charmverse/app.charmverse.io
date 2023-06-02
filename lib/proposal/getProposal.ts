@@ -1,7 +1,8 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
+import { truncate } from 'fs/promises';
+
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { PageWithProposal } from 'lib/pages';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 /**
@@ -13,7 +14,7 @@ export async function getProposal({
   proposalId
 }: {
   proposalId: string;
-}): Promise<PageWithPermissions & PageWithProposal> {
+}): Promise<IPageWithPermissions & PageWithProposal> {
   const proposalPage = await prisma.page.findUnique({
     where: {
       proposalId

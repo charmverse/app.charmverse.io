@@ -1,5 +1,8 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
+import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
@@ -15,16 +18,37 @@ export async function computeSpacePermissions({
     return allowedOperations.empty;
   }
 
-  const { spaceRole } = await hasAccessToSpace({
+  const { error, isAdmin } = await hasAccessToSpace({
     userId,
-    spaceId: resourceId
+    spaceId: resourceId,
+    adminOnly: false,
+    disallowGuest: true
   });
 
-  if (!spaceRole) {
+  if (error) {
     // Returns all permissions as false since user is not space member
     return allowedOperations.empty;
   }
 
-  // Provide full permissions to all space members independent of admin status
-  return allowedOperations.full;
+  if (isAdmin) {
+    return allowedOperations.full;
+  }
+
+  // Rollup space permissions
+  const spacePermissions = await prisma.spacePermission.findMany({
+    where: {
+      forSpaceId: resourceId
+    }
+  });
+
+  const applicablePermissions = await filterApplicablePermissions({
+    permissions: spacePermissions,
+    resourceSpaceId: resourceId,
+    userId
+  });
+
+  applicablePermissions.forEach((permission) => {
+    allowedOperations.addPermissions(permission.operations);
+  });
+  return allowedOperations.operationFlags;
 }

@@ -1,11 +1,11 @@
-import type { PageMeta, PageWithPermissions } from '@charmverse/core/pages';
-import type { PagePermissionWithSource } from '@charmverse/core/permissions';
 import type { Page, PagePermission, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
+import type { IPageWithPermissions, PageMeta } from '../../interfaces';
 import { getPageMeta } from '../getPageMeta';
 
 let user: User;
@@ -135,21 +135,21 @@ describe('getPageMeta', () => {
       }
     });
 
-    const found = (await getPageMeta(childPage.id)) as PageWithPermissions;
+    const found = (await getPageMeta(childPage.id)) as IPageWithPermissions;
 
     expect(found).toBeDefined();
 
     expect(found.permissions).toBeInstanceOf(Array);
 
     expect(found.permissions[0]).toEqual<PagePermission>(
-      expect.objectContaining<Partial<PagePermissionWithSource>>({
+      expect.objectContaining<Partial<IPagePermissionWithSource>>({
         id: expect.stringMatching(inherited.id),
         spaceId: expect.stringMatching(space.id),
         pageId: expect.stringMatching(childPage.id)
       })
     );
 
-    expect((found.permissions[0] as any as PagePermissionWithSource).inheritedFromPermission).toBeUndefined();
+    expect((found.permissions[0] as any as IPagePermissionWithSource).inheritedFromPermission).toBeUndefined();
     expect(found.permissions[0].sourcePermission).toBeUndefined();
   });
 });

@@ -1,25 +1,24 @@
-import type { PagePermissionAssignment } from '@charmverse/core/permissions';
 import type { Role, Space } from '@charmverse/core/prisma';
-import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
+import type { IPagePermissionToCreate } from 'lib/permissions/pages';
+import { upsertPermission } from 'lib/permissions/pages';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let user: User;
+let user: LoggedInUser;
 let userCookie: string;
 let space: Space;
 let role: Role;
 
 beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({
-    isAdmin: false
-  });
+  const generated = await generateUserAndSpaceWithApiToken(undefined, false);
   user = generated.user;
   space = generated.space;
   userCookie = await loginUser(user.id);
-  role = await testUtilsMembers.generateRole({
+  role = await generateRole({
     createdBy: user.id,
     spaceId: space.id
   });
@@ -27,53 +26,59 @@ beforeAll(async () => {
 
 describe('POST /api/permissions - Add page permissions', () => {
   it('should add a permission if the user is creating a permission and has the grant_permissions operation and respond 201', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+      spaceId: space.id
     });
 
-    const permission: PagePermissionAssignment = {
+    await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'view',
-        assignee: { group: 'role', id: role.id }
-      }
+      roleId: role.id
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(201);
   });
 
   it('should add a permission if the user is creating a public permission and has the edit_isPublic operation and respond 201', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+      spaceId: space.id
     });
 
-    const permission: PagePermissionAssignment = {
-      pageId: page.id,
-      permission: {
-        permissionLevel: 'view',
-        assignee: { group: 'public' }
+    await prisma.pagePermission.create({
+      data: {
+        permissionLevel: 'full_access',
+        user: {
+          connect: {
+            id: user.id
+          }
+        },
+        page: {
+          connect: {
+            id: page.id
+          }
+        }
       }
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view',
+      pageId: page.id,
+      public: true
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(201);
   });
 
   it('should fail if the user is creating a permission without grant_permissions operation and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
@@ -95,95 +100,121 @@ describe('POST /api/permissions - Add page permissions', () => {
       }
     });
 
-    const permission: PagePermissionAssignment = {
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'view',
-        assignee: { group: 'role', id: role.id }
-      }
+      roleId: role.id
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
   it('should fail if trying to manually assign the proposal editor value and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+      spaceId: space.id
     });
 
-    const permission: PagePermissionAssignment = {
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'proposal_editor',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'proposal_editor',
-        assignee: { group: 'role', id: role.id }
-      }
+      roleId: role.id
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
   it('should allow a proposal editor to make a proposal page public and respond 201', async () => {
-    const page = await testUtilsProposals.generateProposal({
-      userId: user.id,
-      spaceId: space.id
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
     });
 
-    const permission: PagePermissionAssignment = {
+    await upsertPermission(page.id, {
+      permissionLevel: 'proposal_editor',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'view',
-        assignee: { group: 'public' }
-      }
+      public: true
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(201);
   });
 
   it('should fail if trying to provide permissions other than "view" to the public and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
       spaceId: space.id,
-      type: 'page',
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+      type: 'page'
     });
 
-    const permission: PagePermissionAssignment = {
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'full_access',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'full_access',
-        assignee: {
-          group: 'public'
-        }
-      }
+      public: true
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
   it('should fail if trying to assign permissions other than public to a proposal page and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
       spaceId: space.id,
       type: 'proposal'
     });
-    const permission: PagePermissionAssignment = {
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view_comment',
       pageId: page.id,
-      permission: {
-        permissionLevel: 'view_comment',
-        assignee: { group: 'role', id: role.id }
-      }
+      roleId: role.id
+    };
+
+    await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
+  });
+
+  it('should fail if trying to manually assign permissions to children of a proposal page and respond 401', async () => {
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'proposal'
+    });
+
+    const childPage = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      type: 'page',
+      parentId: page.id
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permission: IPagePermissionToCreate = {
+      permissionLevel: 'view_comment',
+      pageId: childPage.id,
+      roleId: role.id
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
@@ -192,23 +223,21 @@ describe('POST /api/permissions - Add page permissions', () => {
 
 describe('DELETE /api/permissions - Delete page permissions', () => {
   it('should delete a permission if the user has the grant_permissions operation and respond 200', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
+      spaceId: space.id
     });
 
-    const permissionToDelete = await prisma.pagePermission.create({
-      data: {
-        permissionLevel: 'view',
-        page: { connect: { id: page.id } },
-        role: { connect: { id: role.id } }
-      }
+    await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
+
+    const permissionToDelete = await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'view',
+      roleId: role.id
     });
 
     await request(baseUrl)
@@ -221,7 +250,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
   });
 
   it('should delete a public permission if the user has the edit_isPublic operation and respond 200', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
@@ -242,12 +271,10 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
       }
     });
 
-    const permissionToDelete = await prisma.pagePermission.create({
-      data: {
-        permissionLevel: 'view',
-        page: { connect: { id: page.id } },
-        public: true
-      }
+    const permissionToDelete = await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'view',
+      public: true
     });
 
     await request(baseUrl)
@@ -260,7 +287,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
   });
 
   it('should fail to delete a permission if the user does not have the grant_permissions operation and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
+    const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
     });
@@ -282,12 +309,10 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
       }
     });
 
-    const permissionToDelete = await prisma.pagePermission.create({
-      data: {
-        permissionLevel: 'view',
-        page: { connect: { id: page.id } },
-        role: { connect: { id: role.id } }
-      }
+    const permissionToDelete = await upsertPermission(page.id, {
+      // Can only toggle public
+      permissionLevel: 'view',
+      roleId: role.id
     });
 
     await request(baseUrl)

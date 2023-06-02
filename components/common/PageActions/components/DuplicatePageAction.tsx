@@ -1,4 +1,3 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
@@ -7,6 +6,7 @@ import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
 
@@ -21,7 +21,7 @@ export function DuplicatePageAction({
   pageType?: PageType;
   redirect?: boolean;
   onComplete?: VoidFunction;
-  pagePermissions: PagePermissionFlags | undefined;
+  pagePermissions: IPagePermissionFlags | undefined;
 }) {
   const currentSpace = useCurrentSpace();
   const router = useRouter();

@@ -1,4 +1,3 @@
-import type { AssignedPagePermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { BountyPermissionLevel } from '@charmverse/core/prisma';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
@@ -6,10 +5,12 @@ import Typography from '@mui/material/Typography';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { BountyPermissionGroup, BountyPermissions } from 'lib/bounties';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   bountyPermissions: Partial<BountyPermissions>;
-  pagePermissions: AssignedPagePermission[];
+  pagePermissions: PagePermissionMeta[];
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 
@@ -17,7 +18,7 @@ export function MissingPagePermissions({ bountyPermissions, pagePermissions, tar
   const { roles } = useRoles();
   const { members } = useMembers();
 
-  const visibleToSpace = pagePermissions.some((p) => p.assignee.group === 'space' || p.assignee.group === 'public');
+  const visibleToSpace = pagePermissions.some((p) => isTruthy(p.spaceId) || p.public === true);
 
   // Compare each existing assignee against page permissions
   const assigneesMissingPermissions = visibleToSpace
@@ -28,20 +29,16 @@ export function MissingPagePermissions({ bountyPermissions, pagePermissions, tar
           !pagePermissions.some((pp) => {
             // Make sure there are no individual user permissions, or roles through which they can see this page
             if (bountyPermissionAssignee.group === 'user') {
-              const canSeePageViaRole =
-                pp.assignee.group === 'role'
-                  ? members.some(
-                      (member) =>
-                        member.id === bountyPermissionAssignee.id &&
-                        member.roles.some((role) => role.id === (pp.assignee as TargetPermissionGroup<'role'>).id)
-                    )
-                  : false;
+              const canSeePageViaRole = pp.roleId
+                ? members.some(
+                    (member) =>
+                      member.id === bountyPermissionAssignee.id && member.roles.some((role) => role.id === pp.roleId)
+                  )
+                : false;
 
-              return (
-                (pp.assignee.group === 'user' && pp.assignee.id === bountyPermissionAssignee.id) || !!canSeePageViaRole
-              );
+              return pp.userId === bountyPermissionAssignee.id || !!canSeePageViaRole;
             } else {
-              return pp.assignee.group === 'role' && pp.assignee.id === bountyPermissionAssignee.id;
+              return pp.roleId === bountyPermissionAssignee.id;
             }
           })
       ) as BountyPermissionGroup[]);

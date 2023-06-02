@@ -3,10 +3,10 @@ import type {
   AssignedPostCategoryPermission,
   PostCategoryPermissionFlags,
   PostPermissionFlags
-} from '@charmverse/core/permissions';
+} from '@charmverse/core';
 
 import * as http from 'adapters/http';
-import type { PermissionCompute, PermissionResource } from 'lib/permissions/interfaces';
+import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 
 export class ForumPermissionsApi {
   computePostPermissions({ postIdOrPath, spaceDomain }: { postIdOrPath: string; spaceDomain?: string }) {
@@ -26,7 +26,7 @@ export class ForumPermissionsApi {
   }
 
   deletePostCategoryPermission(permissionId: string) {
-    return http.DELETE('/api/permissions/forum', { permissionId } as PermissionResource);
+    return http.DELETE('/api/permissions/forum', { permissionId } as PermissionToDelete);
   }
 
   listPostCategoryPermissions(resourceId: string) {

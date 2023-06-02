@@ -1,4 +1,4 @@
-import { AvailablePostPermissions } from '@charmverse/core/permissions/flags';
+import { AvailablePostPermissions } from '@charmverse/core/shared';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';

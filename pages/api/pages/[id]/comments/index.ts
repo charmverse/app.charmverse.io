@@ -8,29 +8,19 @@ import { createPageComment } from 'lib/pages/comments/createPageComment';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .get(listPageCommentsHandler)
-  .use(requireUser)
-  .post(createPageCommentHandler);
+handler.get(listPageCommentsHandler).use(requireUser).post(createPageCommentHandler);
 
 async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote[]>) {
   const { id: pageId } = req.query as any as { id: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await computeUserPagePermissions({
     resourceId: pageId,
     userId
   });
@@ -58,7 +48,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await computeUserPagePermissions({
     resourceId: pageId,
     userId
   });

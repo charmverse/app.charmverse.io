@@ -1,4 +1,4 @@
-import { isProposalAuthor } from '@charmverse/core/permissions';
+import { isProposalAuthor } from '@charmverse/core';
 import type { ProposalCategory, Space, User, Role } from '@charmverse/core/prisma';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';

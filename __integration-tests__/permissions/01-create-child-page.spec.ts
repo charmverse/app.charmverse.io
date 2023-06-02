@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { PagePermission, Space } from '@charmverse/core/prisma';
+import type { PagePermission, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
+import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { isTruthy } from 'lib/utilities/types';
 import type { LoggedInUser } from 'models';
@@ -38,7 +39,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -53,7 +54,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     // Only 1 default permission
     expect(childPage.parentId).toBe(rootPage.id);
@@ -75,7 +76,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -89,7 +90,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -103,7 +104,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     // Base space permission plus createdBy user full access permission
     expect(nestedChildPage.permissions.length).toBe(2);
@@ -127,7 +128,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     let childPage = (
       await request(baseUrl)
@@ -141,7 +142,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     const separateRoot = (
       await request(baseUrl)
@@ -154,7 +155,7 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     // Inject bad permissions by updating space level and created by permissions to inherit from the separate root
     for (const permission of childPage.permissions) {
@@ -194,10 +195,10 @@ describe('POST /api/pages - create child pages', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     // Refresh the child page
-    childPage = (await getPage(childPage.id)) as PageWithPermissions;
+    childPage = (await getPage(childPage.id)) as IPageWithPermissions;
 
     const sourcePermissionIds = createdPage.permissions.map((p) => p.id);
 

@@ -1,4 +1,4 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';

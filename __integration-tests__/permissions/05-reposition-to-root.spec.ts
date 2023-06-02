@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
+import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
@@ -34,7 +35,7 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
           })
         )
         .expect(201)
-    ).body as PageWithPermissions;
+    ).body as IPageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -135,7 +136,7 @@ describe('PUT /api/pages/{pageId} - reposition page to root', () => {
       getPage(childPage.id),
       getPage(nestedChildPage.id),
       getPage(superNestedChildPage.id)
-    ])) as PageWithPermissions[];
+    ])) as IPageWithPermissions[];
 
     // Base space permission plus createdBy user full access permission
     expect(childWhichBecameRoot.permissions.length).toBe(2);

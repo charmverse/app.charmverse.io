@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -38,6 +37,7 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { isValidCsvResult, addNewCards } from '../utils/databasePageOptions';
 
@@ -47,7 +47,7 @@ import type { PageActionMeta } from './DocumentPageActionList';
 type Props = {
   onComplete: VoidFunction;
   page: PageActionMeta;
-  pagePermissions?: PagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags;
 };
 
 export function DatabasePageActionList({ pagePermissions, onComplete, page }: Props) {

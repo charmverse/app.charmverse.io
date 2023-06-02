@@ -1,30 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Comment, Space } from '@charmverse/core/prisma';
-import type { User } from '@charmverse/core/prisma-client';
-import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import type { Space, Comment } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { CommentCreate } from 'lib/comments';
+import { upsertPermission } from 'lib/permissions/pages';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateCommentWithThreadAndPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
 beforeAll(async () => {
-  const first = await testUtilsUser.generateUserAndSpace({
-    isAdmin: false
-  });
+  const first = await generateUserAndSpaceWithApiToken(undefined, false);
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
   nonAdminCookie = await loginUser(nonAdminUser.id);
 
-  const second = await testUtilsUser.generateUserAndSpace();
+  const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
@@ -33,16 +32,16 @@ beforeAll(async () => {
 
 describe('POST /api/comments - create a comment', () => {
   it('should succeed if the user has a comment permission, returning the comment and author, and respond 201', async () => {
-    const { thread, page } = await testUtilsPages.generateCommentWithThreadAndPage({
+    const { thread, page } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
-      userId: nonAdminUser.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'view_comment',
-          assignee: { group: 'user', id: nonAdminUser.id }
-        }
-      ]
+      userId: nonAdminUser.id
+    });
+
+    await upsertPermission(page.id, {
+      permissionLevel: 'view_comment',
+      pageId: page.id,
+      userId: nonAdminUser.id
     });
 
     const creationContent: Omit<CommentCreate, 'userId'> = {
@@ -65,7 +64,7 @@ describe('POST /api/comments - create a comment', () => {
   });
 
   it('should fail if the user does not have a comment permission, even if they are an admin, and respond 401', async () => {
-    const { thread, page } = await testUtilsPages.generateCommentWithThreadAndPage({
+    const { thread, page } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: adminUserSpace.id,
       userId: adminUser.id

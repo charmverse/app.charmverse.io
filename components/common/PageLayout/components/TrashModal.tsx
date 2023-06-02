@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import RestoreIcon from '@mui/icons-material/Restore';
 import {
@@ -27,7 +26,7 @@ import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
-import type { PagesMap } from 'lib/pages';
+import type { PageMeta, PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import { PageIcon } from './PageIcon';

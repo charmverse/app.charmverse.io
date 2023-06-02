@@ -2,7 +2,6 @@ import type { Prisma } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 
-import type { CreatedProposal } from './createProposal';
 import { createProposal } from './createProposal';
 import { getProposal } from './getProposal';
 
@@ -12,11 +11,7 @@ export interface CreateProposalFromTemplateInput {
   templateId: string;
 }
 
-export async function createProposalFromTemplate({
-  createdBy,
-  spaceId,
-  templateId
-}: CreateProposalFromTemplateInput): Promise<CreatedProposal> {
+export async function createProposalFromTemplate({ createdBy, spaceId, templateId }: CreateProposalFromTemplateInput) {
   const proposalTemplate = await getProposal({ proposalId: templateId });
 
   if (!proposalTemplate) {

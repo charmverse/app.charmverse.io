@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { prisma } from '@charmverse/core/prisma-client';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { upsertPermission } from '../lib/permissions/pages';
 
 /**
  * Publish or unpublish all cards in a board, and the board itself
@@ -32,14 +32,9 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
   }
 
   // Publish the board
-  await premiumPermissionsApiClient.pages.upsertPagePermission({
-    pageId: boardId,
-    permission: {
-      assignee: {
-        group: 'public',
-      },
+  await upsertPermission(boardId, {
+    public: true,
     permissionLevel: 'view'
-    }
   });
 
   const cardsInBoard = await prisma.page.findMany({
@@ -56,11 +51,9 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
   let processed = 0;
 
   for (const card of cardsInBoard) {
-    await premiumPermissionsApiClient.pages.upsertPagePermission({
-      pageId: card.id, permission: {
-      assignee: {group: 'public'},
+    await upsertPermission(card.id, {
+      public: true,
       permissionLevel: 'view'
-    }
     });
     processed += 1;
     console.log(`Processed card ${processed} / ${totalCards}`);

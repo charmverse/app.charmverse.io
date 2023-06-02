@@ -1,8 +1,5 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type { WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -10,6 +7,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import type { IPageWithPermissions } from '../pages';
 import { getPagePath } from '../pages';
 
 type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
@@ -21,12 +19,6 @@ export type CreateProposalInput = {
   reviewers?: TargetPermissionGroup<'role' | 'user'>[];
   userId: string;
   spaceId: string;
-};
-
-export type CreatedProposal = {
-  page: PageWithPermissions;
-  proposal: ProposalWithUsers;
-  workspaceEvent: WorkspaceEvent;
 };
 
 export async function createProposal({ userId, spaceId, categoryId, pageProps, reviewers }: CreateProposalInput) {
@@ -97,5 +89,5 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, r
   ]);
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  return { page: page as PageWithPermissions, proposal, workspaceEvent };
+  return { page: page as IPageWithPermissions, proposal, workspaceEvent };
 }

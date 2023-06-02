@@ -3,7 +3,12 @@ import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
 import { typedKeys } from 'lib/utilities/objects';
-import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import {
+  generateBounty,
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { computeBountyPermissions } from '../computeBountyPermissions';
@@ -11,7 +16,7 @@ import { bountyPermissionMapping } from '../mapping';
 
 describe('computeBountyPermissions', () => {
   it('should combine permissions from user, role assignments and space membership', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -78,7 +83,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should give user space permissions via their role', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -125,7 +130,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should give user space permissions via their space membership', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -162,7 +167,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should always give creator permissions to the bounty creator, even if this is not explicitly assigned', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -189,7 +194,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should give user space permissions as an individual', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -226,7 +231,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should return true to all operations if user is a space admin and admin bypass was enabled, except [allowing an admin to apply to their own bounty]', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: true });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -251,7 +256,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: true });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
@@ -274,7 +279,7 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should contain all Bounty Operations as keys, with no additional or missing properties', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const bounty = await generateBounty({
       createdBy: user.id,
@@ -301,9 +306,9 @@ describe('computeBountyPermissions', () => {
   });
 
   it('should return false for all bounty operations if the the user is not a member of the space', async () => {
-    const { user, space } = await generateUserAndSpace({ isAdmin: true });
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const { user: externalUser } = await generateUserAndSpace({ isAdmin: true });
+    const { user: externalUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     // Create a permission for the non space member which computeBountyPermissions should ignore
     const bounty = await generateBounty({
@@ -331,36 +336,6 @@ describe('computeBountyPermissions', () => {
     typedKeys(BountyOperation).forEach((op) => {
       expect(computedPermissions[op]).toBe(false);
     });
-  });
-
-  it('should delegate the bounty permissions calculation to the public version if the space is a free space', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: false, paidTier: 'free' });
-    const userWithRole = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-
-    const role = await generateRole({
-      createdBy: user.id,
-      spaceId: space.id,
-      assigneeUserIds: [userWithRole.id]
-    });
-
-    const bounty = await generateBounty({
-      createdBy: user.id,
-      approveSubmitters: true,
-      spaceId: space.id,
-      status: 'open',
-      bountyPermissions: {
-        reviewer: [{ group: 'role', id: role.id }]
-      }
-    });
-
-    const userWithRolePermissions = await computeBountyPermissions({
-      allowAdminBypass: false,
-      resourceId: bounty.id,
-      userId: userWithRole.id
-    });
-
-    // Simple way to check for behaviour, as in public mode, custom role permissions are ignored
-    expect(userWithRolePermissions.review).toBe(false);
   });
 
   it('should return empty permissions if the bounty does not exist', async () => {

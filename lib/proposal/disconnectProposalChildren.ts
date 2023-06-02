@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { PageNotFoundError } from 'lib/pages/server';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 
 /**
  * Used for when a proposal has nested pages (mainly because it was a pre february 2023 proposal), or because it was a page converted to proposal
@@ -17,12 +17,7 @@ export async function disconnectProposalChildren({ pageId }: { pageId: string })
       }
     },
     select: {
-      id: true,
-      space: {
-        select: {
-          paidTier: true
-        }
-      }
+      id: true
     }
   });
 
@@ -39,18 +34,17 @@ export async function disconnectProposalChildren({ pageId }: { pageId: string })
   });
 
   for (const subPage of childPages) {
-    await prisma.page.update({
-      where: {
-        id: subPage.id
-      },
-      data: {
-        parentId: null
-      }
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.page.update({
+        where: {
+          id: subPage.id
+        },
+        data: {
+          parentId: null
+        }
+      });
 
-    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
-      event: 'repositioned',
-      pageId: subPage.id
+      await setupPermissionsAfterPageRepositioned(subPage.id, tx);
     });
   }
 }

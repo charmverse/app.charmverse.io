@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 

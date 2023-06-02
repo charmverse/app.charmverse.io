@@ -1,7 +1,6 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import { AvailableProposalCategoryPermissions } from '@charmverse/core/permissions';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core';
+import { AvailableProposalCategoryPermissions, testUtilsProposals, testUtilsUser } from '@charmverse/core';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
-import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 

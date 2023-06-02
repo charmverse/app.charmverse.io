@@ -1,5 +1,5 @@
-import type { PermissionCompute, ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
-import { AvailableProposalCategoryPermissions } from '@charmverse/core/permissions';
+import type { PermissionCompute, ProposalCategoryPermissionFlags } from '@charmverse/core';
+import { AvailableProposalCategoryPermissions } from '@charmverse/core';
 import type { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 

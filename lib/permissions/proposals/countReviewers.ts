@@ -1,4 +1,4 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers } from '@charmverse/core';
 
 // In public mode, only count reviewers who are users
 export function countReviewers({ proposal }: { proposal: ProposalWithUsers }): number {

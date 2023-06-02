@@ -1,5 +1,4 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
@@ -10,6 +9,7 @@ import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/ut
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+import type { PageMeta } from 'lib/pages/interfaces';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;

@@ -1,4 +1,3 @@
-import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
 import { v4 as uuid } from 'uuid';
@@ -7,6 +6,7 @@ import { blockToPrisma } from 'lib/focalboard/block';
 import type { PrismaBlockSortOf } from 'lib/focalboard/block';
 import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
+import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { isTruthy } from 'lib/utilities/types';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;

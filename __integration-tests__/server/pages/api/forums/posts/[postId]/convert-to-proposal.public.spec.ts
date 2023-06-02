@@ -1,4 +1,4 @@
-import { testUtilsForum, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateUserAndSpace, testUtilsForum, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -30,12 +30,12 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
   });
 
   it('should fail if the user is not a space member, and respond 401', async () => {
-    const { space, user } = await testUtilsUser.generateUserAndSpace({
+    const { space, user } = await generateUserAndSpace({
       spacePaidTier: 'free',
       isAdmin: false
     });
 
-    const { user: outsideUser } = await testUtilsUser.generateUserAndSpace();
+    const { user: outsideUser } = await generateUserAndSpace();
 
     const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,

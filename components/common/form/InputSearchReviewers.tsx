@@ -7,7 +7,6 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
@@ -19,11 +18,6 @@ type GroupedRole = ReducedRole & { group: 'role' };
 type GroupedMember = Member & { group: 'user' };
 type GroupedOption = GroupedRole | GroupedMember;
 
-/**
- * Search across users and roles
- *
- * In public mode, custom roles are hidden
- */
 export function InputSearchReviewers({
   disableCloseOnSelect = false,
   excludedIds,
@@ -36,16 +30,10 @@ export function InputSearchReviewers({
 }) {
   const { roles } = useRoles();
   const { members } = useMembers();
-  const { isPublicSpace } = useIsPublicSpace();
 
   const { data: reviewerPool } = useSWR(proposalId ? 'reviewer-pool' : null, () =>
     charmClient.proposals.getReviewerPool(proposalId as string)
   );
-
-  // For public spaces, we don't want to show reviewer roles
-  const applicableValues = isPublicSpace
-    ? (props.value as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
-    : props.value;
 
   const excludedIdsSet = new Set(excludedIds);
 
@@ -64,27 +52,17 @@ export function InputSearchReviewers({
     }, {} as Record<string, string>);
   }, [reviewerPool, excludedIds]);
 
-  let options: GroupedOption[] = [];
-  if (proposalId && isPublicSpace) {
-    options = reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : [];
-  } else if (proposalId && !isPublicSpace) {
-    options = [
-      // For proposals we only want current space members and roles that are allowed to review proposals
-      ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
-      ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id) && !excludedIdsSet.has(role.id))
-    ];
-  } else if (isPublicSpace) {
-    options = [
-      // In public space, don't allow custom roles
-      ...mappedMembers.filter((member) => !excludedIdsSet.has(member.id))
-    ];
-  } else {
-    options = [
-      // For bounties, allow any space member or role to be selected
-      ...mappedMembers.filter((member) => !excludedIdsSet.has(member.id)),
-      ...mappedRoles.filter((role) => !excludedIdsSet.has(role.id))
-    ];
-  }
+  const options: GroupedOption[] = proposalId
+    ? [
+        // For proposals we only want current space members and roles that are allowed to review proposals
+        ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
+        ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id) && !excludedIdsSet.has(role.id))
+      ]
+    : [
+        // For bounties, allow any space member or role to be selected
+        ...mappedMembers.filter((member) => !excludedIdsSet.has(member.id)),
+        ...mappedRoles.filter((role) => !excludedIdsSet.has(role.id))
+      ];
 
   const optionsRecord: Record<string, GroupedOption> = {};
 
@@ -129,8 +107,7 @@ export function InputSearchReviewers({
           <TextField
             {...params}
             size='small'
-            value={applicableValues}
-            placeholder={isPublicSpace ? 'Members' : 'Roles'}
+            placeholder='Members or Roles'
             inputProps={{
               ...params.inputProps
             }}

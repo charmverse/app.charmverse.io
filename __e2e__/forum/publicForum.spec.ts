@@ -163,8 +163,7 @@ test.describe.serial('Access public forum', () => {
 
   test('public user can open a public post from the forum home and see its content', async ({
     forumHomePage,
-    forumPostPage,
-    page
+    forumPostPage
   }) => {
     // Start the navigation steps
 
@@ -192,9 +191,6 @@ test.describe.serial('Access public forum', () => {
 
     // Check user can see the comment
     const comment = forumPostPage.getCommentLocator(publicPostComment.id);
-
-    await expect(comment).toBeVisible();
-
     const commentText = (await comment.allInnerTexts())[0];
     expect(commentText).toMatch(forumPostCommentText);
 

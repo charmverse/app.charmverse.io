@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -13,6 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import type { PageMeta } from 'lib/pages';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { Constants } from '../../constants';

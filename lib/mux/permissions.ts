@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPermissionsClient } from 'lib/permissions/api';
+import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 type VideoPermissionComputeRequest = {
@@ -39,13 +39,10 @@ export async function canCreate({ resourceId, userId, spaceId }: VideoPermission
       spaceId: post.spaceId
     });
   } else if (page) {
-    const pagePermissions = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(
-      ({ client }) =>
-        client.pages.computePagePermissions({
-          resourceId,
-          userId
-        })
-    );
+    const pagePermissions = await computeUserPagePermissions({
+      resourceId,
+      userId
+    });
 
     return pagePermissions.edit_content;
   } else {
@@ -79,13 +76,10 @@ export async function canView({ resourceId, userId }: VideoPermissionComputeRequ
       spaceId: post.spaceId
     });
   } else if (page) {
-    const pagePermissions = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(
-      ({ client }) =>
-        client.pages.computePagePermissions({
-          resourceId,
-          userId
-        })
-    );
+    const pagePermissions = await computeUserPagePermissions({
+      resourceId,
+      userId
+    });
 
     return pagePermissions.read;
   } else {

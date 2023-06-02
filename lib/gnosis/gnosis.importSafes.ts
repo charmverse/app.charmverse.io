@@ -1,4 +1,4 @@
-import type { UserGnosisSafe } from '@charmverse/core/prisma';
+import type { UserGnosisSafe } from '@charmverse/core/dist/cjs/prisma';
 import type { Signer } from 'ethers';
 
 import charmClient from 'charmClient';
