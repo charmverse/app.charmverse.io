@@ -166,15 +166,17 @@ function TableRow(props: Props) {
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
-              <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
-                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-                <TextInput {...commonProps} multiline={wrapColumn} />
-              </div>
+              <div style={{ display: 'flex' }}>
+                <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
+                  <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+                  <TextInput {...commonProps} multiline={wrapColumn} />
+                </div>
 
-              <div className='open-button'>
-                <Button onClick={() => props.showCard(props.card.id || '')}>
-                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                </Button>
+                <div className='open-button'>
+                  <Button onClick={() => props.showCard(props.card.id || '')}>
+                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                  </Button>
+                </div>
               </div>
             </Box>
           );
