@@ -10,6 +10,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
@@ -64,10 +65,8 @@ function EditIconContainer({
 }
 
 export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
-  const { data: userDetails, isLoading } = useSWRImmutable(
-    `/userDetails/${user.id}`,
-    () => charmClient.getUserDetails(),
-    { revalidateOnMount: true }
+  const { data: userDetails, isLoading } = useSWRImmutable(`/userDetails/${user.id}`, () =>
+    charmClient.getUserDetails()
   );
 
   const identityTypes = useIdentityTypes();
@@ -194,6 +193,7 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
     await mutateMembers();
     setForm({});
     showMessage('Profile updated', 'success');
+    mutate('/api/profile/details');
   }
 
   return (

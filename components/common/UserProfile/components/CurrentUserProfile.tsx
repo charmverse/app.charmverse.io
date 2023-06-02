@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -59,10 +60,11 @@ export function CurrentUserProfile({
       await updateSpaceValues(currentSpace.id, memberDetails);
     }
     mutateMembers();
+    onClose();
     setUserDetails({});
     setMemberDetails([]);
-    onClose();
     showMessage('Profile updated', 'success');
+    mutate('/api/profile/details');
   }
 
   const [currentStep, setCurrentStep] = useState<Step>(
