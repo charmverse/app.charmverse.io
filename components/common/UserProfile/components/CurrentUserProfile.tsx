@@ -8,6 +8,7 @@ import type { EditableFields } from 'components/u/components/UserDetails/UserDet
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
@@ -28,6 +29,7 @@ export function CurrentUserProfile({
   currentUser: LoggedInUser;
   isOnboarding?: boolean;
 }) {
+  const { showMessage } = useSnackbar();
   const currentSpace = useCurrentSpace();
   const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
 
@@ -60,6 +62,7 @@ export function CurrentUserProfile({
     setUserDetails({});
     setMemberDetails([]);
     onClose();
+    showMessage('Profile updated', 'success');
   }
 
   const [currentStep, setCurrentStep] = useState<Step>(

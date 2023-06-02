@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Skeleton, Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -20,6 +20,7 @@ import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -176,6 +177,7 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
 export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>) {
   const [form, setForm] = useState<EditableFields>({});
   const { mutateMembers } = useMembers();
+  const { showMessage } = useSnackbar();
   const { trigger: updateUserDetails } = useSWRMutation(
     '/api/profile/details',
     (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
@@ -191,6 +193,7 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
     await updateUserDetails(form);
     await mutateMembers();
     setForm({});
+    showMessage('Profile updated', 'success');
   }
 
   return (
