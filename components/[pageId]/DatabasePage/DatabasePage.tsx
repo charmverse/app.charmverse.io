@@ -1,5 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,6 +20,8 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PageMeta } from 'lib/pages';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 /**
@@ -33,7 +33,7 @@ interface Props {
   page: PageMeta;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
-  pagePermissions?: PagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {

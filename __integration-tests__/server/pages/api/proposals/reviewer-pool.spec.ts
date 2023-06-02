@@ -1,4 +1,4 @@
-import type { ProposalReviewerPool } from '@charmverse/core/permissions';
+import type { ProposalReviewerPool } from '@charmverse/core';
 import type { Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 

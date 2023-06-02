@@ -1,4 +1,4 @@
-import type { PostPermissionFlags } from '@charmverse/core/permissions';
+import type { PostPermissionFlags } from '@charmverse/core';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemText, ListItemButton } from '@mui/material';
 import Divider from '@mui/material/Divider';

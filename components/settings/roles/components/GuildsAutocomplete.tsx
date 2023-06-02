@@ -1,4 +1,4 @@
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@charmverse/core/shared';
 import type { GetGuildResponse } from '@guildxyz/sdk';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';

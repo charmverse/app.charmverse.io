@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

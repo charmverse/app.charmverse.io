@@ -4,35 +4,49 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
 import Button from 'components/common/Button';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BountyWithDetails } from 'lib/bounties';
+import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
+import { isBountyEditableByApplicants } from 'lib/permissions/bounties/isBountyEditableByApplicants';
+import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 
 /**
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
   bounty: BountyWithDetails;
+  bountyPermissions?: Partial<BountyPermissions>;
+  pagePermissions?: PagePermissionMeta[];
   pageId: string;
   readOnly?: boolean;
   refreshPermissions: () => void;
 }
 
-export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refreshPermissions }: Props) {
+export function BountyPropertiesHeader({
+  readOnly = false,
+  bounty,
+  bountyPermissions,
+  pagePermissions,
+  pageId,
+  refreshPermissions
+}: Props) {
+  const { members } = useMembers();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
-  const { isPublicSpace } = useIsPublicSpace();
+  // Detect if the page permissions allow potential applicants to edit the page
+  const editableByCertainApplicants = isBountyEditableByApplicants({
+    bountyPermissions: bountyPermissions ?? {},
+    pagePermissions: pagePermissions ?? [],
+    members,
+    bounty
+  });
 
-  const { data: editableCheck } = useSWR(!isPublicSpace ? `bounty-editable-${bounty.id}` : null, () =>
-    charmClient.bounties.isBountyEditable(bounty.id)
-  );
   function restrictPermissions() {
     setUpdatingPermissions(true);
     charmClient
@@ -71,7 +85,7 @@ export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refre
       </Grid>
 
       {/* Warning for applicants */}
-      {!!editableCheck?.editable && !isPublicSpace && !readOnly && (
+      {editableByCertainApplicants && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}

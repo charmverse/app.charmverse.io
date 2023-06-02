@@ -1,5 +1,5 @@
-import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
-import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
+import { AvailablePostCategoryPermissions } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
@@ -25,7 +25,7 @@ export async function computePostCategoryPermissions({
     throw new PostCategoryNotFoundError(`${resourceId}`);
   }
 
-  const { spaceRole } = await hasAccessToSpace({
+  const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: postCategory.spaceId,
     userId,
     disallowGuest: true
@@ -33,10 +33,14 @@ export async function computePostCategoryPermissions({
 
   const permissions = new AvailablePostCategoryPermissions();
 
-  // Space members can create and edit post categories, people outside the space cannot perform any actions
-  if (spaceRole) {
-    permissions.addPermissions(['create_post', 'edit_category', 'delete_category']);
+  if (isAdmin) {
+    return permissions.full;
+
+    // Requester is not a space member
+  } else if (spaceRole) {
+    permissions.addPermissions(['create_post']);
   }
 
+  // Space members can post, people outside the space cannot perform any actions
   return permissions.operationFlags;
 }

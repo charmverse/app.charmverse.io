@@ -1,11 +1,12 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+
+import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 
 export type CharmNodeViewProps = {
   pageId?: string;
   postId?: string;
   snapshotProposalId?: string | null;
   readOnly: boolean;
-  pagePermissions?: PagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags;
   deleteNode: () => void;
 } & NodeViewProps;

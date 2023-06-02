@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
+import { includePagePermissions } from 'lib/pages/server';
 
 import { countValueOccurrences } from '../utilities/numbers';
 
@@ -29,7 +29,7 @@ export async function rollupBountyStatus(bountyId: string): Promise<BountyWithDe
       include: {
         applications: true,
         page: {
-          include: includePagePermissionsWithSource()
+          include: includePagePermissions()
         }
       }
     }) as Promise<BountyWithDetails>;

@@ -1,8 +1,3 @@
-import type {
-  AssignedPagePermission,
-  PagePermissionAssignment,
-  TargetPermissionGroup
-} from '@charmverse/core/permissions';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
@@ -18,8 +13,13 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Loader from 'components/common/Loader';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ApplicablePagePermissionLevel } from 'lib/permissions/pages/labels';
-import { pagePermissionLevels } from 'lib/permissions/pages/labels';
+import type {
+  IPagePermissionToCreate,
+  IPagePermissionWithAssignee,
+  PagePermissionLevelType
+} from 'lib/permissions/pages/page-permission-interfaces';
+import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 export const schema = yup.object({
@@ -28,14 +28,11 @@ export const schema = yup.object({
   permissionLevel: yup.string()
 });
 
-type FormValues = yup.InferType<typeof schema> & {
-  type: 'role' | 'user';
-  permissionLevel: ApplicablePagePermissionLevel;
-};
+type FormValues = yup.InferType<typeof schema> & { type: 'role' | 'user'; permissionLevel: PagePermissionLevelType };
 
 interface Props {
   pageId: string;
-  existingPermissions: AssignedPagePermission[];
+  existingPermissions: IPagePermissionWithAssignee[];
   permissionsAdded?: () => any;
 }
 
@@ -49,7 +46,7 @@ export default function AddPagePermissionsForm({
   const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
   const { showMessage } = useSnackbar();
 
-  const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<ApplicablePagePermissionLevel>('full_access');
+  const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<PagePermissionLevelType>('full_access');
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
@@ -63,44 +60,36 @@ export default function AddPagePermissionsForm({
   }, [roles]);
 
   const userIdsToHide = existingPermissions
-    .filter((permission) => permission.assignee.group === 'user')
     .map((permission) => {
-      return (permission.assignee as TargetPermissionGroup<'user'>).id;
-    });
+      return permission.userId;
+    })
+    .filter(isTruthy);
 
   const roleIdsToHide = existingPermissions
-    .filter((permission) => permission.assignee.group === 'role')
-    .map((permission) => {
-      return (permission.assignee as TargetPermissionGroup<'role'>).id;
-    });
+    .filter((permission) => {
+      return permission.role;
+    })
+    .map((permission) => permission.role!.id);
 
   const { handleSubmit } = useForm<FormValues>();
 
   async function createUserPermissions() {
-    const permissionsToCreate: PagePermissionAssignment[] = [
+    const permissionsToCreate: IPagePermissionToCreate[] = [
       ...selectedUserIds.map((userId) => {
         return {
           pageId,
-          permission: {
-            permissionLevel: permissionLevelToAssign!,
-            assignee: {
-              group: 'user',
-              id: userId
-            }
-          }
-        } as PagePermissionAssignment;
+          userId,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          permissionLevel: permissionLevelToAssign!
+        };
       }),
       ...selectedRoleIds.map((roleId) => {
         return {
           pageId,
-          permission: {
-            permissionLevel: permissionLevelToAssign!,
-            assignee: {
-              group: 'role',
-              id: roleId
-            }
-          }
-        } as PagePermissionAssignment;
+          roleId,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          permissionLevel: permissionLevelToAssign!
+        };
       })
     ];
 
@@ -111,7 +100,7 @@ export default function AddPagePermissionsForm({
     }: {
       currentIndex?: number;
       total: number;
-      permissions: PagePermissionAssignment[];
+      permissions: IPagePermissionToCreate[];
     }): Promise<true> {
       if (permissions.length === 0) {
         setPermissionBeingAdded(null);
@@ -146,6 +135,7 @@ export default function AddPagePermissionsForm({
   }
 
   // eslint-disable-next-line camelcase
+  const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels;
 
   return (
     <div>
@@ -154,10 +144,8 @@ export default function AddPagePermissionsForm({
           <Grid container item direction='row' justifyContent='space-between' alignItems='center'>
             <Grid item xs={8}>
               <InputEnumToOptions
-                onChange={(newAccessLevel) =>
-                  setPermissionLevelToAssign(newAccessLevel as ApplicablePagePermissionLevel)
-                }
-                keyAndLabel={pagePermissionLevels}
+                onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
+                keyAndLabel={permissionsWithoutCustom}
                 defaultValue={permissionLevelToAssign}
               />
             </Grid>

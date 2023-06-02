@@ -1,4 +1,4 @@
-import { stringUtils } from "@charmverse/core/utilities";
+import { stringUtils } from "@charmverse/core";
 import { Space, prisma } from "@charmverse/core/prisma-client";
 import * as readline from "node:readline";
 

@@ -4,6 +4,7 @@ import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
+import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
@@ -120,12 +121,9 @@ test.describe.serial('Make a page public and visit it', async () => {
       }
     });
 
-    await prisma.pagePermission.create({
-      data: {
-        page: { connect: { id: createdPage.id } },
-        permissionLevel: 'view',
-        public: true
-      }
+    await upsertPermission(createdPage.id, {
+      permissionLevel: 'view',
+      public: true
     });
 
     const domain = space.domain;

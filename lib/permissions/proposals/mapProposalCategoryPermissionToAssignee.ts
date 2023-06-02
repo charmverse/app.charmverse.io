@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core';
 import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 
 import { getPermissionAssignee } from '../utils';

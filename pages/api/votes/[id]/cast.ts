@@ -5,7 +5,9 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { castVote as castVoteService } from 'lib/votes';
@@ -15,13 +17,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'vote'
-    })
-  )
   .use(requireKeys(['choice'], 'body'))
   .post(castVote);
 
@@ -54,7 +49,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new InvalidInputError(`Proposal not found`);
     }
 
-    const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+    const permissions = await computeProposalPermissions({
       resourceId: pageData.proposalId,
       userId
     });
@@ -62,7 +57,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this proposal.`);
     }
   } else if (vote.pageId) {
-    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    const permissions = await computeUserPagePermissions({
       resourceId: vote.pageId,
       userId
     });
@@ -70,10 +65,15 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this page.`);
     }
   } else if (vote.postId) {
-    const postPermissions = await req.basePermissionsClient.forum.computePostPermissions({
-      resourceId: vote.postId as string,
-      userId
-    });
+    const postPermissions = await getPermissionsClient({
+      resourceId: vote.postId,
+      resourceIdType: 'post'
+    }).then(({ client }) =>
+      client.forum.computePostPermissions({
+        resourceId: vote.postId as string,
+        userId
+      })
+    );
 
     if (!postPermissions.edit_post) {
       throw new ActionNotPermittedError('You do not have permissions to cast a vote on this post.');

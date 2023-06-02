@@ -1,10 +1,8 @@
 /* eslint-disable camelcase */
-import type { PageNode, TargetPageTree } from '@charmverse/core/pages';
-
 import { generatePageNode } from 'testing/generateStubs';
 
 import { findParentOfType } from '../findParentOfType';
-import type { PagesMap } from '../interfaces';
+import type { PageNode, PagesMap, TargetPageTree } from '../interfaces';
 
 const root_1 = generatePageNode({
   parentId: null,

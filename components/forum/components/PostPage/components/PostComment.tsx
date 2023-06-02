@@ -1,4 +1,4 @@
-import type { PostPermissionFlags } from '@charmverse/core/permissions';
+import type { PostPermissionFlags } from '@charmverse/core';
 import type { Post } from '@charmverse/core/prisma';
 import type { KeyedMutator } from 'swr';
 

@@ -1,8 +1,5 @@
-import type {
-  AssignableProposalCategoryPermissionGroups,
-  AssignedProposalCategoryPermission
-} from '@charmverse/core/permissions';
-import { proposalCategoryPermissionGroups } from '@charmverse/core/permissions';
+import type { AssignableProposalCategoryPermissionGroups, AssignedProposalCategoryPermission } from '@charmverse/core';
+import { proposalCategoryPermissionGroups } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
 import { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';

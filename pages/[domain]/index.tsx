@@ -1,4 +1,3 @@
-import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -9,6 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import { sortNodes } from 'lib/pages/mapPageTree';
 import { getSubdomainPath } from 'lib/utilities/browser';
 
 // Redirect users to an initial page
@@ -43,7 +43,7 @@ export default function RedirectToMainPage() {
         // Remove any child pages (eg. that have a parentId)
         .filter((page) => !page?.parentId);
 
-      const sortedPages = pageTree.sortNodes(topLevelPages);
+      const sortedPages = sortNodes(topLevelPages);
 
       const firstPage = sortedPages[0] as Page;
 

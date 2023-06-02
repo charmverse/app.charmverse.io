@@ -1,11 +1,10 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
-import type { PageWithContent } from 'lib/pages/interfaces';
+import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];

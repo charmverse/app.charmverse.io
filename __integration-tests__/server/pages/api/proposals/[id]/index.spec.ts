@@ -1,6 +1,6 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateSpaceUser, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -203,7 +203,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const userWithRole = await testUtilsUser.generateSpaceUser({
+    const userWithRole = await generateSpaceUser({
       spaceId: adminSpace.id
     });
 

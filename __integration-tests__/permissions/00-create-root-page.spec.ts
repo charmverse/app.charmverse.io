@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
+import type { IPageWithPermissions } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -30,7 +31,7 @@ describe('POST /api/pages - create root page', () => {
 
     const response = await request(baseUrl).post('/api/pages').set('Cookie', cookie).send(pageToCreate).expect(201);
 
-    const createdPage = response.body as PageWithPermissions;
+    const createdPage = response.body as IPageWithPermissions;
 
     // Base space permission plus createdBy user full access permission
     expect(createdPage.permissions.length).toBe(2);

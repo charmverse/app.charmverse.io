@@ -1,4 +1,4 @@
-import type { BaseForumPermissionsClient } from '@charmverse/core/permissions';
+import type { BaseForumPermissionsClient } from '@charmverse/core';
 
 import { computePostCategoryPermissions } from './computePostCategoryPermissions';
 import { computePostPermissions } from './computePostPermissions';

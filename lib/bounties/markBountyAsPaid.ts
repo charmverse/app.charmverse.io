@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
+import { includePagePermissions } from 'lib/pages/server';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { paidBountyStatuses } from './constants';
@@ -37,7 +37,7 @@ export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDeta
     include: {
       applications: true,
       page: {
-        include: includePagePermissionsWithSource()
+        include: includePagePermissions()
       }
     }
   }) as Promise<BountyWithDetails>;

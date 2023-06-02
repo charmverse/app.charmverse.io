@@ -1,5 +1,5 @@
-import { ProposalNotFoundError } from '@charmverse/core/errors';
-import type { ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
+import type { ProposalReviewerPool, Resource } from '@charmverse/core';
+import { ProposalNotFoundError } from '@charmverse/core';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getProposalReviewerPool({ resourceId }: Resource): Promise<ProposalReviewerPool> {

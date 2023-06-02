@@ -1,4 +1,4 @@
-import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';

@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';

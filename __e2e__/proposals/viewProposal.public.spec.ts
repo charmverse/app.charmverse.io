@@ -1,5 +1,5 @@
+import { testUtilsProposals } from '@charmverse/core';
 import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma';
-import { testUtilsProposals } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
