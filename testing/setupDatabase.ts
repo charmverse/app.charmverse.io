@@ -1,5 +1,6 @@
 import crypto, { randomUUID } from 'node:crypto';
 
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApplicationStatus,
   Block,
@@ -27,7 +28,7 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import type { PageWithProposal } from 'lib/pages';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
@@ -617,7 +618,7 @@ export async function generateRoleWithSpaceRole({
 export function createPage(
   options: Partial<Page> &
     Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
-): Promise<IPageWithPermissions> {
+): Promise<PageWithPermissions> {
   return createPageDb({
     data: {
       id: options.id ?? v4(),
@@ -655,7 +656,7 @@ export function createPage(
         }
       }
     }
-  }) as Promise<IPageWithPermissions>;
+  }) as Promise<PageWithPermissions>;
 }
 
 export async function createVote({

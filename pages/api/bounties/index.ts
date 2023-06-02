@@ -3,12 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BountyCreationData, BountyWithDetails } from 'lib/bounties';
-import { createBounty, listAvailableBounties } from 'lib/bounties';
+import { createBounty } from 'lib/bounties';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -16,7 +16,24 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getBounties).use(requireUser).post(createBountyController);
+handler
+  .get(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'query',
+      resourceIdType: 'space'
+    }),
+    getBounties
+  )
+  .use(requireUser)
+  .post(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'body',
+      resourceIdType: 'space'
+    }),
+    createBountyController
+  );
 
 async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
@@ -26,7 +43,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) 
   // Session may be undefined as non-logged in users can access this endpoint
   const userId = req.session?.user?.id;
 
-  const bounties = await listAvailableBounties({
+  const bounties = await req.basePermissionsClient.spaces.listAvailableBounties({
     spaceId: spaceId as string,
     userId: publicResourcesOnly ? undefined : userId
   });
@@ -50,7 +67,7 @@ async function createBountyController(req: NextApiRequest, res: NextApiResponse<
       throw error;
     }
   } else {
-    const userPermissions = await computeSpacePermissions({
+    const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
       resourceId: spaceId as string,
       userId
     });
