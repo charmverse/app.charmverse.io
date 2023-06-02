@@ -206,7 +206,7 @@ export class DocumentEventHandler {
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.warn('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
+      log.warn('Ignore message from closed document', { message, pageId: session.documentId, userId: session.user.id });
       return;
     }
 
