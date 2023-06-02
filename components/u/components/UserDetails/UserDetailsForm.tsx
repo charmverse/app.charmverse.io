@@ -76,7 +76,7 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
-  const { updateProfileAvatar, isSxaving: isSavingAvatar } = useUpdateProfileAvatar();
+  const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
   const { saveUser } = useUserDetails();
 
   const onLinkCopy = () => {
