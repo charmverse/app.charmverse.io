@@ -34,8 +34,8 @@ export class Merge {
     if (this.mod.editor.docInfo.version < data.doc.v && sendableSteps(this.mod.editor.view.state)) {
       log.debug('Update document with server changes', {
         messages: data.m?.length,
-        version: data.doc.v,
-        clientVersion: this.mod.editor.docInfo.version
+        serverPageVersion: data.doc.v,
+        clientPageVersion: this.mod.editor.docInfo.version
       });
       this.mod.doc.receiving = true;
       const confirmedState = EditorState.create({ doc: this.mod.editor.docInfo.confirmedDoc || undefined });
