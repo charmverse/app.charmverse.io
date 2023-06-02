@@ -79,7 +79,7 @@ export function CurrentUserProfile({
         ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
         .map((mpv) => mpv.properties)
         .flat(),
-    [currentSpace?.id]
+    [memberPropertyValues, currentSpace?.id]
   );
 
   // dont show a modal until the space is loaded at least
