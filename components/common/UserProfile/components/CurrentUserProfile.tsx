@@ -67,7 +67,7 @@ export function CurrentUserProfile({
     setUserDetails({});
     setMemberDetails([]);
     showMessage('Profile updated', 'success');
-    mutate('/api/profile/details');
+    mutate('/current-user-details');
   }
 
   const [currentStep, setCurrentStep] = useState<Step>(

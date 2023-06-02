@@ -66,9 +66,7 @@ function EditIconContainer({
 }
 
 export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
-  const { data: userDetails, isLoading } = useSWRImmutable(`/userDetails/${user.id}`, () =>
-    charmClient.getUserDetails()
-  );
+  const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const identityTypes = useIdentityTypes();
 
@@ -195,7 +193,7 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
     await mutateMembers();
     setForm({});
     showMessage('Profile updated', 'success');
-    mutate('/api/profile/details');
+    mutate('/current-user-details');
   }
 
   return (
