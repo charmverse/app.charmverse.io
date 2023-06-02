@@ -1,3 +1,4 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';
@@ -14,7 +15,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card } from 'lib/focalboard/card';
 
-import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
 export type NewPageInput = Partial<Page> & {
@@ -26,7 +26,7 @@ interface AddPageResponse {
   board: Board | null;
   view: BoardView | null;
   cards: Card[];
-  page: IPageWithPermissions;
+  page: PageWithPermissions;
 }
 
 export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Promise<AddPageResponse> {

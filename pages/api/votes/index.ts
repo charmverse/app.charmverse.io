@@ -7,7 +7,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
@@ -29,10 +28,15 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   const userId = req.session?.user?.id;
 
   if (pageId) {
-    const computed = await computeUserPagePermissions({
+    const computed = await getPermissionsClient({
       resourceId: pageId,
-      userId
-    });
+      resourceIdType: 'page'
+    }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      })
+    );
 
     if (computed.read !== true) {
       throw new UnauthorisedActionError('You do not have access to the page');
@@ -112,10 +116,15 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       );
     }
   } else if (pageId) {
-    const userPagePermissions = await computeUserPagePermissions({
+    const userPagePermissions = await getPermissionsClient({
       resourceId: pageId,
-      userId
-    });
+      resourceIdType: 'page'
+    }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      })
+    );
 
     if (!userPagePermissions.create_poll) {
       throw new UnauthorisedActionError('You do not have permissions to create a vote.');

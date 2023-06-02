@@ -1,4 +1,4 @@
-import { SubscriptionRequiredError } from '@charmverse/core';
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

@@ -1,4 +1,4 @@
-import type { BaseProposalPermissionsClient, ProposalReviewerPool, Resource } from '@charmverse/core';
+import type { BaseProposalPermissionsClient, ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
 
 import { getProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 

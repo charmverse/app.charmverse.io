@@ -1,11 +1,10 @@
-import { generateUserAndSpace, testUtilsMembers, testUtilsUser } from '@charmverse/core';
 import type { Page, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 let space: Space;
 let adminUser: User;
@@ -28,7 +27,7 @@ beforeAll(async () => {
 
 describe('POST /api/proposals/from-template - Instantiate a proposal template - public space', () => {
   it('should copy a proposal from a template and respond with 201', async () => {
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
     const proposalTemplate = await createProposalTemplate({
@@ -70,11 +69,11 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template - 
   });
 
   it('should fail to create a proposal from a template if the user is not a space member and respond with 401', async () => {
-    const { user: outsideUser } = await generateUserAndSpace({
+    const { user: outsideUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
 
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
