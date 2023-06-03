@@ -16,6 +16,8 @@ export type StripeSubscriptionresponse = {
   productId: string;
   customerId: string;
   paymentIntentId?: string;
+  clientSecret: string | null;
+  paymentIntentStatus: Stripe.PaymentIntent.Status | null;
 };
 
 export async function createStripeSubscription({
@@ -29,7 +31,7 @@ export async function createStripeSubscription({
   coupon = ''
 }: {
   spaceId: string;
-} & CreateCryptoSubscriptionRequest): Promise<StripeSubscriptionresponse | null> {
+} & CreateCryptoSubscriptionRequest): Promise<StripeSubscriptionresponse> {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
@@ -70,6 +72,10 @@ export async function createStripeSubscription({
 
   if (existingCustomer && !existingCustomer?.deleted) {
     await stripeClient.customers.update(existingCustomer.id, {
+      ...(paymentMethodId && {
+        payment_method: paymentMethodId,
+        invoice_settings: { default_payment_method: paymentMethodId }
+      }),
       metadata: {
         spaceId: space.id
       },
@@ -200,6 +206,8 @@ export async function createStripeSubscription({
     productId,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent?.id
+    paymentIntentId: paymentIntent?.id,
+    paymentIntentStatus: paymentIntent?.status ?? null,
+    clientSecret: paymentIntent?.client_secret ?? null
   };
 }

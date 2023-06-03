@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
-import { Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
+import { Chip, Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
 import { capitalize } from 'lodash';
@@ -102,6 +102,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
                   </Typography>
                 </Stack>
               </Stack>
+            )}
+            {spaceSubscription?.status && (
+              <Typography>
+                Subscription status: <Chip size='small' color='teal' label={spaceSubscription.status} />
+              </Typography>
             )}
             <Divider sx={{ mb: 1 }} />
             {showCheckoutForm ? (

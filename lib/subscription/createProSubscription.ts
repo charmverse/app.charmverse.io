@@ -58,8 +58,12 @@ export async function createProSubscription({
     throw new NotFoundError('Space not found');
   }
 
-  if (activeSpaceSubscription) {
-    throw new InvalidStateError('Space already has a subscription');
+  if (activeSpaceSubscription?.status === 'active') {
+    throw new InvalidStateError('Space already has an active subscription');
+  } else if (activeSpaceSubscription?.status === 'pending') {
+    throw new InvalidStateError(
+      'Space already has a pending subscription. Please wait for the payment to be processed.'
+    );
   }
 
   // Find an existing customer, otherwise create it

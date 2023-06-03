@@ -4,11 +4,9 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type {
-  CreateProSubscriptionRequest,
-  CreateProSubscriptionResponse
-} from 'lib/subscription/createProSubscription';
-import { createProSubscription } from 'lib/subscription/createProSubscription';
+import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/createCryptoSubscription';
+import type { CreateProSubscriptionResponse } from 'lib/subscription/createProSubscription';
+import { createStripeSubscription } from 'lib/subscription/createStripeSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
@@ -38,16 +36,19 @@ async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiR
 
 async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
   const { id: spaceId } = req.query as { id: string };
-  const { period, productId, paymentMethodId, billingEmail } = req.body as CreateProSubscriptionRequest;
+  const { period, productId, paymentMethodId, billingEmail, name, address, coupon } =
+    req.body as CreateCryptoSubscriptionRequest;
 
   const userId = req.session.user.id;
-  const { clientSecret, paymentIntentStatus } = await createProSubscription({
-    userId,
+  const { clientSecret, paymentIntentStatus } = await createStripeSubscription({
     paymentMethodId,
     spaceId,
     period,
     productId,
-    billingEmail
+    billingEmail,
+    name,
+    address,
+    coupon
   });
 
   trackUserAction('checkout_subscription', {
