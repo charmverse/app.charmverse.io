@@ -24,7 +24,10 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError('You cannot create new proposals');
   }
 
-  const proposalPage = await createProposal(req.body);
+  const proposalPage = await createProposal({
+    ...req.body,
+    userId: req.session.user.id
+  });
 
   return res.status(201).json({
     ...proposalPage.page,

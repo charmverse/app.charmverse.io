@@ -14,7 +14,7 @@ import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  createProposal(input: CreateProposalInput) {
+  createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 

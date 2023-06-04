@@ -1,8 +1,7 @@
-import type { Proposal, ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
@@ -13,20 +12,16 @@ import { useTasks } from 'components/nexus/hooks/useTasks';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
-import ProposalTemplateInput from 'components/proposals/components/ProposalTemplateInput';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
@@ -61,22 +56,10 @@ export function ProposalProperties({
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-  const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
-
   const { getMemberById, members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
-  const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
-  const { data: proposals = [] } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
-  );
-  const proposalsRecord = proposals.reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, Proposal>);
 
   const prevStatusRef = useRef(proposal?.status || '');
   const [detailsExpanded, setDetailsExpanded] = useState(() => proposal?.status === 'draft');
@@ -86,16 +69,8 @@ export function ProposalProperties({
   const proposalAuthors = proposal?.authors ?? [];
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
-  const [selectedProposalTemplate, setSelectedProposalTemplate] = useState<null | PageMeta>(null);
   const proposalReviewer = getMemberById(proposalReviewerId);
-  const proposalPage = pages[pageId];
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
-
-  useEffect(() => {
-    if (pages) {
-      setProposalTemplates(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
-    }
-  }, [pages, proposals]);
 
   useEffect(() => {
     if (!prevStatusRef.current && proposal?.status === 'draft') {
@@ -248,44 +223,12 @@ export function ProposalProperties({
               <ProposalCategoryInput
                 disabled={!proposalPermissions?.edit}
                 options={categories || []}
-                canEditCategories={!proposalPermissions?.edit}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
               />
             </Box>
           </Box>
         </Box>
-
-        {!proposalPage?.type.match('template') && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <div className='octo-propertyname octo-propertyname--readonly'>
-                <Button>Template</Button>
-              </div>
-              <Box display='flex' flex={1}>
-                <ProposalTemplateInput
-                  disabled={!proposalPermissions?.edit}
-                  options={
-                    proposalTemplates.filter((proposalTemplate) => {
-                      if (!proposalTemplate.proposalId) {
-                        return false;
-                      }
-
-                      const _proposal = proposalsRecord[proposalTemplate.proposalId];
-                      if (!_proposal) {
-                        return false;
-                      }
-
-                      return _proposal.categoryId === proposalCategory?.id;
-                    }) || []
-                  }
-                  value={selectedProposalTemplate ?? null}
-                  onChange={setSelectedProposalTemplate}
-                />
-              </Box>
-            </Box>
-          </Box>
-        )}
 
         <Box justifyContent='space-between' gap={2} alignItems='center'>
           <div

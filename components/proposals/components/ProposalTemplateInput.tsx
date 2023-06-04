@@ -28,7 +28,7 @@ export default function ProposalTemplateInput({ disabled, options, value, onChan
       autoHighlight
       clearIcon={null}
       renderOption={(_props, page) => (
-        <MenuItem>
+        <MenuItem {..._props}>
           <ListItemIcon>
             <DescriptionOutlinedIcon />
           </ListItemIcon>
@@ -48,8 +48,8 @@ export default function ProposalTemplateInput({ disabled, options, value, onChan
       isOptionEqualToValue={(templatePage, checkValue) => {
         return templatePage.id === checkValue.id;
       }}
-      onChange={(_, values) => {
-        onChange(values);
+      onChange={(_, _value) => {
+        onChange(_value);
       }}
     />
   );
