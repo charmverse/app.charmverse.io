@@ -15,6 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePagePermissions);
 
+//
 async function computePagePermissions(req: NextApiRequest, res: NextApiResponse<PagePermissionFlags>) {
   const input = req.body as PermissionCompute;
 
