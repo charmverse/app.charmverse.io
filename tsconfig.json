@@ -36,6 +36,9 @@
       "config/*": [
         "./config/*"
       ],
+      "scripts/*": [
+        "./scripts/*",
+      ],
       "lib/*": [
         "./lib/*",
       ],
