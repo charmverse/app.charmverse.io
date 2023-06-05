@@ -1,4 +1,5 @@
 docker-compose.yml
 .ebextensions
 .platform
+.ebstalk.apps.env
 Dockerfile

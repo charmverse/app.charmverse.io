@@ -92,8 +92,9 @@ export async function getSpaceMembers({
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap),
-          roles
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
+          roles,
+          isBot: userData.isBot ?? undefined
         };
       })
       // filter out deleted members

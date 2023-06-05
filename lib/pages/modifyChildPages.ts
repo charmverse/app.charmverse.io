@@ -1,7 +1,6 @@
+import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { resolvePageTree } from './server';
 
 export type ChildModificationAction = 'delete' | 'restore' | 'archive';
 

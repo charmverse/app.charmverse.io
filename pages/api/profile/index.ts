@@ -11,6 +11,7 @@ import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
+import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
@@ -63,6 +64,9 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
     req.session.anonymousUserId = v4();
     await req.session.save();
   }
+
+  await removeOldCookieFromResponse(req, res, false);
+
   return res.status(404).json({ error: 'No user found' });
 }
 
@@ -82,6 +86,7 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
   }
 
   res.setHeader('Cache-Control', 'no-store');
+  await removeOldCookieFromResponse(req, res, true);
 
   return res.status(200).json(profile);
 }

@@ -91,7 +91,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3.micro'
+        value: 't3.small'
       },
       {
         // ALB health check

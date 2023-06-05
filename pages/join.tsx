@@ -2,7 +2,7 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -13,6 +13,8 @@ import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useSpaces } from 'hooks/useSpaces';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
   const { spaces } = useSpaces();
@@ -20,7 +22,7 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
-        <Button variant='text' href={`/${spaces[0]?.domain}`} endIcon={<NavigateNextIcon />}>
+        <Button variant='text' href={getSpaceUrl(spaces[0]?.domain)} endIcon={<NavigateNextIcon />}>
           Go to my space
         </Button>
       )}
@@ -35,6 +37,7 @@ export default function JoinWorkspace() {
   const router = useRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
+  const [isRouterReady, setRouterReady] = useState(false);
   const {
     data: spaceFromPath,
     isLoading: isSpaceLoading,
@@ -42,11 +45,18 @@ export default function JoinWorkspace() {
   } = useSWR(domain ? `space/${domain}` : null, () => charmClient.spaces.searchByDomain(stripUrlParts(domain || '')));
 
   useEffect(() => {
-    const connectedSpace = spaces.find((_space) => _space.domain === router.query.domain);
+    const connectedSpace = filterSpaceByDomain(spaces, domain);
     if (connectedSpace) {
       router.push(`/${connectedSpace.domain}`);
     }
   }, [spaces]);
+
+  useEffect(() => {
+    // isReady should only be used conditionally inside a useEffect()
+    if (router.isReady) {
+      setRouterReady(true);
+    }
+  }, [router.isReady]);
 
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
@@ -58,7 +68,7 @@ export default function JoinWorkspace() {
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
-        {router.isReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
+        {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href='/createSpace'>Create a space</AlternateRouteButton>
     </Box>

@@ -1,7 +1,7 @@
-name: 'Install dependencies'
+name: "Install dependencies"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: actions/checkout@v3
 
@@ -9,7 +9,6 @@ runs:
       with:
         node-version: 18
 
-    
     - name: Create .env.test.local file
       shell: bash
       run: cp .env.test.local.example .env.test.local
@@ -26,3 +25,10 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    # Include this step to deploy and test a different branch of core
+    # 1. Set the webapp branch
+    # 2. Set core branch
+    # - name: Install special core library
+    #   shell: bash
+    #   if: github.head_ref == 'feat/discourse-import'
+    #   run: npm install github:charmverse/core#feat/discourse-import

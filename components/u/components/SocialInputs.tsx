@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { ChangeEvent } from 'react';
-import { useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -55,11 +55,13 @@ const initialSocials: Social = {
   linkedinURL: ''
 };
 
-function SocialInputs(props: SocialInputsProps) {
+export function SocialInputs(props: SocialInputsProps) {
   const { social = initialSocials, save, readOnly } = props;
+
   const {
     register,
     trigger,
+    reset,
     setValue,
     formState: { errors }
   } = useForm<FormValues>({
@@ -84,6 +86,10 @@ function SocialInputs(props: SocialInputsProps) {
     }, 300),
     [readOnly, social]
   );
+
+  useEffect(() => {
+    reset(social);
+  }, [social]);
 
   return (
     <>
@@ -138,5 +144,3 @@ function SocialInputs(props: SocialInputsProps) {
     </>
   );
 }
-
-export default SocialInputs;

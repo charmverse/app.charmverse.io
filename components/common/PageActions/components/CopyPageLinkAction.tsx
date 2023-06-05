@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 export function CopyPageLinkAction({ path, onComplete }: { path: string; onComplete?: VoidFunction }) {
   const { showMessage } = useSnackbar();
@@ -15,7 +16,7 @@ export function CopyPageLinkAction({ path, onComplete }: { path: string; onCompl
   }
 
   return (
-    <CopyToClipboard text={getAbsolutePath(router.query.domain as string | undefined, path)} onCopy={onClick}>
+    <CopyToClipboard text={getAbsolutePath(path, router.query.domain as string | undefined)} onCopy={onClick}>
       <MenuItem dense>
         <ListItemIcon>
           <LinkIcon fontSize='small' />
@@ -24,12 +25,4 @@ export function CopyPageLinkAction({ path, onComplete }: { path: string; onCompl
       </MenuItem>
     </CopyToClipboard>
   );
-}
-
-function getAbsolutePath(subdomain: string | undefined, path: string) {
-  const absolutePath = subdomain ? `/${subdomain}${path}` : path;
-  if (typeof window !== 'undefined') {
-    return window.location.origin + absolutePath;
-  }
-  return absolutePath;
 }

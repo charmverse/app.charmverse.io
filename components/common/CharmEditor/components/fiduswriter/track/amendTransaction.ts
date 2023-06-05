@@ -161,7 +161,6 @@ function markWrapping(
   let blockTrack = track.find((t) => t.type === 'block_change');
 
   const trackBefore = blockTrack?.before as undefined | { type: string; attrs: any };
-
   if (blockTrack) {
     track = track.filter((t: TrackAttribute) => t !== blockTrack);
     if (trackBefore?.type !== newNode.type.name || trackBefore?.attrs.level !== newNode.attrs.level) {
@@ -435,8 +434,6 @@ export function trackedTransaction(
   if (tr.storedMarks && tr.storedMarksSet) {
     newTr.setStoredMarks(tr.storedMarks);
   }
-
-  newTr.scrollIntoView();
 
   return newTr;
 }

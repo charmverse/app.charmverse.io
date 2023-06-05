@@ -9,7 +9,7 @@ import { createFilterGroup } from 'lib/focalboard/filterGroup';
 import { CardFilter } from '../cardFilter';
 
 jest.mock('components/common/BoardEditor/focalboard/src/utils');
-const mockedUtils = jest.mocked(Utils, true);
+const mockedUtils = jest.mocked(Utils, { shallow: true });
 describe('src/cardFilter', () => {
   const board = TestBlockFactory.createBoard();
   board.id = '1';

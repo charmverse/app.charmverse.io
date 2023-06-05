@@ -123,7 +123,7 @@ function ViewMenuItem({
   );
 }
 
-function ShownViewMenuItem({
+function ViewTab({
   view,
   onClick,
   onDrop,
@@ -146,7 +146,7 @@ function ShownViewMenuItem({
       onClick={onClick}
       variant='text'
       size='small'
-      id={view.id}
+      data-view-id={view.id}
       sx={{
         p: 0,
         overflow: 'unset',
@@ -155,9 +155,8 @@ function ShownViewMenuItem({
         backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
         flexDirection: 'row',
         // The tab indicator is not shown anymore since its located in a separate component
-        borderBottom: isActive ? `1.5px solid ${theme.palette.text.primary}` : ''
+        borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
       }}
-      value={view.id}
       label={
         <StyledTabContent
           color={isActive ? 'textPrimary' : 'secondary'}
@@ -220,14 +219,6 @@ function ViewTabs(props: ViewTabsProps) {
     restViewIds.unshift(replacedViewId);
   }
 
-  // make sure active view id is visible or the value for Tabs will be invalid
-  // during transition between boards, there is a period where activeView has not caught up with the new views
-  const activeShowViewId =
-    shownViewIds.find((viewId) => viewId === activeView?.id || viewId === router.query.viewId) ??
-    // check viewId by the query, there is a period where activeView has not caught up
-    shownViewIds[0] ??
-    false;
-
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
     defaultValues: { title: dropdownView?.title || '' }
   });
@@ -235,16 +226,16 @@ function ViewTabs(props: ViewTabsProps) {
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     event.preventDefault();
-    const viewId = event.currentTarget.id;
-    const view = viewsRecord[viewId];
+    const selectedViewId = event.currentTarget.dataset.viewId;
+    const view = selectedViewId && viewsRecord[selectedViewId];
     if (!view) {
       return;
     }
-    if (view && !readOnly && event.currentTarget.id === activeView?.id) {
+    if (view && !readOnly && selectedViewId === activeView?.id) {
       setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
-      showView(viewId);
+      showView(selectedViewId);
     }
   }
 
@@ -358,22 +349,25 @@ function ViewTabs(props: ViewTabsProps) {
         key={viewsProp[0]?.id}
         textColor='primary'
         indicatorColor='secondary'
-        value={activeShowViewId}
-        sx={{ minHeight: 0, mb: '-6px' }}
+        value={false} // use false to disable the indicator
+        sx={{ minHeight: 0, mb: '-5px' }}
       >
         {shownViewIds
           .map((viewId) => {
             const view = viewsRecord[viewId];
-            return view ? (
-              <ShownViewMenuItem
-                onClick={handleViewClick}
-                onDrop={reorderViews}
-                view={view}
-                isActive={activeView?.id === view.id}
-                key={view.id}
-                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
-              />
-            ) : null;
+            if (view) {
+              return (
+                <ViewTab
+                  onClick={handleViewClick}
+                  onDrop={reorderViews}
+                  view={view}
+                  isActive={activeView?.id === view.id}
+                  key={view.id}
+                  href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+                />
+              );
+            }
+            return null;
           })
           .filter(isTruthy)}
         {restViewIds.length !== 0 && (

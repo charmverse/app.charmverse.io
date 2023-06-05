@@ -40,7 +40,6 @@ export default function MemberDirectoryPage() {
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const filteredMembers = useFilteredMembers(searchQuery);
-
   const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
   const sortedMembers = filteredMembers.sort((mem1, mem2) =>

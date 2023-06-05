@@ -1,15 +1,13 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import Link from '@mui/material/Link';
-import type { CryptoCurrency } from 'connectors';
-import { TokenLogoPaths } from 'connectors';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
+import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
@@ -44,15 +42,6 @@ const BountyFooter = styled.div`
   width: 100%;
   padding-top: ${({ theme }) => theme.spacing(1)};
   margin-top: ${({ theme }) => theme.spacing(1)};
-`;
-
-const CurrencyIcon = styled.span`
-  margin-right: ${({ theme }) => theme.spacing(0.5)};
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const StyledBox = styled(Box)`
@@ -121,7 +110,7 @@ const KanbanCard = React.memo((props: Props) => {
 
   return (
     <>
-      <Link href={fullPageUrl} draggable={false}>
+      <Link href={fullPageUrl} draggable={false} color='inherit'>
         <StyledBox
           ref={props.readOnly ? () => null : cardRef}
           className={className}
@@ -163,27 +152,7 @@ const KanbanCard = React.memo((props: Props) => {
           ))}
           {linkedBounty && (
             <BountyFooter>
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: 0.25
-                }}
-              >
-                <CurrencyIcon>
-                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-                    <img loading='lazy' height={20} src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]} />
-                  )}
-                </CurrencyIcon>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 0.25
-                  }}
-                >
-                  <Box component='span'>{linkedBounty.rewardAmount}</Box>
-                </Box>
-              </Box>
-              <BountyStatusChip status={linkedBounty.status} />
+              <BountyStatusBadge bounty={linkedBounty} truncate />
             </BountyFooter>
           )}
         </StyledBox>

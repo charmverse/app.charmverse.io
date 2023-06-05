@@ -22,6 +22,8 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
+import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 import { SpaceFeatureSettings } from './SpaceFeatureSettings';
 
@@ -59,14 +61,11 @@ export default function SpaceSettings({ space }: { space: Space }) {
     resolver: yupResolver(schema)
   });
 
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'settings' });
-  }, []);
-
   // set default values when space is set
   useEffect(() => {
     if (space) {
       reset(space);
+      charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
     }
   }, [space?.id]);
 
@@ -84,7 +83,12 @@ export default function SpaceSettings({ space }: { space: Space }) {
         if (newDomain) {
           // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
           setTimeout(() => {
-            window.location.href = router.asPath.replace(space.domain, values.domain as string);
+            const subdomain = getValidSubdomain();
+            if (subdomain) {
+              window.location.href = `${getSpaceUrl(values.domain)}${getSubdomainPath(router.asPath)}`;
+            } else {
+              window.location.href = router.asPath.replace(space.domain, values.domain as string);
+            }
           }, 100);
         } else {
           setSpace(updatedSpace);
@@ -147,9 +151,9 @@ export default function SpaceSettings({ space }: { space: Space }) {
           </Grid>
           {isAdmin ? (
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton data-test='submit-space-update' disabled={!isDirty} type='submit'>
+              <Button disableElevation size='large' data-test='submit-space-update' disabled={!isDirty} type='submit'>
                 Save
-              </PrimaryButton>
+              </Button>
               <Button variant='outlined' color='error' onClick={deleteWorkspace}>
                 Delete Space
               </Button>

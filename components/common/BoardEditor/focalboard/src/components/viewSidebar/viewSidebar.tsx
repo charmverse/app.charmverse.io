@@ -88,8 +88,17 @@ function ViewSidebar(props: Props) {
     setSidebarView(initialState);
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const newView = createTableView(props.parentBoard, props.view);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const board = {
+      // use parentBoard props like id and rootId by default
+      ...props.parentBoard,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || props.parentBoard.fields
+    };
+    const newView = createTableView(board, props.view);
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;

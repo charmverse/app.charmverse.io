@@ -90,7 +90,7 @@ export default function SidebarSubmenu({
   const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
-  const { handleUserUpdate, isSaving } = useUserDetails({});
+  const { saveUser, isSaving } = useUserDetails();
 
   function showSpaceForm() {
     setSpaceFormOpen(true);
@@ -109,11 +109,11 @@ export default function SidebarSubmenu({
       newOrder.splice(propIndex, 1); // remove the dragged property from the array
       const droppedOnIndex = newOrder.indexOf(droppedOnProperty); // find the index of the space that was dropped on
       newOrder.splice(droppedOnIndex, 0, draggedProperty); // add the property to the new index
-      await handleUserUpdate({ spacesOrder: newOrder });
+      await saveUser({ spacesOrder: newOrder });
       const newOrderedSpaces = spaces.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
       setSpaces(newOrderedSpaces);
     },
-    [handleUserUpdate, spaces]
+    [saveUser, spaces]
   );
 
   return (

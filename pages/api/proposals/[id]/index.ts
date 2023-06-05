@@ -1,11 +1,10 @@
-import { InsecureOperationError } from '@charmverse/core';
+import { InsecureOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -39,7 +38,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const computed = await computeUserPagePermissions({
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
@@ -115,7 +114,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
       const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
         resourceId: proposal.id
       });
-      for (const reviewer of reviewers) {
+      for (const reviewer of newReviewers) {
         if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
           const role = await prisma.role.findUnique({
             where: {

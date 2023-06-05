@@ -1,13 +1,11 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
-
-import { baseUrl } from 'config/constants';
+import { Wallet } from 'ethers';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
-import { createUser, generateUser, generateUserAndSpace } from '../utils/mocks';
-import { login } from '../utils/session';
+import { createUser } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
@@ -33,12 +31,12 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   loginPage,
   signupPage
 }) => {
-  let address: string = '';
+  const wallet = Wallet.createRandom();
+  const address = wallet.address;
 
   await mockWeb3({
     page: sandboxPage,
     init: ({ Web3Mock, context }) => {
-      address = context.address;
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {

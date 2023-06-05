@@ -169,7 +169,8 @@ const config = {
             ..._entry,
             cron: './background/cron.ts',
             websockets: './background/websockets.ts',
-            countSpaceData: './scripts/countSpaceData.ts'
+            countSpaceData: './scripts/countSpaceData.ts',
+            importFromDiscourse: './scripts/importFromDiscourse.ts'
           };
         });
       };

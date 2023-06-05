@@ -34,8 +34,10 @@ export function ProposalsPage() {
   );
 
   useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id, type: 'proposals_list' });
-  }, []);
+    if (currentSpace?.id) {
+      charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
+    }
+  }, [currentSpace?.id]);
 
   const loadingData = !data;
 

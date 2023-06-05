@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 const BOUNTIES_PATH = '/[domain]/bounties';
 const DOCUMENT_PATH = '/[domain]/[pageId]';
@@ -19,7 +20,7 @@ export const useSharedPage = () => {
 
   const { spaces, isLoaded: spacesLoaded } = useSpaces();
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
-  const loadedSpace = spaces.find((s) => s.domain === spaceDomain);
+  const loadedSpace = filterSpaceByDomain(spaces, spaceDomain || '');
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
 
   const pageKey = useMemo(() => {
@@ -36,7 +37,7 @@ export const useSharedPage = () => {
     }
 
     return `${spaceDomain}/${pagePath}`;
-  }, [isBountiesPagePath, isPublicPath, isForumPath, spaceDomain, pagePath]);
+  }, [isBountiesPath, isPublicPath, isForumPath, spaceDomain, pagePath]);
 
   // user does not have access to space and is page path, so we want to verify if it is a public page
   const shouldLoadPublicPage = useMemo(() => {
@@ -59,7 +60,7 @@ export const useSharedPage = () => {
   } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.spaces.searchByDomain(spaceDomain || ''));
 
   const hasError = !!publicPageError || !!spaceError;
-  const hasPublicBounties = space?.publicBountyBoard;
+  const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';
   const hasSharedPageAccess = !!publicPage || !!hasPublicBounties || isForumPagePath(pathname);
   const accessChecked = isRouterReady && !isSpaceLoading && !isPublicPageLoading;
 

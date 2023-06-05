@@ -6,22 +6,22 @@ import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
-import { authOnConnect } from 'lib/websockets/authentication';
-import { DocumentEventHandler } from 'lib/websockets/documentEvents';
-import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
 
+import { authOnConnect } from './authentication';
+import { config } from './config';
+import { DocumentEventHandler } from './documentEvents';
 import type { ServerMessage } from './interfaces';
+import { SpaceEventHandler } from './spaceEvents';
 
 export class WebsocketBroadcaster {
   sockets: Record<string, Socket> = {};
 
   // Server will be set after the first request
-  private io: Server = new Server();
+  private io: Server = new Server(config);
 
   // Only called once in the app lifecycle once the server is initialised
   async bindServer(io: Server): Promise<void> {
     this.io = io;
-
     if (redisClient) {
       const pubClient = redisClient;
       const subClient = pubClient.duplicate();
@@ -49,12 +49,14 @@ export class WebsocketBroadcaster {
       // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
       // so we only need to keep track of the number of clients connected to the root namespace
       log.debug('[ws] Web socket connected', {
+        socketId: socket.id,
         // clientCount: io.engine.clientsCount,
         clientCount: io.of('/').sockets.size
       });
 
       socket.on('disconnect', () => {
         log.debug('[ws] Web socket disconnected', {
+          socketId: socket.id,
           clientCount: io.of('/').sockets.size
         });
       });
@@ -63,7 +65,7 @@ export class WebsocketBroadcaster {
     io.of('/ceditor')
       .use(authOnConnect)
       .on('connect', (socket) => {
-        log.debug('[ws] Web socket namepsace /editor connected');
+        log.debug('[ws] Web socket namespace /editor connected', { socketId: socket.id, userId: socket.data.user.id });
         new DocumentEventHandler(socket).init();
       });
   }
@@ -104,5 +106,10 @@ export class WebsocketBroadcaster {
     socket.join([roomId]);
 
     this.sockets[userId] = socket;
+  }
+
+  close() {
+    log.info('[server] Closing Websocket server...');
+    this.io.close();
   }
 }
