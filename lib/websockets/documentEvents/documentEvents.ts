@@ -483,7 +483,10 @@ export class DocumentEventHandler {
     const session = this.getSession();
 
     if (!session.documentId) {
-      log.error('Cannot send document - session is missing documentId', { session, userId: session.user.id });
+      log.error('Cannot send document - session is missing documentId', {
+        ...this.getSessionMeta(),
+        userId: session.user.id
+      });
       return;
     }
     const room = this.getDocumentRoomOrThrow();
