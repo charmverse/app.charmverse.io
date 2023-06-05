@@ -51,7 +51,7 @@ export const colors = {
     light: '#EFE9CB'
   },
   green: {
-    dark: '#1D7324',
+    dark: '#549b78',
     light: '#D0EFD6'
   },
   teal: {
