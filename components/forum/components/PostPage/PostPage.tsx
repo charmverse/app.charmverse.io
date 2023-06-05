@@ -300,11 +300,19 @@ export function PostPage({
               )}
               {post && !post.isDraft && (
                 <>
-                  {!!permissions?.add_comment && (
-                    <Box my={2} data-test='new-top-level-post-comment'>
-                      <PostCommentForm setPostComments={setPostComments} postId={post.id} />
-                    </Box>
-                  )}
+                  <Box my={2} data-test='new-top-level-post-comment'>
+                    <PostCommentForm
+                      disabled={!permissions.add_comment}
+                      placeholder={
+                        !permissions.add_comment
+                          ? 'You do not have permission to comment on posts in this category'
+                          : undefined
+                      }
+                      setPostComments={setPostComments}
+                      postId={post.id}
+                    />
+                  </Box>
+
                   <Divider
                     sx={{
                       my: 2

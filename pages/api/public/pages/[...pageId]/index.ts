@@ -9,7 +9,7 @@ import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
@@ -178,9 +178,11 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Page not found');
   }
 
-  const computed = await computeUserPagePermissions({
-    resourceId: page.id
-  });
+  const computed = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: page!.id
+    })
+  );
 
   if (computed.read !== true && page.type !== 'bounty') {
     throw new NotFoundError('Page not found');

@@ -3,44 +3,47 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Skeleton, Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/integrations/components/useIdentityTypes';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
+import { usePreventReload } from 'hooks/usePreventReload';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import type { Social } from '../../interfaces';
 import { IdentityIcon } from '../IdentityIcon';
 import IdentityModal from '../IdentityModal';
-import SocialInputs from '../SocialInputs';
+import { SocialInputs } from '../SocialInputs';
 import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
 import UserDescription from '../UserDescription';
 import UserPathModal from '../UserPathModal';
 
 import { useUpdateProfileAvatar } from './hooks/useUpdateProfileAvatar';
 import { useUserDetails } from './hooks/useUserDetails';
-import { isPublicUser } from './utils';
+
+export type EditableFields = Partial<Omit<UserDetailsType, 'id'>>;
 
 export interface UserDetailsProps {
-  user: PublicUser | LoggedInUser;
-  updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
+  user: LoggedInUser;
   sx?: SxProps<Theme>;
+  onChange: (user: EditableFields) => void;
 }
 
 const StyledStack = styled(Stack)`
@@ -62,23 +65,8 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps) {
-  const { user: currentUser } = useUser();
-  const { mutateMembers } = useMembers();
-
-  const isPublic = isPublicUser(user, currentUser);
-  const {
-    data: userDetails,
-    mutate,
-    isLoading
-  } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () =>
-    isPublic ? user.profile : charmClient.getUserDetails()
-  );
-
-  const { trigger: updateUserDetails } = useSWRMutation(
-    '/api/profile/details',
-    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
-  );
+export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
+  const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const identityTypes = useIdentityTypes();
 
@@ -88,32 +76,26 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { handleUserUpdate } = useUserDetails({ updateUser });
+  const { saveUser } = useUserDetails();
 
   const onLinkCopy = () => {
     setIsPersonalLinkCopied(true);
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const saveDescription = async (_description: string) => {
-    await updateUserDetails({ description: _description });
-    await mutate();
-    await mutateMembers();
+  const setDescription = async (description: string) => {
+    onChange({ description });
   };
 
-  const saveTimezone = async (_timezone: string | null = null) => {
-    await updateUserDetails({ timezone: _timezone });
-    await mutate();
-    await mutateMembers();
+  const setTimezone = async (timezone: string | null = null) => {
+    onChange({ timezone });
   };
 
-  const saveSocial = async (social: Social) => {
-    await updateUserDetails({ social });
-    await mutate();
-    await mutateMembers();
+  const setSocial = async (social: Social) => {
+    onChange({ social });
   };
 
-  const disabled = isLoading ?? isPublic;
+  const disabled = isLoading;
 
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path;
@@ -124,18 +106,19 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
       <Grid container direction='column' spacing={2} mt={1} sx={sx}>
         <Grid item>
           <Avatar
-            name={user?.username || ''}
-            image={user?.avatar}
+            name={user.username || ''}
+            image={user.avatar}
             updateAvatar={updateProfileAvatar}
             variant='circular'
             canSetNft
+            editable={true}
             isSaving={isSavingAvatar}
             isNft={hasNftAvatar(user)}
           />
         </Grid>
         <Grid item width='100%'>
           <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
-            {user && !isPublic && <IdentityIcon type={user.identityType as IdentityType} />}
+            <IdentityIcon type={user.identityType as IdentityType} />
             <Typography variant='h1' noWrap>
               {shortWalletAddress(user.username)}
             </Typography>
@@ -160,52 +143,67 @@ export function UserDetailsForm({ user, updateUser, sx = {} }: UserDetailsProps)
             </Tooltip>
           </EditIconContainer>
         </Grid>
-
-        {!userDetails && isLoading ? (
-          <Box display='flex' gap={1} flexDirection='column' ml={2} mt={2}>
-            <Skeleton variant='rectangular' width={150} height={16} />
-            <Skeleton variant='rectangular' width='100%' height={55} />
-            <Skeleton variant='rectangular' width={150} height={16} sx={{ mt: 1 }} />
-            <Skeleton variant='rectangular' width='100%' height={35} />
-          </Box>
-        ) : (
-          <>
-            <Grid item>
-              <UserDescription
-                currentDescription={userDetails?.description}
-                save={saveDescription}
-                readOnly={disabled}
-              />
-            </Grid>
-            <Grid item>
-              <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={saveTimezone} readOnly={disabled} />
-            </Grid>
-            <SocialInputs social={userDetails?.social as Social} save={saveSocial} readOnly={disabled} />
-          </>
-        )}
+        <Grid item>
+          <UserDescription currentDescription={userDetails?.description} save={setDescription} readOnly={disabled} />
+        </Grid>
+        <Grid item>
+          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={setTimezone} readOnly={disabled} />
+        </Grid>
+        <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
       </Grid>
-      {!isPublic && (
-        <>
-          <IdentityModal
-            isOpen={identityModalState.isOpen}
-            close={identityModalState.close}
-            save={(username: string, identityType: IdentityType) => {
-              handleUserUpdate({ username, identityType });
-            }}
-            identityTypes={isPublic ? [] : identityTypes}
-            identityType={(user?.identityType || 'Wallet') as IdentityType}
-          />
-          <UserPathModal
-            isOpen={userPathModalState.isOpen}
-            close={userPathModalState.close}
-            save={(path: string) => {
-              handleUserUpdate({ path });
-              userPathModalState.close();
-            }}
-            currentValue={user.path}
-          />
-        </>
-      )}
+      <IdentityModal
+        isOpen={identityModalState.isOpen}
+        close={identityModalState.close}
+        save={(username: string, identityType: IdentityType) => {
+          saveUser({ username, identityType });
+        }}
+        identityTypes={identityTypes}
+        identityType={(user?.identityType || 'Wallet') as IdentityType}
+      />
+      <UserPathModal
+        isOpen={userPathModalState.isOpen}
+        close={userPathModalState.close}
+        save={(path: string) => {
+          saveUser({ path });
+          userPathModalState.close();
+        }}
+        currentValue={user.path}
+      />
+    </>
+  );
+}
+export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>) {
+  const [form, setForm] = useState<EditableFields>({});
+  const { mutateMembers } = useMembers();
+  const { showMessage } = useSnackbar();
+  const { trigger: updateUserDetails } = useSWRMutation(
+    '/api/profile/details',
+    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
+  );
+  const isFormClean = Object.keys(form).length === 0;
+
+  usePreventReload(!isFormClean);
+
+  function onFormChange(fields: EditableFields) {
+    setForm((_form) => ({ ..._form, ...fields }));
+  }
+
+  async function saveForm() {
+    await updateUserDetails(form);
+    await mutateMembers();
+    setForm({});
+    showMessage('Profile updated', 'success');
+    mutate('/current-user-details');
+  }
+
+  return (
+    <>
+      <UserDetailsForm user={user} onChange={onFormChange} />
+      <Box mt={2} display='flex' justifyContent='flex-end'>
+        <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+          Save
+        </Button>
+      </Box>
     </>
   );
 }

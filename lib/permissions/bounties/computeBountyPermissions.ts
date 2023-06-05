@@ -6,6 +6,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import type { PermissionComputeRequest } from '../interfaces';
 
 import { AvailableBountyPermissions } from './availableBountyPermissions';
+import { computeBountyPermissionsPublic } from './computeBountyPermissions.public';
 import type { BountyPermissionFlags } from './interfaces';
 import { bountyPermissionMapping } from './mapping';
 
@@ -23,7 +24,13 @@ export async function computeBountyPermissions({
     select: {
       id: true,
       spaceId: true,
+      space: {
+        select: {
+          paidTier: true
+        }
+      },
       createdBy: true,
+      permissions: true,
       page: {
         select: {
           permissions: {
@@ -40,6 +47,13 @@ export async function computeBountyPermissions({
   // Page permissions apply for whether a user can view a bounty
   if (!bounty || !userId) {
     return allowedOperations.empty;
+  }
+
+  if (bounty.space.paidTier === 'free') {
+    return computeBountyPermissionsPublic({
+      userId,
+      bounty
+    });
   }
 
   const { error, isAdmin } = await hasAccessToSpace({

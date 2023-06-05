@@ -123,7 +123,7 @@ function PropertyValueElement(props: Props) {
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        wrapColumn={props.wrapColumn ?? false}
         showEmptyPlaceholder={displayType === 'details'}
       />
     );
@@ -133,6 +133,7 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = (
         <DateRange
+          wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}

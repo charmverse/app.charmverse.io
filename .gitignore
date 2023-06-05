@@ -56,3 +56,4 @@ todo.md
 /test-results/
 /playwright-report/
 /playwright/.cache/
+storybook-static

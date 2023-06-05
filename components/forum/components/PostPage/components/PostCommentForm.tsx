@@ -7,10 +7,14 @@ import type { PostCommentWithVote } from 'lib/forums/comments/interface';
 
 export function PostCommentForm({
   postId,
-  setPostComments
+  setPostComments,
+  disabled,
+  placeholder
 }: {
   postId: string;
   setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
+  disabled?: boolean;
+  placeholder?: string;
 }) {
   async function handleCreateComment(comment: CommentContent) {
     const postComment = await charmClient.forum.createPostComment(postId, comment);
@@ -18,5 +22,5 @@ export function PostCommentForm({
     setPostComments((postComments) => (postComments ? [postComment, ...postComments] : [postComment]));
   }
 
-  return <CommentForm handleCreateComment={handleCreateComment} />;
+  return <CommentForm disabled={disabled} handleCreateComment={handleCreateComment} placeholder={placeholder} />;
 }

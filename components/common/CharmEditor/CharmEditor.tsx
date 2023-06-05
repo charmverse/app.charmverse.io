@@ -5,6 +5,7 @@ import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
 import { log } from '@charmverse/core/log';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
@@ -26,7 +27,6 @@ import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -52,10 +52,12 @@ import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import { File } from './components/file/File';
 import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
+import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
+import * as inlineComment from './components/inlineComment';
+import InlineCommentThread from './components/inlineComment/inlineComment.components';
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
@@ -249,18 +251,16 @@ export function charmEditorPlugins({
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
-    filePlugins()
+    filePlugins(),
+    placeholderPlugin(placeholderText)
   ];
 
-  if (!readOnly) {
-    if (!disableRowHandles) {
-      basePlugins.push(
-        rowActions.plugins({
-          key: actionsPluginKey
-        })
-      );
-    }
-    basePlugins.push(placeholderPlugin(placeholderText));
+  if (!readOnly && !disableRowHandles) {
+    basePlugins.push(
+      rowActions.plugins({
+        key: actionsPluginKey
+      })
+    );
   }
 
   if (!disablePageSpecificFeatures) {
@@ -388,7 +388,7 @@ interface CharmEditorProps {
   containerWidth?: number;
   pageType?: PageType | 'post';
   snapshotProposalId?: string | null;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
   focusOnInit?: boolean;
@@ -687,7 +687,7 @@ function CharmEditor({
         }
       }}
     >
-      <floatingMenu.FloatingMenu
+      <FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}

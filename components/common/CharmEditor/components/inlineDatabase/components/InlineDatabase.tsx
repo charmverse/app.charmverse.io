@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -96,6 +96,13 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
+
+  useEffect(() => {
+    if (!currentViewId && views.length > 0) {
+      setCurrentViewId(views[0].id);
+    }
+  }, [views?.length]);
+
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
   const { page: boardPage, updatePage } = usePage({ pageIdOrPath: pageId });
 

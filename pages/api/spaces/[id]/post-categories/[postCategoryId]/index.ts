@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

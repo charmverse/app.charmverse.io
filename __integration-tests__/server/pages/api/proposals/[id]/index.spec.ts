@@ -1,6 +1,6 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { generateSpaceUser, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -203,7 +203,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const userWithRole = await generateSpaceUser({
+    const userWithRole = await testUtilsUser.generateSpaceUser({
       spaceId: adminSpace.id
     });
 
@@ -234,6 +234,11 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
         {
           group: 'user',
           id: userWithRole.id
+        },
+        // New valid reviewer being adding in, admins can always be reviewers
+        {
+          group: 'user',
+          id: adminUser.id
         }
       ]
     };

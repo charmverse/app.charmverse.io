@@ -13,12 +13,16 @@ import { TbDatabase } from 'react-icons/tb';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookBaseUrl } from 'config/constants';
 import { usePages } from 'hooks/usePages';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
+
+import { useAppSelector } from '../../store/hooks';
 
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
 import { SidebarHeader } from './viewSidebar';
@@ -28,7 +32,7 @@ type FormStep = 'select_source' | 'configure_source';
 
 export type DatabaseSourceProps = {
   onCreate?: () => void;
-  onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) => void;
+  onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>, boardBlock?: Board) => void;
 };
 
 type ViewSourceOptionsProps = DatabaseSourceProps & {
@@ -161,6 +165,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: string }) {
   const { pages } = usePages();
   const [searchTerm, setSearchTerm] = useState('');
+
+  const boards = useAppSelector(getBoards);
   const sortedPages = useMemo(() => {
     return Object.values(pages)
       .filter(
@@ -173,10 +179,14 @@ function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: strin
   }, [pages, searchTerm]);
 
   function onSelect(pageId: string) {
-    props.onSelect({
-      linkedSourceId: pageId,
-      sourceType: 'board_page'
-    });
+    const boardBlock = boards[pageId];
+    props.onSelect(
+      {
+        linkedSourceId: pageId,
+        sourceType: 'board_page'
+      },
+      boardBlock
+    );
   }
   return (
     <>

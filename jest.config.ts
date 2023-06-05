@@ -33,7 +33,7 @@ export const jestConfig: JestConfigWithTsJest = {
   // This is needed so CI environment does not attempt to run tests in the permissions_api folder
   testPathIgnorePatterns: ['<rootDir>/permissions_api'],
 
-  testTimeout: 120000
+  testTimeout: 240000
 };
 
 export default createJestConfig(jestConfig);

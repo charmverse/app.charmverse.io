@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';

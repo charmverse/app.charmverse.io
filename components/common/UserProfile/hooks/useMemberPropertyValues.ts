@@ -74,9 +74,10 @@ export function useMemberPropertyValues(memberId: string) {
 
   return {
     getValuesForSpace,
-    memberPropertyValues: memberPropertyValues || [],
+    memberPropertyValues,
     updateSpaceValues,
     isLoading: !memberPropertyValues,
-    canEditSpaceProfile
+    canEditSpaceProfile,
+    refreshPropertyValues: mutate
   };
 }

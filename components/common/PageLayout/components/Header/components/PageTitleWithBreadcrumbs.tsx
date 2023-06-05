@@ -179,15 +179,7 @@ function EmptyPageTitle() {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs({
-  pageId,
-  pageType,
-  spaceDomain
-}: {
-  pageId?: string;
-  pageType?: PageType;
-  spaceDomain?: string;
-}) {
+export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
@@ -197,11 +189,11 @@ export default function PageTitleWithBreadcrumbs({
   } else if (pageType === 'proposal') {
     return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
   } else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${spaceDomain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.includes('/[domain]/forum')) {
     return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${spaceDomain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.startsWith('/u/')) {
     return <EmptyPageTitle />;
   } else {

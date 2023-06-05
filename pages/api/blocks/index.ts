@@ -1,3 +1,4 @@
+import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -16,11 +17,11 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -37,7 +38,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
-  const spaceDomain = pathnameParts[1];
+  const spaceDomain = getValidSubdomain(req.headers.host) || pathnameParts[1];
   if (!spaceDomain) {
     throw new InvalidStateError('invalid referrer url');
   }
@@ -61,6 +62,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     let spaceId = req.query.spaceId as string | undefined;
 
     // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
+    // WARNING: patchBlock api method does not pass in spaceId, so this is needed.
     if (!spaceId) {
       const space = await prisma.space.findUnique({
         where: {
@@ -96,7 +98,10 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  const spaceDomain = referer ? url.pathname.split('/')[1] : null;
+  let spaceDomain = getValidSubdomain(req.headers.host);
+  if (!spaceDomain) {
+    spaceDomain = referer ? url.pathname.split('/')[1] : null;
+  }
 
   if (!spaceDomain) {
     return res.status(200).json(data);
@@ -313,10 +318,12 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   }
 
   for (const blockId of blockIds) {
-    const permissions = await computeUserPagePermissions({
-      resourceId: blockId,
-      userId
-    });
+    const permissions = await getPermissionsClient({ resourceId: blockId, resourceIdType: 'page' }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: blockId,
+        userId
+      })
+    );
 
     if (permissions.delete !== true) {
       throw new ActionNotPermittedError('You are not allowed to delete this block.');
