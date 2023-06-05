@@ -8,6 +8,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalTemplateInput from 'components/proposals/components/ProposalTemplateInput';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
@@ -45,7 +46,7 @@ export function ProposalDialogProperties({
   const { pages } = usePages();
   const currentSpace = useCurrentSpace();
   const [detailsExpanded, setDetailsExpanded] = useState(true);
-
+  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const { members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
@@ -230,7 +231,11 @@ export function ProposalDialogProperties({
                   }
                   value={proposalTemplatePage ?? null}
                   onChange={(page) => {
-                    selectProposalTemplate(page);
+                    if (proposalFormInputs.contentText?.length === 0) {
+                      selectProposalTemplate(page);
+                    } else {
+                      setSelectedProposalTemplateId(page?.id ?? null);
+                    }
                   }}
                 />
               </Box>
@@ -310,6 +315,21 @@ export function ProposalDialogProperties({
         </Box>
       </Collapse>
 
+      <ConfirmDeleteModal
+        onClose={() => {
+          setSelectedProposalTemplateId(null);
+        }}
+        open={!!selectedProposalTemplateId}
+        title='Overwriting your content'
+        buttonText='Overwrite'
+        secondaryButtonText='Go back'
+        question='Are you sure you want to overwrite your current content with the proposal template content?'
+        onConfirm={() => {
+          const templatePage = proposalTemplates.find((template) => template.id === selectedProposalTemplateId);
+          selectProposalTemplate(templatePage ?? null);
+          setSelectedProposalTemplateId(null);
+        }}
+      />
       <Divider
         sx={{
           my: 2
