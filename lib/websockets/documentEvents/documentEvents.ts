@@ -149,7 +149,7 @@ export class DocumentEventHandler {
 
     // Verify the order of the message
     if (!('c' in message) || !('s' in message)) {
-      log.warn(`Received invalid message`, { message, ...this.getSessionMeta() });
+      log.error(`Received invalid message`, { message, ...this.getSessionMeta() });
       this.sendError('Received invalid message');
       return;
     } else if (message.c < this.messages.client + 1) {
@@ -201,12 +201,16 @@ export class DocumentEventHandler {
     }
 
     if (!session.documentId) {
-      log.warn('Ignore message because session is missing document', { socketId: this.id, userId: session.user.id });
+      log.warn('Ignore message because session is missing document', {
+        message,
+        socketId: this.id,
+        userId: session.user.id
+      });
       return;
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.warn('Ignore message from closed document', {
+      log.error('Ignoring message from closed document - this is unusual', {
         socketId: this.id,
         message,
         pageId: session.documentId,
@@ -450,7 +454,10 @@ export class DocumentEventHandler {
       const messages = room.doc.diffs.slice(numberDiffs);
       this.sendDocument(messages);
     } else {
-      log.warn('Unfixable: User is on a very old version of the document', logData);
+      log.warn(
+        'Unfixable: User is on a very old version of the document (is expected if user leaves document for a while)',
+        logData
+      );
       this.unfixable();
     }
   }
