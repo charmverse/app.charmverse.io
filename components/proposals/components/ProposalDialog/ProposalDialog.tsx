@@ -53,7 +53,6 @@ export function ProposalDialog({ isLoading, onClose }: Props) {
 
   return (
     <Dialog
-      fullWidth
       onClose={() => {
         if (contentUpdated) {
           setShowConfirmDialog(true);
