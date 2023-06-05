@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';

@@ -1,12 +1,12 @@
+import type { PageMetaWithPermissions } from '@charmverse/core/pages';
 import type { Bounty, PageType, Application } from '@charmverse/core/prisma';
 
-import type { IPageMetaWithPermissions } from 'lib/pages/interfaces';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
 
-export type BountyWithDetails = Bounty & { applications: Application[]; page: IPageMetaWithPermissions };
+export type BountyWithDetails = Bounty & { applications: Application[]; page: PageMetaWithPermissions };
 
 export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> &
   Partial<

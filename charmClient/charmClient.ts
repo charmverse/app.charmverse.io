@@ -1,3 +1,12 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PagePermissionFlags,
+  PagePermissionWithSource,
+  PermissionCompute,
+  SpaceDefaultPublicPageToggle
+} from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
   Block,
@@ -21,17 +30,9 @@ import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { PermissionToDelete } from 'lib/permissions/interfaces';
-import type {
-  IPagePermissionFlags,
-  IPagePermissionToCreate,
-  IPagePermissionUserRequest,
-  IPagePermissionWithAssignee,
-  IPagePermissionWithSource,
-  SpaceDefaultPublicPageToggle
-} from 'lib/permissions/pages/page-permission-interfaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -227,7 +228,7 @@ class CharmClient {
   }
 
   createPage(pageOpts: Partial<Page>) {
-    return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
+    return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
   archivePage(pageId: string) {
@@ -475,23 +476,23 @@ class CharmClient {
   /**
    * Get full set of permissions for a specific user on a certain page
    */
-  computeUserPagePermissions(request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+  computeUserPagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
     return http.GET('/api/permissions/query', request);
   }
 
-  listPagePermissions(pageId: string): Promise<IPagePermissionWithAssignee[]> {
+  listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission(permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
+  createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 
-  deletePermission(query: PermissionToDelete): Promise<boolean> {
+  deletePermission(query: PermissionResource): Promise<boolean> {
     return http.DELETE('/api/permissions', query);
   }
 
-  restrictPagePermissions({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
+  restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
@@ -512,7 +513,7 @@ class CharmClient {
     return http.PUT(`/api/spaces/${spaceId}/onboarding`);
   }
 
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 
