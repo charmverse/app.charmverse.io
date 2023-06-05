@@ -58,12 +58,19 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         }
       );
     }
+    function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
+      if (value.some((page) => page.id === pageWithContent?.id)) {
+        mutate();
+      }
+    }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
-  }, [mutate]);
+  }, [mutate, pageWithContent?.id]);
 
   if (pageWithContent) {
     return {
