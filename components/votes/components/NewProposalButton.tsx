@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
@@ -15,6 +16,7 @@ import { useProposalCategories } from 'components/proposals/hooks/useProposalCat
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';

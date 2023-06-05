@@ -1,4 +1,4 @@
-import type { ProposalCategoryPermissionFlags } from '@charmverse/core';
+import type { ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

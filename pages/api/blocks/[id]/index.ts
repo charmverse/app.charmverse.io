@@ -7,7 +7,7 @@ import nc from 'next-connect';
 import type { BlockTypes } from 'lib/focalboard/block';
 import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -41,11 +41,14 @@ async function deleteBlock(
 
   const isPageBlock = rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board';
 
-  const permissionsSet = await computeUserPagePermissions({
-    resourceId: isPageBlock ? rootBlock.id : rootBlock.rootId,
-    userId: req.session.user.id as string
-  });
+  const pageId = isPageBlock ? rootBlock.id : rootBlock.rootId;
 
+  const permissionsSet = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: pageId,
+      userId
+    })
+  );
   if (rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board') {
     if (!permissionsSet.delete) {
       throw new ActionNotPermittedError();

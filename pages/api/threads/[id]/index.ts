@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { deleteThread } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -28,10 +28,15 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
+  const permissionSet = await getPermissionsClient({
     resourceId: thread.pageId,
-    userId
-  });
+    resourceIdType: 'page'
+  }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: thread.pageId,
+      userId
+    })
+  );
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
