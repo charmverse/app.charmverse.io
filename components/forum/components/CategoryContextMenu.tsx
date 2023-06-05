@@ -1,4 +1,4 @@
-import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';

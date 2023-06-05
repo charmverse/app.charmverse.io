@@ -1,4 +1,6 @@
 /* eslint-disable default-param-last */
+import type { PageMeta } from '@charmverse/core/pages';
+
 import charmClient from 'charmClient';
 import type { Block, BlockPatch } from 'lib/focalboard/block';
 import { createPatchesFromBlocks } from 'lib/focalboard/block';
@@ -10,7 +12,6 @@ import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';

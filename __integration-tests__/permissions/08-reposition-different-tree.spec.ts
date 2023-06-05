@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PagePermissionWithSource
+} from '@charmverse/core/permissions';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
-import type { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -36,25 +39,27 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const role = await generateRole({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const permissionToAdd: IPagePermissionToCreate = {
+    const permissionToAdd: PagePermissionAssignment = {
       pageId: rootPage.id,
-      permissionLevel: 'view',
-      roleId: role.id
+      permission: {
+        permissionLevel: 'view',
+        assignee: { group: 'role', id: role.id }
+      }
     };
 
     // Add permission on child page which will inherit downwards
     const createdRootPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToAdd).expect(201)
-    ).body as IPagePermissionWithSource;
+    ).body as AssignedPagePermission;
 
-    rootPage = (await getPage(rootPage.id)) as IPageWithPermissions;
+    rootPage = (await getPage(rootPage.id)) as PageWithPermissions;
 
     const rootPage2 = (
       await request(baseUrl)
@@ -68,7 +73,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -95,7 +100,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       })
       .expect(200);
 
-    const childWithPermissions = (await getPage(childPage.id)) as IPageWithPermissions;
+    const childWithPermissions = (await getPage(childPage.id)) as PageWithPermissions;
 
     const newRootPermissionId = rootPage2.permissions[0].id;
 
@@ -128,22 +133,21 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const oldRootSpacePermissionId = oldRootPage.permissions[0].id;
 
-    const permissionToAdd: IPagePermissionToCreate = {
+    const permissionToAdd: PagePermissionAssignment = {
       pageId: oldRootPage.id,
-      permissionLevel: 'view',
-      userId: user.id
+      permission: { assignee: { group: 'user', id: user.id }, permissionLevel: 'view' }
     };
 
     // Add permission on child page which will inherit downwards
     const createdRootPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToAdd).expect(201)
-    ).body as IPagePermissionWithSource;
+    ).body as AssignedPagePermission;
 
-    oldRootPage = (await getPage(oldRootPage.id)) as IPageWithPermissions;
+    oldRootPage = (await getPage(oldRootPage.id)) as PageWithPermissions;
 
     const newRootPage = (
       await request(baseUrl)
@@ -157,7 +161,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -172,7 +176,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -203,7 +207,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
     const [childWithPermissions, nestedChildWithPermissions] = (await Promise.all([
       getPage(childPage.id),
       getPage(nestedChildPage.id)
-    ])) as IPageWithPermissions[];
+    ])) as PageWithPermissions[];
 
     const newRootPermissionId = newRootPage.permissions[0].id;
 
@@ -232,7 +236,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const newRootPage = (
       await request(baseUrl)
@@ -246,7 +250,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -261,7 +265,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     // Reposition nested child to sibling of child
     await request(baseUrl)
@@ -274,7 +278,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       })
       .expect(200);
 
-    const childWithPermissions = (await getPage(childPage.id)) as IPageWithPermissions;
+    const childWithPermissions = (await getPage(childPage.id)) as PageWithPermissions;
 
     // Return Space ID permission, which should inherit
     const newRootPermissionId = newRootPage.permissions.find((p) => p.spaceId)?.id;
@@ -312,7 +316,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -327,7 +331,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -359,16 +363,18 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
         .expect(201)
     ).body;
 
-    const permissionToAdd: IPagePermissionToCreate = {
+    const permissionToAdd: PagePermissionAssignment = {
       pageId: nestedChildPage.id,
-      permissionLevel: 'view',
-      userId: user.id
+      permission: {
+        assignee: { group: 'user', id: user.id },
+        permissionLevel: 'view'
+      }
     };
 
     // Add permission on child page which will inherit downwards
     const createdNestedChildPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToAdd).expect(201)
-    ).body as IPagePermissionWithSource;
+    ).body as PagePermissionWithSource;
 
     // Move subtree out to root
     await request(baseUrl)
@@ -392,7 +398,7 @@ describe('PUT /api/pages/{pageId} - reposition page to different tree', () => {
       })
       .expect(200);
 
-    const nestedChildWithPermissions = (await getPage(nestedChildPage.id)) as IPageWithPermissions;
+    const nestedChildWithPermissions = (await getPage(nestedChildPage.id)) as PageWithPermissions;
 
     expect(nestedChildWithPermissions.permissions.length).toBe(2);
 

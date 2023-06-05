@@ -1,8 +1,9 @@
+import type { PageMeta } from '@charmverse/core/pages';
+
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { PageMeta } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 interface ProposalActionsProps {

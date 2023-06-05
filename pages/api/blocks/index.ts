@@ -1,3 +1,4 @@
+import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -16,8 +17,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -318,10 +318,12 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   }
 
   for (const blockId of blockIds) {
-    const permissions = await computeUserPagePermissions({
-      resourceId: blockId,
-      userId
-    });
+    const permissions = await getPermissionsClient({ resourceId: blockId, resourceIdType: 'page' }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: blockId,
+        userId
+      })
+    );
 
     if (permissions.delete !== true) {
       throw new ActionNotPermittedError('You are not allowed to delete this block.');

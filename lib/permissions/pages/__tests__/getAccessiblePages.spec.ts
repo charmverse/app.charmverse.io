@@ -1,11 +1,12 @@
-import { testUtilsUser } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
-import { createPage, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage } from 'testing/setupDatabase';
 
 import { getAccessiblePages } from '../getAccessiblePages';
 
 describe('getAccessiblePages - public space', () => {
-  it('Should return all pages for the space is a public space', async () => {
+  it('Should return all pages for the space', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       spacePaidTier: 'free'
     });
@@ -48,24 +49,8 @@ describe('getAccessiblePages - public space', () => {
     expect(softDeletedPages.length).toBe(1);
     expect(softDeletedPages[0].id).toBe(page2.id);
   });
-
-  it('Should return a page based on a title match', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({
-      spacePaidTier: 'free'
-    });
-
-    // Page without any permission
-    const pageWithoutMatch = await createPage({ createdBy: user.id, spaceId: space.id, title: 'First' });
-    const pageToFind = await createPage({ createdBy: user.id, spaceId: space.id, title: 'Second' });
-
-    const pages = await getAccessiblePages({
-      userId: undefined,
-      spaceId: space.id,
-      search: 'sec'
-    });
-
-    expect(pages.length).toBe(1);
-    expect(pages[0].id).toBe(pageToFind.id);
+  it('should throw an error if no space ID is provided', async () => {
+    await expect(getAccessiblePages({ spaceId: undefined as any })).rejects.toBeInstanceOf(InvalidInputError);
   });
 });
 
@@ -87,6 +72,21 @@ describe('getAccessiblePages - public space search', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(pageToFind.id);
+  });
+
+  it('Should return a page based on a match on nested content', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+
+    // Page without any permission
+    const pageToFind = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'Searched page',
+      contentText: 'Specific content'
+    });
+
+    const pages = await getAccessiblePages({ userId: user.id, spaceId: space.id, search: 'Specific' });
+    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
 
   it('should return a page when keywords are not adjacent', async () => {
