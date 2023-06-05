@@ -52,6 +52,10 @@ function UserDescription(props: UserDescriptionProps) {
     [readOnly]
   );
 
+  useEffect(() => {
+    setValue('description', currentDescription || '');
+  }, [currentDescription]);
+
   const watchDescription = watch('description');
 
   return (

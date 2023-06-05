@@ -67,6 +67,7 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
       </Typography>
       <TextField
         {...register('email')}
+        autoFocus
         data-test='member-email-input'
         error={!!errors.email}
         helperText={errors.email?.message}

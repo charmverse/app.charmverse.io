@@ -125,8 +125,8 @@ export class DocumentEventHandler {
     });
 
     this.socket.on('disconnect', (...args) => {
-      // console.log('disconnect', args);
       try {
+        log.debug('Closing collaboration session', { args, ...this.getSessionMeta() });
         this.onClose();
       } catch (error) {
         const logData = this.getSessionMeta();
@@ -195,18 +195,23 @@ export class DocumentEventHandler {
 
     // handle subscription to document
     if (message.type === 'subscribe') {
-      log.debug('Received subscribe event', { pageId: message.roomId, userId: session.user.id });
+      log.debug('Received subscribe event', { socketId: this.id, pageId: message.roomId, userId: session.user.id });
       await this.subscribeToDoc({ pageId: message.roomId, connectionCount: message.connection });
       return;
     }
 
     if (!session.documentId) {
-      log.warn('Ignore message because session is missing document', { userId: session.user.id });
+      log.warn('Ignore message because session is missing document', { socketId: this.id, userId: session.user.id });
       return;
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.warn('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
+      log.warn('Ignore message from closed document', {
+        socketId: this.id,
+        message,
+        pageId: session.documentId,
+        userId: session.user.id
+      });
       return;
     }
 
@@ -264,10 +269,16 @@ export class DocumentEventHandler {
 
       const docRoom = docRooms.get(pageId);
       if (docRoom && docRoom.participants.size > 0) {
-        log.debug('Join existing document room', { pageId, userId, connectionCount });
+        log.debug('Join existing document room', {
+          pageId,
+          userId,
+          connectionCount,
+          socketId: this.id,
+          participants: docRoom.participants.size
+        });
         docRoom.participants.set(this.id, this);
       } else {
-        log.debug('Opening new document room', { pageId, userId, connectionCount });
+        log.debug('Opening new document room', { socketId: this.id, pageId, userId, connectionCount });
         const page = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
@@ -300,6 +311,7 @@ export class DocumentEventHandler {
       if (connectionCount < 1) {
         await this.sendDocument();
         log.debug('Sent document to new subscriber', {
+          socketId: this.id,
           pageId,
           userId,
           pageVersion: docRooms.get(pageId)?.doc.version
@@ -307,7 +319,12 @@ export class DocumentEventHandler {
       }
       this.handleParticipantUpdate();
     } catch (error) {
-      log.error('Error subscribing user to page', { error, pageId, userId: this.getSession().user.id });
+      log.error('Error subscribing user to page', {
+        error,
+        socketId: this.id,
+        pageId,
+        userId: this.getSession().user.id
+      });
       this.sendError('There was an error loading the page! Please try again later.');
     }
   }
@@ -357,6 +374,7 @@ export class DocumentEventHandler {
     const clientV = message.v;
     const serverV = room.doc.version;
     const logMeta = {
+      socketId: this.id,
       userId: this.getSession().user.id,
       pageId: room.doc.id,
       v: clientV,
@@ -540,11 +558,10 @@ export class DocumentEventHandler {
   }
 
   onClose() {
-    log.debug('Closing collaboration session', this.getSessionMeta());
     const room = this.getDocumentRoom();
     if (room) {
       room.participants.delete(this.id);
-      if (Object.keys(room.participants).length === 0) {
+      if (room.participants.size === 0) {
         docRooms.delete(room.doc.id);
       } else {
         this.sendParticipantList();
