@@ -9,7 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSudoApiKey)
-  .use(requireKeys(['name'], 'body'))
+  .use(requireKeys(['name']))
   .post(provisionSuperToken)
   .delete(invalidateSuperToken);
 

@@ -15,14 +15,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys<SpaceRoleToRole & SpaceRole>(['roleId', 'userId'], 'body'))
+  .use(requireKeys<SpaceRoleToRole & SpaceRole>(['roleId', 'userId']))
   .post(assignRoleController)
   .delete(unassignRoleController);
 
 async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
   // TODO: Remove use of req.body after browser update - 06/2023
   const { roleId, userId } = (req.query || req.body) as RoleAssignment;
-
   const { id: requestingUserId } = req.session.user;
 
   const roleSpaceId = await prisma.role.findUnique({

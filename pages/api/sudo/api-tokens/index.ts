@@ -9,7 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSudoApiKey)
-  .use(requireKeys(['spaceId'], 'body'))
+  .use(requireKeys(['spaceId']))
   .post(provisionToken)
   .delete(invalidateToken);
 
