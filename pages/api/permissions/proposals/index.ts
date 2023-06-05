@@ -51,7 +51,8 @@ async function upsertProposalCategoryPermissionController(
 }
 
 async function removeProposalCategoryPermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as PermissionToDelete;
+  // Remove use of req.body after browsers update - 06/2023
+  const { permissionId } = (req.query || req.body) as PermissionToDelete;
 
   const proposalCategory = await prisma.proposalCategory.findFirst({
     where: {

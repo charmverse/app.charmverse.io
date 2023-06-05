@@ -48,10 +48,6 @@ export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inherite
 export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> &
   Partial<Pick<PagePermission, 'permissions'>>;
 
-export interface IPagePermissionToDelete {
-  permissionId: string;
-}
-
 export interface IPagePermissionWithSource extends PagePermission {
   sourcePermission: PagePermission | null;
 }

@@ -23,6 +23,7 @@ import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
+import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import type {
   IPagePermissionFlags,
   IPagePermissionToCreate,
@@ -242,7 +243,7 @@ class CharmClient {
   }
 
   deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, pageIds);
+    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -486,8 +487,8 @@ class CharmClient {
     return http.POST('/api/permissions', permission);
   }
 
-  deletePermission(permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions', { permissionId });
+  deletePermission(query: PermissionToDelete): Promise<boolean> {
+    return http.DELETE('/api/permissions', query);
   }
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {

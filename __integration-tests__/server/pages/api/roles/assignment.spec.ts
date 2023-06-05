@@ -119,7 +119,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
     await request(baseUrl)
       .delete('/api/roles/assignment')
       .set('Cookie', nonAdminCookie)
-      .send(roleAssignment)
+      .query(roleAssignment)
       .expect(401);
   });
 });

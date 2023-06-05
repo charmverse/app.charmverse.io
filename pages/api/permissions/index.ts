@@ -7,10 +7,10 @@ import nc from 'next-connect';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { PermissionToDelete } from 'lib/permissions/interfaces';
 import type {
   IPagePermissionRequest,
   IPagePermissionToCreate,
-  IPagePermissionToDelete,
   IPagePermissionWithAssignee,
   IPagePermissionWithSource
 } from 'lib/permissions/pages';
@@ -150,7 +150,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
 }
 
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as IPagePermissionToDelete;
+  const { permissionId } = req.query as PermissionToDelete;
 
   const permission = await getPagePermission(permissionId);
 

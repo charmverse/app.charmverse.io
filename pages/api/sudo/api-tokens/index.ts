@@ -22,10 +22,10 @@ async function provisionToken(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function invalidateToken(req: NextApiRequest, res: NextApiResponse) {
-  const { spaceId } = req.body;
+  const { spaceId } = req.query as { spaceId: string };
   await prisma.spaceApiToken.delete({
     where: {
-      spaceId: spaceId as string
+      spaceId
     }
   });
 

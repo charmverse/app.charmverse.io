@@ -22,10 +22,10 @@ async function provisionSuperToken(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function invalidateSuperToken(req: NextApiRequest, res: NextApiResponse) {
-  const { token } = req.body;
+  const { token } = req.query as { token: string };
   await prisma.superApiToken.delete({
     where: {
-      token: token as string
+      token
     }
   });
 

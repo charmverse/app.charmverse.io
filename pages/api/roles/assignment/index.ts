@@ -20,7 +20,8 @@ handler
   .delete(unassignRoleController);
 
 async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
-  const { roleId, userId } = req.body as RoleAssignment;
+  // TODO: Remove use of req.body after browser update - 06/2023
+  const { roleId, userId } = (req.query || req.body) as RoleAssignment;
 
   const { id: requestingUserId } = req.session.user;
 
