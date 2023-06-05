@@ -11,7 +11,6 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Button from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -38,12 +37,11 @@ type Props = {
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const currentSpace = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { hideProposal } = useProposalDialog();
+  const { showProposal } = useProposalDialog();
   const [_, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const { showPage } = usePageDialog();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   usePreventReload(contentUpdated);
   const router = useRouter();
@@ -72,10 +70,9 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
 
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
-      hideProposal();
       mutate(`proposals/${currentSpace.id}`);
       mutateTasks();
-      showPage({
+      showProposal({
         pageId: page.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });

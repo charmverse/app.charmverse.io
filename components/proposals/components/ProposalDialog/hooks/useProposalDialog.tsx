@@ -5,18 +5,21 @@ import { createContext, useContext, useMemo, useState } from 'react';
 interface ProposalDialogContext {
   newProposal?: { category: ProposalCategory | null };
   onClose?: () => void;
+  pageId?: string;
 }
 
 interface Context {
   props: ProposalDialogContext;
   createProposal: (newProposal: ProposalDialogContext['newProposal']) => void;
   hideProposal: () => void;
+  showProposal: (context: ProposalDialogContext) => void;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
   props: {},
   createProposal: () => {},
-  hideProposal: () => {}
+  hideProposal: () => {},
+  showProposal: () => {}
 });
 
 export const useProposalDialog = () => useContext(ContextElement);
@@ -33,9 +36,14 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     setProps({ newProposal });
   }
 
+  function showProposal(_context: ProposalDialogContext) {
+    setProps(_context);
+  }
+
   const value = useMemo(
     () => ({
       props,
+      showProposal,
       createProposal,
       hideProposal
     }),

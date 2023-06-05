@@ -1,15 +1,36 @@
+import type { Page } from '@charmverse/core/src/prisma-client';
+import log from 'loglevel';
+import { useEffect, useState } from 'react';
+
+import charmClient from 'charmClient';
+import type { PageWithContent } from 'lib/pages';
+
 import { useProposalDialog } from './hooks/useProposalDialog';
 import { ProposalDialog } from './ProposalDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function ProposalDialogGlobal() {
   const { props, hideProposal } = useProposalDialog();
-  const { newProposal } = props;
+  const { newProposal, pageId } = props;
+  const [page, setPage] = useState<PageWithContent | null>(null);
 
-  // include postId: when creating a draft, the dialog is open due to 'newPost' being set.
-  // once we save it, we need to load it as 'post' but keep the dialog open in the meantime
-  if (newProposal) {
-    return <ProposalDialog isLoading={false} onClose={hideProposal} />;
+  useEffect(() => {
+    if (pageId) {
+      charmClient.pages
+        .getPage(pageId)
+        .then((_page) => {
+          setPage(_page);
+        })
+        .catch((error) => {
+          log.error('Could not load page', error);
+        });
+    } else {
+      setPage(null);
+    }
+  }, [pageId]);
+
+  if (newProposal || page || pageId) {
+    return <ProposalDialog isLoading={false} onClose={hideProposal} page={page} />;
   }
   return null;
 }

@@ -1,8 +1,15 @@
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import { Box, Stack } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
+import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
+import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useUser } from 'hooks/useUser';
+import type { PageWithContent } from 'lib/pages';
 
 import type { ProposalFormInputs } from '../interfaces';
 
@@ -11,10 +18,12 @@ import { ProposalPage } from './ProposalPage';
 interface Props {
   isLoading: boolean;
   onClose: () => void;
+  page?: PageWithContent | null;
 }
 
-export function ProposalDialog({ isLoading, onClose }: Props) {
+export function ProposalDialog({ page, isLoading, onClose }: Props) {
   const mounted = useRef(false);
+  const router = useRouter();
   const { user } = useUser();
   const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
     title: '',
@@ -51,6 +60,8 @@ export function ProposalDialog({ isLoading, onClose }: Props) {
     setShowConfirmDialog(false);
   }
 
+  const relativePath = `/${router.query.domain}/${page?.path}`;
+
   return (
     <Dialog
       onClose={() => {
@@ -60,18 +71,46 @@ export function ProposalDialog({ isLoading, onClose }: Props) {
           close();
         }
       }}
+      toolbar={
+        page ? (
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              data-test='open-post-as-page'
+              size='small'
+              color='secondary'
+              href={relativePath}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+            >
+              Open as Page
+            </Button>
+          </Box>
+        ) : (
+          <div />
+        )
+      }
+      toolsMenu={
+        page ? (
+          <Stack flexDirection='row' gap={1}>
+            <FullPageActionsMenuButton page={page} onDelete={close} />
+          </Stack>
+        ) : null
+      }
     >
-      {!isLoading && (
-        <ProposalPage
-          formInputs={formInputs}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-          }}
-          contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
-        />
-      )}
+      {!isLoading &&
+        (page ? (
+          <EditorPage pageId={page.id} />
+        ) : (
+          <ProposalPage
+            formInputs={formInputs}
+            setFormInputs={(_formInputs) => {
+              setContentUpdated(true);
+              setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+            }}
+            contentUpdated={contentUpdated}
+            setContentUpdated={setContentUpdated}
+          />
+        ))}
       <ConfirmDeleteModal
         onClose={() => {
           setShowConfirmDialog(false);
