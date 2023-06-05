@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Proposal } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
@@ -18,7 +19,6 @@ import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { PageContent } from 'lib/prosemirror/interfaces';
