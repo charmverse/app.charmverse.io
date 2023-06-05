@@ -1,4 +1,5 @@
 import { Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -49,7 +50,8 @@ function PropertyValueElement(props: Props) {
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
-
+  const router = useRouter();
+  const domain = router.query.domain as string;
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
@@ -188,6 +190,13 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
+  } else if (propertyTemplate.type === 'proposalUrl') {
+    const proposalUrl = `${window.location.origin}/${domain}/${finalDisplayValue}`;
+    propertyValueElement = (
+      <div className='octo-propertyvalue'>
+        <a href={proposalUrl}>{proposalUrl}</a>
+      </div>
+    );
   } else if (propertyValueElement === null) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }

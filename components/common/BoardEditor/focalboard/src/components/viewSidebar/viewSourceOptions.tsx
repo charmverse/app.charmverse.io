@@ -2,6 +2,7 @@ import type { ApiPageKey } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ChangeEvent } from 'react';
@@ -31,7 +32,7 @@ import { SourceType } from './viewSourceType';
 type FormStep = 'select_source' | 'configure_source';
 
 export type DatabaseSourceProps = {
-  onCreate?: () => void;
+  onCreate?: () => Promise<void>;
   onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>, boardBlock?: Board) => void;
 };
 
@@ -51,7 +52,8 @@ const SidebarContent = styled.div`
 `;
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
-  const activeView = props.view;
+  const { view: activeView, pageId, title, onCreate, onSelect, onCsvImport, goBack, closeSidebar } = props;
+
   const activeSourceType = activeView?.fields.sourceType;
 
   const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
@@ -67,14 +69,26 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
       charmClient.createApiPageKey(arg)
   );
 
+  const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
+    `/api/pages/${pageId}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.createProposalSource(arg)
+  );
+
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
-  const handleApiKeyClick = async (type: ApiPageKey['type']) => {
-    if (props.pageId) {
-      await createWebhookApiKey({ pageId: props.pageId, type });
+  async function handleApiKeyClick(type: ApiPageKey['type']) {
+    if (pageId) {
+      await createWebhookApiKey({ pageId, type });
       typeformPopup.open();
     }
-  };
+  }
+
+  async function handleProposalSource() {
+    if (pageId && onCreate) {
+      await onCreate?.();
+      await createProposalSource({ pageId });
+    }
+  }
 
   function selectSourceType(_source: ViewSourceType) {
     return () => {
@@ -90,9 +104,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   return (
     <>
       <SidebarHeader
-        goBack={formStep === 'select_source' ? props.goBack : goToFirstStep}
-        title={props.title}
-        closeSidebar={props.closeSidebar}
+        goBack={formStep === 'select_source' ? goBack : goToFirstStep}
+        title={title}
+        closeSidebar={closeSidebar}
       />
       <Box onClick={(e) => e.stopPropagation()}>
         {formStep === 'select_source' && (
@@ -102,7 +116,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               CharmVerse database
             </SourceType>
             <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={props.onCsvImport} />
+              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
               <BsFiletypeCsv style={{ fontSize: 24 }} />
               Import CSV
             </SourceType>
@@ -111,14 +125,28 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               Google Form
             </SourceType>
             <SourceType
+              active={activeSourceType === 'proposals'}
+              onClick={
+                isLoadingProposalSource
+                  ? undefined
+                  : () => {
+                      selectSourceType('proposals');
+                      handleProposalSource();
+                    }
+              }
+            >
+              <TaskOutlinedIcon fontSize='small' />
+              Proposal
+            </SourceType>
+            <SourceType
               active={false}
               onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
             >
               <SiTypeform style={{ fontSize: 24 }} />
               Typeform
             </SourceType>
-            {props.onCreate && (
-              <SourceType onClick={props.onCreate}>
+            {onCreate && (
+              <SourceType onClick={onCreate}>
                 <AddCircleIcon style={{ fontSize: 24 }} />
                 New database
               </SourceType>
@@ -127,16 +155,16 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (
           <CharmVerseDatabases
-            onSelect={props.onSelect}
+            onSelect={onSelect}
             activePageId={activeView?.fields.linkedSourceId}
-            onCreate={props.onCreate}
+            onCreate={onCreate}
           />
         )}
         {formStep === 'configure_source' && sourceType === 'google_form' && (
           <GoogleDataSource
             activeFormId={activeView?.fields.sourceData?.formId}
             activeCredential={activeView?.fields.sourceData?.credentialId}
-            onSelect={props.onSelect}
+            onSelect={onSelect}
           />
         )}
       </Box>
@@ -154,7 +182,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         open={typeformPopup.isOpen}
         onClose={typeformPopup.close}
         onConfirm={() => {
-          props.onCreate?.();
+          onCreate?.();
           typeformPopup.close();
         }}
       />

@@ -108,6 +108,7 @@ export type PageMeta = Pick<
   | 'bountyId'
   | 'hasContent'
   | 'galleryImage'
+  | 'syncWithPageId'
 >;
 // extend PageMeta so that we can populate usePages hook while /pages is loading
 export type PageWithContent = PageMeta &
