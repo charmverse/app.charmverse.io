@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -60,7 +61,10 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       if (value.some((page) => page.id === pageWithContent?.id)) {
-        mutate();
+        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        mutate(undefined, {
+          rollbackOnError: false
+        });
       }
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
