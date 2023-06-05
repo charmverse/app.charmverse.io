@@ -25,10 +25,10 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    # Include this step to deploy and test a different branch of core
-    # 1. Set the webapp branch
-    # 2. Set core branch
-    # - name: Install special core library
-    #   shell: bash
-    #   if: github.head_ref == 'feat/discourse-import'
-    #   run: npm install github:charmverse/core#feat/discourse-import
+    Include this step to deploy and test a different branch of core
+    1. Set the webapp branch
+    2. Set core branch
+    - name: Install special core library
+      shell: bash
+      if: github.head_ref == 'feat/sync-pages-together'
+      run: npm install github:charmverse/core#feat/sync-pages-together
