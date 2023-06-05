@@ -1,6 +1,7 @@
 import type { Theme } from '@mui/material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
@@ -43,8 +44,13 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const { mutatePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const { showPage } = usePageDialog();
+  const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   usePreventReload(contentUpdated);
   const router = useRouter();
+
+  useEffect(() => {
+    setReadOnlyEditor(!formInputs.proposalTemplateId);
+  }, [formInputs.proposalTemplateId]);
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -105,9 +111,16 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
         <Container top={50} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
-              placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+              placeholderText={
+                readOnlyEditor
+                  ? `You must select a proposal template to begin writing`
+                  : `Describe the proposal. Type '/' to see the list of available commands`
+              }
               content={formInputs.content as PageContent}
               autoFocus={false}
+              style={{
+                color: readOnlyEditor ? `var(--secondary-text)` : 'inherit'
+              }}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType='proposal'
@@ -116,7 +129,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
               focusOnInit
               isContentControlled
               insideModal
-              key={String(formInputs.proposalTemplateId)}
+              readOnly={readOnlyEditor}
+              key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
