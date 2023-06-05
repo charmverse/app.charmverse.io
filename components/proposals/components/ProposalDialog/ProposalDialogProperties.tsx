@@ -131,10 +131,11 @@ export function ProposalDialogProperties({
   });
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
-    if (updatedCategory) {
+    if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
       setProposalFormInputs({
         ...proposalFormInputs,
-        categoryId: updatedCategory.id
+        categoryId: updatedCategory.id,
+        proposalTemplateId: null
       });
     }
   }
