@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useUser } from 'hooks/useUser';
 
 import type { ProposalFormInputs } from '../interfaces';
 
@@ -14,12 +15,13 @@ interface Props {
 
 export function ProposalDialog({ isLoading, onClose }: Props) {
   const mounted = useRef(false);
+  const { user } = useUser();
   const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
     title: '',
     content: null,
     contentText: '',
     categoryId: null,
-    authors: [],
+    authors: user ? [user.id] : [],
     reviewers: [],
     proposalTemplateId: null
   });

@@ -1,8 +1,10 @@
 import type { ProposalReviewerInput } from '@charmverse/core';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
+
 export type ProposalFormInputs = {
   title: string;
-  content: any | null;
+  content: PageContent | null;
   contentText?: string;
   id?: string;
   categoryId: string | null;

@@ -107,13 +107,16 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
             <CharmEditor
               placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
               content={formInputs.content as PageContent}
-              // readOnly={readOnly}
               autoFocus={false}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType='proposal'
               disableNestedPages
               onContentChange={updateProposalContent}
+              focusOnInit
+              isContentControlled
+              insideModal
+              key={String(formInputs.proposalTemplateId)}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader

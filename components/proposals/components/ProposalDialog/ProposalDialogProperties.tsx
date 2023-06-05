@@ -19,6 +19,7 @@ import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import type { ProposalFormInputs } from '../interfaces';
@@ -58,8 +59,11 @@ export function ProposalDialogProperties({
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
-  const [selectedProposalTemplate, setSelectedProposalTemplate] = useState<null | PageMeta>(null);
   const isProposalAuthor = user && proposalAuthorIds.some((authorId) => authorId === user.id);
+
+  const proposalTemplatePage = proposalFormInputs.proposalTemplateId
+    ? pages[proposalFormInputs.proposalTemplateId]
+    : null;
 
   useEffect(() => {
     if (pages) {
@@ -69,20 +73,20 @@ export function ProposalDialogProperties({
 
   async function selectProposalTemplate(templatePage: PageMeta | null) {
     if (templatePage && templatePage.proposalId) {
-      const proposalTemplatePage = await charmClient.pages.getPage(templatePage.id);
+      // Fetch the proposal page to get its content
+      const fetchedProposalTemplatePage = await charmClient.pages.getPage(templatePage.id);
       const proposalTemplate = await charmClient.proposals.getProposal(templatePage.proposalId);
-      if (proposalTemplatePage) {
+      if (fetchedProposalTemplatePage) {
         setProposalFormInputs({
           ...proposalFormInputs,
-          content: proposalTemplatePage.content,
-          contentText: proposalTemplatePage.contentText,
+          content: fetchedProposalTemplatePage.content as PageContent,
+          contentText: fetchedProposalTemplatePage.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
           })),
           proposalTemplateId: templatePage.id
         });
-        setSelectedProposalTemplate(templatePage);
       }
     }
   }
@@ -191,7 +195,7 @@ export function ProposalDialogProperties({
                       return _proposal.categoryId === proposalCategory?.id;
                     }) || []
                   }
-                  value={selectedProposalTemplate ?? null}
+                  value={proposalTemplatePage ?? null}
                   onChange={(page) => {
                     selectProposalTemplate(page);
                   }}
