@@ -28,6 +28,7 @@ playwright-report
 .DS_Store
 .env
 .env.test.local
+.env.staging
 .env.production
 **.local
 *.tsbuildinfo
