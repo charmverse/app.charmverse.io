@@ -171,7 +171,7 @@ export function ProposalProperties({
           <Grid container mb={2}>
             <ProposalStepSummary
               proposalFlowFlags={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />
@@ -199,7 +199,7 @@ export function ProposalProperties({
           <Grid container mb={2} mt={2}>
             <ProposalStepper
               proposalFlowPermissions={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />

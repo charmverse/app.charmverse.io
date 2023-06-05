@@ -1,5 +1,6 @@
 import type { Proposal } from '@charmverse/core/prisma';
-import { Box, Collapse, Divider, Grid, Typography } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,6 +24,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import type { ProposalFormInputs } from '../interfaces';
+import { ProposalStepper } from '../ProposalStepper/ProposalStepper';
+import { ProposalStepSummary } from '../ProposalStepSummary';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -41,6 +44,7 @@ export function ProposalDialogProperties({
 
   const { pages } = usePages();
   const currentSpace = useCurrentSpace();
+  const [detailsExpanded, setDetailsExpanded] = useState(true);
 
   const { members } = useMembers();
   const { roles = [] } = useRoles();
@@ -150,7 +154,35 @@ export function ProposalDialogProperties({
       }}
       mt={2}
     >
-      <Collapse in timeout='auto' unmountOnExit>
+      {!isTemplate && (
+        <>
+          <Grid container mb={2}>
+            <ProposalStepSummary proposalStatus='draft' />
+          </Grid>
+
+          <Stack
+            direction='row'
+            gap={4}
+            alignItems='center'
+            sx={{ cursor: 'pointer' }}
+            onClick={() => setDetailsExpanded((v) => !v)}
+          >
+            <Typography variant='subtitle1'>Additional information</Typography>
+            <IconButton size='small'>
+              <KeyboardArrowDown
+                fontSize='small'
+                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
+              />
+            </IconButton>
+          </Stack>
+        </>
+      )}
+      <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
+        {!isTemplate && (
+          <Grid container mb={2} mt={2}>
+            <ProposalStepper proposalStatus='draft' />
+          </Grid>
+        )}
         <Grid container mb={2}>
           <Grid item xs={8}>
             <Box display='flex' gap={1} alignItems='center'>
