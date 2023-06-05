@@ -49,7 +49,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
@@ -94,7 +94,7 @@ services:
       [
         'sh',
         '-c',
-        'node --experimental-specifier-resolution=node ./dist/main.js',
+        'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js',
       ]
     env_file:
       - '.env'

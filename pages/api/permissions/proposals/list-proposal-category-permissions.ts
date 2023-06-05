@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

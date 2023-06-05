@@ -1,6 +1,7 @@
+import type { PageMeta } from '@charmverse/core/pages';
+
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
-import type { PageMeta } from 'lib/pages';
 
 export type CardFields = {
   icon?: string;

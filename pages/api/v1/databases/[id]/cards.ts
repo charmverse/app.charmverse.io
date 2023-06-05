@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import type { CardPage } from 'lib/public-api';
 import { validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
@@ -53,7 +53,10 @@ export async function createCard(req: NextApiRequest, res: NextApiResponse) {
     createdBy: req.botUser.id
   });
 
-  await setupPermissionsAfterPageCreated(card.id);
+  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+    event: 'created',
+    pageId: card.id
+  });
 
   return res.status(201).json(card);
 }
