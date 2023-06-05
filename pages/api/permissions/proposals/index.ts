@@ -16,7 +16,6 @@ handler
   .delete(
     requirePaidPermissionsSubscription({
       key: 'permissionId',
-      location: 'body',
       resourceIdType: 'proposalCategoryPermission'
     }),
     removeProposalCategoryPermission

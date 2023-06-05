@@ -85,7 +85,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200);
+    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).query(roleAssignment).expect(200);
     const userRoleRecord = await prisma.spaceRoleToRole.count({
       where: {
         roleId: role.id,
