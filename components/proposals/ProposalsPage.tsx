@@ -124,8 +124,8 @@ export function ProposalsPage() {
             )}
           </Grid>
           <PageDialogGlobal />
+          <ProposalDialogGlobal />
         </PageDialogProvider>
-        <ProposalDialogGlobal />
       </ProposalDialogProvider>
     </CenteredPageContent>
   );

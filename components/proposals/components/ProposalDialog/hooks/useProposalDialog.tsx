@@ -11,14 +11,12 @@ interface Context {
   props: ProposalDialogContext;
   createProposal: (newProposal: ProposalDialogContext['newProposal']) => void;
   hideProposal: () => void;
-  showProposal: (context: ProposalDialogContext) => void;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
   props: {},
   createProposal: () => {},
-  hideProposal: () => {},
-  showProposal: () => {}
+  hideProposal: () => {}
 });
 
 export const useProposalDialog = () => useContext(ContextElement);
@@ -31,10 +29,6 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     setProps({});
   }
 
-  function showProposal(_context: ProposalDialogContext) {
-    setProps(_context);
-  }
-
   function createProposal(newProposal: ProposalDialogContext['newProposal']) {
     setProps({ newProposal });
   }
@@ -43,8 +37,7 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     () => ({
       props,
       createProposal,
-      hideProposal,
-      showProposal
+      hideProposal
     }),
     [props]
   );

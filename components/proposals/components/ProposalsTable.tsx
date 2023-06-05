@@ -60,6 +60,7 @@ export function ProposalsTable({
       });
     }
   }, [router.query.id]);
+
   return (
     <>
       <GridHeader>
