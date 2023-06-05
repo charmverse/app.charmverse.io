@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Menu, Popover, Tooltip } from '@mui/material';
 import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
@@ -13,7 +14,6 @@ import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
 
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';

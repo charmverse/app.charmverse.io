@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 // TODO: frontend should tell us which space to use
@@ -26,11 +26,13 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
     return res.status(404).json({ error: 'page not found' });
   }
 
-  const computed = await computeUserPagePermissions({
-    resourceId: publicPage.id,
-    userId: req.session.user?.id
-  });
-
+  const computed = await getPermissionsClient({ resourceId: publicPage.id, resourceIdType: 'page' }).then(
+    ({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: publicPage.id,
+        userId: req.session.user?.id
+      })
+  );
   if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
   }

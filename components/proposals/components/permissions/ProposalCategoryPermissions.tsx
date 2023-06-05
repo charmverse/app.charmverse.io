@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalCategory } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';

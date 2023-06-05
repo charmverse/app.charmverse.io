@@ -4,20 +4,30 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { MultipleThreadsInput } from 'lib/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(requireKeys<MultipleThreadsInput>(['threadIds', 'pageId'], 'body'), resolveThreads);
+handler
+  .use(requireUser)
+  .use(requireKeys<MultipleThreadsInput>(['threadIds', 'pageId'], 'body'))
+  .use(
+    providePermissionClients({
+      key: 'pageId',
+      location: 'body',
+      resourceIdType: 'page'
+    })
+  )
+  .post(resolveThreads);
 
 async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
   const { threadIds, pageId } = req.body as MultipleThreadsInput;
 
   const userId = req.session.user.id;
 
-  const permissionSet = await computeUserPagePermissions({
+  const permissionSet = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

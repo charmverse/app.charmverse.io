@@ -2,11 +2,11 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
@@ -16,9 +16,9 @@ jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
-let root_1: IPageWithPermissions;
-let page_1_1: IPageWithPermissions;
-let page_1_1_1: IPageWithPermissions;
+let root_1: PageWithPermissions;
+let page_1_1: PageWithPermissions;
+let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;

@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -6,7 +7,6 @@ import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog'
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
 
 import { BountyGalleryCard } from './BountyGalleryCard';
 
