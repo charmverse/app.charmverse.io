@@ -133,7 +133,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
   async function updateSpacePagePermissionLevel(permissionLevel: ApplicablePagePermissionLevel | 'delete') {
     if (permissionLevel === 'delete') {
       if (spaceLevelPermission) {
-        await charmClient.deletePermission(spaceLevelPermission.id);
+        await charmClient.deletePermission({ permissionId: spaceLevelPermission.id });
       }
     } else if (space) {
       // The permission is being manually edited, so we drop the inheritance reference
@@ -156,7 +156,7 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
     permissionLevel: ApplicablePagePermissionLevel | 'delete'
   ) {
     if (permissionLevel === 'delete') {
-      await charmClient.deletePermission(permission.id);
+      await charmClient.deletePermission({ permissionId: permission.id });
     } else if (permissionLevel !== permission.permissionLevel) {
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({

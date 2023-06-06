@@ -151,7 +151,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -168,7 +168,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', adminUserCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -186,7 +186,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(401);
   });
 });

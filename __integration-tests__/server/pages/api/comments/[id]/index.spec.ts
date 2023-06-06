@@ -69,7 +69,7 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', nonAdminCookie).send({}).expect(200);
+    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', nonAdminCookie).expect(200);
   });
 
   it('should fail if the user did not create the comment, and respond 401', async () => {
@@ -86,6 +86,6 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', otherAdminCookie).send({}).expect(401);
+    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', otherAdminCookie).expect(401);
   });
 });

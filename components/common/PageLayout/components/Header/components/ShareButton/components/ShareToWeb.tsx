@@ -78,7 +78,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   async function togglePublic() {
     if (publicPermission) {
-      await charmClient.deletePermission(publicPermission.id);
+      await charmClient.deletePermission({ permissionId: publicPermission.id });
     } else {
       await charmClient.createPermission({
         pageId,
