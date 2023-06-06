@@ -50,6 +50,12 @@ export async function getProposalTasks(userId: string): Promise<{
   marked: ProposalTask[];
   unmarked: ProposalTask[];
 }> {
+  const userNotifications = await prisma.userNotification.findMany({
+    where: {
+      userId
+    }
+  });
+
   const workspaceEvents = await prisma.workspaceEvent.findMany({
     where: {
       type: 'proposal_status_change'
@@ -128,12 +134,12 @@ export async function getProposalTasks(userId: string): Promise<{
     }
   });
 
+  const userNotificationIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
+
   const proposalsRecord: { marked: ProposalTask[]; unmarked: ProposalTask[] } = {
     marked: [],
     unmarked: []
   };
-
-  const tasks: ProposalTask[] = [];
 
   pagesWithProposals.forEach(({ proposal, ...page }) => {
     if (proposal) {
@@ -149,14 +155,6 @@ export async function getProposalTasks(userId: string): Promise<{
       });
 
       if (workspaceEvent) {
-        // Check notifications are emabled for space-wide proposal notifications
-        const notifyNewEvents =
-          page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
-
-        if (!notifyNewEvents && (action === 'discuss' || action === 'vote')) {
-          return;
-        }
-
         const proposalTask = {
           id: workspaceEvent.id,
           eventDate: workspaceEvent.createdAt,
@@ -171,25 +169,12 @@ export async function getProposalTasks(userId: string): Promise<{
           taskId: workspaceEvent.id,
           createdAt: workspaceEvent.createdAt
         };
-        tasks.push(proposalTask);
+        if (!userNotificationIds.has(workspaceEvent.id)) {
+          proposalsRecord.unmarked.push(proposalTask);
+        } else {
+          proposalsRecord.marked.push(proposalTask);
+        }
       }
-    }
-  });
-
-  const userNotifications = await prisma.userNotification.findMany({
-    where: {
-      taskId: {
-        in: tasks.map((task) => task.id)
-      },
-      userId
-    }
-  });
-
-  tasks.forEach((task) => {
-    if (!userNotifications.some((t) => t.taskId === task.id)) {
-      proposalsRecord.unmarked.push(task);
-    } else {
-      proposalsRecord.marked.push(task);
     }
   });
 
