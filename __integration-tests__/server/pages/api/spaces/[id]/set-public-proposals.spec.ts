@@ -56,4 +56,14 @@ describe('POST /api/spaces/[id]/set-public-proposals - Make the space proposals 
       })
       .expect(401);
   });
+
+  it('should fail if the space is not a  admin of the space, and respond 401', async () => {
+    await request(baseUrl)
+      .post(`/api/spaces/${space.id}/set-public-proposals`)
+      .set('Cookie', nonAdminUserCookie)
+      .send({
+        publicProposals: true
+      })
+      .expect(401);
+  });
 });
