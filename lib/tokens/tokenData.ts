@@ -3,9 +3,6 @@ import type { PaymentMethod } from '@charmverse/core/prisma';
 import type { IChainDetails } from 'connectors';
 import { getChainById, getChainBySymbol } from 'connectors';
 
-import * as http from 'adapters/http';
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
-
 import type { SupportedChainId } from '../blockchain/provider/alchemy';
 
 export interface ITokenMetadataRequest {
@@ -21,44 +18,6 @@ export interface ITokenMetadata {
 }
 
 export type TokenInfo = Pick<PaymentMethod, 'tokenName' | 'tokenSymbol' | 'tokenLogo'> & { isContract: boolean };
-
-/**
- * Call external provider to get information about a specific cryptocurrency
- */
-export function getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
-  return new Promise((resolve, reject) => {
-    if (!chainId || !contractAddress) {
-      reject(new Error('Please provide a valid chainId and contractAddress'));
-    }
-
-    let baseUrl = '';
-    try {
-      baseUrl = getAlchemyBaseUrl(chainId);
-    } catch (e: unknown) {
-      reject(e);
-    }
-
-    http
-      .POST(baseUrl, {
-        jsonrpc: '2.0',
-        method: 'alchemy_getTokenMetadata',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        params: [`${contractAddress}`]
-      })
-      .then((data: any) => {
-        if (data.error) {
-          reject(data.error);
-        } else {
-          resolve(data.result as ITokenMetadata);
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
 
 type TokenAndChain = TokenInfo & { chain: IChainDetails; canonicalLogo: string };
 type getTokenInfoProps = { chainId?: number; methods: PaymentMethod[]; symbolOrAddress: string };
