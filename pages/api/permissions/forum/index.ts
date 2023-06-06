@@ -17,7 +17,6 @@ handler
   .delete(
     requirePaidPermissionsSubscription({
       key: 'permissionId',
-      location: 'body',
       resourceIdType: 'postCategoryPermission'
     }),
     removePostCategoryPermission
@@ -52,7 +51,8 @@ async function upsertPostCategoryPermissionController(
 }
 
 async function removePostCategoryPermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as PermissionResource;
+  // TODO: remove check on req.body after browsers update - 06/2023
+  const { permissionId } = (req.query || req.body) as PermissionResource;
 
   const postCategory = await prisma.postCategory.findFirst({
     where: {

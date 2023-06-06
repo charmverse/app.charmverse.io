@@ -33,6 +33,7 @@ import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
@@ -244,7 +245,7 @@ class CharmClient {
   }
 
   deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, pageIds);
+    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -488,8 +489,8 @@ class CharmClient {
     return http.POST('/api/permissions', permission);
   }
 
-  deletePermission(permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions', { permissionId });
+  deletePermission(query: PermissionResource): Promise<boolean> {
+    return http.DELETE('/api/permissions', query);
   }
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {

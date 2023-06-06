@@ -10,6 +10,8 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { usePages } from 'hooks/usePages';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
@@ -20,19 +22,19 @@ import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
+  const { pages } = usePages();
   const currentSpace = useCurrentSpace();
+  const { isPublicSpace } = useIsPublicSpace();
   const {
     data,
     mutate: mutateProposals,
     isLoading
-  } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
+  } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
+    charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
-
   useEffect(() => {
     if (currentSpace?.id) {
       charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
@@ -41,14 +43,16 @@ export function ProposalsPage() {
 
   const loadingData = !data;
 
-  const { hasAccess: canSeeProposals, isLoadingAccess } = useHasMemberLevel('member');
+  const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
+
+  const canSeeProposals = hasAccess || isPublicSpace || currentSpace?.publicProposals === true;
 
   if (isLoadingAccess) {
     return null;
   }
 
   if (!canSeeProposals) {
-    return <ErrorPage message='Guests cannot access proposals' />;
+    return <ErrorPage message='You cannot access proposals for this space' />;
   }
 
   return (

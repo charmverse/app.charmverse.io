@@ -65,6 +65,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     superApiTokenId: null,
     webhookSubscriptionUrl: null,
     webhookSigningSecret: null,
+    publicProposals: null,
     hiddenFeatures: [],
     ...space
   };

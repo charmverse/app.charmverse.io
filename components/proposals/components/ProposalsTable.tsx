@@ -1,5 +1,5 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -12,10 +12,10 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
 import ProposalActionsMenu from './ProposalActionsMenu';
+import { ProposalCategoryChip } from './ProposalChip';
 import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
@@ -129,7 +129,7 @@ export function ProposalsTable({
               justifyContent='center'
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
-              {category ? <Chip size='small' color={category.color as BrandColor} label={category.title} /> : '-'}
+              {category ? <ProposalCategoryChip size='small' color={category.color} title={category.title} /> : '-'}
             </Grid>
             <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
               <Tooltip arrow placement='top' title={`Created on ${formatDateTime(proposalPage.createdAt)}`}>
