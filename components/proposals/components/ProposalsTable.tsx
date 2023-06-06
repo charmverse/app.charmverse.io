@@ -7,15 +7,16 @@ import Button from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
 import ProposalActionsMenu from './ProposalActionsMenu';
+import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
 import { ProposalStatusChip } from './ProposalStatusBadge';
 
 export function ProposalsTable({
@@ -29,12 +30,12 @@ export function ProposalsTable({
 }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const { showPage } = usePageDialog();
+  const { showProposal } = useProposalDialog();
   const router = useRouter();
   const { formatDateTime, formatDate } = useDateFormatter();
 
   function onClose() {
-    router.push({ pathname: router.pathname, query: { domain: router.query.domain } });
+    setUrlWithoutRerender(router.pathname, { id: null });
     mutateProposals();
     mutateTasks();
   }
@@ -54,7 +55,7 @@ export function ProposalsTable({
 
   useEffect(() => {
     if (typeof router.query.id === 'string') {
-      showPage({
+      showProposal({
         pageId: router.query.id,
         onClose
       });

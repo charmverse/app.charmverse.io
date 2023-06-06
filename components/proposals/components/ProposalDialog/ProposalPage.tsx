@@ -12,7 +12,6 @@ import Button from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
-import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -41,7 +40,6 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const [_, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
-  const { mutate: mutateTasks } = useTasks();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   usePreventReload(contentUpdated);
   const router = useRouter();
@@ -73,12 +71,10 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
       mutate(`proposals/${currentSpace.id}`);
-      mutateTasks();
       showProposal({
         pageId: page.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
-          mutate(`proposals/${currentSpace.id}`);
         }
       });
       setUrlWithoutRerender(router.pathname, { id: page.id });

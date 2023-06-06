@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useUser } from 'hooks/useUser';
@@ -97,20 +98,21 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         ) : null
       }
     >
-      {!isLoading &&
-        (page ? (
-          <EditorPage pageId={page.id} />
-        ) : (
-          <ProposalPage
-            formInputs={formInputs}
-            setFormInputs={(_formInputs) => {
-              setContentUpdated(true);
-              setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-            }}
-            contentUpdated={contentUpdated}
-            setContentUpdated={setContentUpdated}
-          />
-        ))}
+      {isLoading ? (
+        <LoadingComponent isLoading />
+      ) : page ? (
+        <EditorPage pageId={page.id} />
+      ) : (
+        <ProposalPage
+          formInputs={formInputs}
+          setFormInputs={(_formInputs) => {
+            setContentUpdated(true);
+            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+          }}
+          contentUpdated={contentUpdated}
+          setContentUpdated={setContentUpdated}
+        />
+      )}
       <ConfirmDeleteModal
         onClose={() => {
           setShowConfirmDialog(false);

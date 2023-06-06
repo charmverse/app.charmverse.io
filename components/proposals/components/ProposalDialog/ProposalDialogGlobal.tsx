@@ -1,4 +1,3 @@
-import type { Page } from '@charmverse/core/src/prisma-client';
 import log from 'loglevel';
 import { useEffect, useState } from 'react';
 
@@ -13,9 +12,11 @@ export default function ProposalDialogGlobal() {
   const { props, hideProposal } = useProposalDialog();
   const { newProposal, pageId } = props;
   const [page, setPage] = useState<PageWithContent | null>(null);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
 
   useEffect(() => {
     if (pageId) {
+      setIsLoadingPage(true);
       charmClient.pages
         .getPage(pageId)
         .then((_page) => {
@@ -23,6 +24,9 @@ export default function ProposalDialogGlobal() {
         })
         .catch((error) => {
           log.error('Could not load page', error);
+        })
+        .finally(() => {
+          setIsLoadingPage(false);
         });
     } else {
       setPage(null);
@@ -30,7 +34,7 @@ export default function ProposalDialogGlobal() {
   }, [pageId]);
 
   if (newProposal || page || pageId) {
-    return <ProposalDialog isLoading={false} onClose={hideProposal} page={page} />;
+    return <ProposalDialog isLoading={isLoadingPage} onClose={hideProposal} page={page} />;
   }
   return null;
 }

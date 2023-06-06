@@ -9,7 +9,6 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useProposalDialog } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
@@ -22,7 +21,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const { showPage } = usePageDialog();
+  const { showProposal } = useProposalDialog();
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
@@ -59,8 +58,8 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
       mutateProposals();
       mutatePage(newProposal);
       setUrlWithoutRerender(router.pathname, { id: newProposal.id });
-      showPage({
-        pageId: newProposal.id,
+      showProposal({
+        pageId: templateId,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
         }
@@ -77,7 +76,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
 
       mutatePage(newTemplate);
       setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
-      showPage({
+      showProposal({
         pageId: newTemplate.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
@@ -113,7 +112,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
         createTemplate={createProposalTemplate}
         editTemplate={(pageId) => {
           setUrlWithoutRerender(router.pathname, { id: pageId });
-          showPage({
+          showProposal({
             pageId,
             onClose() {
               setUrlWithoutRerender(router.pathname, { id: null });
