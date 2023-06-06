@@ -8,8 +8,8 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -123,9 +123,9 @@ export default function ConnectSnapshot() {
 
         {isAdmin && (
           <Grid item display='flex' justifyContent='space-between'>
-            <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type='submit'>
+            <Button size='large' disabled={!isValid || snapshotDomainUnchanged} type='submit'>
               Save
-            </PrimaryButton>
+            </Button>
           </Grid>
         )}
       </Grid>

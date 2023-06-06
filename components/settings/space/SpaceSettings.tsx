@@ -1,13 +1,11 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, Feature } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
+import { Box, FormControlLabel, Grid, Stack, Switch, Typography, TextField } from '@mui/material';
 import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
@@ -21,13 +19,18 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+import { typedKeys } from 'lib/utilities/objects';
 
 import Avatar from './components/LargeAvatar';
-import { SpaceFeatureSettings } from './components/SpaceFeatureSettings';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
+  show_bounties: yup.boolean(),
+  show_forum: yup.boolean(),
+  show_member_directory: yup.boolean(),
+  show_proposals: yup.boolean(),
+  notifyNewProposals: yup.boolean(),
   domain: yup
     .string()
     .ensure()
@@ -38,6 +41,13 @@ const schema = yup.object({
 });
 
 type FormValues = yup.InferType<typeof schema>;
+
+const featureLabels: Record<Feature, string> = {
+  bounties: 'Bounties',
+  forum: 'Forum',
+  member_directory: 'Member Directory',
+  proposals: 'Proposals'
+};
 
 export function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
@@ -51,28 +61,52 @@ export function SpaceSettings({ space }: { space: Space }) {
     register,
     handleSubmit,
     reset,
+    control,
     setValue,
     watch,
     formState: { errors, isDirty }
   } = useForm<FormValues>({
-    defaultValues: space,
+    defaultValues: {
+      name: space.name,
+      spaceImage: space.spaceImage,
+      domain: space.domain,
+      notifyNewProposals: !!space.notifyNewProposals,
+      show_bounties: !space.hiddenFeatures.includes('bounties'),
+      show_forum: !space.hiddenFeatures.includes('forum'),
+      show_member_directory: !space.hiddenFeatures.includes('member_directory'),
+      show_proposals: !space.hiddenFeatures.includes('proposals')
+    },
     resolver: yupResolver(schema)
   });
 
   // set default values when space is set
   useEffect(() => {
-    if (space) {
-      reset(space);
-      charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
-    }
-  }, [space?.id]);
+    charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
+  }, [space.id]);
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
+  const notifyNewProposals = watch('notifyNewProposals');
 
   function onSubmit(values: FormValues) {
-    if (!space || !isAdmin || !values.domain) return;
+    if (!isAdmin || !values.domain) return;
     setError(null);
+    // console.log(values);
+    // console.log('space', space);
+    return;
+
+    // const toSet = typedKeys(values).reduce((acc, key) => {
+    //   if (!values[key as Feature]) {
+    //     acc.push(key as Feature);
+    //   }
+
+    //   return acc;
+    // }, [] as Feature[]);
+
+    // const settingsChanged =
+    //   uniqueValues(toSet).length !== space.hiddenFeatures.length ||
+    //   toSet.some((feature) => !space.hiddenFeatures.includes(feature)) ||
+    //   space.hiddenFeatures.some((feature) => !toSet.includes(feature));
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     charmClient
@@ -91,7 +125,6 @@ export function SpaceSettings({ space }: { space: Space }) {
         } else {
           setSpace(updatedSpace);
         }
-        reset(updatedSpace);
       })
       .catch((err) => {
         setError(err?.message || err || 'Something went wrong');
@@ -147,6 +180,71 @@ export function SpaceSettings({ space }: { space: Space }) {
             />
             {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>
+          <Grid item>
+            <FieldLabel>Notifications</FieldLabel>
+            <Typography variant='caption'>Control space-wide notifications for your members.</Typography>
+            <Stack>
+              <Controller
+                control={control}
+                name='notifyNewProposals'
+                render={({ field: { onChange, value, name, ref } }) => {
+                  return (
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          disabled={!isAdmin}
+                          checked={value}
+                          onChange={(event, val) => {
+                            if (val) {
+                              setValue(`notifyNewProposals`, val);
+                            }
+                            return onChange(val);
+                          }}
+                        />
+                      }
+                      label='Send notifications for new proposals'
+                    />
+                  );
+                }}
+              />
+            </Stack>
+          </Grid>
+          <Grid item>
+            <FieldLabel>Sidebar Module Visibility</FieldLabel>
+            <Typography variant='caption'>
+              Turn on and off the visibility of the following modules in the sidebar. The functionality will still
+              exist, but it won't be visible in the sidebar.
+            </Typography>
+            <Stack>
+              {typedKeys(featureLabels).map((feature) => (
+                <Controller
+                  key={feature}
+                  control={control}
+                  name={`show_${feature}`}
+                  render={({ field: { onChange, value, name, ref } }) => {
+                    return (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            data-test={`space-feature-toggle-${feature}`}
+                            disabled={!isAdmin}
+                            checked={value}
+                            onChange={(event, val) => {
+                              if (val) {
+                                setValue(`show_${feature}`, val);
+                              }
+                              return onChange(val);
+                            }}
+                          />
+                        }
+                        label={featureLabels[feature]}
+                      />
+                    );
+                  }}
+                />
+              ))}
+            </Stack>
+          </Grid>
           {isAdmin ? (
             <Grid item display='flex' justifyContent='space-between'>
               <Button disableElevation size='large' data-test='submit-space-update' disabled={!isDirty} type='submit'>
@@ -171,10 +269,8 @@ export function SpaceSettings({ space }: { space: Space }) {
           )}
         </Grid>
       </form>
-
-      <Legend mt={4}>Sidebar Module Visibility</Legend>
-      <SpaceFeatureSettings />
-
+      <br />
+      <br />
       <Legend mt={4}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
