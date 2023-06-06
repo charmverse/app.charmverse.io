@@ -32,7 +32,7 @@ import { SourceType } from './viewSourceType';
 type FormStep = 'select_source' | 'configure_source';
 
 export type DatabaseSourceProps = {
-  onCreate?: () => Promise<void>;
+  onCreate?: () => Promise<BoardView>;
   onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>, boardBlock?: Board) => void;
 };
 
