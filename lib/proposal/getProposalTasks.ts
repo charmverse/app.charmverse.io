@@ -149,7 +149,7 @@ export async function getProposalTasks(userId: string): Promise<{
       });
 
       if (workspaceEvent) {
-        // Check notifications are emabled for space-wide proposal notifications
+        // Check notifications are enabled for space-wide proposal notifications
         const notifyNewEvents =
           page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
 
