@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
@@ -59,12 +60,22 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         }
       );
     }
+    function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
+      if (value.some((page) => page.id === pageWithContent?.id)) {
+        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        mutate(undefined, {
+          rollbackOnError: false
+        });
+      }
+    }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
-  }, [mutate]);
+  }, [mutate, pageWithContent?.id]);
 
   if (pageWithContent) {
     return {

@@ -28,7 +28,7 @@ handler
     findPagePermissions
   )
   .delete(
-    requirePaidPermissionsSubscription({ key: 'permissionId', location: 'body', resourceIdType: 'pagePermission' }),
+    requirePaidPermissionsSubscription({ key: 'permissionId', resourceIdType: 'pagePermission' }),
     removePagePermission
   )
   .use(requireKeys(['pageId'], 'body'))
@@ -124,7 +124,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 }
 
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as PermissionResource;
+  const { permissionId } = (req.query || req.body) as PermissionResource;
 
   const permission = await prisma.pagePermission.findUnique({
     where: { id: permissionId },

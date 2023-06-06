@@ -106,7 +106,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', userCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(200);
   });
 
@@ -118,7 +118,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', adminUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(200);
   });
 
@@ -130,7 +130,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', extraSpaceUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(401);
   });
 
@@ -142,7 +142,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', nonSpaceUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(401);
   });
 });

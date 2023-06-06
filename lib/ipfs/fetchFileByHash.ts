@@ -1,4 +1,4 @@
-import fetch from 'adapters/http/fetch.server';
+import { GET } from '@charmverse/core/http';
 
 const GATEWAY_BASE_URL = 'https://cloudflare-ipfs.com/ipfs';
 
@@ -7,5 +7,5 @@ export function getIpfsFileUrl(hash: string) {
 }
 
 export function fetchFileByHash<T = unknown>(hash: string) {
-  return fetch<T>(getIpfsFileUrl(hash));
+  return GET<T>(getIpfsFileUrl(hash), {});
 }

@@ -5,6 +5,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useProposal } from 'hooks/useProposal';
 import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
@@ -20,9 +21,7 @@ const userFriendlyPermissionLabels: Record<ProposalCategoryPermissionLevel, stri
 };
 
 export function ProposalPagePermissions({ proposalId }: Props) {
-  const { data: proposal } = useSWR(!proposalId ? null : `proposal/${proposalId}`, () =>
-    charmClient.proposals.getProposal(proposalId)
-  );
+  const { proposal } = useProposal({ proposalId });
   const { data: proposalCategoryPermissions } = useSWR(
     !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
     () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
@@ -34,7 +33,11 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   const rolePermissions =
     proposalCategoryPermissions?.filter((permission) => permission.assignee.group === 'role') ?? [];
   if (!proposalCategoryPermissions) {
-    return <LoadingComponent />;
+    return (
+      <Box sx={{ height: '100px' }}>
+        <LoadingComponent />
+      </Box>
+    );
   }
   return (
     <Box p={1}>

@@ -84,6 +84,9 @@
       "@charmverse/core/log": [
         "node_modules/@charmverse/core/dist/cjs/lib/log",
       ],
+      "@charmverse/core/http": [
+        "node_modules/@charmverse/core/dist/cjs/http"
+      ],
       "@charmverse/core/test": [
         "node_modules/@charmverse/core/dist/cjs/test"
       ],

@@ -7,14 +7,14 @@ import {
   PostComment,
   prisma
 } from '@charmverse/core/prisma-client';
-import fetch from 'adapters/http/fetch.server';
+import { GET } from '@charmverse/core/http';
 import { htmlToText } from 'html-to-text';
 import { RateLimit } from 'async-sema';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import TurndownService from 'turndown';
-import emoji from "emoji-js"
-import { PremiumPermissionsClient } from '@charmverse/core/permissions'
-import { getPermissionsClient } from 'lib/permissions/api'
+import emoji from 'emoji-js';
+import { PremiumPermissionsClient } from '@charmverse/core/permissions';
+import { getPermissionsClient } from 'lib/permissions/api';
 
 const rateLimiter = RateLimit(1);
 
@@ -265,13 +265,13 @@ export async function importFromDiscourse(community: string, spaceDomain: string
 
     const {
       category_list: { categories }
-    } = await fetch<{
+    } = await GET<{
       category_list: {
         categories: Category[];
       };
-    }>(`https://${community}/categories.json`);
+    }>(`https://${community}/categories.json`, {});
 
-    const { tags } = await fetch<{ tags: Tag[] }>(`https://${community}/tags.json`);
+    const { tags } = await GET<{ tags: Tag[] }>(`https://${community}/tags.json`, {});
 
     const postTagRecord: Record<string, PostTag> = {};
 
@@ -333,7 +333,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     }) {
       if (!userRecord[userId]) {
         await rateLimiter();
-        const fetchedUser = (await fetch<{ user: User }>(`https://${community}/users/${username}.json`)).user;
+        const fetchedUser = (await GET<{ user: User }>(`https://${community}/users/${username}.json`, {})).user;
         userRecord[userId] = await createCharmverseUser({
           community,
           spaceId,
@@ -351,12 +351,15 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       await rateLimiter();
       const {
         topic_list: { topics: fetchedTopics }
-      } = await fetch<{ users: User[]; topic_list: { topics: Topic[] } }>(`https://${community}/c/${categoryId}.json`);
+      } = await GET<{ users: User[]; topic_list: { topics: Topic[] } }>(
+        `https://${community}/c/${categoryId}.json`,
+        {}
+      );
       for (const topic of fetchedTopics) {
         await rateLimiter();
         const {
           post_stream: { posts: fetchedPosts }
-        } = await fetch<{ post_stream: { posts: Post[] } }>(`https://${community}/t/${topic.id}.json`);
+        } = await GET<{ post_stream: { posts: Post[] } }>(`https://${community}/t/${topic.id}.json`, {});
         topicPostsRecord[topic.id] = {
           posts: fetchedPosts,
           topic
@@ -462,8 +465,9 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       }
 
       await rateLimiter();
-      const userActions = await fetch<{ user_actions: UserAction[] }>(
-        `https://${community}/user_actions.json?username=${user.username}`
+      const userActions = await GET<{ user_actions: UserAction[] }>(
+        `https://${community}/user_actions.json?username=${user.username}`,
+        {}
       );
       // action_type === 2 is post like
       const postLikeUserActions = userActions.user_actions.filter((userAction) => userAction.action_type === 2);

@@ -214,7 +214,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', userCookie)
-      .send({
+      .query({
         permissionId: permissionToDelete.id
       })
       .expect(200);
@@ -253,7 +253,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', userCookie)
-      .send({
+      .query({
         permissionId: permissionToDelete.id
       })
       .expect(200);
@@ -293,7 +293,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', userCookie)
-      .send({
+      .query({
         permissionId: permissionToDelete.id
       })
       .expect(401);
