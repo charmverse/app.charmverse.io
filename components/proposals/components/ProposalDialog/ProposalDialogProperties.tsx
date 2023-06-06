@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Proposal } from '@charmverse/core/prisma';
+import type { Page, Proposal } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -58,7 +58,7 @@ export function ProposalDialogProperties({
   const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
-  }, {} as Record<string, Proposal>);
+  }, {} as Record<string, Proposal & { page: Page }>);
 
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
@@ -79,13 +79,14 @@ export function ProposalDialogProperties({
   async function selectProposalTemplate(templatePage: PageMeta | null) {
     if (templatePage && templatePage.proposalId) {
       // Fetch the proposal page to get its content
-      const fetchedProposalTemplatePage = await charmClient.pages.getPage(templatePage.id);
-      const proposalTemplate = await charmClient.proposals.getProposal(templatePage.proposalId);
-      if (fetchedProposalTemplatePage) {
+      const proposalTemplate = proposalTemplates.find(
+        (_proposalTemplate) => _proposalTemplate.page.id === templatePage.id
+      );
+      if (proposalTemplate) {
         setProposalFormInputs({
           ...proposalFormInputs,
-          content: fetchedProposalTemplatePage.content as PageContent,
-          contentText: fetchedProposalTemplatePage.contentText,
+          content: proposalTemplate.page.content as PageContent,
+          contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)

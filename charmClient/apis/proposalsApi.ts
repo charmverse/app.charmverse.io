@@ -4,7 +4,7 @@ import type {
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { PageWithProposal } from 'lib/pages';
@@ -36,7 +36,7 @@ export class ProposalsApi {
   }
 
   getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
-    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposal-templates`);
+    return http.GET<(ProposalWithUsers & { page: Page })[]>(`/api/spaces/${spaceId}/proposal-templates`);
   }
 
   getProposalCategories(spaceId: string) {
