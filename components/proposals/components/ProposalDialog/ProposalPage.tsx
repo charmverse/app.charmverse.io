@@ -46,8 +46,10 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
 
   useEffect(() => {
-    setReadOnlyEditor(!formInputs.proposalTemplateId);
-  }, [formInputs.proposalTemplateId]);
+    if (currentSpace?.requireProposalTemplate) {
+      setReadOnlyEditor(!formInputs.proposalTemplateId);
+    }
+  }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -98,7 +100,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
     disabledTooltip = 'Content is required';
   } else if (!formInputs.categoryId) {
     disabledTooltip = 'Category is required';
-  } else if (!formInputs.proposalTemplateId) {
+  } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
     disabledTooltip = 'Template is required';
   }
 

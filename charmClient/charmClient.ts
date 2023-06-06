@@ -5,7 +5,8 @@ import type {
   PagePermissionFlags,
   PagePermissionWithSource,
   PermissionCompute,
-  SpaceDefaultPublicPageToggle
+  SpaceDefaultPublicPageToggle,
+  SpaceRequireProposalTemplateToggle
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -505,6 +506,12 @@ class CharmClient {
   setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
+    });
+  }
+
+  setRequireProposalTemplate({ spaceId, requireProposalTemplate }: SpaceRequireProposalTemplateToggle) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-require-proposal-template`, {
+      requireProposalTemplate
     });
   }
 
