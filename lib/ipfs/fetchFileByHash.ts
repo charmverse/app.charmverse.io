@@ -7,5 +7,5 @@ export function getIpfsFileUrl(hash: string) {
 }
 
 export function fetchFileByHash<T = unknown>(hash: string) {
-  return GET<T>(getIpfsFileUrl(hash));
+  return GET<T>(getIpfsFileUrl(hash), {});
 }
