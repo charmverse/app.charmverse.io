@@ -40,7 +40,13 @@ export default function ProposalTemplateInput({ disabled, options, value, onChan
         onDelete: null as any
       }}
       noOptionsText='No templates available'
-      renderInput={(params) => <TextField {...params} placeholder='Select template' size='small' />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          placeholder={options.length > 0 ? 'Select template' : 'No templates available'}
+          size='small'
+        />
+      )}
       getOptionLabel={(templatePage: PageMeta) => {
         // Regular option
         return templatePage?.title;
