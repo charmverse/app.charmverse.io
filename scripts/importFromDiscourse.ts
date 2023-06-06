@@ -269,9 +269,9 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       category_list: {
         categories: Category[];
       };
-    }>(`https://${community}/categories.json`);
+    }>(`https://${community}/categories.json`, {});
 
-    const { tags } = await GET<{ tags: Tag[] }>(`https://${community}/tags.json`);
+    const { tags } = await GET<{ tags: Tag[] }>(`https://${community}/tags.json`, {});
 
     const postTagRecord: Record<string, PostTag> = {};
 
@@ -333,7 +333,7 @@ export async function importFromDiscourse(community: string, spaceDomain: string
     }) {
       if (!userRecord[userId]) {
         await rateLimiter();
-        const fetchedUser = (await GET<{ user: User }>(`https://${community}/users/${username}.json`)).user;
+        const fetchedUser = (await GET<{ user: User }>(`https://${community}/users/${username}.json`, {})).user;
         userRecord[userId] = await createCharmverseUser({
           community,
           spaceId,
@@ -351,12 +351,15 @@ export async function importFromDiscourse(community: string, spaceDomain: string
       await rateLimiter();
       const {
         topic_list: { topics: fetchedTopics }
-      } = await GET<{ users: User[]; topic_list: { topics: Topic[] } }>(`https://${community}/c/${categoryId}.json`);
+      } = await GET<{ users: User[]; topic_list: { topics: Topic[] } }>(
+        `https://${community}/c/${categoryId}.json`,
+        {}
+      );
       for (const topic of fetchedTopics) {
         await rateLimiter();
         const {
           post_stream: { posts: fetchedPosts }
-        } = await GET<{ post_stream: { posts: Post[] } }>(`https://${community}/t/${topic.id}.json`);
+        } = await GET<{ post_stream: { posts: Post[] } }>(`https://${community}/t/${topic.id}.json`, {});
         topicPostsRecord[topic.id] = {
           posts: fetchedPosts,
           topic
@@ -463,7 +466,8 @@ export async function importFromDiscourse(community: string, spaceDomain: string
 
       await rateLimiter();
       const userActions = await GET<{ user_actions: UserAction[] }>(
-        `https://${community}/user_actions.json?username=${user.username}`
+        `https://${community}/user_actions.json?username=${user.username}`,
+        {}
       );
       // action_type === 2 is post like
       const postLikeUserActions = userActions.user_actions.filter((userAction) => userAction.action_type === 2);
