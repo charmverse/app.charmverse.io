@@ -151,6 +151,7 @@ type CreateUserAndSpaceInput = {
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
   walletAddress?: string;
+  notifyNewProposals?: Date | null;
 };
 
 export async function generateUserAndSpace({
@@ -162,7 +163,8 @@ export async function generateUserAndSpace({
   publicBountyBoard,
   superApiTokenId,
   walletAddress,
-  paidTier
+  paidTier,
+  notifyNewProposals
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -188,6 +190,7 @@ export async function generateUserAndSpace({
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
               publicBountyBoard,
+              notifyNewProposals,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }
