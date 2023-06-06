@@ -45,6 +45,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   usePreventReload(contentUpdated);
   const router = useRouter();
+  const [isCreatingProposal, setIsCreatingProposal] = useState(false);
 
   useEffect(() => {
     setReadOnlyEditor(!formInputs.proposalTemplateId);
@@ -52,6 +53,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
+      setIsCreatingProposal(true);
       const createdProposal = await charmClient.proposals
         .createProposal({
           categoryId: formInputs.categoryId,
@@ -80,6 +82,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
         }
       });
       setUrlWithoutRerender(router.pathname, { id: page.id });
+      setContentUpdated(false);
+      setIsCreatingProposal(false);
     }
   }
 
@@ -157,7 +161,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
           </Box>
           <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
             <Button
-              disabled={Boolean(disabledTooltip) || !contentUpdated}
+              disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
               onClick={createProposal}
             >
