@@ -1,5 +1,7 @@
-import type { CategoriesToFilter, PostCategoryWithPermissions } from '@charmverse/core';
-import { AvailablePostCategoryPermissions, hasAccessToSpace, InvalidInputError, arrayUtils } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { CategoriesToFilter, PostCategoryWithPermissions } from '@charmverse/core/permissions';
+import { AvailablePostCategoryPermissions, hasAccessToSpace } from '@charmverse/core/permissions';
+import { arrayUtils } from '@charmverse/core/utilities';
 
 export async function getPermissionedCategories({
   postCategories,

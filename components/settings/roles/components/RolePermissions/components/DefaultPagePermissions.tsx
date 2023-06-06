@@ -1,6 +1,6 @@
 import type { PagePermissionLevel } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
+import { Box, FormControlLabel, Menu, MenuItem, Switch, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -11,7 +11,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 import { typedKeys } from 'lib/utilities/objects';
 
 type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
@@ -21,7 +21,6 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view_comment: 'Space members can view and comment on pages.',
   view: 'Space members can only view pages.'
 };
-
 export function DefaultPagePermissions() {
   const space = useCurrentSpace();
   const { setSpace } = useSpaces();
@@ -96,7 +95,7 @@ export function DefaultPagePermissions() {
           endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
           {...bindTrigger(popupState)}
         >
-          {permissionLevels[selectedPagePermission]}
+          {pagePermissionLevels[selectedPagePermission]}
         </Button>
       </Box>
       <FormControlLabel
@@ -139,7 +138,7 @@ export function DefaultPagePermissions() {
         }}
       >
         {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
-          const permissionLevelLabel = permissionLevels[permissionLevel];
+          const permissionLevelLabel = pagePermissionLevels[permissionLevel];
           const isSelected = selectedPagePermission === permissionLevel;
           const description = pagePermissionDescriptions[permissionLevel];
 

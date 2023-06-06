@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PagePermission, Space, User } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { AssignedPagePermission, PagePermissionAssignment } from '@charmverse/core/permissions';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
-import type { IPagePermissionToCreate } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -38,7 +37,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const [childCard1, childCard2, childCard3] = await Promise.all(
       [1, 2, 3].map(async (num) => {
@@ -74,21 +73,23 @@ describe('POST /api/permissions - create or update board permissions', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
-    const permissionToUpsert: IPagePermissionToCreate = {
+    const permissionToUpsert: PagePermissionAssignment = {
       pageId: boardPage.id,
-      permissionLevel: 'view',
-      public: true
+      permission: {
+        assignee: { group: 'public' },
+        permissionLevel: 'view'
+      }
     };
 
     const createdPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    ).body as AssignedPagePermission;
 
     const childrenWithPermissions = await Promise.all(
       [childCard1, childCard2, childCard3, nestedChildCardPage].map((card) => {
-        return getPage(card.id) as Promise<IPageWithPermissions>;
+        return getPage(card.id) as Promise<PageWithPermissions>;
       })
     );
 
@@ -124,7 +125,7 @@ describe('POST /api/permissions - create or update board permissions', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const [childCard1, childCard2, childCard3] = await Promise.all(
       [1, 2, 3].map(async (num) => {
@@ -160,20 +161,24 @@ describe('POST /api/permissions - create or update board permissions', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
-    const childPermissionToUpsert: IPagePermissionToCreate = {
+    const childPermissionToUpsert: PagePermissionAssignment = {
       pageId: childCard1.id,
-      permissionLevel: 'editor',
-      roleId: role.id
+      permission: {
+        assignee: { group: 'role', id: role.id },
+        permissionLevel: 'editor'
+      }
     };
 
     await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(childPermissionToUpsert).expect(201);
 
-    const nestedChildPermissionToUpsert: IPagePermissionToCreate = {
+    const nestedChildPermissionToUpsert: PagePermissionAssignment = {
       pageId: nestedChildCardPage.id,
-      permissionLevel: 'full_access',
-      roleId: role.id
+      permission: {
+        assignee: { group: 'role', id: role.id },
+        permissionLevel: 'full_access'
+      }
     };
 
     await request(baseUrl)
@@ -183,19 +188,18 @@ describe('POST /api/permissions - create or update board permissions', () => {
       .expect(201);
 
     // This will happen at board page level and should be cascaded downwards
-    const permissionToUpsert: IPagePermissionToCreate = {
+    const permissionToUpsert: PagePermissionAssignment = {
       pageId: boardPage.id,
-      permissionLevel: 'view',
-      roleId: role.id
+      permission: { assignee: { group: 'role', id: role.id }, permissionLevel: 'view' }
     };
 
     const createdPermission = (
       await request(baseUrl).post('/api/permissions').set('Cookie', cookie).send(permissionToUpsert).expect(201)
-    ).body as PagePermission;
+    ).body as AssignedPagePermission;
 
     const childrenWithPermissions = await Promise.all(
       [childCard1, childCard2, childCard3, nestedChildCardPage].map((card) => {
-        return getPage(card.id) as Promise<IPageWithPermissions>;
+        return getPage(card.id) as Promise<PageWithPermissions>;
       })
     );
 

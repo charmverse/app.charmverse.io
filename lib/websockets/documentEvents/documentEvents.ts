@@ -1,11 +1,11 @@
 import type { Node } from '@bangle.dev/pm';
 import { getLogger } from '@charmverse/core/log';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
@@ -32,7 +32,7 @@ const log = getLogger('ws-docs');
 type SocketSessionData = AuthenticatedSocketData & {
   documentId?: string;
   isOwner?: boolean;
-  permissions: Partial<IPagePermissionFlags>;
+  permissions: Partial<PagePermissionFlags>;
 };
 
 type DocumentRoom = {
@@ -149,7 +149,7 @@ export class DocumentEventHandler {
 
     // Verify the order of the message
     if (!('c' in message) || !('s' in message)) {
-      log.warn(`Received invalid message`, { message, ...this.getSessionMeta() });
+      log.error(`Received invalid message`, { message, ...this.getSessionMeta() });
       this.sendError('Received invalid message');
       return;
     } else if (message.c < this.messages.client + 1) {
@@ -201,12 +201,16 @@ export class DocumentEventHandler {
     }
 
     if (!session.documentId) {
-      log.warn('Ignore message because session is missing document', { socketId: this.id, userId: session.user.id });
+      log.warn('Ignore message because session is missing document', {
+        message,
+        socketId: this.id,
+        userId: session.user.id
+      });
       return;
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.warn('Ignore message from closed document', {
+      log.error('Ignoring message from closed document - this is unusual', {
         socketId: this.id,
         message,
         pageId: session.documentId,
@@ -251,10 +255,13 @@ export class DocumentEventHandler {
       if (!isValidPageId) {
         throw new Error(`Invalid page id: ${pageId}`);
       }
-      const permissions = await computeUserPagePermissions({
-        resourceId: pageId,
-        userId
-      });
+      const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(
+        ({ client }) =>
+          client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId
+          })
+      );
 
       if (permissions.edit_content !== true && permissions.comment !== true) {
         log.warn('Denied permission to user', { permissions, pageId, userId });
@@ -450,7 +457,10 @@ export class DocumentEventHandler {
       const messages = room.doc.diffs.slice(numberDiffs);
       this.sendDocument(messages);
     } else {
-      log.warn('Unfixable: User is on a very old version of the document', logData);
+      log.warn(
+        'Unfixable: User is on a very old version of the document (is expected if user leaves document for a while)',
+        logData
+      );
       this.unfixable();
     }
   }
@@ -476,7 +486,10 @@ export class DocumentEventHandler {
     const session = this.getSession();
 
     if (!session.documentId) {
-      log.error('Cannot send document - session is missing documentId', { session, userId: session.user.id });
+      log.error('Cannot send document - session is missing documentId', {
+        ...this.getSessionMeta(),
+        userId: session.user.id
+      });
       return;
     }
     const room = this.getDocumentRoomOrThrow();

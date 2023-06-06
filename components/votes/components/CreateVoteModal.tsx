@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
