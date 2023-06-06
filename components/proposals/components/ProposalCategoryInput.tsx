@@ -6,6 +6,7 @@ import { useEffect, useRef, useMemo, useState } from 'react';
 
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
+import { brandColorNames } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 type TempOption = NewProposalCategory & {
@@ -37,7 +38,7 @@ function ProposalCategoryOption({ props, category }: ProposalCategoryOptionProps
       <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
         <Chip
           variant='filled'
-          color={category.color as BrandColor}
+          color={brandColorNames.includes(category.color as BrandColor) ? (category.color as BrandColor) : undefined}
           label={`${category.title}`}
           sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
         />
@@ -78,6 +79,8 @@ export default function ProposalCategoryInput({ disabled, options, canEditCatego
     }
   }
 
+  const colorToDisplay = tempValue?.color || value?.color || 'gray';
+
   return (
     <Autocomplete
       disabled={disabled}
@@ -93,7 +96,8 @@ export default function ProposalCategoryInput({ disabled, options, canEditCatego
       clearIcon={null}
       renderOption={(_props, category) => <ProposalCategoryOption category={category} props={_props} />}
       ChipProps={{
-        color: (tempValue?.color || value?.color || 'gray') as BrandColor,
+        // Avoids a bug where an error is thrown if the color is unsupported
+        color: brandColorNames.includes(colorToDisplay as BrandColor) ? (colorToDisplay as BrandColor) : undefined,
         // Hack for preventing delete from showing
         onDelete: null as any
       }}
