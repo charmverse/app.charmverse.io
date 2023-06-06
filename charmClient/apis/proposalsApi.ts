@@ -35,6 +35,10 @@ export class ProposalsApi {
     return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
+  getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
+    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposal-templates`);
+  }
+
   getProposalCategories(spaceId: string) {
     return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }

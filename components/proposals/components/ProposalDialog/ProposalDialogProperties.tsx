@@ -50,12 +50,12 @@ export function ProposalDialogProperties({
   const { members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
-  const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
-  const { data: proposals = [] } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
+  const [proposalTemplatePages, setProposalTemplatePages] = useState<PageMeta[]>([]);
+  const { data: proposalTemplates = [] } = useSWR(
+    () => (currentSpace ? `proposals-templates/${currentSpace.id}` : null),
+    () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: currentSpace!.id })
   );
-  const proposalsRecord = proposals.reduce((acc, _proposal) => {
+  const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
   }, {} as Record<string, Proposal>);
@@ -72,9 +72,9 @@ export function ProposalDialogProperties({
 
   useEffect(() => {
     if (pages) {
-      setProposalTemplates(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
+      setProposalTemplatePages(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
     }
-  }, [pages, proposals]);
+  }, [pages]);
 
   async function selectProposalTemplate(templatePage: PageMeta | null) {
     if (templatePage && templatePage.proposalId) {
@@ -216,7 +216,7 @@ export function ProposalDialogProperties({
               <Box display='flex' flex={1}>
                 <ProposalTemplateInput
                   options={
-                    proposalTemplates.filter((proposalTemplate) => {
+                    proposalTemplatePages.filter((proposalTemplate) => {
                       if (!proposalTemplate.proposalId) {
                         return false;
                       }
@@ -325,7 +325,7 @@ export function ProposalDialogProperties({
         secondaryButtonText='Go back'
         question='Are you sure you want to overwrite your current content with the proposal template content?'
         onConfirm={() => {
-          const templatePage = proposalTemplates.find((template) => template.id === selectedProposalTemplateId);
+          const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
           selectProposalTemplate(templatePage ?? null);
           setSelectedProposalTemplateId(null);
         }}
