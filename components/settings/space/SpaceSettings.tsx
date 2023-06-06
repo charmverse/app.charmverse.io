@@ -15,17 +15,15 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
-import PrimaryButton from 'components/common/PrimaryButton';
 import Legend from 'components/settings/Legend';
-import ImportContent from 'components/settings/workspace/ImportContent';
-import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
-import { SpaceFeatureSettings } from './SpaceFeatureSettings';
+import Avatar from './components/LargeAvatar';
+import { SpaceFeatureSettings } from './components/SpaceFeatureSettings';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
@@ -41,7 +39,7 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function SpaceSettings({ space }: { space: Space }) {
+export function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const [error, setError] = useState<string | null>(null);
@@ -173,10 +171,6 @@ export default function SpaceSettings({ space }: { space: Space }) {
           )}
         </Grid>
       </form>
-      <Legend mt={4}>Import Content</Legend>
-      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ImportContent />
-      </Box>
 
       <Legend mt={4}>Sidebar Module Visibility</Legend>
       <SpaceFeatureSettings />

@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
-import { AccountSettings } from 'components/settings/AccountSettings';
+import { AccountPreferences } from 'components/settings/account/components/AccountPreferences';
 import Legend from 'components/settings/Legend';
 
 import { IdentityProviders } from './components/IdentityProviders';
 import { MultiSigList } from './components/MultiSigList';
 
-export function IntegrationSettings() {
+export function AccountSettings() {
   useEffect(() => {
     charmClient.track.trackAction('page_view', { type: 'integrations' });
   }, []);
@@ -16,7 +16,7 @@ export function IntegrationSettings() {
     <>
       <Legend>My Account</Legend>
       <IdentityProviders />
-      <AccountSettings />
+      <AccountPreferences />
       <MultiSigList />
     </>
   );
