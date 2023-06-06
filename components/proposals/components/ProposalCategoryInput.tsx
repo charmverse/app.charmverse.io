@@ -38,7 +38,7 @@ function ProposalCategoryOption({ props, category }: ProposalCategoryOptionProps
       <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
         <Chip
           variant='filled'
-          color={category.color as BrandColor}
+          color={brandColorNames.includes(category.color as BrandColor) ? (category.color as BrandColor) : undefined}
           label={`${category.title}`}
           sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
         />
