@@ -59,7 +59,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
       mutatePage(newProposal);
       setUrlWithoutRerender(router.pathname, { id: newProposal.id });
       showProposal({
-        pageId: templateId,
+        pageId: newProposal.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
         }
