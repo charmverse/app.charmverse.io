@@ -50,7 +50,8 @@ async function addFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial
 }
 
 async function unFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
-  const pageId = req.body.pageId as string;
+  // remove use of req.body after browsers update - 06/2023
+  const pageId = (req.query || req.body).pageId as string;
   const user = await prisma.user.update({
     where: {
       id: req.session.user.id

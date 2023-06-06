@@ -128,7 +128,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
 }
 
 async function deletePages(req: NextApiRequest, res: NextApiResponse) {
-  const pageIds = (req.body || []) as string[];
+  const pageIds = req.query.pageIds as string[];
   const userId = req.session.user.id;
 
   for (const pageId of pageIds) {

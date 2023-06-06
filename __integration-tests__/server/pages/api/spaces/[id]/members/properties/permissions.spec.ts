@@ -101,7 +101,7 @@ describe('DELETE /api/space/[id]/members/properties/permissions - Delete member 
       await request(baseUrl)
         .delete(`/api/spaces/${space.id}/members/properties/permissions`)
         .set('Cookie', adminCookie)
-        .send({
+        .query({
           permissionId: permission.id
         })
         .expect(200)
@@ -115,7 +115,7 @@ describe('DELETE /api/space/[id]/members/properties/permissions - Delete member 
       await request(baseUrl)
         .delete(`/api/spaces/${space.id}/members/properties/permissions`)
         .set('Cookie', nonAdminCookie)
-        .send({
+        .query({
           permissionId: permission.id
         })
         .expect(401)
@@ -131,7 +131,7 @@ describe('DELETE /api/space/[id]/members/properties/permissions - Delete member 
       await request(baseUrl)
         .delete(`/api/spaces/${space.id}/members/properties/permissions`)
         .set('Cookie', otherSpaceUserCookie)
-        .send({
+        .query({
           permissionId: permission.id
         })
         .expect(401)
