@@ -20,12 +20,14 @@ export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyT
           <Divider />
         </>
       )}
-      {propertyTypesList.map((type) => (
-        <MenuItem onClick={() => onClick(type)} key={type}>
-          <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
-          <Typography>{typeDisplayName(intl, type)}</Typography>
-        </MenuItem>
-      ))}
+      {propertyTypesList
+        .filter((type) => type !== 'proposalUrl')
+        .map((type) => (
+          <MenuItem onClick={() => onClick(type)} key={type}>
+            <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
+            <Typography>{typeDisplayName(intl, type)}</Typography>
+          </MenuItem>
+        ))}
     </Stack>
   );
 }

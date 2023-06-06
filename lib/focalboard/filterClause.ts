@@ -128,6 +128,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   url: {
     datatype: 'text',
     conditions: TextDataTypeConditions
+  },
+  proposalUrl: {
+    datatype: 'text',
+    conditions: TextDataTypeConditions
   }
 };
 
