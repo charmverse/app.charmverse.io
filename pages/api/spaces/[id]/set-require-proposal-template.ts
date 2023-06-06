@@ -1,36 +1,36 @@
-import type { SpaceRequireProposalTemplateToggle } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { withSessionRoute } from 'lib/session/withSession';
+import { toggleRequireProposalTemplate } from 'lib/spaces/toggleRequireProposalTemplate';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
   .use(
-    providePermissionClients({
+    requireSpaceMembership({
+      adminOnly: true,
+      spaceIdKey: 'id'
+    })
+  )
+  .use(
+    requirePaidPermissionsSubscription({
       key: 'id',
       location: 'query',
       resourceIdType: 'space'
     })
   )
-  .use(
-    requireSpaceMembership({
-      spaceIdKey: 'id',
-      adminOnly: true
-    })
-  )
-  .post(setRequireProposalTemplate);
+  .post(setRequireProposalTemplatesController);
 
-async function setRequireProposalTemplate(req: NextApiRequest, res: NextApiResponse<Space>) {
+async function setRequireProposalTemplatesController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
-  const { requireProposalTemplate } = req.body as Pick<SpaceRequireProposalTemplateToggle, 'requireProposalTemplate'>;
+  const { requireProposalTemplate } = req.body as { requireProposalTemplate: boolean };
 
-  const updatedSpace = await req.premiumPermissionsClient.spaces.toggleRequireProposalTemplate({
+  const updatedSpace = await toggleRequireProposalTemplate({
     requireProposalTemplate,
     spaceId: spaceId as string
   });
