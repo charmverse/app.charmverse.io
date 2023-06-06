@@ -40,8 +40,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  await createCardsFromProposals({ boardPage, userId });
-  // updateTrackPageProfile(proposalPage.id);
+  await createCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
 
   return res.status(200).end();
 }
@@ -69,8 +68,7 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  await updateCardsFromProposals({ boardPage, userId });
-  // updateTrackPageProfile(proposalPage.id);
+  await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
 
   return res.status(200).end();
 }

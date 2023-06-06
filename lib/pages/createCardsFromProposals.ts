@@ -1,16 +1,24 @@
-import type { Page } from '@charmverse/core/prisma-client';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
-import { createDatabaseCardPage } from 'lib/public-api';
+import { DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-export async function createCardsFromProposals({ boardPage, userId }: { boardPage: Page; userId: string }) {
+export async function createCardsFromProposals({
+  boardId,
+  spaceId,
+  userId
+}: {
+  boardId: string;
+  spaceId: string;
+  userId: string;
+}) {
   const pageProposals = await prisma.page.findMany({
     where: {
-      spaceId: boardPage.spaceId,
+      spaceId,
       type: 'proposal',
       deletedAt: null
     }
@@ -18,10 +26,14 @@ export async function createCardsFromProposals({ boardPage, userId }: { boardPag
   const board = (await prisma.block.findUnique({
     where: {
       type: 'board',
-      id: boardPage.id,
-      spaceId: boardPage.spaceId
+      id: boardId,
+      spaceId
     }
-  })) as unknown as Board;
+  })) as unknown as Board | undefined;
+
+  if (!board) {
+    throw new DatabasePageNotFoundError(boardId);
+  }
 
   const newBoardField = {
     id: uuid(),
@@ -48,13 +60,13 @@ export async function createCardsFromProposals({ boardPage, userId }: { boardPag
       type: 'blocks_updated',
       payload: [prismaToBlock(updatedBoard)]
     },
-    boardPage.spaceId
+    spaceId
   );
 
   const views = await prisma.block.findMany({
     where: {
       type: 'view',
-      parentId: boardPage.id
+      parentId: boardId
     }
   });
 
@@ -80,13 +92,13 @@ export async function createCardsFromProposals({ boardPage, userId }: { boardPag
       type: 'blocks_updated',
       payload: updatedViewBlocks.map(prismaToBlock)
     },
-    boardPage.spaceId
+    spaceId
   );
 
   for (const pageProposal of pageProposals) {
     await createDatabaseCardPage({
       title: pageProposal.title,
-      boardId: boardPage.id,
+      boardId,
       spaceId: pageProposal.spaceId,
       createdBy: userId,
       properties: { [newBoardField.id]: `${pageProposal.path}` },
@@ -96,4 +108,9 @@ export async function createCardsFromProposals({ boardPage, userId }: { boardPag
       syncWithPageId: pageProposal.id
     });
   }
+
+  log.debug('Created cards from new Proposals', {
+    boardId,
+    createdCardPagesCount: pageProposals.length
+  });
 }

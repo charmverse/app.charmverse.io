@@ -1,4 +1,3 @@
-import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { Board } from 'lib/focalboard/board';
@@ -6,10 +5,18 @@ import { createDatabaseCardPage } from 'lib/public-api';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
-export async function updateCardsFromProposals({ boardPage, userId }: { boardPage: Page; userId: string }) {
+export async function updateCardsFromProposals({
+  boardId,
+  spaceId,
+  userId
+}: {
+  boardId: string;
+  spaceId: string;
+  userId: string;
+}) {
   const pageProposals = await prisma.page.findMany({
     where: {
-      spaceId: boardPage.spaceId,
+      spaceId,
       type: 'proposal'
     }
   });
@@ -17,7 +24,7 @@ export async function updateCardsFromProposals({ boardPage, userId }: { boardPag
   const existingCards = await prisma.page.findMany({
     where: {
       type: 'card',
-      parentId: boardPage.id,
+      parentId: boardId,
       AND: [{ syncWithPageId: { not: null } }, { syncWithPageId: { not: undefined } }]
     }
   });
@@ -71,8 +78,8 @@ export async function updateCardsFromProposals({ boardPage, userId }: { boardPag
   const board = (await prisma.block.findUnique({
     where: {
       type: 'board',
-      id: boardPage.id,
-      spaceId: boardPage.spaceId
+      id: boardId,
+      spaceId
     }
   })) as unknown as Board | null;
 
@@ -84,7 +91,7 @@ export async function updateCardsFromProposals({ boardPage, userId }: { boardPag
   for (const pageProposal of newPageProposals) {
     await createDatabaseCardPage({
       title: pageProposal.title,
-      boardId: boardPage.id,
+      boardId,
       spaceId: pageProposal.spaceId,
       createdBy: userId,
       properties: { [boardCardProp?.id || '']: `${pageProposal.path}` },
