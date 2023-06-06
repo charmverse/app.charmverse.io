@@ -1,8 +1,8 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { ListItemIcon, ListItemText, MenuItem, TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 const maxTitleLength = 35;

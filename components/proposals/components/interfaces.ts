@@ -1,4 +1,4 @@
-import type { ProposalReviewerInput } from '@charmverse/core';
+import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
