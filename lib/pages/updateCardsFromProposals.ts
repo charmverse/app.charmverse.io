@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { Board } from 'lib/focalboard/board';
-import { createDatabaseCardPage } from 'lib/public-api';
+import { DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -14,6 +14,18 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
+  const board = (await prisma.block.findUnique({
+    where: {
+      type: 'board',
+      id: boardId,
+      spaceId
+    }
+  })) as unknown as Board | undefined;
+
+  if (!board) {
+    throw new DatabasePageNotFoundError(boardId);
+  }
+
   const pageProposals = await prisma.page.findMany({
     where: {
       spaceId,
@@ -25,6 +37,7 @@ export async function updateCardsFromProposals({
     where: {
       type: 'card',
       parentId: boardId,
+      spaceId,
       AND: [{ syncWithPageId: { not: null } }, { syncWithPageId: { not: undefined } }]
     }
   });
@@ -75,7 +88,7 @@ export async function updateCardsFromProposals({
     (page) => !existingSyncWithPageIds.includes(page.id) && !page.deletedAt
   );
 
-  const board = (await prisma.block.findUnique({
+  const boardBlock = (await prisma.block.findUnique({
     where: {
       type: 'board',
       id: boardId,
@@ -83,7 +96,7 @@ export async function updateCardsFromProposals({
     }
   })) as unknown as Board | null;
 
-  const boardCardProp = board?.fields.cardProperties.find((field) => field.type === 'proposalUrl');
+  const boardCardProp = boardBlock?.fields.cardProperties.find((field) => field.type === 'proposalUrl');
 
   /**
    * Case for new cards to be created from proposal pages and are not included in the current list of cards
