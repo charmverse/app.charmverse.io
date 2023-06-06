@@ -9,7 +9,8 @@ type StandardFields =
   | 'updatedAt'
   | 'updatedBy'
   | 'fontFamily'
-  | 'fontSizeSmall';
+  | 'fontSizeSmall'
+  | 'syncWithPageId';
 
 function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPage {
   return {
@@ -22,6 +23,7 @@ function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPag
     deletedBy: null,
     fontFamily: 'default',
     fontSizeSmall: null,
+    syncWithPageId: null,
     ...template
   };
 }
