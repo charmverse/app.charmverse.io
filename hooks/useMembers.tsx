@@ -19,6 +19,7 @@ type Context = {
   makeMember: (userIds: string[]) => Promise<void>;
   removeFromSpace: (userId: string) => Promise<void>;
   isLoading: boolean;
+  isValidating: boolean;
   getMemberById: (id?: string | null) => Member | undefined;
 };
 
@@ -27,6 +28,7 @@ const MembersContext = createContext<Readonly<Context>>({
   membersRecord: {},
   guests: [],
   isLoading: false,
+  isValidating: false,
   mutateMembers: () => Promise.resolve(undefined),
   removeGuest: () => Promise.resolve(),
   makeAdmin: () => Promise.resolve(),
@@ -42,7 +44,8 @@ export function MembersProvider({ children }: { children: ReactNode }) {
   const {
     data: members,
     mutate: mutateMembers,
-    isLoading
+    isLoading,
+    isValidating
   } = useSWR(
     () => (space ? `members/${space?.id}` : null),
     () => {
@@ -126,6 +129,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       removeGuest,
       removeFromSpace,
       isLoading,
+      isValidating,
       getMemberById
     }),
     [members, membersRecord, getMemberById]

@@ -1,5 +1,6 @@
-import { prisma } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Bounty, Page, Prisma, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
@@ -7,7 +8,6 @@ import { v4 } from 'uuid';
 import { baseUrl } from 'config/constants';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -35,6 +35,7 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
+// Note: the endpoint creates a user when wallet address is provided
 export async function createUser({
   browserPage,
   address
@@ -89,7 +90,7 @@ export async function getPages({
 }: {
   browserPage: BrowserPage;
   spaceId: string;
-}): Promise<IPageWithPermissions[]> {
+}): Promise<PageWithPermissions[]> {
   return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then((res) => res.json());
 }
 
@@ -112,7 +113,7 @@ export async function createUserAndSpace({
   address: string;
   privateKey: string;
   space: Space;
-  pages: IPageWithPermissions[];
+  pages: PageWithPermissions[];
 }> {
   const wallet = Wallet.createRandom();
   const address = wallet.address;

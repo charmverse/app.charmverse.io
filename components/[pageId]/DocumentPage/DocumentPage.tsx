@@ -22,6 +22,7 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useBounties } from 'hooks/useBounties';
+import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
@@ -37,7 +38,7 @@ import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
-export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props} />)<{
+export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
   top: number;
   fullWidth?: boolean;
 }>`
@@ -48,7 +49,7 @@ export const Container = styled(({ fullWidth, ...props }: any) => <Box {...props
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
 
-  ${({ theme }) => theme.breakpoints.up('sm')} {
+  ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
 `;
@@ -88,8 +89,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
-  // Only populate bounty permission data if this is a bounty page
-  const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
+  const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
+    bountyId: page.bountyId
+  });
   const [containerRef, { width: containerWidth }] = useElementSize();
 
   const pagePermissions = page.permissionFlags;
@@ -99,21 +101,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
-
-  async function refreshBountyPermissions(bountyId: string) {
-    setBountyPermissions(
-      await charmClient.bounties.computePermissions({
-        resourceId: bountyId
-      })
-    );
-  }
-
-  useEffect(() => {
-    if (page.bountyId) {
-      refreshBountyPermissions(page.bountyId);
-    }
-  }, [page.bountyId]);
-
   // keep a ref in sync for printing
   const printRef = useRef(null);
   useEffect(() => {
@@ -300,9 +287,10 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         <BountyProperties
                           bountyId={page.bountyId}
                           pageId={page.id}
+                          pagePath={page.path}
                           readOnly={readOnly}
-                          permissions={bountyPermissions}
-                          refreshBountyPermissions={refreshBountyPermissions}
+                          permissions={bountyPermissions || null}
+                          refreshBountyPermissions={() => refreshBountyPermissions()}
                         />
                       )}
                       {(page.type === 'card' || page.type === 'card_synced') && (

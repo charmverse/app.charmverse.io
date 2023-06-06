@@ -1,16 +1,17 @@
-import { prisma } from '@charmverse/core';
 import type { Page, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { upsertPermission } from 'lib/permissions/pages';
 import { baseUrl } from 'testing/mockApiCall';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
 
 beforeAll(async () => {
-  const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
+  const generated1 = await testUtilsUser.generateUserAndSpace({
+    isAdmin: false
+  });
   nonAdminUser = generated1.user;
   nonAdminUserSpace = generated1.space;
 });
@@ -22,19 +23,19 @@ const pagePath = 'page-path';
 // These API calls should succeed without needed a user account
 describe('GET /api/public/pages/[pageId] - Load public page', () => {
   it('should return the public page if provided the page ID and respond 200', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
       path: pagePath,
-      content: {}
+      content: {},
+      pagePermissions: [
+        {
+          permissionLevel: 'view',
+          assignee: { group: 'public' }
+        }
+      ]
     });
-
-    const publicPermission = await upsertPermission((await page).id, {
-      public: true,
-      permissionLevel: 'view'
-    });
-
     const foundPage = (await request(baseUrl).get(`/api/public/pages/${page.id}`).expect(200)).body as { page: Page };
 
     expect(foundPage.page.contentText).toBe(exampleText);
@@ -47,17 +48,18 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
   });
 
   it('should return the public page if provided the space domain + page path and respond 200', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
       path: pagePath,
-      content: {}
-    });
-
-    const publicPermission = await upsertPermission((await page).id, {
-      public: true,
-      permissionLevel: 'view'
+      content: {},
+      pagePermissions: [
+        {
+          permissionLevel: 'view',
+          assignee: { group: 'public' }
+        }
+      ]
     });
 
     const foundPage = (
@@ -74,7 +76,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
   });
 
   it('should throw a not found error if the page is not public and respond with 404', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,

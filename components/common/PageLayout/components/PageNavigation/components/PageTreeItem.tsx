@@ -11,7 +11,6 @@ import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
@@ -20,6 +19,7 @@ import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
@@ -47,6 +47,7 @@ interface PageTreeItemProps {
   label: string;
   pageType: PageType;
   pageId: string;
+  pagePath: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
   onClick?: () => void;
@@ -234,7 +235,7 @@ export function PageLink({
   const triggerState = bindTrigger(popupState);
 
   return (
-    <PageAnchor href={href} onClick={stopPropagation}>
+    <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
       <span onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
@@ -297,6 +298,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     label,
     pageType,
     pageId,
+    pagePath,
     hasSelectedChildView,
     onClick
   } = props;
@@ -373,7 +375,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={href} />}
+        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
@@ -404,13 +406,6 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
   }
 
-  function getAbsolutePath() {
-    if (typeof window !== 'undefined') {
-      return window.location.origin + pagePath;
-    }
-    return '';
-  }
-
   return (
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
@@ -430,7 +425,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
       />
-      <CopyPageLinkAction path={getAbsolutePath()} onComplete={closeMenu} />
+      <CopyPageLinkAction path={`/${pagePath}`} onComplete={closeMenu} />
     </>
   );
 }

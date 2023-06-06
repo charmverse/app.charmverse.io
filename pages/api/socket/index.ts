@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
+import { config } from 'lib/websockets/config';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
@@ -48,7 +49,7 @@ async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketS
     res.send({ authToken: sealedUserId });
     return;
   }
-  const io = new Server(res.socket.server);
+  const io = new Server(res.socket.server, config);
   res.socket.server.io = io;
   relay.bindServer(io);
   log.info('Web socket server instantiated');

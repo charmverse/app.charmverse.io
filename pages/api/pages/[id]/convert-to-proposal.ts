@@ -1,12 +1,11 @@
-import { prisma } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions, PageMeta } from 'lib/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -17,6 +16,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys(['categoryId'], 'body'))
   .post(convertToProposal);
 
@@ -43,7 +49,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new NotFoundError();
   }
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -54,7 +60,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const categoryId = req.body.categoryId;
 
-  const proposalPermissions = await computeProposalCategoryPermissions({
+  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
     resourceId: categoryId,
     userId
   });

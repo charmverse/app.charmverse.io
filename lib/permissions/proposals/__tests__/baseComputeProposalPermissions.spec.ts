@@ -1,6 +1,8 @@
-import type { ProposalPermissionFlags } from '@charmverse/core';
-import { prisma, proposalOperations, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import { proposalOperations } from '@charmverse/core/permissions';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';

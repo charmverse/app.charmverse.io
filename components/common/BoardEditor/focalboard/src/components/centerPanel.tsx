@@ -2,6 +2,7 @@
 /* eslint-disable max-lines */
 
 import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
@@ -47,7 +48,6 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -381,8 +381,17 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const view = createTableView(board);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const _board = {
+      // use parentBoard props like id and rootId by default
+      ...board,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || board.fields
+    };
+    const view = createTableView(_board);
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -499,7 +508,17 @@ function CenterPanel(props: Props) {
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
-          <PageWebhookBanner key={key.apiKey} type={key.type} url={`${webhookBaseUrl}/${key?.apiKey}`} />
+          <PageWebhookBanner
+            key={key.apiKey}
+            type={key.type}
+            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            sx={{
+              ...(isEmbedded && {
+                border: (theme) => `2px solid ${theme.palette.text.primary}`,
+                backgroundColor: 'transparent !important'
+              })
+            }}
+          />
         ) : null
       )}
       <div

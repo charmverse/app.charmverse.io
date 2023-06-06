@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
@@ -85,7 +85,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200);
+    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).query(roleAssignment).expect(200);
     const userRoleRecord = await prisma.spaceRoleToRole.count({
       where: {
         roleId: role.id,
@@ -119,7 +119,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
     await request(baseUrl)
       .delete('/api/roles/assignment')
       .set('Cookie', nonAdminCookie)
-      .send(roleAssignment)
+      .query(roleAssignment)
       .expect(401);
   });
 });

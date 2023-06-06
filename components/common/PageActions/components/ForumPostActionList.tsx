@@ -1,4 +1,4 @@
-import type { PostPermissionFlags } from '@charmverse/core';
+import type { PostPermissionFlags } from '@charmverse/core/permissions';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemText, ListItemButton } from '@mui/material';
 import Divider from '@mui/material/Divider';
@@ -81,7 +81,7 @@ export function ForumPostActionList({
 
   return (
     <List data-test='header--forum-post-actions' dense>
-      <CopyPageLinkAction path={router.asPath} onComplete={onComplete} />
+      <CopyPageLinkAction path={`/forum/post/${post?.path}`} onComplete={onComplete} />
       <Divider />
       <DeletePageAction onClick={deletePost} disabled={!postPermissions?.delete_post} />
       <UndoAction onClick={undoEditorChanges} disabled={!postPermissions?.edit_post} />

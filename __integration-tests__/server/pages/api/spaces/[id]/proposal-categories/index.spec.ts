@@ -1,5 +1,6 @@
-import { testUtilsUser } from '@charmverse/core';
 import type { ProposalCategory, ProposalCategoryPermission, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { CreateProposalCategoryInput } from 'lib/proposal/createProposalCategory';

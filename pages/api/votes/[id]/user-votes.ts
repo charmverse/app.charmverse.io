@@ -1,15 +1,23 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { UserVoteExtendedDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getUserVotes);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'vote'
+    })
+  )
+  .get(getUserVotes);
 
 async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteExtendedDTO[] | { error: any }>) {
   const voteId = req.query.id as string;
@@ -31,7 +39,7 @@ async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteEx
     throw new NotFoundError('Vote not found');
   }
 
-  const computed = await computeUserPagePermissions({
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: vote.page.id,
     userId: req.session?.user?.id
   });

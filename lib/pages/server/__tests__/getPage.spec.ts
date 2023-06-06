@@ -1,30 +1,29 @@
-import { prisma } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { PagePermissionWithSource } from '@charmverse/core/permissions';
 import type { Page, PagePermission, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { IPagePermissionWithSource } from 'lib/permissions/pages';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-
-import type { IPageWithPermissions } from '../../interfaces';
 import { getPage } from '../getPage';
 
 let user: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await testUtilsUser.generateUserAndSpace();
   user = generated.user;
   space = generated.space;
 });
 
 describe('getPage', () => {
   it('should return a page queried by its ID', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const childPage = await createPage({
+    const childPage = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       parentId: page.id,
@@ -53,7 +52,7 @@ describe('getPage', () => {
   });
 
   it('should allow looking up a page by its path + spaceId', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       path: 'My example path'
@@ -71,13 +70,15 @@ describe('getPage', () => {
   });
 
   it('should return null if a path but no spaceId is provided', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       path: 'My example path'
     });
 
     const foundPage = await getPage(page.path);
+
+    expect(foundPage).toBe(null);
   });
 
   it('should return null if the page does not exist', async () => {
@@ -86,12 +87,12 @@ describe('getPage', () => {
   });
 
   it('should return all permissions for a page, and which permissions they inherit from', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const childPage = await createPage({
+    const childPage = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       parentId: page.id
@@ -134,14 +135,14 @@ describe('getPage', () => {
       }
     });
 
-    const found = (await getPage(childPage.id)) as IPageWithPermissions;
+    const found = (await getPage(childPage.id)) as PageWithPermissions;
 
     expect(found).toBeDefined();
 
     expect(found.permissions).toBeInstanceOf(Array);
 
     expect(found.permissions[0]).toEqual<PagePermission>(
-      expect.objectContaining<Partial<IPagePermissionWithSource>>({
+      expect.objectContaining<Partial<PagePermissionWithSource>>({
         id: expect.stringMatching(inherited.id),
         spaceId: expect.stringMatching(space.id),
         pageId: expect.stringMatching(childPage.id),
@@ -150,7 +151,7 @@ describe('getPage', () => {
     );
 
     expect(found.permissions[0].sourcePermission).toEqual<PagePermission>(
-      expect.objectContaining<Partial<IPagePermissionWithSource>>({
+      expect.objectContaining<Partial<PagePermissionWithSource>>({
         id: expect.stringMatching(source.id),
         spaceId: expect.stringMatching(space.id),
         pageId: expect.stringMatching(page.id),

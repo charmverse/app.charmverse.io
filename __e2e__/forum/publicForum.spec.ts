@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { expect, test as base } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 
@@ -163,7 +163,8 @@ test.describe.serial('Access public forum', () => {
 
   test('public user can open a public post from the forum home and see its content', async ({
     forumHomePage,
-    forumPostPage
+    forumPostPage,
+    page
   }) => {
     // Start the navigation steps
 
@@ -191,6 +192,9 @@ test.describe.serial('Access public forum', () => {
 
     // Check user can see the comment
     const comment = forumPostPage.getCommentLocator(publicPostComment.id);
+
+    await expect(comment).toBeVisible();
+
     const commentText = (await comment.allInnerTexts())[0];
     expect(commentText).toMatch(forumPostCommentText);
 

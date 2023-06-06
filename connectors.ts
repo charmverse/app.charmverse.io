@@ -264,16 +264,6 @@ export function getChainShortname(chainId: string | number): string {
 
 export type CryptoCurrency = (typeof RPC)[Blockchain]['nativeCurrency']['symbol'];
 
-export const CryptoCurrencyList = Object.values(RPC).reduce((acc, chain) => {
-  acc[chain.nativeCurrency.symbol] = chain.nativeCurrency.name;
-  return acc;
-}, {} as Record<CryptoCurrency, string>);
-
-export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
-  acc[chain.nativeCurrency.symbol] = chain.iconUrl;
-  return acc;
-}, {} as Record<CryptoCurrency, string>);
-
 export const CryptoCurrencies = uniqueValues<CryptoCurrency>(
   RPCList.map((chain) => {
     return chain.nativeCurrency.symbol as CryptoCurrency;
@@ -304,6 +294,10 @@ export interface IPairQuote extends ICurrencyPair {
 
 export function getChainById(chainId: number): IChainDetails | undefined {
   return RPCList.find((rpc) => rpc.chainId === chainId);
+}
+
+export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined {
+  return RPCList.find((rpc) => rpc.nativeCurrency.symbol === tokenSymbol);
 }
 
 const supportedChains: Blockchain[] = [
@@ -348,21 +342,6 @@ const walletLink = new WalletLinkConnector({
   appName: 'CharmVerse.io',
   supportedChainIds
 });
-
-/**
- *
- * @param chainId
- * @returns The native crypto of a chain. If the chain is not found, returns an empty list
- */
-export function getCryptos(chainId: number): (string | CryptoCurrency)[] {
-  const chain = getChainById(chainId);
-
-  if (!chain) {
-    return [];
-  }
-
-  return [chain.nativeCurrency.symbol];
-}
 
 export function getChainExplorerLink(
   chainId: string | number,
@@ -411,6 +390,9 @@ export function getChainExplorerLink(
 
     case '80001':
       return `https://mumbai.polygonscan.com/${path}/${transactionOrContractId}`;
+
+    case '10':
+      return `https://optimistic.etherscan.io/${path}/${transactionOrContractId}`;
 
     default:
       return '';

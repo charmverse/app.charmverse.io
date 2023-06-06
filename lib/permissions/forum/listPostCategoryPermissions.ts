@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
-import type { AssignedPostCategoryPermission } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

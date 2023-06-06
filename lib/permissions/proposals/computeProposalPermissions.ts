@@ -1,11 +1,11 @@
-import type { PermissionCompute, ProposalPermissionFlags, ProposalResource } from '@charmverse/core';
+import type { PermissionCompute, ProposalPermissionFlags, ProposalResource } from '@charmverse/core/permissions';
 import {
   AvailableProposalPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
   getDefaultProposalPermissionPolicies,
-  isProposalAuthor,
-  prisma
-} from '@charmverse/core';
+  isProposalAuthor
+} from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';

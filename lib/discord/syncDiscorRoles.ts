@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getGuildRoles } from 'lib/collabland/collablandClient';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
@@ -7,7 +7,6 @@ import { findOrCreateRoles } from 'lib/roles/createRoles';
 type Props = {
   spaceId: string;
 };
-
 export async function syncDiscordRoles({ spaceId }: Props) {
   const space = await prisma.space.findFirst({ where: { id: spaceId } });
   if (!space?.discordServerId) {
@@ -31,6 +30,7 @@ export async function syncDiscordRoles({ spaceId }: Props) {
 
   try {
     const roles = await getGuildRoles(space.discordServerId);
+
     await findOrCreateRoles(roles, space.id, botUser?.userId, {
       source: 'collabland',
       createRoles: true

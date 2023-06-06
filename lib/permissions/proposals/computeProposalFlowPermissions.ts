@@ -1,5 +1,7 @@
-import type { PermissionCompute, ProposalFlowPermissionFlags } from '@charmverse/core';
-import { ProposalNotFoundError, TransitionFlags, getProposalFlagFilters, prisma } from '@charmverse/core';
+import { ProposalNotFoundError } from '@charmverse/core/errors';
+import type { PermissionCompute, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import { TransitionFlags, getProposalFlagFilters } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { computeProposalPermissions } from './computeProposalPermissions';
 import { countReviewers } from './countReviewers';

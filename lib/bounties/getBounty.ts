@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';

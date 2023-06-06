@@ -1,5 +1,6 @@
-import { prisma, testUtilsMembers, testUtilsUser } from '@charmverse/core';
 import type { Page, Role, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';

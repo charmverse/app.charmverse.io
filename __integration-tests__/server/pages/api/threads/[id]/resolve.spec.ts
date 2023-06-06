@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import {
@@ -42,9 +41,12 @@ describe('PUT /api/threads/{id} - update a comment', () => {
       userId: nonAdminUser.id
     });
 
-    await upsertPermission(page.id, {
-      permissionLevel: 'view_comment',
-      userId: nonAdminUser.id
+    await prisma.pagePermission.create({
+      data: {
+        permissionLevel: 'view_comment',
+        user: { connect: { id: nonAdminUser.id } },
+        page: { connect: { id: page.id } }
+      }
     });
 
     await request(baseUrl)
@@ -84,12 +86,15 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       userId: nonAdminUser.id
     });
 
-    await upsertPermission(page.id, {
-      permissionLevel: 'view_comment',
-      userId: nonAdminUser.id
+    await prisma.pagePermission.create({
+      data: {
+        permissionLevel: 'view_comment',
+        user: { connect: { id: nonAdminUser.id } },
+        page: { connect: { id: page.id } }
+      }
     });
 
-    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', nonAdminCookie).send({}).expect(200);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', nonAdminCookie).expect(200);
 
     const inexistentThread = await prisma.thread.findUnique({
       where: {
@@ -114,6 +119,6 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', otherAdminCookie).send({}).expect(401);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', otherAdminCookie).expect(401);
   });
 });

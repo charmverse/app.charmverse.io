@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
@@ -43,12 +43,12 @@ describe('countConnectableIdentities', () => {
         username: 'userWithNoIdentities',
         wallets: {
           create: {
-            address: '0x2'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test2@example.com',
+            email: `test2-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -67,12 +67,12 @@ describe('countConnectableIdentities', () => {
         username: 'userWithOneIdentities',
         wallets: {
           create: {
-            address: '0x4'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test4@example.com',
+            email: `test4-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -81,10 +81,10 @@ describe('countConnectableIdentities', () => {
           createMany: {
             data: [
               {
-                domain: 'example4a.nft'
+                domain: `example4a-${v4()}.nft`
               },
               {
-                domain: 'example4b.nft'
+                domain: `example4b-${v4()}.nft`
               }
             ]
           }
@@ -102,12 +102,12 @@ describe('countConnectableIdentities', () => {
         username: 'userWithOneIdentities',
         wallets: {
           create: {
-            address: '0x5'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test5@example.com',
+            email: `test5-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -116,17 +116,17 @@ describe('countConnectableIdentities', () => {
           createMany: {
             data: [
               {
-                domain: 'example5a.nft'
+                domain: `example5a-${v4()}.nft`
               },
               {
-                domain: 'example5b.nft'
+                domain: `example5b${v4()}.nft`
               }
             ]
           }
         },
         discordUser: {
           create: {
-            discordId: '1234567890',
+            discordId: `1234567890-${Math.random()}`,
             account: {}
           }
         }
@@ -142,12 +142,12 @@ describe('countConnectableIdentities', () => {
         username: 'userWithSixIdentities',
         wallets: {
           create: {
-            address: '0x6'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test6@example.com',
+            email: `test6-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -156,17 +156,17 @@ describe('countConnectableIdentities', () => {
           createMany: {
             data: [
               {
-                domain: 'example6a.nft'
+                domain: `example6a-${v4()}.nft`
               },
               {
-                domain: 'example6b.nft'
+                domain: `example6b-${v4()}.nft`
               }
             ]
           }
         },
         discordUser: {
           create: {
-            discordId: '1234567890.6',
+            discordId: `1234567890${Math.random()}`,
             account: {}
           }
         },

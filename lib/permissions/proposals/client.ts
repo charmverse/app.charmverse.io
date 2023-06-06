@@ -1,4 +1,6 @@
-import type { BaseProposalPermissionsClient } from '@charmverse/core';
+import type { BaseProposalPermissionsClient, ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
+
+import { getProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 
 import { computeProposalCategoryPermissions } from './computeProposalCategoryPermissions';
 import { computeProposalFlowPermissions } from './computeProposalFlowPermissions';
@@ -7,6 +9,8 @@ import { getAccessibleProposalCategories } from './getAccessibleProposalCategori
 import { getAccessibleProposals } from './getAccessibleProposals';
 
 export class PublicProposalsPermissionsClient implements BaseProposalPermissionsClient {
+  getProposalReviewerPool = getProposalReviewerPool;
+
   computeProposalFlowPermissions = computeProposalFlowPermissions;
 
   computeProposalPermissions = computeProposalPermissions;

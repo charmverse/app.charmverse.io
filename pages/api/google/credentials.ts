@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -76,7 +76,8 @@ async function getCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) 
 async function deleteCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
-  const query = req.body as CredentialRequest;
+  // Remove req.body check after browser update - 06/2023
+  const query = (req.query || req.body) as CredentialRequest;
 
   if (!query.credentialId) {
     throw new InvalidInputError('Credential id is required');

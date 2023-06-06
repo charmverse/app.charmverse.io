@@ -1,6 +1,6 @@
+import { GET } from '@charmverse/core/http';
+import { log } from '@charmverse/core/log';
 import orderBy from 'lodash/orderBy';
-
-import { GET } from 'adapters/http';
 
 export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
 export type SupportedChainId = (typeof SupportedChainIds)[number];
@@ -22,7 +22,14 @@ export interface AlchemyNft {
   id: {
     tokenId: string;
   };
+  error?: string;
   title: string;
+  contractMetadata: {
+    name: string;
+    symbol: string;
+    contractDeployer: string;
+    tokenType: 'ERC1155' | 'ERC721';
+  };
   description: string;
   tokenUri: {
     raw: string;
@@ -37,6 +44,7 @@ interface AlchemyNftResponse {
   blockHash: string;
   ownedNfts: AlchemyNft[];
   totalCount: number;
+  pageKey?: string; // 100 nfts per page
 }
 
 const alchemyApis: Record<SupportedChainId, string> = {
@@ -72,8 +80,31 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 // Docs: https://docs.alchemy.com/reference/getnfts
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const res = await GET<AlchemyNftResponse>(url, { owner: address, excludeFilters: ['AIRDROPS', 'SPAM'] });
-  return { address, nfts: res.ownedNfts };
+  const filterSpam = chainId === 1 || chainId === 137;
+
+  let pageKey: string | undefined;
+  const nfts: AlchemyNft[] = [];
+  do {
+    const res = await GET<AlchemyNftResponse>(url, {
+      owner: address,
+      pageKey,
+      // Only use spam filters on chains we know that work.
+      // Including the request params throw an error when calling for Arbitrum, maybe others
+      ...(filterSpam
+        ? {
+            spamConfidenceLevel: 'HIGH',
+            excludeFilters: ['SPAM']
+          }
+        : {})
+    }).catch((err) => {
+      log.error('Error fetching nfts from alchemy', err);
+      return Promise.reject(err);
+    });
+    pageKey = res.pageKey;
+    nfts.push(...res.ownedNfts);
+  } while (pageKey);
+
+  return { address, chainId, nfts };
 };
 
 export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
@@ -89,8 +120,20 @@ export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1
       }
     }, [])
     // Filter out invalid NFTs
-    .filter((n) => !!n.media?.length && !!n.media[0].gateway && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
-
+    .filter((n) => {
+      if (FILTERED_NFT_CONTRACTS.includes(n.contract.address)) {
+        return false;
+      }
+      // The error is most likely to be "Contract returned a broken token uri"
+      if (n.error) {
+        return false;
+      }
+      // No artwork found (animations and videos dont seem to be picked up)
+      if (!n.media[0].gateway) {
+        return false;
+      }
+      return true;
+    });
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 
   return sortedNfts;

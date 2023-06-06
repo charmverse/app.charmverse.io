@@ -12,13 +12,18 @@ if (isTestEnv) {
 }
 
 export type TestLoginRequest = {
-  userId: string;
+  anonymousUserId?: string;
+  userId?: string;
 };
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
-  const { userId } = req.body as TestLoginRequest;
+  const { anonymousUserId, userId } = req.body as TestLoginRequest;
 
-  req.session.user = { id: userId };
+  if (userId) {
+    req.session.user = { id: userId };
+  } else {
+    req.session.anonymousUserId = anonymousUserId;
+  }
 
   await req.session.save();
 

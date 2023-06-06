@@ -4,13 +4,10 @@ services:
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
       com.datadoghq.tags.service: '${SERVICE_NAME}'
-    volumes:
-      - $PWD/.env:/app/.env
     ports:
       - '80:3000'
     env_file:
       - '.env'
-
     environment:
       - NODE_ENV=production
     profiles:
@@ -52,10 +49,11 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
+      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-webapp
 
@@ -90,6 +88,21 @@ services:
     profiles:
       - dev
 
+  permissions-api:
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
+    command:
+      [
+        'sh',
+        '-c',
+        'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js',
+      ]
+    env_file:
+      - '.env'
+    environment:
+      - HOST=permissions-api
+    profiles:
+      - stg-webapp
+
   localpostgres:
     image: postgres
     ports:
@@ -108,7 +121,6 @@ services:
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/host/var/log:ro
-      - $PWD/.env:/app/.env
     env_file:
       - '.env'
     environment:

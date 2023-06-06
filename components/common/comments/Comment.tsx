@@ -15,7 +15,7 @@ import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
@@ -68,7 +68,7 @@ export function Comment({
     rawText: comment.contentText
   });
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -152,7 +152,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showMemberProfile(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >
@@ -229,21 +229,23 @@ export function Comment({
           {!comment.deletedAt && !replyingDisabled && (
             <Stack flexDirection='row' gap={1}>
               {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
-              <Typography
-                sx={{
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  if (permissions?.add_comment) {
-                    setShowCommentReply(true);
-                  }
-                }}
-                color='secondary'
-                fontWeight='semibold'
-                variant='subtitle1'
-              >
-                Reply
-              </Typography>
+              <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
+                <Typography
+                  sx={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    if (permissions?.add_comment) {
+                      setShowCommentReply(true);
+                    }
+                  }}
+                  color='secondary'
+                  fontWeight='semibold'
+                  variant='subtitle1'
+                >
+                  Reply
+                </Typography>
+              </Tooltip>
             </Stack>
           )}
           <Box mt={2}>

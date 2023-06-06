@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,19 +8,29 @@ import { createPageComment } from 'lib/pages/comments/createPageComment';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(listPageCommentsHandler).use(requireUser).post(createPageCommentHandler);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .get(listPageCommentsHandler)
+  .use(requireUser)
+  .post(createPageCommentHandler);
 
 async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote[]>) {
   const { id: pageId } = req.query as any as { id: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -48,7 +58,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

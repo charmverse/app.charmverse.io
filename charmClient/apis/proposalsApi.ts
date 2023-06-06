@@ -1,11 +1,15 @@
-import type { ProposalCategoryWithPermissions, ProposalFlowPermissionFlags } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type {
+  ProposalCategoryWithPermissions,
+  ProposalFlowPermissionFlags,
+  ProposalReviewerPool
+} from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import type { PageWithProposal } from 'lib/pages';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
-import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -41,18 +45,18 @@ export class ProposalsApi {
   }: {
     spaceId: string;
     categoryId: string;
-  }): Promise<IPageWithPermissions> {
+  }): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId, categoryId });
   }
 
   createProposalFromTemplate({
     spaceId,
     templateId
-  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<IPageWithPermissions> {
+  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
-  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<IPageWithPermissions> {
+  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 
@@ -74,7 +78,7 @@ export class ProposalsApi {
     return http.GET<ProposalFlowPermissionFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
   }
 
-  getReviewerPool(spaceId: string) {
-    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?spaceId=${spaceId}`);
+  getReviewerPool(proposalId: string) {
+    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?resourceId=${proposalId}`);
   }
 }

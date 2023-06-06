@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
 import { BountyPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { InvalidInputError } from 'lib/utilities/errors';

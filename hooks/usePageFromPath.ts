@@ -1,7 +1,7 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useRouter } from 'next/router';
 
 import { usePages } from 'hooks/usePages';
-import type { PageMeta } from 'lib/pages';
 
 export function usePageIdFromPath() {
   const router = useRouter();

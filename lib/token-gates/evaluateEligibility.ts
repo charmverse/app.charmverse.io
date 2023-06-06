@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { LitNodeClient } from 'lit-js-sdk';
 import { validate } from 'uuid';
 
@@ -19,11 +19,9 @@ export async function evalueTokenGateEligibility({
   userId
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
-    if (process.env.ENABLE_LIT) {
-      await litClient.connect().catch((err) => {
-        log.debug('Error connecting to lit node', err);
-      });
-    }
+    await litClient.connect().catch((err) => {
+      log.debug('Error connecting to lit node', err);
+    });
   }
 
   const validUuid = validate(spaceIdOrDomain);

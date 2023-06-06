@@ -21,6 +21,7 @@ type Props = {
   value: string;
   showEmptyPlaceholder?: boolean;
   onChange: (value: string) => void;
+  wrapColumn?: boolean;
 };
 
 export type DateProperty = {
@@ -157,7 +158,9 @@ function DateRange(props: Props): JSX.Element {
     <>
       <div className='octo-propertyvalue' data-testid='select-non-editable' {...bindTrigger(popupState)}>
         <Label color={displayValue ? 'propColorDefault' : 'empty'}>
-          <span className='Label-text'>{buttonText}</span>
+          <span style={{ whiteSpace: props.wrapColumn ? 'break-spaces' : undefined }} className='Label-text'>
+            {buttonText}
+          </span>
         </Label>
       </div>
       <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>

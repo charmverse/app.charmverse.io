@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Page, PageDiff } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -92,7 +92,7 @@ export async function restoreDocument({ pageId, version }: RestoreInput): Promis
     return updated;
   });
 
-  log.debug(`Rebuilt document with ${pageWithDiffs.diffs} steps`);
+  log.debug(`Rebuilt document with ${pageWithDiffs.diffs.length} steps`);
 
   return pageAfterUpdate;
 }

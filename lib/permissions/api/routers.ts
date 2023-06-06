@@ -1,16 +1,18 @@
-import type { PermissionsClient } from '@charmverse/core';
-import { PermissionsApiClient, prisma } from '@charmverse/core';
-import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
-import type { PremiumPermissionsClient } from '@charmverse/core/shared';
 import {
+  PageNotFoundError,
   ProposalCategoryPermissionNotFoundError,
-  stringUtils,
   InvalidInputError,
   PostCategoryNotFoundError,
   PostNotFoundError,
   ProposalNotFoundError,
-  ProposalCategoryNotFoundError
-} from '@charmverse/core/shared';
+  ProposalCategoryNotFoundError,
+  DataNotFoundError
+} from '@charmverse/core/errors';
+import { PermissionsApiClient } from '@charmverse/core/permissions';
+import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core/permissions';
+import type { Space, SubscriptionTier } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { SpaceNotFoundError } from 'lib/public-api/errors';
@@ -219,6 +221,109 @@ export async function isProposalCategoryPermissionSpaceOptedIn({
   return getEngine(proposalCategoryPermission.proposalCategory.space);
 }
 
+export async function isPageSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const page = await prisma.page.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(resourceId);
+  }
+
+  return getEngine(page.space);
+}
+export async function isPagePermissionSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const pagePermission = await prisma.pagePermission.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      page: {
+        select: {
+          space: {
+            select: {
+              id: true,
+              paidTier: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (!pagePermission) {
+    throw new ProposalCategoryPermissionNotFoundError(resourceId);
+  }
+
+  return getEngine(pagePermission.page.space);
+}
+
+export async function isBountySpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const bounty = await prisma.bounty.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!bounty) {
+    throw new DataNotFoundError(resourceId);
+  }
+
+  return getEngine(bounty.space);
+}
+
+export async function isVoteSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const vote = await prisma.vote.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!vote) {
+    throw new DataNotFoundError(resourceId);
+  }
+
+  return getEngine(vote.space);
+}
+
 export type ResourceIdEntity =
   | 'space'
   | 'post'
@@ -226,8 +331,11 @@ export type ResourceIdEntity =
   | 'postCategoryPermission'
   | 'proposal'
   | 'proposalCategory'
-  | 'proposalCategoryPermission';
-
+  | 'proposalCategoryPermission'
+  | 'page'
+  | 'pagePermission'
+  | 'bounty'
+  | 'vote';
 export type GetPermissionClient = {
   resourceId: string;
   resourceIdType: ResourceIdEntity;
@@ -252,6 +360,14 @@ export async function checkSpaceSpaceSubscriptionInfo({
       ? isProposalCategorySpaceOptedIn
       : resourceIdType === 'proposalCategoryPermission'
       ? isProposalCategoryPermissionSpaceOptedIn
+      : resourceIdType === 'page'
+      ? isPageSpaceOptedIn
+      : resourceIdType === 'pagePermission'
+      ? isPagePermissionSpaceOptedIn
+      : resourceIdType === 'bounty'
+      ? isBountySpaceOptedIn
+      : resourceIdType === 'vote'
+      ? isVoteSpaceOptedIn
       : null;
 
   if (!engineResolver) {

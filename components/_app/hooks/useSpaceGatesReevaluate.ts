@@ -13,7 +13,7 @@ export function useSpaceGatesReevaluate() {
   useEffect(() => {
     const reevaluateRoles = async () => {
       if (user?.id && currentSpace?.id && account) {
-        const authSig = getStoredSignature();
+        const authSig = getStoredSignature(account);
         if (!authSig) return;
 
         const newRoles = await charmClient.tokenGates.reevaluateRoles({

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { MemberProperty } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getMemberSearchValue } from 'lib/members/getMemberSearchValue';
@@ -85,14 +85,16 @@ export async function getSpaceMembers({
           avatar: userData.avatar || undefined,
           avatarTokenId: userData.avatarTokenId || undefined,
           username,
+          path: userData.path,
           onboarded: spaceRole.onboarded,
           isAdmin: spaceRole.isAdmin,
           isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap),
-          roles
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
+          roles,
+          isBot: userData.isBot ?? undefined
         };
       })
       // filter out deleted members

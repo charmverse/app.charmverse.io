@@ -2,11 +2,12 @@ import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import TwitterIcon from '@mui/icons-material/Twitter';
 
+import OpenSeaIcon from 'public/images/opensea_logo.svg';
+
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
-import { OpenSeaIcon } from '../../nft/config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 

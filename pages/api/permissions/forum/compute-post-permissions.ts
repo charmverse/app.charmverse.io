@@ -1,5 +1,5 @@
-import type { PermissionCompute, PostPermissionFlags } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
+import type { PermissionCompute, PostPermissionFlags } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

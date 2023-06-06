@@ -1,4 +1,4 @@
-import * as http from 'adapters/http';
+import * as http from '@charmverse/core/http';
 
 import type { XPSAchievement, XPSUserInventory } from './interfaces';
 

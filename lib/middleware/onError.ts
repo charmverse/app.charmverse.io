@@ -4,11 +4,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { UnknownError } from 'lib/middleware';
 import { SystemError } from 'lib/utilities/errors';
 
+const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
+
 export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
-  const errorAsSystemError = err instanceof SystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
+  // We need to change strategy to validate the error since Prototypes are not always correct
+  const isValidSystemError =
+    validationProps.every((prop) => !!err[prop]) && typeof err.code === 'number' && err.code >= 400 && err.code <= 599;
+
+  const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 
   if (errorAsSystemError.code === 500) {
-    // err.error?.message is for errors from adapters/http/fetch.server
+    // err.error?.message is for errors from @charmverse/core/http
     log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,

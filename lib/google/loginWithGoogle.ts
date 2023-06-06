@@ -1,4 +1,5 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -45,6 +46,19 @@ export async function loginWithGoogle({
       }
     });
 
+    const emailAccount = await prisma.verifiedEmail.findUnique({
+      where: {
+        email
+      },
+      include: {
+        user: {
+          select: {
+            deletedAt: true
+          }
+        }
+      }
+    });
+
     if (googleAccount) {
       if (googleAccount.user.deletedAt) {
         throw new DisabledAccountError(`This account has been disabled`);
@@ -66,6 +80,26 @@ export async function loginWithGoogle({
         return updateUserProfile(googleAccount.userId, { identityType: 'Google', username: displayName });
       } else {
         return getUserProfile('id', googleAccount.userId);
+      }
+    }
+
+    if (emailAccount && !emailAccount.user.deletedAt) {
+      if (emailAccount.name !== displayName || emailAccount.avatarUrl !== avatarUrl) {
+        trackUserAction('sign_in', { userId: emailAccount.userId, identityType: 'Google' });
+
+        await prisma.verifiedEmail.update({
+          where: {
+            id: emailAccount.id
+          },
+          data: {
+            avatarUrl,
+            name: displayName
+          }
+        });
+
+        return updateUserProfile(emailAccount.userId, { identityType: 'Google', username: displayName });
+      } else {
+        return getUserProfile('id', emailAccount.userId);
       }
     }
 

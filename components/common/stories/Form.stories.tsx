@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import SocialInputs from 'components/profile/components/SocialInputs';
-import { TimezoneAutocomplete } from 'components/profile/components/TimezoneAutocomplete';
-import UserDescription from 'components/profile/components/UserDescription';
-import type { Social } from 'components/profile/interfaces';
+import { SocialInputs } from 'components/u/components/SocialInputs';
+import { TimezoneAutocomplete } from 'components/u/components/TimezoneAutocomplete';
+import UserDescription from 'components/u/components/UserDescription';
+import type { Social } from 'components/u/interfaces';
 
 import Button from '../Button';
 import type { SelectOptionType } from '../form/fields/Select/interfaces';

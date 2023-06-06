@@ -1,4 +1,5 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,11 +8,7 @@ import { useMemo } from 'react';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type {
-  StaticPagesList,
-  StaticPagesType
-} from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
-import type { PageMeta } from 'lib/pages';
+import type { StaticPage, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 
 export type AllPagesProp = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
   type: Page['type'] | StaticPagesType | 'forum_category';
@@ -21,7 +18,7 @@ interface Props {
   activeItemIndex?: number;
   activePageId?: string;
   pages: PageMeta[];
-  staticPages?: StaticPagesList[];
+  staticPages?: StaticPage[];
   forumCategories?: PostCategoryWithPermissions[];
   onSelectPage: (pageId: string, type: AllPagesProp['type'], path: string) => void;
   emptyText?: string;

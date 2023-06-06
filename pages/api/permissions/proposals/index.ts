@@ -1,11 +1,11 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core';
-import { prisma } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
-import type { PermissionToDelete } from 'lib/permissions/interfaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -16,7 +16,6 @@ handler
   .delete(
     requirePaidPermissionsSubscription({
       key: 'permissionId',
-      location: 'body',
       resourceIdType: 'proposalCategoryPermission'
     }),
     removeProposalCategoryPermission
@@ -51,7 +50,8 @@ async function upsertProposalCategoryPermissionController(
 }
 
 async function removeProposalCategoryPermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as PermissionToDelete;
+  // Remove use of req.body after browsers update - 06/2023
+  const { permissionId } = (req.query || req.body) as PermissionResource;
 
   const proposalCategory = await prisma.proposalCategory.findFirst({
     where: {

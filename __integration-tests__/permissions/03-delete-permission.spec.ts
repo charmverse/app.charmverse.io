@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
-import type { Space, User } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -36,7 +35,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -50,7 +49,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -64,14 +63,14 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const rootPermissionId = rootPage.permissions[0].id;
 
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', cookie)
-      .send({
+      .query({
         permissionId: rootPermissionId
       })
       .expect(200);
@@ -105,7 +104,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const childPage = (
       await request(baseUrl)
@@ -120,7 +119,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const nestedChildPage = (
       await request(baseUrl)
@@ -135,7 +134,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const subNestedChildPage = (
       await request(baseUrl)
@@ -150,7 +149,7 @@ describe('DELETE /api/permissions - delete permission', () => {
           })
         )
         .expect(201)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     const rootPermissionId = rootPage.permissions[0].id;
 
@@ -161,7 +160,7 @@ describe('DELETE /api/permissions - delete permission', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', cookie)
-      .send({
+      .query({
         permissionId: nestedChildPermissionId
       })
       .expect(200);

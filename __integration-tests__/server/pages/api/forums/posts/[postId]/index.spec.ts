@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
@@ -127,11 +127,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
       ...createInput,
       categoryId: moderatedPostCategory.id
     });
-    await request(baseUrl)
-      .delete(`/api/forums/posts/${post.id}`)
-      .set('Cookie', extraSpaceUserCookie)
-      .send()
-      .expect(200);
+    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', extraSpaceUserCookie).expect(200);
 
     const postAfterDelete = await prisma.post.findUnique({
       where: {
@@ -145,11 +141,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
   it('should fail to delete the post if the user does not have permissions to do so in this category, responding with 401', async () => {
     const page = await generateForumPost(createInput);
 
-    await request(baseUrl)
-      .delete(`/api/forums/posts/${page.id}`)
-      .set('Cookie', extraSpaceUserCookie)
-      .send()
-      .expect(401);
+    await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', extraSpaceUserCookie).expect(401);
   });
 });
 describe('GET /api/forums/posts/[postId] - Get a post', () => {

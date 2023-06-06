@@ -1,3 +1,4 @@
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
@@ -22,7 +23,6 @@ import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -33,7 +33,7 @@ interface ProposalPropertiesProps {
   proposalId: string;
   snapshotProposalId: string | null;
   isTemplate: boolean;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
 }
 
@@ -294,7 +294,7 @@ export function ProposalProperties({
                 <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
               ) : (
                 <InputSearchReviewers
-                  isProposal
+                  proposalId={proposal?.id}
                   disabled={readOnly || !canUpdateProposalProperties}
                   readOnly={readOnly}
                   value={proposalReviewers.map(
