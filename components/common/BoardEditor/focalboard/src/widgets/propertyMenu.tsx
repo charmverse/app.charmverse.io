@@ -52,6 +52,8 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
       return intl.formatMessage({ id: 'PropertyType.UpdatedBy', defaultMessage: 'Last updated by' });
     case 'date':
       return intl.formatMessage({ id: 'PropertyType.Date', defaultMessage: 'Date' });
+    case 'proposalUrl':
+      return intl.formatMessage({ id: 'PropertyType.ProposalUrl', defaultMessage: 'Proposal Url' });
     default: {
       Utils.assertFailure(`typeDisplayName, unhandled type: ${type}`);
       return type;
@@ -73,7 +75,8 @@ export const propertyTypesList: PropertyType[] = [
   'createdTime',
   'createdBy',
   'updatedTime',
-  'updatedBy'
+  'updatedBy',
+  'proposalUrl'
 ];
 
 const PropertyMenu = React.memo((props: Props) => {

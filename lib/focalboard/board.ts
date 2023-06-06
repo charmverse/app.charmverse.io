@@ -16,6 +16,7 @@ export type PropertyType =
   | 'file'
   | 'checkbox'
   | 'url'
+  | 'proposalUrl'
   | 'email'
   | 'phone'
   | 'createdTime'
