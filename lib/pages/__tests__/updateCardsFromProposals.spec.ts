@@ -1,7 +1,6 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Space, User } from '@charmverse/core/src/prisma-client';
-import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
 import { DatabasePageNotFoundError } from 'lib/public-api';

@@ -115,15 +115,6 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
-            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
-              <BsFiletypeCsv style={{ fontSize: 24 }} />
-              Import CSV
-            </SourceType>
-            <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
-              <RiGoogleFill style={{ fontSize: 24 }} />
-              Google Form
-            </SourceType>
             <SourceType
               active={activeSourceType === 'proposals'}
               onClick={
@@ -136,7 +127,16 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               }
             >
               <TaskOutlinedIcon fontSize='small' />
-              Proposal
+              Charmverse Proposals
+            </SourceType>
+            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
+              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
+              <BsFiletypeCsv style={{ fontSize: 24 }} />
+              Import CSV
+            </SourceType>
+            <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
+              <RiGoogleFill style={{ fontSize: 24 }} />
+              Google Form
             </SourceType>
             <SourceType
               active={false}

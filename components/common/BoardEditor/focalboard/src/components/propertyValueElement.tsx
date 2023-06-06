@@ -9,6 +9,7 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
@@ -168,35 +169,31 @@ function PropertyValueElement(props: Props) {
     );
   }
 
-  if (editableFields.includes(propertyTemplate.type)) {
-    const commonProps = {
-      className: 'octo-propertyvalue',
-      placeholderText: emptyDisplayValue,
-      readOnly,
-      value: value.toString(),
-      autoExpand: true,
-      onChange: setValue,
-      multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-      onSave: () => {
-        mutator.changePropertyValue(card, propertyTemplate.id, value);
-      },
-      onCancel: () => setValue(propertyValue || ''),
-      validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-      spellCheck: propertyTemplate.type === 'text'
-    };
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: emptyDisplayValue,
+    readOnly,
+    value: value.toString(),
+    autoExpand: true,
+    onChange: setValue,
+    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    onSave: () => {
+      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    },
+    onCancel: () => setValue(propertyValue || ''),
+    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    spellCheck: propertyTemplate.type === 'text'
+  };
 
+  if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
-  } else if (propertyTemplate.type === 'proposalUrl') {
-    const proposalUrl = `${window.location.origin}/${domain}/${finalDisplayValue}`;
-    propertyValueElement = (
-      <div className='octo-propertyvalue'>
-        <a href={proposalUrl}>{proposalUrl}</a>
-      </div>
-    );
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+    propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
   } else if (propertyValueElement === null) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }
