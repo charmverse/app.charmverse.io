@@ -1,7 +1,6 @@
+import * as http from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import { RateLimit } from 'async-sema';
-
-import * as http from 'adapters/http';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 

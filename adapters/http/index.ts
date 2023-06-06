@@ -3,21 +3,12 @@ import fetch from './fetch';
 type Params = { [key: string]: any };
 
 export function GET<T = Response>(
-  path: string,
+  _requestUrl: string,
   data: Params = {},
   { headers = {}, credentials = 'include' }: { credentials?: RequestCredentials; headers?: any } = {}
 ): Promise<T> {
-  const queryStr = Object.keys(data)
-    .filter((key) => !!data[key])
-    .map((key) => {
-      const value = data[key];
-      return Array.isArray(value)
-        ? `${value.map((v: string) => `${key}[]=${v}`).join('&')}`
-        : `${key}=${encodeURIComponent(value)}`;
-    })
-    .join('&');
-  const url = `${path}${queryStr ? `?${queryStr}` : ''}`;
-  return fetch<T>(url, {
+  const requestUrl = _appendQuery(_requestUrl, data);
+  return fetch<T>(requestUrl, {
     method: 'GET',
     headers: new Headers({
       Accept: 'application/json',
@@ -27,9 +18,13 @@ export function GET<T = Response>(
   });
 }
 
-export function DELETE<T>(requestURL: string, data: Params = {}, { headers = {} }: { headers?: any } = {}): Promise<T> {
-  return fetch<T>(requestURL, {
-    body: JSON.stringify(data),
+export function DELETE<T>(
+  _requestUrl: string,
+  data: Params = {},
+  { headers = {} }: { headers?: any } = {}
+): Promise<T> {
+  const requestUrl = _appendQuery(_requestUrl, data);
+  return fetch<T>(requestUrl, {
     method: 'DELETE',
     headers: new Headers({
       Accept: 'application/json',
@@ -70,4 +65,17 @@ export function PUT<T>(requestURL: string, data: Params = {}, { headers = {} }: 
     }),
     credentials: 'include'
   });
+}
+
+function _appendQuery(path: string, data: Params) {
+  const queryString = Object.keys(data)
+    .filter((key) => !!data[key])
+    .map((key) => {
+      const value = data[key];
+      return Array.isArray(value)
+        ? `${value.map((v: string) => `${key}[]=${v}`).join('&')}`
+        : `${key}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
+  return `${path}${queryString ? `?${queryString}` : ''}`;
 }

@@ -20,7 +20,7 @@ declare module 'http' {
 type MiddlewareConfig = {
   resourceIdType: ResourceIdEntity;
   key: string;
-  location: 'body' | 'query';
+  location?: 'body' | 'query';
 };
 
 /**
@@ -31,11 +31,11 @@ type MiddlewareConfig = {
 export function providePermissionClients({ key, location, resourceIdType }: MiddlewareConfig) {
   // eslint-disable-next-line func-names
   return async function (req: NextApiRequest, res: NextApiResponse, next?: NextHandler) {
-    const resourceId = req[location][key];
+    const resourceId = location ? req[location][key] : req.body[key] || req.query[key];
 
     if (!stringUtils.isUUID(resourceId)) {
       throw new InvalidInputError(
-        `Valid ID for a ${resourceIdType} at request ${location} with key ${key} is required`
+        `Valid ID for a ${resourceIdType} at request ${location || ''} with key ${key} is required`
       );
     }
 

@@ -94,7 +94,7 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       }
     });
 
-    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', nonAdminCookie).send({}).expect(200);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', nonAdminCookie).expect(200);
 
     const inexistentThread = await prisma.thread.findUnique({
       where: {
@@ -119,6 +119,6 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', otherAdminCookie).send({}).expect(401);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', otherAdminCookie).expect(401);
   });
 });
