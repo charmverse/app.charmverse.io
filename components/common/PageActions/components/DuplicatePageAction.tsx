@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
 const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
 
@@ -24,10 +25,11 @@ export function DuplicatePageAction({
   pagePermissions: PagePermissionFlags | undefined;
 }) {
   const currentSpace = useCurrentSpace();
+  const [userSpacePermissions] = useCurrentSpacePermissions();
   const router = useRouter();
   const { refreshBounty } = useBounties();
 
-  const disabled = !pagePermissions?.read;
+  const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
 
   async function duplicatePage() {
     if (currentSpace) {
