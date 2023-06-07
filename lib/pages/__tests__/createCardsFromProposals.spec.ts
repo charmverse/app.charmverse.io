@@ -57,27 +57,7 @@ describe('createCardsFromProposals', () => {
       userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const cards = await prisma.page.findMany({
-      where: {
-        type: 'card',
-        spaceId: space.id,
-        parentId: board.id,
-        AND: [
-          {
-            syncWithPageId: {
-              not: null
-            }
-          },
-          {
-            syncWithPageId: {
-              not: undefined
-            }
-          }
-        ]
-      }
-    });
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(1);
 
@@ -106,27 +86,7 @@ describe('createCardsFromProposals', () => {
   });
 
   it('should not create cards if no proposals are found', async () => {
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const cards = await prisma.page.findMany({
-      where: {
-        type: 'card',
-        spaceId: space.id,
-        parentId: board.id,
-        AND: [
-          {
-            syncWithPageId: {
-              not: null
-            }
-          },
-          {
-            syncWithPageId: {
-              not: undefined
-            }
-          }
-        ]
-      }
-    });
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(0);
   });
