@@ -9,22 +9,23 @@ import IconButton from '@mui/material/IconButton';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import { IntegrationSettings } from 'components/integrations/IntegrationsPage';
-import { ApiSettings } from 'components/settings/api/Api';
-import type { SpaceSettingsTab, UserSettingsTab } from 'components/settings/config';
-import { ACCOUNT_TABS, getSettingsTabs } from 'components/settings/config';
-import Invites from 'components/settings/invites/Invites';
-import { RoleSettings } from 'components/settings/roles/RoleSettings';
-import SpaceSettings from 'components/settings/workspace/Space';
-import { SubscriptionSettings } from 'components/subscription/SubscriptionSettings';
+import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
+import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
+import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 
-import { SectionName } from '../PageLayout/components/Sidebar/Sidebar';
-import { SidebarLink } from '../PageLayout/components/Sidebar/SidebarButton';
+import { AccountSettings } from './account/AccountSettings';
+import { ApiSettings } from './api/ApiSettings';
+import type { SpaceSettingsTab, UserSettingsTab } from './config';
+import { ACCOUNT_TABS, getSettingsTabs } from './config';
+import { ImportSettings } from './import/ImportSettings';
+import Invites from './invites/Invites';
+import { RoleSettings } from './roles/RoleSettings';
+import { SpaceSettings } from './space/SpaceSettings';
 
 interface TabPanelProps extends BoxProps {
   children?: ReactNode;
@@ -54,6 +55,10 @@ function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab 
     return <Invites space={space} />;
   }
 
+  if (tab.path === 'import' && space) {
+    return <ImportSettings space={space} />;
+  }
+
   if (tab.path === 'api' && space) {
     return <ApiSettings space={space} />;
   }
@@ -63,7 +68,7 @@ function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab 
   }
 
   if (tab.path === 'account') {
-    return <IntegrationSettings />;
+    return <AccountSettings />;
   }
 
   if (tab.path === 'profile') {

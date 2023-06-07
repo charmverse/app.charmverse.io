@@ -39,6 +39,7 @@ test('Space settings - toggle feature visibility', async ({ spaceSettings }) => 
   await spaceSettings.proposalsVisibilityToggle.click();
 
   await expect(spaceSettings.proposalsVisibilityToggle).not.toBeChecked();
+  await spaceSettings.submitSpaceUpdateButton.click();
   // Proposal visibility toggle should now be off
   await spaceSettings.closeModalButton.click();
 

@@ -1,13 +1,14 @@
 import type { Space } from '@charmverse/core/prisma';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import UserRoleIcon from '@mui/icons-material/AssignmentInd';
+import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 
-export const spaceSettingsSections = ['space', 'roles', 'invites', 'api', 'subscription'] as const;
+export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'api', 'subscription'] as const;
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
 type SettingsTab<T extends string> = {
@@ -22,6 +23,7 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <SettingsIcon fontSize='small' />, path: 'space', label: 'Overview' },
   { icon: <UserRoleIcon fontSize='small' />, path: 'roles', label: 'Roles & Permissions' },
   { icon: <GroupAddOutlinedIcon fontSize='small' />, path: 'invites', label: 'Invites' },
+  { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <AttachMoneyIcon fontSize='small' />, path: 'subscription', label: 'Subscription' }
 ];

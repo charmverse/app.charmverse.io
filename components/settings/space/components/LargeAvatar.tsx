@@ -8,7 +8,7 @@ import { useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import { NftAvatarGalleryPopup } from 'components/common/UserProfile/components/NftAvatarGallery/NftAvatarGalleryPopup';
-import { AvatarEditMenu } from 'components/settings/workspace/AvatarEditMenu';
+import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditMenu';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NftData } from 'lib/blockchain/interfaces';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';

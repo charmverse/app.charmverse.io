@@ -39,6 +39,7 @@ async function getCurrentSpace(req: NextApiRequest, res: NextApiResponse<Space |
       domain: spaceDomain
     }
   });
+
   if (space) {
     return res.status(200).json(space);
   }

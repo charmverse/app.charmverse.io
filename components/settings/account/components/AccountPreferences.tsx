@@ -25,7 +25,7 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import { formatDateTime } from 'lib/utilities/dates';
 import debounce from 'lib/utilities/debounce';
 
-import Legend from './Legend';
+import Legend from '../../Legend';
 
 export const schema = yup.object({
   email: yup.string().ensure().trim().email(),
@@ -35,7 +35,7 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-export function AccountSettings() {
+export function AccountPreferences() {
   const { userPreferences, updatePreferences } = useUserPreferences();
   const theme = useTheme();
   const { toggleColorMode } = useColorMode();
