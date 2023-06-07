@@ -325,7 +325,7 @@ export function SpaceSettings({ space }: { space: Space }) {
   );
 }
 
-function _getFormValues(space: Space) {
+function _getFormValues(space: Space): FormValues {
   return {
     name: space.name,
     spaceImage: space.spaceImage,

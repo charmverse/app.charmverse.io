@@ -34,7 +34,13 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     where: {
       id: spaceId
     },
-    data: updates
+    data: {
+      domain: updates.domain,
+      name: updates.name,
+      spaceImage: updates.spaceImage,
+      notifyNewProposals: updates.notifyNewProposals,
+      hiddenFeatures: updates.hiddenFeatures
+    }
   });
 
   updateTrackGroupProfile(updatedSpace);
