@@ -3,6 +3,7 @@ import type { Space } from '@charmverse/core/prisma';
 import * as http from 'adapters/http';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
+import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 
 export class SpacesApi {
   async searchByDomain(search: string) {
@@ -15,5 +16,11 @@ export class SpacesApi {
 
   async setHiddenFeatures({ hiddenFeatures, spaceId }: SpaceHiddenFeatures) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-hidden-features`, { hiddenFeatures });
+  }
+
+  async setPublicProposals({ publicProposals, spaceId }: SpacePublicProposalToggle): Promise<Space> {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-proposals`, {
+      publicProposals
+    });
   }
 }

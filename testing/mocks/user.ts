@@ -58,6 +58,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     spaceImage: null,
     defaultPostCategoryId: null,
     notifyNewProposals: null,
+    requireProposalTemplate: null,
     defaultPagePermissionGroup: null,
     defaultPublicPages: null,
     permissionConfigurationMode: null,
@@ -66,6 +67,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     superApiTokenId: null,
     webhookSubscriptionUrl: null,
     webhookSigningSecret: null,
+    publicProposals: null,
     hiddenFeatures: [],
     ...space
   };

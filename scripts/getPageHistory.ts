@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { fancyTrim } from 'lib/utilities/strings';
 
 const spaceDomain = 'myosinxyz';
-const pagePath = 'page-012379792069703965';
+const pagePath = 'page-5896376256522182';
 const maxContentSize = 750;
 const maxRows = 300;
 const minVersion = 0;
@@ -45,7 +45,7 @@ async function exec() {
       diffs: true
     }
   });
-
+  console.log(page);
   const sortedDiffs = page.diffs
     .filter((diff) => diff.createdAt >= startDate && diff.createdAt <= endDate && diff.version >= minVersion)
     .sort((a, b) => a.version - b.version)

@@ -1,7 +1,6 @@
+import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import orderBy from 'lodash/orderBy';
-
-import { GET } from 'adapters/http';
 
 export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
 export type SupportedChainId = (typeof SupportedChainIds)[number];
@@ -148,8 +147,8 @@ export const getNFT = async (contractAddress: string, tokenId: string, chainId: 
 };
 
 export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
-  const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken?contractAddress=${contractAddress}&tokenId=${tokenId}`;
-  const res = await GET<{ owners: string[] }>(url);
+  const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
+  const res = await GET<{ owners: string[] }>(url, { contractAddress, tokenId });
 
   return res.owners;
 };

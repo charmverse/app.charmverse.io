@@ -180,7 +180,7 @@ describe('POST /api/permissions - add new permission', () => {
         return request(baseUrl)
           .delete('/api/permissions')
           .set('Cookie', cookie)
-          .send({
+          .query({
             permissionId: perm.id
           })
           .expect(200);

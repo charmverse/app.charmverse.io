@@ -174,7 +174,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
     await request(baseUrl)
       .delete(`/api/votes/${targetVote.id}`)
       .set('Cookie', adminCookie)
-      .send({
+      .query({
         status: 'Cancelled'
       })
       .expect(200);
@@ -199,7 +199,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
     await request(baseUrl)
       .delete(`/api/votes/${targetVote.id}`)
       .set('Cookie', nonAdminCookie)
-      .send({
+      .query({
         status: 'Cancelled'
       })
       .expect(401);

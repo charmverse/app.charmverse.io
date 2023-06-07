@@ -50,6 +50,7 @@ export type PageWithContent = PageMeta &
     | 'type'
     | 'updatedAt'
     | 'updatedBy'
+    | 'syncWithPageId'
   > & { permissionFlags: PagePermissionFlags };
 
 export type PageDetails = {
