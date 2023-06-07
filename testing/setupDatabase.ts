@@ -44,6 +44,8 @@ import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
 
+type PageWithProposal = Page & { proposal: ProposalWithUsers };
+
 export async function generateSpaceUser({
   spaceId,
   isAdmin,
@@ -530,8 +532,7 @@ export async function generateRole({
   createdBy,
   roleName = `role-${v4()}`,
   source,
-  assigneeUserIds,
-  id = v4()
+  assigneeUserIds
 }: {
   externalId?: string;
   spaceId: string;
@@ -731,8 +732,6 @@ export async function createVote({
     }
   });
 }
-
-type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function createProposalWithUsers({
   proposalStatus = 'draft',
@@ -944,7 +943,7 @@ export async function generateProposal({
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
   title?: string;
-}): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
