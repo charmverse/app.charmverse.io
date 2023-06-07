@@ -4,6 +4,8 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
@@ -86,44 +88,74 @@ export default function ShareProposals({ padding = 1 }: Props) {
   }
 
   return (
-    <>
-      <Box display='flex' justifyContent='space-between' alignItems='center' padding={padding}>
-        <Box>
+    <Grid container padding={padding} flexDirection='column' display='flex' justifyContent='space-between'>
+      <Grid container item justifyContent='space-between' alignItems='center'>
+        <Grid item>
           <Typography>Make proposals public</Typography>
+        </Grid>
+        <Grid item>
+          <Switch
+            checked={proposalsArePublic || isPublicSpace}
+            disabled={!isAdmin || isPublicSpace}
+            onChange={togglePublic}
+          />
+        </Grid>
+      </Grid>
+      <Grid item>
+        <Typography variant='body2' color='secondary'>
+          {proposalsArePublic
+            ? 'Anyone outside this space can view proposals, except drafts.'
+            : 'Proposals can only be seen by space members.'}
+        </Typography>
+      </Grid>
 
-          <Typography variant='body2' color='secondary'>
-            {proposalsArePublic
-              ? 'Anyone outside this space can view proposals, except drafts.'
-              : 'Proposals can only be seen by space members.'}
-          </Typography>
-        </Box>
-        <Switch
-          checked={proposalsArePublic || isPublicSpace}
-          disabled={!isAdmin || isPublicSpace}
-          onChange={togglePublic}
-        />
-      </Box>
       {isPublicSpace && (
-        <Alert severity='info'>All proposals in public spaces are publicly visible, except drafts</Alert>
+        <Grid item>
+          <Alert severity='info'>All proposals in public spaces are publicly visible, except drafts</Alert>
+        </Grid>
       )}
-      <Collapse in={proposalsArePublic}>
-        {shareLink && (
-          <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>
-            <StyledInput
-              fullWidth
-              disabled
-              value={shareLink}
-              endAdornment={
-                <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position='end'>
-                    <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
-                  </InputAdornment>
-                </CopyToClipboard>
-              }
-            />
-          </Box>
-        )}
-      </Collapse>
-    </>
+      <Grid item>
+        <Collapse in={proposalsArePublic}>
+          {shareLink && (
+            <Box sx={{ mt: 1 }}>
+              <StyledInput
+                fullWidth
+                disabled
+                value={shareLink}
+                endAdornment={
+                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                    <InputAdornment position='end'>
+                      <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
+                    </InputAdornment>
+                  </CopyToClipboard>
+                }
+              />
+            </Box>
+          )}
+        </Collapse>
+      </Grid>
+      {proposalsArePublic && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Grid container item justifyContent='space-between' alignItems='center'>
+            <Grid item>
+              <Typography>Allow anyone to join</Typography>
+            </Grid>
+            <Grid item>
+              <Switch
+                checked={proposalsArePublic || isPublicSpace}
+                disabled={!isAdmin || isPublicSpace}
+                onChange={togglePublic}
+              />
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Typography variant='body2' color='secondary'>
+              People can join your space from the proposals page via a public invite link
+            </Typography>
+          </Grid>
+        </>
+      )}
+    </Grid>
   );
 }
