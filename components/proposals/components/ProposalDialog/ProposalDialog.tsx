@@ -76,7 +76,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         page ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
-              data-test='open-post-as-page'
+              data-test='open-as-page'
               size='small'
               color='secondary'
               href={relativePath}

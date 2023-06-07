@@ -135,7 +135,9 @@ test.describe.serial('View proposal', () => {
 
     await expect(proposalListPage.dialog).toBeVisible();
 
-    await proposalListPage.openAsPageButton.click();
+    await expect(proposalListPage.openAsPageButton).toBeVisible();
+
+    await proposalListPage.openAsPageButton.click({ force: true });
 
     // Check we can see the contents
     await proposalListPage.waitForDocumentPage({
