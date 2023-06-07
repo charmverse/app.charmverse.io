@@ -9,7 +9,7 @@ type ApiResponse<T> = { data: T };
 
 type GetParticipationScoreResponse = ApiResponse<DeepDaoParticipationScore>;
 type GetProfileResponse = ApiResponse<DeepDaoProfile>;
-type GetOrganizationsResponse = ApiResponse<{
+export type GetOrganizationsResponse = ApiResponse<{
   totalResources: number;
   resources: DeepDaoOrganizationDetails[];
 }>;
