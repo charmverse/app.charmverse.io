@@ -1,11 +1,14 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
-import { DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
+
+import { createCardPage } from './createCardPage';
 
 export async function createCardsFromProposals({
   boardId,
@@ -32,7 +35,7 @@ export async function createCardsFromProposals({
   })) as unknown as Board | undefined;
 
   if (!board) {
-    throw new DatabasePageNotFoundError(boardId);
+    throw new DataNotFoundError('Database was not found');
   }
 
   const newBoardField = {
@@ -54,14 +57,6 @@ export async function createCardsFromProposals({
       }
     }
   });
-
-  relay.broadcast(
-    {
-      type: 'blocks_updated',
-      payload: [prismaToBlock(updatedBoard)]
-    },
-    spaceId
-  );
 
   const views = await prisma.block.findMany({
     where: {
@@ -90,13 +85,14 @@ export async function createCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock)
+      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(updatedBoard))
     },
     spaceId
   );
 
+  const cards: { page: Page; block: Block }[] = [];
   for (const pageProposal of pageProposals) {
-    await createDatabaseCardPage({
+    const _card = await createCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
@@ -107,10 +103,30 @@ export async function createCardsFromProposals({
       contentText: pageProposal.contentText,
       syncWithPageId: pageProposal.id
     });
+    cards.push(_card);
+  }
+
+  if (cards.length > 0) {
+    relay.broadcast(
+      {
+        type: 'blocks_created',
+        payload: cards.map((card) => prismaToBlock(card.block))
+      },
+      spaceId
+    );
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: cards.map((card) => card.page)
+      },
+      spaceId
+    );
   }
 
   log.debug('Created cards from new Proposals', {
     boardId,
     createdCardPagesCount: pageProposals.length
   });
+
+  return cards.map((card) => card.page);
 }
