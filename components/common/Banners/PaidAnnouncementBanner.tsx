@@ -14,7 +14,7 @@ export function PaidAnnouncementBanner() {
       <Typography component='div'>
         Community Edition coming on June 30th. Includes complex role-based access control, API, & custom domain.{' '}
         <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-          <Link color='inherit' target='_blank' href='https://charmverse.io/pricing' sx={{ fontWeight: 600 }}>
+          <Link color='inherit' target='_blank' href='https://app.charmverse.io/charmverse/page-5371612014886058' sx={{ fontWeight: 600 }}>
             More Details
           </Link>
           <EastIcon sx={{ position: 'relative', top: 1.5, fontSize: 16 }} />
