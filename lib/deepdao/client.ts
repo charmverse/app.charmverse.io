@@ -48,7 +48,7 @@ function _requestGET<T>(endpoint: string, { apiToken = DEEPDAO_API_KEY }: { apiT
     log.debug('Skip request: No API Key or URL for DeepDAO');
     return Promise.resolve(null);
   }
-  return GET<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, {
+  return GET<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, undefined, {
     headers: {
       'x-api-key': apiToken
     }
