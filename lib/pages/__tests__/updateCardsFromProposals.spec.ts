@@ -1,9 +1,8 @@
-import type { Page } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Space, User } from '@charmverse/core/src/prisma-client';
+import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { DatabasePageNotFoundError } from 'lib/public-api';
 import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
@@ -229,12 +228,12 @@ describe('updateCardsFromProposals', () => {
   it('should not create cards from proposals if board is not found', async () => {
     await expect(
       updateCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
     await expect(
       updateCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
 });
