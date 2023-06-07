@@ -74,7 +74,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
 
-  const page: Page = await createPage({
+  const page = await createPage({
     data: {
       spaceId,
       createdBy,

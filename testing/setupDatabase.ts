@@ -28,7 +28,6 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import type { PageWithProposal } from 'lib/pages';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
@@ -733,6 +732,8 @@ export async function createVote({
   });
 }
 
+type PageWithProposal = Page & { proposal: ProposalWithUsers };
+
 export async function createProposalWithUsers({
   proposalStatus = 'draft',
   authors,
@@ -763,7 +764,7 @@ export async function createProposalWithUsers({
       ).id
     : proposalCategoryId;
 
-  const proposalPage: PageWithProposal = await createPageDb({
+  const proposalPage = await createPageDb<PageWithProposal>({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -962,7 +963,7 @@ export async function generateProposal({
       })
     ).id;
 
-  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
+  const result = await createPageDb<PageWithProposal>({
     data: {
       id: proposalId,
       contentText: '',
