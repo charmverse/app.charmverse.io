@@ -28,7 +28,6 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import type { PageWithProposal } from 'lib/pages';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
@@ -44,6 +43,8 @@ import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
+
+type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function generateSpaceUser({
   spaceId,
@@ -531,8 +532,7 @@ export async function generateRole({
   createdBy,
   roleName = `role-${v4()}`,
   source,
-  assigneeUserIds,
-  id = v4()
+  assigneeUserIds
 }: {
   externalId?: string;
   spaceId: string;
@@ -763,7 +763,7 @@ export async function createProposalWithUsers({
       ).id
     : proposalCategoryId;
 
-  const proposalPage: PageWithProposal = await createPageDb({
+  const proposalPage = await createPageDb<PageWithProposal>({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -943,7 +943,7 @@ export async function generateProposal({
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
   title?: string;
-}): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
@@ -962,7 +962,7 @@ export async function generateProposal({
       })
     ).id;
 
-  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
+  const result = await createPageDb<PageWithProposal>({
     data: {
       id: proposalId,
       contentText: '',

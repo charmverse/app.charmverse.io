@@ -7,14 +7,15 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { generateFirstDiff } from './generateFirstDiff';
 
-export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
+export function createPage<T = Page>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<T> {
   const hasContent = data.content ? !checkIsContentEmpty(data.content as PageContent) : false;
   const createArgs: Prisma.PageCreateArgs = {
     data: {
       ...data,
       hasContent,
       galleryImage: extractPreviewImage(data.content as PageContent)
-    }
+    },
+    include
   };
 
   if (hasContent) {
@@ -27,18 +28,5 @@ export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaP
     };
   }
 
-  const includeData =
-    typeof include !== 'undefined'
-      ? include
-      : {
-          permissions: {
-            include: {
-              sourcePermission: true
-            }
-          }
-        };
-
-  createArgs.include = includeData;
-
-  return prisma.page.create(createArgs) as unknown as PrismaPromise<Page & T>;
+  return prisma.page.create(createArgs) as unknown as PrismaPromise<T>;
 }
