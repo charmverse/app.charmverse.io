@@ -4,8 +4,7 @@ import type {
   PagePermissionAssignment,
   PagePermissionFlags,
   PagePermissionWithSource,
-  PermissionCompute,
-  SpaceDefaultPublicPageToggle
+  PermissionCompute
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -14,7 +13,6 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Prisma,
   Space,
   TelegramUser,
   TokenGateToRole,
@@ -34,8 +32,6 @@ import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -44,8 +40,6 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -181,39 +175,6 @@ class CharmClient {
 
   removeUserWallet(address: Pick<UserWallet, 'address'>) {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
-  }
-
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) {
-    const space = await http.POST<Space>('/api/spaces', spaceOptions);
-    return space;
-  }
-
-  deleteSpace(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}`);
-  }
-
-  updateSpace(spaceOpts: Prisma.SpaceUpdateInput) {
-    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
-  }
-
-  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
-    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
-  }
-
-  leaveSpace(spaceId: string) {
-    return http.POST(`/api/spaces/${spaceId}/leave`);
-  }
-
-  getSpaces() {
-    return http.GET<Space[]>('/api/spaces');
-  }
-
-  getSpaceWebhook(spaceId: string) {
-    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
-  }
-
-  checkDomain(params: { spaceId?: string; domain: string }) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
   getPublicPageByViewId(viewId: string) {
@@ -495,29 +456,6 @@ class CharmClient {
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
-  }
-
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
-    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
-      defaultPublicPages
-    });
-  }
-
-  setRequireProposalTemplate({ spaceId, requireProposalTemplate }: SpaceRequireProposalTemplateToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-require-proposal-template`, {
-      requireProposalTemplate
-    });
-  }
-
-  completeOnboarding({ spaceId }: { spaceId: string }) {
-    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
   }
 
   updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {

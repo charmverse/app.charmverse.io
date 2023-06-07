@@ -4,15 +4,16 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 
-export type UpdateableSpaceFields = Partial<Pick<Space, 'domain' | 'name' | 'spaceImage'>>;
+export type UpdateableSpaceFields = Partial<
+  Pick<Space, 'notifyNewProposals' | 'hiddenFeatures' | 'domain' | 'name' | 'spaceImage'>
+>;
 
-export async function updateSpace(
-  spaceId: string,
-  { domain, name, spaceImage }: UpdateableSpaceFields
-): Promise<Space> {
+export async function updateSpace(spaceId: string, updates: UpdateableSpaceFields): Promise<Space> {
   if (!spaceId) {
     throw new InvalidInputError('A space ID is required');
   }
+
+  const { domain } = updates;
 
   if (domain) {
     const existingSpace = await prisma.space.findUnique({
@@ -33,11 +34,7 @@ export async function updateSpace(
     where: {
       id: spaceId
     },
-    data: {
-      domain,
-      name,
-      spaceImage
-    }
+    data: updates
   });
 
   updateTrackGroupProfile(updatedSpace);

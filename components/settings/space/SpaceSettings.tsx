@@ -66,16 +66,7 @@ export function SpaceSettings({ space }: { space: Space }) {
     watch,
     formState: { errors, isDirty }
   } = useForm<FormValues>({
-    defaultValues: {
-      name: space.name,
-      spaceImage: space.spaceImage,
-      domain: space.domain,
-      notifyNewProposals: !!space.notifyNewProposals,
-      show_bounties: !space.hiddenFeatures.includes('bounties'),
-      show_forum: !space.hiddenFeatures.includes('forum'),
-      show_member_directory: !space.hiddenFeatures.includes('member_directory'),
-      show_proposals: !space.hiddenFeatures.includes('proposals')
-    },
+    defaultValues: _getFormValues(space),
     resolver: yupResolver(schema)
   });
 
@@ -86,31 +77,39 @@ export function SpaceSettings({ space }: { space: Space }) {
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
-  const notifyNewProposals = watch('notifyNewProposals');
 
   function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
     setError(null);
     // console.log(values);
     // console.log('space', space);
-    return;
+    // // return;
 
-    // const toSet = typedKeys(values).reduce((acc, key) => {
-    //   if (!values[key as Feature]) {
-    //     acc.push(key as Feature);
-    //   }
+    const hiddenFeatures = typedKeys(featureLabels).reduce<Feature[]>((acc, key) => {
+      if (!values[`show_${key}`]) {
+        acc.push(key as Feature);
+      }
+      return acc;
+    }, []);
 
-    //   return acc;
-    // }, [] as Feature[]);
+    let notifyNewProposals: Date | null | undefined;
+    if (!values.notifyNewProposals) {
+      notifyNewProposals = null;
+    } else if (!space.notifyNewProposals) {
+      notifyNewProposals = new Date();
+    }
 
-    // const settingsChanged =
-    //   uniqueValues(toSet).length !== space.hiddenFeatures.length ||
-    //   toSet.some((feature) => !space.hiddenFeatures.includes(feature)) ||
-    //   space.hiddenFeatures.some((feature) => !toSet.includes(feature));
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
-    charmClient
-      .updateSpace({ ...space, name: values.name, domain: values.domain, spaceImage: values.spaceImage })
+    charmClient.spaces
+      .updateSpace({
+        id: space.id,
+        notifyNewProposals,
+        hiddenFeatures,
+        name: values.name,
+        domain: values.domain,
+        spaceImage: values.spaceImage
+      })
       .then((updatedSpace) => {
         if (newDomain) {
           // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
@@ -124,6 +123,7 @@ export function SpaceSettings({ space }: { space: Space }) {
           }, 100);
         } else {
           setSpace(updatedSpace);
+          reset(_getFormValues(updatedSpace));
         }
       })
       .catch((err) => {
@@ -284,7 +284,7 @@ export function SpaceSettings({ space }: { space: Space }) {
           question={`Are you sure you want to delete ${space.name}? This action cannot be undone`}
           onConfirm={async () => {
             if (isAdmin) {
-              await charmClient.deleteSpace(space.id);
+              await charmClient.spaces.deleteSpace(space.id);
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
               setSpaces(filteredSpaces);
             }
@@ -301,7 +301,7 @@ export function SpaceSettings({ space }: { space: Space }) {
           buttonText={`Leave ${space.name}`}
           question={`Are you sure you want to leave ${space.name}?`}
           onConfirm={async () => {
-            await charmClient.leaveSpace(space.id);
+            await charmClient.spaces.leaveSpace(space.id);
             const filteredSpaces = spaces.filter((s) => s.id !== space.id);
             setSpaces(filteredSpaces);
           }}
@@ -323,4 +323,17 @@ export function SpaceSettings({ space }: { space: Space }) {
       />
     </>
   );
+}
+
+function _getFormValues(space: Space) {
+  return {
+    name: space.name,
+    spaceImage: space.spaceImage,
+    domain: space.domain,
+    notifyNewProposals: !!space.notifyNewProposals,
+    show_bounties: !space.hiddenFeatures.includes('bounties'),
+    show_forum: !space.hiddenFeatures.includes('forum'),
+    show_member_directory: !space.hiddenFeatures.includes('member_directory'),
+    show_proposals: !space.hiddenFeatures.includes('proposals')
+  };
 }

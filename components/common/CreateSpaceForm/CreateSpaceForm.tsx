@@ -79,7 +79,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
   // This use effect should only be relevant when a user uploads markdown, has an error, and then changes the space name or image. In other cases, the space is created and the user is redirected to the space.
   useEffect(() => {
     if (newSpace) {
-      charmClient.updateSpace({
+      charmClient.spaces.updateSpace({
         name: watchName,
         spaceImage: watchSpaceImage
       });

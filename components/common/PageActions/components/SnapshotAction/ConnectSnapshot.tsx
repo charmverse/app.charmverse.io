@@ -66,7 +66,7 @@ export default function ConnectSnapshot() {
   async function onSubmit(formValues: FormValues) {
     setFormError(null);
     try {
-      const spaceWithDomain = await charmClient.updateSnapshotConnection(space?.id as any, formValues);
+      const spaceWithDomain = await charmClient.spaces.updateSnapshotConnection(space?.id as any, formValues);
       setSpace(spaceWithDomain);
     } catch (err) {
       setFormError(err as any);
