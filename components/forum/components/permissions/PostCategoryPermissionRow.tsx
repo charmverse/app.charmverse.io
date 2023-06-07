@@ -43,7 +43,7 @@ export function PostCategoryRolePermissionRow({
   const space = useCurrentSpace();
 
   const defaultExists = !!defaultPermissionLevel;
-  const usingDefault = defaultExists && defaultPermissionLevel === permissionLevel;
+  const usingDefault = defaultExists && !existingPermissionId;
 
   const friendlyLabels = {
     ...forumMemberPermissionOptions,

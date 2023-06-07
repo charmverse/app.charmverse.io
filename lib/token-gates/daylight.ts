@@ -1,9 +1,9 @@
+import { GET, PUT } from '@charmverse/core/http';
 import type { TokenGate } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { AccsDefaultParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 
-import fetch from 'adapters/http/fetch.server';
 import { baseUrl } from 'config/constants';
 
 import { getAccessType } from './utils';
@@ -36,24 +36,22 @@ export async function addDaylightAbility(tokenGate: TokenGate) {
     return;
   }
 
-  const params = {
-    method: 'PUT',
-    headers: HEADERS,
-    body: JSON.stringify({
-      requirements: requirementsData.requirements,
-      requirementsLogic: requirementsData.operator,
-      action: { linkUrl: getActionUrl(space.domain) },
-      title: ` Join the ${space.name} Space on CharmVerse`,
-      description:
-        'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
-      type: 'access',
-      isActive: true,
-      sourceId: getAbilitySourceId(tokenGate.id)
-    })
+  const body = {
+    requirements: requirementsData.requirements,
+    requirementsLogic: requirementsData.operator,
+    action: { linkUrl: getActionUrl(space.domain) },
+    title: ` Join the ${space.name} Space on CharmVerse`,
+    description:
+      'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
+    type: 'access',
+    isActive: true,
+    sourceId: getAbilitySourceId(tokenGate.id)
   };
 
   try {
-    return await fetch('https://api.daylight.xyz/v1/abilities', params);
+    return await PUT('https://api.daylight.xyz/v1/abilities', body, {
+      headers: HEADERS
+    });
   } catch (e) {
     // eslint-disable-next-line no-empty
   }
@@ -86,10 +84,7 @@ export async function getAllAbilities() {
     headers: HEADERS
   };
 
-  return fetch<{ abilities: { sourceId: string; uid: string }[] }>(
-    'https://api.daylight.xyz/v1/abilities/mine',
-    params
-  );
+  return GET<{ abilities: { sourceId: string; uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
 }
 
 function getRequirement(condition: AccsDefaultParams) {

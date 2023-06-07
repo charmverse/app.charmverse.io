@@ -147,6 +147,7 @@
   "PropertyType.Select": "Select",
   "PropertyType.Text": "Text",
   "PropertyType.URL": "URL",
+  "PropertyType.ProposalUrl": "Proposal Url",
   "PropertyType.UpdatedBy": "Last updated by",
   "PropertyType.UpdatedTime": "Last updated time",
   "PropertyValueElement.empty": "Empty",

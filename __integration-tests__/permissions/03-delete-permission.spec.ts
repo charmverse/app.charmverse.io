@@ -70,7 +70,7 @@ describe('DELETE /api/permissions - delete permission', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', cookie)
-      .send({
+      .query({
         permissionId: rootPermissionId
       })
       .expect(200);
@@ -160,7 +160,7 @@ describe('DELETE /api/permissions - delete permission', () => {
     await request(baseUrl)
       .delete('/api/permissions')
       .set('Cookie', cookie)
-      .send({
+      .query({
         permissionId: nestedChildPermissionId
       })
       .expect(200);

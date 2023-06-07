@@ -4,7 +4,7 @@ import type {
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { PageWithProposal } from 'lib/pages';
@@ -15,7 +15,7 @@ import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  createProposal(input: CreateProposalInput) {
+  createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
@@ -33,6 +33,10 @@ export class ProposalsApi {
 
   getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
     return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
+  }
+
+  getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
+    return http.GET<(ProposalWithUsers & { page: Page })[]>(`/api/spaces/${spaceId}/proposal-templates`);
   }
 
   getProposalCategories(spaceId: string) {

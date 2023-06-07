@@ -19,7 +19,9 @@ import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -74,6 +76,11 @@ function ViewSidebar(props: Props) {
     props.board?.fields.cardProperties.some((c) => c.id === id)
   ).length;
 
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${props.pageId}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+
   let SourceIcon = RiFolder2Line;
   let sourceTitle = 'None';
   const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
@@ -110,6 +117,12 @@ function ViewSidebar(props: Props) {
       setSidebarView(initialState);
     }
   }, [props.isOpen]);
+
+  useEffect(() => {
+    if (props.pageId && props.view.fields.sourceType === 'proposals') {
+      updateProposalSource({ pageId: props.pageId });
+    }
+  }, [props.pageId]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>

@@ -946,7 +946,7 @@ export async function generateProposal({
 }): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
-  const colors = ['gray', 'orange', 'yellow', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
+  const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
 
   const randomColor = colors[Math.floor(Math.random() * colors.length)];
 

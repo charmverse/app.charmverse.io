@@ -61,6 +61,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
 
       const pagesRes = await charmClient.pages.getPages(currentSpace.id);
+
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;

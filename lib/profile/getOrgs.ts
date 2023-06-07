@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { GetOrganizationsResponse } from 'lib/deepdao/client';
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { isTruthy } from 'lib/utilities/types';
@@ -25,17 +26,23 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
             address
           };
         } catch (error) {
-          log.error('Error calling DEEP DAO API', error);
+          log.error('Error retrieving profiles from DEEP DAO API', error);
           return null;
         }
       })
     )
   ).filter(isTruthy);
 
-  const [allOrganizations, userWorkspaces] = await Promise.all([
-    getAllOrganizations(apiToken),
-    getSpacesOfUser(userId)
-  ]);
+  async function getOrgsSafe() {
+    try {
+      return await getAllOrganizations(apiToken);
+    } catch (error) {
+      log.error('Error retrieving orgs from DEEP DAO API', error);
+      return { data: { resources: [], totalResources: 0 } } as GetOrganizationsResponse;
+    }
+  }
+
+  const [allOrganizations, userWorkspaces] = await Promise.all([getOrgsSafe(), getSpacesOfUser(userId)]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
     logos[org.organizationId] = org.logo;

@@ -12,16 +12,16 @@ import type { StepperProps } from './interfaces';
 
 export function MobileStepper({
   openVoteModal,
-  proposal,
+  proposalStatus,
   updateProposalStatus,
   proposalFlowPermissions
 }: StepperProps) {
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
       if (newStatus === 'vote_active') {
-        openVoteModal();
+        openVoteModal?.();
       } else {
-        updateProposalStatus(newStatus);
+        updateProposalStatus?.(newStatus);
       }
     }
   }
@@ -41,7 +41,7 @@ export function MobileStepper({
           <Box display='flex' flex={1}>
             <Select
               fullWidth
-              value={proposal?.status ?? ''}
+              value={proposalStatus ?? ''}
               onChange={(e) => {
                 const status = e.target.value as ProposalStatus;
                 updateStatus(status);

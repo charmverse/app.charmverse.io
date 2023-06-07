@@ -231,6 +231,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
+            disabled={type === 'proposalUrl'}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -242,6 +243,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
+            disabled={type === 'proposalUrl'}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}
