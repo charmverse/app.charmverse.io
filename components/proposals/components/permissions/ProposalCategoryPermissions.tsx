@@ -1,5 +1,6 @@
 import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalCategory } from '@charmverse/core/prisma';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -161,6 +162,12 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
 
            */}
 
+        {!!space.publicProposals && (
+          <Alert sx={{ mt: 2 }} severity='info'>
+            Your space uses public proposals. Anyone can view proposals beyond the draft stage
+          </Alert>
+        )}
+
         <Grid item xs={12}>
           <ProposalCategoryRolePermissionRow
             canEdit={permissions.manage_permissions}
@@ -180,7 +187,8 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
               updatePermission={updatePermission}
               proposalCategoryId={proposalCategory.id}
               existingPermissionId={rolePermission.id}
-              defaultPermissionLevel={rolePermission.permissionLevel}
+              permissionLevel={rolePermission.permissionLevel}
+              defaultPermissionLevel={mappedPermissions.space?.permissionLevel}
               assignee={{ group: 'role', id: rolePermission.assignee.id }}
             />
           </Grid>

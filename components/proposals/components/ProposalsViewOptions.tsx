@@ -1,7 +1,7 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Chip, MenuItem, Select, TextField } from '@mui/material';
+import { Box, MenuItem, Select, TextField } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -11,12 +11,12 @@ import { ViewOptions } from 'components/common/ViewOptions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 
 import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
+import { ProposalCategoryChip } from './ProposalChip';
 
 export type ProposalStatusFilter = ProposalStatus | 'all';
 
@@ -80,13 +80,7 @@ export function ProposalsViewOptions({
 
             const category = categories.find((c) => c.id === value);
             if (category) {
-              return (
-                <Chip
-                  sx={{ cursor: 'pointer', minWidth: '100px' }}
-                  color={category.color as BrandColor}
-                  label={category.title}
-                />
-              );
+              return <ProposalCategoryChip color={category.color} title={category.title} />;
             }
           }}
           onChange={(e) => setCategoryIdFilter(e.target.value)}
@@ -94,11 +88,7 @@ export function ProposalsViewOptions({
           <MenuItem value='all'>All categories</MenuItem>
           {categories.map((category) => (
             <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
-              <Chip
-                sx={{ cursor: 'pointer', minWidth: '100px' }}
-                color={category.color as BrandColor}
-                label={category.title}
-              />
+              <ProposalCategoryChip color={category.color} title={category.title} />
               {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
             </MenuItem>
           ))}

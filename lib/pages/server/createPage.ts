@@ -28,7 +28,7 @@ export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaP
   }
 
   const includeData =
-    typeof include !== undefined
+    typeof include !== 'undefined'
       ? include
       : {
           permissions: {

@@ -56,7 +56,6 @@ export function ProposalProperties({
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-
   const { getMemberById, members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
@@ -70,9 +69,7 @@ export function ProposalProperties({
   const proposalAuthors = proposal?.authors ?? [];
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
-
   const proposalReviewer = getMemberById(proposalReviewerId);
-
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
   useEffect(() => {
@@ -174,7 +171,7 @@ export function ProposalProperties({
           <Grid container mb={2}>
             <ProposalStepSummary
               proposalFlowFlags={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />
@@ -202,7 +199,7 @@ export function ProposalProperties({
           <Grid container mb={2} mt={2}>
             <ProposalStepper
               proposalFlowPermissions={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />
@@ -226,7 +223,6 @@ export function ProposalProperties({
               <ProposalCategoryInput
                 disabled={!proposalPermissions?.edit}
                 options={categories || []}
-                canEditCategories={!proposalPermissions?.edit}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
               />
