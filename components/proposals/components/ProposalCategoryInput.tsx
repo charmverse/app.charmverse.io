@@ -1,8 +1,7 @@
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Box, Chip, IconButton, TextField } from '@mui/material';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import { Box, Chip, TextField } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import type { HTMLAttributes } from 'react';
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
@@ -14,8 +13,6 @@ type TempOption = NewProposalCategory & {
 };
 
 type OptionType = TempOption | ProposalCategory;
-
-const filter = createFilterOptions<OptionType>();
 
 type ProposalCategoryOptionProps = {
   category: OptionType;
@@ -51,13 +48,11 @@ type Props = {
   disabled?: boolean;
   options: OptionType[];
   value: ProposalCategory | null;
-  canEditCategories?: boolean;
   onChange: (value: ProposalCategory | null) => void;
 };
 
-export default function ProposalCategoryInput({ disabled, options, canEditCategories, value, onChange }: Props) {
+export default function ProposalCategoryInput({ disabled, options, value, onChange }: Props) {
   const internalValue = useMemo(() => (value ? [value] : []), [value]);
-  const newCategoryColorRef = useRef(getRandomThemeColor());
   const [tempValue, setTempValue] = useState<TempOption | null>(null);
 
   useEffect(() => {

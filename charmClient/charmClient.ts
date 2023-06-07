@@ -35,6 +35,7 @@ import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
+import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -506,6 +507,12 @@ class CharmClient {
   setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
+    });
+  }
+
+  setRequireProposalTemplate({ spaceId, requireProposalTemplate }: SpaceRequireProposalTemplateToggle) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-require-proposal-template`, {
+      requireProposalTemplate
     });
   }
 

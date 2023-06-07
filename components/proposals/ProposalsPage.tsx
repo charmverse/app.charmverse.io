@@ -6,8 +6,6 @@ import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -15,6 +13,8 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { usePages } from 'hooks/usePages';
 
+import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
+import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
 import { ProposalsTable } from './components/ProposalsTable';
 import { ProposalsViewOptions } from './components/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
@@ -57,7 +57,7 @@ export function ProposalsPage() {
 
   return (
     <CenteredPageContent>
-      <PageDialogProvider>
+      <ProposalDialogProvider>
         <Grid container mb={6}>
           <Grid item xs={12}>
             <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
@@ -120,8 +120,8 @@ export function ProposalsPage() {
             </Grid>
           )}
         </Grid>
-        <PageDialogGlobal />
-      </PageDialogProvider>
+        <ProposalDialogGlobal />
+      </ProposalDialogProvider>
     </CenteredPageContent>
   );
 }

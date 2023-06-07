@@ -9,32 +9,28 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
-import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useProposalDialog } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
-  const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const { showPage } = usePageDialog();
+  const { showProposal } = useProposalDialog();
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { mutatePagesRemove, mutatePage, pages } = usePages();
-  const { mutate } = useTasks();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-
+  const { createProposal } = useProposalDialog();
   const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
 
   useEffect(() => {
@@ -62,7 +58,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
       mutateProposals();
       mutatePage(newProposal);
       setUrlWithoutRerender(router.pathname, { id: newProposal.id });
-      showPage({
+      showProposal({
         pageId: newProposal.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
@@ -80,7 +76,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
 
       mutatePage(newTemplate);
       setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
-      showPage({
+      showProposal({
         pageId: newTemplate.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
@@ -90,26 +86,10 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   }
 
   async function onClickCreate() {
-    if (currentSpace && user) {
-      const createdProposal = await charmClient.proposals.createProposal({
-        spaceId: currentSpace.id,
-        userId: user.id,
-        categoryId: getDefaultCreateCategory().id
+    if (currentSpace) {
+      createProposal({
+        category: null
       });
-
-      const { proposal, ...page } = createdProposal;
-      mutatePage(page);
-
-      mutateProposals();
-      mutate();
-      showPage({
-        pageId: page.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-          mutateProposals();
-        }
-      });
-      setUrlWithoutRerender(router.pathname, { id: page.id });
     }
   }
 
@@ -132,7 +112,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
         createTemplate={createProposalTemplate}
         editTemplate={(pageId) => {
           setUrlWithoutRerender(router.pathname, { id: pageId });
-          showPage({
+          showProposal({
             pageId,
             onClose() {
               setUrlWithoutRerender(router.pathname, { id: null });

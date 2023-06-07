@@ -202,7 +202,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
-  it('should fail to update a proposal if the user is an admin', async () => {
+  it('should allow an admin to update a draft proposal they did not create', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
       spacePaidTier: 'free'
@@ -231,7 +231,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .put(`/api/proposals/${page.proposalId}`)
       .set('Cookie', adminCookie)
       .send(updateContent)
-      .expect(401);
+      .expect(200);
   });
 
   it('should fail to update a proposal template if the user is not a space admin', async () => {
