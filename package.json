@@ -74,7 +74,7 @@
     "@aws-sdk/client-sqs": "^3.347.1",
     "@aws-sdk/client-sts": "^3.347.1",
     "@aws-sdk/lib-storage": "^3.67.0",
-    "@aws-sdk/xhr-http-handler": "^3.282.0",
+    "@aws-sdk/xhr-http-handler": "^3.347.0",
     "@bangle.dev/base-components": "^0.31.6",
     "@bangle.dev/core": "^0.31.6",
     "@bangle.dev/markdown": "^0.31.6",
