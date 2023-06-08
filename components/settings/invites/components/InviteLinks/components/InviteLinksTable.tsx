@@ -17,12 +17,12 @@ import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import type { InviteLinkPopulatedWithRoles } from 'pages/api/invites/index';
 
 interface Props {
   isAdmin: boolean;
-  invites: InviteLinkPopulated[];
-  onDelete: (invite: InviteLinkPopulated) => void;
+  invites: InviteLinkPopulatedWithRoles[];
+  onDelete: (invite: InviteLinkPopulatedWithRoles) => void;
   refetchInvites: VoidFunction;
 }
 
@@ -149,7 +149,7 @@ function getInviteLink(code: string) {
   return `${window.location.origin}/invite/${code}`;
 }
 
-function getExpires(invite: InviteLinkPopulated) {
+function getExpires(invite: InviteLinkPopulatedWithRoles) {
   if (invite.maxAgeMinutes > 0) {
     const expireDate = new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000;
     if (expireDate < Date.now()) {

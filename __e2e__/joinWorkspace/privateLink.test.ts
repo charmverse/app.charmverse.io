@@ -3,7 +3,7 @@ import { AcceptInvitePage } from '__e2e__/po/inviteLink.po';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
-import { createInviteLink } from 'lib/invites';
+import { createInviteLink } from 'lib/invites/getInviteLink';
 
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
 

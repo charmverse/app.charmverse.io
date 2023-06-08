@@ -1,5 +1,7 @@
-import type { SpacePermissionConfigurationMode } from '@charmverse/core/prisma';
+import type { User } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 import styled from '@emotion/styled';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,16 +11,22 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
-import { configurationModeName } from 'lib/permissions/meta/preset-templates';
+import { useUser } from 'hooks/useUser';
+import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
@@ -56,10 +64,25 @@ export default function ShareProposals({ padding = 1 }: Props) {
   const isAdmin = useIsAdmin();
   const { isPublicSpace } = useIsPublicSpace();
 
+  const { onClick: openSpaceSettings } = useSettingsDialog();
+
+  const {
+    isOpen,
+    close: closeConfirmDeleteModal,
+    open: openConfirmDeleteModal
+  } = usePopupState({ variant: 'popover', popupId: 'share-proposals' });
+
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
 
   const proposalsArePublic = !!space?.publicProposals;
+
+  const { data: invites, mutate } = useSWR<InviteLinkPopulatedWithRoles[]>(`${space?.id}/search-invites`, () =>
+    charmClient.getInviteLinks(space?.id as string)
+  );
+
+  const publicProposalInvite = invites?.find((invite) => invite.publicContext === 'proposals');
+  const publicInviteExists = !!publicProposalInvite;
 
   async function togglePublic() {
     const updatedSpace = await charmClient.spaces.setPublicProposals({
@@ -67,6 +90,47 @@ export default function ShareProposals({ padding = 1 }: Props) {
       spaceId: space?.id as string
     });
     setSpace(updatedSpace);
+  }
+
+  async function enablePublicInvite() {
+    charmClient
+      .createInviteLink({
+        publicContext: 'proposals',
+        spaceId: space?.id as string
+      })
+      .then((newInvite) =>
+        mutate((existingInvites) => {
+          const updatedNewInvite: InviteLinkPopulatedWithRoles = {
+            ...newInvite,
+            inviteLinkToRoles: []
+          };
+
+          if (existingInvites) {
+            return [...existingInvites, updatedNewInvite];
+          }
+          return [updatedNewInvite];
+        })
+      );
+  }
+
+  async function removePublicInvite() {
+    if (publicProposalInvite) {
+      await charmClient.deleteInviteLink(publicProposalInvite.id);
+      mutate((existingInvites) => {
+        return existingInvites?.filter((invite) => invite.id !== publicProposalInvite.id);
+      });
+    }
+  }
+
+  function togglePublicInvite() {
+    if (publicInviteExists && publicProposalInvite.inviteLinkToRoles.length === 0) {
+      removePublicInvite();
+    } else if (publicInviteExists) {
+      openConfirmDeleteModal();
+      // Show confirmation dialog
+    } else {
+      enablePublicInvite();
+    }
   }
 
   useEffect(() => {
@@ -139,23 +203,42 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <Divider sx={{ my: 2 }} />
           <Grid container item justifyContent='space-between' alignItems='center'>
             <Grid item>
-              <Typography>Allow anyone to join</Typography>
+              <Typography>
+                Show public invite link{' '}
+                {publicInviteExists && (
+                  <Tooltip title='Customise link roles in the settings'>
+                    <LaunchIcon onClick={() => openSpaceSettings('invites')} sx={{ fontSize: 14, ml: 1 }} />
+                  </Tooltip>
+                )}
+              </Typography>
             </Grid>
             <Grid item>
-              <Switch
-                checked={proposalsArePublic || isPublicSpace}
-                disabled={!isAdmin || isPublicSpace}
-                onChange={togglePublic}
-              />
+              <Switch checked={publicInviteExists} disabled={!isAdmin} onChange={togglePublicInvite} />
             </Grid>
           </Grid>
           <Grid item>
             <Typography variant='body2' color='secondary'>
-              People can join your space from the proposals page via a public invite link
+              {publicInviteExists
+                ? 'Anyone can join your space from the proposals page via a public invite link'
+                : 'Users can see proposals, but cannot join your space.'}
             </Typography>
           </Grid>
         </>
       )}
+
+      <ConfirmDeleteModal
+        title='Confirm delete'
+        question={`This invite link has ${
+          publicProposalInvite?.inviteLinkToRoles.length
+        } ${stringUtils.conditionalPlural({
+          word: 'role',
+          count: publicProposalInvite?.inviteLinkToRoles.length ?? 0
+        })} attached. Are you sure you want to delete it?`}
+        open={isOpen}
+        onClose={closeConfirmDeleteModal}
+        onConfirm={removePublicInvite}
+        buttonText='Delete invite'
+      />
     </Grid>
   );
 }

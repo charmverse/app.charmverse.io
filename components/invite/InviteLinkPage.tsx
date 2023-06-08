@@ -8,7 +8,7 @@ import { LoginButton } from 'components/login/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { InviteLinkPopulated } from 'lib/invites';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 
 import { CenteredBox } from './components/CenteredBox';
 

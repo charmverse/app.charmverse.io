@@ -7,7 +7,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
+import type { InviteLinkPopulatedWithRoles } from 'pages/api/invites/index';
 
 import type { FormValues as InviteLinkFormValues } from './components/InviteLinkForm';
 import InviteForm from './components/InviteLinkForm';
@@ -21,7 +22,7 @@ interface InviteLinksProps {
 
 export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
-  const { data = [], mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
+  const { invites, refreshInvitesList } = useSpaceInvitesList();
 
   const { isOpen: isOpenInviteModal, close: closeInviteModal } = popupState;
   const {
@@ -41,18 +42,18 @@ export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteL
       ...values
     });
     // update the list of links
-    await mutate();
+    await refreshInvitesList();
     closeInviteModal();
   }
 
-  async function deleteLink(link: InviteLinkPopulated) {
+  async function deleteLink(link: InviteLinkPopulatedWithRoles) {
     setRemovedInviteLink(link);
     openInviteLinkDelete();
   }
 
   return (
     <>
-      <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />
+      <InvitesTable isAdmin={isAdmin} invites={invites} refetchInvites={refreshInvitesList} onDelete={deleteLink} />
       <Modal open={isOpenInviteModal} onClose={closeInviteModal}>
         <InviteForm onSubmit={createLink} onClose={closeInviteModal} />
       </Modal>
@@ -66,7 +67,7 @@ export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteL
           onConfirm={async () => {
             await charmClient.deleteInviteLink(removedInviteLink.id);
             // update the list of links
-            await mutate();
+            await refreshInvitesList();
             setRemovedInviteLink(null);
           }}
         />
