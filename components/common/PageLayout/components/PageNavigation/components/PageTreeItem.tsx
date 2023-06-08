@@ -221,9 +221,9 @@ export function PageLink({
     variant: 'popover'
   });
 
-  const [iconHovered, setIconHovered] = useState(false);
+  const [iconClicked, setIconClicked] = useState(false);
   const { permissions } = usePagePermissions({
-    pageIdOrPath: iconHovered && showPicker ? pageId : null,
+    pageIdOrPath: iconClicked && showPicker ? pageId : null,
     revalidate: false
   });
 
@@ -237,17 +237,22 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
-
   const triggerState = bindTrigger(popupState);
+
+  function handleIconClicked(ev: any) {
+    triggerState.onClick(ev);
+    setIconClicked(ev);
+  }
+
   return (
     <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
-      <span onFocus={() => setIconHovered(true)} onMouseOver={() => setIconHovered(true)} onClick={preventDefault}>
+      <span onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
           isEditorEmpty={isEmptyContent}
           icon={labelIcon}
           {...triggerState}
-          onClick={showPicker ? triggerState.onClick : undefined}
+          onClick={showPicker ? handleIconClicked : undefined}
         />
       </span>
       <PageTitle hasContent={isempty} onClick={onClick}>
