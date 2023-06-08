@@ -13,7 +13,8 @@ import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -221,6 +222,11 @@ export function PageLink({
     variant: 'popover'
   });
 
+  const [iconClicked, setIconClicked] = useState(false);
+  const { data: permissions } = useSWRImmutable(iconClicked && pageId ? `check-page-permissions-${pageId}` : null, () =>
+    charmClient.permissions.pages.computePagePermissions({ pageIdOrPath: pageId as string })
+  );
+
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
@@ -231,8 +237,12 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
-
   const triggerState = bindTrigger(popupState);
+
+  function handleIconClicked(ev: any) {
+    triggerState.onClick(ev);
+    setIconClicked(ev);
+  }
 
   return (
     <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
@@ -242,14 +252,14 @@ export function PageLink({
           isEditorEmpty={isEmptyContent}
           icon={labelIcon}
           {...triggerState}
-          onClick={showPicker ? triggerState.onClick : undefined}
+          onClick={showPicker ? handleIconClicked : undefined}
         />
       </span>
       <PageTitle hasContent={isempty} onClick={onClick}>
         {isempty ? 'Untitled' : label}
       </PageTitle>
       {children}
-      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
+      {showPicker && pageId && permissions?.edit_content && <EmojiMenu popupState={popupState} pageId={pageId} />}
     </PageAnchor>
   );
 }
