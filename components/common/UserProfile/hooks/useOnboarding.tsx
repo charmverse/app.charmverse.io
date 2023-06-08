@@ -13,7 +13,7 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
 
   async function completeOnboarding() {
     if (userId && spaceId) {
-      await charmClient.completeOnboarding({
+      await charmClient.spaces.completeOnboarding({
         spaceId
       });
       mutateMembers(members.map((member) => (member.id === userId ? { ...member, onboarded: true } : member)));

@@ -46,7 +46,7 @@ export async function generateProposal({
 }): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = v4();
 
-  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
+  const result = await createPageDb<{ proposal: ProposalWithUsers; title: string; path: string }>({
     data: {
       id: proposalId,
       contentText: '',

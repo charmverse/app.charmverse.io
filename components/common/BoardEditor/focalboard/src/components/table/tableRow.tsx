@@ -166,7 +166,7 @@ function TableRow(props: Props) {
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
-              <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', width: '100%' }}>
                 <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
                   <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
                   <TextInput {...commonProps} multiline={wrapColumn} />

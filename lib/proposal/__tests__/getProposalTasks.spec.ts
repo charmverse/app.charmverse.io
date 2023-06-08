@@ -3,18 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';
-import {
-  createVote,
-  generateProposal,
-  generateRoleWithSpaceRole,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
+import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
   it('Should only return non archived proposals', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
     // This proposal page was archived, this shouldn't be fetched
     await generateProposal({
@@ -48,7 +43,7 @@ describe('getProposalTasks', () => {
   });
 
   it('Should not get draft and private draft proposals where the user is one of the authors', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
     await generateProposal({
@@ -82,7 +77,7 @@ describe('getProposalTasks', () => {
   });
 
   it('Should get all reviewed proposals where the user is one of the authors', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
     const reviewedProposal1 = await generateProposal({
@@ -114,13 +109,18 @@ describe('getProposalTasks', () => {
   });
 
   it('Should get all proposals to review where the user is one of the reviewer through both roleId and userId', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId: space.id
+      }
+    });
 
     const { role } = await generateRoleWithSpaceRole({
       spaceId: space.id,
       createdBy: user.id,
-      spaceRoleId: (space.spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
+      spaceRoleId: (spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
     });
 
     const proposalToReviewViaRole = await generateProposal({
@@ -164,10 +164,10 @@ describe('getProposalTasks', () => {
   });
 
   it('Should get all proposals in discussion and active vote stage where the user is a member of the proposal space', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
-    const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await generateUserAndSpaceWithApiToken();
+    const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await generateUserAndSpace();
 
     // Making user2 a member of the proposal space
     await prisma.spaceRole.create({
@@ -272,5 +272,23 @@ describe('getProposalTasks', () => {
         })
       ])
     );
+  });
+
+  it('Should not return public notifications when disabled by the space admin', async () => {
+    const { user, space } = await generateUserAndSpace({
+      notifyNewProposals: null
+    });
+
+    await generateProposal({
+      proposalStatus: 'discussion',
+      spaceId: space.id,
+      authors: [],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual([]);
   });
 });

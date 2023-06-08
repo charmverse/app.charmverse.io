@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
+import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';

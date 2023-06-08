@@ -46,12 +46,12 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: pageId,
+  const spacePermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+    resourceId: pageToDuplicate.spaceId,
     userId
   });
 
-  if (!permissions.read) {
+  if (!spacePermissions.createPage) {
     throw new ActionNotPermittedError('You are not allowed to duplicate this page.');
   }
 

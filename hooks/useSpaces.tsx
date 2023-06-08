@@ -39,7 +39,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       setIsLoaded(false);
-      charmClient
+      charmClient.spaces
         .getSpaces()
         .then((_spaces) => {
           setSpaces(_spaces);
@@ -55,7 +55,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     setIsCreatingSpace(true);
 
     try {
-      const space = await charmClient.createSpace(newSpace);
+      const space = await charmClient.spaces.createSpace(newSpace);
       setSpaces((s) => [...s, space]);
       // refresh user permissions
       const _user = await charmClient.getUser();
