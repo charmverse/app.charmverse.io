@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import LitJsSdk from '@lit-protocol/lit-node-client';
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import { useEffect, useMemo, useState } from 'react';
 
 function useLitProtocol() {
