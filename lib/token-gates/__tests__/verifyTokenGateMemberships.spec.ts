@@ -61,7 +61,7 @@ describe('verifyTokenGateMemberships', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -80,7 +80,8 @@ describe('verifyTokenGateMemberships', () => {
     await deleteTokenGate(tokenGate.id);
 
     const tokenGate2 = await generateTokenGate({ userId: user2.id, spaceId: space2.id });
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -110,7 +111,7 @@ describe('verifyTokenGateMemberships', () => {
   it('should remove multi-space user from a proper space', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -129,7 +130,7 @@ describe('verifyTokenGateMemberships', () => {
     await deleteTokenGate(tokenGate.id);
 
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space2.id });
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -146,7 +147,7 @@ describe('verifyTokenGateMemberships', () => {
       tokens: [{ tokenGateId: tokenGate2.id, signedToken: 'jwt2' }]
     });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
