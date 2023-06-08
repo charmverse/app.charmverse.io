@@ -17,7 +17,7 @@ import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { InviteLinkPopulatedWithRoles } from 'pages/api/invites/index';
+import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
 interface Props {
   isAdmin: boolean;
@@ -26,7 +26,7 @@ interface Props {
   refetchInvites: VoidFunction;
 }
 
-export default function InvitesTable(props: Props) {
+export function InvitesTable(props: Props) {
   const { isAdmin, invites, onDelete, refetchInvites } = props;
   const space = useCurrentSpace();
 

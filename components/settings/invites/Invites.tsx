@@ -10,12 +10,12 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 import Legend from '../Legend';
 
-import InviteLinkList from './components/InviteLinks';
+import { InviteLinkList } from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';
 import InviteIntro from './components/InviteLinks/components/InviteIntro';
 import TokenGates from './components/TokenGates';
 
-function Invites({ space }: { space: Space }) {
+export function Invites({ space }: { space: Space }) {
   const spaceId = space.id;
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
@@ -74,5 +74,3 @@ function Invites({ space }: { space: Space }) {
     </>
   );
 }
-
-export default Invites;

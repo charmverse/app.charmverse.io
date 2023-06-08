@@ -2,17 +2,16 @@ import type { InviteLink } from '@charmverse/core/prisma';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import type { InviteLinkPopulatedWithRoles } from 'pages/api/invites/index';
+import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
 import type { FormValues as InviteLinkFormValues } from './components/InviteLinkForm';
-import InviteForm from './components/InviteLinkForm';
-import InvitesTable from './components/InviteLinksTable';
+import { WorkspaceSettings } from './components/InviteLinkForm';
+import { InvitesTable } from './components/InviteLinksTable';
 
 interface InviteLinksProps {
   isAdmin: boolean;
@@ -20,7 +19,7 @@ interface InviteLinksProps {
   popupState: PopupState;
 }
 
-export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
+export function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
   const { invites, refreshInvitesList } = useSpaceInvitesList();
 
@@ -55,7 +54,7 @@ export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteL
     <>
       <InvitesTable isAdmin={isAdmin} invites={invites} refetchInvites={refreshInvitesList} onDelete={deleteLink} />
       <Modal open={isOpenInviteModal} onClose={closeInviteModal}>
-        <InviteForm onSubmit={createLink} onClose={closeInviteModal} />
+        <WorkspaceSettings onSubmit={createLink} onClose={closeInviteModal} />
       </Modal>
       {removedInviteLink && (
         <ConfirmDeleteModal
