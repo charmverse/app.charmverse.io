@@ -1,4 +1,4 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import request from 'supertest';
 
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';

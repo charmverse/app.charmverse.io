@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,7 +13,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { Constants } from '../../constants';
@@ -166,15 +166,17 @@ function TableRow(props: Props) {
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
-              <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
-                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-                <TextInput {...commonProps} multiline={wrapColumn} />
-              </div>
+              <div style={{ display: 'flex', width: '100%' }}>
+                <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
+                  <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+                  <TextInput {...commonProps} multiline={wrapColumn} />
+                </div>
 
-              <div className='open-button'>
-                <Button onClick={() => props.showCard(props.card.id || '')}>
-                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                </Button>
+                <div className='open-button'>
+                  <Button onClick={() => props.showCard(props.card.id || '')}>
+                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                  </Button>
+                </div>
               </div>
             </Box>
           );

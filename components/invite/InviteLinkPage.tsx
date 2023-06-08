@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/LoginButton';
-import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { InviteLinkPopulated } from 'lib/invites';

@@ -1,3 +1,4 @@
+import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
@@ -18,7 +19,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
+import { useProposal } from 'hooks/useProposal';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
@@ -47,7 +48,7 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 
 interface Props {
   pageId: string;
-  pagePermissions: IPagePermissionWithAssignee[];
+  pagePermissions: AssignedPagePermission[];
   refreshPermissions: () => void;
 }
 
@@ -61,13 +62,14 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
   const router = useRouter();
   const { pages } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
+
   const space = useCurrentSpace();
-  const publicPermission = pagePermissions.find((publicPerm) => publicPerm.public === true) ?? null;
+  const publicPermission = pagePermissions.find((publicPerm) => publicPerm.assignee.group === 'public') ?? null;
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const currentPage = pages[pageId];
 
-  const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true;
+  const { proposal } = useProposal({ proposalId: currentPage?.proposalId });
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
@@ -76,12 +78,16 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   async function togglePublic() {
     if (publicPermission) {
-      await charmClient.deletePermission(publicPermission.id);
+      await charmClient.deletePermission({ permissionId: publicPermission.id });
     } else {
       await charmClient.createPermission({
         pageId,
-        permissionLevel: 'view',
-        public: true
+        permission: {
+          permissionLevel: 'view',
+          assignee: {
+            group: 'public'
+          }
+        }
       });
     }
     refreshPermissions();
@@ -118,6 +124,18 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
     }
   }
 
+  // In the case of public proposals, we want to override the manual setting
+  const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true || !!space?.publicProposals;
+  const isChecked =
+    (!space?.publicProposals && !!publicPermission) || (!!space?.publicProposals && proposal?.status !== 'draft');
+  let publicProposalToggleInfo = space?.publicProposals ? 'Your space uses public proposals. ' : null;
+  if (space?.publicProposals && proposal?.status === 'draft') {
+    publicProposalToggleInfo +=
+      'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.';
+  } else if (space?.publicProposals && !!proposal) {
+    publicProposalToggleInfo += 'Proposals in discussion stage and beyond are publicly visible.';
+  }
+
   return (
     <>
       <Box display='flex' justifyContent='space-between' alignItems='center' padding={1}>
@@ -134,7 +152,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
           <Box>
             <Switch
               data-test='toggle-public-page'
-              checked={!!publicPermission}
+              checked={isChecked}
               disabled={disablePublicToggle}
               onChange={togglePublic}
             />
@@ -142,7 +160,14 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         </Tooltip>
       </Box>
 
-      {shareAlertMessage && <Alert severity='info'>{shareAlertMessage}</Alert>}
+      {shareAlertMessage && (
+        <Alert severity='info'>
+          {publicProposalToggleInfo}
+          <br />
+          <br />
+          {shareAlertMessage}
+        </Alert>
+      )}
 
       <Collapse in={!!publicPermission}>
         {shareLink && (

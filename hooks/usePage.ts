@@ -1,9 +1,11 @@
+import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
-import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
+import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useWebSocketClient } from './useWebSocketClient';
@@ -58,12 +60,22 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         }
       );
     }
+    function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
+      if (value.some((page) => page.id === pageWithContent?.id)) {
+        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        mutate(undefined, {
+          rollbackOnError: false
+        });
+      }
+    }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
-  }, [mutate]);
+  }, [mutate, pageWithContent?.id]);
 
   if (pageWithContent) {
     return {

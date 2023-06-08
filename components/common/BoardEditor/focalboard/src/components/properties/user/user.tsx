@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { Box, Stack } from '@mui/system';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -72,6 +73,13 @@ function MembersDisplay({
   setMemberIds: (memberIds: string[]) => void;
 }) {
   const { membersRecord } = useMembers();
+
+  const enableDelete = !readOnly && clicked;
+
+  function removeMember(memberId: string) {
+    setMemberIds(memberIds.filter((_memberId) => _memberId !== memberId));
+  }
+
   return memberIds.length === 0 ? null : (
     <Stack flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
       {memberIds.map((memberId) => {
@@ -81,9 +89,20 @@ function MembersDisplay({
         }
 
         return (
-          <Stack alignItems='center' flexDirection='row' key={user.id} gap={0.5}>
-            <UserDisplay fontSize={14} avatarSize='xSmall' user={user} />
-            {!readOnly && clicked && (
+          <Stack
+            alignItems='center'
+            flexDirection='row'
+            key={user.id}
+            gap={0.5}
+            sx={
+              wrapColumn
+                ? { width: '100%', justifyContent: 'space-between', overflowX: 'hidden' }
+                : { overflowX: 'hidden' }
+            }
+            onClick={enableDelete ? () => removeMember(user.id) : undefined}
+          >
+            <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
+            {enableDelete && (
               <IconButton size='small'>
                 <CloseIcon
                   sx={{
@@ -92,7 +111,7 @@ function MembersDisplay({
                   cursor='pointer'
                   fontSize='small'
                   color='secondary'
-                  onClick={() => setMemberIds(memberIds.filter((_memberId) => _memberId !== user.id))}
+                  onClick={() => removeMember(user.id)}
                 />
               </IconButton>
             )}
@@ -112,6 +131,8 @@ function UserProperty(props: Props): JSX.Element | null {
     [memberIds, membersRecord]
   );
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const updateMemberIds = useCallback(
     (unfilteredIds: string[]) => {
       setMemberIds(getFilteredMemberIds(unfilteredIds, membersRecord));
@@ -123,68 +144,80 @@ function UserProperty(props: Props): JSX.Element | null {
     updateMemberIds(props.memberIds);
   }, [props.memberIds, updateMemberIds]);
 
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (props.readOnly) {
-    return (
-      <MembersDisplay
-        wrapColumn={props.wrapColumn ?? false}
-        readOnly={props.readOnly}
-        clicked={clicked}
-        memberIds={memberIds}
-        setMemberIds={updateMemberIds}
-      />
-    );
+  function saveUsers(_memberIds: string[]) {
+    if (!props.readOnly && !arrayEquals(_memberIds, props.memberIds)) {
+      props.onChange(_memberIds);
+    }
   }
 
-  return (
-    <StyledUserPropertyContainer
-      hideOverflow={props.displayType === 'table'}
-      onClick={() => {
-        // Only register click if display type is details or table
-        if (!props.readOnly) {
-          setIsOpen(true);
-          setClicked(true);
+  if (props.readOnly || !isOpen) {
+    return (
+      <div
+        style={{ width: '100%', height: '100%', minHeight: '30px', overflow: 'hidden' }}
+        onClick={
+          !props.readOnly
+            ? () => {
+                setClicked(true);
+                setIsOpen(true);
+              }
+            : undefined
         }
+      >
+        <MembersDisplay
+          wrapColumn={props.wrapColumn ?? false}
+          readOnly={props.readOnly}
+          clicked={clicked}
+          memberIds={memberIds}
+          setMemberIds={updateMemberIds}
+        />
+      </div>
+    );
+  }
+  return (
+    <ClickAwayListener
+      onClickAway={(ev) => {
+        setClicked(false);
+        setIsOpen(false);
+        saveUsers(memberIds);
       }}
-      hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
     >
-      <InputSearchMemberMultiple
-        disableClearable
-        open={isOpen}
-        disableCloseOnSelect
-        defaultValue={memberIds}
-        value={membersValue}
-        onChange={(_memberIds, reason) => {
-          if (reason === 'removeOption' && !isOpen) {
-            props.onChange(_memberIds);
-          }
-          updateMemberIds(_memberIds);
-        }}
-        onClose={() => {
-          if (isOpen) {
-            // Reduce flicker in the ui
-            if (!arrayEquals(memberIds, props.memberIds)) {
-              props.onChange(memberIds);
-            }
-            setIsOpen(false);
-            setClicked(false);
+      <StyledUserPropertyContainer
+        hideOverflow={props.displayType === 'table'}
+        onClick={() => {
+          // Only register click if display type is details or table
+          if (!props.readOnly) {
+            setIsOpen(true);
+            setClicked(true);
           }
         }}
-        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
-        readOnly={props.readOnly}
-        placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
-        renderTags={() => (
-          <MembersDisplay
-            wrapColumn={props.wrapColumn ?? false}
-            readOnly={props.readOnly}
-            clicked={clicked}
-            memberIds={memberIds}
-            setMemberIds={updateMemberIds}
-          />
-        )}
-      />
-    </StyledUserPropertyContainer>
+        hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
+      >
+        <InputSearchMemberMultiple
+          // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
+          disableClearable
+          open={isOpen}
+          openOnFocus
+          disableCloseOnSelect
+          defaultValue={memberIds}
+          value={membersValue}
+          onChange={(_memberIds) => {
+            updateMemberIds(_memberIds);
+          }}
+          getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+          readOnly={props.readOnly}
+          placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+          renderTags={() => (
+            <MembersDisplay
+              wrapColumn={true}
+              readOnly={props.readOnly}
+              clicked={clicked}
+              memberIds={memberIds}
+              setMemberIds={updateMemberIds}
+            />
+          )}
+        />
+      </StyledUserPropertyContainer>
+    </ClickAwayListener>
   );
 }
 

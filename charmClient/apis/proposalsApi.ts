@@ -1,12 +1,13 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ProposalCategoryWithPermissions,
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
-} from '@charmverse/core';
-import type { ProposalStatus } from '@charmverse/core/prisma';
+} from '@charmverse/core/permissions';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import type { PageWithProposal } from 'lib/pages';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
@@ -14,7 +15,7 @@ import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  createProposal(input: CreateProposalInput) {
+  createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
@@ -34,6 +35,10 @@ export class ProposalsApi {
     return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
+  getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
+    return http.GET<(ProposalWithUsers & { page: Page })[]>(`/api/spaces/${spaceId}/proposal-templates`);
+  }
+
   getProposalCategories(spaceId: string) {
     return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
@@ -44,18 +49,18 @@ export class ProposalsApi {
   }: {
     spaceId: string;
     categoryId: string;
-  }): Promise<IPageWithPermissions> {
+  }): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId, categoryId });
   }
 
   createProposalFromTemplate({
     spaceId,
     templateId
-  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<IPageWithPermissions> {
+  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
-  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<IPageWithPermissions> {
+  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 

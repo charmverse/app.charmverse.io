@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';

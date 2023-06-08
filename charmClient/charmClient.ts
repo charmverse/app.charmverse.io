@@ -1,3 +1,11 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PagePermissionFlags,
+  PagePermissionWithSource,
+  PermissionCompute
+} from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
   Block,
@@ -5,7 +13,6 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Prisma,
   Space,
   TelegramUser,
   TokenGateToRole,
@@ -21,18 +28,10 @@ import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type {
-  IPagePermissionFlags,
-  IPagePermissionToCreate,
-  IPagePermissionUserRequest,
-  IPagePermissionWithAssignee,
-  IPagePermissionWithSource,
-  SpaceDefaultPublicPageToggle
-} from 'lib/permissions/pages/page-permission-interfaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
@@ -41,8 +40,6 @@ import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -180,39 +177,6 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) {
-    const space = await http.POST<Space>('/api/spaces', spaceOptions);
-    return space;
-  }
-
-  deleteSpace(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}`);
-  }
-
-  updateSpace(spaceOpts: Prisma.SpaceUpdateInput) {
-    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
-  }
-
-  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
-    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
-  }
-
-  leaveSpace(spaceId: string) {
-    return http.POST(`/api/spaces/${spaceId}/leave`);
-  }
-
-  getSpaces() {
-    return http.GET<Space[]>('/api/spaces');
-  }
-
-  getSpaceWebhook(spaceId: string) {
-    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
-  }
-
-  checkDomain(params: { spaceId?: string; domain: string }) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -226,7 +190,7 @@ class CharmClient {
   }
 
   createPage(pageOpts: Partial<Page>) {
-    return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
+    return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
   archivePage(pageId: string) {
@@ -242,7 +206,7 @@ class CharmClient {
   }
 
   deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, pageIds);
+    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -474,45 +438,36 @@ class CharmClient {
   /**
    * Get full set of permissions for a specific user on a certain page
    */
-  computeUserPagePermissions(request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
+  computeUserPagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
     return http.GET('/api/permissions/query', request);
   }
 
-  listPagePermissions(pageId: string): Promise<IPagePermissionWithAssignee[]> {
+  listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission(permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
+  createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 
-  deletePermission(permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions', { permissionId });
+  deletePermission(query: PermissionResource): Promise<boolean> {
+    return http.DELETE('/api/permissions', query);
   }
 
-  restrictPagePermissions({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
+  restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
-    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
-      defaultPublicPages
-    });
-  }
-
-  completeOnboarding({ spaceId }: { spaceId: string }) {
-    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
+  }
+
+  createProposalSource({ pageId }: { pageId: string }) {
+    return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
+  }
+
+  updateProposalSource({ pageId }: { pageId: string }) {
+    return http.PUT<void>(`/api/pages/${pageId}/proposal-source`);
   }
 
   getBuildId() {

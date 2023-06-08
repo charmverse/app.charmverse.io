@@ -46,6 +46,8 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
       return <AccessTimeIcon fontSize='small' {...props} />;
     case 'url':
       return <LinkIcon fontSize='small' {...props} />;
+    case 'proposalUrl':
+      return <LinkIcon fontSize='small' {...props} />;
     default:
       return null;
   }

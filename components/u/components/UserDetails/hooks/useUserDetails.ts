@@ -2,24 +2,22 @@ import type { User } from '@charmverse/core/prisma';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
 
-import type { UserDetailsProps } from '../UserDetailsForm';
-
-export const useUserDetails = ({ updateUser }: Pick<UserDetailsProps, 'updateUser'> = {}) => {
+export function useUserDetails() {
   const [isSaving, setIsSaving] = useState(false);
+  const { setUser } = useUser();
 
-  const handleUserUpdate = async (data: Partial<User>) => {
+  const saveUser = async (data: Partial<User>) => {
     setIsSaving(true);
 
     try {
       const updatedUser = await charmClient.updateUser(data);
-      if (updateUser) {
-        updateUser(updatedUser);
-      }
+      setUser(updatedUser);
     } finally {
       setIsSaving(false);
     }
   };
 
-  return { handleUserUpdate, isSaving };
-};
+  return { saveUser, isSaving };
+}

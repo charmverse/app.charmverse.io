@@ -22,7 +22,7 @@ import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
-import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import type { BrandColor } from 'theme/colors';
@@ -151,12 +151,7 @@ export function BountyStatusNexusChip({
   );
 }
 
-export default function BountyStatusBadgeWrapper({
-  truncate = false,
-  hideStatus,
-  bounty,
-  layout = 'row'
-}: IBountyBadgeProps) {
+export function BountyStatusBadge({ truncate = false, hideStatus, bounty, layout = 'row' }: IBountyBadgeProps) {
   const space = useCurrentSpace();
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
@@ -225,7 +220,7 @@ export function BountyAmount({
   const rewardToken = bounty.rewardToken;
   const chainId = bounty.chainId;
 
-  const tokenInfo = getTokenAndChainInfoFromPayments({
+  const tokenInfo = getTokenInfo({
     chainId,
     methods: paymentMethods,
     symbolOrAddress: rewardToken

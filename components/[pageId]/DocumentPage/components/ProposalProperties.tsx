@@ -1,3 +1,4 @@
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
@@ -22,7 +23,6 @@ import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -33,7 +33,7 @@ interface ProposalPropertiesProps {
   proposalId: string;
   snapshotProposalId: string | null;
   isTemplate: boolean;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
 }
 
@@ -56,7 +56,6 @@ export function ProposalProperties({
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-
   const { getMemberById, members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
@@ -70,9 +69,7 @@ export function ProposalProperties({
   const proposalAuthors = proposal?.authors ?? [];
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
-
   const proposalReviewer = getMemberById(proposalReviewerId);
-
   const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
   useEffect(() => {
@@ -174,7 +171,7 @@ export function ProposalProperties({
           <Grid container mb={2}>
             <ProposalStepSummary
               proposalFlowFlags={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />
@@ -202,7 +199,7 @@ export function ProposalProperties({
           <Grid container mb={2} mt={2}>
             <ProposalStepper
               proposalFlowPermissions={proposalFlowFlags}
-              proposal={proposal}
+              proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
             />
@@ -226,7 +223,6 @@ export function ProposalProperties({
               <ProposalCategoryInput
                 disabled={!proposalPermissions?.edit}
                 options={categories || []}
-                canEditCategories={!proposalPermissions?.edit}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
               />

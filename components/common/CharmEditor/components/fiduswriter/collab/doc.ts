@@ -88,7 +88,11 @@ export class ModCollabDoc {
   receiveDocument(data: ServerDocDataMessage) {
     this.cancelCurrentlyCheckingVersion();
     if (this.mod.editor.docInfo.confirmedDoc) {
-      log.debug('merge document updates', { pageId: this.mod.editor.docInfo.id });
+      log.debug('merge document updates', {
+        clientPageVersion: this.mod.editor.docInfo.version,
+        pageId: this.mod.editor.docInfo.id,
+        serverPageVersion: data.doc.v
+      });
       this.merge.adjustDocument(data);
     } else {
       this.loadDocument(data);
