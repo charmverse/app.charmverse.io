@@ -13,7 +13,7 @@ import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { useState, forwardRef, memo, useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -221,6 +221,12 @@ export function PageLink({
     variant: 'popover'
   });
 
+  const [iconHovered, setIconHovered] = useState(false);
+  const { permissions } = usePagePermissions({
+    pageIdOrPath: iconHovered && showPicker ? pageId : null,
+    revalidate: false
+  });
+
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
@@ -233,10 +239,9 @@ export function PageLink({
   }, []);
 
   const triggerState = bindTrigger(popupState);
-
   return (
     <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
-      <span onClick={preventDefault}>
+      <span onFocus={() => setIconHovered(true)} onMouseOver={() => setIconHovered(true)} onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
           isEditorEmpty={isEmptyContent}
@@ -249,7 +254,7 @@ export function PageLink({
         {isempty ? 'Untitled' : label}
       </PageTitle>
       {children}
-      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
+      {showPicker && pageId && permissions?.edit_content && <EmojiMenu popupState={popupState} pageId={pageId} />}
     </PageAnchor>
   );
 }
