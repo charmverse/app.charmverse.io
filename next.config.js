@@ -38,6 +38,9 @@ const config = {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}'
     },
+    '@mui/system': {
+      transform: '@mui/system/{{member}}'
+    },
     lodash: {
       transform: 'lodash/{{member}}'
     }
