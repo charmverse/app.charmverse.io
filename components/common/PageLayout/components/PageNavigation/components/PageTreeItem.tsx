@@ -14,6 +14,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { useState, forwardRef, memo, useCallback, useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -28,6 +29,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
+import { useUserId } from 'hooks/useUserId';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
@@ -221,11 +223,13 @@ export function PageLink({
     variant: 'popover'
   });
 
+  const currentUserId = useUserId();
+
   const [iconClicked, setIconClicked] = useState(false);
-  const { permissions } = usePagePermissions({
-    pageIdOrPath: iconClicked && showPicker ? pageId : null,
-    revalidate: false
-  });
+  const { data: permissions } = useSWRImmutable(
+    iconClicked && pageId && currentUserId ? null : `check-page-permissions-${pageId}-${currentUserId}`,
+    () => charmClient.computeUserPagePermissions({ resourceId: pageId as string, userId: currentUserId })
+  );
 
   const isempty = !label;
 
