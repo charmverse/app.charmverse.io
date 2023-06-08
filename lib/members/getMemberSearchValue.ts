@@ -1,5 +1,4 @@
 import type { DiscordUser, MemberPropertyValue, TelegramUser, User, UserDetails } from '@charmverse/core/prisma';
-import { stringUtils } from '@charmverse/core/utilities';
 
 type UserData = User & {
   memberPropertyValues: MemberPropertyValue[];
@@ -30,13 +29,9 @@ export function getMemberSearchValue(
   const propertyValuesString = memberPropertyValues
     .map((prop) => {
       if (Array.isArray(prop.value)) {
-        return prop.value
-          .map((val) => (stringUtils.isUUID(val as string) ? memberProperties[val as string] || val : val))
-          .join(' ');
+        return prop.value.map((val) => memberProperties[val as string] || val).join(' ');
       }
-      return stringUtils.isUUID(prop.value as string)
-        ? memberProperties[prop.value as string] || prop.value
-        : prop.value;
+      return memberProperties[prop.value as string] || prop.value;
     })
     .join(' ');
 
