@@ -3,11 +3,8 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type {
-  CreateCryptoSubscriptionRequest,
-  CreateCryptoSubscriptionResponse
-} from 'lib/subscription/createCryptoSubscription';
 import { createCryptoSubscription } from 'lib/subscription/createCryptoSubscription';
+import type { CreateCryptoSubscriptionResponse, CreateSubscriptionRequest } from 'lib/subscription/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,11 +19,11 @@ async function createCryptoSubscriptionIntent(
   res: NextApiResponse<CreateCryptoSubscriptionResponse>
 ) {
   const { id: spaceId } = req.query as { id: string };
-  const { period, productId, paymentMethodId, billingEmail, name, address, coupon } =
-    req.body as CreateCryptoSubscriptionRequest;
+  const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
+  const userId = req.session.user.id;
 
-  const subscriptionData = await createCryptoSubscription({
-    paymentMethodId,
+  const cryptoUrl = await createCryptoSubscription({
+    userId,
     spaceId,
     period,
     productId,
@@ -36,7 +33,7 @@ async function createCryptoSubscriptionIntent(
     coupon
   });
 
-  res.status(200).json(subscriptionData);
+  res.status(200).json(cryptoUrl);
 }
 
 export default withSessionRoute(handler);

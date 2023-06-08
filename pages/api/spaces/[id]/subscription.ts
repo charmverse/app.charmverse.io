@@ -4,11 +4,10 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/createCryptoSubscription';
-import type { CreateProSubscriptionResponse } from 'lib/subscription/createProSubscription';
-import { createStripeSubscription } from 'lib/subscription/createStripeSubscription';
+import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { CreatePaymentSubscriptionResponse, CreateSubscriptionRequest } from 'lib/subscription/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -34,14 +33,12 @@ async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiR
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
+async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreatePaymentSubscriptionResponse>) {
   const { id: spaceId } = req.query as { id: string };
-  const { period, productId, paymentMethodId, billingEmail, name, address, coupon } =
-    req.body as CreateCryptoSubscriptionRequest;
+  const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
 
   const userId = req.session.user.id;
-  const { clientSecret, paymentIntentStatus } = await createStripeSubscription({
-    paymentMethodId,
+  const { clientSecret, paymentIntentStatus } = await createProSubscription({
     spaceId,
     period,
     productId,
@@ -58,7 +55,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     productId,
     period,
     tier: 'pro',
-    result: paymentIntentStatus === 'succeeded' ? 'success' : 'failure'
+    result: paymentIntentStatus === 'succeeded' ? 'success' : 'pending'
   });
 
   res.status(200).json({

@@ -28,9 +28,8 @@ jest.mock('../stripe', () => ({
 
 describe('createProSubscription', () => {
   it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space } = await generateUserAndSpaceWithApiToken();
 
-    const paymentMethodId = v4();
     const subscriptionId = v4();
     const client_secret = v4();
     const customerId = v4();
@@ -66,18 +65,14 @@ describe('createProSubscription', () => {
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
 
     const { clientSecret, paymentIntentStatus } = await createProSubscription({
-      paymentMethodId,
       period: 'monthly',
       spaceId: space.id,
       productId: 'community_5k',
-      userId: user.id,
       billingEmail: 'test@gmail.com'
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
       name: space.name,
-      payment_method: paymentMethodId,
-      invoice_settings: { default_payment_method: paymentMethodId },
       email: 'test@gmail.com',
       metadata: {
         spaceId: space.id
@@ -130,16 +125,12 @@ describe('createProSubscription', () => {
   });
 
   it("should throw error if space doesn't exist", async () => {
-    const paymentMethodId = v4();
-
     await expect(
       createProSubscription({
-        paymentMethodId,
         period: 'monthly',
         spaceId: v4(),
         productId: 'community_5k',
-        billingEmail: 'test@gmail.com',
-        userId: v4()
+        billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -152,16 +143,12 @@ describe('createProSubscription', () => {
       createdBy: user.id
     });
 
-    const paymentMethodId = v4();
-
     await expect(
       createProSubscription({
-        paymentMethodId,
         period: 'monthly',
         spaceId: space.id,
         productId: 'community_5k',
-        billingEmail: 'test@gmail.com',
-        userId: v4()
+        billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

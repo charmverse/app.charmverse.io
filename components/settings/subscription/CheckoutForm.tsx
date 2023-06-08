@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -17,15 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import { styled } from '@mui/system';
-import {
-  AddressElement,
-  CardCvcElement,
-  CardExpiryElement,
-  CardNumberElement,
-  useElements,
-  useStripe
-} from '@stripe/react-stripe-js';
-import type { StripeAddressElementChangeEvent, StripeElementChangeEvent } from '@stripe/stripe-js';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -42,8 +33,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
 import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
-import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/createCryptoSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { CreateSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
@@ -55,16 +46,6 @@ const StyledList = styled(List)`
 
 const StyledListItemText = styled(ListItemText)`
   display: list-item;
-`;
-
-const StyledCardElementContainer = styled(Box)`
-  padding: ${({ theme }) => theme.spacing(1, 1.5)};
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  &:hover {
-    border: ${({ theme }) => `1px solid ${theme.palette.text.primary}`};
-  }
-  background-color: var(--input-bg);
 `;
 
 const schema = () => {
@@ -110,17 +91,6 @@ export function CheckoutForm({
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
   const [productId, setProductId] = useState<SubscriptionProductId>('community_5k');
-  const [cardEvent, setCardEvent] = useState<{
-    cardNumber: StripeElementChangeEvent | null;
-    cvc: StripeElementChangeEvent | null;
-    expiry: StripeElementChangeEvent | null;
-    address: StripeAddressElementChangeEvent | null;
-  }>({
-    address: null,
-    expiry: null,
-    cvc: null,
-    cardNumber: null
-  });
 
   const {
     data: checkoutUrl,
@@ -128,7 +98,7 @@ export function CheckoutForm({
     isMutating: isLoadingCreateSubscriptionIntent
   } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateCryptoSubscriptionRequest } }>) =>
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateSubscriptionRequest } }>) =>
       charmClient.subscription.createCryptoSubscription(arg.spaceId, arg.payload),
     {
       onError(error) {
@@ -156,18 +126,7 @@ export function CheckoutForm({
     }
   }, [spaceSubscription]);
 
-  const cardError =
-    cardEvent.cardNumber?.error ||
-    cardEvent.cvc?.error ||
-    cardEvent.expiry?.error ||
-    errors.billingEmail ||
-    billingEmail.length === 0;
-
-  const cardComplete =
-    cardEvent.cardNumber?.complete &&
-    cardEvent.cvc?.complete &&
-    cardEvent.expiry?.complete &&
-    cardEvent.address?.complete;
+  const cardError = errors.billingEmail || billingEmail.length === 0;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -177,10 +136,9 @@ export function CheckoutForm({
       return;
     }
 
-    const cardNumberElement = elements?.getElement('cardNumber');
-    const cardAddressElement = elements?.getElement('address');
+    const cardElement = elements?.getElement(CardElement);
 
-    if (!cardNumberElement || !cardAddressElement) {
+    if (!cardElement) {
       return;
     }
 
@@ -191,58 +149,34 @@ export function CheckoutForm({
       period,
       billingEmail: paymentDetails.billingEmail
     };
-
     try {
       setIsProcessing(true);
-      const { error: createPaymentMethodError, paymentMethod } = await stripe.createPaymentMethod({
-        billing_details: {
-          email: paymentDetails.billingEmail,
-          address: cardEvent.address
-            ? {
-                ...cardEvent.address.value.address,
-                line2: cardEvent.address.value.address.line2 ?? undefined
-              }
-            : undefined,
-          name: cardEvent.address?.value.name,
-          phone: cardEvent.address?.value.phone
-        },
-        card: cardNumberElement,
-        type: 'card'
+      const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription(space.id, {
+        period,
+        productId,
+        billingEmail: paymentDetails.billingEmail
       });
 
-      if (createPaymentMethodError) {
-        log.error(`[stripe]: Failed to create payment method. ${createPaymentMethodError.message}`, {
-          ...paymentErrorMetadata,
-          errorType: createPaymentMethodError.type,
-          errorCode: createPaymentMethodError.code
-        });
-      } else if (paymentMethod) {
-        const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription(space.id, {
-          paymentMethodId: paymentMethod.id,
-          period,
-          productId,
-          billingEmail: paymentDetails.billingEmail
-        });
-
-        if (clientSecret && paymentIntentStatus) {
-          if (paymentIntentStatus !== 'succeeded') {
-            const { error: confirmCardPaymentError } = await stripe.confirmCardPayment(clientSecret, {
-              receipt_email: paymentDetails.billingEmail,
-              payment_method: paymentMethod.id
-            });
-            if (confirmCardPaymentError) {
-              showMessage('Payment failed! Please try again', 'error');
-              log.error(`[stripe]: Failed to confirm card payment. ${confirmCardPaymentError.message}`, {
-                ...paymentErrorMetadata,
-                errorType: confirmCardPaymentError.type,
-                errorCode: confirmCardPaymentError.code
-              });
-            } else {
-              showMessage('Payment successful! Community subscription active.', 'success');
+      if (clientSecret && paymentIntentStatus) {
+        if (paymentIntentStatus !== 'succeeded') {
+          const { error: confirmCardPaymentError } = await stripe.confirmCardPayment(clientSecret, {
+            receipt_email: paymentDetails.billingEmail,
+            payment_method: {
+              card: cardElement
             }
+          });
+          if (confirmCardPaymentError) {
+            showMessage('Payment failed! Please try again', 'error');
+            log.error(`[stripe]: Failed to confirm card payment. ${confirmCardPaymentError.message}`, {
+              ...paymentErrorMetadata,
+              errorType: confirmCardPaymentError.type,
+              errorCode: confirmCardPaymentError.code
+            });
           } else {
             showMessage('Payment successful! Community subscription active.', 'success');
           }
+        } else {
+          showMessage('Payment successful! Community subscription active.', 'success');
         }
       }
     } catch (error: any) {
@@ -274,19 +208,10 @@ export function CheckoutForm({
       payload: {
         period,
         productId,
-        billingEmail: paymentDetails.billingEmail,
-        address: cardEvent.address
-          ? {
-              ...cardEvent.address.value.address,
-              line2: cardEvent.address.value.address.line2 ?? undefined
-            }
-          : undefined,
-        name: cardEvent.address?.value.name
+        billingEmail: paymentDetails.billingEmail
       }
     });
   };
-
-  const theme = useTheme();
 
   return (
     <Stack onSubmit={createSubscription} gap={1}>
@@ -338,22 +263,6 @@ export function CheckoutForm({
         <Typography variant='h6' mb={1}>
           Billing Information
         </Typography>
-        <AddressElement
-          options={{
-            mode: 'billing',
-            defaultValues: {
-              address: {
-                country: 'US'
-              }
-            }
-          }}
-          onChange={(e) =>
-            setCardEvent({
-              ...cardEvent,
-              address: e
-            })
-          }
-        />
         <Stack gap={0.5} my={2}>
           <InputLabel>Billing Email</InputLabel>
           <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('billingEmail')} />
@@ -363,74 +272,7 @@ export function CheckoutForm({
       <Typography variant='h6'>Payment method</Typography>
       <PaymentTabs value={paymentType} onChange={changePaymentType} />
       <PaymentTabPanel value={paymentType} index='card'>
-        <Stack display='flex' mb={1} flexDirection='row' gap={1}>
-          <Stack gap={0.5} flexGrow={1}>
-            <InputLabel>Card number</InputLabel>
-            <StyledCardElementContainer>
-              <CardNumberElement
-                options={{
-                  disabled: isProcessing,
-                  placeholder: '4242 4242 4242 4242',
-                  style: {
-                    base: {
-                      color: theme.palette.text.primary
-                    }
-                  }
-                }}
-                onChange={(e) =>
-                  setCardEvent({
-                    ...cardEvent,
-                    cardNumber: e
-                  })
-                }
-              />
-            </StyledCardElementContainer>
-          </Stack>
-          <Stack gap={0.5} flexGrow={0.25}>
-            <InputLabel>Expiry Date</InputLabel>
-            <StyledCardElementContainer>
-              <CardExpiryElement
-                options={{
-                  disabled: isProcessing,
-                  placeholder: '10 / 25',
-                  style: {
-                    base: {
-                      color: theme.palette.text.primary
-                    }
-                  }
-                }}
-                onChange={(e) =>
-                  setCardEvent({
-                    ...cardEvent,
-                    expiry: e
-                  })
-                }
-              />
-            </StyledCardElementContainer>
-          </Stack>
-          <Stack gap={0.5} flexGrow={0.25}>
-            <InputLabel>CVC</InputLabel>
-            <StyledCardElementContainer>
-              <CardCvcElement
-                options={{
-                  disabled: isProcessing,
-                  placeholder: '1234',
-                  style: {
-                    base: {
-                      color: theme.palette.text.primary
-                    }
-                  }
-                }}
-                onChange={(e) =>
-                  setCardEvent({
-                    ...cardEvent,
-                    cvc: e
-                  })
-                }
-              />
-            </StyledCardElementContainer>
-          </Stack>
-        </Stack>
+        <CardElement />
       </PaymentTabPanel>
       <PaymentTabPanel value={paymentType} index='crypto'>
         <Typography mb={1}>
@@ -455,7 +297,7 @@ export function CheckoutForm({
             onClick={createSubscription}
             sx={{ width: 'fit-content' }}
             loading={isProcessing}
-            disabled={cardError || !cardComplete || isProcessing || !stripe || !elements || !space}
+            disabled={cardError || !billingEmail || isProcessing || !stripe || !elements || !space}
           >
             {isProcessing ? 'Processing ... ' : 'Upgrade'}
           </Button>
@@ -472,7 +314,7 @@ export function CheckoutForm({
       </PaymentTabPanel>
       <PaymentTabPanel value={paymentType} index='crypto'>
         <Stack gap={1} display='flex' flexDirection='row'>
-          <Button onClick={() => startCryptoPayment()} disabled={!cardEvent.address?.complete}>
+          <Button onClick={() => startCryptoPayment()} disabled={!billingEmail}>
             Upgrade
           </Button>
           <Button

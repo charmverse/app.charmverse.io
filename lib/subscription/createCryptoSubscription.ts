@@ -1,29 +1,17 @@
-import { DataNotFoundError, ExternalServiceError } from '@charmverse/core/errors';
+import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AddressParam } from '@stripe/stripe-js';
 
 import { getLoopProducts } from 'lib/loop/loop';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
-import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
 import { loopCheckoutUrl } from './constants';
-import { createStripeSubscription } from './createStripeSubscription';
-
-export type CreateCryptoSubscriptionRequest = {
-  productId: SubscriptionProductId;
-  paymentMethodId?: string;
-  period: SubscriptionPeriod;
-  billingEmail: string;
-  name?: string;
-  address?: AddressParam;
-  coupon?: string;
-};
-
-export type CreateCryptoSubscriptionResponse = string;
+import { createProSubscription } from './createProSubscription';
+import type { CreateCryptoSubscriptionResponse, CreateSubscriptionRequest } from './interfaces';
 
 export async function createCryptoSubscription({
+  userId,
   spaceId,
-  paymentMethodId,
   period,
   productId,
   billingEmail,
@@ -31,8 +19,9 @@ export async function createCryptoSubscription({
   address,
   coupon = ''
 }: {
+  userId: string;
   spaceId: string;
-} & CreateCryptoSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
+} & CreateSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
@@ -63,20 +52,25 @@ export async function createCryptoSubscription({
     throw new InvalidStateError('Space already has a subscription');
   }
 
-  const subscriptionData = await createStripeSubscription({
-    paymentMethodId,
+  const subscriptionData = await createProSubscription({
     spaceId,
     period,
     productId,
     billingEmail,
-    name,
+    name: name || space.name,
     address,
     coupon
   });
 
-  if (!subscriptionData) {
-    throw new DataNotFoundError('Insufficient data to create subscription');
-  }
+  trackUserAction('checkout_subscription', {
+    userId,
+    spaceId,
+    billingEmail,
+    productId,
+    period,
+    tier: 'pro',
+    result: 'pending'
+  });
 
   let loopItem;
   try {

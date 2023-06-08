@@ -10,7 +10,7 @@ export type CheckoutSubscriptionEvent = BaseEvent & {
   productId: SubscriptionProductId;
   period: SubscriptionPeriod;
   tier: 'pro';
-  result: 'success' | 'failure';
+  result: 'success' | 'failure' | 'pending';
 };
 
 export type SubscriptionEventMap = {
