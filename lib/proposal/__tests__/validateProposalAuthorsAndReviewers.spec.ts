@@ -1,5 +1,5 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { Role, Space, User } from '@charmverse/core/src/prisma-client';
+import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 
 import type { ProposalUsersValidationResult } from '../validateProposalAuthorsAndReviewers';

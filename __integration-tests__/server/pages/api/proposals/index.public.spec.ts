@@ -1,6 +1,6 @@
-import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { Space, User } from '@charmverse/core/prisma';
 import type { ProposalCategory } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
@@ -68,7 +68,7 @@ describe('POST /api/proposals - Create a proposal', () => {
   });
 
   it('should not allow a user outside the space to create a proposal and respond with 401', async () => {
-    const outsideUser = await testUtilsUser.generateUser();
+    const { user: outsideUser } = await testUtilsUser.generateUserAndSpace();
 
     const userCookie = await loginUser(outsideUser.id);
 
