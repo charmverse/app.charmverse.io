@@ -1,5 +1,5 @@
 import type { UserWallet } from '@charmverse/core/prisma';
-import { utils, Wallet } from 'ethers';
+import { getAddress, Wallet } from 'ethers';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
@@ -94,7 +94,7 @@ describe('matchShortAddress', () => {
   it('should return true if the first argument is a short, or full lower / mixed case version of the wallet address', () => {
     const address = randomETHWalletAddress();
 
-    const withMixedCase = utils.getAddress(address);
+    const withMixedCase = getAddress(address);
 
     const shortAddress = shortWalletAddress(address);
 

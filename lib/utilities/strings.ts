@@ -1,5 +1,5 @@
 import type { UserWallet } from '@charmverse/core/prisma';
-import { utils } from 'ethers';
+import { isAddress } from 'ethers';
 import { customAlphabet } from 'nanoid';
 import * as dictionaries from 'nanoid-dictionary';
 import { validate } from 'uuid';
@@ -192,7 +192,7 @@ export function shortWalletAddress(string?: string): string {
     return '';
   }
 
-  if (utils.isAddress(string)) {
+  if (isAddress(string)) {
     return shortenHex(string).toLowerCase();
   }
 

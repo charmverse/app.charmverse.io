@@ -4,9 +4,8 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById, RPC } from 'connectors';
-import type { Signer } from 'ethers';
-import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
+import type { Signer, Provider } from 'ethers';
+import { ethers, getAddress } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
@@ -16,7 +15,7 @@ function getGnosisRPCUrl(chainId: number) {
 }
 
 interface GetGnosisServiceProps {
-  signer: ethers.Signer | ethers.providers.Provider;
+  signer: Signer | Provider;
   chainId?: number;
   serviceUrl?: string;
 }

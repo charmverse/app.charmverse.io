@@ -3,7 +3,7 @@ import { Refresh as RefreshIcon } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Box, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import { utils } from 'ethers';
+import { isAddress } from 'ethers';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -91,7 +91,7 @@ function IdentityModal(props: IdentityModalProps) {
                       <RefreshIcon fontSize='small' />
                     </IconButton>
                   </Tooltip>
-                ) : utils.isAddress(usernameToDisplay) ? (
+                ) : isAddress(usernameToDisplay) ? (
                   <Tooltip
                     //                    disableHoverListener
                     onMouseEnter={(e) => e.stopPropagation()}

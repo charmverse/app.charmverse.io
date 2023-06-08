@@ -1,11 +1,11 @@
 import { getChainShortname } from 'connectors';
-import { ethers } from 'ethers';
+import { formatEther, parseEther } from 'ethers';
 
 export function getFriendlyEthValue(value: string) {
-  const valueBigNumber = ethers.BigNumber.from(value);
-  const ethersValue = ethers.utils.formatEther(valueBigNumber);
-  const upperBound = ethers.BigNumber.from(ethers.utils.parseEther('0.001'));
-  if (valueBigNumber.gt(0) && valueBigNumber.lt(upperBound)) {
+  const valueBigNumber = BigInt(value);
+  const ethersValue = formatEther(valueBigNumber);
+  const upperBound = BigInt(parseEther('0.001'));
+  if (valueBigNumber > 0 && valueBigNumber < upperBound) {
     return '< 0.0001';
   } else {
     return ethersValue;

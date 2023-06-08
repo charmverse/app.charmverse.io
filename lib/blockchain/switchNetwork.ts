@@ -1,5 +1,5 @@
 import { getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { toQuantity } from 'ethers';
 
 /**
  * See
@@ -11,7 +11,7 @@ export async function switchActiveNetwork(chainId: number) {
   try {
     await (window as any).ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.utils.hexValue(chainId) }]
+      params: [{ chainId: toQuantity(chainId) }]
     });
   } catch (error: any) {
     if (error.code === 4902) {
@@ -26,7 +26,7 @@ export async function switchActiveNetwork(chainId: number) {
         params: [
           {
             ...chainInfo,
-            chainId: ethers.utils.hexValue(chainInfo?.chainId)
+            chainId: toQuantity(chainInfo?.chainId)
           }
         ]
       });

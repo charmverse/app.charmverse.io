@@ -1,4 +1,4 @@
-import { verifyMessage } from 'ethers/lib/utils';
+import { verifyMessage } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 
 import { lowerCaseEqual } from 'lib/utilities/strings';

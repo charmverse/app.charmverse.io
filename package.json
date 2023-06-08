@@ -154,7 +154,7 @@
     "dotenv-expand": "^8.0.3",
     "emoji-js": "^3.7.0",
     "emoji-mart": "^3.0.1",
-    "ethers": "^5.5.4",
+    "ethers": "^6.5.1",
     "fetch-retry": "^5.0.4",
     "firebase": "^9.14.0",
     "firebase-admin": "^11.5.0",

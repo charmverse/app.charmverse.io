@@ -1,5 +1,4 @@
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
-import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
@@ -7,7 +6,7 @@ import Button from '@mui/material/Button';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';
-import { ethers } from 'ethers';
+import { parseEther, parseUnits, Contract } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -146,12 +145,12 @@ export function BountyPaymentButton({
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         const tx = await web3signer.sendTransaction({
           to: receiver,
-          value: ethers.utils.parseEther(amount)
+          value: parseEther(amount)
         });
 
         onSuccess(tx.hash, chainToUse.chainId);
       } else if (isValidChainAddress(tokenSymbolOrAddress)) {
-        const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, web3signer);
+        const tokenContract = new Contract(tokenSymbolOrAddress, ERC20ABI, web3signer);
 
         const paymentMethod = paymentMethods.find(
           (method) => method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
@@ -173,12 +172,12 @@ export function BountyPaymentButton({
           }
         }
 
-        const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
+        const parsedTokenAmount = parseUnits(amount, tokenDecimals);
 
         // get allowance
         const allowance = await tokenContract.allowance(account, receiver);
 
-        if (BigNumber.from(allowance).lt(parsedTokenAmount)) {
+        if (BigInt(allowance) < parsedTokenAmount) {
           // approve if the allowance is small
           await tokenContract.approve(receiver, parsedTokenAmount);
         }

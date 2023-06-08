@@ -1,7 +1,7 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { parseUnits, Interface, getAddress } from 'ethers';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 
@@ -67,17 +67,18 @@ export function useMultiBountyPayment({
             .map((application) => {
               let data = '0x';
               let to = application.walletAddress as string;
-              let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount as number), 18).toString();
+              let value = parseUnits(eToNumber(bounty.rewardAmount as number), 18).toString();
 
               // assume this is ERC20 if its not a native token
               const isERC20Token =
                 safeAddress && bounty.rewardToken !== getChainById(bounty.chainId as number)?.nativeCurrency.symbol;
               if (isERC20Token) {
                 const paymentMethod = paymentMethods.find((method) => method.contractAddress === bounty.rewardToken);
-                const erc20 = new ethers.utils.Interface(ERC20_ABI);
-                const parsedAmount = ethers.utils
-                  .parseUnits(eToNumber(bounty.rewardAmount as number), paymentMethod?.tokenDecimals)
-                  .toString();
+                const erc20 = new Interface(ERC20_ABI);
+                const parsedAmount = parseUnits(
+                  eToNumber(bounty.rewardAmount as number),
+                  paymentMethod?.tokenDecimals
+                ).toString();
                 data = erc20.encodeFunctionData('transfer', [application.walletAddress, parsedAmount]);
                 // send the request to the token contract
                 to = bounty.rewardToken as string;
@@ -86,7 +87,7 @@ export function useMultiBountyPayment({
 
               return {
                 // convert to checksum address, or else gnosis-safe will fail
-                to: ethers.utils.getAddress(to),
+                to: getAddress(to),
                 value,
                 data,
                 applicationId: application.id,

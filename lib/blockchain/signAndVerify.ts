@@ -1,4 +1,4 @@
-import { getAddress, verifyMessage } from 'ethers/lib/utils';
+import { getAddress, verifyMessage } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 
 import { InvalidInputError } from '../utilities/errors';

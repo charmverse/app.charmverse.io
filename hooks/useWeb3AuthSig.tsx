@@ -3,7 +3,7 @@ import type { UserWallet } from '@charmverse/core/prisma';
 import { verifyMessage } from '@ethersproject/wallet';
 import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
-import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
+import { getAddress, toUtf8Bytes } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';

@@ -2,7 +2,7 @@ import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
-import { ethers, utils } from 'ethers';
+import { ethers, getAddress } from 'ethers';
 import log from 'loglevel';
 
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
@@ -60,7 +60,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       safeAddress,
       safeTransactionData: safeTransaction.data,
       safeTxHash: txHash,
-      senderAddress: utils.getAddress(account),
+      senderAddress: getAddress(account),
       senderSignature: senderSignature.data,
       origin
     });

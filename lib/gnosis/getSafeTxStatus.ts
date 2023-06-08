@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import { ApplicationStatus } from '@charmverse/core/prisma';
 import { AlchemyProvider } from '@ethersproject/providers';
 import type { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
-import { BigNumber } from 'ethers';
 
 import { getGnosisService } from 'lib/gnosis/gnosis';
 
@@ -57,5 +56,5 @@ export async function getSafeTxStatus({
 }
 
 function hasValue(safeTx: SafeMultisigTransactionResponse): boolean {
-  return BigNumber.from(safeTx.value || '0').gt(0) || !!safeTx.data;
+  return BigInt(safeTx.value || '0') > 0 || !!safeTx.data;
 }

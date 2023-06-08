@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { getChainById } from 'connectors';
-import { utils } from 'ethers';
+import { getAddress } from 'ethers';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 
@@ -250,7 +250,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
 
       const receipt: SnapshotReceipt = (await client.proposal(
         library,
-        utils.getAddress(account as string),
+        getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
 
