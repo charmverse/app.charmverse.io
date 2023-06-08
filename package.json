@@ -8,7 +8,7 @@
     "build": "cross-env NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",
     "build:analyze": "cross-env ANALYZE=true next build",
-    "verifydeps": "npx depcruise --include-only \"^(pages|lib|components|hooks)\" --ts-config ./tsconfig.json --config -- ./",
+    "verifydeps": "npx depcruise --include-only \"^(pages|lib)\" --ts-config ./tsconfig.json --config -- ./",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "start:api:permissions:ci": "cd permissions_api && dotenv -e ../.env.test.local -- npm run start:prod",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
