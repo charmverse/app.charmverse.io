@@ -1,4 +1,4 @@
-import { ExternalServiceError } from '@charmverse/core';
+import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';

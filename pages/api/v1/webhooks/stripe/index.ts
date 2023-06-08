@@ -1,6 +1,6 @@
+import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InsecureOperationError } from '@charmverse/core/shared';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 

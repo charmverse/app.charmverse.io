@@ -1,4 +1,4 @@
-import fetch from 'adapters/http/fetch.server';
+import fetch from 'adapters/http/fetch';
 
 export interface LoopItem {
   itemId: string;

@@ -1,4 +1,4 @@
-import { DataNotFoundError, ExternalServiceError } from '@charmverse/core';
+import { DataNotFoundError, ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 
