@@ -26,6 +26,9 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -38,7 +41,6 @@ import type { SocketAuthReponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -242,23 +244,27 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.POST<InviteLinkPopulatedWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkPopulatedWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkPopulatedWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ publicContext, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, publicContext });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkPopulatedWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
