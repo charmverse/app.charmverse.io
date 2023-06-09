@@ -4,7 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { getAccessibleProposals } from '../getAccessibleProposals';
 
 describe('getAccessibleProposals', () => {
-  it('Should return all proposals, except templates and drafts', async () => {
+  it('Should return all proposals at discussion stage and beyond, except templates and drafts', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -49,7 +49,7 @@ describe('getAccessibleProposals', () => {
     expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));
   });
 
-  it('should not return drafts if user is not an author or reviewer', async () => {
+  it('should not return drafts if user is not an author', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -73,7 +73,14 @@ describe('getAccessibleProposals', () => {
         categoryId: proposalCategory1.id,
         spaceId: space.id,
         userId: adminUser.id,
-        proposalStatus: 'draft'
+        proposalStatus: 'draft',
+        reviewers: [
+          // User shouldn't see this yet since it's a draft
+          {
+            group: 'user',
+            id: user.id
+          }
+        ]
       }
     );
 
@@ -168,7 +175,7 @@ describe('getAccessibleProposals', () => {
     });
   });
 
-  it('should return only proposals from the intersection of specified and accessible categories if categoryIds are provided', async () => {
+  it('should return only proposals from specified categories if categoryIds are provided', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -180,16 +187,7 @@ describe('getAccessibleProposals', () => {
 
     const category1 = await testUtilsProposals.generateProposalCategory({
       title: 'Visible Category 1',
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: {
-            group: 'space',
-            id: space.id
-          }
-        }
-      ]
+      spaceId: space.id
     });
 
     const { page, ...proposal } = await testUtilsProposals.generateProposal({
@@ -201,16 +199,7 @@ describe('getAccessibleProposals', () => {
 
     const category2 = await testUtilsProposals.generateProposalCategory({
       title: 'Visible Category 2',
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: {
-            group: 'space',
-            id: space.id
-          }
-        }
-      ]
+      spaceId: space.id
     });
 
     const { page: page2, ...proposal2 } = await testUtilsProposals.generateProposal({
@@ -241,7 +230,7 @@ describe('getAccessibleProposals', () => {
     expect(proposalsRequestedByUser[0]).toMatchObject(proposal);
   });
 
-  it('should return only the proposals where a user is author or reviewer if onlyAssigned is true', async () => {
+  it('should return only the proposals where a user is an author if onlyAssigned is true', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -253,16 +242,7 @@ describe('getAccessibleProposals', () => {
 
     const category1 = await testUtilsProposals.generateProposalCategory({
       title: 'Visible Category 1',
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: {
-            group: 'space',
-            id: space.id
-          }
-        }
-      ]
+      spaceId: space.id
     });
 
     const { page, ...proposalByAdmin } = await testUtilsProposals.generateProposal({
@@ -317,15 +297,10 @@ describe('getAccessibleProposals', () => {
       onlyAssigned: true
     });
 
-    const expectedUserProposals = [proposalByUser, proposalByAdminReviewedByUser];
+    const expectedUserProposals = [proposalByUser];
 
     expect(proposalsRequestedByUser.length).toBe(expectedUserProposals.length);
 
-    expect(proposalsRequestedByUser).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining(proposalByUser),
-        expect.objectContaining(proposalByAdminReviewedByUser)
-      ])
-    );
+    expect(proposalsRequestedByUser).toEqual([expect.objectContaining(proposalByUser)]);
   });
 });
