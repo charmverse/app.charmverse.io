@@ -1,10 +1,9 @@
-import type { Page } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Space, User } from '@charmverse/core/src/prisma-client';
+import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
-import { DatabasePageNotFoundError } from 'lib/public-api';
 import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
@@ -58,27 +57,7 @@ describe('createCardsFromProposals', () => {
       userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const cards = await prisma.page.findMany({
-      where: {
-        type: 'card',
-        spaceId: space.id,
-        parentId: board.id,
-        AND: [
-          {
-            syncWithPageId: {
-              not: null
-            }
-          },
-          {
-            syncWithPageId: {
-              not: undefined
-            }
-          }
-        ]
-      }
-    });
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(1);
 
@@ -97,37 +76,17 @@ describe('createCardsFromProposals', () => {
   it('should not create cards from proposals if board is not found', async () => {
     await expect(
       createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
     await expect(
       createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
   it('should not create cards if no proposals are found', async () => {
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const cards = await prisma.page.findMany({
-      where: {
-        type: 'card',
-        spaceId: space.id,
-        parentId: board.id,
-        AND: [
-          {
-            syncWithPageId: {
-              not: null
-            }
-          },
-          {
-            syncWithPageId: {
-              not: undefined
-            }
-          }
-        ]
-      }
-    });
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(0);
   });

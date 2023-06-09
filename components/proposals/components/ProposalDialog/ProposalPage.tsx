@@ -56,6 +56,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
       setIsCreatingProposal(true);
       const createdProposal = await charmClient.proposals
         .createProposal({
+          authors: formInputs.authors,
           categoryId: formInputs.categoryId,
           pageProps: {
             content: formInputs.content,

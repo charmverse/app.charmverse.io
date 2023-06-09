@@ -1,9 +1,13 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
+import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
-import { DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
+
+import { createCardPage } from './createCardPage';
 
 export async function updateCardsFromProposals({
   boardId,
@@ -23,7 +27,7 @@ export async function updateCardsFromProposals({
   })) as unknown as Board | undefined;
 
   if (!board) {
-    throw new DatabasePageNotFoundError(boardId);
+    throw new DataNotFoundError('Database was not found');
   }
 
   const pageProposals = await prisma.page.findMany({
@@ -49,6 +53,7 @@ export async function updateCardsFromProposals({
   /**
    * Case for cards that are linked to a proposal page and need to be updated
    */
+  const updatedCards: Page[] = [];
   for (const pageProposal of oldPageProposals) {
     const card = existingCards.find((_card) => _card.syncWithPageId === pageProposal.id);
     if (
@@ -73,15 +78,30 @@ export async function updateCardsFromProposals({
           contentText: pageProposal.contentText
         }
       });
-
-      relay.broadcast(
-        {
-          type: 'pages_meta_updated',
-          payload: [updatedCard]
-        },
-        updatedCard.spaceId
-      );
+      updatedCards.push(updatedCard);
     }
+  }
+
+  if (updatedCards.length > 0) {
+    relay.broadcast(
+      {
+        type: 'pages_meta_updated',
+        payload: updatedCards.map(
+          ({ id, updatedAt, updatedBy, deletedAt, title, hasContent, content, contentText }) => ({
+            id,
+            spaceId,
+            updatedAt,
+            updatedBy,
+            deletedAt,
+            title,
+            hasContent,
+            content,
+            contentText
+          })
+        )
+      },
+      spaceId
+    );
   }
 
   const newPageProposals = pageProposals.filter(
@@ -101,8 +121,9 @@ export async function updateCardsFromProposals({
   /**
    * Case for new cards to be created from proposal pages and are not included in the current list of cards
    */
+  const newCards: { page: Page; block: Block }[] = [];
   for (const pageProposal of newPageProposals) {
-    await createDatabaseCardPage({
+    const _card = await createCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
@@ -113,20 +134,48 @@ export async function updateCardsFromProposals({
       contentText: pageProposal.contentText,
       syncWithPageId: pageProposal.id
     });
+    newCards.push(_card);
   }
 
-  const nonExistingProposalPages = existingCards
+  if (newCards.length > 0) {
+    relay.broadcast(
+      {
+        type: 'blocks_created',
+        payload: newCards.map((card) => prismaToBlock(card.block))
+      },
+      spaceId
+    );
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: newCards.map((card) => card.page)
+      },
+      spaceId
+    );
+  }
+
+  const nonExistingProposalPagesIds = existingCards
     .filter((card) => card.syncWithPageId && !pageProposals.map((page) => page.id).includes(card.syncWithPageId))
     .map((card) => card.id);
 
   /**
    * Case where a user permanently deleted a proposal page
    */
-  for (const cardToBeDeleted of nonExistingProposalPages) {
+  for (const cardToBeDeleted of nonExistingProposalPagesIds) {
     await prisma.page.delete({
       where: {
         id: cardToBeDeleted
       }
     });
+  }
+
+  if (nonExistingProposalPagesIds.length > 0) {
+    relay.broadcast(
+      {
+        type: 'pages_deleted',
+        payload: nonExistingProposalPagesIds.map((id) => ({ id }))
+      },
+      spaceId
+    );
   }
 }
