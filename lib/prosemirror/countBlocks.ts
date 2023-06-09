@@ -39,8 +39,11 @@ export function countBlocks(pageContent: any | null, spaceId?: string) {
     try {
       const doc = getNodeFromJson(pageContent);
       if (doc) {
-        doc.nodesBetween(0, doc.nodeSize, (node) => {
-          if (node.type && !INLINE_NODES_TO_IGNORE.includes(node.type.name)) {
+        doc.nodesBetween(0, doc.content.size, (node) => {
+          if (INLINE_NODES_TO_IGNORE.includes(node.type.name)) {
+            return false;
+          }
+          if (node.type) {
             count += 1;
           }
         });
