@@ -5,12 +5,14 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePages } from 'hooks/usePages';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
@@ -24,6 +26,9 @@ export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
   const { pages } = usePages();
   const currentSpace = useCurrentSpace();
+
+  const { isSpaceMember } = useIsSpaceMember();
+
   const { isPublicSpace } = useIsPublicSpace();
   const {
     data,
@@ -32,6 +37,16 @@ export function ProposalsPage() {
   } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
     charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
+
+  const { data: publicInviteLink } = useSWR(
+    !isSpaceMember && currentSpace ? `space-public-invite-${currentSpace.id}` : null,
+    () =>
+      charmClient.getPublicInviteLink({
+        spaceId: currentSpace!.id,
+        publicContext: 'proposals'
+      })
+  );
+
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
@@ -75,7 +90,15 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  <NewProposalButton mutateProposals={mutateProposals} />
+                  {isSpaceMember && <NewProposalButton mutateProposals={mutateProposals} />}
+
+                  {publicInviteLink && !isSpaceMember && (
+                    <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
+                      <Link href={`${window.location.origin}/invite/${publicInviteLink.code}`} variant='body2'>
+                        Join this space to create proposals
+                      </Link>
+                    </Box>
+                  )}
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
