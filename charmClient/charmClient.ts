@@ -28,7 +28,7 @@ import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
-import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -244,7 +244,7 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulatedWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
@@ -252,11 +252,11 @@ class CharmClient {
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulatedWithRoles[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulatedWithRoles[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
   }
 
   getPublicInviteLink({ publicContext, spaceId }: PublicInviteLinkRequest) {
@@ -264,7 +264,7 @@ class CharmClient {
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulatedWithRoles[]>(`/api/invites/${id}/accept`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {

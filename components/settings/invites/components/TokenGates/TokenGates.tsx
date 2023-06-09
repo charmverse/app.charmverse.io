@@ -55,12 +55,10 @@ type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlCondit
 };
 
 interface TokenGatesProps {
-  isAdmin: boolean;
-  spaceId: string;
   popupState: PopupState;
 }
 
-export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 

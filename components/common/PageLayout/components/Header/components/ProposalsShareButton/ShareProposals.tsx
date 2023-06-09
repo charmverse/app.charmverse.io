@@ -24,9 +24,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
@@ -77,9 +78,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   const proposalsArePublic = !!space?.publicProposals;
 
-  const { data: invites, mutate } = useSWR<InviteLinkPopulatedWithRoles[]>(`${space?.id}/search-invites`, () =>
-    charmClient.getInviteLinks(space?.id as string)
-  );
+  const { deleteInviteLink, invites } = useSpaceInvitesList();
 
   const publicProposalInvite = invites?.find((invite) => invite.publicContext === 'proposals');
   const publicInviteExists = !!publicProposalInvite;
@@ -100,7 +99,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
       })
       .then((newInvite) =>
         mutate((existingInvites) => {
-          const updatedNewInvite: InviteLinkPopulatedWithRoles = {
+          const updatedNewInvite: InviteLinkWithRoles = {
             ...newInvite,
             inviteLinkToRoles: []
           };
@@ -113,18 +112,9 @@ export default function ShareProposals({ padding = 1 }: Props) {
       );
   }
 
-  async function removePublicInvite() {
-    if (publicProposalInvite) {
-      await charmClient.deleteInviteLink(publicProposalInvite.id);
-      mutate((existingInvites) => {
-        return existingInvites?.filter((invite) => invite.id !== publicProposalInvite.id);
-      });
-    }
-  }
-
   function togglePublicInvite() {
-    if (publicInviteExists && publicProposalInvite.inviteLinkToRoles.length === 0) {
-      removePublicInvite();
+    if (publicInviteExists && publicProposalInvite.roleIds.length === 0) {
+      deleteInviteLink(publicProposalInvite.id);
     } else if (publicInviteExists) {
       openConfirmDeleteModal();
       // Show confirmation dialog

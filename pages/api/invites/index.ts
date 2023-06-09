@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createInviteLink } from 'lib/invites/createInviteLink';
-import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { getSpaceInviteLinks } from 'lib/invites/getSpaceInviteLinks';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
@@ -38,7 +38,7 @@ async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiRespons
 
   return res.status(200).json(invite);
 }
-async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkPopulatedWithRoles[]>) {
+async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkWithRoles[]>) {
   const invites = await getSpaceInviteLinks({
     spaceId: req.query.spaceId as string
   });

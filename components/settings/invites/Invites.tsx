@@ -13,7 +13,7 @@ import Legend from '../Legend';
 import { InviteLinkList } from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';
 import InviteIntro from './components/InviteLinks/components/InviteIntro';
-import TokenGates from './components/TokenGates';
+import { TokenGates } from './components/TokenGates';
 
 export function Invites({ space }: { space: Space }) {
   const spaceId = space.id;
@@ -69,7 +69,7 @@ export function Invites({ space }: { space: Space }) {
           isAdmin={isAdmin}
         />
       </Legend>
-      <InviteLinkList isAdmin={isAdmin} spaceId={spaceId} popupState={popupInvitesState} />
+      <InviteLinkList popupState={popupInvitesState} />
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
     </>
   );

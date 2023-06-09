@@ -6,22 +6,21 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import type { InviteLinkPopulatedWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
 import type { FormValues as InviteLinkFormValues } from './components/InviteLinkForm';
 import { WorkspaceSettings } from './components/InviteLinkForm';
 import { InvitesTable } from './components/InviteLinksTable';
 
 interface InviteLinksProps {
-  isAdmin: boolean;
-  spaceId: string;
   popupState: PopupState;
 }
 
-export function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
+export function InviteLinkList({ popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
-  const { invites, refreshInvitesList } = useSpaceInvitesList();
+  const { invites, refreshInvitesList, createInviteLink } = useSpaceInvitesList();
+  const isAdmin = useIsAdmin();
 
   const { isOpen: isOpenInviteModal, close: closeInviteModal } = popupState;
   const {
@@ -36,23 +35,13 @@ export function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProp
   }
 
   async function createLink(values: InviteLinkFormValues) {
-    await charmClient.createInviteLink({
-      spaceId,
-      ...values
-    });
-    // update the list of links
-    await refreshInvitesList();
+    await createInviteLink(values);
     closeInviteModal();
-  }
-
-  async function deleteLink(link: InviteLinkPopulatedWithRoles) {
-    setRemovedInviteLink(link);
-    openInviteLinkDelete();
   }
 
   return (
     <>
-      <InvitesTable isAdmin={isAdmin} invites={invites} refetchInvites={refreshInvitesList} onDelete={deleteLink} />
+      <InvitesTable />
       <Modal open={isOpenInviteModal} onClose={closeInviteModal}>
         <WorkspaceSettings onSubmit={createLink} onClose={closeInviteModal} />
       </Modal>

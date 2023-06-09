@@ -1,13 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { InviteLink, InviteLinkToRole, Role } from '@charmverse/core/prisma-client';
+import type { InviteLink } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-export type InviteLinkPopulatedWithRoles = InviteLink & {
-  inviteLinkToRoles: (InviteLinkToRole & { role: Role })[];
+export type InviteLinkWithRoles = InviteLink & {
+  roleIds: string[];
 };
 
-export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Promise<InviteLinkPopulatedWithRoles[]> {
+export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Promise<InviteLinkWithRoles[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Valid spaceId is required`);
   }
@@ -25,5 +25,10 @@ export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Pro
     }
   });
 
-  return links;
+  return links.map((link) => {
+    return {
+      ...link,
+      roleIds: link.inviteLinkToRoles.map((linkToRole) => linkToRole.roleId)
+    };
+  });
 }
