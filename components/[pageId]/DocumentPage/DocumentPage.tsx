@@ -164,6 +164,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     setPageProps({ participants });
   }
 
+  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+
   return (
     <>
       {!!page?.deletedAt && (
@@ -203,7 +206,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       ? `Describe the bounty. Type '/' to see the list of available commands`
                       : undefined
                   }
-                  key={page.id + editMode + String(pagePermissions?.edit_content)}
+                  key={editorKey}
                   content={page.content as PageContent}
                   readOnly={readOnly}
                   autoFocus={false}
