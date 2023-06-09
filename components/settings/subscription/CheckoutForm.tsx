@@ -31,13 +31,14 @@ import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
+import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
 import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type { CreateSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
+import { PlanSelection } from './PlanSelection';
 
 const StyledList = styled(List)`
   list-style-type: disc;
@@ -213,51 +214,17 @@ export function CheckoutForm({
     });
   };
 
+  const handlePlanSelect = (_productId: SubscriptionProductId | null, _period: SubscriptionPeriod | null) => {
+    if (_productId) {
+      setProductId(_productId);
+    } else if (_period) {
+      setPeriod(_period);
+    }
+  };
+
   return (
     <Stack onSubmit={createSubscription} gap={1}>
-      <Stack>
-        <InputLabel>Usage</InputLabel>
-        <Box
-          sx={{
-            mx: 2
-          }}
-        >
-          <Slider
-            disabled={isProcessing}
-            size='small'
-            aria-label='Product Id'
-            valueLabelDisplay='off'
-            value={SUBSCRIPTION_PRODUCT_IDS.indexOf(productId)}
-            marks={SUBSCRIPTION_PRODUCT_IDS.map((_productId, index) => ({
-              value: index,
-              label: `$${SUBSCRIPTION_PRODUCTS_RECORD[_productId].pricing[period]}/${period === 'annual' ? 'yr' : 'mo'}`
-            }))}
-            min={0}
-            max={SUBSCRIPTION_PRODUCT_IDS.length - 1}
-            onChange={(_, value) => {
-              setProductId(SUBSCRIPTION_PRODUCT_IDS[value as number]);
-            }}
-          />
-        </Box>
-      </Stack>
-      <Stack>
-        <InputLabel>Billing Period</InputLabel>
-        <FormControlLabel
-          sx={{
-            width: 'fit-content'
-          }}
-          control={
-            <Switch
-              checked={period === 'annual'}
-              onChange={(e) => {
-                setPeriod(e.target.checked ? 'annual' : 'monthly');
-              }}
-              disabled={isProcessing}
-            />
-          }
-          label='Annual'
-        />
-      </Stack>
+      <PlanSelection disabled={isProcessing} onSelect={handlePlanSelect} productId={productId} period={period} />
       <Divider sx={{ mb: 1 }} />
       <Stack>
         <Typography variant='h6' mb={1}>
