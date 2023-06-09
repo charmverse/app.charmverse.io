@@ -1,5 +1,6 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import type { SubscriptionPeriod, SubscriptionStatus, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
@@ -88,29 +89,39 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         const space = await prisma.space.findUnique({
-          where: { id: stripeSubscription.metadata.spaceId }
+          where: { id: stripeSubscription.metadata.spaceId },
+          include: { stripeSubscription: true }
         });
 
         if (!space) {
-          log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`, {
-            invoice
-          });
+          log.warn(
+            `Can't create or update the user subscription. Space not found for subscription ${stripeSubscription.id}`
+          );
           break;
         }
 
-        await prisma.stripeSubscription.create({
-          data: {
-            customerId: invoice.customer as string,
-            subscriptionId: invoice.subscription as string,
-            // @ts-ignore There is a plan
-            period: (stripeSubscription.plan.interval as string) === 'month' ? 'monthly' : 'annual',
-            // @ts-ignore There is a plan
-            productId: stripeSubscription.plan.product as string,
-            // @ts-ignore There is a plan
-            priceId: stripeSubscription.plan.id as string,
-            spaceId: stripeSubscription.metadata.spaceId,
-            status: 'pending'
-          }
+        const newData = {
+          customerId: invoice.customer as string,
+          subscriptionId: invoice.subscription as string,
+          // @ts-ignore The plan exists
+          period: ((stripeSubscription.plan.interval as Stripe.Subscription.PendingInvoiceItemInterval.Interval) ===
+          'month'
+            ? 'monthly'
+            : 'annual') as SubscriptionPeriod,
+          // @ts-ignore The plan exists
+          productId: stripeSubscription.plan.product as string,
+          // @ts-ignore The plan exists
+          priceId: stripeSubscription.plan.id as string,
+          spaceId: stripeSubscription.metadata.spaceId,
+          status: 'pending' as SubscriptionStatus
+        };
+
+        await prisma.stripeSubscription.upsert({
+          where: {
+            subscriptionId: stripeSubscription.id
+          },
+          create: newData,
+          update: newData
         });
 
         log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was finalised`);
@@ -127,13 +138,17 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         const space = await prisma.space.findUnique({
-          where: { id: stripeSubscription.metadata.spaceId }
+          where: { id: stripeSubscription.metadata.spaceId },
+          include: { stripeSubscription: true }
         });
 
         if (!space) {
-          log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`, {
-            invoice
-          });
+          log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`);
+          break;
+        } else if (!space.stripeSubscription) {
+          log.warn(
+            `Can't update the user subscription. Stripe subscription with the subscriptionId ${stripeSubscription.id} not found for space ${space.id}`
+          );
           break;
         }
 
@@ -151,7 +166,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: 'pro'
+              paidTier: stripeSubscription.metadata.tier as SubscriptionTier
             }
           })
         ]);
