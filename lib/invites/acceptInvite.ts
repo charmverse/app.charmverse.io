@@ -1,4 +1,4 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
@@ -8,6 +8,8 @@ import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUser
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
+
+import { validateInviteLink } from './validateInviteLink';
 
 export type InviteLinkAcceptance = {
   inviteLinkId: string;
@@ -22,10 +24,19 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
   const invite = await prisma.inviteLink.findUnique({
     where: {
       id: inviteLinkId
+    },
+    include: {
+      space: true
     }
   });
   if (!invite) {
     throw new DataNotFoundError(`Invite with id ${inviteLinkId} not found`);
+  }
+
+  const validationResult = await validateInviteLink({ invite });
+
+  if (!validationResult.valid) {
+    throw new UnauthorisedActionError(`You cannot accept this invite.`);
   }
 
   const spaceRole = await prisma.spaceRole.findFirst({

@@ -22,7 +22,7 @@ import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
 export function InvitesTable() {
   const isAdmin = useIsAdmin();
-  const { updateInviteLinkRoles, deleteInviteLink, invites } = useSpaceInvitesList();
+  const { updateInviteLinkRoles, deleteInviteLink, privateInvites } = useSpaceInvitesList();
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
 
   function onCopy(id: string) {
@@ -48,23 +48,18 @@ export function InvitesTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {invites.length === 0 && (
+          {privateInvites.length === 0 && (
             <TableRow>
               <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>
                 This Space has no Invite Links
               </TableCell>
             </TableRow>
           )}
-          {invites.map((invite) => (
+          {privateInvites.map((invite) => (
             <TableRow key={invite.id}>
               <TableCell sx={{ padding: '20px 16px' }}>
                 <Box display='flex' justifyContent='flex-start' gap={1}>
-                  {invite.publicContext === 'proposals' ? 'Public proposals' : 'Private'} Link
-                  {invite.publicContext === 'proposals' && (
-                    <Tooltip title='Anyone can join your space from the public proposals page'>
-                      <InfoOutlinedIcon color='secondary' fontSize='small' />
-                    </Tooltip>
-                  )}
+                  Private Link
                 </Box>
               </TableCell>
               <TableCell>

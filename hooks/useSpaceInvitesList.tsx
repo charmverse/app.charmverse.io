@@ -1,3 +1,4 @@
+import type { PublicInviteLinkContext } from '@charmverse/core/src/prisma-client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -49,7 +50,10 @@ export function useSpaceInvitesList() {
   }
 
   return {
-    invites,
+    privateInvites: invites.filter((invite) => !invite.publicContext),
+    publicInvites: invites.filter((invite) => invite.publicContext) as (InviteLinkWithRoles & {
+      publicContent: PublicInviteLinkContext;
+    })[],
     createInviteLink,
     refreshInvitesList,
     updateInviteLinkRoles,

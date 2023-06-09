@@ -56,6 +56,8 @@ type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlCondit
 
 interface TokenGatesProps {
   popupState: PopupState;
+  isAdmin: boolean;
+  spaceId: string;
 }
 
 export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {

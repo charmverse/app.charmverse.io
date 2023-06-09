@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
@@ -13,6 +13,7 @@ import Legend from '../Legend';
 import { InviteLinkList } from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';
 import InviteIntro from './components/InviteLinks/components/InviteIntro';
+import { PublicInvitesList } from './components/PublicInvitesList';
 import { TokenGates } from './components/TokenGates';
 
 export function Invites({ space }: { space: Space }) {
@@ -69,7 +70,14 @@ export function Invites({ space }: { space: Space }) {
           isAdmin={isAdmin}
         />
       </Legend>
+
       <InviteLinkList popupState={popupInvitesState} />
+      {/** TODO - Complete Public Invites
+             <Box sx={{ my: 2 }} />
+      <PublicInvitesList />
+      <Box sx={{ my: 2 }} />  
+
+         */}
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
     </>
   );

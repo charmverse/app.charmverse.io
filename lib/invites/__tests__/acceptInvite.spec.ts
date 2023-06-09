@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { InviteLink, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
@@ -76,6 +76,65 @@ describe('acceptInvite', () => {
     expect(spaceRole).toBeDefined();
     // No roles should hae been added
     expect(spaceRole?.spaceRoleToRole.length).toBe(0);
+  });
+
+  it('should throw an error if the invite link has expired or exceeded its use count', async () => {
+    const outsideUser = await testUtilsUser.generateUser();
+
+    const linkWithUsageExceeded = await testUtilsMembers.generateInviteLink({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      maxUses: 1,
+      useCount: 1
+    });
+
+    await expect(
+      acceptInvite({
+        inviteLinkId: linkWithUsageExceeded.id,
+        userId: outsideUser.id
+      })
+    ).rejects.toBeInstanceOf(UnauthorisedActionError);
+
+    const expiredLink = await testUtilsMembers.generateInviteLink({
+      createdBy: adminUser.id,
+      createdAt: new Date(Date.now() - 1000 * 60 * 5),
+      spaceId: space.id,
+      maxUses: 1,
+      useCount: 0,
+      maxAgeMinutes: 1
+    });
+
+    // Todo - figure out how to mock dates
+    await expect(
+      acceptInvite({
+        inviteLinkId: expiredLink.id,
+        userId: outsideUser.id
+      })
+    ).rejects.toBeInstanceOf(UnauthorisedActionError);
+  });
+
+  it('should throw an error if a proposals invite link is valid, but the space does not have public proposals enabled', async () => {
+    const { space: spaceWithPublicProposalsDisabled, user: spaceAdmin } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      publicProposals: false
+    });
+
+    const outsideUser = await testUtilsUser.generateUser();
+
+    const linkWithUsageExceeded = await testUtilsMembers.generateInviteLink({
+      createdBy: spaceAdmin.id,
+      spaceId: spaceWithPublicProposalsDisabled.id,
+      maxUses: 10,
+      useCount: 1,
+      publicContext: 'proposals'
+    });
+
+    await expect(
+      acceptInvite({
+        inviteLinkId: linkWithUsageExceeded.id,
+        userId: outsideUser.id
+      })
+    ).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 
   it('should throw an error if inviteLinkId or userId is invalid', async () => {
