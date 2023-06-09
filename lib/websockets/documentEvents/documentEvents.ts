@@ -170,7 +170,7 @@ export class DocumentEventHandler {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.warn('Resend messages to client', { message, ...logData });
+      log.warn('Resend messages to client', { message, messagesToSend: this.messages.lastTen.length, ...logData });
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
