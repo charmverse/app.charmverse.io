@@ -74,7 +74,8 @@ export async function createWorkspaceApi({
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    spaceTemplate: internalTemplate
+    spaceTemplate: internalTemplate,
+    skipTracking: true
   });
 
   // create roles from discord

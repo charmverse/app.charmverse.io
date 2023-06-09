@@ -239,11 +239,11 @@ export async function createWorkspace({
   }
 
   if (!skipTracking) {
-    logSpaceCreation(space);
     updateTrackGroupProfile(space);
     updateTrackUserProfileById(userId);
     trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: spaceTemplate });
   }
+  logSpaceCreation(space);
 
   return updatedSpace;
 }
