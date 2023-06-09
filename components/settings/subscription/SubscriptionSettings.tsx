@@ -30,7 +30,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   );
 
-  const [showPlans, setShowPlans] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   useEffect(() => {

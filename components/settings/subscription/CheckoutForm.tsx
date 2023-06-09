@@ -1,17 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
 import {
-  Box,
   Divider,
   Drawer,
-  FormControlLabel,
   IconButton,
   InputLabel,
   List,
   ListItemText,
-  Slider,
   Stack,
-  Switch,
   TextField,
   Typography
 } from '@mui/material';
@@ -231,7 +227,7 @@ export function CheckoutForm({
           Billing Information
         </Typography>
         <Stack gap={0.5} my={2}>
-          <InputLabel>Billing Email</InputLabel>
+          <InputLabel>Email</InputLabel>
           <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('billingEmail')} />
         </Stack>
       </Stack>
