@@ -27,6 +27,7 @@ export function getTrackPageProfile(page: PageWithPermissions) {
     Type: page.type,
     Deleted: !!page.deletedAt,
     Public: isPublic,
+    'Space Id': page.spaceId,
     'Is Database': ['board', 'inline_board', 'inline_linked_board', 'linked_board'].includes(page.type),
     'Page Created By': page.createdBy,
     'Page Updated At': page.updatedAt
