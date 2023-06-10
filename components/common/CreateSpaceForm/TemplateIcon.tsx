@@ -7,7 +7,7 @@ import CreatorIcon from 'public/images/template_icons/creator_icon.svg';
 import GrantRecipientIcon from 'public/images/template_icons/grantee_icon.svg';
 import HackathonIcon from 'public/images/template_icons/hacker_icon.svg';
 import ImpactCommunityIcon from 'public/images/template_icons/impact_icon.svg';
-import LightBulbIcon from 'public/images/template_icons/light_bulb_icon_color.svg';
+import LightBulbIcon from 'public/images/template_icons/light_bulb_icon_bnw.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 import NounsIcon from 'public/images/template_icons/nounish_icon.svg';
 
