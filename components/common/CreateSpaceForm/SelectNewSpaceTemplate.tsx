@@ -7,7 +7,7 @@ import { SiNotion } from 'react-icons/si';
 import { staticSpaceTemplates } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
 
-import { TemplateIcon } from './TemplateIcon';
+import { TemplateIcon, CreateMyOwnIcon } from './TemplateIcon';
 import { TemplateOption } from './TemplateOption';
 
 type SelectNewSpaceTemplateProps = {
@@ -32,7 +32,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             onClick={() => onSelect('default')}
             label='Create my own'
             data-test='space-template-default'
-            icon={<TemplateIcon template='templateCreator' />}
+            icon={<CreateMyOwnIcon />}
           />
         </Grid>
         <Grid item>
