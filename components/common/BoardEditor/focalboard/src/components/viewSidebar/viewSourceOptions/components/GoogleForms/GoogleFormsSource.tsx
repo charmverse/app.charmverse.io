@@ -22,7 +22,7 @@ type Props = {
   onSelect: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
 };
 
-export function GoogleDataSource(props: Props) {
+export function GoogleFormsSource(props: Props) {
   const { data: credentials, mutate } = useSwr('google-credentials', () => charmClient.google.forms.getCredentials());
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
   const { loginWithGoogle, onLoadScript } = useGoogleAuth({
