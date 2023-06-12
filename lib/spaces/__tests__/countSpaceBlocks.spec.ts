@@ -271,8 +271,9 @@ describe('countSpaceBlocks', () => {
     expect(updatedCounts.forumCategories).toBe(1);
     expect(updatedCounts.forumPosts).toBe(3);
 
-    // Count the nodes inside the blocks
+    // Count the nodes inside the blocks and make sure they are not double counted
     expect(updatedCounts.forumPostBlocks).toBeGreaterThan(1);
+    expect(updatedCounts.documentBlocks).toBe(0);
   });
 
   it('should count each forum post comment as 1 block, exluding deleted comments', async () => {
