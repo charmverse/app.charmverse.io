@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues,
@@ -57,8 +56,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     resourceId: pageId,
     userId: req.session.user.id
   });
-
-  console.log({ computedPermissions });
 
   if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');

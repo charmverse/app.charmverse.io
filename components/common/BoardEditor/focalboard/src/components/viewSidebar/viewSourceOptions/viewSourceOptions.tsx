@@ -1,12 +1,10 @@
 import type { ApiPageKey } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Grid, ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { useMemo, useState } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
 import { RiGoogleFill } from 'react-icons/ri';
 import { SiTypeform } from 'react-icons/si';
@@ -14,27 +12,18 @@ import { TbDatabase } from 'react-icons/tb';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import PagesList from 'components/common/CharmEditor/components/PageList';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookBaseUrl } from 'config/constants';
-import { usePages } from 'hooks/usePages';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView, BoardViewFields, ViewSourceType } from 'lib/focalboard/boardView';
-import { isTruthy } from 'lib/utilities/types';
+import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 
-import { useAppSelector } from '../../store/hooks';
+import { SidebarHeader } from '../viewSidebar';
 
-import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
-import { SidebarHeader } from './viewSidebar';
-import { SourceType } from './viewSourceType';
+import type { DatabaseSourceProps } from './components/CharmVerseDatabases';
+import { CharmVerseDatabasesSource } from './components/CharmVerseDatabases';
+import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
+import { SourceType } from './components/viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
-
-export type DatabaseSourceProps = {
-  onCreate?: () => Promise<BoardView>;
-  onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>, boardBlock?: Board) => void;
-};
 
 type ViewSourceOptionsProps = DatabaseSourceProps & {
   closeSidebar?: () => void;
@@ -44,12 +33,6 @@ type ViewSourceOptionsProps = DatabaseSourceProps & {
   view?: BoardView;
   pageId?: string;
 };
-
-const SidebarContent = styled.div`
-  flex-grow: 1;
-  overflow-y: auto;
-  border-bottom: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
-`;
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const { view: activeView, pageId, title, onCreate, onSelect, onCsvImport, goBack, closeSidebar } = props;
@@ -154,14 +137,14 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           </Grid>
         )}
         {formStep === 'configure_source' && sourceType === 'board_page' && (
-          <CharmVerseDatabases
+          <CharmVerseDatabasesSource
             onSelect={onSelect}
             activePageId={activeView?.fields.linkedSourceId}
             onCreate={onCreate}
           />
         )}
         {formStep === 'configure_source' && sourceType === 'google_form' && (
-          <GoogleDataSource
+          <GoogleFormsSource
             activeFormId={activeView?.fields.sourceData?.formId}
             activeCredential={activeView?.fields.sourceData?.credentialId}
             onSelect={onSelect}
@@ -186,72 +169,6 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           typeformPopup.close();
         }}
       />
-    </>
-  );
-}
-
-function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: string }) {
-  const { pages } = usePages();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const boards = useAppSelector(getBoards);
-  const sortedPages = useMemo(() => {
-    return Object.values(pages)
-      .filter(
-        (p) =>
-          (p?.type === 'board' || p?.type === 'inline_board') &&
-          p.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .filter(isTruthy)
-      .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
-  }, [pages, searchTerm]);
-
-  function onSelect(pageId: string) {
-    const boardBlock = boards[pageId];
-    props.onSelect(
-      {
-        linkedSourceId: pageId,
-        sourceType: 'board_page'
-      },
-      boardBlock
-    );
-  }
-  return (
-    <>
-      <SidebarContent>
-        <TextField
-          autoFocus
-          placeholder='Search pages'
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-          sx={{
-            mb: 1
-          }}
-          fullWidth
-        />
-        <PagesList
-          emptyText='No databases found'
-          pages={sortedPages}
-          activePageId={props.activePageId}
-          onSelectPage={onSelect}
-          style={{
-            height: '250px',
-            overflow: 'auto'
-          }}
-        />
-      </SidebarContent>
-      {props.onCreate && (
-        <MenuItem onClick={props.onCreate}>
-          <ListItemIcon>
-            <AddIcon color='secondary' />
-          </ListItemIcon>
-          <Typography variant='body2' color='secondary'>
-            New database
-          </Typography>
-        </MenuItem>
-      )}
     </>
   );
 }
