@@ -420,6 +420,7 @@ export function indentList(type: NodeType) {
               ...nodes
             ]);
 
+            // Based on https://github.com/ProseMirror/prosemirror-schema-list/blob/master/src/schema-list.ts#LL219C47-L219C47
             const range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild?.type === itemType);
             if (!range) return false;
             const startIndex = range.startIndex;
@@ -437,6 +438,7 @@ export function indentList(type: NodeType) {
               );
               const before = range.start;
               const after = range.end;
+              // Combine the transactions together (indenting the list + leveling the children list items), which was not possible in sinkListItem
               let tr = state.tr
                 .step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice, 1, true))
                 .replace(
@@ -444,7 +446,7 @@ export function indentList(type: NodeType) {
                   $from.end($from.depth - 1),
                   new Slice(fragment, fragment.firstChild ? 0 : 1, fragment.lastChild ? 0 : 1)
                 );
-
+              // Retain the previous selection
               tr = tr.setSelection(TextSelection.create(tr.doc, $from.start() - 2));
               // Step 5: Replace the whole listItem node with the above fragment
               dispatch(tr);
