@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
-export async function countData({ spaceId }: { spaceId: string }) {
+export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
   const [
     boardBlocks,
     views,
@@ -11,6 +11,7 @@ export async function countData({ spaceId }: { spaceId: string }) {
     allPages,
     posts,
     postComments,
+    inlineComments,
     pageComments,
     memberProperties,
     proposalCategories,
@@ -63,6 +64,13 @@ export async function countData({ spaceId }: { spaceId: string }) {
       where: {
         deletedAt: null,
         post: {
+          spaceId
+        }
+      }
+    }),
+    prisma.comment.count({
+      where: {
+        page: {
           spaceId
         }
       }
@@ -125,7 +133,7 @@ export async function countData({ spaceId }: { spaceId: string }) {
 
   const forumPostBlocks = posts.map((post) => countBlocks(post.content, spaceId)).reduce((a, b) => a + b, 0);
 
-  const comments = blockComments + pageComments + postComments;
+  const comments = blockComments + inlineComments + pageComments + postComments;
 
   const counts = {
     boards: boards.length,
@@ -143,6 +151,15 @@ export async function countData({ spaceId }: { spaceId: string }) {
     pages: pages.length,
     views
   };
+
+  const total = getTotal(counts);
+
+  await prisma.blockCount.create({
+    data: {
+      count: total,
+      space: { connect: { id: spaceId } }
+    }
+  });
 
   return {
     counts,
