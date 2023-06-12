@@ -1,5 +1,4 @@
 import type { PublicInviteLinkContext } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Box from '@mui/material/Box';
@@ -15,15 +14,13 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import ButtonChip from 'components/common/ButtonChip';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { ConfirmPublicProposalLinkDeletion } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/ConfirmProposalDeletion';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { BrandColor } from 'theme/colors';
-
-import { TogglePublicProposalsInvite } from './TogglePublicProposalsInvite';
 
 const colorMapping: Record<PublicInviteLinkContext, BrandColor> = {
   proposals: 'purple'
@@ -52,7 +49,7 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
     isOpen,
     close: closeDeleteConfirmation,
     open: openDeleteConfirmation
-  } = usePopupState({ variant: 'popover', popupId: 'delete-invite' });
+  } = usePopupState({ variant: 'popover', popupId: `delete-invite-${invite.id}` });
 
   function removeInvite() {
     if (invite.roleIds.length > 0) {
@@ -127,17 +124,7 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
           )}
         </TableCell>
       </TableRow>
-      <ConfirmDeleteModal
-        title='Confirm delete'
-        question={`This invite link has ${invite?.roleIds.length} ${stringUtils.conditionalPlural({
-          word: 'role',
-          count: invite?.roleIds.length ?? 0
-        })} attached. Are you sure you want to delete it?`}
-        open={isOpen}
-        onClose={closeDeleteConfirmation}
-        onConfirm={() => deleteInviteLink(invite?.id as string)}
-        buttonText='Delete invite'
-      />
+      <ConfirmPublicProposalLinkDeletion onClose={closeDeleteConfirmation} open={isOpen} />
     </>
   );
 }
@@ -175,8 +162,6 @@ export function PublicInvitesList() {
           )}
         </TableBody>
       </Table>
-
-      {!publicProposalsInvite && <TogglePublicProposalsInvite />}
     </Box>
   );
 }

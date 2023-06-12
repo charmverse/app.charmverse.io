@@ -52,7 +52,7 @@ export function useSpaceInvitesList() {
   return {
     privateInvites: invites.filter((invite) => !invite.publicContext),
     publicInvites: invites.filter((invite) => invite.publicContext) as (InviteLinkWithRoles & {
-      publicContent: PublicInviteLinkContext;
+      publicContext: PublicInviteLinkContext;
     })[],
     createInviteLink,
     refreshInvitesList,

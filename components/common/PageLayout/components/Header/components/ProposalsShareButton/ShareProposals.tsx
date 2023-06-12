@@ -1,7 +1,4 @@
-import type { User } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import styled from '@emotion/styled';
-import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -11,25 +8,22 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { TogglePublicProposalsInvite } from 'components/settings/invites/components/TogglePublicProposalsInvite';
+import { TogglePublicProposalsInvite } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/TogglePublicProposalsInvite';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { getAbsolutePath } from 'lib/utilities/browser';
+
+import { ConfirmPublicProposalLinkDeletion } from './ConfirmProposalDeletion';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -65,9 +59,6 @@ export default function ShareProposals({ padding = 1 }: Props) {
   const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const { isPublicSpace } = useIsPublicSpace();
-
-  const { onClick: openSpaceSettings } = useSettingsDialog();
-
   const {
     isOpen,
     close: closeConfirmDeleteModal,
@@ -92,15 +83,16 @@ export default function ShareProposals({ padding = 1 }: Props) {
     setSpace(updatedSpace);
   }
 
-  function togglePublicInvite() {
-    if (publicInviteExists && publicProposalInvite.roleIds.length === 0) {
-      deleteInviteLink(publicProposalInvite.id);
-    } else if (publicInviteExists) {
-      openConfirmDeleteModal();
-      // Show confirmation dialog
-    } else {
-      createInviteLink({ publicContext: 'proposals' });
-    }
+  async function togglePublicInvite() {
+    // if (proposalsArePublic && publicProposalInvite?.roleIds.length === 0) {
+    //   deleteInviteLink(publicProposalInvite.id);
+    //   togglePublic();
+    // } else if (proposalsArePublic &&) {
+    // } else if (publicInviteExists) {
+    //   openConfirmDeleteModal();
+    // } else {
+    //   createInviteLink({ publicContext: 'proposals' });
+    // }
   }
 
   useEffect(() => {
@@ -131,7 +123,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <Switch
             checked={proposalsArePublic || isPublicSpace}
             disabled={!isAdmin || isPublicSpace}
-            onChange={togglePublic}
+            onChange={togglePublicInvite}
           />
         </Grid>
       </Grid>
@@ -175,6 +167,8 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <TogglePublicProposalsInvite showOpenSettingsLink />
         </>
       )}
+
+      <ConfirmPublicProposalLinkDeletion open={isOpen} onClose={closeConfirmDeleteModal} onConfirm={togglePublic} />
     </Grid>
   );
 }
