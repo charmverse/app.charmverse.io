@@ -70,14 +70,10 @@ export function Invites({ space }: { space: Space }) {
           isAdmin={isAdmin}
         />
       </Legend>
-
       <InviteLinkList popupState={popupInvitesState} />
-      {/** TODO - Complete Public Invites
-             <Box sx={{ my: 2 }} />
+      <Box sx={{ my: 2 }} />
       <PublicInvitesList />
-      <Box sx={{ my: 2 }} />  
-
-         */}
+      <Box sx={{ my: 2 }} />
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
     </>
   );

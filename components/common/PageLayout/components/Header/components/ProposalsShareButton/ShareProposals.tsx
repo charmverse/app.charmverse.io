@@ -168,7 +168,6 @@ export default function ShareProposals({ padding = 1 }: Props) {
           )}
         </Collapse>
       </Grid>
-      {/** TODO - Complete UI
 
       {proposalsArePublic && (
         <>
@@ -176,8 +175,6 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <TogglePublicProposalsInvite showOpenSettingsLink />
         </>
       )}
-
-         */}
     </Grid>
   );
 }
