@@ -19,18 +19,18 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
     }
 
     # back up the .env file first
-    bk_file_name=$(mktemp -t ._env_bk_XXXXX -p $APP_STAGING_DIR)
-    cp $APP_STAGING_DIR/.env $bk_file_name
+    env_bk_file_name=$(mktemp -t ._env_bk_XXXXX -p $APP_STAGING_DIR)
+    cp $APP_STAGING_DIR/.env $env_bk_file_name
 
     # before we process the secrets, 
     # lets get any non-secret env variables from ebstalk_env_file and append it to the $APP_STAGING_DIR/.env file
     #   returns true when there are no non-mustached lines so the script doesn't quit with -e option set
-    grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" $ebstalk_env_file >> $APP_STAGING_DIR/.env || true
+    grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" $ebstalk_env_file $env_bk_file_name > $APP_STAGING_DIR/.env || true
 
     # Now start processing secrets
     secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
     # looping through secrets requested in .env file
-    grep "pull:secretsmanager" $ebstalk_env_file | while read -r line; do
+    grep "pull:secretsmanager" $ebstalk_env_file $env_bk_file_name | while read -r line; do
         [[ $line =~ $secrets_pattern ]] && { 
             export env_var_name=${BASH_REMATCH[1]}
             secret_name=${BASH_REMATCH[2]}
