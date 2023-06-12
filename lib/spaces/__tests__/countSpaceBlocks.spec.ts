@@ -1,6 +1,12 @@
 import type { Block } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsForum, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import {
+  testUtilsBounties,
+  testUtilsForum,
+  testUtilsPages,
+  testUtilsProposals,
+  testUtilsUser
+} from '@charmverse/core/test';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { generateBoard } from 'testing/setupDatabase';
@@ -381,5 +387,44 @@ describe('countSpaceBlocks', () => {
 
     expect(updatedCounts.proposals).toBe(1);
     expect(updatedCounts.documentBlocks).toBeGreaterThan(0);
+  });
+
+  it('should count each bounty', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const bounty = await testUtilsBounties.generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      content: {}
+    });
+
+    const { counts, total } = await countSpaceBlocks({
+      spaceId: space.id
+    });
+
+    expect(counts.bounties).toBe(1);
+
+    expect(total).toBe(2);
+  });
+
+  it('should count the content of each page bounty', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const bounty = await testUtilsBounties.generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      content: pageContent
+    });
+
+    const { counts, total } = await countSpaceBlocks({
+      spaceId: space.id
+    });
+
+    expect(counts.bounties).toBe(1);
+    expect(counts.documentBlocks).toBeGreaterThan(1);
   });
 });
