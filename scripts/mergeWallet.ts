@@ -1,4 +1,4 @@
-import { stringUtils } from "@charmverse/core";
+import { stringUtils } from "@charmverse/core/utilities";
 import { Prisma, prisma } from "@charmverse/core/prisma-client";
 import { utils} from 'ethers'
 import fs from 'node:fs/promises'
