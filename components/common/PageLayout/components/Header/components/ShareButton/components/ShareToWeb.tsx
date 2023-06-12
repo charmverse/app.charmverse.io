@@ -124,10 +124,19 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
     }
   }
 
-  // In the case of public proposals, we want to override the manual setting
-  const disablePublicToggle = currentPagePermissions?.edit_isPublic !== true || !!space?.publicProposals;
+  // In the case of a space with public proposals, we want to override the manual setting
+  const disablePublicToggle =
+    currentPagePermissions?.edit_isPublic !== true || (!!space?.publicProposals && currentPage?.type === 'proposal');
+
   const isChecked =
-    (!space?.publicProposals && !!publicPermission) || (!!space?.publicProposals && proposal?.status !== 'draft');
+    // If not using space wide proposals, go by the page permissions
+    (!space?.publicProposals && !!publicPermission) ||
+    (!!space?.publicProposals &&
+      // If space has public proposals, don't interfere with non-proposal pages
+      ((currentPage?.type !== 'proposal' && !!publicPermission) ||
+        // All proposals beyond draft are public
+        (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
+
   let publicProposalToggleInfo = space?.publicProposals ? 'Your space uses public proposals. ' : null;
   if (space?.publicProposals && proposal?.status === 'draft') {
     publicProposalToggleInfo +=
@@ -162,9 +171,14 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
       {shareAlertMessage && (
         <Alert severity='info'>
-          {publicProposalToggleInfo}
-          <br />
-          <br />
+          {publicProposalToggleInfo && (
+            <>
+              {publicProposalToggleInfo}
+              <br />
+              <br />
+            </>
+          )}
+
           {shareAlertMessage}
         </Alert>
       )}
