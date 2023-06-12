@@ -71,7 +71,6 @@ export function plugins({ key }: { key: PluginKey }) {
           const attrs = marks.find((markItem) => markItem.type.name === markType.name)?.attrs ?? {};
           if (attrs.href) {
             event.stopPropagation();
-            window.open(attrs.href, '_blank');
           }
           return false;
         },
