@@ -572,7 +572,12 @@ export class DocumentEventHandler {
     if (room) {
       room.participants.delete(this.id);
       if (room.participants.size === 0) {
-        docRooms.delete(room.doc.id);
+        // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
+        setTimeout(() => {
+          if (room.participants.size === 0) {
+            docRooms.delete(room.doc.id);
+          }
+        }, 100);
       } else {
         this.sendParticipantList();
       }
