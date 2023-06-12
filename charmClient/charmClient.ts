@@ -435,13 +435,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  computeUserPagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
-    return http.GET('/api/permissions/query', request);
-  }
-
   listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }

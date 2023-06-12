@@ -1,4 +1,4 @@
-import type { SubscriptionTier } from '@charmverse/core/src/prisma-client';
+import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 
 import { isProdEnv } from 'config/constants';
 
