@@ -33,7 +33,6 @@ function buffer(req: NextApiRequest) {
 
 const handler = defaultHandler();
 
-// handler.use(requireKeys(['contractAddress', 'event', 'networkId'], 'body')).post(stripePayment);
 handler.post(stripePayment);
 
 /**
