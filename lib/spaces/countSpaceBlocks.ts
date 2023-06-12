@@ -157,7 +157,8 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
   await prisma.blockCount.create({
     data: {
       count: total,
-      space: { connect: { id: spaceId } }
+      space: { connect: { id: spaceId } },
+      details: counts
     }
   });
 

@@ -1,4 +1,4 @@
-import type { Block } from '@charmverse/core/prisma-client';
+import type { Block, BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import {
   testUtilsBounties,
@@ -293,6 +293,36 @@ describe('countSpaceBlocks - count blocks', () => {
     expect(counts.bounties).toBe(1);
 
     expect(total).toBe(1);
+  });
+
+  it('should record an audit of the counts used to calculate the total', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const bounty = await testUtilsBounties.generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      content: {}
+    });
+
+    const { counts, total } = await countSpaceBlocks({
+      spaceId: space.id
+    });
+
+    const loggedCount = await prisma.blockCount.findFirst({
+      where: {
+        spaceId: space.id
+      }
+    });
+
+    expect(loggedCount).toMatchObject<BlockCount>({
+      spaceId: space.id,
+      count: total,
+      createdAt: expect.any(Date),
+      id: expect.any(String),
+      details: expect.objectContaining(counts)
+    });
   });
 });
 describe('countSpaceBlocks - count content', () => {
