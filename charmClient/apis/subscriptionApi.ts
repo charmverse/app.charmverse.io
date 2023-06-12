@@ -18,4 +18,9 @@ export class SubscriptionApi {
   createCryptoSubscription(spaceId: string, payload: CreateSubscriptionRequest) {
     return http.POST<CreateCryptoSubscriptionResponse>(`/api/spaces/${spaceId}/crypto-subscription`, payload);
   }
+
+  // @TODO Delete this when all is done
+  freeSpaceSubscription(spaceId: string) {
+    return http.DELETE(`/api/spaces/${spaceId}/subscription`);
+  }
 }

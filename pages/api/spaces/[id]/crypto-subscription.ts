@@ -20,10 +20,8 @@ async function createCryptoSubscriptionIntent(
 ) {
   const { id: spaceId } = req.query as { id: string };
   const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
-  const userId = req.session.user.id;
 
   const cryptoUrl = await createCryptoSubscription({
-    userId,
     spaceId,
     period,
     productId,

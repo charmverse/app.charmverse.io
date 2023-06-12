@@ -64,11 +64,6 @@ export function SubscriptionInformation({
           </Stack>
         </Stack>
       )}
-      {spaceSubscription?.status && (
-        <Typography>
-          Subscription status: <Chip size='small' color='teal' label={spaceSubscription.status} />
-        </Typography>
-      )}
     </>
   );
 }

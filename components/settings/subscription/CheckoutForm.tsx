@@ -88,6 +88,7 @@ export function CheckoutForm({
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
   const [productId, setProductId] = useState<SubscriptionProductId>('community_5k');
+  const [pendingPayment, setPendingPayment] = useState(false);
 
   const {
     data: checkoutUrl,
@@ -162,6 +163,7 @@ export function CheckoutForm({
               card: cardElement
             }
           });
+
           if (confirmCardPaymentError) {
             showMessage('Payment failed! Please try again', 'error');
             log.error(`[stripe]: Failed to confirm card payment. ${confirmCardPaymentError.message}`, {
@@ -208,6 +210,7 @@ export function CheckoutForm({
         billingEmail: paymentDetails.billingEmail
       }
     });
+    setPendingPayment(true);
   };
 
   const handlePlanSelect = (_productId: SubscriptionProductId | null, _period: SubscriptionPeriod | null) => {
@@ -217,6 +220,14 @@ export function CheckoutForm({
       setPeriod(_period);
     }
   };
+
+  if (pendingPayment) {
+    return (
+      <Stack gap={1}>
+        <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>;
+      </Stack>
+    );
+  }
 
   return (
     <Stack onSubmit={createSubscription} gap={1}>
@@ -253,7 +264,6 @@ export function CheckoutForm({
         </StyledListItemText>
         <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
       </StyledList>
-
       <PaymentTabPanel value={paymentType} index='card'>
         <Stack gap={1} display='flex' flexDirection='row'>
           <Button

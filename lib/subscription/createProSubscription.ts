@@ -54,12 +54,33 @@ export async function createProSubscription({
   }
 
   // Find an existing customer, otherwise create it
-  const existingCustomer = spaceSubscription
+  const existingSpaceCustomer = spaceSubscription
     ? await stripeClient.customers.retrieve(spaceSubscription.customerId)
     : null;
 
-  if (existingCustomer && !existingCustomer?.deleted) {
-    await stripeClient.customers.update(existingCustomer.id, {
+  if (existingSpaceCustomer && !existingSpaceCustomer?.deleted) {
+    await stripeClient.customers.update(existingSpaceCustomer.id, {
+      metadata: {
+        spaceId: space.id
+      },
+      address,
+      name: name || space.name,
+      email: billingEmail
+    });
+  }
+
+  const existingStripeSubscription = await stripeClient.subscriptions.search({
+    query: `metadata['spaceId']:'${spaceId}'`,
+    expand: ['data.customer']
+  });
+
+  const existingStripeCustomer = existingStripeSubscription.data.find(
+    (sub) => (sub.customer as Stripe.Customer | Stripe.DeletedCustomer).deleted !== true
+  )?.customer as Stripe.Customer | undefined;
+
+  // A failed payment will already have a customer & subscription
+  if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
+    await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
         spaceId: space.id
       },
@@ -70,7 +91,8 @@ export async function createProSubscription({
   }
 
   const customer =
-    existingCustomer ||
+    existingSpaceCustomer ||
+    existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
         spaceId: space.id
@@ -99,12 +121,13 @@ export async function createProSubscription({
     throw new InvalidStateError(`No price  ${productId}`);
   }
 
-  let subscription;
+  let subscription: Stripe.Subscription | undefined;
   try {
     // Case if user downgrades or upgrades or user has an expired subscription and purchases again
     if (
-      (spaceSubscription?.productId !== productId || spaceSubscription.period !== period) &&
-      spaceSubscription?.deletedAt === null
+      spaceSubscription &&
+      (spaceSubscription.productId !== productId || spaceSubscription.period !== period) &&
+      spaceSubscription.deletedAt === null
     ) {
       const oldSubscription = await stripeClient.subscriptions.retrieve(spaceSubscription.subscriptionId);
       subscription = await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
@@ -135,7 +158,8 @@ export async function createProSubscription({
         data: {
           period,
           productId,
-          priceId: productPrice.id
+          priceId: productPrice.id,
+          deletedAt: null
         }
       });
     } else {

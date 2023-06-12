@@ -1,7 +1,7 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
@@ -21,7 +21,8 @@ handler
   )
   .get(getSpaceSubscriptionController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .post(createPaymentSubscription);
+  .post(createPaymentSubscription)
+  .delete(deletePaymentSubscription);
 
 async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
   const { id: spaceId } = req.query as { id: string };
@@ -37,7 +38,6 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   const { id: spaceId } = req.query as { id: string };
   const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
 
-  const userId = req.session.user.id;
   const { clientSecret, paymentIntentStatus } = await createProSubscription({
     spaceId,
     period,
@@ -48,20 +48,35 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     coupon
   });
 
-  trackUserAction('checkout_subscription', {
-    userId,
-    spaceId,
-    billingEmail,
-    productId,
-    period,
-    tier: 'pro',
-    result: paymentIntentStatus === 'succeeded' ? 'success' : 'pending'
-  });
-
   res.status(200).json({
     paymentIntentStatus,
     clientSecret
   });
+}
+
+async function deletePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
+  const { id: spaceId } = req.query as { id: string };
+
+  const userId = req.session.user.id;
+
+  await prisma.stripeSubscription.deleteMany({
+    where: {
+      spaceId
+    }
+  });
+
+  await prisma.space.update({
+    where: {
+      id: spaceId
+    },
+    data: {
+      updatedAt: new Date(),
+      updatedBy: userId,
+      paidTier: 'free'
+    }
+  });
+
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);

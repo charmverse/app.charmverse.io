@@ -45,6 +45,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     });
   }
 
+  async function handleDeleteSubs() {
+    await charmClient.subscription.freeSpaceSubscription(space.id);
+    await refetchSpaceSubscription();
+  }
+
   const theme = useTheme();
 
   const stripePromise = loadStripe();
@@ -54,7 +59,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         <SubscriptionInformation space={space} spaceSubscription={spaceSubscription} isLoading={isLoading} />
         {!showCheckoutForm && (
-          <SubscriptionActions spaceSubscription={spaceSubscription} onCreate={handleShowCheckoutForm} />
+          <SubscriptionActions
+            spaceSubscription={spaceSubscription}
+            onCreate={handleShowCheckoutForm}
+            onDelete={handleDeleteSubs}
+          />
         )}
         <Divider sx={{ mb: 1 }} />
         {!isLoading && spaceSubscription !== undefined && showCheckoutForm && (

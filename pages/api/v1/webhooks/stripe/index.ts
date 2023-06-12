@@ -1,10 +1,11 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { SubscriptionPeriod, SubscriptionStatus, SubscriptionTier } from '@charmverse/core/prisma-client';
+import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { stripeClient } from 'lib/subscription/stripe';
 
@@ -81,85 +82,51 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
 
     switch (event.type) {
-      // Invoice created means that the user has a new invoice to pay
-      case 'invoice.finalized': {
-        const invoice = event.data.object as Stripe.Invoice;
-        const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
-          expand: ['plan', 'latest_invoice.payment_intent']
-        });
-
-        const space = await prisma.space.findUnique({
-          where: { id: stripeSubscription.metadata.spaceId },
-          include: { stripeSubscription: true }
-        });
-
-        if (!space) {
-          log.warn(
-            `Can't create or update the user subscription. Space not found for subscription ${stripeSubscription.id}`
-          );
-          break;
-        }
-
-        const newData = {
-          customerId: invoice.customer as string,
-          subscriptionId: invoice.subscription as string,
-          // @ts-ignore The plan exists
-          period: ((stripeSubscription.plan.interval as Stripe.Subscription.PendingInvoiceItemInterval.Interval) ===
-          'month'
-            ? 'monthly'
-            : 'annual') as SubscriptionPeriod,
-          // @ts-ignore The plan exists
-          productId: stripeSubscription.plan.product as string,
-          // @ts-ignore The plan exists
-          priceId: stripeSubscription.plan.id as string,
-          spaceId: stripeSubscription.metadata.spaceId,
-          status: 'pending' as SubscriptionStatus
-        };
-
-        await prisma.stripeSubscription.upsert({
-          where: {
-            subscriptionId: stripeSubscription.id
-          },
-          create: newData,
-          update: newData
-        });
-
-        log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was finalised`);
-
-        break;
-      }
-
       // Invoice paid means that the user has paid the invoice using any payment method
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
 
         const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
-          expand: ['plan', 'latest_invoice.payment_intent']
+          expand: ['plan']
         });
 
+        const spaceId = stripeSubscription.metadata.spaceId;
+
         const space = await prisma.space.findUnique({
-          where: { id: stripeSubscription.metadata.spaceId },
-          include: { stripeSubscription: true }
+          where: { id: spaceId, deletedAt: null }
         });
 
         if (!space) {
           log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`);
           break;
-        } else if (!space.stripeSubscription) {
-          log.warn(
-            `Can't update the user subscription. Stripe subscription with the subscriptionId ${stripeSubscription.id} not found for space ${space.id}`
-          );
-          break;
         }
 
+        // @ts-ignore The plan exists
+        const period = ((stripeSubscription.plan?.interval as string) === 'month' ? 'monthly' : 'annual') as const;
+        // @ts-ignore The plan exists
+        const productId = stripeSubscription.plan?.product as const;
+
+        const newData = {
+          customerId: invoice.customer as string,
+          subscriptionId: invoice.subscription as string,
+          period,
+          // @ts-ignore The plan exists
+          productId: stripeSubscription.plan?.product as string,
+          // @ts-ignore The plan exists
+          priceId: stripeSubscription.plan?.id as string,
+          spaceId,
+          status: 'active' as const,
+          deletedAt: null
+        };
+
         await prisma.$transaction([
-          prisma.stripeSubscription.update({
+          prisma.stripeSubscription.upsert({
             where: {
-              subscriptionId: stripeSubscription.id
+              subscriptionId: stripeSubscription.id,
+              spaceId
             },
-            data: {
-              status: 'active'
-            }
+            create: newData,
+            update: newData
           }),
           prisma.space.update({
             where: {
@@ -172,6 +139,16 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         ]);
 
         log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid`);
+
+        trackUserAction('checkout_subscription', {
+          userId: space.updatedBy,
+          spaceId,
+          billingEmail: invoice.customer_email || '',
+          productId,
+          period,
+          tier: 'pro',
+          result: 'success'
+        });
 
         break;
       }
