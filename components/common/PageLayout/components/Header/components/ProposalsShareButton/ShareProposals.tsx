@@ -15,14 +15,13 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import charmClient from 'charmClient';
 import { TogglePublicProposalsInvite } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/TogglePublicProposalsInvite';
+import { ConfirmInviteLinkDeletion } from 'components/settings/invites/components/InviteLinks/components/ConfirmInviteLinkDeletion';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
-
-import { ConfirmPublicProposalLinkDeletion } from './ConfirmPublicProposalLinkDeletion';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -69,7 +68,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   const proposalsArePublic = !!space?.publicProposals;
 
-  const { publicInvites } = useSpaceInvitesList();
+  const { publicInvites, refreshInvitesList } = useSpaceInvitesList();
 
   const publicProposalInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
 
@@ -83,9 +82,10 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   async function togglePublicProposals() {
     if (!proposalsArePublic) {
-      updateSpacePublicProposals(true);
+      await updateSpacePublicProposals(true);
     } else if (proposalsArePublic && (!publicProposalInvite || publicProposalInvite?.roleIds.length === 0)) {
-      updateSpacePublicProposals(false);
+      await updateSpacePublicProposals(false);
+      refreshInvitesList();
     } else {
       openConfirmDeleteModal();
     }
@@ -165,7 +165,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
       )}
 
       {publicProposalInvite && (
-        <ConfirmPublicProposalLinkDeletion
+        <ConfirmInviteLinkDeletion
           open={isOpen}
           onClose={closeConfirmDeleteModal}
           onConfirm={() => updateSpacePublicProposals(false)}

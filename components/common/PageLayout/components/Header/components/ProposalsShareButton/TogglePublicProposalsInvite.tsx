@@ -6,12 +6,10 @@ import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import Loader from 'components/common/Loader';
-import LoadingComponent from 'components/common/LoadingComponent';
+import { ConfirmInviteLinkDeletion } from 'components/settings/invites/components/InviteLinks/components/ConfirmInviteLinkDeletion';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-
-import { ConfirmPublicProposalLinkDeletion } from './ConfirmPublicProposalLinkDeletion';
 
 type Props = {
   showOpenSettingsLink?: boolean;
@@ -75,11 +73,7 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
       </Grid>
 
       {publicProposalInvite && (
-        <ConfirmPublicProposalLinkDeletion
-          open={isOpen}
-          onClose={closeConfirmDeleteModal}
-          invite={publicProposalInvite}
-        />
+        <ConfirmInviteLinkDeletion open={isOpen} onClose={closeConfirmDeleteModal} invite={publicProposalInvite} />
       )}
     </Grid>
   );

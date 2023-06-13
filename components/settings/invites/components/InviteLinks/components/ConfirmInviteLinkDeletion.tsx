@@ -11,13 +11,17 @@ type Props = {
   invite: InviteLinkWithRoles;
 };
 
-export function ConfirmPublicProposalLinkDeletion({ onClose, open, onConfirm, invite }: Props) {
+export function ConfirmInviteLinkDeletion({ onClose, open, onConfirm, invite }: Props) {
   const { deleteInviteLink } = useSpaceInvitesList();
+
+  const questionPrefix = invite.publicContext
+    ? `The public invite link for ${invite.publicContext}`
+    : 'This private link';
 
   return (
     <ConfirmDeleteModal
-      title='Confirm delete'
-      question={`This invite link has ${invite.roleIds.length} ${stringUtils.conditionalPlural({
+      title='Confirm deletion'
+      question={`${questionPrefix} has ${invite.roleIds.length} ${stringUtils.conditionalPlural({
         word: 'role',
         count: invite.roleIds.length ?? 0
       })} attached. Are you sure you want to delete it?`}

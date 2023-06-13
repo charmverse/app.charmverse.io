@@ -27,5 +27,14 @@ export async function toggleSpacePublicProposals({
     }
   });
 
+  if (publicProposals === false) {
+    await prisma.inviteLink.deleteMany({
+      where: {
+        spaceId,
+        publicContext: 'proposals'
+      }
+    });
+  }
+
   return updatedSpace;
 }

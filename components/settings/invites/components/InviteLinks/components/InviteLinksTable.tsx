@@ -19,17 +19,28 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
+import { ConfirmInviteLinkDeletion } from './ConfirmInviteLinkDeletion';
+
 export function InvitesTable() {
   const isAdmin = useIsAdmin();
   const { updateInviteLinkRoles, deleteInviteLink, privateInvites } = useSpaceInvitesList();
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
 
+  const [inviteToDelete, setInviteToDelete] = useState<InviteLinkWithRoles | null>(null);
+
   function onCopy(id: string) {
     setCopied({ [id]: true });
     setTimeout(() => setCopied({ [id]: false }), 1000);
   }
-
   const padding = 32;
+
+  function triggerInviteDeletion(invite: InviteLinkWithRoles) {
+    if (invite.roleIds.length === 0) {
+      deleteInviteLink(invite.id);
+    } else {
+      setInviteToDelete(invite);
+    }
+  }
 
   return (
     <Box overflow='auto'>
@@ -114,7 +125,7 @@ export function InvitesTable() {
                       color='secondary'
                       size='small'
                       variant='outlined'
-                      onClick={() => deleteInviteLink(invite.id)}
+                      onClick={() => triggerInviteDeletion(invite)}
                     />
                   </Tooltip>
                 )}
@@ -123,6 +134,14 @@ export function InvitesTable() {
           ))}
         </TableBody>
       </Table>
+      {inviteToDelete && (
+        <ConfirmInviteLinkDeletion
+          onClose={() => setInviteToDelete(null)}
+          open
+          invite={inviteToDelete}
+          onConfirm={() => setInviteToDelete(null)}
+        />
+      )}
     </Box>
   );
 }

@@ -14,8 +14,8 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import ButtonChip from 'components/common/ButtonChip';
-import { ConfirmPublicProposalLinkDeletion } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/ConfirmPublicProposalLinkDeletion';
 import TableRow from 'components/common/Table/TableRow';
+import { ConfirmInviteLinkDeletion } from 'components/settings/invites/components/InviteLinks/components/ConfirmInviteLinkDeletion';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
@@ -124,7 +124,7 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
           )}
         </TableCell>
       </TableRow>
-      <ConfirmPublicProposalLinkDeletion invite={invite} onClose={closeDeleteConfirmation} open={isOpen} />
+      <ConfirmInviteLinkDeletion invite={invite} onClose={closeDeleteConfirmation} open={isOpen} />
     </>
   );
 }
