@@ -38,7 +38,8 @@ export async function cancelAtEndProSubscription({ spaceId }: { spaceId: string 
 
   await prisma.stripeSubscription.update({
     where: {
-      id: spaceSubscription.id
+      id: spaceSubscription.id,
+      spaceId
     },
     data: {
       status: 'cancelAtEnd'

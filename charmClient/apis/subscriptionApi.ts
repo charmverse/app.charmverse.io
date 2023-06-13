@@ -3,7 +3,8 @@ import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
   CreateCryptoSubscriptionResponse,
   CreatePaymentSubscriptionResponse,
-  CreateSubscriptionRequest
+  CreateSubscriptionRequest,
+  UpdateSubscriptionRequest
 } from 'lib/subscription/interfaces';
 
 export class SubscriptionApi {
@@ -21,10 +22,10 @@ export class SubscriptionApi {
 
   // @TODO Delete this when all is done
   deleteSpaceSubscription(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}/subscription`);
+    return http.DELETE<void>(`/api/spaces/${spaceId}/subscription`);
   }
 
-  cancelAtEndSpaceSubscription(spaceId: string) {
-    return http.PUT(`/api/spaces/${spaceId}/subscription`, { status: 'cancelAtEnd' });
+  updateSpaceSubscription(spaceId: string, payload: UpdateSubscriptionRequest) {
+    return http.PUT<void>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 }
