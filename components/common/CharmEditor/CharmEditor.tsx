@@ -394,6 +394,7 @@ interface CharmEditorProps {
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
   disableNestedPages?: boolean;
+  onConnectionError?: (error: Error) => void;
 }
 
 function CharmEditor({
@@ -419,7 +420,8 @@ function CharmEditor({
   focusOnInit,
   onParticipantUpdate,
   disableRowHandles = false,
-  disableNestedPages = false
+  disableNestedPages = false,
+  onConnectionError
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -569,6 +571,7 @@ function CharmEditor({
       trackChanges
       readOnly={readOnly}
       enableComments={enableComments}
+      onConnectionError={onConnectionError}
       style={{
         ...(style ?? {}),
         width: '100%',

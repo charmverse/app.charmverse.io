@@ -48,6 +48,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
   initialContent?: any;
   enableComments?: boolean;
+  onConnectionError?: (error: Error) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -69,7 +70,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     trackChanges = false,
     onParticipantUpdate = () => {},
     readOnly = false,
-    enableComments = true
+    enableComments = true,
+    onConnectionError
   },
   ref
 ) {
@@ -115,12 +117,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(_editor: CoreBangleEditor, error: Error) {
-    // for now, just use a standard error message to be over-cautious
-    showMessage(
-      'Can’t establish a connection to the server. New data WILL NOT be saved. Please refresh the page',
-      'warning'
-    );
+  function _onError(_editor: CoreBangleEditor, error: Error) {
+    if (onConnectionError) {
+      onConnectionError(error);
+    } else {
+      // for now, just use a standard error message to be over-cautious
+      showMessage(error.message, 'warning');
+    }
     log.error('[ws/ceditor]: Error message displayed to user', { error });
     if (isLoading) {
       setIsLoading(false);
@@ -184,7 +187,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, (error) => onError(_editor, error));
+        fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
         setIsLoading(false);
