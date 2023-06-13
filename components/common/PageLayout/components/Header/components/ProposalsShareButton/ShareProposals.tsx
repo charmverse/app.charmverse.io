@@ -123,7 +123,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <Switch
             checked={proposalsArePublic || isPublicSpace}
             disabled={!isAdmin || isPublicSpace}
-            onChange={togglePublicInvite}
+            onChange={togglePublic}
           />
         </Grid>
       </Grid>

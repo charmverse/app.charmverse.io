@@ -52,6 +52,11 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
               }}
             >
               <PageTitleWithBreadcrumbs pageId={basePageId} pageType={basePageType} />
+
+              <Button variant='text' sx={{ mr: 93 }}>
+                Join this space to create a proposal
+              </Button>
+
               <Button
                 startIcon={<LogoImage width={32} height={32} src={logo} />}
                 variant='text'

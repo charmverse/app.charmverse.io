@@ -90,15 +90,15 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  {isSpaceMember && <NewProposalButton mutateProposals={mutateProposals} />}
+                  <NewProposalButton mutateProposals={mutateProposals} />
 
-                  {publicInviteLink && !isSpaceMember && (
+                  {/* {publicInviteLink && !isSpaceMember && (
                     <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                       <Link href={`${window.location.origin}/invite/${publicInviteLink.code}`} variant='body2'>
                         Join this space to create proposals
                       </Link>
                     </Box>
-                  )}
+                  )} */}
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
