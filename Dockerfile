@@ -5,7 +5,7 @@ FROM node:lts-slim AS BASE_APP
 
 # useful for node-alpine
 #RUN apk add --no-cache libc6-compat git openssl
-RUN apt update && apt install openssl
+RUN apt update && apt install -y openssl
 
 WORKDIR /app
 
