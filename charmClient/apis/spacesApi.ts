@@ -83,4 +83,8 @@ export class SpacesApi {
   completeOnboarding({ spaceId }: { spaceId: string }) {
     return http.PUT(`/api/spaces/${spaceId}/onboarding`);
   }
+
+  getBlockCount({ spaceId }: { spaceId: string }) {
+    return http.GET(`/api/spaces/${spaceId}/block-count`);
+  }
 }
