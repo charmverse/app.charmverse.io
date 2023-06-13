@@ -116,7 +116,11 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   );
 
   function onError(_editor: CoreBangleEditor, error: Error) {
-    showMessage(error.message, 'warning');
+    // for now, just use a standard error message to be over-cautious
+    showMessage(
+      'Can’t establish a connection to the server. New data WILL NOT be saved. Please refresh the page',
+      'warning'
+    );
     log.error('[ws/ceditor]: Error message displayed to user', { error });
     if (isLoading) {
       setIsLoading(false);
