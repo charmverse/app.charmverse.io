@@ -1,7 +1,7 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { countSpaceBlocks } from './countSpaceBlocks';
 
 export type BlockCountInfo = Pick<BlockCount, 'count' | 'details' | 'createdAt'>;
 
@@ -15,21 +15,13 @@ export async function getSpaceBlockCount({ spaceId }: { spaceId: string }): Prom
     }
   });
 
-  if (blockCount) {
-    return {
-      count: blockCount.count,
-      createdAt: blockCount.createdAt,
-      details: blockCount.details
-    };
+  if (!blockCount) {
+    log.warn('No block count found for space', { spaceId });
+    throw new DataNotFoundError(`Block count not found for space ${spaceId}`);
   }
-
-  const { counts, total } = await countSpaceBlocks({
-    spaceId
-  });
-
   return {
-    count: total,
-    details: counts,
-    createdAt: new Date()
+    count: blockCount.count,
+    details: blockCount.details,
+    createdAt: blockCount.createdAt
   };
 }
