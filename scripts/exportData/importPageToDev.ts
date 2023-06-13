@@ -9,11 +9,11 @@ import { v4 as uuid } from 'uuid';
  *
  */
 
-const originalPageId = '0c3fb05f-c701-4daa-a0d5-649915f88c2f';
-const destinationSpaceDomain = 'tame-fomo-duck';
-const destinationUserName = '0x1bd0…07f4';
+const originalPageId = 'd4d3ffcc-0cbd-4aa3-a56f-230d45ecc443';
+const destinationSpaceDomain = 'sharp-yellow-toucan';
+const destinationUserName = 'mattcasey.eth';
 
-const fileName = `./page-backup-05-22.json`;
+const fileName = `./page-backup-06-12.json`;
 const pathName = path.join(process.cwd(), fileName);
 
 type RestoreData = Awaited<ReturnType<typeof queryData>>;
