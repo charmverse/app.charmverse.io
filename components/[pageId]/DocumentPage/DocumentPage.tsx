@@ -8,7 +8,6 @@ import { memo, useEffect, useRef } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
-import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -34,6 +33,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
+import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
 export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
