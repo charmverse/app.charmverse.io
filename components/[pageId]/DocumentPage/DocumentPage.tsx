@@ -86,7 +86,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
-  const [connectionError, setConnectionError] = useState<Error | null>(new Error('woosp'));
+  const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
