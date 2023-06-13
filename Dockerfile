@@ -1,7 +1,7 @@
 # Install dependencies only when needed
 
 # Use node-slim because node-alpine does not seem to supports the `sharp` npm library that gets built
-FROM node:18-slim AS BASE_APP
+FROM node:lts-slim AS BASE_APP
 
 # useful for node-alpine
 # RUN apk add --no-cache libc6-compat git
