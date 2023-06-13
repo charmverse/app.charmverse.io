@@ -31,7 +31,7 @@ const labels: Record<PublicInviteLinkContext, string> = {
 };
 
 type InviteRowProps = {
-  invite: InviteLinkWithRoles & { publicContext: PublicInviteLinkContext };
+  invite: InviteLinkWithRoles & { visibleOn: PublicInviteLinkContext };
   isAdmin: boolean;
   updateInviteLinkRoles: (args: { inviteLinkId: string; roleIds: string[] }) => void;
   deleteInviteLink: (id: string) => void;
@@ -154,7 +154,7 @@ export function PublicInvitesList() {
         <TableBody>
           {publicProposalsInvite && (
             <InviteRow
-              invite={publicProposalsInvite as InviteLinkWithRoles & { publicContext: PublicInviteLinkContext }}
+              invite={publicProposalsInvite as InviteLinkWithRoles & { visibleOn: PublicInviteLinkContext }}
               deleteInviteLink={deleteInviteLink}
               isAdmin={isAdmin}
               updateInviteLinkRoles={updateInviteLinkRoles}

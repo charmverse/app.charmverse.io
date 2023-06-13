@@ -19,13 +19,13 @@ handler
 
 async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiResponse<InviteLink>) {
   const userId = req.session.user.id;
-  const { maxAgeMinutes, maxUses, spaceId, publicContext } = req.body;
+  const { maxAgeMinutes, maxUses, spaceId, visibleOn } = req.body;
 
   const invite = await createInviteLink({
     createdBy: userId,
     maxAgeMinutes,
     maxUses,
-    publicContext,
+    visibleOn,
     spaceId: spaceId as string
   });
 

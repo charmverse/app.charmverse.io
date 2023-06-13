@@ -21,13 +21,13 @@ export function useSpaceInvitesList() {
   async function createInviteLink({
     maxAgeMinutes,
     maxUses,
-    publicContext
-  }: Pick<InviteLinkInput, 'maxAgeMinutes' | 'maxUses' | 'publicContext'>) {
+    visibleOn
+  }: Pick<InviteLinkInput, 'maxAgeMinutes' | 'maxUses' | 'visibleOn'>) {
     const createdLink = await charmClient.createInviteLink({
       spaceId: space?.id as string,
       maxAgeMinutes,
       maxUses,
-      publicContext
+      visibleOn
     });
     refreshInvitesList((invitesData) => {
       const linkWithRoles = {
@@ -56,7 +56,7 @@ export function useSpaceInvitesList() {
     privateInvites: invites?.filter((invite) => !invite.visibleOn),
     publicInvites: invites?.filter((invite) => invite.visibleOn) as
       | (InviteLinkWithRoles & {
-          publicContext: PublicInviteLinkContext;
+          visibleOn: PublicInviteLinkContext;
         })[]
       | undefined,
     createInviteLink,

@@ -42,7 +42,7 @@ describe('getSpaceInviteLinks', () => {
         code: v4(),
         author: { connect: { id: user.id } },
         space: { connect: { id: space.id } },
-        publicContext: 'proposals'
+        visibleOn: 'proposals'
       },
       include: {
         inviteLinkToRoles: {
@@ -107,7 +107,7 @@ describe('getSpaceInviteLinks', () => {
         code: v4(),
         author: { connect: { id: user.id } },
         space: { connect: { id: space.id } },
-        publicContext: 'proposals'
+        visibleOn: 'proposals'
       },
       include: {
         inviteLinkToRoles: {

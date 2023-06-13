@@ -31,7 +31,7 @@ export async function toggleSpacePublicProposals({
     await prisma.inviteLink.deleteMany({
       where: {
         spaceId,
-        publicContext: 'proposals'
+        visibleOn: 'proposals'
       }
     });
   }

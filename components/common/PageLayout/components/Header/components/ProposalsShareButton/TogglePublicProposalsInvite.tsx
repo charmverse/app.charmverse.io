@@ -39,7 +39,7 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
       openConfirmDeleteModal();
       // Show confirmation dialog
     } else {
-      createInviteLink({ publicContext: 'proposals' });
+      createInviteLink({ visibleOn: 'proposals' });
     }
   }
 

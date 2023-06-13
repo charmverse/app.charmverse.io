@@ -49,7 +49,7 @@ function JoinSpaceWithPublicProposals() {
     () =>
       charmClient.getPublicInviteLink({
         spaceId: currentSpace!.id,
-        publicContext: 'proposals'
+        visibleOn: 'proposals'
       })
   );
 

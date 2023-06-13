@@ -6,22 +6,22 @@ import type { InviteLinkPopulated } from './getInviteLink';
 
 export type PublicInviteLinkRequest = {
   spaceId: string;
-  publicContext: PublicInviteLinkContext;
+  visibleOn: PublicInviteLinkContext;
 };
 
 export async function getPublicInviteLink({
-  publicContext,
+  visibleOn,
   spaceId
 }: PublicInviteLinkRequest): Promise<InviteLinkPopulated> {
-  if (!stringUtils.isUUID(spaceId) || !publicContext || !PublicInviteLinkContext[publicContext]) {
+  if (!stringUtils.isUUID(spaceId) || !visibleOn || !PublicInviteLinkContext[visibleOn]) {
     throw new InvalidInputError(`Valid space ID and public context are required.`);
   }
 
   const invite = await prisma.inviteLink.findUnique({
     where: {
-      spaceId_publicContext: {
+      spaceId_visibleOn: {
         spaceId,
-        publicContext
+        visibleOn
       }
     },
     include: {

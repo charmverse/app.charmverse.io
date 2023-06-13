@@ -259,8 +259,8 @@ class CharmClient {
     return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
   }
 
-  getPublicInviteLink({ publicContext, spaceId }: PublicInviteLinkRequest) {
-    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, publicContext });
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {

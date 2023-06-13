@@ -126,7 +126,7 @@ describe('acceptInvite', () => {
       spaceId: spaceWithPublicProposalsDisabled.id,
       maxUses: 10,
       useCount: 1,
-      publicContext: 'proposals'
+      visibleOn: 'proposals'
     });
 
     await expect(

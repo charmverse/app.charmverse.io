@@ -1,7 +1,7 @@
 import { testUtils } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { createMockSpace } from 'testing/mocks/user';
+import { createMockSpace } from 'testing/mocks/space';
 
 import type { InviteLinkPopulated } from '../getInviteLink';
 import { validateInviteLink } from '../validateInviteLink';
@@ -13,7 +13,7 @@ const linkStub: Omit<InviteLinkPopulated, 'maxAgeMinutes' | 'maxUses' | 'useCoun
   createdAt: new Date(),
   createdBy: '123',
   id: '123',
-  publicContext: null,
+  visibleOn: null,
   spaceId: v4(),
   space
 };
@@ -61,7 +61,7 @@ describe('validateInviteLink', () => {
       maxUses: 1,
       useCount: 1,
       ...linkStub,
-      publicContext: 'proposals',
+      visibleOn: 'proposals',
       space: {
         ...linkStub.space,
         publicProposals: true
@@ -94,7 +94,7 @@ describe('validateInviteLink', () => {
       maxUses: 1,
       useCount: 1,
       ...linkStub,
-      publicContext: 'proposals',
+      visibleOn: 'proposals',
       space: {
         ...linkStub.space,
         publicProposals: false

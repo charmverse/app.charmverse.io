@@ -7,7 +7,7 @@ export type InviteLinkInput = {
   createdBy: string;
   maxAgeMinutes?: number;
   maxUses?: number;
-  publicContext?: PublicInviteLinkContext;
+  visibleOn?: PublicInviteLinkContext;
 };
 
 export async function createInviteLink({
@@ -15,17 +15,17 @@ export async function createInviteLink({
   maxUses,
   spaceId,
   createdBy,
-  publicContext
+  visibleOn
 }: InviteLinkInput): Promise<InviteLink> {
   const link = await prisma.inviteLink.create({
     data: {
       code: uuid().substring(0, 6),
       createdBy,
       // Links with a public context have unlimited uses and do not expire
-      maxAgeMinutes: publicContext ? -1 : maxAgeMinutes,
-      maxUses: publicContext ? -1 : maxUses,
+      maxAgeMinutes: visibleOn ? -1 : maxAgeMinutes,
+      maxUses: visibleOn ? -1 : maxUses,
       spaceId,
-      publicContext
+      visibleOn
     }
   });
   return link;

@@ -42,7 +42,7 @@ describe('togglePublicProposals', () => {
         code: v4(),
         createdBy: user.id,
         spaceId: space.id,
-        publicContext: 'proposals'
+        visibleOn: 'proposals'
       }
     });
 

@@ -34,7 +34,7 @@ describe('createInviteLink', () => {
       spaceId: space.id,
       maxAgeMinutes: 60,
       maxUses: 10,
-      publicContext: 'proposals'
+      visibleOn: 'proposals'
     };
 
     const link = await createInviteLink(input);

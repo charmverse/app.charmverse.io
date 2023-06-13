@@ -13,7 +13,7 @@ describe('getPublicInviteLink', () => {
     });
     const inviteLink = await prisma.inviteLink.create({
       data: {
-        publicContext: 'proposals',
+        visibleOn: 'proposals',
         code: v4(),
         author: {
           connect: {
@@ -32,7 +32,7 @@ describe('getPublicInviteLink', () => {
     });
 
     const foundInvite = await getPublicInviteLink({
-      publicContext: 'proposals',
+      visibleOn: 'proposals',
       spaceId: space.id
     });
 
@@ -42,7 +42,7 @@ describe('getPublicInviteLink', () => {
   it('should throw an error if the space ID is not a valid UUID', async () => {
     await expect(
       getPublicInviteLink({
-        publicContext: 'proposals',
+        visibleOn: 'proposals',
         spaceId: 'not-a-valid-uuid'
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -51,14 +51,14 @@ describe('getPublicInviteLink', () => {
   it('should throw an error if the public context is not valid', async () => {
     await expect(
       getPublicInviteLink({
-        publicContext: 'bad-context' as any,
+        visibleOn: 'bad-context' as any,
         spaceId: v4()
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
       getPublicInviteLink({
-        publicContext: undefined as any,
+        visibleOn: undefined as any,
         spaceId: v4()
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -67,7 +67,7 @@ describe('getPublicInviteLink', () => {
   it('should throw an error if the invite link is not found', async () => {
     await expect(
       getPublicInviteLink({
-        publicContext: 'proposals',
+        visibleOn: 'proposals',
         spaceId: v4()
       })
     ).rejects.toBeInstanceOf(DataNotFoundError);
