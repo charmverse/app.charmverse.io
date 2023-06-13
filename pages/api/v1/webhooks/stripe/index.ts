@@ -81,7 +81,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
 
     switch (event.type) {
-      // Invoice paid means that the user has paid the invoice using any payment method
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
 
@@ -136,6 +135,20 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           })
         ]);
+
+        if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
+          // The subscription automatically activates after successful payment
+          // Set the payment method used to pay the first invoice
+          // as the default payment method for that subscription
+
+          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string);
+
+          if (typeof paymentIntent.payment_method === 'string') {
+            await stripeClient.subscriptions.update(invoice.subscription as string, {
+              default_payment_method: paymentIntent.payment_method
+            });
+          }
+        }
 
         log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid`);
 

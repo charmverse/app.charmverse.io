@@ -1,13 +1,18 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { cancelAtEndProSubscription } from 'lib/subscription/cancelAtEndProSubscription';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
+import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import type { CreatePaymentSubscriptionResponse, CreateSubscriptionRequest } from 'lib/subscription/interfaces';
+import type {
+  CreatePaymentSubscriptionResponse,
+  CreateSubscriptionRequest,
+  UpdateSubscriptionRequest
+} from 'lib/subscription/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,7 +27,8 @@ handler
   .get(getSpaceSubscriptionController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createPaymentSubscription)
-  .delete(deletePaymentSubscription);
+  .delete(deletePaymentSubscription)
+  .put(updatePaymentSubscription);
 
 async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
   const { id: spaceId } = req.query as { id: string };
@@ -59,22 +65,18 @@ async function deletePaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   const userId = req.session.user.id;
 
-  await prisma.stripeSubscription.deleteMany({
-    where: {
-      spaceId
-    }
-  });
+  await deleteProSubscription({ spaceId, userId });
 
-  await prisma.space.update({
-    where: {
-      id: spaceId
-    },
-    data: {
-      updatedAt: new Date(),
-      updatedBy: userId,
-      paidTier: 'free'
-    }
-  });
+  res.status(200).end();
+}
+
+async function updatePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
+  const { id: spaceId } = req.query as { id: string };
+  const { status } = req.body as UpdateSubscriptionRequest;
+
+  if (status === 'cancelAtEnd') {
+    await cancelAtEndProSubscription({ spaceId });
+  }
 
   res.status(200).end();
 }

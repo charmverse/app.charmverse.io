@@ -1,3 +1,4 @@
+import type { StripeSubscription } from '@charmverse/core/src/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 
@@ -25,3 +26,5 @@ export type ProSubscriptionResponse = {
 
 export type CreateCryptoSubscriptionResponse = string;
 export type CreatePaymentSubscriptionResponse = Pick<ProSubscriptionResponse, 'paymentIntentStatus' | 'clientSecret'>;
+
+export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>>;
