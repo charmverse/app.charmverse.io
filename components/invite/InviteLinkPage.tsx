@@ -21,7 +21,13 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       await charmClient.createUser({ address: walletAuthSignature.address, walletSignature: walletAuthSignature });
     }
     await charmClient.acceptInvite({ id: invite.id });
-    window.location.href = `/${invite.space.domain}`;
+
+    let redirectUrl = `/${invite.space.domain}`;
+
+    if (invite.visibleOn) {
+      redirectUrl += '/proposals';
+    }
+    window.location.href = redirectUrl;
   }
   return (
     <CenteredBox>
