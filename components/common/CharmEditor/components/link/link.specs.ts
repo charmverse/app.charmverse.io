@@ -3,7 +3,7 @@ import type { BaseRawMarkSpec } from '@bangle.dev/core';
 
 export function spec() {
   const linkSpec = link.spec({
-    openOnClick: true
+    openOnClick: false
   }) as BaseRawMarkSpec;
 
   linkSpec.schema.toDOM = (node) => {
