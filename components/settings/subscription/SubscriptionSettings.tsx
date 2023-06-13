@@ -31,13 +31,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     revalidateOnFocus: false
   });
 
-  const { trigger: updateSpaceSubscription, isMutating: isLoadingCancellation } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
+  const { trigger: updateSpaceSubscription, isMutating: isLoadingUpdate } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpdateSubscriptionRequest } }>) =>
       charmClient.subscription.updateSpaceSubscription(arg.spaceId, arg.payload),
     {
       onError() {
-        showMessage('Cancellation failed! Please try again', 'error');
+        showMessage('Updating failed! Please try again', 'error');
       },
       async onSuccess() {
         await refetchSpaceSubscription();
@@ -90,10 +90,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         {!showCheckoutForm && (
           <SubscriptionActions
             spaceSubscription={spaceSubscription}
-            loading={isLoading || isLoadingCancellation || isLoadingDeletion}
+            loading={isLoading || isLoadingUpdate || isLoadingDeletion}
             onCreate={handleShowCheckoutForm}
             onDelete={handleDeleteSubs}
             onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancelAtEnd' } })}
+            onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
           />
         )}
         <Divider sx={{ mb: 1 }} />

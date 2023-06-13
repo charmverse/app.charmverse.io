@@ -10,13 +10,15 @@ export function SubscriptionActions({
   loading,
   onCreate,
   onDelete,
-  onCancelAtEnd
+  onCancelAtEnd,
+  onReactivation
 }: {
   spaceSubscription: SpaceSubscription | null | undefined;
   loading: boolean;
   onCreate: () => void;
   onDelete: () => void;
   onCancelAtEnd: () => void;
+  onReactivation: () => void;
 }) {
   const isAdmin = useIsAdmin();
 
@@ -31,7 +33,12 @@ export function SubscriptionActions({
           Create a Plan
         </Button>
       )}
-      {spaceSubscription && spaceSubscription.status === 'active' && (
+      {spaceSubscription?.status === 'cancelAtEnd' && (
+        <Button disabled={loading} onClick={onReactivation} variant='outlined'>
+          Reactivate Plan
+        </Button>
+      )}
+      {spaceSubscription?.status === 'active' && (
         <>
           <Button disabled={loading} onClick={() => {}} variant='outlined'>
             Upgrade/Downgrade Plan
@@ -40,7 +47,7 @@ export function SubscriptionActions({
             Cancel Plan
           </Button>
           {!isProdEnv && (
-            <Button disabled={loading} onClick={onDelete} variant='outlined'>
+            <Button disabled={loading} onClick={onDelete} color='error' variant='outlined'>
               Delete Plan
             </Button>
           )}

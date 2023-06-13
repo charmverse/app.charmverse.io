@@ -3,7 +3,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { cancelAtEndProSubscription } from 'lib/subscription/cancelAtEndProSubscription';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
@@ -13,6 +12,7 @@ import type {
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest
 } from 'lib/subscription/interfaces';
+import { updateProSubscription } from 'lib/subscription/updateProSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -72,11 +72,9 @@ async function deletePaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
 async function updatePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
   const { id: spaceId } = req.query as { id: string };
-  const { status } = req.body as UpdateSubscriptionRequest;
+  const payload = req.body as UpdateSubscriptionRequest;
 
-  if (status === 'cancelAtEnd') {
-    await cancelAtEndProSubscription({ spaceId });
-  }
+  await updateProSubscription({ spaceId, payload });
 
   res.status(200).end();
 }

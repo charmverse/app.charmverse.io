@@ -4,9 +4,16 @@ import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
+import type { UpdateSubscriptionRequest } from './interfaces';
 import { stripeClient } from './stripe';
 
-export async function cancelAtEndProSubscription({ spaceId }: { spaceId: string }) {
+export async function updateProSubscription({
+  spaceId,
+  payload
+}: {
+  spaceId: string;
+  payload: UpdateSubscriptionRequest;
+}) {
   const spaceSubscription = await prisma.stripeSubscription.findFirst({
     where: {
       spaceId,
@@ -24,16 +31,18 @@ export async function cancelAtEndProSubscription({ spaceId }: { spaceId: string 
     throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
   }
 
-  try {
-    await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
-      cancel_at_period_end: true
-    });
-  } catch (err: any) {
-    log.error(`[stripe]: Failed to cancel_at_period_end subscription. ${err.message}`, {
-      spaceId,
-      errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
-      errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
-    });
+  if (payload.status) {
+    try {
+      await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+        cancel_at_period_end: payload.status === 'cancelAtEnd'
+      });
+    } catch (err: any) {
+      log.error(`[stripe]: Failed to cancel_at_period_end subscription. ${err.message}`, {
+        spaceId,
+        errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
+        errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
+      });
+    }
   }
 
   await prisma.stripeSubscription.update({
@@ -42,7 +51,7 @@ export async function cancelAtEndProSubscription({ spaceId }: { spaceId: string 
       spaceId
     },
     data: {
-      status: 'cancelAtEnd'
+      ...payload
     }
   });
 }

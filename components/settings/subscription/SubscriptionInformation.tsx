@@ -30,7 +30,7 @@ export function SubscriptionInformation({
       case 'pending':
         return 'Pending';
       case 'cancelAtEnd':
-        return 'Your subscription was cancelled and will end on the next billing date';
+        return 'Your subscription was cancelled and will end on the next billing date. You can reactivate it by clicking the button below.';
       case 'cancelled':
       default:
         return null;
