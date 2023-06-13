@@ -329,9 +329,7 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      if (activeView?.fields.viewType !== 'table') {
-        e.stopPropagation();
-      }
+      e.stopPropagation();
     },
     [activeView]
   );

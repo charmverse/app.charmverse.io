@@ -2,16 +2,12 @@ import styled from '@emotion/styled';
 import { InputBase } from '@mui/material';
 import React, { forwardRef, useRef } from 'react';
 
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import PopperPopup from 'components/common/PopperPopup';
-
 import type { EditableProps, Focusable } from './editable';
 import { useEditable } from './editable';
 
 export type TextInputProps = EditableProps & {
   className?: string;
   multiline?: boolean;
-  displayType?: PropertyValueDisplayType;
 };
 
 const StyledInput = styled(InputBase)`
@@ -23,50 +19,17 @@ const StyledInput = styled(InputBase)`
   border: 0px;
 `;
 
-function Editable({ multiline, displayType, ..._props }: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
+function Editable({ multiline, ..._props }: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
-
-  // Keep it as before for card modal view
-  if (displayType === 'details') {
-    return (
-      <StyledInput
-        inputProps={{
-          className
-        }}
-        {...props}
-        fullWidth
-        multiline={multiline}
-      />
-    );
-  }
-
   return (
-    <PopperPopup
-      style={{ width: '100%' }}
-      paperSx={{
-        width: 350,
-        p: 2
+    <StyledInput
+      inputProps={{
+        className
       }}
-      popupContent={
-        <StyledInput
-          inputProps={{
-            className
-          }}
-          {...props}
-          multiline
-        />
-      }
-    >
-      <StyledInput
-        inputProps={{
-          className
-        }}
-        {...props}
-        fullWidth
-        multiline={multiline}
-      />
-    </PopperPopup>
+      {...props}
+      multiline={multiline}
+    />
   );
 }
 
