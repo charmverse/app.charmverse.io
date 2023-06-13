@@ -31,7 +31,7 @@ export function SubscriptionActions({
           Create a Plan
         </Button>
       )}
-      {spaceSubscription && (
+      {spaceSubscription && spaceSubscription.status === 'active' && (
         <>
           <Button disabled={loading} onClick={() => {}} variant='outlined'>
             Upgrade/Downgrade Plan
