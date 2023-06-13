@@ -60,6 +60,7 @@ const alerts: Partial<Record<PageType, string>> = {
 
 export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions }: Props) {
   const router = useRouter();
+
   const { pages } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
 
