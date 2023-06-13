@@ -8,7 +8,7 @@ import { memo, useEffect, useRef } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
-import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
+import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
