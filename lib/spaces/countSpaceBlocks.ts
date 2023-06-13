@@ -2,6 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 
+import type { BlockCountInfo } from './getSpaceBlockCount';
+
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
 export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
   const [
@@ -152,16 +154,6 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
     views
   };
 
-  const total = getTotal(counts);
-
-  await prisma.blockCount.create({
-    data: {
-      count: total,
-      space: { connect: { id: spaceId } },
-      details: counts
-    }
-  });
-
   return {
     counts,
     spaceId,
@@ -173,4 +165,21 @@ function getTotal(counts: Record<string, number>): number {
   return Object.entries(counts).reduce((count, [blockType, value]) => {
     return count + value;
   }, 0);
+}
+export async function countSpaceBlocksAndSave({ spaceId }: { spaceId: string }): Promise<BlockCountInfo> {
+  const countResult = await countSpaceBlocks({ spaceId });
+
+  const blockCount = await prisma.blockCount.create({
+    data: {
+      count: countResult.total,
+      space: { connect: { id: spaceId } },
+      details: countResult.counts
+    }
+  });
+
+  return {
+    count: blockCount.count,
+    createdAt: blockCount.createdAt,
+    details: blockCount.details
+  };
 }

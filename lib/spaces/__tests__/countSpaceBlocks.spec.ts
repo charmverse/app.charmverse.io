@@ -11,7 +11,7 @@ import {
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { generateBoard } from 'testing/setupDatabase';
 
-import { countSpaceBlocks } from '../countSpaceBlocks';
+import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countSpaceBlocks';
 
 const pageContent = {
   ...emptyDocument,
@@ -294,36 +294,6 @@ describe('countSpaceBlocks - count blocks', () => {
 
     expect(total).toBe(1);
   });
-
-  it('should record an audit of the counts used to calculate the total', async () => {
-    const { space, user } = await testUtilsUser.generateUserAndSpace();
-
-    const bounty = await testUtilsBounties.generateBounty({
-      approveSubmitters: false,
-      createdBy: user.id,
-      spaceId: space.id,
-      status: 'open',
-      content: {}
-    });
-
-    const { counts, total } = await countSpaceBlocks({
-      spaceId: space.id
-    });
-
-    const loggedCount = await prisma.blockCount.findFirst({
-      where: {
-        spaceId: space.id
-      }
-    });
-
-    expect(loggedCount).toMatchObject<BlockCount>({
-      spaceId: space.id,
-      count: total,
-      createdAt: expect.any(Date),
-      id: expect.any(String),
-      details: expect.objectContaining(counts)
-    });
-  });
 });
 describe('countSpaceBlocks - count content', () => {
   it('should count the content of the database description, and the content inside each database card / row', async () => {
@@ -476,5 +446,36 @@ describe('countSpaceBlocks - count content', () => {
 
     expect(counts.bounties).toBe(1);
     expect(counts.documentBlocks).toBeGreaterThan(1);
+  });
+});
+describe('countSpaceBlocksAndSave', () => {
+  it('should record an audit of the counts used to calculate the total', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const bounty = await testUtilsBounties.generateBounty({
+      approveSubmitters: false,
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      content: {}
+    });
+
+    const { count, details } = await countSpaceBlocksAndSave({
+      spaceId: space.id
+    });
+
+    const loggedCount = await prisma.blockCount.findFirst({
+      where: {
+        spaceId: space.id
+      }
+    });
+
+    expect(loggedCount).toMatchObject<BlockCount>({
+      spaceId: space.id,
+      count,
+      createdAt: expect.any(Date),
+      id: expect.any(String),
+      details
+    });
   });
 });
