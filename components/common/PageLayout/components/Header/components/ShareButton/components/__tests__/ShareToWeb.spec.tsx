@@ -47,7 +47,7 @@ describe('shareToWeb', () => {
   it('should render the toggle as checked if no public permission exists or as unchecked if a public permission exists', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
 
@@ -61,6 +61,10 @@ describe('shareToWeb', () => {
     // Important part of the test
     expect(toggle).not.toBeChecked();
     expect(toggle).not.toBeDisabled();
+
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
+      permissions: new AvailablePagePermissions().full
+    });
 
     // Re-render this with a public permission
     resultWithPermissions.rerender(
@@ -89,7 +93,7 @@ describe('shareToWeb', () => {
   it('should render an enabled public toggle only if a user has permissions to toggle the public status of the page', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
 
@@ -107,7 +111,7 @@ describe('shareToWeb', () => {
   it('should render a disabled public toggle if a user does not have permissions to toggle the public status of the page', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().empty
     });
 
@@ -125,16 +129,16 @@ describe('shareToWeb', () => {
   it('should render a disabled unchecked public toggle if the space has activated public proposals, the page is a proposal page and proposal status is draft', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<ReturnType<typeof useProposal>>).mockReturnValue({
+    (useProposal as jest.Mock<ReturnType<typeof useProposal>>).mockReturnValueOnce({
       proposal: {
         status: 'draft'
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValue({
+    (usePages as jest.Mock).mockReturnValueOnce({
       pages: {
         [pageId]: {
           type: 'proposal'
@@ -142,7 +146,7 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValue(
+    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
       createMockSpace({
         publicProposals: true
       })
@@ -163,16 +167,16 @@ describe('shareToWeb', () => {
   it('should render a disabled checked public toggle if the space has activated public proposals, the page is a proposal page and proposal status is discussion or beyond', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<ReturnType<typeof useProposal>>).mockReturnValue({
+    (useProposal as jest.Mock<ReturnType<typeof useProposal>>).mockReturnValueOnce({
       proposal: {
         status: 'discussion'
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValue({
+    (usePages as jest.Mock).mockReturnValueOnce({
       pages: {
         [pageId]: {
           type: 'proposal'
@@ -180,7 +184,7 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValue(
+    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
       createMockSpace({
         publicProposals: true
       })
@@ -201,11 +205,11 @@ describe('shareToWeb', () => {
   it('should render an enabled public toggle if the space has activated public proposals, user has permissions to toggle public status, and the page is not of type proposal', async () => {
     const pageId = uuid();
 
-    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValue({
+    (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
 
-    (usePages as jest.Mock).mockReturnValue({
+    (usePages as jest.Mock).mockReturnValueOnce({
       pages: {
         [pageId]: {
           type: 'page'
@@ -213,7 +217,7 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValue(
+    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
       createMockSpace({
         publicProposals: true
       })
