@@ -77,6 +77,8 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   const shareAlertMessage = currentPage ? alerts[currentPage.type] : undefined;
 
+  console.log({ pages, currentPagePermissions });
+
   async function togglePublic() {
     if (publicPermission) {
       await charmClient.deletePermission({ permissionId: publicPermission.id });

@@ -27,7 +27,9 @@ jest.mock('hooks/usePagePermissions');
 //   jest.resetModules();
 // });
 
-afterEach(() => {});
+afterEach(() => {
+  jest.resetAllMocks();
+});
 
 afterAll(() => {
   jest.resetModules();
@@ -35,13 +37,13 @@ afterAll(() => {
 
 describe('shareToWeb', () => {
   it('should render an enabled public toggle only if a user has permissions to toggle the public status of the page', async () => {
-    jest.doMock('hooks/useCurrentSpace', () => ({
+    jest.mock('hooks/useCurrentSpace', () => ({
       useCurrentSpace: jest.fn(createMockSpace)
     }));
 
     const pageId = uuid();
 
-    jest.doMock('hooks/usePages', () => ({
+    jest.mock('hooks/usePages', () => ({
       usePages: jest.fn(() => ({
         pages: {
           [pageId]: {
@@ -74,13 +76,13 @@ describe('shareToWeb', () => {
   });
 
   it('should render a disabled public toggle if a user does not have permissions to toggle the public status of the page', async () => {
-    jest.doMock('hooks/useCurrentSpace', () => ({
+    jest.mock('hooks/useCurrentSpace', () => ({
       useCurrentSpace: jest.fn(createMockSpace)
     }));
 
     const pageId = uuid();
 
-    jest.doMock('hooks/usePages', () => ({
+    jest.mock('hooks/usePages', () => ({
       usePages: jest.fn(() => ({
         pages: {
           [pageId]: {
@@ -109,31 +111,83 @@ describe('shareToWeb', () => {
     expect(toggle).toBeDisabled();
   });
 
-  // it('should render a disabled public toggle if the space has activated public proposals and the page is a proposal page', async () => {
-  //   jest.mock('hooks/useCurrentSpace', () => ({
-  //     useCurrentSpace: jest.fn(createMockSpace)
-  //   }));
+  it('should render a disabled public toggle if the space has activated public proposals and the page is a proposal page', async () => {
+    jest.mock('hooks/useCurrentSpace', () => ({
+      useCurrentSpace: jest.fn(() =>
+        createMockSpace({
+          publicProposals: true
+        })
+      )
+    }));
 
-  //   jest.mock('hooks/usePagePermissions', () => ({
-  //     usePagePermissions: jest.fn(() => ({ permissions: new AvailablePagePermissions().full }))
+    const pageId = uuid();
+
+    jest.mock('hooks/usePages', () => ({
+      usePages: jest.fn(() => ({
+        pages: {
+          [pageId]: {
+            type: 'proposal',
+            path: `path-${uuid()}`
+          }
+        }
+      }))
+    }));
+
+    // Test user without permissions
+    const usePagePermissions = await import('hooks/usePagePermissions');
+    // eslint-disable-next-line no-unused-expressions
+    usePagePermissions.usePagePermissions = jest.fn(() => ({ permissions: new AvailablePagePermissions().full }));
+
+    const ShareToWeb = (await import('../ShareToWeb')).default;
+
+    const resultWithPermissions = render(
+      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+    );
+
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
+    expect(toggle?.getAttribute('type')).toBe('checkbox');
+
+    // Important part of the test
+    expect(toggle).toBeDisabled();
+  });
+
+  // it('should render an enabled public toggle if the space has activated public proposals, user has permissions to toggle public status, and the page is not of type proposal', async () => {
+  //   jest.mock('hooks/useCurrentSpace', () => ({
+  //     useCurrentSpace: jest.fn(() =>
+  //       createMockSpace({
+  //         publicProposals: true
+  //       })
+  //     )
   //   }));
 
   //   const pageId = uuid();
 
-  //   jest.mock('hooks/usePages', () => ({
+  //   jest.doMock('hooks/usePages', () => ({
   //     usePages: jest.fn(() => ({
-  //       [pageId]: {
-  //         type: 'page'
+  //       pages: {
+  //         [pageId]: {
+  //           type: 'page',
+  //           path: `path-${uuid()}`
+  //         }
   //       }
   //     }))
   //   }));
 
-  //   const result = render(<ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />);
+  //   // Test user without permissions
+  //   const usePagePermissions = await import('hooks/usePagePermissions');
+  //   // eslint-disable-next-line no-unused-expressions
+  //   usePagePermissions.usePagePermissions = jest.fn(() => ({ permissions: new AvailablePagePermissions().full }));
 
-  //   const toggle = result.getByTestId('toggle-public-page', {}).children.item(0);
-  //   expect(toggle?.getAttribute('disabled')).toBe('');
+  //   const ShareToWeb = (await import('../ShareToWeb')).default;
+
+  //   const resultWithPermissions = render(
+  //     <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+  //   );
+
+  //   const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
   //   expect(toggle?.getAttribute('type')).toBe('checkbox');
-  // });
 
-  it('should render an enabled public toggle if the space has activated public proposals, user has permissions to toggle public status, and the page is not of type proposal', async () => {});
+  //   // Important part of the test
+  //   expect(toggle).not.toBeDisabled();
+  // });
 });

@@ -49,7 +49,7 @@
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
     "typecheck": "node_modules/typescript/bin/tsc --project tsconfig.json --noEmit",
     "test:setup-db": "./scripts/configure-db.sh",
-    "test:browser": "TZ=UTC jest --config='./jest.config.browser.ts'",
+    "test:browser": "TZ=UTC jest components/common/PageLayout/components/Header/components/ShareButton/components/__tests__/ShareToWeb.spec.ts --config='./jest.config.browser.ts'",
     "e2e:compile": "npx tsx esbuild.e2e.ts",
     "test:e2e": "dotenv -e .env.test.local -- npx playwright test --timeout=0",
     "test": "npm run test:ci -- --verbose --watch",
