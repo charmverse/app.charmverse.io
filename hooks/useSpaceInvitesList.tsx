@@ -53,8 +53,8 @@ export function useSpaceInvitesList() {
   }
 
   return {
-    privateInvites: invites?.filter((invite) => !invite.publicContext),
-    publicInvites: invites?.filter((invite) => invite.publicContext) as
+    privateInvites: invites?.filter((invite) => !invite.visibleOn),
+    publicInvites: invites?.filter((invite) => invite.visibleOn) as
       | (InviteLinkWithRoles & {
           publicContext: PublicInviteLinkContext;
         })[]

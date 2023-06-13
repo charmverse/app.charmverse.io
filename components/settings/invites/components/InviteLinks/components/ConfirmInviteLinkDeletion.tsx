@@ -14,9 +14,7 @@ type Props = {
 export function ConfirmInviteLinkDeletion({ onClose, open, onConfirm, invite }: Props) {
   const { deleteInviteLink } = useSpaceInvitesList();
 
-  const questionPrefix = invite.publicContext
-    ? `The public invite link for ${invite.publicContext}`
-    : 'This private link';
+  const questionPrefix = invite.visibleOn ? `The public invite link for ${invite.visibleOn}` : 'This private link';
 
   return (
     <ConfirmDeleteModal

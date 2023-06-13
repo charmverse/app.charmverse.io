@@ -64,8 +64,8 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
       <TableRow key={invite.id}>
         <TableCell sx={{ padding: '20px 16px' }}>
           <Box display='flex' justifyContent='flex-start' gap={1}>
-            {invite.publicContext === 'proposals' ? 'Public proposals' : 'Private'} Link
-            {invite.publicContext === 'proposals' && (
+            {invite.visibleOn === 'proposals' ? 'Public proposals' : 'Private'} Link
+            {invite.visibleOn === 'proposals' && (
               <Tooltip title='Anyone can join your space from the public proposals page'>
                 <InfoOutlinedIcon color='secondary' fontSize='small' />
               </Tooltip>
@@ -74,7 +74,7 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
         </TableCell>
         <TableCell>
           <Typography>
-            <Chip label={labels[invite.publicContext]} color={colorMapping[invite.publicContext]} />
+            <Chip label={labels[invite.visibleOn]} color={colorMapping[invite.visibleOn]} />
           </Typography>
         </TableCell>
         <TableCell width={150}>
@@ -133,7 +133,7 @@ export function PublicInvitesList() {
   const isAdmin = useIsAdmin();
   const { updateInviteLinkRoles, deleteInviteLink, publicInvites } = useSpaceInvitesList();
 
-  const publicProposalsInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
+  const publicProposalsInvite = publicInvites?.find((invite) => invite.visibleOn === 'proposals');
 
   const padding = 32;
 

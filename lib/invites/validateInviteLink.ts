@@ -15,7 +15,7 @@ function isOutOfDate({ invite }: { invite: InviteLinkPopulated }): boolean {
 }
 
 export function validateInviteLink({ invite }: { invite: InviteLinkPopulated }): ValidatedLink {
-  if (invite.publicContext === 'proposals') {
+  if (invite.visibleOn === 'proposals') {
     const isValid = invite.space.publicProposals === true;
     return { invite, valid: isValid, reason: isValid ? undefined : 'publicProposalsDisabled' };
   } else if (invite.maxUses > 0 && invite.useCount >= invite.maxUses) {

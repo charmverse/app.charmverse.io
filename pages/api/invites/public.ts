@@ -15,7 +15,7 @@ handler.get(getPublicInviteLinkController);
 
 async function getPublicInviteLinkController(req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated>) {
   const inviteLink = await getPublicInviteLink({
-    publicContext: req.query.publicContext as PublicInviteLinkContext,
+    publicContext: req.query.visibleOn as PublicInviteLinkContext,
     spaceId: req.query.spaceId as string
   });
 

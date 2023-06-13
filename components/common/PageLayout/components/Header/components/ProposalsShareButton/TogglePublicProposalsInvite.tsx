@@ -29,7 +29,7 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
   // Current values of the public permission
   const { deleteInviteLink, publicInvites, createInviteLink, isLoadingInvites } = useSpaceInvitesList();
 
-  const publicProposalInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
+  const publicProposalInvite = publicInvites?.find((invite) => invite.visibleOn === 'proposals');
   const publicInviteExists = !!publicProposalInvite;
 
   function togglePublicInvite() {

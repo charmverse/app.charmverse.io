@@ -32,7 +32,7 @@ export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Pro
     };
   });
 
-  if (mappedLinks.some((link) => link.publicContext === 'proposals')) {
+  if (mappedLinks.some((link) => link.visibleOn === 'proposals')) {
     const space = (await prisma.space.findUnique({
       where: {
         id: spaceId
@@ -41,7 +41,7 @@ export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Pro
 
     // Remove public links if these don't exist
     if (!space.publicProposals) {
-      mappedLinks = mappedLinks.filter((link) => !link.publicContext);
+      mappedLinks = mappedLinks.filter((link) => !link.visibleOn);
     }
   }
 

@@ -70,7 +70,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   const { publicInvites, refreshInvitesList } = useSpaceInvitesList();
 
-  const publicProposalInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
+  const publicProposalInvite = publicInvites?.find((invite) => invite.visibleOn === 'proposals');
 
   async function updateSpacePublicProposals(publicProposals: boolean) {
     const updatedSpace = await charmClient.spaces.setPublicProposals({
