@@ -38,15 +38,6 @@ export function ProposalsPage() {
     charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
 
-  const { data: publicInviteLink } = useSWR(
-    !isSpaceMember && currentSpace ? `space-public-invite-${currentSpace.id}` : null,
-    () =>
-      charmClient.getPublicInviteLink({
-        spaceId: currentSpace!.id,
-        publicContext: 'proposals'
-      })
-  );
-
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
@@ -91,14 +82,6 @@ export function ProposalsPage() {
                   }}
                 >
                   <NewProposalButton mutateProposals={mutateProposals} />
-
-                  {/* {publicInviteLink && !isSpaceMember && (
-                    <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
-                      <Link href={`${window.location.origin}/invite/${publicInviteLink.code}`} variant='body2'>
-                        Join this space to create proposals
-                      </Link>
-                    </Box>
-                  )} */}
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions

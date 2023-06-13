@@ -10,9 +10,12 @@ import { useCurrentSpace } from './useCurrentSpace';
 export function useSpaceInvitesList() {
   const space = useCurrentSpace();
 
-  const { data: invites = [], mutate: refreshInvitesList } = useSWR<InviteLinkWithRoles[]>(
-    `${space?.id}/search-invites`,
-    () => charmClient.getInviteLinks(space?.id as string)
+  const {
+    data: invites,
+    mutate: refreshInvitesList,
+    isLoading
+  } = useSWR<InviteLinkWithRoles[]>(`${space?.id}/search-invites`, () =>
+    charmClient.getInviteLinks(space?.id as string)
   );
 
   async function createInviteLink({
@@ -50,13 +53,16 @@ export function useSpaceInvitesList() {
   }
 
   return {
-    privateInvites: invites.filter((invite) => !invite.publicContext),
-    publicInvites: invites.filter((invite) => invite.publicContext) as (InviteLinkWithRoles & {
-      publicContext: PublicInviteLinkContext;
-    })[],
+    privateInvites: invites?.filter((invite) => !invite.publicContext),
+    publicInvites: invites?.filter((invite) => invite.publicContext) as
+      | (InviteLinkWithRoles & {
+          publicContext: PublicInviteLinkContext;
+        })[]
+      | undefined,
     createInviteLink,
     refreshInvitesList,
     updateInviteLinkRoles,
-    deleteInviteLink
+    deleteInviteLink,
+    isLoadingInvites: !invites && isLoading
   };
 }

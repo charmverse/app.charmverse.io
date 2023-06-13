@@ -4,8 +4,10 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 import Legend from '../Legend';
@@ -25,6 +27,7 @@ export function Invites({ space }: { space: Space }) {
   const isTokenGatePending = useRef(false);
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const { account } = useWeb3AuthSig();
+  const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
 
   if (account && isTokenGatePending.current) {
     setPendingAction();
@@ -70,10 +73,14 @@ export function Invites({ space }: { space: Space }) {
           isAdmin={isAdmin}
         />
       </Legend>
-      <InviteLinkList popupState={popupInvitesState} />
+      {isLoadingInvites ? <Loader size={20} /> : <InviteLinkList popupState={popupInvitesState} />}
       <Box sx={{ my: 2 }} />
-      <PublicInvitesList />
-      <Box sx={{ my: 2 }} />
+      {publicInvites && publicInvites.length > 0 && (
+        <>
+          <PublicInvitesList />
+          <Box sx={{ my: 2 }} />
+        </>
+      )}
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
     </>
   );

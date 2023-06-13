@@ -19,8 +19,7 @@ interface InviteLinksProps {
 
 export function InviteLinkList({ popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
-  const { invites, refreshInvitesList, createInviteLink } = useSpaceInvitesList();
-  const isAdmin = useIsAdmin();
+  const { refreshInvitesList, createInviteLink } = useSpaceInvitesList();
 
   const { isOpen: isOpenInviteModal, close: closeInviteModal } = popupState;
   const {

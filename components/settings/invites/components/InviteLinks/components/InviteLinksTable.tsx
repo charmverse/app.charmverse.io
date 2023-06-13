@@ -1,6 +1,5 @@
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import CloseIcon from '@mui/icons-material/Close';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
@@ -48,14 +47,14 @@ export function InvitesTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {privateInvites.length === 0 && (
+          {privateInvites?.length === 0 && (
             <TableRow>
               <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>
                 This Space has no Invite Links
               </TableCell>
             </TableRow>
           )}
-          {privateInvites.map((invite) => (
+          {privateInvites?.map((invite) => (
             <TableRow key={invite.id}>
               <TableCell sx={{ padding: '20px 16px' }}>
                 <Box display='flex' justifyContent='flex-start' gap={1}>

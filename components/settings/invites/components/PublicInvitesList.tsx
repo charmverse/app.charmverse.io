@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import ButtonChip from 'components/common/ButtonChip';
-import { ConfirmPublicProposalLinkDeletion } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/ConfirmProposalDeletion';
+import { ConfirmPublicProposalLinkDeletion } from 'components/common/PageLayout/components/Header/components/ProposalsShareButton/ConfirmPublicProposalLinkDeletion';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -124,7 +124,7 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
           )}
         </TableCell>
       </TableRow>
-      <ConfirmPublicProposalLinkDeletion onClose={closeDeleteConfirmation} open={isOpen} />
+      <ConfirmPublicProposalLinkDeletion invite={invite} onClose={closeDeleteConfirmation} open={isOpen} />
     </>
   );
 }
@@ -133,7 +133,7 @@ export function PublicInvitesList() {
   const isAdmin = useIsAdmin();
   const { updateInviteLinkRoles, deleteInviteLink, publicInvites } = useSpaceInvitesList();
 
-  const publicProposalsInvite = publicInvites.find((invite) => invite.publicContext === 'proposals');
+  const publicProposalsInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
 
   const padding = 32;
 

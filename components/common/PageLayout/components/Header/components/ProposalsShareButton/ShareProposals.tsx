@@ -18,12 +18,11 @@ import { TogglePublicProposalsInvite } from 'components/common/PageLayout/compon
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
-import { ConfirmPublicProposalLinkDeletion } from './ConfirmProposalDeletion';
+import { ConfirmPublicProposalLinkDeletion } from './ConfirmPublicProposalLinkDeletion';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -70,29 +69,26 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   const proposalsArePublic = !!space?.publicProposals;
 
-  const { deleteInviteLink, publicInvites, createInviteLink } = useSpaceInvitesList();
+  const { publicInvites } = useSpaceInvitesList();
 
   const publicProposalInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
-  const publicInviteExists = !!publicProposalInvite;
 
-  async function togglePublic() {
+  async function updateSpacePublicProposals(publicProposals: boolean) {
     const updatedSpace = await charmClient.spaces.setPublicProposals({
-      publicProposals: !proposalsArePublic,
+      publicProposals,
       spaceId: space?.id as string
     });
     setSpace(updatedSpace);
   }
 
-  async function togglePublicInvite() {
-    // if (proposalsArePublic && publicProposalInvite?.roleIds.length === 0) {
-    //   deleteInviteLink(publicProposalInvite.id);
-    //   togglePublic();
-    // } else if (proposalsArePublic &&) {
-    // } else if (publicInviteExists) {
-    //   openConfirmDeleteModal();
-    // } else {
-    //   createInviteLink({ publicContext: 'proposals' });
-    // }
+  async function togglePublicProposals() {
+    if (!proposalsArePublic) {
+      updateSpacePublicProposals(true);
+    } else if (proposalsArePublic && (!publicProposalInvite || publicProposalInvite?.roleIds.length === 0)) {
+      updateSpacePublicProposals(false);
+    } else {
+      openConfirmDeleteModal();
+    }
   }
 
   useEffect(() => {
@@ -123,7 +119,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
           <Switch
             checked={proposalsArePublic || isPublicSpace}
             disabled={!isAdmin || isPublicSpace}
-            onChange={togglePublic}
+            onChange={togglePublicProposals}
           />
         </Grid>
       </Grid>
@@ -168,7 +164,14 @@ export default function ShareProposals({ padding = 1 }: Props) {
         </>
       )}
 
-      <ConfirmPublicProposalLinkDeletion open={isOpen} onClose={closeConfirmDeleteModal} onConfirm={togglePublic} />
+      {publicProposalInvite && (
+        <ConfirmPublicProposalLinkDeletion
+          open={isOpen}
+          onClose={closeConfirmDeleteModal}
+          onConfirm={() => updateSpacePublicProposals(false)}
+          invite={publicProposalInvite}
+        />
+      )}
     </Grid>
   );
 }

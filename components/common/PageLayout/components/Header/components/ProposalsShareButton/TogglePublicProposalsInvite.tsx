@@ -5,11 +5,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
+import Loader from 'components/common/Loader';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 
-import { ConfirmPublicProposalLinkDeletion } from './ConfirmProposalDeletion';
+import { ConfirmPublicProposalLinkDeletion } from './ConfirmPublicProposalLinkDeletion';
 
 type Props = {
   showOpenSettingsLink?: boolean;
@@ -27,7 +29,7 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
   } = usePopupState({ variant: 'popover', popupId: 'proposals-toggle' });
 
   // Current values of the public permission
-  const { deleteInviteLink, publicInvites, createInviteLink } = useSpaceInvitesList();
+  const { deleteInviteLink, publicInvites, createInviteLink, isLoadingInvites } = useSpaceInvitesList();
 
   const publicProposalInvite = publicInvites?.find((invite) => invite.publicContext === 'proposals');
   const publicInviteExists = !!publicProposalInvite;
@@ -41,6 +43,10 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
     } else {
       createInviteLink({ publicContext: 'proposals' });
     }
+  }
+
+  if (isLoadingInvites && !publicInvites) {
+    return <Loader size={20} />;
   }
 
   return (
@@ -68,7 +74,13 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
         </Typography>
       </Grid>
 
-      <ConfirmPublicProposalLinkDeletion open={isOpen} onClose={closeConfirmDeleteModal} />
+      {publicProposalInvite && (
+        <ConfirmPublicProposalLinkDeletion
+          open={isOpen}
+          onClose={closeConfirmDeleteModal}
+          invite={publicProposalInvite}
+        />
+      )}
     </Grid>
   );
 }
