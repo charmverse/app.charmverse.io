@@ -7,12 +7,16 @@ import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 
 export function SubscriptionActions({
   spaceSubscription,
+  loading,
   onCreate,
-  onDelete
+  onDelete,
+  onCancelAtEnd
 }: {
   spaceSubscription: SpaceSubscription | null | undefined;
+  loading: boolean;
   onCreate: () => void;
   onDelete: () => void;
+  onCancelAtEnd: () => void;
 }) {
   const isAdmin = useIsAdmin();
 
@@ -23,20 +27,20 @@ export function SubscriptionActions({
   return (
     <Stack flexDirection='row' gap={1} mb={1}>
       {spaceSubscription === null && (
-        <Button sx={{ width: 'fit-content' }} onClick={onCreate}>
+        <Button disabled={loading} sx={{ width: 'fit-content' }} onClick={onCreate}>
           Create a Plan
         </Button>
       )}
       {spaceSubscription && (
         <>
-          <Button onClick={() => {}} variant='outlined'>
+          <Button disabled={loading} onClick={() => {}} variant='outlined'>
             Upgrade/Downgrade Plan
           </Button>
-          <Button onClick={() => {}} color='error' variant='outlined'>
+          <Button disabled={loading} onClick={onCancelAtEnd} color='error' variant='outlined'>
             Cancel Plan
           </Button>
           {!isProdEnv && (
-            <Button onClick={onDelete} variant='outlined'>
+            <Button disabled={loading} onClick={onDelete} variant='outlined'>
               Delete Plan
             </Button>
           )}

@@ -20,7 +20,11 @@ export class SubscriptionApi {
   }
 
   // @TODO Delete this when all is done
-  freeSpaceSubscription(spaceId: string) {
+  deleteSpaceSubscription(spaceId: string) {
     return http.DELETE(`/api/spaces/${spaceId}/subscription`);
+  }
+
+  cancelAtEndSpaceSubscription(spaceId: string) {
+    return http.PUT(`/api/spaces/${spaceId}/subscription`, { status: 'cancelAtEnd' });
   }
 }

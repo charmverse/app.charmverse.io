@@ -5,8 +5,11 @@ import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
 import { inputBackground } from 'theme/colors';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -15,18 +18,44 @@ import { SubscriptionActions } from './SubscriptionActions';
 import { SubscriptionInformation } from './SubscriptionInformation';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
+  const { showMessage } = useSnackbar();
+  const { setSpace } = useSpaces();
+
   const {
     data: spaceSubscription,
     isLoading,
     mutate: refetchSpaceSubscription
-  } = useSWR(
-    `${space.id}-subscription`,
-    () => {
-      return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
-    },
+  } = useSWR(`${space.id}-subscription`, () => charmClient.subscription.getSpaceSubscription({ spaceId: space.id }), {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false
+  });
+
+  const { trigger: cancelAtEndSubscription, isMutating: isLoadingCancellation } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription-intent`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
+      charmClient.subscription.cancelAtEndSpaceSubscription(arg.spaceId),
     {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false
+      onError() {
+        showMessage('Cancellation failed! Please try again', 'error');
+      },
+      async onSuccess() {
+        await refetchSpaceSubscription();
+      }
+    }
+  );
+
+  const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription-intent`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
+      charmClient.subscription.deleteSpaceSubscription(arg.spaceId),
+    {
+      onError() {
+        showMessage('Deletion failed! Please try again', 'error');
+      },
+      async onSuccess() {
+        await refetchSpaceSubscription();
+        setSpace({ ...space, paidTier: 'free' });
+      }
     }
   );
 
@@ -46,8 +75,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   }
 
   async function handleDeleteSubs() {
-    await charmClient.subscription.freeSpaceSubscription(space.id);
-    await refetchSpaceSubscription();
+    await deleteSubscription({ spaceId: space.id });
   }
 
   const theme = useTheme();
@@ -61,8 +89,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         {!showCheckoutForm && (
           <SubscriptionActions
             spaceSubscription={spaceSubscription}
+            loading={isLoading || isLoadingCancellation || isLoadingDeletion}
             onCreate={handleShowCheckoutForm}
             onDelete={handleDeleteSubs}
+            onCancelAtEnd={cancelAtEndSubscription}
           />
         )}
         <Divider sx={{ mb: 1 }} />
