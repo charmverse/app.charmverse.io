@@ -1,8 +1,8 @@
 import type { Space } from '@charmverse/core/src/prisma-client';
-import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useMemo } from 'react';
 
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
@@ -22,6 +22,20 @@ export function SubscriptionInformation({
   isLoading: boolean;
 }) {
   const { members } = useMembers();
+
+  const status = useMemo(() => {
+    switch (spaceSubscription?.status) {
+      case 'active':
+        return 'Active';
+      case 'pending':
+        return 'Pending';
+      case 'cancelAtEnd':
+        return 'Your subscription was cancelled and will end on the next billing date';
+      case 'cancelled':
+      default:
+        return null;
+    }
+  }, [spaceSubscription?.status]);
 
   if (spaceSubscription === undefined) {
     return null;
@@ -64,6 +78,7 @@ export function SubscriptionInformation({
           </Stack>
         </Stack>
       )}
+      {status && <Typography>Status: {status}</Typography>}
     </>
   );
 }

@@ -10,6 +10,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/interfaces';
 import { inputBackground } from 'theme/colors';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -30,10 +31,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     revalidateOnFocus: false
   });
 
-  const { trigger: cancelAtEndSubscription, isMutating: isLoadingCancellation } = useSWRMutation(
+  const { trigger: updateSpaceSubscription, isMutating: isLoadingCancellation } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
-      charmClient.subscription.cancelAtEndSpaceSubscription(arg.spaceId),
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpdateSubscriptionRequest } }>) =>
+      charmClient.subscription.updateSpaceSubscription(arg.spaceId, arg.payload),
     {
       onError() {
         showMessage('Cancellation failed! Please try again', 'error');
@@ -92,7 +93,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             loading={isLoading || isLoadingCancellation || isLoadingDeletion}
             onCreate={handleShowCheckoutForm}
             onDelete={handleDeleteSubs}
-            onCancelAtEnd={cancelAtEndSubscription}
+            onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancelAtEnd' } })}
           />
         )}
         <Divider sx={{ mb: 1 }} />
