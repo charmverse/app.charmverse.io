@@ -16,7 +16,7 @@ function cleanUtilisationRatio(ratio: number): number {
 export function BlockCounts() {
   const currentSpace = useCurrentSpace();
 
-  const blockQuota = 1000;
+  const blockQuota = 10000;
 
   const { data: blockCount } = useSWR(currentSpace ? `space-block-count-${currentSpace.id}` : null, () =>
     charmClient.spaces.getBlockCount({
@@ -43,7 +43,13 @@ export function BlockCounts() {
       <Box width='90%' margin='auto'>
         <Typography
           variant='caption'
-          sx={{ display: 'block', width: '100%', lineHeight: 1.5, whiteSpace: 'break-spaces' }}
+          color={quotaExceeded ? 'red !important' : undefined}
+          sx={{
+            display: 'block',
+            width: '100%',
+            lineHeight: 1.5,
+            whiteSpace: 'break-spaces'
+          }}
         >
           This space has used{' '}
           {`${blockCount.count} blocks of its ${blockQuota} block storage limit (${usedRatioToFixed}%)`}
@@ -58,7 +64,7 @@ export function BlockCounts() {
         >
           <Box
             sx={{
-              background: quotaExceeded ? 'red' : 'grey',
+              background: 'grey',
               width: `${Math.min(100, usedRatioToFixed)}%`,
               height: usageBarHeight
             }}
