@@ -22,7 +22,7 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
       {showMySpacesLink && (
-        <Button variant='text' href={getSpaceUrl(spaces[0]?.domain)} endIcon={<NavigateNextIcon />}>
+        <Button variant='text' href={getSpaceUrl({ domain: spaces[0]?.domain })} endIcon={<NavigateNextIcon />}>
           Go to my space
         </Button>
       )}
