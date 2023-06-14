@@ -10,6 +10,8 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
+import { redirectToAppLogin } from 'lib/utilities/browser';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
@@ -25,6 +27,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
   const hasSpaceDomain = !!spaceDomain;
+  const isSubdomainUrl = !!getValidSubdomain();
 
   useEffect(() => {
     const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
@@ -83,15 +86,10 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
 
-    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
-      return { authorized: true };
-    }
-
     // condition: no user session and no wallet address
     else if (!user) {
-      // condition: space subdomain / custom domain main path
-      // do not redirect - it will display login
-      if (isSpaceSubdomainPath) {
+      // if app is running on a subdomain, redirect to main app login
+      if (isSubdomainUrl && redirectToAppLogin()) {
         return { authorized: true };
       }
 

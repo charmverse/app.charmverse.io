@@ -1,4 +1,4 @@
-import { baseUrl, isDevEnv } from 'config/constants';
+import { appSubdomain, baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
@@ -329,4 +329,24 @@ export function getDefaultSpaceUrl({
   }
 
   return `/${domain}${path}`;
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appDomain = getAppApexDomain();
+
+  if (appDomain) {
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const loginUrl = new URL(`${window.location.protocol}//${appSubdomain}.${appDomain}${port}/`);
+    const returnUrl = window.location.href;
+
+    loginUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = loginUrl.toString();
+    return true;
+  }
+
+  return false;
 }
