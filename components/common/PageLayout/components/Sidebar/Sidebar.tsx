@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
+import { BlockCounts } from 'components/settings/subscription/BlockCounts';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -219,6 +220,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             icon={<DeleteOutlinedIcon fontSize='small' />}
             label='Trash'
           />
+          <BlockCounts />
         </Box>
       </>
     );
@@ -290,7 +292,6 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                     />
                   );
                 }
-
                 return null;
               })}
             </Box>
