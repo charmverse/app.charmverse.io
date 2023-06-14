@@ -1,4 +1,3 @@
-import { PaidAnnouncementBanner } from 'components/common/Banners/PaidAnnouncementBanner';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';

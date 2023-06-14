@@ -20,11 +20,10 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
-import { PaidAnnouncementBanner } from '../Banners/PaidAnnouncementBanner';
-
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
+import { PaidAnnouncementBanner } from './components/PaidAnnouncementBanner';
 import Sidebar from './components/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
