@@ -71,7 +71,7 @@ function TableRow(props: Props) {
     pageUpdatedBy,
     saveTitle
   } = props;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;

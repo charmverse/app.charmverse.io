@@ -138,7 +138,7 @@ function reducerWithContext({ id }: { id: string }) {
 }
 
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { categories: proposalCategories = [] } = useProposalCategories();
   const { categories: forumCategories = [] } = useForumCategories();
   const isAdmin = useIsAdmin();

@@ -30,7 +30,7 @@ import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
   const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();

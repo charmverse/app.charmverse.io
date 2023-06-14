@@ -62,7 +62,7 @@ export default function BountyProperties(props: {
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>();
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { isPublicSpace } = useIsPublicSpace();
 

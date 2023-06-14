@@ -23,7 +23,7 @@ import { useProposals } from './hooks/useProposals';
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
   const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { isPublicSpace } = useIsPublicSpace();
   const {
     data,

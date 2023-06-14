@@ -39,7 +39,7 @@ export type FormValues = yup.InferType<typeof schema>;
 const DEFAULT_VOTING_DURATION = 7;
 
 export default function ConnectSnapshot() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
   const [formError, setFormError] = useState<SystemError | null>(null);
   const [touched, setTouched] = useState<boolean>(false);
