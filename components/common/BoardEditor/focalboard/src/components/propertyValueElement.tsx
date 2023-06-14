@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -22,7 +22,7 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
+import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;

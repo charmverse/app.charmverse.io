@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
-} from 'components/common/BoardEditor/components/properties/SelectProperty/mappers';
+} from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/mappers';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -16,7 +16,7 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 };
-const SelectPreviewContainer = styled(Stack, {
+export const SelectPreviewContainer = styled(Stack, {
   shouldForwardProp: (prop: string) => prop !== 'displayType'
 })<ContainerProps>`
   justify-content: center;
@@ -60,15 +60,14 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
-    .MuiAutocomplete-input {
-      ${({ displayType, theme }) =>
-        displayType === 'table'
-          ? `
-      width: 100%;
-      border-top: 1px solid ${theme.palette.divider};
-    `
-          : ''}
-    }
+    ${({ displayType, theme }) =>
+      displayType === 'table'
+        ? `
+        .MuiAutocomplete-input {
+          width: 100%;
+          border-top: 1px solid ${theme.palette.divider};
+        }`
+        : ''}
   }
 
   .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
