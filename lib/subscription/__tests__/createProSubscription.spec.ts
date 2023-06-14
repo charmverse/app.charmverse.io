@@ -42,6 +42,10 @@ describe('createProSubscription', () => {
       id: customerId
     });
 
+    const updateCustomersMockFn = jest.fn().mockResolvedValue({
+      id: customerId
+    });
+
     const listCustomersMockFn = jest.fn().mockResolvedValue({
       data: []
     });
@@ -74,6 +78,7 @@ describe('createProSubscription', () => {
     });
 
     (stripeClient.customers.create as jest.Mock<any, any>) = createCustomersMockFn;
+    (stripeClient.customers.update as jest.Mock<any, any>) = updateCustomersMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
     (stripeClient.subscriptions.search as jest.Mock<any, any>) = searchSubscriptionsMockFn;
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
