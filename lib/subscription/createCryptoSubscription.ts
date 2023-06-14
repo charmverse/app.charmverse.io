@@ -28,13 +28,8 @@ export async function createCryptoSubscription({
     coupon
   });
 
-  let loopItem;
-  try {
-    const loopItems = await getLoopProducts();
-    loopItem = loopItems.find((product) => product.externalId === subscriptionData?.priceId);
-  } catch (error: any) {
-    throw new ExternalServiceError('Loop failed to retrieve the requested items');
-  }
+  const loopItems = await getLoopProducts();
+  const loopItem = loopItems.find((product) => product.externalId === subscriptionData?.priceId);
 
   if (!loopItem) {
     throw new NotFoundError('Loop item not found');

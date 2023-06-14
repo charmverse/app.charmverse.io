@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/dist/cjs/lib/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -42,6 +43,7 @@ async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiR
 
 async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreatePaymentSubscriptionResponse>) {
   const { id: spaceId } = req.query as { id: string };
+  const userId = req.session.user.id;
   const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
 
   const { clientSecret, paymentIntentStatus } = await createProSubscription({
@@ -53,6 +55,8 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
     address,
     coupon
   });
+
+  log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
   res.status(200).json({
     paymentIntentStatus,
@@ -67,14 +71,19 @@ async function deletePaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   await deleteProSubscription({ spaceId, userId });
 
+  log.info(`Subscription cancelled for space ${spaceId} by user ${userId}`);
+
   res.status(200).end();
 }
 
 async function updatePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
   const { id: spaceId } = req.query as { id: string };
+  const userId = req.session.user.id;
   const payload = req.body as UpdateSubscriptionRequest;
 
   await updateProSubscription({ spaceId, payload });
+
+  log.info(`Subscription updated for space ${spaceId} by user ${userId}`);
 
   res.status(200).end();
 }

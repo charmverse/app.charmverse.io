@@ -164,6 +164,87 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        const spaceSubscription = await prisma.stripeSubscription.findUnique({
+          where: {
+            spaceId: subscription.metadata.spaceId as string,
+            subscriptionId: subscription.id,
+            deletedAt: null,
+            status: {
+              not: 'cancelled'
+            }
+          }
+        });
+
+        if (!spaceSubscription) {
+          log.warn(
+            `Can't update the user subscription. Space subscription not found for subscription ${subscription.id}`
+          );
+          break;
+        }
+
+        const isStatusUpdate =
+          (subscription.cancel_at_period_end && subscription.status === 'active') ||
+          (!subscription.cancel_at_period_end && spaceSubscription.status === 'cancelAtEnd');
+
+        if (isStatusUpdate) {
+          await prisma.stripeSubscription.update({
+            where: {
+              id: spaceSubscription.id
+            },
+            data: {
+              status: subscription.cancel_at_period_end ? 'cancelAtEnd' : 'active'
+            }
+          });
+        }
+
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        const spaceSubscription = await prisma.stripeSubscription.findUnique({
+          where: {
+            spaceId: subscription.metadata.spaceId as string,
+            subscriptionId: subscription.id,
+            deletedAt: null,
+            status: {
+              not: 'cancelled'
+            }
+          }
+        });
+
+        if (!spaceSubscription) {
+          log.warn(
+            `Can't update the user subscription. Space subscription not found for subscription ${subscription.id}`
+          );
+          break;
+        }
+
+        await prisma.stripeSubscription.update({
+          where: {
+            spaceId: subscription.metadata.spaceId as string,
+            subscriptionId: subscription.id,
+            deletedAt: null,
+            status: {
+              not: 'cancelled'
+            }
+          },
+          data: {
+            deletedAt: new Date(),
+            status: 'cancelled',
+            space: {
+              update: {
+                paidTier: 'free'
+              }
+            }
+          }
+        });
+
+        break;
+      }
       default: {
         log.warn(`Unhandled event type in stripe webhook: ${event.type}`);
         break;

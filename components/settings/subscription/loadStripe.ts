@@ -3,11 +3,11 @@ import { loadStripe as _loadStripe } from '@stripe/stripe-js';
 
 const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string;
 
-let stripePromise: Stripe | null;
+let stripePromise: Promise<Stripe | null>;
 
-export async function loadStripe() {
+export function loadStripe() {
   if (!stripePromise) {
-    stripePromise = await _loadStripe(stripePublicKey);
+    stripePromise = _loadStripe(stripePublicKey);
   }
   return stripePromise;
 }

@@ -1,6 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import log from 'loglevel';
-import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
@@ -32,17 +30,9 @@ export async function updateProSubscription({
   }
 
   if (payload.status) {
-    try {
-      await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
-        cancel_at_period_end: payload.status === 'cancelAtEnd'
-      });
-    } catch (err: any) {
-      log.error(`[stripe]: Failed to cancel_at_period_end subscription. ${err.message}`, {
-        spaceId,
-        errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
-        errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
-      });
-    }
+    await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+      cancel_at_period_end: payload.status === 'cancelAtEnd'
+    });
   }
 
   await prisma.stripeSubscription.update({

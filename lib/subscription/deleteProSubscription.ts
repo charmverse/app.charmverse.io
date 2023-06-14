@@ -1,6 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import log from 'loglevel';
-import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
@@ -24,10 +22,14 @@ export async function deleteProSubscription({ spaceId, userId }: { spaceId: stri
     throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
   }
 
-  await prisma.stripeSubscription.delete({
+  await prisma.stripeSubscription.update({
     where: {
       subscriptionId: spaceSubscription.subscriptionId,
       spaceId
+    },
+    data: {
+      deletedAt: new Date(),
+      status: 'cancelled'
     }
   });
 
@@ -42,13 +44,5 @@ export async function deleteProSubscription({ spaceId, userId }: { spaceId: stri
     }
   });
 
-  try {
-    await stripeClient.subscriptions.cancel(spaceSubscription.subscriptionId);
-  } catch (err: any) {
-    log.error(`[stripe]: Failed to cancel subscription. ${err.message}`, {
-      spaceId,
-      errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
-      errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
-    });
-  }
+  await stripeClient.subscriptions.cancel(spaceSubscription.subscriptionId);
 }

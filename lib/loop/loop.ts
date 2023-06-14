@@ -1,4 +1,6 @@
-import fetch from 'adapters/http/fetch';
+import { GET } from '@charmverse/core/http';
+
+import { loopApiUrl } from 'lib/subscription/constants';
 
 export interface LoopItem {
   itemId: string;
@@ -23,7 +25,7 @@ const DEFAULT_HEADERS = {
 };
 
 export async function getLoopProducts(productId?: string) {
-  return fetch<LoopItem[]>(`${process.env.LOOP_API_URL}/api/v1/items${productId ? `?id=${productId}` : ''}`, {
+  return GET<LoopItem[]>(`${loopApiUrl}/api/v1/items${productId ? `?id=${productId}` : ''}`, null, {
     headers: DEFAULT_HEADERS
   });
 }
