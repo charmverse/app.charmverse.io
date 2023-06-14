@@ -9,11 +9,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { stripeClient } from 'lib/subscription/stripe';
 
-export const config = {
-  api: {
-    bodyParser: false
-  }
-};
+// Stripe requires the raw body to construct the event. https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
+export const config = { api: { bodyParser: false } };
 
 function buffer(req: NextApiRequest) {
   return new Promise<Buffer>((resolve, reject) => {
@@ -72,10 +69,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     throw new InsecureOperationError('Signature not found');
   }
 
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST').status(405).end('Method Not Allowed');
-  }
-
   try {
     const body = await buffer(req);
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
@@ -89,6 +82,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         const spaceId = stripeSubscription.metadata.spaceId;
+        // @ts-ignore The plan exists
+        const subscriptionPlan = stripeSubscription.plan as Stripe.Plan;
 
         const space = await prisma.space.findUnique({
           where: { id: spaceId, deletedAt: null }
@@ -98,20 +93,15 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`);
           break;
         }
-
-        // @ts-ignore The plan exists
-        const period = ((stripeSubscription.plan?.interval as string) === 'month' ? 'monthly' : 'annual') as const;
-        // @ts-ignore The plan exists
-        const productId = stripeSubscription.plan?.product as const;
+        const period = subscriptionPlan.interval === 'month' ? ('monthly' as const) : ('annual' as const);
+        const productId = subscriptionPlan.product as string;
 
         const newData = {
           customerId: invoice.customer as string,
           subscriptionId: invoice.subscription as string,
           period,
-          // @ts-ignore The plan exists
-          productId: stripeSubscription.plan?.product as string,
-          // @ts-ignore The plan exists
-          priceId: stripeSubscription.plan?.id as string,
+          productId: subscriptionPlan.product as string,
+          priceId: subscriptionPlan.id as string,
           spaceId,
           status: 'active' as const,
           deletedAt: null
@@ -150,12 +140,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
         }
 
-        log.info(`The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid`);
+        log.info(
+          `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
+        );
 
         trackUserAction('checkout_subscription', {
           userId: space.updatedBy,
           spaceId,
-          billingEmail: invoice.customer_email || '',
           productId,
           period,
           tier: 'pro',
@@ -246,7 +237,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         break;
       }
       default: {
-        log.warn(`Unhandled event type in stripe webhook: ${event.type}`);
+        log.debug(`Unhandled event type in stripe webhook: ${event.type}`);
         break;
       }
     }
