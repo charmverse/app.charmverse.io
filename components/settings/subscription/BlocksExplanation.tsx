@@ -12,7 +12,7 @@ export function BlocksExplanation() {
   return (
     <Stack gap={2}>
       <Box>
-        <Typography variant='h6'>What is a block?</Typography>
+        <Typography variant='h6'></Typography>
         <Typography variant='body2'>
           Every piece of content in CharmVerse is a block:
           <ul>
@@ -24,7 +24,9 @@ export function BlocksExplanation() {
         </Typography>
       </Box>
       <Box>
-        <Typography variant='h6'>How many blocks does my community need?</Typography>
+        <Typography variant='h6' sx={{ mb: 2 }}>
+          How many blocks does my community need?
+        </Typography>
         <Typography variant='body2'>
           Based on your community's size, here are some suggested block needs:
           <br />
@@ -60,7 +62,7 @@ type Props = {
 
 export function BlocksExplanationModal({ onClose, open }: Props) {
   return (
-    <Modal open={open} onClose={onClose} size='large'>
+    <Modal open={open} onClose={onClose} size='large' title='What is a block?'>
       <BlocksExplanation />
     </Modal>
   );
