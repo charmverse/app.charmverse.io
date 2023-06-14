@@ -1,9 +1,14 @@
+import { useTheme } from '@emotion/react';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
+import { BlocksExplanationModal } from './BlocksExplanation';
 
 function cleanUtilisationRatio(ratio: number): number {
   if (ratio % 1 === 0) {
@@ -15,8 +20,14 @@ function cleanUtilisationRatio(ratio: number): number {
 
 export function BlockCounts() {
   const currentSpace = useCurrentSpace();
+  const theme = useTheme();
 
-  const blockQuota = 10000;
+  const {
+    isOpen: isExplanationModalOpen,
+    close: closeExplanationModal,
+    open: openExplanationModal
+  } = usePopupState({ variant: 'popover', popupId: 'block-count-info' });
+  const blockQuota = 1000;
 
   const { data: blockCount } = useSWR(currentSpace ? `space-block-count-${currentSpace.id}` : null, () =>
     charmClient.spaces.getBlockCount({
@@ -45,7 +56,7 @@ export function BlockCounts() {
           variant='caption'
           color={quotaExceeded ? 'red !important' : undefined}
           sx={{
-            display: 'block',
+            display: 'inline-flex',
             width: '100%',
             lineHeight: 1.5,
             whiteSpace: 'break-spaces'
@@ -53,6 +64,11 @@ export function BlockCounts() {
         >
           This space has used{' '}
           {`${blockCount.count} blocks of its ${blockQuota} block storage limit (${usedRatioToFixed}%)`}
+          <HelpOutlineIcon
+            onClick={openExplanationModal}
+            color={theme.palette.background.default as any}
+            fontSize='small'
+          />
         </Typography>
         <Box
           sx={{
@@ -71,6 +87,7 @@ export function BlockCounts() {
           />
           <Box
             sx={{
+              opacity: 0.6,
               width: `${unusedRatio}%`,
               height: usageBarHeight,
               background: 'white'
@@ -78,6 +95,8 @@ export function BlockCounts() {
           />
         </Box>
       </Box>
+
+      <BlocksExplanationModal open={isExplanationModalOpen} onClose={closeExplanationModal} />
     </Box>
   );
 }
