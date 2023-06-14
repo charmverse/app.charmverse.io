@@ -11,12 +11,10 @@ type MemberLevelOutput = {
 
 export function useHasMemberLevel(level: MemberLevel): MemberLevelOutput {
   const space = useCurrentSpace();
-  const { isLoaded: isSpacesLoaded, spaces } = useSpaces();
+  const { spaces } = useSpaces();
   const { user, isLoaded: isUserLoaded } = useUser();
-
   if (
     !isUserLoaded ||
-    !isSpacesLoaded ||
     // This condition is required for the interim state where the user has the spaces loaded, but the space has not yet been set
     // We assert a condition of having at least one space in the array to avoid impacting users without a space
     (spaces.length > 0 && !space)
