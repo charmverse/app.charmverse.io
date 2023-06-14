@@ -2,9 +2,8 @@ import EastIcon from '@mui/icons-material/East';
 import { Typography, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 
+import { StyledBanner } from 'components/common/Banners/Banner';
 import Link from 'components/common/Link';
-
-import { StyledBanner } from './Banner';
 
 export function ProposalBanner({ type, proposalId }: { type: 'page' | 'post'; proposalId: string }) {
   const router = useRouter();

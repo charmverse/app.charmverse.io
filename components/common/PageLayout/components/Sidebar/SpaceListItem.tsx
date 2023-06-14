@@ -54,7 +54,7 @@ export default function SpaceListItem({ space, changeOrderHandler, selected, dis
     <MenuItem
       key={space.domain}
       component={NextLink}
-      href={getSpaceUrl(space.domain)}
+      href={getSpaceUrl({ domain: space.domain, customDomain: space.customDomain })}
       sx={{ ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active' }) }}
       ref={ref}
       selected={selected}

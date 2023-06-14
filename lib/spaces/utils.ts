@@ -16,3 +16,7 @@ export function getSpaceDomainFromName(name: string) {
     .replace(/\s/g, '-')
     .toLowerCase();
 }
+
+export function isCustomDomain(domain: string) {
+  return domain.includes('.');
+}

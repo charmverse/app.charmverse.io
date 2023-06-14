@@ -2,10 +2,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
 
+import { StyledBanner } from 'components/common/Banners/Banner';
 import Link from 'components/common/Link';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-
-import { StyledBanner } from './Banner';
 
 export function PaidAnnouncementBanner() {
   const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage('show-paid-banner', true);

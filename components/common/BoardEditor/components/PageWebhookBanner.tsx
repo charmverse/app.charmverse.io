@@ -2,7 +2,7 @@ import type { BoxProps } from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { StyledBanner } from './Banner';
+import { StyledBanner } from '../../Banners/Banner';
 
 export function PageWebhookBanner({ type, url, ...restProps }: BoxProps & { type: string; url: string }) {
   return (
