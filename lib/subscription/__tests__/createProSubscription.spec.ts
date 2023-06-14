@@ -20,8 +20,12 @@ jest.mock('../stripe', () => ({
     products: {
       retrieve: jest.fn()
     },
+    prices: {
+      list: jest.fn()
+    },
     subscriptions: {
-      create: jest.fn()
+      create: jest.fn(),
+      search: jest.fn()
     }
   }
 }));
@@ -35,17 +39,18 @@ describe('createProSubscription', () => {
     const customerId = v4();
     const productId = v4();
     const paymentId = v4();
+    const priceId = v4();
 
     const createCustomersMockFn = jest.fn().mockResolvedValue({
       id: customerId
     });
 
-    const retrieveProductsMockFn = jest.fn().mockResolvedValue({
-      id: productId
-    });
-
     const listCustomersMockFn = jest.fn().mockResolvedValue({
       data: []
+    });
+
+    const listPricesMockFn = jest.fn().mockResolvedValue({
+      data: [{ id: priceId, recurring: { interval: 'month' } }]
     });
 
     const createSubscriptionsMockFn = jest.fn().mockResolvedValue({
@@ -59,16 +64,30 @@ describe('createProSubscription', () => {
       }
     });
 
+    const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
+      id: subscriptionId,
+      data: [{ customer: customerId }],
+      latest_invoice: {
+        payment_intent: {
+          client_secret,
+          status: 'pending',
+          id: paymentId
+        }
+      }
+    });
+
     (stripeClient.customers.create as jest.Mock<any, any>) = createCustomersMockFn;
-    (stripeClient.products.retrieve as jest.Mock<any, any>) = retrieveProductsMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
+    (stripeClient.subscriptions.search as jest.Mock<any, any>) = searchSubscriptionsMockFn;
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
+    (stripeClient.prices.list as jest.Mock<any, any>) = listPricesMockFn;
 
     const { clientSecret, paymentIntentStatus } = await createProSubscription({
       period: 'monthly',
       spaceId: space.id,
       productId: 'community_5k',
-      billingEmail: 'test@gmail.com'
+      billingEmail: 'test@gmail.com',
+      coupon: ''
     });
 
     expect(createCustomersMockFn).toHaveBeenCalledWith({
@@ -79,9 +98,14 @@ describe('createProSubscription', () => {
       }
     });
 
-    expect(retrieveProductsMockFn).toHaveBeenCalledWith(`community_5k`);
+    expect(listPricesMockFn).toHaveBeenCalledWith({
+      product: 'community_5k',
+      type: 'recurring',
+      active: true
+    });
 
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
+      coupon: '',
       metadata: {
         tier: 'pro',
         period: 'monthly',
@@ -91,34 +115,15 @@ describe('createProSubscription', () => {
       customer: customerId,
       items: [
         {
-          price_data: {
-            currency: 'USD',
-            product: productId,
-            unit_amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
-            recurring: {
-              interval: 'month'
-            }
-          }
+          price: priceId
         }
       ],
       payment_settings: {
-        payment_method_types: ['card'],
         save_default_payment_method: 'on_subscription'
       },
+      payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent']
     });
-
-    expect(
-      await prisma.stripeSubscription.findFirstOrThrow({
-        where: {
-          spaceId: space.id,
-          customerId,
-          subscriptionId,
-          productId,
-          period: 'monthly'
-        }
-      })
-    ).not.toBeFalsy();
 
     expect(paymentIntentStatus).toStrictEqual('succeeded');
     expect(clientSecret).toStrictEqual(client_secret);
