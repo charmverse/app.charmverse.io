@@ -35,7 +35,7 @@ export function VideoNodeView({
   isPost = false
 }: CharmNodeViewProps & { isPost?: boolean }) {
   const attrs = node.attrs as VideoNodeAttrs;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready

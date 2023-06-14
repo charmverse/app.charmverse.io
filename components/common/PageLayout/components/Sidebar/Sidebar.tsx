@@ -132,7 +132,7 @@ interface SidebarProps {
 export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);

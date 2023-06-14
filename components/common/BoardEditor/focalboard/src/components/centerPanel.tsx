@@ -107,7 +107,7 @@ function CenterPanel(props: Props) {
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();

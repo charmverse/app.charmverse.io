@@ -34,7 +34,7 @@ type Props = {
 };
 
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
   const [_, { width: containerWidth }] = useElementSize();
