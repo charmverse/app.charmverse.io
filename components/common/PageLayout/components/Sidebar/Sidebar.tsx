@@ -220,6 +220,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             icon={<DeleteOutlinedIcon fontSize='small' />}
             label='Trash'
           />
+          <Box my={2} />
           <BlockCounts />
         </Box>
       </>
