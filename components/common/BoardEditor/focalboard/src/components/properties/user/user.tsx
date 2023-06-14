@@ -163,13 +163,24 @@ function UserProperty(props: Props): JSX.Element | null {
             : undefined
         }
       >
-        <MembersDisplay
-          wrapColumn={props.wrapColumn ?? false}
-          readOnly={props.readOnly}
-          clicked={clicked}
-          memberIds={memberIds}
-          setMemberIds={updateMemberIds}
-        />
+        {props.displayType === 'details' && memberIds.length === 0 ? (
+          <div
+            className='octo-propertyvalue'
+            style={{
+              color: 'var(--text-gray)'
+            }}
+          >
+            Empty
+          </div>
+        ) : (
+          <MembersDisplay
+            wrapColumn={props.wrapColumn ?? false}
+            readOnly={props.readOnly}
+            clicked={clicked}
+            memberIds={memberIds}
+            setMemberIds={updateMemberIds}
+          />
+        )}
       </div>
     );
   }
