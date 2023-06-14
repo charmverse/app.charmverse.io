@@ -2,7 +2,6 @@ import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';
-import stripe from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
@@ -35,17 +34,15 @@ export async function createProSubscription({
 
   const spaceSubscription = await prisma.stripeSubscription.findFirst({
     where: {
-      spaceId
+      spaceId,
+      deletedAt: null
     },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
-  const activeSpaceSubscription =
-    spaceSubscription?.productId === productId &&
-    spaceSubscription.period === period &&
-    spaceSubscription.deletedAt === null;
+  const activeSpaceSubscription = spaceSubscription?.productId === productId && spaceSubscription.period === period;
 
   if (activeSpaceSubscription) {
     throw new InvalidStateError(
@@ -69,14 +66,15 @@ export async function createProSubscription({
     });
   }
 
-  const existingStripeSubscription = await stripeClient.subscriptions.search({
+  const pendingStripeSubscription = await stripeClient.subscriptions.search({
     query: `metadata['spaceId']:'${spaceId}'`,
     expand: ['data.customer']
   });
 
-  const existingStripeCustomer = existingStripeSubscription.data.find(
-    (sub) => (sub.customer as Stripe.Customer | Stripe.DeletedCustomer).deleted !== true
-  )?.customer as Stripe.Customer | undefined;
+  const existingStripeCustomer = pendingStripeSubscription.data?.find((sub) => {
+    const _customer = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
+    return _customer.deleted !== true && (sub.status === 'trialing' || sub.status === 'incomplete');
+  })?.customer as Stripe.Customer | undefined;
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
@@ -124,11 +122,7 @@ export async function createProSubscription({
   let subscription: Stripe.Subscription | undefined;
   try {
     // Case if user downgrades or upgrades or user has an expired subscription and purchases again
-    if (
-      spaceSubscription &&
-      (spaceSubscription.productId !== productId || spaceSubscription.period !== period) &&
-      spaceSubscription.deletedAt === null
-    ) {
+    if (spaceSubscription && (spaceSubscription.productId !== productId || spaceSubscription.period !== period)) {
       const oldSubscription = await stripeClient.subscriptions.retrieve(spaceSubscription.subscriptionId);
       subscription = await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
         metadata: {
@@ -184,13 +178,12 @@ export async function createProSubscription({
         expand: ['latest_invoice.payment_intent']
       });
     }
-  } catch (err: any) {
-    log.error(`[stripe]: Failed to create subscription. ${err.message}`, {
+  } catch (error: any) {
+    log.error(`[stripe]: Failed to create subscription. ${error.message}`, {
       spaceId,
       period,
       billingEmail,
-      errorType: err instanceof stripe.errors.StripeError ? err.type : undefined,
-      errorCode: err instanceof stripe.errors.StripeError ? err.code : undefined
+      error
     });
   }
 
