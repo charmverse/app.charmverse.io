@@ -61,7 +61,7 @@
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "update-core": "npm install github:charmverse/core#feat/stripe-loop-subs"
+    "update-core": "npm install github:charmverse/core#main"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -84,7 +84,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "github:charmverse/core#feat/stripe-loop-subs",
+    "@charmverse/core": "github:charmverse/core#main",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@date-io/luxon": "^2.13.1",

@@ -98,7 +98,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           />
         )}
         <Divider sx={{ mb: 1 }} />
-        {!isLoading && spaceSubscription !== undefined && showCheckoutForm && (
+        {!isLoading && spaceSubscription !== undefined && (
           <Elements
             stripe={stripePromise}
             options={{
@@ -129,6 +129,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             }}
           >
             <CheckoutForm
+              show={showCheckoutForm}
               spaceSubscription={spaceSubscription}
               refetch={refetchSpaceSubscription}
               onCancel={() => setShowCheckoutForm(false)}
