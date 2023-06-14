@@ -1,7 +1,6 @@
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
-import { isMarkActiveInSelection } from '@bangle.dev/utils';
 import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
@@ -143,13 +142,13 @@ export function rowNodeAtPos(view: EditorView, startPos: number) {
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
   }
-  let levels = 10; // pre-caution to prevent infinite loop
-  while (rowNode && rowNode.parentNode !== view.dom && levels > 0) {
-    levels -= 1;
-    if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
-      rowNode = rowNode.parentNode;
-    }
-  }
+  // let levels = 10; // pre-caution to prevent infinite loop
+  // while (rowNode && rowNode.parentNode !== view.dom && levels > 0) {
+  //   levels -= 1;
+  //   if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
+  //     rowNode = rowNode.parentNode;
+  //   }
+  // }
   // another approach, which may require checking the nodeType:
   // while (node && node.parentNode) {
   //   if ((node.parentNode as Element).classList?.contains('ProseMirror')) { // todo
