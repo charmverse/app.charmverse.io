@@ -1,13 +1,11 @@
 /* eslint-disable camelcase */
 
-import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
-import { SUBSCRIPTION_PRODUCTS_RECORD } from '../constants';
 import { createProSubscription } from '../createProSubscription';
 import { stripeClient } from '../stripe';
 
@@ -37,7 +35,6 @@ describe('createProSubscription', () => {
     const subscriptionId = v4();
     const client_secret = v4();
     const customerId = v4();
-    const productId = v4();
     const paymentId = v4();
     const priceId = v4();
 
@@ -58,7 +55,7 @@ describe('createProSubscription', () => {
       latest_invoice: {
         payment_intent: {
           client_secret,
-          status: 'succeeded',
+          status: 'incomplete',
           id: paymentId
         }
       }
@@ -125,7 +122,7 @@ describe('createProSubscription', () => {
       expand: ['latest_invoice.payment_intent']
     });
 
-    expect(paymentIntentStatus).toStrictEqual('succeeded');
+    expect(paymentIntentStatus).toStrictEqual('incomplete');
     expect(clientSecret).toStrictEqual(client_secret);
   });
 
