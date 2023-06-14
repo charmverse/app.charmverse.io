@@ -9,6 +9,7 @@ import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { getLinkElement } from '../link/getLinkElement';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';
@@ -63,6 +64,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
           const className =
             (event.target as HTMLElement).className +
             ((event.target as HTMLElement).parentNode as HTMLElement).className;
+
           if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,

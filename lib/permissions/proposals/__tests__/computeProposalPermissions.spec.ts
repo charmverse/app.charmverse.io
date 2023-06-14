@@ -1,7 +1,7 @@
-import type { ProposalPermissionFlags } from '@charmverse/core';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalCategory, ProposalStatus, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
@@ -91,7 +91,7 @@ describe('computeProposalPermissions', () => {
     });
   });
 
-  it('should allow the admin to always see proposals, but only edit the proposal during the discussion, review and reviewed stages', async () => {
+  it('should allow the admin to always see proposals, but only edit the proposal during the draft, discussion, review and reviewed stages', async () => {
     const testedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
@@ -106,7 +106,7 @@ describe('computeProposalPermissions', () => {
       userId: adminUser.id
     });
 
-    expect(permissions.edit).toBe(false);
+    expect(permissions.edit).toBe(true);
 
     const editableStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed'];
 

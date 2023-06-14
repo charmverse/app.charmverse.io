@@ -2,6 +2,7 @@
 /* eslint-disable max-lines */
 
 import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
@@ -22,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
-import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
+import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -47,7 +48,6 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import type { PageMeta } from 'lib/pages';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -724,8 +724,8 @@ export function groupCardsByOptions(
   for (const optionId of optionIds) {
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
-      if (option) {
-        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty!.id]);
+      if (groupByProperty && option) {
+        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
           option,
           cardPages: c,

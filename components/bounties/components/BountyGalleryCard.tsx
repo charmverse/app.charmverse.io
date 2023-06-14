@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Bounty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
@@ -8,10 +9,9 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
-import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import BountyStatusBadge from './BountyStatusBadge';
+import { BountyStatusBadge } from './BountyStatusBadge';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })};

@@ -1,4 +1,4 @@
-import { SubscriptionRequiredError } from '@charmverse/core';
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
@@ -11,7 +11,7 @@ import type { ResourceIdEntity } from 'lib/permissions/api/routers';
 type MiddlewareConfig = {
   resourceIdType: ResourceIdEntity;
   key: string;
-  location: 'body' | 'query';
+  location?: 'body' | 'query';
 };
 
 export function requirePaidPermissionsSubscription({ key, location, resourceIdType }: MiddlewareConfig) {

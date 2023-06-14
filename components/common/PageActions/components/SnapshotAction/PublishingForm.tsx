@@ -30,7 +30,7 @@ import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/e
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
-import InputVotingStrategies from './InputVotingStrategies';
+import { InputVotingStrategies } from './InputVotingStrategies';
 
 async function getSnapshotClient() {
   const snapshot = (await import('@snapshot-labs/snapshot.js')).default;

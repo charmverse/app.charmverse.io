@@ -8,7 +8,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { PageNotFoundError } from 'lib/pages/server';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -16,6 +16,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys(['archive'], 'body'))
   .put(togglePageArchiveStatus);
 
@@ -37,7 +44,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -79,7 +86,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
         });
       }
 
-      await setupPermissionsAfterPageRepositioned(pageId);
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({ event: 'repositioned', pageId });
     }
   }
 

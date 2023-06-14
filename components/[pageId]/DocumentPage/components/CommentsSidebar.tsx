@@ -1,7 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import type { BoxProps, SelectProps } from '@mui/material';
+import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -11,7 +12,6 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -45,7 +45,7 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: IPagePermissionFlags }) {
+function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: PagePermissionFlags }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();

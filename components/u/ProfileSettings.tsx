@@ -6,7 +6,7 @@ import { PublicProfile } from 'components/u/PublicProfile';
 import { useUser } from 'hooks/useUser';
 
 export default function ProfileSettings() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { type: 'profile' });
@@ -19,7 +19,7 @@ export default function ProfileSettings() {
   return (
     <>
       <Legend>My profile</Legend>
-      <PublicProfile user={user} updateUser={setUser} />
+      <PublicProfile user={user} />
     </>
   );
 }

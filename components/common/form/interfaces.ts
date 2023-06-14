@@ -20,6 +20,7 @@ export type SelectFieldProps = {
 };
 
 export type FieldProps = {
+  placeholder?: string;
   label?: string;
   iconLabel?: ReactNode;
   inline?: boolean;

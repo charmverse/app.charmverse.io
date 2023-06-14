@@ -15,18 +15,18 @@ import { StepperIcon } from './StepperIcon';
 
 export function DesktopStepper({
   openVoteModal,
-  proposal,
+  proposalStatus,
   updateProposalStatus,
   proposalFlowPermissions
 }: StepperProps) {
-  const currentStatusIndex = proposal?.status ? PROPOSAL_STATUSES.indexOf(proposal.status) : -1;
+  const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
 
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
       if (newStatus === 'vote_active') {
-        openVoteModal();
+        openVoteModal?.();
       } else {
-        updateProposalStatus(newStatus);
+        updateProposalStatus?.(newStatus);
       }
     }
   }

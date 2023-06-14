@@ -1,9 +1,10 @@
-import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core';
-import { InvalidInputError, stringUtils } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core/permissions';
+import { stringUtils } from '@charmverse/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { getPermissionsClient } from './routers';
+import { getPermissionsClient, premiumPermissionsApiClient } from './routers';
 import type { PermissionsEngine, ResourceIdEntity } from './routers';
 
 declare module 'http' {
@@ -19,7 +20,7 @@ declare module 'http' {
 type MiddlewareConfig = {
   resourceIdType: ResourceIdEntity;
   key: string;
-  location: 'body' | 'query';
+  location?: 'body' | 'query';
 };
 
 /**
@@ -30,11 +31,11 @@ type MiddlewareConfig = {
 export function providePermissionClients({ key, location, resourceIdType }: MiddlewareConfig) {
   // eslint-disable-next-line func-names
   return async function (req: NextApiRequest, res: NextApiResponse, next?: NextHandler) {
-    const resourceId = req[location][key];
+    const resourceId = location ? req[location][key] : req.body[key] || req.query[key];
 
     if (!stringUtils.isUUID(resourceId)) {
       throw new InvalidInputError(
-        `Valid ID for a ${resourceIdType} at request ${location} with key ${key} is required`
+        `Valid ID for a ${resourceIdType} at request ${location || ''} with key ${key} is required`
       );
     }
 
@@ -43,11 +44,10 @@ export function providePermissionClients({ key, location, resourceIdType }: Midd
       resourceIdType
     });
 
+    // Provide different base client based on space paid tier
     req.basePermissionsClient = clientWithInfo.client;
-
-    if (clientWithInfo.type === 'premium') {
-      req.premiumPermissionsClient = clientWithInfo.client as PremiumPermissionsClient;
-    }
+    // Always provide premium client
+    req.premiumPermissionsClient = premiumPermissionsApiClient;
 
     req.spacePermissionsEngine = clientWithInfo.type;
 

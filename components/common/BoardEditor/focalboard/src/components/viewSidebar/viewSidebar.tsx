@@ -5,6 +5,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import {
   Box,
   ClickAwayListener,
@@ -15,11 +16,16 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
+import type { OverridableComponent } from '@mui/material/OverridableComponent';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
+import type { IconType } from 'react-icons/lib';
 import { RiFolder2Line } from 'react-icons/ri';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -30,7 +36,7 @@ import mutator from '../../mutator';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
-import { ViewSourceOptions } from './viewSourceOptions';
+import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
   board?: Board;
@@ -74,7 +80,12 @@ function ViewSidebar(props: Props) {
     props.board?.fields.cardProperties.some((c) => c.id === id)
   ).length;
 
-  let SourceIcon = RiFolder2Line;
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${props.pageId}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+
+  let SourceIcon: IconType | OverridableComponent<SvgIconTypeMap<object, 'svg'>> = RiFolder2Line;
   let sourceTitle = 'None';
   const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
   if (sourcePage) {
@@ -82,6 +93,9 @@ function ViewSidebar(props: Props) {
   } else if (props.view.fields.sourceType === 'google_form') {
     sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
     SourceIcon = FcGoogle;
+  } else if (props.view.fields.sourceType === 'proposals') {
+    sourceTitle = 'Proposals';
+    SourceIcon = TaskOutlinedIcon;
   }
 
   function goBack() {
@@ -110,6 +124,12 @@ function ViewSidebar(props: Props) {
       setSidebarView(initialState);
     }
   }, [props.isOpen]);
+
+  useEffect(() => {
+    if (props.pageId && props.view.fields.sourceType === 'proposals') {
+      updateProposalSource({ pageId: props.pageId });
+    }
+  }, [props.pageId]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>

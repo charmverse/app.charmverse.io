@@ -3,7 +3,7 @@ import type { StepperProps } from './interfaces';
 import { MobileStepper } from './MobileStepper';
 
 export function ProposalStepper({
-  proposal,
+  proposalStatus,
   openVoteModal,
   updateProposalStatus,
   proposalFlowPermissions
@@ -11,13 +11,13 @@ export function ProposalStepper({
   return (
     <>
       <DesktopStepper
-        proposal={proposal}
+        proposalStatus={proposalStatus}
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         proposalFlowPermissions={proposalFlowPermissions}
       />
       <MobileStepper
-        proposal={proposal}
+        proposalStatus={proposalStatus}
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         proposalFlowPermissions={proposalFlowPermissions}

@@ -1,7 +1,7 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
-import type { PageType, SpaceOperation } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -13,8 +13,8 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
@@ -46,8 +46,8 @@ function createTableCell(state: EditorState, text: string) {
 }
 
 function createTableHeader(state: EditorState, text: string) {
-  return state.schema.nodes.table_cell.create(
-    { header: true },
+  return state.schema.nodes.table_header.create(
+    undefined,
     Fragment.fromArray([state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([state.schema.text(text)]))])
   );
 }

@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Box, CardHeader, Typography } from '@mui/material';
 import { memo } from 'react';
@@ -6,10 +7,9 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { usePage } from 'hooks/usePage';
 import type { BountyWithDetails } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import BountyStatusBadge from './BountyStatusBadge';
+import { BountyStatusBadge } from './BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails;

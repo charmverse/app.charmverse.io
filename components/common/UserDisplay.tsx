@@ -1,4 +1,3 @@
-import type { User } from '@charmverse/core/prisma';
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -20,6 +19,7 @@ interface StyleProps extends BoxProps {
   avatarSize?: InitialAvatarProps['size'];
   hideName?: boolean;
   avatarIcon?: ReactNode;
+  wrapName?: boolean;
 }
 
 interface BaseComponentProps extends StyleProps {
@@ -36,6 +36,7 @@ function BaseComponent({
   fontWeight,
   isNft,
   hideName,
+  wrapName,
   ...props
 }: BaseComponentProps) {
   return (
@@ -55,7 +56,7 @@ function BaseComponent({
         <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       )}
       {!hideName && (
-        <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
+        <Typography whiteSpace={wrapName ? 'break-spaces' : 'nowrap'} fontSize={fontSize} fontWeight={fontWeight}>
           {username}
         </Typography>
       )}

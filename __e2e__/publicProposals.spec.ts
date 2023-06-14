@@ -1,10 +1,10 @@
 import type { Page, WorkspaceEvent } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import { upsertPermission } from 'lib/permissions/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateProposal, generateRole } from 'testing/setupDatabase';
 
@@ -55,13 +55,13 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
       title
     });
 
-    await upsertPermission(proposal.id, {
-      // Can only toggle public
-      permissionLevel: 'view',
-      public: true
+    await prisma.pagePermission.create({
+      data: {
+        page: { connect: { id: proposal.id } },
+        permissionLevel: 'view',
+        public: true
+      }
     });
-
-    // Act
 
     await page.goto(`${baseUrl}/${space.domain}/${proposal.path}`);
 

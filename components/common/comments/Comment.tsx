@@ -229,21 +229,23 @@ export function Comment({
           {!comment.deletedAt && !replyingDisabled && (
             <Stack flexDirection='row' gap={1}>
               {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
-              <Typography
-                sx={{
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  if (permissions?.add_comment) {
-                    setShowCommentReply(true);
-                  }
-                }}
-                color='secondary'
-                fontWeight='semibold'
-                variant='subtitle1'
-              >
-                Reply
-              </Typography>
+              <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
+                <Typography
+                  sx={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    if (permissions?.add_comment) {
+                      setShowCommentReply(true);
+                    }
+                  }}
+                  color='secondary'
+                  fontWeight='semibold'
+                  variant='subtitle1'
+                >
+                  Reply
+                </Typography>
+              </Tooltip>
             </Stack>
           )}
           <Box mt={2}>

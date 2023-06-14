@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
@@ -13,14 +13,13 @@ import {
 
 type Props = {
   proposalFlowFlags?: ProposalFlowPermissionFlags;
-  proposal?: ProposalWithUsers;
-  openVoteModal: () => void;
-  updateProposalStatus: (newStatus: ProposalStatus) => Promise<void>;
+  proposalStatus?: ProposalWithUsers['status'];
+  openVoteModal?: () => void;
+  updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
 };
 
-export function ProposalStepSummary({ proposal, proposalFlowFlags, openVoteModal, updateProposalStatus }: Props) {
-  const currentStatus = proposal?.status;
-  const currentStatusIndex = currentStatus ? PROPOSAL_STATUSES.indexOf(currentStatus) : -1;
+export function ProposalStepSummary({ proposalStatus, proposalFlowFlags, openVoteModal, updateProposalStatus }: Props) {
+  const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
   const nextStatus = PROPOSAL_STATUSES[currentStatusIndex + 1];
   const previousStatus = PROPOSAL_STATUSES[currentStatusIndex - 1];
 
@@ -37,10 +36,10 @@ export function ProposalStepSummary({ proposal, proposalFlowFlags, openVoteModal
       >
         <Stack gap={0.5}>
           <Typography variant='h5' fontWeight='bold'>
-            {currentStatus ? PROPOSAL_STATUS_LABELS[currentStatus] : '-'}
+            {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : '-'}
           </Typography>
           <Typography color='secondary' variant='body1'>
-            {currentStatus ? proposalStatusDetails[currentStatus] : '-'}
+            {proposalStatus ? proposalStatusDetails[proposalStatus] : '-'}
           </Typography>
         </Stack>
 
@@ -57,7 +56,7 @@ export function ProposalStepSummary({ proposal, proposalFlowFlags, openVoteModal
                 variant='outlined'
                 onClick={() => {
                   if (previousStatus) {
-                    updateProposalStatus(previousStatus);
+                    updateProposalStatus?.(previousStatus);
                   }
                 }}
               >
@@ -75,9 +74,9 @@ export function ProposalStepSummary({ proposal, proposalFlowFlags, openVoteModal
                 onClick={() => {
                   if (nextStatus) {
                     if (nextStatus === 'vote_active') {
-                      openVoteModal();
+                      openVoteModal?.();
                     } else {
-                      updateProposalStatus(nextStatus);
+                      updateProposalStatus?.(nextStatus);
                     }
                   }
                 }}

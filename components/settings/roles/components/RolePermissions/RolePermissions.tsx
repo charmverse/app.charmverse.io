@@ -1,5 +1,6 @@
+import type { PostCategoryPermissionAssignment, TargetPermissionGroup } from '@charmverse/core/permissions';
+import { AvailableSpacePermissions } from '@charmverse/core/permissions/flags';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import type { PostCategoryPermissionAssignment } from '@charmverse/core/shared';
 import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useReducer, useEffect, useState } from 'react';
@@ -19,7 +20,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
-import { AvailableSpacePermissions } from 'lib/permissions/spaces/client';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 
 /**
@@ -223,7 +223,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
     });
     setTouched(true);
   }
-
   return (
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form style={{ margin: 'auto' }}>
@@ -279,12 +278,15 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <Box flexGrow={1}>
                 {proposalCategories.map((category) => {
                   const permission = formState.proposalCategories.find(
-                    (p) => p.proposalCategoryId === category.id && (p.assignee as { id: string }).id === id
+                    (p) =>
+                      p.proposalCategoryId === category.id &&
+                      (p.assignee as TargetPermissionGroup<'space' | 'role'>).id === id
                   );
-                  const memberRolePermission =
-                    targetGroup !== 'space'
-                      ? defaultProposalCategoryPermissions?.find((p) => p.proposalCategoryId === category.id)
-                      : undefined;
+
+                  const defaultSpaceProposalPermission =
+                    targetGroup === 'space'
+                      ? undefined
+                      : defaultProposalCategoryPermissions.find((p) => p.proposalCategoryId === category.id);
                   return (
                     <ProposalCategoryRolePermissionRow
                       key={category.id}
@@ -295,7 +297,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                       proposalCategoryId={category.id}
                       existingPermissionId={permission?.id}
                       permissionLevel={permission?.permissionLevel}
-                      defaultPermissionLevel={memberRolePermission?.permissionLevel}
+                      defaultPermissionLevel={
+                        targetGroup === 'space' ? undefined : defaultSpaceProposalPermission?.permissionLevel
+                      }
                       assignee={{ group: targetGroup, id }}
                     />
                   );

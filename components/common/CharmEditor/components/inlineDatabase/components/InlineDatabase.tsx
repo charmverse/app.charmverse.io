@@ -52,11 +52,6 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
     margin-top: 0;
     width: fit-content;
     min-width: 100%;
-
-    // Hide calculations footer
-    .CalculationRow {
-      display: none;
-    }
   }
 
   // remove extra padding on Kanban view

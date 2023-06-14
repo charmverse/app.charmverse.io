@@ -38,6 +38,9 @@ const config = {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}'
     },
+    '@mui/system': {
+      transform: '@mui/system/{{member}}'
+    },
     lodash: {
       transform: 'lodash/{{member}}'
     }
@@ -169,7 +172,8 @@ const config = {
             ..._entry,
             cron: './background/cron.ts',
             websockets: './background/websockets.ts',
-            countSpaceData: './scripts/countSpaceData.ts'
+            countSpaceData: './scripts/countSpaceData.ts',
+            importFromDiscourse: './scripts/importFromDiscourse.ts'
           };
         });
       };

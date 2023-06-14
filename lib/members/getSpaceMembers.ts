@@ -1,4 +1,4 @@
-import type { MemberProperty } from '@charmverse/core/prisma';
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
@@ -30,7 +30,6 @@ export async function getSpaceMembers({
     }
     return acc;
   }, {} as Record<string, string>);
-
   const spaceRoles = await prisma.spaceRole.findMany({
     where:
       whereOr.length !== 0
@@ -93,7 +92,8 @@ export async function getSpaceMembers({
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
           searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
-          roles
+          roles,
+          isBot: userData.isBot ?? undefined
         };
       })
       // filter out deleted members

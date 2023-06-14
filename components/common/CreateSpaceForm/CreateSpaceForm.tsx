@@ -20,7 +20,7 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import Avatar from 'components/settings/workspace/LargeAvatar';
+import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
@@ -80,7 +80,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
   // This use effect should only be relevant when a user uploads markdown, has an error, and then changes the space name or image. In other cases, the space is created and the user is redirected to the space.
   useEffect(() => {
     if (newSpace) {
-      charmClient.updateSpace({
+      charmClient.spaces.updateSpace({
         name: watchName,
         spaceImage: watchSpaceImage
       });

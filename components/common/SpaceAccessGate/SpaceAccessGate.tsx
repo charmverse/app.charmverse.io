@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
-import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';

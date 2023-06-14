@@ -186,6 +186,10 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: colors.gray[mode || 'light'],
         contrastText
       },
+      green: {
+        main: colors.green[mode || 'light'],
+        contrastText
+      },
       turquoise: {
         main: colors.turquoise[mode || 'light'],
         contrastText

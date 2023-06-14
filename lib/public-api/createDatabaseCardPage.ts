@@ -77,7 +77,7 @@ export async function createDatabase(
 export async function createDatabaseCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
     properties: Record<string, string | string[]>;
-  }
+  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>>
 ): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);
 
@@ -147,9 +147,9 @@ export async function createDatabaseCardPage(
           id: cardBlock.id
         }
       },
-      content: { type: 'doc', content: [] },
-      hasContent: false,
-      contentText: '',
+      content: pageInfo.content || { type: 'doc', content: [] },
+      hasContent: !!pageInfo.hasContent,
+      contentText: pageInfo.contentText || '',
       path: getPagePath(),
       type: 'card',
       title: pageInfo.title || '',
@@ -160,6 +160,7 @@ export async function createDatabaseCardPage(
           id: pageInfo.spaceId
         }
       },
+      syncWithPageId: pageInfo.syncWithPageId,
       permissions: {
         create: [
           {

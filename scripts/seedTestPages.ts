@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { Prisma } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
+import  { prisma } from '@charmverse/core/prisma-client';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -208,19 +208,19 @@ async function cleanSpacePages({ spaceDomain }: { spaceDomain: string }) {
 //   process.exit(1)
 // })
 
-// seedTestBoards({spaceDomain: 'maximum-fuchsia-cicada', boardCount: 1, cardCount: 500})
-//   .then(() => console.log('Done'))
-// .catch(e => {
-//   console.error(e)
-//   process.exit(1)
-// })
+seedTestBoards({spaceDomain: 'gross-blush-vicuna', boardCount: 75, cardCount: 100})
+  .then(() => console.log('Done'))
+.catch(e => {
+  console.error(e)
+  process.exit(1)
+})
 
-seedTestPages({ spaceDomain: 'deliberate-peach-barnacle', pagesToCreate: 10000, perBatch: 1000, nestedPercent: 92 })
-  .then(() => {
-    console.log('Done');
-    process.exit(0);
-  })
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+// seedTestPages({ spaceDomain: 'gross-blush-vicuna', pagesToCreate: 10000, nestedPercent: 92 })
+//   .then(() => {
+//     console.log('Done');
+//     process.exit(0);
+//   })
+//   .catch((e) => {
+//     console.error(e);
+//     process.exit(1);
+//   });

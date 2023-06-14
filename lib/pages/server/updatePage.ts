@@ -1,7 +1,6 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { PageType, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { IPageWithPermissions } from 'lib/pages/server';
 
 type CurrentPageData = {
   id: string;
@@ -12,7 +11,7 @@ export async function updatePage(
   page: CurrentPageData,
   userId: string,
   updates: Prisma.PageUpdateInput
-): Promise<IPageWithPermissions> {
+): Promise<PageWithPermissions> {
   const data: Prisma.PageUpdateInput = {
     ...updates,
     updatedAt: new Date(),
