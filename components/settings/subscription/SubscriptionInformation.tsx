@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/src/prisma-client';
+import type { Space } from '@charmverse/core/prisma-client';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';

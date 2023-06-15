@@ -1,4 +1,4 @@
-import type { PublicInviteLinkContext } from '@charmverse/core/src/prisma-client';
+import type { PublicInviteLinkContext } from '@charmverse/core/prisma-client';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -8,7 +8,7 @@ import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { useCurrentSpace } from './useCurrentSpace';
 
 export function useSpaceInvitesList() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const {
     data: invites,

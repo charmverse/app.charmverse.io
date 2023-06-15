@@ -41,7 +41,7 @@ const LogoImage = styled(Image)`
 // We could update this component in future to support other invite types
 function JoinSpaceWithPublicProposals() {
   const { isSpaceMember } = useIsSpaceMember();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const router = useRouter();
 
   const { data: publicInviteLink } = useSWR(
