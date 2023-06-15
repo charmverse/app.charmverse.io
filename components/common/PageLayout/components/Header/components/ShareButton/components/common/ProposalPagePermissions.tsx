@@ -1,5 +1,6 @@
 import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -54,12 +55,10 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   }
 
   return (
-    <Box p={1}>
-      <Box display='block' py={0.5}>
-        <ReadonlyPagePermissionRow assignee='Default permissions' value={defaultPermissionLabel} />
-        <ReadonlyPagePermissionRow assignee='Authors' value='Edit proposal' />
-        <ReadonlyPagePermissionRow assignee='Reviewers' value='Review & comment proposal' />
-      </Box>
-    </Box>
+    <Stack gap={1.5}>
+      <ReadonlyPagePermissionRow assignee='Default permissions' value={defaultPermissionLabel} />
+      <ReadonlyPagePermissionRow assignee='Authors' value='Edit proposal' />
+      <ReadonlyPagePermissionRow assignee='Reviewers' value='Review & comment proposal' />
+    </Stack>
   );
 }

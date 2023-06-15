@@ -34,7 +34,7 @@ export function PagePermissionsContainer({ pageId }: Props) {
   }
 
   return (
-    <Box p={1}>
+    <Box p={2} pt={1}>
       {isFreeSpace ? (
         <FreeShareToWeb pageId={pageId} />
       ) : (
@@ -45,7 +45,7 @@ export function PagePermissionsContainer({ pageId }: Props) {
         />
       )}
 
-      <Divider />
+      <Divider sx={{ my: 1 }} />
       {isFreeSpace ? (
         <FreePagePermissions pageId={pageId} />
       ) : (

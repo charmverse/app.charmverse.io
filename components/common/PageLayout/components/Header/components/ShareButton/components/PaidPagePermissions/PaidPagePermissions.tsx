@@ -114,6 +114,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
     userPagePermissions?.grant_permissions === true &&
     !!page &&
     canReceiveManualPermissionUpdates({ pageType: page.type });
+
   if (page?.type === 'proposal' && !!page.proposalId) {
     return <ProposalPagePermissions proposalId={page.proposalId} />;
   }
@@ -138,7 +139,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
         </>
       )}
 
-      <Stack gap={1}>
+      <Stack gap={1} mt={1}>
         <PagePermissionRow
           editable={!!userPagePermissions?.grant_permissions}
           assignee={{

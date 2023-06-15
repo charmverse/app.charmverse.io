@@ -118,31 +118,28 @@ export default function ShareToWeb({
         </Tooltip>
       </Box>
 
+      <Collapse in={toggleChecked && !!shareLink}>
+        <Box>
+          <StyledInput
+            data-test='share-link'
+            fullWidth
+            disabled
+            value={shareLink}
+            endAdornment={
+              <CopyToClipboard data-test='copy-button' text={shareLink ?? ''} onCopy={onCopy}>
+                <InputAdornment position='end'>
+                  <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
+                </InputAdornment>
+              </CopyToClipboard>
+            }
+          />
+        </Box>
+      </Collapse>
       {shareAlertMessage && (
-        <Alert severity='info' sx={{ whiteSpace: 'break-spaces' }}>
+        <Alert severity='info' sx={{ whiteSpace: 'break-spaces', mt: 1 }}>
           {shareAlertMessage}
         </Alert>
       )}
-
-      <Collapse in={toggleChecked && !!shareLink}>
-        {shareLink && (
-          <Box>
-            <StyledInput
-              data-test='share-link'
-              fullWidth
-              disabled
-              value={shareLink}
-              endAdornment={
-                <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position='end'>
-                    <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
-                  </InputAdornment>
-                </CopyToClipboard>
-              }
-            />
-          </Box>
-        )}
-      </Collapse>
     </>
   );
 }
