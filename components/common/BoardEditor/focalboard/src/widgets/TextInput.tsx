@@ -54,6 +54,8 @@ function Editable({ multiline, displayType, ..._props }: TextInputProps, ref: Re
             className
           }}
           {...props}
+          inputRef={(input) => input && input.focus()}
+          onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
           multiline
         />
       }
