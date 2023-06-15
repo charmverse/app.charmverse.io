@@ -19,7 +19,7 @@ function cleanUtilisationRatio(ratio: number): number {
 }
 
 export function BlockCounts() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const theme = useTheme();
 
   const {
