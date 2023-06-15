@@ -138,7 +138,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
         </>
       )}
 
-      <Stack>
+      <Stack gap={1}>
         <PagePermissionRow
           editable={!!userPagePermissions?.grant_permissions}
           assignee={{

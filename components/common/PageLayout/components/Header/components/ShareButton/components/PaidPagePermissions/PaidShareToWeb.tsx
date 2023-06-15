@@ -20,7 +20,7 @@ interface Props {
 const alerts: Partial<Record<PageType, string>> = {
   board: "Updates to this board's permissions, including whether it is public, will also apply to its cards.",
   card_template: 'This card template inherits permissions from its parent board.',
-  proposal: 'Proposal permissions are managed at the category level.'
+  proposal: 'Proposal permissions for space members are managed at the category level.'
 };
 
 export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermissions }: Props) {
@@ -54,7 +54,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
     !!space?.publicProposals && currentPage?.type === 'proposal'
       ? 'This toggle is disabled because your space uses public proposals.'
       : currentPagePermissions?.edit_isPublic !== true
-      ? 'You cannot manage permissions for this page'
+      ? 'You cannot update permissions for this page'
       : null;
 
   const isChecked =
@@ -65,19 +65,21 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       ((currentPage?.type !== 'proposal' && !!publicPermission) ||
         // All proposals beyond draft are public
         (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
+  const baseShareAlertMessage = currentPage ? alerts[currentPage.type] : '';
 
-  let publicProposalToggleInfo = space?.publicProposals && proposal ? 'Your space uses public proposals. ' : null;
-  if (space?.publicProposals && proposal?.status === 'draft') {
-    publicProposalToggleInfo +=
-      'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.';
-  } else if (space?.publicProposals && !!proposal) {
-    publicProposalToggleInfo += 'Proposals in discussion stage and beyond are publicly visible.';
-  }
-
-  const baseShareAlertMessage = currentPage ? alerts[currentPage.type] : null;
+  const publicProposalToggleInfo =
+    space?.publicProposals && !!proposal
+      ? `Your space uses public proposals. ${
+          proposal?.status === 'draft'
+            ? 'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.'
+            : 'Proposals in discussion stage and beyond are publicly visible.'
+        }`
+      : null;
 
   const shareAlertMessage =
-    currentPage?.type === 'proposal' ? baseShareAlertMessage + (publicProposalToggleInfo ?? '') : baseShareAlertMessage;
+    currentPage?.type === 'proposal' && publicProposalToggleInfo
+      ? `${publicProposalToggleInfo ?? ''}\r\n\r\n${baseShareAlertMessage}`
+      : baseShareAlertMessage;
 
   return (
     <>

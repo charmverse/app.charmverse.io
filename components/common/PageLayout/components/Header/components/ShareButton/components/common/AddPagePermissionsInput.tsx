@@ -32,6 +32,9 @@ export function AddPagePermissionsInput({ onClick }: Props) {
     <StyledInput
       placeholder='Add people, roles or emails'
       onClick={onClick}
+      sx={{
+        height: '35px'
+      }}
       fullWidth
       readOnly
       endAdornment={

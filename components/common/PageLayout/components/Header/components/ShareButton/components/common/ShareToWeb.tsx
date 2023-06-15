@@ -96,7 +96,7 @@ export default function ShareToWeb({
 
   return (
     <>
-      <Box display='flex' justifyContent='space-between' alignItems='center' padding={1}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' my={1}>
         <Box>
           <Typography>Share to web</Typography>
 
@@ -121,11 +121,15 @@ export default function ShareToWeb({
         </Tooltip>
       </Box>
 
-      {shareAlertMessage && <Alert severity='info'>{shareAlertMessage}</Alert>}
+      {shareAlertMessage && (
+        <Alert severity='info' sx={{ whiteSpace: 'break-spaces' }}>
+          {shareAlertMessage}
+        </Alert>
+      )}
 
       <Collapse in={toggleChecked && !!shareLink}>
         {shareLink && (
-          <Box p={1}>
+          <Box>
             <StyledInput
               data-test='share-link'
               fullWidth

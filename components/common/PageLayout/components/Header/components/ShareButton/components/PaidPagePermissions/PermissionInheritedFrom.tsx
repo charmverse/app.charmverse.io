@@ -21,7 +21,7 @@ export function PermissionInheritedFrom({ permission }: Props) {
 
   return (
     <Box display='block'>
-      <Typography variant='caption' sx={{ ml: 1 }}>
+      <Typography variant='caption'>
         Inherited from
         <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${sourcePage.path}`}>
           {sourcePage.title || 'Untitled'}
