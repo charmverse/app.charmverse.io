@@ -27,6 +27,7 @@ import type { ApplicablePagePermissionLevel } from 'lib/permissions/pages/labels
 import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
+import { ProposalPagePermissions } from './ProposalPagePermissions';
 
 const permissionDisplayOrder: AssignablePagePermissionGroups[] = ['space', 'role', 'user'];
 
@@ -178,6 +179,10 @@ export default function PagePermissions({ pageId, pagePermissions, refreshPermis
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
   const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType });
+
+  if (pages[pageId]?.type === 'proposal') {
+    return <ProposalPagePermissions proposalId={pages[pageId]?.proposalId as string} />;
+  }
 
   return (
     <Box p={1}>

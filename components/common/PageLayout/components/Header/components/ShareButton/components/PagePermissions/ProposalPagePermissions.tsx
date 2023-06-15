@@ -5,9 +5,9 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { useProposal } from 'hooks/useProposal';
-import { useRoles } from 'hooks/useRoles';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 type Props = {
   proposalId: string;
@@ -22,23 +22,36 @@ const userFriendlyPermissionLabels: Record<ProposalCategoryPermissionLevel, stri
 
 export function ProposalPagePermissions({ proposalId }: Props) {
   const { proposal } = useProposal({ proposalId });
+
+  const { space } = useCurrentSpace();
+  const { isPublicSpace } = useIsPublicSpace();
+
   const { data: proposalCategoryPermissions } = useSWR(
-    !proposal ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
+    !proposal || isPublicSpace ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
     () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
   );
 
-  const { roles } = useRoles();
-
   const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
-  const rolePermissions =
-    proposalCategoryPermissions?.filter((permission) => permission.assignee.group === 'role') ?? [];
-  if (!proposalCategoryPermissions) {
+
+  const defaultPermissionLabel = isPublicSpace
+    ? userFriendlyPermissionLabels.view_comment_vote
+    : // Resume normal flow of checks for a paid space
+    spaceLevelPermission
+    ? userFriendlyPermissionLabels[spaceLevelPermission.permissionLevel]
+    : // When using public proposals, this also provides view permission to space members if no permission exists
+    space?.publicProposals
+    ? userFriendlyPermissionLabels.view
+    : 'No access';
+
+  // Only wait for permissions if this is a paid space
+  if (!proposalCategoryPermissions && !isPublicSpace) {
     return (
       <Box sx={{ height: '100px' }}>
         <LoadingComponent />
       </Box>
     );
   }
+
   return (
     <Box p={1}>
       <Box display='block' py={0.5}>
@@ -62,22 +75,10 @@ export function ProposalPagePermissions({ proposalId }: Props) {
           <Typography variant='body2'>Default permissions</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             <Typography color='secondary' variant='caption'>
-              {spaceLevelPermission ? userFriendlyPermissionLabels[spaceLevelPermission.permissionLevel] : 'No access'}
+              {defaultPermissionLabel}
             </Typography>
           </div>
         </Box>
-        {rolePermissions.map((perm) => (
-          <Box key={perm.id} display='flex' justifyContent='space-between' alignItems='center'>
-            <Typography variant='body2'>
-              {roles?.find((r) => r.id === (perm.assignee as TargetPermissionGroup<'role'>).id)?.name ?? ''}
-            </Typography>
-            <div style={{ width: '160px', textAlign: 'right' }}>
-              <Typography color='secondary' variant='caption'>
-                {userFriendlyPermissionLabels[perm.permissionLevel]}
-              </Typography>
-            </div>
-          </Box>
-        ))}
       </Box>
     </Box>
   );

@@ -96,14 +96,14 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   useEffect(() => {
     updateShareLink();
-  }, [publicPermission, router.query.viewId]);
+  }, [publicPermission, router.query.viewId, pageId]);
 
   function onCopy() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
-  async function updateShareLink() {
+  function updateShareLink() {
     if (!publicPermission) {
       setShareLink(null);
     } else if (
@@ -153,7 +153,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
           <Typography>Share to web</Typography>
 
           <Typography variant='body2' color='secondary'>
-            {publicPermission ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
+            {isChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
           </Typography>
         </Box>
         <Tooltip
@@ -184,7 +184,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         </Alert>
       )}
 
-      <Collapse in={!!publicPermission}>
+      <Collapse in={isChecked}>
         {shareLink && (
           <Box p={1}>
             <StyledInput
@@ -203,7 +203,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
           </Box>
         )}
       </Collapse>
-      {publicPermission?.sourcePermission && (
+      {isChecked && publicPermission?.sourcePermission && (
         <Box display='block'>
           <Typography variant='caption' sx={{ ml: 1 }}>
             Inherited from

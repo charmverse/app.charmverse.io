@@ -43,7 +43,7 @@ afterAll(() => {
 });
 
 describe('shareToWeb', () => {
-  it('should render the toggle as checked if no public permission exists or as unchecked if a public permission exists', async () => {
+  it('should render the toggle as checked if a public permission exists or as unchecked if no public permission exists', async () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({

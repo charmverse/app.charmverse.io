@@ -7,11 +7,13 @@ import { memo } from 'react';
 
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
+import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 
 import PagePermissions from './components/PagePermissions';
-import { ProposalPagePermissions } from './components/PagePermissions/ProposalPagePermissions';
-import ShareToWeb from './components/ShareToWeb';
+import ShareToWeb from './components/PagePermissions/ShareToWeb';
+import PublicPagePermissions from './components/PublicPagePermissions/PublicPagePermissions';
+import PublicShareToWeb from './components/PublicPagePermissions/PublicShareToWeb';
 
 type Props = {
   headerHeight: number;
@@ -22,8 +24,9 @@ type Props = {
 
 function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
+  const { isPublicSpace } = useIsPublicSpace();
   const { pagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId
+    pageId: isPublicSpace ? null : pageId
   });
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
@@ -74,25 +77,34 @@ function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
           }
         }}
       >
-        {!pagePermissions ? (
-          <Box sx={{ height: 100 }}>
-            <Loader size={20} sx={{ height: 600 }} />
-          </Box>
-        ) : (
+        {isPublicSpace && (
           <>
-            <ShareToWeb pageId={pageId} pagePermissions={pagePermissions} refreshPermissions={refreshPermissions} />
+            <PublicShareToWeb pageId={pageId} />
             <Divider />
-            {proposalId && <ProposalPagePermissions proposalId={proposalId} />}
-            {pageType !== 'proposal' && (
+            <PublicPagePermissions pageId={pageId} />
+          </>
+        )}
+        {!isPublicSpace &&
+          (!pagePermissions ? (
+            <Box sx={{ height: 100 }}>
+              <Loader size={20} sx={{ height: 600 }} />
+            </Box>
+          ) : (
+            <>
+              <ShareToWeb
+                pageId={pageId}
+                pagePermissions={pagePermissions ?? []}
+                refreshPermissions={refreshPermissions}
+              />
+              <Divider />
               <PagePermissions
                 pageId={pageId}
                 refreshPermissions={refreshPermissions}
-                pagePermissions={pagePermissions}
+                pagePermissions={pagePermissions ?? []}
                 pageType={pageType}
               />
-            )}
-          </>
-        )}
+            </>
+          ))}
       </Popover>
     </>
   );
