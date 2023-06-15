@@ -274,13 +274,13 @@ img.ProseMirror-separator {
 
 // nested list styles
 ul li {
-  li {
+  ul li {
     list-style-type: circle;
 
-    li {
+    ul li {
       list-style-type: square;
 
-      li {
+      ul li {
         list-style-type: disc;
       }
     }
@@ -288,13 +288,13 @@ ul li {
 }
 
 ol li {
-  li {
+  ol li {
     list-style-type: lower-alpha;
 
-    li {
+    ol li {
       list-style-type: lower-roman;
 
-      li {
+      ol li {
         list-style-type: circle;
       }
     }
