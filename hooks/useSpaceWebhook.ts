@@ -28,7 +28,7 @@ const convertToEventMap = (webhook: SetSpaceWebhookResponse | null | undefined) 
 };
 
 export default function useWebhookSubscription(spaceId: string) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { data: spaceWebhook, isLoading } = useSWR(
     () => (space ? `webhook/${space.id}` : null),

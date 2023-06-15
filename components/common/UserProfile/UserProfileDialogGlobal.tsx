@@ -9,7 +9,7 @@ import { useUserProfile } from './hooks/useUserProfile';
 
 export function UserProfileDialogGlobal() {
   const { hideUserProfile, memberId } = useUserProfile();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { getMemberById } = useMembers();
   const member = memberId ? getMemberById(memberId) : null;
   const { user } = useUser();

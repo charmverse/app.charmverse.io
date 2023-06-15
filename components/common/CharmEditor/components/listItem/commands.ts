@@ -165,7 +165,7 @@ export function toggleList(listType: NodeType, itemType?: NodeType, todo?: boole
     const fromNode = selection.$from.node(selection.$from.depth - 2);
     const endNode = selection.$to.node(selection.$to.depth - 2);
     if (!fromNode || fromNode.type.name !== listType.name || !endNode || endNode.type.name !== listType.name) {
-      return toggleListCommand(listType, todo)(state, dispatch, view);
+      return toggleListCommand(listType)(state, dispatch, view);
     } else {
       // If current ListType is the same as `listType` in arg,
       // toggle the list to `p`.
@@ -191,6 +191,24 @@ export function toggleList(listType: NodeType, itemType?: NodeType, todo?: boole
       }
       return true;
     }
+  };
+}
+
+export function replaceToggleListCommand(listType: NodeType): Command {
+  return function (state, dispatch, view) {
+    if (dispatch) {
+      dispatch(state.tr.setSelection(adjustSelectionInList(state.doc, state.selection)));
+    }
+
+    if (!view) {
+      return false;
+    }
+
+    state = view.state;
+    liftListItems()(state, dispatch);
+    state = view.state;
+
+    return wrapInList(listType)(state, dispatch);
   };
 }
 

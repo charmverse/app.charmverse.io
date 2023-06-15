@@ -54,7 +54,7 @@ interface Props {
 export default function ShareProposals({ padding = 1 }: Props) {
   const [copied, setCopied] = useState<boolean>(false);
   const { setSpace } = useSpaces();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const { isPublicSpace } = useIsPublicSpace();
   const {

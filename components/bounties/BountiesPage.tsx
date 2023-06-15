@@ -45,7 +45,7 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
 ];
 
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const router = useRouter();
 
   const currentView = views.find((view) => view.view === router.query.view) ?? views[0];

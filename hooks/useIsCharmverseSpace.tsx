@@ -10,7 +10,7 @@ const defaultDomains = ['charmverse'];
  * Use this hook for reserving some features in prod for charmverse users only
  */
 export function useIsCharmverseSpace(allowedDomains = defaultDomains) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   return !isProdEnv || allowedDomains.includes(currentSpace?.domain ?? '') || currentSpace?.domain.startsWith('cvt-');
 }

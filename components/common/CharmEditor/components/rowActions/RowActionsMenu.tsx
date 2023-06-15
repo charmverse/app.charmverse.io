@@ -31,7 +31,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, pages } = usePages();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {

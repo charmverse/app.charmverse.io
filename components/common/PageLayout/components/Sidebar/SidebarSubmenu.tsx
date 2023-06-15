@@ -86,7 +86,7 @@ export default function SidebarSubmenu({
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();

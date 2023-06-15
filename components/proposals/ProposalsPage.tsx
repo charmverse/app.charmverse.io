@@ -5,15 +5,12 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
-import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { usePages } from 'hooks/usePages';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
@@ -24,11 +21,7 @@ import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
-  const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
-
-  const { isSpaceMember } = useIsSpaceMember();
-
+  const { space: currentSpace } = useCurrentSpace();
   const { isPublicSpace } = useIsPublicSpace();
   const {
     data,

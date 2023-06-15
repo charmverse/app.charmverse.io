@@ -5,7 +5,7 @@ type SpaceSubscriptionMeta = {
 };
 
 export function useIsPublicSpace(): SpaceSubscriptionMeta {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   return { isPublicSpace: space?.paidTier === 'free' };
 }

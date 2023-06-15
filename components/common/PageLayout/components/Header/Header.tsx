@@ -40,7 +40,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { user } = useUser();
   const basePageId = usePageIdFromPath();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { page: basePage } = usePage({
     pageIdOrPath: currentSpace ? basePageId : undefined,
     spaceId: currentSpace?.id

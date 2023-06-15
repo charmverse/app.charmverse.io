@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 
 export default function PageDeleteBanner({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const router = useRouter();
   const { pages } = usePages();
 
