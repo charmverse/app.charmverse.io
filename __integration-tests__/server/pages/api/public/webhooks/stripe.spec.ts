@@ -74,6 +74,6 @@ describe('POST api/v1/webhooks/stripe - Catch events from Stripe', () => {
       .expect(400);
 
     // Do something with mocked signed event
-    expect(event.id).to.equal(payload.id);
+    expect(event.id).toEqual(payload.id);
   });
 });
