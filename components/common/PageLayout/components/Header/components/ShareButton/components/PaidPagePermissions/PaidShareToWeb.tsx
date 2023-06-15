@@ -92,7 +92,9 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
         shareAlertMessage={shareAlertMessage}
       />
 
-      {isChecked && publicPermission && <PermissionInheritedFrom permission={publicPermission} />}
+      {isChecked && publicPermission && currentPage?.type !== 'proposal' && (
+        <PermissionInheritedFrom permission={publicPermission} />
+      )}
     </>
   );
 }

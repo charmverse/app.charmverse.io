@@ -4,9 +4,8 @@ import { v4 as uuid, v4 } from 'uuid';
 
 // Import hooks to mock
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
-// import { usePages } from 'hooks/usePages';
 import { useProposal } from 'hooks/useProposal';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
@@ -28,10 +27,16 @@ jest.mock('hooks/useProposal', () => ({
 }));
 jest.mock('charmClient');
 jest.mock('hooks/useCurrentSpace');
-jest.mock('hooks/usePagePermissions');
-jest.mock('hooks/usePages', () => ({
-  usePages: jest.fn(() => ({
-    pages: {}
+jest.mock('hooks/usePagePermissions', () => ({
+  usePagePermissions: jest.fn(() => ({
+    permissions: new AvailablePagePermissions().empty
+  }))
+}));
+jest.mock('hooks/usePage', () => ({
+  usePage: jest.fn(() => ({
+    page: {
+      type: 'page'
+    }
   }))
 }));
 jest.mock('hooks/useCurrentSpace', () => ({
@@ -137,11 +142,9 @@ describe('PaidShareToWeb', () => {
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'proposal'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'proposal'
       }
     });
 
@@ -175,11 +178,9 @@ describe('PaidShareToWeb', () => {
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'proposal'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'proposal'
       }
     });
 
@@ -208,11 +209,9 @@ describe('PaidShareToWeb', () => {
       permissions: new AvailablePagePermissions().full
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'page'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'page'
       }
     });
 

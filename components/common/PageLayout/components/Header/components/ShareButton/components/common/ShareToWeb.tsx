@@ -1,4 +1,3 @@
-import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -17,8 +16,6 @@ import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/Up
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { getAbsolutePath } from 'lib/utilities/browser';
-
-import { PermissionInheritedFrom } from '../PaidPagePermissions/PermissionInheritedFrom';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
