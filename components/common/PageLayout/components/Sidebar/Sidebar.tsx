@@ -132,7 +132,7 @@ interface SidebarProps {
 export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -222,11 +222,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, navAction, addPage, isLoadingAccess]);
-
-  if (isLoadingAccess) {
-    return null;
-  }
+  }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
   return (
     <SidebarContainer>
@@ -263,36 +259,41 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              {showMemberFeatures && (
-                <SidebarBox
-                  onClick={() => handleModalClick('invites')}
-                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                  label='Invites'
-                />
-              )}
-              <Divider sx={{ mx: 2, my: 1 }} />
-              {STATIC_PAGES.map((page) => {
-                if (
-                  !space.hiddenFeatures.includes(page.feature) &&
-                  (showMemberFeatures ||
-                    // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                    (page.path === 'forum' && categories.length > 0))
-                ) {
-                  return (
-                    <SidebarLink
-                      key={page.path}
-                      href={`/${space.domain}/${page.path}`}
-                      active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                      icon={<PageIcon icon={null} pageType={page.path} />}
-                      label={page.title}
-                      onClick={navAction}
-                      data-test={`sidebar-link-${page.path}`}
-                    />
-                  );
-                }
 
-                return null;
-              })}
+              {!isLoadingAccess && (
+                <>
+                  {showMemberFeatures && (
+                    <SidebarBox
+                      onClick={() => handleModalClick('invites')}
+                      icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                      label='Invites'
+                    />
+                  )}
+                  <Divider sx={{ mx: 2, my: 1 }} />
+                  {STATIC_PAGES.map((page) => {
+                    if (
+                      !space.hiddenFeatures.includes(page.feature) &&
+                      (showMemberFeatures ||
+                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                        (page.path === 'forum' && categories.length > 0))
+                    ) {
+                      return (
+                        <SidebarLink
+                          key={page.path}
+                          href={`/${space.domain}/${page.path}`}
+                          active={router.pathname.startsWith(`/[domain]/${page.path}`)}
+                          icon={<PageIcon icon={null} pageType={page.path} />}
+                          label={page.title}
+                          onClick={navAction}
+                          data-test={`sidebar-link-${page.path}`}
+                        />
+                      );
+                    }
+
+                    return null;
+                  })}
+                </>
+              )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>

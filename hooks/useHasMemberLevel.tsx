@@ -1,27 +1,18 @@
 import { useCurrentSpace } from './useCurrentSpace';
-import { useSpaces } from './useSpaces';
 import { useUser } from './useUser';
 
 type MemberLevel = 'admin' | 'member' | 'guest';
 
 type MemberLevelOutput = {
-  hasAccess: boolean | null;
+  hasAccess?: boolean;
   isLoadingAccess: boolean;
 };
 
 export function useHasMemberLevel(level: MemberLevel): MemberLevelOutput {
-  const space = useCurrentSpace();
-  const { isLoaded: isSpacesLoaded, spaces } = useSpaces();
+  const { space, isLoading: isSpaceLoading } = useCurrentSpace();
   const { user, isLoaded: isUserLoaded } = useUser();
-
-  if (
-    !isUserLoaded ||
-    !isSpacesLoaded ||
-    // This condition is required for the interim state where the user has the spaces loaded, but the space has not yet been set
-    // We assert a condition of having at least one space in the array to avoid impacting users without a space
-    (spaces.length > 0 && !space)
-  ) {
-    return { hasAccess: null, isLoadingAccess: true };
+  if (!isUserLoaded || isSpaceLoading) {
+    return { isLoadingAccess: true };
   }
 
   if (!space || !user) {

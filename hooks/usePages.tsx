@@ -47,7 +47,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
