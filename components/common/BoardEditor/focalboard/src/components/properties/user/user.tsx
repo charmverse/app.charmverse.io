@@ -89,11 +89,7 @@ function MembersDisplay({
             flexDirection='row'
             key={user.id}
             gap={0.5}
-            sx={
-              wrapColumn
-                ? { width: '100%', justifyContent: 'space-between', overflowX: 'hidden' }
-                : { overflowX: 'hidden' }
-            }
+            sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
           >
             <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
             {!readOnly && (
