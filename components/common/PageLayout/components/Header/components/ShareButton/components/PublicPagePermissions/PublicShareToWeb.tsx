@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useProposal } from 'hooks/useProposal';
@@ -116,6 +116,7 @@ export default function PublicShareToWeb({ pageId }: Props) {
             </Typography>
           )}
         </Box>
+        <UpgradeChip upgradeContext='pagePermissions' />
         <UpgradeWrapper upgradeContext='pagePermissions'>
           <Switch data-test='toggle-public-page' checked={isChecked} disabled />
         </UpgradeWrapper>
