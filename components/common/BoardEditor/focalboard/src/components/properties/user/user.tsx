@@ -81,7 +81,7 @@ function MembersDisplay({
   const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
 
   return memberIds.length === 0 ? null : (
-    <Stack flexDirection='row' gap={1}>
+    <Stack flexDirection='row' gap={1} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
       {members.map((user) => {
         return (
           <Stack
@@ -175,6 +175,7 @@ export function UserProperty({
         readOnly={readOnly}
         placeholder={memberIds.length === 0 ? 'Search for an option...' : ''}
         inputVariant='standard'
+        forcePopupIcon={false}
         renderTags={() => (
           <MembersDisplay wrapColumn={true} readOnly={readOnly} memberIds={memberIds} setMemberIds={_onChange} />
         )}

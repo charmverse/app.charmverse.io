@@ -1,7 +1,7 @@
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
@@ -217,4 +217,4 @@ function PropertyValueElement(props: Props) {
   return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);
