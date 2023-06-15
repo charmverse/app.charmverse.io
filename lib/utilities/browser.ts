@@ -342,20 +342,34 @@ export function shouldRedirectToAppLogin() {
   return isSubdomainUrl && !!appDomain;
 }
 
-export function redirectToAppLogin() {
+export function getAppUrl() {
   if (typeof window === 'undefined') {
-    return false;
+    return '';
   }
 
   const appDomain = getAppApexDomain();
 
   if (appDomain) {
     const port = window.location.port ? `:${window.location.port}` : '';
-    const loginUrl = new URL(`${window.location.protocol}//${appSubdomain}.${appDomain}${port}/`);
+    return new URL(`${window.location.protocol}//${appSubdomain}.${appDomain}${port}/`);
+  }
+
+  return '';
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appUrl = getAppUrl();
+
+  if (appUrl) {
     const returnUrl = window.location.href;
 
-    loginUrl.searchParams.append('returnUrl', returnUrl);
-    window.location.href = loginUrl.toString();
+    appUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = appUrl.toString();
+
     return true;
   }
 

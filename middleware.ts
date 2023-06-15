@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { isTestEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
@@ -14,7 +14,6 @@ const PUBLIC_FILE = /\.(.*)$/; // Files
 const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
 export async function middleware(req: NextRequest) {
-  console.log('🔥', 'FORCE_SUBDOMAINS', process.env.FORCE_SUBDOMAINS);
   if (isTestEnv) {
     // Skip middleware in tests
     return;
@@ -41,12 +40,13 @@ export async function middleware(req: NextRequest) {
     // We are on url without subdomain AND domain in path - redirect to subdomain url
     const subdomainHost = `${spaceDomainFromPath}.${getAppApexDomain()}`;
     const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
+    const port = isDevEnv ? `:${url.port}` : '';
+    const baseUrl = `${url.protocol}//${subdomainHost}${port}`;
+    const redirectUrl = new URL(pathWithoutSpaceDomain, baseUrl);
 
-    console.debug(`>>> Redirecting to subdomain url: ${url.pathname} to ${subdomainHost}`);
-    url.pathname = pathWithoutSpaceDomain;
-    url.host = subdomainHost;
+    console.debug(`>>> Redirecting to subdomain url: ${url.pathname} to ${redirectUrl.toString()}`);
 
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(redirectUrl);
   }
 
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
