@@ -15,7 +15,7 @@ const IsSpaceMemberContext = createContext<Readonly<Context>>({
 });
 
 export function IsSpaceMemberProvider({ children }: { children: ReactNode }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const value = useMemo(() => {
     if (!user || !space) {

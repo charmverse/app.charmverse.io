@@ -95,7 +95,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export function SpaceSettingsDialog() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();

@@ -152,7 +152,7 @@ export function BountyStatusNexusChip({
 }
 
 export function BountyStatusBadge({ truncate = false, hideStatus, bounty, layout = 'row' }: IBountyBadgeProps) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
 

@@ -44,7 +44,7 @@ export function ProposalDialogProperties({
   const { categories } = useProposalCategories();
 
   const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [detailsExpanded, setDetailsExpanded] = useState(true);
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const { members } = useMembers();

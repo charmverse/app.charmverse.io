@@ -4,6 +4,12 @@
 // Used for __tests__/testing-library.js
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
+import { configure } from '@testing-library/react';
+
+configure({
+  // Align data-test attribute with Playwright
+  testIdAttribute: 'data-test'
+});
 
 // fix dynamic imports in next.js 13: https://github.com/vercel/next.js/issues/41725
 jest.mock('next/dynamic', () => ({

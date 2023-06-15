@@ -41,7 +41,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const documentPage = pages[node.attrs.id];

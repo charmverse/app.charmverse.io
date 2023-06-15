@@ -158,6 +158,8 @@ export class DocumentEventHandler {
         ...logData,
         message
       });
+      // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
+      this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
@@ -572,7 +574,12 @@ export class DocumentEventHandler {
     if (room) {
       room.participants.delete(this.id);
       if (room.participants.size === 0) {
-        docRooms.delete(room.doc.id);
+        // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
+        setTimeout(() => {
+          if (room.participants.size === 0) {
+            docRooms.delete(room.doc.id);
+          }
+        }, 100);
       } else {
         this.sendParticipantList();
       }

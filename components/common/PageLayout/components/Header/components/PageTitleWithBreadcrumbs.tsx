@@ -157,7 +157,7 @@ function BountyPageTitle({ basePath }: { basePath: string }) {
 }
 
 function PublicBountyPageTitle() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   return (
     <PageTitle>
       {space && (

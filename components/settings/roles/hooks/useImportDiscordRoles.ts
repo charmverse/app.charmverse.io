@@ -15,7 +15,7 @@ export function useImportDiscordRoles() {
   const { showMessage } = useSnackbar();
   const isAdmin = useIsAdmin();
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { refreshRoles } = useRoles();
   const { onClick } = useSettingsDialog();
 

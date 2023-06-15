@@ -20,7 +20,7 @@ type Props = {
   postCategory: PostCategory;
 };
 function PostCategoryPermissions({ postCategory }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   if (!space) {
     return (

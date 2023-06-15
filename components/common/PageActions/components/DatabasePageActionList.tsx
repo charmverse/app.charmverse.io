@@ -60,7 +60,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const { user } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
   const { keys } = useApiPageKeys(pageId);

@@ -37,7 +37,7 @@ export function ProposalCategoryRolePermissionRow({
   deletePermission
 }: Props) {
   const roles = useRoles();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const defaultExists = !!defaultPermissionLevel;
   const usingDefault = defaultExists && !existingPermissionId;

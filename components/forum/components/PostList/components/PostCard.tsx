@@ -40,7 +40,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   const { id: postId } = pagePost;
   const router = useRouter();
   const { showPost } = usePostDialog();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const permissions = usePostPermissions({ postIdOrPath: post.id });
 
