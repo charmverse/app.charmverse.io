@@ -46,7 +46,7 @@ const ArchivedPageItem = memo<{
   onRestore: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
   onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
 }>(({ onRestore, onDelete, disabled, archivedPage }) => {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   return (
     <MenuItem
@@ -81,7 +81,7 @@ const ArchivedPageItem = memo<{
 export default function TrashModal({ onClose, isOpen }: { onClose: () => void; isOpen: boolean }) {
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
   const { mutatePagesRemove, pages, getPageByPath } = usePages();
   const dispatch = useAppDispatch();

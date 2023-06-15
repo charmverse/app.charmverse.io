@@ -85,7 +85,7 @@ export function CheckoutForm({
 
   const billingEmail = watch('billingEmail');
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
   const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');

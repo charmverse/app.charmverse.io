@@ -31,7 +31,7 @@ type Props = {
 
 export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   const { isPublicSpace } = useIsPublicSpace();

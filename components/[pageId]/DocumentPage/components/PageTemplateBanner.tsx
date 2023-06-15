@@ -27,7 +27,7 @@ type Props = {
 };
 
 export function PageTemplateBanner({ pageType, parentId }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;

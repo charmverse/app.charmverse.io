@@ -165,7 +165,7 @@ export default function CharmEditor({
   placeholderText,
   readOnly = false
 }: InlineCharmEditorProps) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
   const onContentChangeDebounced = onContentChange

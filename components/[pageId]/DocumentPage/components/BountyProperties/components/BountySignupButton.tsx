@@ -22,7 +22,7 @@ interface Props {
 export function BountySignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { data: spaceWithGates } = useSWR(space ? `spaceByDomain/${space.domain}` : null, () =>
     charmClient.spaces.searchByDomain(space!.domain)
   );

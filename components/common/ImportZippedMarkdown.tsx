@@ -17,7 +17,7 @@ type Props = InputProps & {
 };
 
 export function ImportZippedMarkdown({ onFile, ...props }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
   const { showMessage } = useSnackbar();

@@ -22,7 +22,7 @@ type Props = {
 
 export function ProposalCategoryContextMenu({ category }: Props) {
   const [tempName, setTempName] = useState(category.title || '');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { mutateCategory, deleteCategory } = useProposalCategories();
   const { showMessage } = useSnackbar();
 
