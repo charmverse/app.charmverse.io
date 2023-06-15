@@ -22,7 +22,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
-import { countSpaceBlocks } from './countSpaceBlocks';
+import { countSpaceBlocks, countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -236,7 +236,7 @@ export async function createWorkspace({
   }
 
   // Generate the first count
-  await countSpaceBlocks({ spaceId: space.id });
+  await countSpaceBlocksAndSave({ spaceId: space.id });
 
   logSpaceCreation(space);
 
