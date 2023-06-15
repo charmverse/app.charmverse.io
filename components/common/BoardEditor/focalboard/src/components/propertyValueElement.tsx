@@ -127,7 +127,7 @@ function PropertyValueElement(props: Props) {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         wrapColumn={props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {

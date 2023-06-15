@@ -15,10 +15,13 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
+  isHidden?: boolean;
 };
 export const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType'
+  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden'
 })<ContainerProps>`
+  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+
   justify-content: center;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   transition: background-color 0.2s ease-in-out;
@@ -80,7 +83,6 @@ type Props = {
   multiselect?: boolean;
   options: IPropertyOption[];
   propertyValue: string | string[];
-  placeholder?: string;
   displayType?: PropertyValueDisplayType;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
@@ -93,7 +95,6 @@ export function SelectProperty({
   readOnly,
   options,
   propertyValue,
-  placeholder,
   multiselect = false,
   onChange,
   onUpdateOption,
@@ -173,7 +174,7 @@ export function SelectProperty({
 
   return (
     <StyledSelect
-      placeholder={placeholder}
+      placeholder='Search for an option...'
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}

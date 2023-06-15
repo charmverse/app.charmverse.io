@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton } from '@mui/material';
-import { Box, Stack } from '@mui/system';
+import { IconButton, Box, Stack, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -28,52 +27,33 @@ type ContainerProps = {
 const StyledUserPropertyContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'displayType'
 })<ContainerProps>`
-  width: 100%;
-  height: 100%;
-  overflow: ${({ displayType }) => (displayType === 'table' ? 'hidden' : 'initial')};
+  flex-grow: 1;
 
   .MuiInputBase-root {
-    background-color: ${({ theme }) => theme.palette.background.paper};
-
-    ${({ displayType, theme }) =>
-      displayType === 'table'
-        ? `
-        .MuiAutocomplete-input {
-          width: 100%;
-          border-top: 1px solid ${theme.palette.divider};
-        }`
-        : ''}
+    padding: 4px 8px;
   }
 
-  .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
-    padding: 1px;
+  // override the background from focalboard
+  .MuiInputBase-input {
+    background: transparent;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
-  & .MuiInputBase-root,
-  & input.MuiInputBase-input {
-    /** this overflows to the next line on smaller width */
-    position: ${({ displayType }) => (displayType === 'table' ? `inherit` : 'absolute')};
-  }
+  // dont let the input extend over neighbor columns in table mode when it is expanded
+  overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
 
-  & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
-    padding: 2px;
-  }
-
-  & fieldset.MuiOutlinedInput-notchedOutline {
-    border: none;
-    outline: none;
-  }
-
-  & button.MuiButtonBase-root[title='Open'],
-  & button.MuiButtonBase-root[title='Close'] {
-    display: none;
-  }
-
-  & .MuiAutocomplete-tag {
-    margin: 2px;
-  }
+  ${(props) =>
+    props.displayType !== 'table'
+      ? `
+        // & .MuiInputBase-root,
+        // & input.MuiInputBase-input {
+        //   /** this overflows to the next line on smaller width */
+        //   position: absolute;
+        // }
+      `
+      : ''};
 `;
-
 function MembersDisplay({
   memberIds,
   readOnly,
@@ -96,7 +76,7 @@ function MembersDisplay({
   const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
 
   return memberIds.length === 0 ? null : (
-    <Stack flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
+    <Stack flexDirection='row' gap={1}>
       {members.map((user) => {
         return (
           <Stack
@@ -109,11 +89,10 @@ function MembersDisplay({
                 ? { width: '100%', justifyContent: 'space-between', overflowX: 'hidden' }
                 : { overflowX: 'hidden' }
             }
-            onClick={() => removeMember(user.id)}
           >
             <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
             {!readOnly && (
-              <IconButton size='small'>
+              <IconButton size='small' onClick={() => removeMember(user.id)}>
                 <CloseIcon
                   sx={{
                     fontSize: 14
@@ -121,7 +100,6 @@ function MembersDisplay({
                   cursor='pointer'
                   fontSize='small'
                   color='secondary'
-                  onClick={() => removeMember(user.id)}
                 />
               </IconButton>
             )}
@@ -159,16 +137,11 @@ export function UserProperty({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer displayType={displayType} onClick={onClickToEdit}>
-        {displayType === 'details' && memberIds.length === 0 ? (
-          <div
-            className='octo-propertyvalue'
-            style={{
-              color: 'var(--text-gray)'
-            }}
-          >
+      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
+        {showEmptyPlaceholder && memberIds.length === 0 ? (
+          <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
             Empty
-          </div>
+          </Typography>
         ) : (
           <MembersDisplay
             wrapColumn={wrapColumn ?? false}
@@ -185,15 +158,17 @@ export function UserProperty({
       <InputSearchMemberMultiple
         // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
         disableClearable
-        open={true}
+        clearOnBlur
         openOnFocus
         disableCloseOnSelect
         defaultValue={memberIds}
         onClose={() => setIsOpen(false)}
+        fullWidth
         onChange={_onChange}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={readOnly}
-        placeholder={showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
+        placeholder={memberIds.length === 0 ? 'Search for an option...' : ''}
+        inputVariant='standard'
         renderTags={() => (
           <MembersDisplay wrapColumn={true} readOnly={readOnly} memberIds={memberIds} setMemberIds={_onChange} />
         )}
