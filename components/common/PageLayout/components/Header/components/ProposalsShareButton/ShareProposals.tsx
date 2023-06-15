@@ -1,4 +1,3 @@
-import type { SpacePermissionConfigurationMode } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -14,9 +13,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaces } from 'hooks/useSpaces';
-import { configurationModeName } from 'lib/permissions/meta/preset-templates';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
@@ -52,7 +50,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
   const { setSpace } = useSpaces();
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   // Current values of the public permission
   const [shareLink, setShareLink] = useState<null | string>(null);
@@ -98,14 +96,12 @@ export default function ShareProposals({ padding = 1 }: Props) {
           </Typography>
         </Box>
         <Switch
-          checked={proposalsArePublic || isPublicSpace}
-          disabled={!isAdmin || isPublicSpace}
+          checked={proposalsArePublic || isFreeSpace}
+          disabled={!isAdmin || isFreeSpace}
           onChange={togglePublic}
         />
       </Box>
-      {isPublicSpace && (
-        <Alert severity='info'>All proposals in public spaces are publicly visible, except drafts</Alert>
-      )}
+      {isFreeSpace && <Alert severity='info'>All proposals in free spaces are publicly visible, except drafts</Alert>}
       <Collapse in={proposalsArePublic}>
         {shareLink && (
           <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>

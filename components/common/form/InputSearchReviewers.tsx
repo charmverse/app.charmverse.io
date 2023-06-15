@@ -7,7 +7,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
@@ -36,14 +36,14 @@ export function InputSearchReviewers({
 }) {
   const { roles } = useRoles();
   const { members } = useMembers();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { data: reviewerPool } = useSWR(proposalId ? 'reviewer-pool' : null, () =>
     charmClient.proposals.getReviewerPool(proposalId as string)
   );
 
   // For public spaces, we don't want to show reviewer roles
-  const applicableValues = isPublicSpace
+  const applicableValues = isFreeSpace
     ? (props.value as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
     : props.value;
 
@@ -65,15 +65,15 @@ export function InputSearchReviewers({
   }, [reviewerPool, excludedIds]);
 
   let options: GroupedOption[] = [];
-  if (proposalId && isPublicSpace) {
+  if (proposalId && isFreeSpace) {
     options = reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : [];
-  } else if (proposalId && !isPublicSpace) {
+  } else if (proposalId && !isFreeSpace) {
     options = [
       // For proposals we only want current space members and roles that are allowed to review proposals
       ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
       ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id) && !excludedIdsSet.has(role.id))
     ];
-  } else if (isPublicSpace) {
+  } else if (isFreeSpace) {
     options = [
       // In public space, don't allow custom roles
       ...mappedMembers.filter((member) => !excludedIdsSet.has(member.id))
@@ -130,7 +130,7 @@ export function InputSearchReviewers({
             {...params}
             size='small'
             value={applicableValues}
-            placeholder={isPublicSpace ? 'Members' : 'Roles'}
+            placeholder={isFreeSpace ? 'Members' : 'Roles'}
             inputProps={{
               ...params.inputProps
             }}

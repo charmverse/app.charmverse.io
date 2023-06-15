@@ -7,7 +7,7 @@ import { memo } from 'react';
 
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 
 import PagePermissions from './components/PagePermissions';
@@ -24,9 +24,9 @@ type Props = {
 
 function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
   const { pagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId: isPublicSpace ? null : pageId
+    pageId: isFreeSpace ? null : pageId
   });
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
@@ -77,14 +77,14 @@ function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
           }
         }}
       >
-        {isPublicSpace && (
+        {isFreeSpace && (
           <>
             <PublicShareToWeb pageId={pageId} />
             <Divider />
             <PublicPagePermissions pageId={pageId} />
           </>
         )}
-        {!isPublicSpace &&
+        {!isFreeSpace &&
           (!pagePermissions ? (
             <Box sx={{ height: 100 }}>
               <Loader size={20} sx={{ height: 600 }} />

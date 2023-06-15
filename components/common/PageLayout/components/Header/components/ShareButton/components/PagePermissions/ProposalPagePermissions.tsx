@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useProposal } from 'hooks/useProposal';
 
 type Props = {
@@ -24,16 +24,16 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   const { proposal } = useProposal({ proposalId });
 
   const { space } = useCurrentSpace();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { data: proposalCategoryPermissions } = useSWR(
-    !proposal || isPublicSpace ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
+    !proposal || isFreeSpace ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
     () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
   );
 
   const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
 
-  const defaultPermissionLabel = isPublicSpace
+  const defaultPermissionLabel = isFreeSpace
     ? userFriendlyPermissionLabels.view_comment_vote
     : // Resume normal flow of checks for a paid space
     spaceLevelPermission
@@ -44,7 +44,7 @@ export function ProposalPagePermissions({ proposalId }: Props) {
     : 'No access';
 
   // Only wait for permissions if this is a paid space
-  if (!proposalCategoryPermissions && !isPublicSpace) {
+  if (!proposalCategoryPermissions && !isFreeSpace) {
     return (
       <Box sx={{ height: '100px' }}>
         <LoadingComponent />
