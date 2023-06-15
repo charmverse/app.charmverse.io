@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import { useProposal } from 'hooks/useProposal';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
-import ShareToWeb from '../ShareToWeb';
+import PaidShareToWeb from '../PaidShareToWeb';
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({
@@ -42,7 +42,7 @@ afterAll(() => {
   jest.resetModules();
 });
 
-describe('shareToWeb', () => {
+describe('PaidShareToWeb', () => {
   it('should render the toggle as checked if a public permission exists or as unchecked if no public permission exists', async () => {
     const pageId = uuid();
 
@@ -51,7 +51,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     let toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -67,7 +67,7 @@ describe('shareToWeb', () => {
 
     // Re-render this with a public permission
     resultWithPermissions.rerender(
-      <ShareToWeb
+      <PaidShareToWeb
         pageId={pageId}
         pagePermissions={[
           {
@@ -97,7 +97,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -115,7 +115,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -152,7 +152,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -190,7 +190,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -223,7 +223,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);

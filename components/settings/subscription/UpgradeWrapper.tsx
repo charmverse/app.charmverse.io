@@ -3,6 +3,7 @@ import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode } from 'react';
 
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 export const upgradeMessages = {
@@ -11,19 +12,32 @@ export const upgradeMessages = {
 
 type Props = {
   children: ReactNode;
-  upgradeContext: keyof typeof upgradeMessages;
+  upgradeContext?: keyof typeof upgradeMessages;
 };
 
 export function UpgradeWrapper({ children, upgradeContext }: Props) {
   const { openUpgradeSubscription } = useSettingsDialog();
 
+  const { isFreeSpace } = useIsFreeSpace();
+
+  if (!isFreeSpace) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <>{children}</>;
+  }
+
   return (
-    <Tooltip title={upgradeMessages[upgradeContext]}>
+    <Tooltip title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
       <Box onClick={openUpgradeSubscription}>{children}</Box>
     </Tooltip>
   );
 }
 export function UpgradeChip({ upgradeContext }: Pick<Props, 'upgradeContext'>) {
+  const { isFreeSpace } = useIsFreeSpace();
+
+  if (!isFreeSpace) {
+    return null;
+  }
+
   return (
     <UpgradeWrapper upgradeContext={upgradeContext}>
       <Chip

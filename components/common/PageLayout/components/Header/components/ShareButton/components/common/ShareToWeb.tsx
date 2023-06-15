@@ -1,3 +1,4 @@
+import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -12,12 +13,12 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { UpgradeChip, UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
-import { useProposal } from 'hooks/useProposal';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { usePage } from 'hooks/usePage';
 import { getAbsolutePath } from 'lib/utilities/browser';
+
+import { PermissionInheritedFrom } from '../PaidPagePermissions/PermissionInheritedFrom';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -43,66 +44,55 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
   border-bottom-color: transparent;
 `;
 
-interface Props {
+export type ShareToWebProps = {
+  disabled: boolean;
+  toggleChecked: boolean;
   pageId: string;
-}
+  onChange?: (newValue: boolean) => void;
+  disabledTooltip?: string | null;
+  shareAlertMessage?: string | null;
+};
 
-export default function PublicShareToWeb({ pageId }: Props) {
-  const router = useRouter();
-
-  const { pages } = usePages();
+export default function ShareToWeb({
+  toggleChecked,
+  disabled,
+  pageId,
+  onChange,
+  shareAlertMessage,
+  disabledTooltip
+}: ShareToWebProps) {
   const [copied, setCopied] = useState<boolean>(false);
 
+  const { page } = usePage({ pageIdOrPath: pageId });
+
   const { space } = useCurrentSpace();
+  const router = useRouter();
 
-  const currentPage = pages[pageId];
-
-  const { proposal } = useProposal({ proposalId: currentPage?.proposalId });
-
-  // Current values of the public permission
-  const [shareLink, setShareLink] = useState<null | string>(null);
-
-  function updateShareLink() {
-    if (
-      currentPage?.type === 'page' ||
-      currentPage?.type === 'card' ||
-      currentPage?.type === 'card_synced' ||
-      currentPage?.type === 'proposal'
-    ) {
-      const shareLinkToSet =
-        typeof window !== 'undefined' ? getAbsolutePath(`/${currentPage.path}`, space?.domain) : '';
-      setShareLink(shareLinkToSet);
-    } else if (currentPage?.type.match(/board/)) {
-      const viewIdToProvide = router.query.viewId;
-      const shareLinkToSet =
-        typeof window !== 'undefined'
-          ? getAbsolutePath(`/${currentPage.path}?viewId=${viewIdToProvide}`, space?.domain)
-          : '';
-      setShareLink(shareLinkToSet);
-    }
-  }
-
-  const shareAlertMessage =
-    currentPage?.type === 'proposal' && proposal?.status === 'draft'
-      ? 'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.'
-      : currentPage?.type === 'proposal' && proposal?.status !== 'draft'
-      ? 'Proposals in discussion stage and beyond are publicly visible.'
-      : null;
+  const [shareLink, setShareLink] = useState(getShareLink());
 
   useEffect(() => {
-    updateShareLink();
-  }, [router.query.viewId, pageId]);
+    setShareLink(getShareLink());
+  }, [pageId, router.query.viewId, toggleChecked]);
+
+  // Current values of the public permission
 
   function onCopy() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
-  const isChecked =
-    // If space has public proposals, don't interfere with non-proposal pages
-    currentPage?.type !== 'proposal' ||
-    // All proposals beyond draft are public
-    (currentPage?.type === 'proposal' && proposal?.status !== 'draft');
+  function getShareLink() {
+    if (!toggleChecked || !page) {
+      return null;
+    } else if (page?.type.match(/board/)) {
+      const viewIdToProvide = router.query.viewId;
+      return typeof window !== 'undefined'
+        ? getAbsolutePath(`/${page.path}?viewId=${viewIdToProvide}`, space?.domain)
+        : '';
+    } else {
+      return typeof window !== 'undefined' ? getAbsolutePath(`/${page.path}`, space?.domain) : '';
+    }
+  }
 
   return (
     <>
@@ -110,21 +100,30 @@ export default function PublicShareToWeb({ pageId }: Props) {
         <Box>
           <Typography>Share to web</Typography>
 
-          {isChecked && (
-            <Typography variant='body2' color='secondary'>
-              Anyone with the link can view
-            </Typography>
-          )}
+          <Typography variant='body2' color='secondary'>
+            {toggleChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
+          </Typography>
         </Box>
         <UpgradeChip upgradeContext='pagePermissions' />
-        <UpgradeWrapper upgradeContext='pagePermissions'>
-          <Switch data-test='toggle-public-page' checked={isChecked} disabled />
-        </UpgradeWrapper>
+        <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
+          <Box>
+            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'pagePermissions' : undefined}>
+              <Switch
+                data-test='toggle-public-page'
+                checked={toggleChecked}
+                disabled={disabled}
+                onChange={(_, checked) => {
+                  onChange?.(checked);
+                }}
+              />
+            </UpgradeWrapper>
+          </Box>
+        </Tooltip>
       </Box>
 
       {shareAlertMessage && <Alert severity='info'>{shareAlertMessage}</Alert>}
 
-      <Collapse in={!!isChecked}>
+      <Collapse in={toggleChecked && !!shareLink}>
         {shareLink && (
           <Box p={1}>
             <StyledInput

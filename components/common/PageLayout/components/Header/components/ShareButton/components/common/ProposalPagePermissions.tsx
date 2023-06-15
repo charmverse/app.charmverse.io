@@ -1,6 +1,5 @@
 import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -8,6 +7,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useProposal } from 'hooks/useProposal';
+
+import { ReadonlyPagePermissionRow } from './ReadonlyPagePermissionRow';
 
 type Props = {
   proposalId: string;
@@ -55,30 +56,9 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   return (
     <Box p={1}>
       <Box display='block' py={0.5}>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Authors</Typography>
-          <div style={{ width: '160px', textAlign: 'right' }}>
-            <Typography color='secondary' variant='caption'>
-              Edit proposal
-            </Typography>
-          </div>
-        </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Reviewers</Typography>
-          <div style={{ width: '160px', textAlign: 'right' }}>
-            <Typography color='secondary' variant='caption'>
-              Review & comment proposal
-            </Typography>
-          </div>
-        </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Default permissions</Typography>
-          <div style={{ width: '160px', textAlign: 'right' }}>
-            <Typography color='secondary' variant='caption'>
-              {defaultPermissionLabel}
-            </Typography>
-          </div>
-        </Box>
+        <ReadonlyPagePermissionRow assignee='Default permissions' value={defaultPermissionLabel} />
+        <ReadonlyPagePermissionRow assignee='Authors' value='Edit proposal' />
+        <ReadonlyPagePermissionRow assignee='Reviewers' value='Review & comment proposal' />
       </Box>
     </Box>
   );

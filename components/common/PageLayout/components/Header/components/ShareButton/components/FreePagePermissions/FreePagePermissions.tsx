@@ -3,11 +3,12 @@ import { Box, Button } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 
-import { Typography } from 'components/common/Typography';
 import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { usePages } from 'hooks/usePages';
 
-import { ProposalPagePermissions } from '../PagePermissions/ProposalPagePermissions';
+import { AddPagePermissionsInput } from '../common/AddPagePermissionsInput';
+import { ProposalPagePermissions } from '../common/ProposalPagePermissions';
+import { ReadonlyPagePermissionRow } from '../common/ReadonlyPagePermissionRow';
 
 const StyledInput = styled(Input)`
   padding-right: 0;
@@ -34,7 +35,7 @@ type Props = {
   pageId: string;
 };
 
-export default function PublicPagePermissions({ pageId }: Props) {
+export default function FreePagePermissions({ pageId }: Props) {
   const { pages } = usePages();
 
   if (pages[pageId]?.type === 'proposal') {
@@ -44,31 +45,13 @@ export default function PublicPagePermissions({ pageId }: Props) {
   return (
     <Box p={1}>
       <UpgradeWrapper upgradeContext='pagePermissions'>
-        <Box mb={1}>
-          <StyledInput
-            placeholder='Add people, roles or emails'
-            fullWidth
-            readOnly
-            endAdornment={
-              <InputAdornment position='end'>
-                <Button disableElevation>Invite</Button>
-              </InputAdornment>
-            }
-          />
-        </Box>
+        <AddPagePermissionsInput />
       </UpgradeWrapper>
 
       <Box display='block' py={0.5}>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='body2'>Default permissions</Typography>
-          <div style={{ width: '160px', textAlign: 'right' }}>
-            <UpgradeWrapper upgradeContext='pagePermissions'>
-              <Typography color='secondary' variant='caption'>
-                Editor
-              </Typography>
-            </UpgradeWrapper>
-          </div>
-        </Box>
+        <UpgradeWrapper upgradeContext='pagePermissions'>
+          <ReadonlyPagePermissionRow assignee='Default permissions' value='Editor' />
+        </UpgradeWrapper>
       </Box>
     </Box>
   );

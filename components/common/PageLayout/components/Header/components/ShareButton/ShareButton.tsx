@@ -1,33 +1,25 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
+import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo } from 'react';
 
 import Button from 'components/common/Button';
-import Loader from 'components/common/Loader';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 
-import PagePermissions from './components/PagePermissions';
-import ShareToWeb from './components/PagePermissions/ShareToWeb';
-import PublicPagePermissions from './components/PublicPagePermissions/PublicPagePermissions';
-import PublicShareToWeb from './components/PublicPagePermissions/PublicShareToWeb';
+import { FreePagePermissionsContainer } from './components/FreePagePermissions/FreePagePermissionsContainer';
+import { PaidPagePermissionsContainer } from './components/PaidPagePermissions/PaidPagePermissionsContainer';
 
 type Props = {
   headerHeight: number;
   pageId: string;
-  proposalId?: string | null;
-  pageType: PageType;
 };
 
-function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
+function ShareButton({ headerHeight, pageId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
   const { isFreeSpace } = useIsFreeSpace();
-  const { pagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId: isFreeSpace ? null : pageId
-  });
+
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   return (
@@ -40,7 +32,6 @@ function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
             variant='text'
             size='small'
             onClick={() => {
-              refreshPermissions();
               popupState.open();
             }}
           >
@@ -50,7 +41,6 @@ function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
           <IconButton
             data-test='toggle-page-permissions-dialog'
             onClick={() => {
-              refreshPermissions();
               popupState.open();
             }}
           >
@@ -77,34 +67,11 @@ function ShareButton({ headerHeight, pageId, pageType, proposalId }: Props) {
           }
         }}
       >
-        {isFreeSpace && (
-          <>
-            <PublicShareToWeb pageId={pageId} />
-            <Divider />
-            <PublicPagePermissions pageId={pageId} />
-          </>
+        {isFreeSpace ? (
+          <FreePagePermissionsContainer pageId={pageId} />
+        ) : (
+          <PaidPagePermissionsContainer pageId={pageId} />
         )}
-        {!isFreeSpace &&
-          (!pagePermissions ? (
-            <Box sx={{ height: 100 }}>
-              <Loader size={20} sx={{ height: 600 }} />
-            </Box>
-          ) : (
-            <>
-              <ShareToWeb
-                pageId={pageId}
-                pagePermissions={pagePermissions ?? []}
-                refreshPermissions={refreshPermissions}
-              />
-              <Divider />
-              <PagePermissions
-                pageId={pageId}
-                refreshPermissions={refreshPermissions}
-                pagePermissions={pagePermissions ?? []}
-                pageType={pageType}
-              />
-            </>
-          ))}
       </Popover>
     </>
   );
