@@ -178,7 +178,8 @@ export function InputSearchMemberMultiple({
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
-  const [value, setValue] = useState<Member[]>([]);
+  const defaultMembers = (defaultValue || []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const [value, setValue] = useState<Member[]>(defaultMembers);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
@@ -190,8 +191,10 @@ export function InputSearchMemberMultiple({
 
   useEffect(() => {
     if (defaultValue && value.length === 0) {
-      const defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
-      setValue(defaultMembers);
+      const _defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
+      if (_defaultMembers.length > 0) {
+        setValue(_defaultMembers);
+      }
     }
   }, [defaultValue, membersRecord]);
 

@@ -162,7 +162,7 @@ export function SelectProperty({
           size='small'
           emptyComponent={
             displayType === 'details' && (
-              <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
+              <Typography component='span' variant='subtitle2' color='secondary'>
                 Empty
               </Typography>
             )

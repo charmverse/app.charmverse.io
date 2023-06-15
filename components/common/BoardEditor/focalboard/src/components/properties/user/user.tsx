@@ -29,11 +29,16 @@ const StyledUserPropertyContainer = styled(Box, {
 })<ContainerProps>`
   flex-grow: 1;
 
-  .MuiInputBase-root {
-    padding: 4px 8px;
-  }
+  ${(props) =>
+    props.displayType === 'details'
+      ? `
+      .MuiInputBase-root {
+        padding: 4px 8px;
+      }
+      `
+      : ''}
 
-  // override the background from focalboard
+  // override styles from focalboard
   .MuiInputBase-input {
     background: transparent;
     padding-top: 0 !important;
@@ -52,7 +57,7 @@ const StyledUserPropertyContainer = styled(Box, {
         //   position: absolute;
         // }
       `
-      : ''};
+      : ''}
 `;
 function MembersDisplay({
   memberIds,
@@ -139,7 +144,7 @@ export function UserProperty({
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
         {showEmptyPlaceholder && memberIds.length === 0 ? (
-          <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
+          <Typography component='span' variant='subtitle2' color='secondary'>
             Empty
           </Typography>
         ) : (
@@ -159,6 +164,7 @@ export function UserProperty({
         // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
         disableClearable
         clearOnBlur
+        open
         openOnFocus
         disableCloseOnSelect
         defaultValue={memberIds}
