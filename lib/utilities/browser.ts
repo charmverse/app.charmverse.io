@@ -331,6 +331,17 @@ export function getDefaultSpaceUrl({
   return `/${domain}${path}`;
 }
 
+export function shouldRedirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const isSubdomainUrl = !!getValidSubdomain();
+  const appDomain = getAppApexDomain();
+
+  return isSubdomainUrl && !!appDomain;
+}
+
 export function redirectToAppLogin() {
   if (typeof window === 'undefined') {
     return false;

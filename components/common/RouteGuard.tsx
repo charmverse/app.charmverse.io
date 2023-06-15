@@ -10,9 +10,7 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { redirectToAppLogin } from 'lib/utilities/browser';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
-
+import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/browser';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
@@ -27,7 +25,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
   const hasSpaceDomain = !!spaceDomain;
-  const isSubdomainUrl = !!getValidSubdomain();
 
   useEffect(() => {
     const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
@@ -89,8 +86,8 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     // condition: no user session and no wallet address
     else if (!user) {
       // if app is running on a subdomain, redirect to main app login
-      if (isSubdomainUrl && redirectToAppLogin()) {
-        return { authorized: true };
+      if (shouldRedirectToAppLogin() && redirectToAppLogin()) {
+        return { authorized: false };
       }
 
       log.info('[RouteGuard]: redirect to login');
