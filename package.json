@@ -226,6 +226,7 @@
     "react-hot-keys": "^2.7.1",
     "react-hotkeys-hook": "^3.4.4",
     "react-icons": "^4.8.0",
+    "react-iframe": "^1.8.5",
     "react-intl": "^6.3.2",
     "react-pdf": "^5.7.2",
     "react-resizable": "^3.0.4",

@@ -176,6 +176,7 @@ function PropertyValueElement(props: Props) {
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,
+    displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
     onSave: () => {
       mutator.changePropertyValue(card, propertyTemplate.id, value);

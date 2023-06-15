@@ -18,7 +18,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const {
     error: pageWithContentError,

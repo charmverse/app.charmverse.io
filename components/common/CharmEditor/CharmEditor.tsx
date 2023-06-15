@@ -426,7 +426,7 @@ function CharmEditor({
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;

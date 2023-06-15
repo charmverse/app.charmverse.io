@@ -1,5 +1,4 @@
 import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
-import type { Space } from '@charmverse/core/prisma-client';
 import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';
 
@@ -9,7 +8,7 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 // import { usePages } from 'hooks/usePages';
 import { useProposal } from 'hooks/useProposal';
-import { createMockSpace } from 'testing/mocks/space';
+import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 import ShareToWeb from '../ShareToWeb';
 
@@ -36,7 +35,7 @@ jest.mock('hooks/usePages', () => ({
   }))
 }));
 jest.mock('hooks/useCurrentSpace', () => ({
-  useCurrentSpace: jest.fn(() => createMockSpace())
+  useCurrentSpace: jest.fn(() => mockCurrentSpaceContext())
 }));
 
 afterAll(() => {
@@ -146,8 +145,8 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
-      createMockSpace({
+    (useCurrentSpace as jest.Mock<ReturnType<typeof useCurrentSpace>>).mockReturnValueOnce(
+      mockCurrentSpaceContext({
         publicProposals: true
       })
     );
@@ -184,8 +183,8 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
-      createMockSpace({
+    (useCurrentSpace as jest.Mock<ReturnType<typeof useCurrentSpace>>).mockReturnValueOnce(
+      mockCurrentSpaceContext({
         publicProposals: true
       })
     );
@@ -217,8 +216,8 @@ describe('shareToWeb', () => {
       }
     });
 
-    (useCurrentSpace as jest.Mock<Space>).mockReturnValueOnce(
-      createMockSpace({
+    (useCurrentSpace as jest.Mock<ReturnType<typeof useCurrentSpace>>).mockReturnValueOnce(
+      mockCurrentSpaceContext({
         publicProposals: true
       })
     );

@@ -1,4 +1,3 @@
-import { CacheProvider } from '@emotion/react';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
@@ -44,7 +43,6 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
-import { createEmotionCache } from 'theme/createEmotionCache';
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -102,9 +100,6 @@ import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
-
-const clientSideEmotionCache = createEmotionCache();
-
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
@@ -113,7 +108,7 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
 };
-export default function App({ Component, emotionCache = clientSideEmotionCache, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
@@ -145,52 +140,49 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     }
   }, [router.isReady]);
 
-  // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
   return (
-    <CacheProvider value={emotionCache}>
-      <AppThemeProvider>
-        <SnackbarProvider>
-          <ReactDndProvider>
-            <DataProviders>
-              <SettingsDialogProvider>
-                <NotificationsProvider>
-                  <LocalizationProvider>
-                    <FocalBoardProvider>
-                      <NotionProvider>
-                        <IntlProvider>
-                          <PageHead />
+    <AppThemeProvider>
+      <SnackbarProvider>
+        <ReactDndProvider>
+          <DataProviders>
+            <SettingsDialogProvider>
+              <NotificationsProvider>
+                <LocalizationProvider>
+                  <FocalBoardProvider>
+                    <NotionProvider>
+                      <IntlProvider>
+                        <PageHead />
 
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                              {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </IntlProvider>
-                      </NotionProvider>
-                    </FocalBoardProvider>
-                  </LocalizationProvider>
-                </NotificationsProvider>
-              </SettingsDialogProvider>
-            </DataProviders>
-          </ReactDndProvider>
-        </SnackbarProvider>
-      </AppThemeProvider>
-    </CacheProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </NotionProvider>
+                  </FocalBoardProvider>
+                </LocalizationProvider>
+              </NotificationsProvider>
+            </SettingsDialogProvider>
+          </DataProviders>
+        </ReactDndProvider>
+      </SnackbarProvider>
+    </AppThemeProvider>
   );
 }
 

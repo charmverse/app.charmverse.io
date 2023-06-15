@@ -151,7 +151,7 @@ function PageLayout({ children }: PageLayoutProps) {
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 

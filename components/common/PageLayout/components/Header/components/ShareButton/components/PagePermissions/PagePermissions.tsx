@@ -114,7 +114,7 @@ interface Props {
 
 export default function PagePermissions({ pageId, pagePermissions, refreshPermissions, pageType }: Props) {
   const { pages } = usePages();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { members, mutateMembers } = useMembers();
   const { roles } = useRoles();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });

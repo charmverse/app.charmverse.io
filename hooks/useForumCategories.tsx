@@ -37,7 +37,7 @@ export const PostCategoriesContext = createContext<Readonly<IContext>>({
 });
 
 export function PostCategoriesProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const { user } = useUser();
