@@ -363,6 +363,14 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoom();
     if (message.v === room?.doc.version) {
       this.sendUpdatesToOthers(message);
+    } else {
+      log.debug('Ignoring selection change because version is out of date', {
+        socketId: this.id,
+        pageId: room?.doc.id,
+        version: message.v,
+        docVersion: room?.doc.version,
+        userId: this.getSession().user.id
+      });
     }
   }
 
