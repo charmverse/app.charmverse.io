@@ -85,8 +85,6 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   }, [error, openNetworkModal, closeWalletSelectorModal]);
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
-  // eslint-disable-next-line no-console
-  console.log('🔥 app url:', getAppUrl().toString());
   const redirectUri = typeof window === 'undefined' ? '' : getAppUrl().toString();
 
   async function handleUnstoppableDomainsLogin() {
