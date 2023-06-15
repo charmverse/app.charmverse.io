@@ -14,6 +14,7 @@ const PUBLIC_FILE = /\.(.*)$/; // Files
 const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
 export async function middleware(req: NextRequest) {
+  console.log('🔥', 'FORCE_SUBDOMAINS', process.env.FORCE_SUBDOMAINS);
   if (isTestEnv) {
     // Skip middleware in tests
     return;
