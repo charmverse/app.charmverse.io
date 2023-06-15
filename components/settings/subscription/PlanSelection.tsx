@@ -1,4 +1,4 @@
-import type { SubscriptionPeriod } from '@charmverse/core/src/prisma-client';
+import type { SubscriptionPeriod } from '@charmverse/core/prisma-client';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';

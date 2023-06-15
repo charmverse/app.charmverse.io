@@ -2,26 +2,24 @@ import type { InviteLink } from '@charmverse/core/prisma';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 
 import type { FormValues as InviteLinkFormValues } from './components/InviteLinkForm';
-import InviteForm from './components/InviteLinkForm';
-import InvitesTable from './components/InviteLinksTable';
+import { WorkspaceSettings } from './components/InviteLinkForm';
+import { InvitesTable } from './components/InviteLinksTable';
 
 interface InviteLinksProps {
-  isAdmin: boolean;
-  spaceId: string;
   popupState: PopupState;
 }
 
-export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
+export function InviteLinkList({ popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
-  const { data = [], mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
+  const { refreshInvitesList, createInviteLink } = useSpaceInvitesList();
 
   const { isOpen: isOpenInviteModal, close: closeInviteModal } = popupState;
   const {
@@ -36,25 +34,15 @@ export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteL
   }
 
   async function createLink(values: InviteLinkFormValues) {
-    await charmClient.createInviteLink({
-      spaceId,
-      ...values
-    });
-    // update the list of links
-    await mutate();
+    await createInviteLink(values);
     closeInviteModal();
-  }
-
-  async function deleteLink(link: InviteLinkPopulated) {
-    setRemovedInviteLink(link);
-    openInviteLinkDelete();
   }
 
   return (
     <>
-      <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />
+      <InvitesTable />
       <Modal open={isOpenInviteModal} onClose={closeInviteModal}>
-        <InviteForm onSubmit={createLink} onClose={closeInviteModal} />
+        <WorkspaceSettings onSubmit={createLink} onClose={closeInviteModal} />
       </Modal>
       {removedInviteLink && (
         <ConfirmDeleteModal
@@ -66,7 +54,7 @@ export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteL
           onConfirm={async () => {
             await charmClient.deleteInviteLink(removedInviteLink.id);
             // update the list of links
-            await mutate();
+            await refreshInvitesList();
             setRemovedInviteLink(null);
           }}
         />
