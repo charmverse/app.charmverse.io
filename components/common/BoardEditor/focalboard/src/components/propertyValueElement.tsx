@@ -183,7 +183,8 @@ function PropertyValueElement(props: Props) {
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-    spellCheck: propertyTemplate.type === 'text'
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false
   };
 
   if (editableFields.includes(propertyTemplate.type)) {

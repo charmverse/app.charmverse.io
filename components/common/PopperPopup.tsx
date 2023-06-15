@@ -15,10 +15,20 @@ interface PopperPopupProps {
   onClick?: () => void;
   paperSx?: SxProps<Theme>;
   style?: React.CSSProperties;
+  popoverProps?: Partial<PopoverProps>;
 }
 
 export default function PopperPopup(props: PopperPopupProps) {
-  const { style = {}, closeOnClick = false, popupContent, children, autoOpen = false, onClose, onOpen } = props;
+  const {
+    style = {},
+    closeOnClick = false,
+    popupContent,
+    children,
+    autoOpen = false,
+    onClose,
+    onOpen,
+    popoverProps: customPopoverProps = {}
+  } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -34,6 +44,7 @@ export default function PopperPopup(props: PopperPopupProps) {
       vertical: 'top',
       horizontal: 'center'
     },
+    ...customPopoverProps,
     onClick: (e) => {
       e.stopPropagation();
     }
