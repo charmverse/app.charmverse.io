@@ -19,6 +19,7 @@ import type { AnyIdLogin } from 'components/login/LoginButton';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import { getAppUrl } from 'lib/utilities/browser';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
@@ -85,7 +86,8 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   }, [error, openNetworkModal, closeWalletSelectorModal]);
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
-  const redirectUri = typeof window === 'undefined' ? '' : 'https://app.local.io';
+  const appUrl = isLocalhostAlias() ? window.location.origin : getAppUrl().toString();
+  const redirectUri = typeof window === 'undefined' ? '' : appUrl;
   // eslint-disable-next-line no-console
   console.log('🔥redirect uri:', redirectUri, clientID);
   async function handleUnstoppableDomainsLogin() {
