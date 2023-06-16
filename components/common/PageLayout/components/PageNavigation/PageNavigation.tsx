@@ -120,8 +120,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         reorderFavorites({ reorderId: droppedItem.id, nextSiblingId: containerItem.id });
         return;
       }
-      // If there is no parentId, the page was dropped at the root level
-      const parentId = containerItem.parentId ?? null;
+
+      const parentId = containerItem.parentId;
 
       setPages((_pages) => {
         const unsortedSiblings = Object.values(_pages)
@@ -137,11 +137,12 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         siblings.splice(originIndex, 0, droppedPage);
         siblings.forEach((page, _index) => {
           page.index = _index;
-          page.parentId = parentId;
+          page.parentId = parentId ?? null;
           charmClient.pages.updatePage({
             id: page.id,
             index: _index,
-            parentId
+            // If there is no parentId, the page was dropped at the root level
+            parentId: parentId ?? null
           });
         });
         siblings.forEach((page) => {
