@@ -120,14 +120,14 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         reorderFavorites({ reorderId: droppedItem.id, nextSiblingId: containerItem.id });
         return;
       }
-      const parentId = containerItem.parentId;
+      // If there is no parentId, the page was dropped at the root level
+      const parentId = containerItem.parentId ?? null;
 
       setPages((_pages) => {
         const unsortedSiblings = Object.values(_pages)
           .filter(isTruthy)
           .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
         const siblings = pageTree.sortNodes(unsortedSiblings);
-
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {
           throw new Error('cannot find dropped page');
@@ -141,7 +141,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           charmClient.pages.updatePage({
             id: page.id,
             index: _index,
-            parentId: parentId ?? null
+            parentId
           });
         });
         siblings.forEach((page) => {
