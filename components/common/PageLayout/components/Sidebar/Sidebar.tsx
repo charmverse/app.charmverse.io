@@ -224,7 +224,11 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
 
           {
             // Don't show block counts for free or entreprise spaces
-            space?.paidTier === 'pro' && <BlockCounts />
+            space?.paidTier === 'pro' && (
+              <Box ml={2}>
+                <BlockCounts />
+              </Box>
+            )
           }
         </Box>
       </>
