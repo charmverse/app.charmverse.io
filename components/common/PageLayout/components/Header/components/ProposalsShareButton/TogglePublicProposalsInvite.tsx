@@ -1,4 +1,5 @@
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import SettingsIcon from '@mui/icons-material/Settings';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
@@ -51,11 +52,14 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
     <Grid container>
       <Grid container item justifyContent='space-between' alignItems='center'>
         <Grid item>
-          <Typography>
+          <Typography display='flex' justifyContent='center'>
             Show public invite link{' '}
             {publicInviteExists && showOpenSettingsLink && (
               <Tooltip title='Customise link roles in the settings'>
-                <LaunchIcon onClick={() => openSpaceSettings('invites')} sx={{ fontSize: 14, ml: 1 }} />
+                <SettingsIcon
+                  onClick={() => openSpaceSettings('invites')}
+                  sx={{ fontSize: 14, margin: 'auto', ml: 0.5 }}
+                />
               </Tooltip>
             )}
           </Typography>
