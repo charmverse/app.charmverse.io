@@ -38,8 +38,9 @@ const productId = v4();
 const payload = {
   id: 'evt_1NIulWCoqmaE6diLjyGS6Aqd',
   object: 'event',
+  type: 'invoice.paid',
   api_version: '2020-08-27',
-  created: 1686753221,
+  created: 1685025603,
   data: {
     object: {
       id: invoiceId,
@@ -57,13 +58,12 @@ const payload = {
       subtotal: 1000,
       total: 1000
     }
-  },
-  request: {
-    id: 'req_TKLwTS8ey0C3iU',
-    idempotency_key: '4104b812-c196-47d4-a0b6-f40ee7499261'
-  },
-  type: 'invoice.paid'
+  }
 };
+
+const payloadString = JSON.stringify(payload, null, 2);
+const payloadBuffer = Buffer.from(payloadString);
+const payloadLength = String(payloadBuffer.length);
 
 let space: Space;
 
@@ -74,8 +74,6 @@ beforeAll(async () => {
 
 describe('POST api/v1/webhooks/stripe - Catch events from Stripe', () => {
   it('should update the subscription status', async () => {
-    const payloadString = JSON.stringify(payload, null, 2);
-    const payloadBuffer = Buffer.from(payloadString);
     const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
 
     const header = _stripeClient.webhooks.generateTestHeaderString({
@@ -109,10 +107,12 @@ describe('POST api/v1/webhooks/stripe - Catch events from Stripe', () => {
 
     const response = await request(baseUrl)
       .post('/api/v1/webhooks/stripe')
-      .set('content-length', '100')
-      .set('stripe-signature', header)
-      .set('content-type', 'application/json; charset=utf-8')
-      .send(payload)
+      .send(payloadBuffer)
+      .set('Stripe-Signature', header)
+      .set('Content-Length', payloadLength)
+      .set('Content-Type', 'application/json; charset=utf-8')
+      .set('user-agent', 'Stripe/1.0 (+https://stripe.com/docs/webhooks)')
+      .set('host', '127.0.0.1:3335')
       .expect(200);
 
     // Do something with mocked signed event
