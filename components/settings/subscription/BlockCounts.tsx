@@ -69,6 +69,9 @@ export function BlockCounts() {
             onClick={openExplanationModal}
             color={theme.palette.background.default as any}
             fontSize='small'
+            sx={{
+              cursor: 'pointer'
+            }}
           />
         </Typography>
         <Box
