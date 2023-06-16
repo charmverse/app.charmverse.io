@@ -46,7 +46,7 @@ export function countBlocks(pageContent: any | null, spaceId?: string) {
         });
       }
     } catch (error) {
-      log.error('Error counting prosemirror blocks', { error, pageContent, spaceId });
+      log.info('Error counting prosemirror blocks', { error, pageContent, spaceId });
     }
   }
   return count;
