@@ -86,7 +86,8 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
   const redirectUri = typeof window === 'undefined' ? '' : getAppUrl().toString();
-
+  // eslint-disable-next-line no-console
+  console.log('🔥redirect uri:', redirectUri);
   async function handleUnstoppableDomainsLogin() {
     const UAuth = (await import('@uauth/js')).default;
     const uauth = new UAuth({
@@ -97,7 +98,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
     setIsConnectingIdentity(true);
     try {
-      const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
+      const authSig = (await uauth.loginWithPopup({ redirectUri })) as any as UnstoppableDomainsAuthSig;
       const user = await charmClient.unstoppableDomains.login({ authSig });
 
       const domain = extractDomainFromProof(authSig);
