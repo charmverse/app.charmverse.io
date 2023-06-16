@@ -11,16 +11,16 @@ export const upgradeMessages = {
 };
 
 type Props = {
-  children: ReactNode;
   upgradeContext?: keyof typeof upgradeMessages;
+  forceDisplay?: boolean;
 };
 
-export function UpgradeWrapper({ children, upgradeContext }: Props) {
+export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props & { children: ReactNode }) {
   const { openUpgradeSubscription } = useSettingsDialog();
 
   const { isFreeSpace } = useIsFreeSpace();
 
-  if (!isFreeSpace) {
+  if (!isFreeSpace && !forceDisplay) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{children}</>;
   }
@@ -31,15 +31,14 @@ export function UpgradeWrapper({ children, upgradeContext }: Props) {
     </Tooltip>
   );
 }
-export function UpgradeChip({ upgradeContext }: Pick<Props, 'upgradeContext'>) {
+export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
   const { isFreeSpace } = useIsFreeSpace();
-
-  if (!isFreeSpace) {
+  if (!isFreeSpace && !forceDisplay) {
     return null;
   }
 
   return (
-    <UpgradeWrapper upgradeContext={upgradeContext}>
+    <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay>
       <Chip
         color='orange'
         variant='outlined'
@@ -47,6 +46,7 @@ export function UpgradeChip({ upgradeContext }: Pick<Props, 'upgradeContext'>) {
         sx={{
           letterSpacing: '0.04em',
           fontSize: '9px',
+          width: 'fit-content',
           height: '16px',
           borderRadius: '3px',
           padding: '2px',

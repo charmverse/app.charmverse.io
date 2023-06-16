@@ -44,7 +44,7 @@ export const colors = {
   },
   orange: {
     dark: '#C44F1C',
-    light: '#F4D8D0'
+    light: '#FF7F00'
   },
   yellow: {
     dark: '#81730E',
