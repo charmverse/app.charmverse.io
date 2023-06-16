@@ -6,13 +6,36 @@ import Typography from '@mui/material/Typography';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 
-export function BlocksExplanation() {
+type LinkProps = {
+  label: string;
+};
+
+function PricingLink({ label }: LinkProps) {
   const theme = useTheme();
 
   return (
+    <Link
+      sx={{ ...theme.typography.caption }}
+      external
+      href='https://app.charmverse.io/charmverse/page-5371612014886058'
+      target='_blank'
+    >
+      {label}
+    </Link>
+  );
+}
+
+export function BlocksExplanation() {
+  return (
     <Stack gap={2}>
       <Box>
-        <Typography variant='h6'></Typography>
+        <Typography variant='body2'>
+          Community Edition is coming on July 1st. You have 3 months of complimentary access. There will be an option to
+          downgrade to FREE. <PricingLink label='Learn more' />
+        </Typography>
+      </Box>
+      <Box>
+        <Typography variant='h6'>What are blocks?</Typography>
         <Typography variant='body2'>
           Every piece of content in CharmVerse is a block:
           <ul>
@@ -42,14 +65,7 @@ export function BlocksExplanation() {
         </Typography>
       </Box>
       <Box>
-        <Link
-          sx={{ ...theme.typography.caption }}
-          external
-          href='https://app.charmverse.io/charmverse/page-5371612014886058'
-          target='_blank'
-        >
-          Find out more about pricing
-        </Link>
+        <PricingLink label='Find out more about pricing' />
       </Box>
     </Stack>
   );
@@ -62,7 +78,7 @@ type Props = {
 
 export function BlocksExplanationModal({ onClose, open }: Props) {
   return (
-    <Modal open={open} onClose={onClose} size='large' title='What is a block?'>
+    <Modal open={open} onClose={onClose} size='large' title='CharmVerse Community Edition'>
       <BlocksExplanation />
     </Modal>
   );
