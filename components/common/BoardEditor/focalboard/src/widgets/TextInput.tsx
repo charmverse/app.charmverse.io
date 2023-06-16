@@ -13,6 +13,7 @@ export type TextInputProps = EditableProps & {
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
 };
 
 const StyledInput = styled(InputBase)`
@@ -25,7 +26,7 @@ const StyledInput = styled(InputBase)`
 `;
 
 function Editable(
-  { multiline, wrapColumn, displayType, ..._props }: TextInputProps,
+  { multiline, columnRef, wrapColumn, displayType, ..._props }: TextInputProps,
   ref: React.Ref<Focusable>
 ): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
@@ -51,7 +52,7 @@ function Editable(
       paperSx={{
         width: 350,
         p: 2,
-        height: wrapColumn ? 'calc(100vh - 32px)' : 'fit-content'
+        height: wrapColumn && columnRef?.current ? `${columnRef?.current?.clientHeight}px` : 'fit-content'
       }}
       popoverProps={{
         anchorOrigin: {
@@ -59,7 +60,7 @@ function Editable(
           horizontal: 'left'
         },
         transformOrigin: {
-          vertical: 'center',
+          vertical: 'bottom',
           horizontal: 'left'
         }
       }}
