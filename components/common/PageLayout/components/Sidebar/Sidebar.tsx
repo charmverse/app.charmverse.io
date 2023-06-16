@@ -221,7 +221,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             label='Trash'
           />
           <Box my={2} />
-          <BlockCounts />
+          {!!space && space?.paidTier !== 'enterprise' && <BlockCounts />}
         </Box>
       </>
     );
