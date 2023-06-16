@@ -221,7 +221,11 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             label='Trash'
           />
           <Box my={2} />
-          {!!space && space?.paidTier !== 'enterprise' && <BlockCounts />}
+
+          {
+            // Don't show block counts for free or entreprise spaces
+            space?.paidTier === 'pro' && <BlockCounts />
+          }
         </Box>
       </>
     );
