@@ -1,3 +1,5 @@
+import { useTheme } from '@emotion/react';
+import type { PaletteMode } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
@@ -31,8 +33,10 @@ export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props
     </Tooltip>
   );
 }
+
 export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
   const { isFreeSpace } = useIsFreeSpace();
+
   if (!isFreeSpace && !forceDisplay) {
     return null;
   }
@@ -40,7 +44,7 @@ export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
   return (
     <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay>
       <Chip
-        color='orange'
+        color='warning'
         variant='outlined'
         label='UPGRADE'
         sx={{
