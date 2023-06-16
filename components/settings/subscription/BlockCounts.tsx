@@ -64,7 +64,7 @@ export function BlockCounts() {
           }}
         >
           This space has used{' '}
-          {`${blockCount.count} blocks of its ${blockQuota} block storage limit (${usedRatioToFixed}%)`}
+          {`${blockCount.count.toLocaleString()} blocks of its ${blockQuota.toLocaleString()} block storage limit (${usedRatioToFixed}%)`}
           <HelpOutlineIcon
             onClick={openExplanationModal}
             color={theme.palette.background.default as any}
