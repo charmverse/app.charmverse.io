@@ -18,6 +18,8 @@ function cleanUtilisationRatio(ratio: number): number {
   }
 }
 
+const blockQuota = 10000;
+
 export function BlockCounts() {
   const { space: currentSpace } = useCurrentSpace();
   const theme = useTheme();
@@ -27,7 +29,6 @@ export function BlockCounts() {
     close: closeExplanationModal,
     open: openExplanationModal
   } = usePopupState({ variant: 'popover', popupId: 'block-count-info' });
-  const blockQuota = 1000;
 
   const { data: blockCount } = useSWR(currentSpace ? `space-block-count-${currentSpace.id}` : null, () =>
     charmClient.spaces.getBlockCount({
