@@ -69,7 +69,7 @@ export default function ShareToWeb({
 
   useEffect(() => {
     setShareLink(getShareLink());
-  }, [pageId, router.query.viewId, toggleChecked]);
+  }, [pageId, !!page, router.query.viewId, toggleChecked]);
 
   // Current values of the public permission
 

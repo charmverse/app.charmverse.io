@@ -17,7 +17,6 @@ const StyledInput = styled(Input)`
     right: 0;
     width: 100px;
     text-align: right;
-
     button {
       height: 100%;
     }
@@ -33,7 +32,8 @@ export function AddPagePermissionsInput({ onClick }: Props) {
       placeholder='Add people, roles or emails'
       onClick={onClick}
       sx={{
-        height: '35px'
+        height: '35px',
+        my: 1
       }}
       fullWidth
       readOnly
