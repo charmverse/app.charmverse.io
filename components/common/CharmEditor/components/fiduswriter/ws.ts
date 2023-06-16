@@ -179,6 +179,10 @@ export class WebSocketConnector {
             const clientDifference = this.messages.client - data.c;
             this.messages.client = data.c;
             if (clientDifference > this.messages.lastTen.length) {
+              log.debug(`[ws${namespace}] reset the document because we are too far ahead of the server`, {
+                messagesAvailableToResend: this.messages.lastTen.length,
+                clientDifference
+              });
               // We cannot fix the situation
               this.send(this.restartMessage);
               return;
