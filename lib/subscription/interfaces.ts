@@ -1,4 +1,4 @@
-import type { StripeSubscription } from '@charmverse/core/src/prisma-client';
+import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 

@@ -1,34 +1,31 @@
-import type { InviteLink, InviteLinkToRole, Role, User } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { InviteLink } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createInviteLink } from 'lib/invites';
+import { createInviteLink } from 'lib/invites/createInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import { getSpaceInviteLinks } from 'lib/invites/getSpaceInviteLinks';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-export type InviteLinkPopulated = InviteLink & {
-  author: User;
-  inviteLinkToRoles: (InviteLinkToRole & { role: Role })[];
-};
-
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership())
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
   .get(getInviteLinks)
   .use(requireSpaceMembership({ adminOnly: true }))
   .post(createInviteLinkEndpoint);
 
-async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiResponse<InviteLink>) {
   const userId = req.session.user.id;
-  const { maxAgeMinutes, maxUses, spaceId } = req.body;
+  const { maxAgeMinutes, maxUses, spaceId, visibleOn } = req.body;
 
   const invite = await createInviteLink({
     createdBy: userId,
     maxAgeMinutes,
     maxUses,
+    visibleOn,
     spaceId: spaceId as string
   });
 
@@ -41,25 +38,11 @@ async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiRespons
 
   return res.status(200).json(invite);
 }
-async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated[] | { error: string }>) {
-  const spaceId = req.query.spaceId as string;
-  if (!spaceId) {
-    return res.status(400).json({ error: 'spaceId is required' });
-  }
-
-  const invites = await prisma.inviteLink.findMany({
-    where: {
-      spaceId
-    },
-    include: {
-      author: true,
-      inviteLinkToRoles: {
-        include: {
-          role: true
-        }
-      }
-    }
+async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkWithRoles[]>) {
+  const invites = await getSpaceInviteLinks({
+    spaceId: req.query.spaceId as string
   });
+
   return res.status(200).json(invites);
 }
 

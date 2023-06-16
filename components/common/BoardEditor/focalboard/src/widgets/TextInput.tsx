@@ -12,6 +12,7 @@ export type TextInputProps = EditableProps & {
   className?: string;
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
+  wrapColumn?: boolean;
 };
 
 const StyledInput = styled(InputBase)`
@@ -23,7 +24,10 @@ const StyledInput = styled(InputBase)`
   border: 0px;
 `;
 
-function Editable({ multiline, displayType, ..._props }: TextInputProps, ref: React.Ref<Focusable>): JSX.Element {
+function Editable(
+  { multiline, wrapColumn, displayType, ..._props }: TextInputProps,
+  ref: React.Ref<Focusable>
+): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
 
@@ -46,7 +50,18 @@ function Editable({ multiline, displayType, ..._props }: TextInputProps, ref: Re
       style={{ width: '100%' }}
       paperSx={{
         width: 350,
-        p: 2
+        p: 2,
+        height: wrapColumn ? 'calc(100vh - 32px)' : 'fit-content'
+      }}
+      popoverProps={{
+        anchorOrigin: {
+          vertical: 'bottom',
+          horizontal: 'left'
+        },
+        transformOrigin: {
+          vertical: 'center',
+          horizontal: 'left'
+        }
       }}
       popupContent={
         <StyledInput
