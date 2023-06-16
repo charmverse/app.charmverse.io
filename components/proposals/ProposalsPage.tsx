@@ -11,7 +11,6 @@ import { NewProposalButton } from 'components/votes/components/NewProposalButton
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
-import { usePages } from 'hooks/usePages';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
@@ -22,7 +21,6 @@ import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
-  const { pages } = usePages();
   const { space: currentSpace } = useCurrentSpace();
   const { isPublicSpace } = useIsPublicSpace();
   const {
@@ -32,6 +30,7 @@ export function ProposalsPage() {
   } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
     charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
+
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
