@@ -1050,14 +1050,25 @@ export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
-  cardCount
+  cardCount,
+  views,
+  addPageContent
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  views?: number;
+  addPageContent?: boolean;
 }): Promise<Page> {
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({
+    createdBy,
+    spaceId,
+    parentId,
+    cardCount,
+    views,
+    addPageContent
+  });
 
   const pagePermissions = pageArgs.map((createArg) => ({
     pageId: createArg.data.id as string,

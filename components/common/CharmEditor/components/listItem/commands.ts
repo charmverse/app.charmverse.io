@@ -39,7 +39,7 @@ import {
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';
 
-const maxIndentation = 4;
+const maxIndentation = 15;
 
 // Returns the number of nested lists that are ancestors of the given selection
 const numberNestedLists = (resolvedPos: ResolvedPos, nodes: Schema['nodes']) => {
