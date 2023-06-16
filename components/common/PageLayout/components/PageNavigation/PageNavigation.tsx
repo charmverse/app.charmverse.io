@@ -141,7 +141,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           charmClient.pages.updatePage({
             id: page.id,
             index: _index,
-            parentId
+            parentId: parentId ?? null
           });
         });
         siblings.forEach((page) => {
