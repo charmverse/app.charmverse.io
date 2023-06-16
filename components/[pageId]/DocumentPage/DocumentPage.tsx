@@ -173,6 +173,11 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     setConnectionError(error);
   }
 
+  // reset error whenever page id changes
+  useEffect(() => {
+    setConnectionError(null);
+  }, [page.id]);
+
   return (
     <>
       {!!page?.deletedAt && (
