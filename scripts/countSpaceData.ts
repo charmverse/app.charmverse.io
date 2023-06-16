@@ -1,4 +1,4 @@
-import { countData } from 'lib/spaces/countData';
+import { countSpaceBlocks } from 'lib/spaces/countSpaceBlocks';
 import { prisma } from '@charmverse/core/prisma-client';
 import { writeFileSync } from 'fs';
 
@@ -16,7 +16,7 @@ async function init() {
 
   for (let space of spaces) {
     console.log('\nSpace: ', space.name);
-    const data = await countData({ spaceId: space.id });
+    const data = await countSpaceBlocks({ spaceId: space.id });
     console.log(data);
     // write to CSV file
     const columns = [

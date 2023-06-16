@@ -85,6 +85,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
   const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
+  log.info('Connect redirectUri', redirectUri, clientID);
 
   async function handleUnstoppableDomainsLogin() {
     const UAuth = (await import('@uauth/js')).default;
