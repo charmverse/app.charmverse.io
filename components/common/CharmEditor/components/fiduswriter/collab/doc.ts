@@ -288,7 +288,6 @@ export class ModCollabDoc {
 
   applyDiffs(diffs: any[], cid: number) {
     this.receiving = true;
-    log.debug('GENERATE STEPS', diffs);
     const steps = diffs.map((j) => Step.fromJSON(this.mod.editor.schema, j));
     const clientIds = diffs.map((_) => cid);
     log.debug('APPLY DIFFS', steps);
