@@ -290,7 +290,7 @@ export class ModCollabDoc {
     this.receiving = true;
     const steps = diffs.map((j) => Step.fromJSON(this.mod.editor.schema, j));
     const clientIds = diffs.map((_) => cid);
-    log.debug('APPLY DIFFS', steps);
+    log.debug('APPLY DIFFS', this.mod.editor.view.state.doc, steps);
     const tr = receiveTransaction(this.mod.editor.view.state, steps, clientIds, {
       // add content inserted at the cursor after the cursor instead of before
       mapSelectionBackward: true
