@@ -86,10 +86,9 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   }, [error, openNetworkModal, closeWalletSelectorModal]);
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
-  const appUrl = isLocalhostAlias() ? window.location.origin : getAppUrl().toString();
-  const redirectUri = typeof window === 'undefined' ? '' : appUrl;
-  // eslint-disable-next-line no-console
-  console.log('🔥redirect uri:', redirectUri, clientID);
+  const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
+  log.info('Connect redirectUri', redirectUri, clientID);
+
   async function handleUnstoppableDomainsLogin() {
     const UAuth = (await import('@uauth/js')).default;
     const uauth = new UAuth({
