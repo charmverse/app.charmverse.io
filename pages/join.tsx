@@ -14,7 +14,7 @@ import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGa
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getAppUrl, getSpaceUrl } from 'lib/utilities/browser';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
   const { spaces } = useSpaces();
@@ -70,7 +70,7 @@ export default function JoinWorkspace() {
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
-      <AlternateRouteButton href='/createSpace'>Create a space</AlternateRouteButton>
+      <AlternateRouteButton href={`${getAppUrl()}/createSpace`}>Create a space</AlternateRouteButton>
     </Box>
   );
 }

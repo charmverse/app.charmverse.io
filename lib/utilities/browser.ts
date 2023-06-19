@@ -316,16 +316,18 @@ export function getDefaultSpaceUrl({
   useSubdomain?: boolean;
 }) {
   let protocol = isDevEnv ? 'http:' : 'https:';
+  let port = '';
   const appDomain = getAppApexDomain();
 
   if (typeof window !== 'undefined') {
     protocol = window.location.protocol;
+    port = window.location.port ? `:${window.location.port}` : '';
   }
 
   if (appDomain) {
     return useSubdomain
-      ? `${protocol}//${domain}.${appDomain}${path}`
-      : `${protocol}//app.${appDomain}/${domain}${path}`;
+      ? `${protocol}//${domain}.${appDomain}${port}${path}`
+      : `${protocol}//app.${appDomain}${port}/${domain}${path}`;
   }
 
   return `/${domain}${path}`;
