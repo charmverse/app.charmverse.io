@@ -32,6 +32,13 @@ function Editable(
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
 
+  const memoizedHeight = React.useMemo(() => {
+    if (wrapColumn && columnRef?.current) {
+      return `${columnRef?.current?.clientHeight}px`;
+    }
+    return 'fit-content';
+  }, [wrapColumn, columnRef?.current]);
+
   // Keep it as before for card modal view
   if (displayType === 'details') {
     return (
@@ -52,7 +59,7 @@ function Editable(
       paperSx={{
         width: 350,
         p: 2,
-        height: wrapColumn && columnRef?.current ? `${columnRef?.current?.clientHeight}px` : 'fit-content'
+        height: memoizedHeight
       }}
       popoverProps={{
         anchorOrigin: {
