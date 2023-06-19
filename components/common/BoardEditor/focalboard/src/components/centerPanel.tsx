@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -148,11 +148,15 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards
-    .map((card) => ({ card, page: pages[card.id]! }))
-    .filter(({ page }) => !!page && !page.deletedAt);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {

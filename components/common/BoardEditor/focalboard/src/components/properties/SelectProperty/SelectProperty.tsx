@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
-} from 'components/common/BoardEditor/components/properties/SelectProperty/mappers';
+} from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/mappers';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -15,10 +15,13 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
+  isHidden?: boolean;
 };
-const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType'
+export const SelectPreviewContainer = styled(Stack, {
+  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden'
 })<ContainerProps>`
+  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+
   justify-content: center;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   transition: background-color 0.2s ease-in-out;
@@ -60,15 +63,14 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
-    .MuiAutocomplete-input {
-      ${({ displayType, theme }) =>
-        displayType === 'table'
-          ? `
-      width: 100%;
-      border-top: 1px solid ${theme.palette.divider};
-    `
-          : ''}
-    }
+    ${({ displayType, theme }) =>
+      displayType === 'table'
+        ? `
+        .MuiAutocomplete-input {
+          width: 100%;
+          border-top: 1px solid ${theme.palette.divider};
+        }`
+        : ''}
   }
 
   .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
@@ -81,7 +83,6 @@ type Props = {
   multiselect?: boolean;
   options: IPropertyOption[];
   propertyValue: string | string[];
-  placeholder?: string;
   displayType?: PropertyValueDisplayType;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
@@ -94,7 +95,6 @@ export function SelectProperty({
   readOnly,
   options,
   propertyValue,
-  placeholder,
   multiselect = false,
   onChange,
   onUpdateOption,
@@ -162,7 +162,7 @@ export function SelectProperty({
           size='small'
           emptyComponent={
             displayType === 'details' && (
-              <Typography component='span' variant='subtitle2' sx={{ opacity: 0.4, pl: '2px' }}>
+              <Typography component='span' variant='subtitle2' color='secondary'>
                 Empty
               </Typography>
             )
@@ -174,7 +174,7 @@ export function SelectProperty({
 
   return (
     <StyledSelect
-      placeholder={placeholder}
+      placeholder='Search for an option...'
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}

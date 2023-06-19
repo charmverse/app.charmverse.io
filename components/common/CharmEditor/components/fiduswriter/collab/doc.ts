@@ -267,7 +267,11 @@ export class ModCollabDoc {
         this.mod.editor.view.state,
         // @ts-ignore because `Step` is roughly the same as `ProsemirrorJSONStep`
         sentSteps,
-        ourIds
+        ourIds,
+        {
+          // add content inserted at the cursor after the cursor instead of before
+          mapSelectionBackward: true
+        }
       );
       this.mod.editor.view.dispatch(tr);
       this.mod.editor.docInfo.confirmedDoc = unconfirmedDiffs.doc;
@@ -286,7 +290,11 @@ export class ModCollabDoc {
     this.receiving = true;
     const steps = diffs.map((j) => Step.fromJSON(this.mod.editor.schema, j));
     const clientIds = diffs.map((_) => cid);
-    const tr = receiveTransaction(this.mod.editor.view.state, steps, clientIds);
+    log.debug('APPLY DIFFS', this.mod.editor.view.state.doc, steps);
+    const tr = receiveTransaction(this.mod.editor.view.state, steps, clientIds, {
+      // add content inserted at the cursor after the cursor instead of before
+      mapSelectionBackward: true
+    });
     tr.setMeta('addToHistory', false);
     tr.setMeta('remote', true);
     this.mod.editor.view.dispatch(tr);
