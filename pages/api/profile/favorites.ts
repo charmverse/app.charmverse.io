@@ -14,14 +14,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .put(updateFavoritePagesHandler)
+  .delete(unFavoritePage)
   .use((req, res, next) => {
     if (!req.body.pageId) {
       return res.status(400).json({ error: 'pageId is required' });
     }
     next();
   })
-  .post(addFavoritePage)
-  .delete(unFavoritePage);
+  .post(addFavoritePage);
 
 async function addFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
   const pageId = req.body.pageId as string;
