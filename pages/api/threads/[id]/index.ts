@@ -44,7 +44,7 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
   }
 
   await deleteThread(threadId);
-  log.info(`Deleted page comment`, { userId, pageId: thread.pageId, threadId });
+  log.info(`Deleted page inline comment thread`, { userId, pageId: thread.pageId, threadId });
 
   return res.status(200).json({ ok: true });
 }
