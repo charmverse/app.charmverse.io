@@ -20,7 +20,6 @@ import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import * as bulletList from '../../bulletList';
-import { replaceToggleListCommand } from '../../listItem/commands';
 import { nestedPageSuggestMarkName } from '../../nestedPage/nestedPage.constants';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import * as orderedList from '../../orderedList';
@@ -244,7 +243,8 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
-            return replaceToggleListCommand(state.schema.nodes.bulletList)(_state, _dispatch, _view);
+            setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
+            return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
 
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
