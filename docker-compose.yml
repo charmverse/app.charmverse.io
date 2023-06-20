@@ -133,4 +133,5 @@ services:
       - prd-cron
       - prd-webapp
       - prd-sockets
+      - stg-sockets
       - ddtst
