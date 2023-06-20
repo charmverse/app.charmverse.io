@@ -124,6 +124,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       showMessage(error.message, 'warning');
     }
     log.error('[ws/ceditor]: Error message displayed to user', {
+      pageId,
       error
     });
     if (isLoadingRef.current) {
