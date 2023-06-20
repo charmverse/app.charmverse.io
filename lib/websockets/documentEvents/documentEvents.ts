@@ -422,7 +422,7 @@ export class DocumentEventHandler {
         }
       }
       room.doc.diffs.push(message);
-      room.doc.diffs = room.doc.diffs.slice(this.historyLength);
+      room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
       if (room.doc.version % this.docSaveInterval === 0) {
         await this.saveDocument();
@@ -437,12 +437,12 @@ export class DocumentEventHandler {
         log.debug('Client is behind. Resend document diffs', {
           ...logMeta,
           roomDiffs: room.doc.diffs.length,
-          diffsToSend
+          diffsToSend: diffsToSend * -1
         });
         const messages = room.doc.diffs.slice(diffsToSend);
         for (const m of messages) {
           const newMessage = { ...m, server_fix: true };
-          await this.sendMessage(newMessage);
+          this.sendMessage(newMessage);
         }
       } else {
         log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
