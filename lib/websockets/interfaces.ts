@@ -111,6 +111,11 @@ type SpaceSubscriptionActivated = {
   payload: object;
 };
 
+type SpaceSubscriptionCancelled = {
+  type: 'space_subscription_cancelled';
+  payload: object;
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -128,7 +133,8 @@ export type ServerMessage =
   | PostUpdated
   | PostDeleted
   | SpaceSubscriptionUpdated
-  | SpaceSubscriptionActivated;
+  | SpaceSubscriptionActivated
+  | SpaceSubscriptionCancelled;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

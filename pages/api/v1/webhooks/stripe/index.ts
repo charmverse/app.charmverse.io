@@ -77,7 +77,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     switch (event.type) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-
         const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
           expand: ['plan']
         });
@@ -213,10 +212,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-
+        const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -234,7 +233,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         await prisma.stripeSubscription.update({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -251,6 +250,14 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           }
         });
+
+        relay.broadcast(
+          {
+            type: 'space_subscription_cancelled',
+            payload: {}
+          },
+          spaceId
+        );
 
         break;
       }

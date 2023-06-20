@@ -40,9 +40,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     {
       onError() {
         showMessage('Updating failed! Please try again', 'error');
-      },
-      async onSuccess() {
-        await refetchSpaceSubscription();
       }
     }
   );
@@ -56,9 +53,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       refetchSpaceSubscription();
     });
 
+    const unsubscribeFromSpaceSubscriptionCancellation = subscribe('space_subscription_cancelled', () => {
+      refetchSpaceSubscription();
+    });
+
     return () => {
       unsubscribeFromSpaceSubscriptionActivation();
       unsubscribeFromSpaceSubscriptionUpdates();
+      unsubscribeFromSpaceSubscriptionCancellation();
     };
   }, []);
 
