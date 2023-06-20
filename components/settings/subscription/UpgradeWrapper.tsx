@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import type { TooltipProps } from '@mui/material/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode, SyntheticEvent } from 'react';
 
@@ -10,6 +11,7 @@ export const upgradeMessages = {
   pagePermissions: 'Upgrade to a paid plan to change page permissions',
   forumPermissions: 'Upgrade to a paid plan to change forum permissions',
   proposalPermissions: 'Upgrade to a paid plan to change proposal permissions',
+  bountyPermissions: 'Upgrade to a paid plan to change bounty permissions',
   customRoles: 'Upgrade to a paid plan to use custom roles',
   inviteGuests: 'Upgrade to a paid plan to invite members with guest-level access',
   customiseMemberProperty: 'Upgrade to a paid plan to use this member property',
@@ -23,7 +25,12 @@ type Props = {
   forceDisplay?: boolean;
 };
 
-export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props & { children: ReactNode }) {
+export function UpgradeWrapper({
+  children,
+  upgradeContext,
+  forceDisplay,
+  tooltipProps
+}: Props & { children: ReactNode; tooltipProps?: TooltipProps }) {
   const { openUpgradeSubscription } = useSettingsDialog();
 
   const { isFreeSpace } = useIsFreeSpace();
@@ -40,7 +47,7 @@ export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props
   }
 
   return (
-    <Tooltip title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
+    <Tooltip {...tooltipProps} title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
       <Box onClick={handleClick}>{children}</Box>
     </Tooltip>
   );
