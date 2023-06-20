@@ -10,6 +10,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/interfaces';
 import { inputBackground } from 'theme/colors';
 
@@ -21,6 +22,7 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
   const { setSpace } = useSpaces();
+  const { subscribe } = useWebSocketClient();
 
   const {
     data: spaceSubscription,
@@ -44,6 +46,21 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       }
     }
   );
+
+  useEffect(() => {
+    const unsubscribeFromSpaceSubscriptionActivation = subscribe('space_subscription_activated', () => {
+      refetchSpaceSubscription();
+    });
+
+    const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription_updated', () => {
+      refetchSpaceSubscription();
+    });
+
+    return () => {
+      unsubscribeFromSpaceSubscriptionActivation();
+      unsubscribeFromSpaceSubscriptionUpdates();
+    };
+  }, []);
 
   const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription-intent`,

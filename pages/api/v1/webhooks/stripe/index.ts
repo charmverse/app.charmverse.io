@@ -8,6 +8,7 @@ import type Stripe from 'stripe';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { stripeClient } from 'lib/subscription/stripe';
+import { relay } from 'lib/websockets/relay';
 
 // Stripe requires the raw body to construct the event. https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
 export const config = { api: { bodyParser: false } };
@@ -153,14 +154,22 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           result: 'success'
         });
 
+        relay.broadcast(
+          {
+            type: 'space_subscription_activated',
+            payload: {}
+          },
+          spaceId
+        );
+
         break;
       }
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
-
+        const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -189,10 +198,19 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               status: subscription.cancel_at_period_end ? 'cancelAtEnd' : 'active'
             }
           });
+
+          relay.broadcast(
+            {
+              type: 'space_subscription_updated',
+              payload: {}
+            },
+            spaceId
+          );
         }
 
         break;
       }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
 

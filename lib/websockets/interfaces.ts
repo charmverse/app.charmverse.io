@@ -101,6 +101,16 @@ type SubscribeToWorkspace = {
   } & SocketAuthReponse;
 };
 
+type SpaceSubscriptionUpdated = {
+  type: 'space_subscription_updated';
+  payload: object;
+};
+
+type SpaceSubscriptionActivated = {
+  type: 'space_subscription_activated';
+  payload: object;
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -116,7 +126,9 @@ export type ServerMessage =
   | VotesUpdated
   | PostPublished
   | PostUpdated
-  | PostDeleted;
+  | PostDeleted
+  | SpaceSubscriptionUpdated
+  | SpaceSubscriptionActivated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
