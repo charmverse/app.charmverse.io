@@ -155,8 +155,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         relay.broadcast(
           {
-            type: 'space_subscription_activated',
-            payload: {}
+            type: 'space_subscription',
+            payload: {
+              type: 'activated'
+            }
           },
           spaceId
         );
@@ -200,8 +202,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
           relay.broadcast(
             {
-              type: 'space_subscription_updated',
-              payload: {}
+              type: 'space_subscription',
+              payload: {
+                type: 'updated'
+              }
             },
             spaceId
           );
@@ -253,8 +257,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         relay.broadcast(
           {
-            type: 'space_subscription_cancelled',
-            payload: {}
+            type: 'space_subscription',
+            payload: {
+              type: 'cancelled'
+            }
           },
           spaceId
         );

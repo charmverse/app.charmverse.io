@@ -13,7 +13,7 @@ export type SealedUserId = {
   userId: string;
 };
 
-export type SocketAuthReponse = {
+export type SocketAuthResponse = {
   authToken: string;
 };
 
@@ -98,22 +98,14 @@ type SubscribeToWorkspace = {
   type: 'subscribe';
   payload: {
     spaceId: string;
-  } & SocketAuthReponse;
+  } & SocketAuthResponse;
 };
 
 type SpaceSubscriptionUpdated = {
-  type: 'space_subscription_updated';
-  payload: object;
-};
-
-type SpaceSubscriptionActivated = {
-  type: 'space_subscription_activated';
-  payload: object;
-};
-
-type SpaceSubscriptionCancelled = {
-  type: 'space_subscription_cancelled';
-  payload: object;
+  type: 'space_subscription';
+  payload: {
+    type: 'activated' | 'cancelled' | 'updated';
+  };
 };
 
 export type ClientMessage = SubscribeToWorkspace;
@@ -132,9 +124,7 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
-  | SpaceSubscriptionUpdated
-  | SpaceSubscriptionActivated
-  | SpaceSubscriptionCancelled;
+  | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

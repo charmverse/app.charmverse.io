@@ -45,22 +45,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   );
 
   useEffect(() => {
-    const unsubscribeFromSpaceSubscriptionActivation = subscribe('space_subscription_activated', () => {
-      refetchSpaceSubscription();
-    });
-
-    const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription_updated', () => {
-      refetchSpaceSubscription();
-    });
-
-    const unsubscribeFromSpaceSubscriptionCancellation = subscribe('space_subscription_cancelled', () => {
+    const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription', () => {
       refetchSpaceSubscription();
     });
 
     return () => {
-      unsubscribeFromSpaceSubscriptionActivation();
       unsubscribeFromSpaceSubscriptionUpdates();
-      unsubscribeFromSpaceSubscriptionCancellation();
     };
   }, []);
 
