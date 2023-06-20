@@ -159,6 +159,7 @@ test.describe.serial('View proposal', () => {
     await expect(pagePermissions.publicShareToggle).toBeVisible();
 
     await pagePermissions.togglePageIsPublic();
+    await expect(pagePermissions.pageShareLink).toBeVisible();
 
     const shareLink = await pagePermissions.getPageShareLinkValue();
 

@@ -3,6 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
@@ -66,6 +69,9 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
     spaceTemplate: data.spaceTemplate,
     userId
   });
+  updateTrackGroupProfile(space);
+  updateTrackUserProfileById(userId);
+  trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: data.spaceTemplate || 'default' });
 
   return res.status(200).json(space);
 }

@@ -39,7 +39,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
     return record;
   }, {} as any);
 
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');

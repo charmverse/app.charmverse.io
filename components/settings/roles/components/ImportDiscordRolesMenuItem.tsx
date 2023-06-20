@@ -7,7 +7,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 
 export default function ImportDiscordRolesMenuItem() {
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
 

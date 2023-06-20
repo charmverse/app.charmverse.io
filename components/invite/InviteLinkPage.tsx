@@ -5,10 +5,10 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/LoginButton';
-import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { InviteLinkPopulated } from 'lib/invites';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 
 import { CenteredBox } from './components/CenteredBox';
 
@@ -21,7 +21,13 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       await charmClient.createUser({ address: walletAuthSignature.address, walletSignature: walletAuthSignature });
     }
     await charmClient.acceptInvite({ id: invite.id });
-    window.location.href = `/${invite.space.domain}`;
+
+    let redirectUrl = `/${invite.space.domain}`;
+
+    if (invite.visibleOn) {
+      redirectUrl += '/proposals';
+    }
+    window.location.href = redirectUrl;
   }
   return (
     <CenteredBox>

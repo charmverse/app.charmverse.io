@@ -38,7 +38,7 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
   const { roles } = useRoles();
   const addRolesDialog = usePopupState({ variant: 'popover', popupId: 'add-roles-dialog' });
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   async function deletePermission(id: string) {
     await charmClient.permissions.proposals.deleteProposalCategoryPermission(id);
     mutatePermissions((list) => list?.filter((p) => p.id !== id));

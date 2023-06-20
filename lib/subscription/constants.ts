@@ -1,4 +1,8 @@
-import type { SubscriptionTier } from '@charmverse/core/src/prisma-client';
+import type { SubscriptionTier } from '@charmverse/core/prisma-client';
+
+import { isProdEnv } from 'config/constants';
+
+// Stripe Constants
 
 export const SUBSCRIPTION_PRODUCT_IDS = [
   'community_5k',
@@ -84,3 +88,8 @@ export const SUBSCRIPTION_PRODUCTS_RECORD: Record<
     }
   }
 };
+
+// Loop constants
+
+export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';
+export const loopApiUrl = isProdEnv ? 'https://api.loopcrypto.xyz' : 'https://demo.api.loopcrypto.xyz';

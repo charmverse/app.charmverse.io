@@ -55,6 +55,7 @@ export default function Callout({
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
+    event.stopPropagation();
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -80,7 +81,8 @@ export default function Callout({
               color: '#FFFFFFFF'
             }
           }}
-          onClick={handleClick}
+          // use onMouseDown - for some reason, onClick gets intercepted by the editor
+          onMouseDown={handleClick}
           disabled={readOnly}
         >
           {twemojiImage ? (

@@ -1,4 +1,4 @@
-import type { MemberProperty } from '@charmverse/core/prisma';
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
@@ -30,7 +30,6 @@ export async function getSpaceMembers({
     }
     return acc;
   }, {} as Record<string, string>);
-
   const spaceRoles = await prisma.spaceRole.findMany({
     where:
       whereOr.length !== 0

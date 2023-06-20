@@ -56,17 +56,25 @@ export class Merge {
         receiveTransaction(
           this.mod.editor.view.state,
           unconfirmedTr.steps,
-          unconfirmedTr.steps.map((_step) => this.mod.editor.client_id)
+          unconfirmedTr.steps.map((_step) => this.mod.editor.client_id),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         )
       );
       this.mod.editor.view.dispatch(
         receiveTransaction(
           this.mod.editor.view.state,
           rollbackTr.steps,
-          rollbackTr.steps.map((_step) => 'remote')
+          rollbackTr.steps.map((_step) => 'remote'),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         ).setMeta('remote', true)
       );
-      const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
+      const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
       // Apply the online Transaction
       let lostTr: Transform;
       if (data.m) {
@@ -88,7 +96,11 @@ export class Merge {
         receiveTransaction(
           this.mod.editor.view.state,
           lostTr.steps,
-          lostTr.steps.map((_step) => 'remote')
+          lostTr.steps.map((_step) => 'remote'),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         ).setMeta('remote', true)
       );
 
@@ -137,12 +149,13 @@ export class Merge {
     } else {
       // The server seems to have lost some data. We reset.
       this.mod.doc.loadDocument(data);
+      log.error('Server has lost data, reset the document');
     }
   }
 
   autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
     /* This automerges documents incase of no conflicts */
-    const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
+    const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
     const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
     const maps = new Mapping(
       []

@@ -30,7 +30,7 @@ import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/e
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
-import InputVotingStrategies from './InputVotingStrategies';
+import { InputVotingStrategies } from './InputVotingStrategies';
 
 async function getSnapshotClient() {
   const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
@@ -51,7 +51,7 @@ const MIN_VOTING_OPTIONS = 2;
 export function PublishingForm({ onSubmit, pageId }: Props) {
   const { account, library } = useWeb3AuthSig();
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { members } = useMembers();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);

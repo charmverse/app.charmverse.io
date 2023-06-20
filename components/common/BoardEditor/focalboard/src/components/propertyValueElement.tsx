@@ -1,10 +1,10 @@
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -22,7 +22,7 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
+import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -127,7 +127,7 @@ function PropertyValueElement(props: Props) {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         wrapColumn={props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {
@@ -176,13 +176,15 @@ function PropertyValueElement(props: Props) {
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,
+    displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
     onSave: () => {
       mutator.changePropertyValue(card, propertyTemplate.id, value);
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-    spellCheck: propertyTemplate.type === 'text'
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false
   };
 
   if (editableFields.includes(propertyTemplate.type)) {
@@ -216,4 +218,4 @@ function PropertyValueElement(props: Props) {
   return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);

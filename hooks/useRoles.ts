@@ -7,7 +7,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 
 export function useRoles() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { mutateMembers } = useMembers();
 
   const { data: roles } = useSWR(

@@ -22,7 +22,7 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view: 'Space members can only view pages.'
 };
 export function DefaultPagePermissions() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
@@ -61,7 +61,7 @@ export function DefaultPagePermissions() {
 
   async function updateSpaceDefaultPublicPages() {
     if (space && defaultPublicPages !== space?.defaultPublicPages) {
-      const updatedSpace = await charmClient.setDefaultPublicPages({
+      const updatedSpace = await charmClient.spaces.setDefaultPublicPages({
         defaultPublicPages,
         spaceId: space.id
       });
@@ -72,7 +72,7 @@ export function DefaultPagePermissions() {
 
   async function updateSpaceRequireProposalTemplate() {
     if (space && requireProposalTemplate !== space?.requireProposalTemplate) {
-      const updatedSpace = await charmClient.setRequireProposalTemplate({
+      const updatedSpace = await charmClient.spaces.setRequireProposalTemplate({
         requireProposalTemplate,
         spaceId: space.id
       });

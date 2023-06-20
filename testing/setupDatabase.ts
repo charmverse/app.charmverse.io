@@ -28,7 +28,6 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
-import type { PageWithProposal } from 'lib/pages';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
@@ -44,6 +43,8 @@ import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
+
+type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function generateSpaceUser({
   spaceId,
@@ -151,6 +152,7 @@ type CreateUserAndSpaceInput = {
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
   walletAddress?: string;
+  notifyNewProposals?: Date | null;
 };
 
 export async function generateUserAndSpace({
@@ -162,7 +164,8 @@ export async function generateUserAndSpace({
   publicBountyBoard,
   superApiTokenId,
   walletAddress,
-  paidTier
+  paidTier,
+  notifyNewProposals
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -188,6 +191,7 @@ export async function generateUserAndSpace({
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
               publicBountyBoard,
+              notifyNewProposals,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }
@@ -531,8 +535,7 @@ export async function generateRole({
   createdBy,
   roleName = `role-${v4()}`,
   source,
-  assigneeUserIds,
-  id = v4()
+  assigneeUserIds
 }: {
   externalId?: string;
   spaceId: string;
@@ -763,7 +766,7 @@ export async function createProposalWithUsers({
       ).id
     : proposalCategoryId;
 
-  const proposalPage: PageWithProposal = await createPageDb({
+  const proposalPage = await createPageDb<PageWithProposal>({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -943,7 +946,7 @@ export async function generateProposal({
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
   title?: string;
-}): Promise<Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
@@ -962,7 +965,7 @@ export async function generateProposal({
       })
     ).id;
 
-  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
+  const result = await createPageDb<PageWithProposal>({
     data: {
       id: proposalId,
       contentText: '',
@@ -1047,14 +1050,25 @@ export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
-  cardCount
+  cardCount,
+  views,
+  addPageContent
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  views?: number;
+  addPageContent?: boolean;
 }): Promise<Page> {
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({
+    createdBy,
+    spaceId,
+    parentId,
+    cardCount,
+    views,
+    addPageContent
+  });
 
   const pagePermissions = pageArgs.map((createArg) => ({
     pageId: createArg.data.id as string,

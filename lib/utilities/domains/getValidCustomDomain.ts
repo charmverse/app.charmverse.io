@@ -11,14 +11,19 @@ export function getValidCustomDomain(host?: string | null) {
     return null;
   }
 
-  const defaultHost = getValidDefaultHost(host);
+  const hostname = host?.split(':')[0];
+
+  if (hostname && !/[a-z]/i.test(hostname)) {
+    // hostname is an IP address - case not supported
+    return null;
+  }
+
+  const defaultHost = getValidDefaultHost(hostname);
 
   if (defaultHost) {
     // app runs on default domain so space does not use custom domain
     return null;
   }
 
-  const customDomain = host?.split(':')[0];
-
-  return customDomain || null;
+  return hostname || null;
 }

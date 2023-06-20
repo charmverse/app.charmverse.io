@@ -14,7 +14,7 @@ export interface Props {
 
 const MAX_CONCURRENT_STRATEGIES = 8;
 
-export default function InputVotingStrategies({ onChange = () => {}, strategies }: Props) {
+export function InputVotingStrategies({ onChange = () => {}, strategies }: Props) {
   const [value, setValue] = useState<SnapshotVotingStrategy[]>([strategies[0]]);
 
   useEffect(() => {

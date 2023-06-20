@@ -4,11 +4,10 @@ import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
-import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -31,9 +30,11 @@ import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
+import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
+import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
 export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
@@ -85,6 +86,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
+  const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
@@ -164,11 +166,28 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     setPageProps({ participants });
   }
 
+  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+
+  function onConnectionError(error: Error) {
+    setConnectionError(error);
+  }
+
+  // reset error whenever page id changes
+  useEffect(() => {
+    setConnectionError(null);
+  }, [page.id]);
+
   return (
     <>
       {!!page?.deletedAt && (
         <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
           <PageDeleteBanner pageId={page.id} />
+        </StyledBannerContainer>
+      )}
+      {connectionError && (
+        <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
+          <PageConnectionBanner />
         </StyledBannerContainer>
       )}
       {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
@@ -203,7 +222,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       ? `Describe the bounty. Type '/' to see the list of available commands`
                       : undefined
                   }
-                  key={page.id + editMode + String(pagePermissions?.edit_content)}
+                  key={editorKey}
                   content={page.content as PageContent}
                   readOnly={readOnly}
                   autoFocus={false}
@@ -215,6 +234,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  onConnectionError={onConnectionError}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{

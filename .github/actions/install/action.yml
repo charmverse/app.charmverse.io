@@ -30,5 +30,5 @@ runs:
     # 2. Set core branch
     # - name: Install special core library
     #   shell: bash
-    #   if: github.head_ref == 'feat/discourse-import'
-    #   run: npm install github:charmverse/core#feat/discourse-import
+    #   if: github.head_ref == 'feat/count-blocks'
+    #   run: npm install github:charmverse/core#feat/count-blocks

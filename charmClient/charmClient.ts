@@ -4,8 +4,7 @@ import type {
   PagePermissionAssignment,
   PagePermissionFlags,
   PagePermissionWithSource,
-  PermissionCompute,
-  SpaceDefaultPublicPageToggle
+  PermissionCompute
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -14,7 +13,6 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Prisma,
   Space,
   TelegramUser,
   TokenGateToRole,
@@ -28,24 +26,22 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -183,39 +179,6 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) {
-    const space = await http.POST<Space>('/api/spaces', spaceOptions);
-    return space;
-  }
-
-  deleteSpace(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}`);
-  }
-
-  updateSpace(spaceOpts: Prisma.SpaceUpdateInput) {
-    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
-  }
-
-  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
-    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
-  }
-
-  leaveSpace(spaceId: string) {
-    return http.POST(`/api/spaces/${spaceId}/leave`);
-  }
-
-  getSpaces() {
-    return http.GET<Space[]>('/api/spaces');
-  }
-
-  getSpaceWebhook(spaceId: string) {
-    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
-  }
-
-  checkDomain(params: { spaceId?: string; domain: string }) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -281,23 +244,27 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
@@ -474,13 +441,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  computeUserPagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
-    return http.GET('/api/permissions/query', request);
-  }
-
   listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }
@@ -495,29 +455,6 @@ class CharmClient {
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
-  }
-
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
-    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
-      defaultPublicPages
-    });
-  }
-
-  setRequireProposalTemplate({ spaceId, requireProposalTemplate }: SpaceRequireProposalTemplateToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-require-proposal-template`, {
-      requireProposalTemplate
-    });
-  }
-
-  completeOnboarding({ spaceId }: { spaceId: string }) {
-    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
   }
 
   updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {

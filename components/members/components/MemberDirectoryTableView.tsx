@@ -42,7 +42,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
   const { properties = [] } = useMemberProperties();
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));

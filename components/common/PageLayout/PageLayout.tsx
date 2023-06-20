@@ -23,6 +23,7 @@ import { useWindowSize } from 'hooks/useWindowSize';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
+import { PaidAnnouncementBanner } from './components/PaidAnnouncementBanner';
 import Sidebar from './components/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
@@ -150,7 +151,7 @@ function PageLayout({ children }: PageLayoutProps) {
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
@@ -217,6 +218,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
+                    <PaidAnnouncementBanner />
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

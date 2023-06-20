@@ -158,6 +158,8 @@ export class DocumentEventHandler {
         ...logData,
         message
       });
+      // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
+      this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
@@ -170,7 +172,7 @@ export class DocumentEventHandler {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.warn('Resend messages to client', { message, ...logData });
+      log.warn('Resend messages to client', { message, messagesToSend: this.messages.lastTen.length, ...logData });
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -361,6 +363,14 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoom();
     if (message.v === room?.doc.version) {
       this.sendUpdatesToOthers(message);
+    } else {
+      log.debug('Ignoring selection change because version is out of date', {
+        socketId: this.id,
+        pageId: room?.doc.id,
+        version: message.v,
+        docVersion: room?.doc.version,
+        userId: this.getSession().user.id
+      });
     }
   }
 
@@ -476,7 +486,8 @@ export class DocumentEventHandler {
       log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
       this.unfixable();
     } else {
-      for (const message of this.messages.lastTen.slice(-toSend)) {
+      const lastTen = this.messages.lastTen.slice(-toSend);
+      for (const message of lastTen) {
         this.sendMessage(message);
       }
     }
@@ -572,7 +583,12 @@ export class DocumentEventHandler {
     if (room) {
       room.participants.delete(this.id);
       if (room.participants.size === 0) {
-        docRooms.delete(room.doc.id);
+        // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
+        setTimeout(() => {
+          if (room.participants.size === 0) {
+            docRooms.delete(room.doc.id);
+          }
+        }, 100);
       } else {
         this.sendParticipantList();
       }

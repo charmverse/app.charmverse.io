@@ -246,6 +246,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
+
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
