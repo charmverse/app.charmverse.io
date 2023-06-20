@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 
 import PopperPopup from 'components/common/PopperPopup';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -109,7 +110,9 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <ListItemIcon>
             <LockIcon />
           </ListItemIcon>
-          <Typography variant='subtitle1'>Permissions</Typography>
+          <Typography variant='subtitle1' gap={1} display='flex'>
+            Permissions <UpgradeChip />
+          </Typography>
         </MenuItem>
         <Tooltip title='Receive notifications when new posts are created in this category'>
           <MenuItem
