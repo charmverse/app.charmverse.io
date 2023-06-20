@@ -159,7 +159,10 @@ export class DocumentEventHandler {
         message
       });
       // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
-      this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      // check if there are at least 10 updates and ask the user to refresh
+      if (message.type === 'diff' && message.ds.length > 10) {
+        this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      }
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
