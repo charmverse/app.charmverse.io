@@ -109,7 +109,7 @@ describe('createProSubscription', () => {
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
       coupon: '',
       metadata: {
-        tier: 'comunity',
+        tier: 'pro',
         period: 'monthly',
         spaceId: space.id,
         productId: 'community_5k'

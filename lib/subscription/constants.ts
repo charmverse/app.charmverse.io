@@ -6,7 +6,7 @@ export type SubscriptionPeriod = 'monthly' | 'annual';
 
 export const communityProduct = {
   id: 'community',
-  tier: 'community',
+  tier: 'pro',
   name: 'CharmVerse Community',
   guestLimit: 100,
   blockLimit: 10000,

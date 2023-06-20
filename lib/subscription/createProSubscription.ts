@@ -120,7 +120,7 @@ export async function createProSubscription({
         metadata: {
           productId,
           period,
-          tier: 'comunity',
+          tier: 'pro',
           spaceId: space.id
         },
         customer: customer.id,
