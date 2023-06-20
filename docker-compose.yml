@@ -60,14 +60,14 @@ services:
   prd-sockets:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node --require dd-trace/init ./.next/server/websockets.js']
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
     profiles:
       - prd-sockets
 
   stg-sockets:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node --require dd-trace/init ./.next/server/websockets.js']
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
