@@ -7,8 +7,10 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { pagePermissionLevels } from 'lib/permissions/pages/labels';
@@ -24,6 +26,7 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
 export function DefaultPagePermissions() {
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
@@ -104,17 +107,21 @@ export function DefaultPagePermissions() {
       </Box>
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
         <Typography>Default access level for Members</Typography>
-        <Button
-          color='secondary'
-          variant='outlined'
-          disabled={isUpdatingPagePermission || !isAdmin}
-          loading={isUpdatingPagePermission}
-          endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-          {...bindTrigger(popupState)}
-        >
-          {pagePermissionLevels[selectedPagePermission]}
-        </Button>
+        <Box display='flex' gap={1} alignItems='center'>
+          <UpgradeChip upgradeContext='pagePermissions' />
+          <Button
+            color='secondary'
+            variant='outlined'
+            disabled={isUpdatingPagePermission || !isAdmin || isFreeSpace}
+            loading={isUpdatingPagePermission}
+            endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
+            {...bindTrigger(popupState)}
+          >
+            {isFreeSpace ? pagePermissionLevels.editor : pagePermissionLevels[selectedPagePermission]}
+          </Button>
+        </Box>
       </Box>
+
       <FormControlLabel
         sx={{
           margin: 0,
@@ -122,15 +129,20 @@ export function DefaultPagePermissions() {
           justifyContent: 'space-between'
         }}
         control={
-          <Switch
-            disabled={!isAdmin}
-            onChange={(ev) => {
-              const { checked: publiclyAccessible } = ev.target;
-              setDefaultPublicPages(publiclyAccessible);
-              setTouched(true);
-            }}
-            defaultChecked={defaultPublicPages}
-          />
+          <Box display='flex' gap={5.5} alignItems='center'>
+            <UpgradeChip upgradeContext='pagePermissions' />
+            <Switch
+              disabled={!isAdmin || isFreeSpace}
+              onChange={(ev) => {
+                if (!isFreeSpace) {
+                  const { checked: publiclyAccessible } = ev.target;
+                  setDefaultPublicPages(publiclyAccessible);
+                  setTouched(true);
+                }
+              }}
+              defaultChecked={defaultPublicPages || isFreeSpace}
+            />
+          </Box>
         }
         label='Accessible to public'
         labelPlacement='start'
@@ -142,14 +154,17 @@ export function DefaultPagePermissions() {
           justifyContent: 'space-between'
         }}
         control={
-          <Switch
-            disabled={!isAdmin}
-            onChange={(ev) => {
-              setRequireProposalTemplate(ev.target.checked);
-              setTouched(true);
-            }}
-            defaultChecked={requireProposalTemplate}
-          />
+          <Box display='flex' gap={5.5} alignItems='center'>
+            <UpgradeChip upgradeContext='proposalPermissions' />
+            <Switch
+              disabled={!isAdmin || isFreeSpace}
+              onChange={(ev) => {
+                setRequireProposalTemplate(ev.target.checked);
+                setTouched(true);
+              }}
+              defaultChecked={requireProposalTemplate && !isFreeSpace}
+            />
+          </Box>
         }
         label='Require proposal template'
         labelPlacement='start'

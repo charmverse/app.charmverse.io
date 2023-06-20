@@ -22,6 +22,8 @@ import type { ReactNode } from 'react';
 import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
+import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Member } from 'lib/members/interfaces';
 
@@ -37,6 +39,7 @@ type RoleRowProps = {
   permissions?: ReactNode;
   roleActions?: ReactNode;
   memberRoleId?: string;
+  upgradeContext?: UpgradeContext;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -54,7 +57,8 @@ export function RoleRowBase({
   title,
   permissions,
   onAddMembers,
-  members
+  members,
+  upgradeContext
 }: RoleRowProps) {
   const [openTab, setOpenTab] = useState(0);
 
@@ -71,6 +75,7 @@ export function RoleRowBase({
               <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {title}
                 <Chip size='small' label={members.length} />
+                {upgradeContext && <UpgradeChip upgradeContext={upgradeContext} />}
               </Typography>
             </Box>
             <div onClick={(e) => e.stopPropagation()}>{roleActions}</div>
