@@ -68,7 +68,7 @@ function MemberActions({
   memberRoleId?: string;
   readOnly: boolean;
 }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
   const { makeAdmin, makeGuest, makeMember, members, removeFromSpace, getMemberById } = useMembers();

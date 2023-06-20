@@ -4,30 +4,30 @@ import Head from 'next/head';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import InviteLinkPage from 'components/invite/InviteLinkPage';
 import InviteLinkPageError from 'components/invite/InviteLinkPageError';
-import { getInviteLink } from 'lib/invites';
+import { getInviteLink } from 'lib/invites/getInviteLink';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const inviteCode = context.query.inviteCode as string;
-  const { invite, expired } = await getInviteLink(inviteCode);
+  const inviteLink = await getInviteLink(inviteCode);
 
-  if (!invite) {
+  if (!inviteLink) {
     return {
       props: {
         error: 'Invitation not found'
       }
     };
   }
-  if (expired) {
+  if (!inviteLink.valid) {
     return {
       props: {
-        error: 'This link has expired'
+        error: 'This link is invalid'
       }
     };
   }
 
   return {
     props: {
-      invite
+      invite: inviteLink.invite
     }
   };
 };

@@ -50,7 +50,7 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
 
 // make sure teh id prop is on the same element as onClick
 const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const { href, external, children, id, onClick, target, 'data-test': dataTest, ...props } = _props;
   if (href && !_props.disabled) {

@@ -14,7 +14,7 @@ import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-ico
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
@@ -31,10 +31,10 @@ type Props = {
 
 export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const notifications = useForumCategoryNotification(category.id);
 
@@ -166,7 +166,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
-      {isPublicSpace ? (
+      {isFreeSpace ? (
         <PostCategoryPermissionsDialogPublic
           postCategory={category}
           onClose={closeDialog}

@@ -12,6 +12,8 @@ const DOCUMENT_PATH = '/[domain]/[pageId]';
 const FORUM_PATH = '/[domain]/forum';
 const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH, PROPOSALS_PATH];
 
+type PublicPageType = 'forum' | 'proposals' | 'bounties';
+
 export const useSharedPage = () => {
   const { pathname, query, isReady: isRouterReady } = useRouter();
 
@@ -80,7 +82,14 @@ export const useSharedPage = () => {
     hasError,
     hasSharedPageAccess,
     publicSpace: space,
-    publicPage
+    publicPage,
+    publicPageType: (isBountiesPath
+      ? 'bounties'
+      : isProposalsPath
+      ? 'proposals'
+      : isForumPath
+      ? 'forum'
+      : null) as PublicPageType | null
   };
 };
 

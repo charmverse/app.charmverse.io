@@ -110,7 +110,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
-        viewIds={activeBoard?.fields.viewIds ?? []}
+        viewIds={viewsBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -217,7 +217,12 @@ function ViewHeader(props: Props) {
         {props.embeddedBoardPath && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
+              <span>
+                <IconButton
+                  icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                  style={{ width: '32px' }}
+                />
+              </span>
             </Tooltip>
           </Link>
         )}

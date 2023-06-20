@@ -71,7 +71,7 @@ function TableRow(props: Props) {
     pageUpdatedBy,
     saveTitle
   } = props;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -181,6 +181,9 @@ function TableRow(props: Props) {
             </Box>
           );
         }
+
+        const columnRef = columnRefs.get(template.id);
+
         return (
           <div
             className='octo-table-cell'
@@ -189,7 +192,7 @@ function TableRow(props: Props) {
               alignItems: 'flex-start',
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
-            ref={columnRefs.get(template.id)}
+            ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             {!props.readOnly && templateIndex === 0 && (
@@ -206,6 +209,7 @@ function TableRow(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               displayType='table'
+              columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
             />
           </div>

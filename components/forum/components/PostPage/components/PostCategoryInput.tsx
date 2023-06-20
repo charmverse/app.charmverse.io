@@ -31,7 +31,7 @@ export function PostCategoryInput({
 }) {
   const { categories, getPostableCategories } = useForumCategories();
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const postCategory = categories?.find((category) => {
     if (!categoryId && space?.defaultPostCategoryId && category.id === space.defaultPostCategoryId) {

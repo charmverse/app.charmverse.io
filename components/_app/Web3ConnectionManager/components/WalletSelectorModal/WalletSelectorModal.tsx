@@ -18,6 +18,8 @@ import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/LoginButton';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
+import { getAppUrl } from 'lib/utilities/browser';
+import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
@@ -85,6 +87,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
   const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
+  log.info('Connect redirectUri', redirectUri);
 
   async function handleUnstoppableDomainsLogin() {
     const UAuth = (await import('@uauth/js')).default;

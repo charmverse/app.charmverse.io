@@ -44,7 +44,7 @@ export function NotionProvider({ children }: Props) {
   const { showMessage } = useSnackbar();
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const dispatch = useAppDispatch();
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);

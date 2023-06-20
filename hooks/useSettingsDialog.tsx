@@ -12,13 +12,15 @@ type IContext = {
   activePath: string;
   onClose: () => any;
   onClick: (path?: SettingsPath, section?: string) => void;
+  openUpgradeSubscription: () => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
   open: false,
   activePath: '',
   onClose: () => {},
-  onClick: () => undefined
+  onClick: () => undefined,
+  openUpgradeSubscription: () => null
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
@@ -56,12 +58,17 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     };
   }, [router]);
 
+  function openUpgradeSubscription() {
+    onClick('subscription');
+  }
+
   const value = useMemo<IContext>(
     () => ({
       open: settingsModalState.isOpen,
       activePath,
       onClick,
-      onClose
+      onClose,
+      openUpgradeSubscription
     }),
     [activePath, settingsModalState.isOpen]
   );

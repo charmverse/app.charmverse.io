@@ -316,4 +316,19 @@ describe('createWorkspace', () => {
     expect(secondSpace.domain).not.toBe(newSpace.domain);
     expect(secondSpace.id).not.toBe(newSpace.id);
   });
+
+  it('should generate an initial block count', async () => {
+    const space = await createWorkspace({
+      spaceData: { name: `name-${v4()}` },
+      userId: user.id
+    });
+
+    const blockCounts = await prisma.blockCount.count({
+      where: {
+        spaceId: space.id
+      }
+    });
+
+    expect(blockCounts).toBe(1);
+  });
 });

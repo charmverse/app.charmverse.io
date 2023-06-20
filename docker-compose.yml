@@ -90,12 +90,7 @@ services:
 
   permissions-api:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
-    command:
-      [
-        'sh',
-        '-c',
-        'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js',
-      ]
+    command: ['sh', '-c', 'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js']
     env_file:
       - '.env'
     environment:

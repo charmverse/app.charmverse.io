@@ -53,7 +53,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const [parent, setParent] = useState<{ pageId?: string; postId?: string } | null>(null);
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 

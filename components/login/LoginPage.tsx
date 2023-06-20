@@ -15,7 +15,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import { isSpaceDomain } from 'lib/spaces/utils';
-import { deleteCookie, getCookie } from 'lib/utilities/browser';
+import { deleteCookie, getCookie, getSpaceUrl } from 'lib/utilities/browser';
 
 export function LoginPageView() {
   const { triedEager } = useContext(Web3Connection);
@@ -101,10 +101,10 @@ export function LoginPageView() {
 }
 
 export function getDefaultWorkspaceUrl(spaces: Space[]) {
-  const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
+  const defaultSpaceDomain = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
 
-  const isValidDefaultWorkspace =
-    !!defaultWorkspace && spaces.some((space) => defaultWorkspace.startsWith(`/${space.domain}`));
+  const defaultSpace =
+    !!defaultSpaceDomain && spaces.find((space) => defaultSpaceDomain.startsWith(`/${space.domain}`));
 
-  return isValidDefaultWorkspace ? `/${defaultWorkspace}` : `/${spaces[0].domain}`;
+  return getSpaceUrl(defaultSpace || spaces[0]);
 }

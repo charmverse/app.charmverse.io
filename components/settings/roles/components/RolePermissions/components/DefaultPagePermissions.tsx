@@ -22,7 +22,7 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view: 'Space members can only view pages.'
 };
 export function DefaultPagePermissions() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);

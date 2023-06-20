@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 
 import app from './server/app';
+import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
@@ -32,6 +33,9 @@ cron.schedule('*/30 * * * *', verifyTokenGateMembershipsTask);
 
 // Refresh applications with pending payments
 cron.schedule('*/30 * * * *', refreshBountyApplications);
+
+// Count blocks in all spaces
+cron.schedule('*/30 * * * *', countAllSpacesBlocksTask);
 
 const port = process.env.PORT || 4000;
 
