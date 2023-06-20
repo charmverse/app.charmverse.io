@@ -39,13 +39,15 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       });
       setCurrentPageId(page.id);
     }
+    return () => {
+      resetPageProps();
+    };
   }, [page?.id]);
 
   // reset page id on unmount
   useEffect(() => {
     return () => {
       setCurrentPageId('');
-      resetPageProps();
     };
   }, []);
 
