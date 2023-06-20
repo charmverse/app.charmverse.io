@@ -3,14 +3,13 @@ import { useEffect, useState } from 'react';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 
 export function useCustomDomain() {
-  const [isOnCustomDomain, setIsOnCustomDomain] = useState(false);
+  const [customDomain, setIsOnCustomDomain] = useState('');
 
   useEffect(() => {
-    const customDomain = getValidCustomDomain();
-    if (customDomain) {
-      setIsOnCustomDomain(true);
-    }
+    const domain = getValidCustomDomain() || '';
+
+    setIsOnCustomDomain(domain);
   }, []);
 
-  return { isOnCustomDomain };
+  return { isOnCustomDomain: !!customDomain, customDomain };
 }
