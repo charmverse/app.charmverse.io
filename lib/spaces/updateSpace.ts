@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
+import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 
 export type UpdateableSpaceFields = Partial<
@@ -14,7 +15,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     throw new InvalidInputError('A space ID is required');
   }
 
-  const domain = updates?.domain?.toLowerCase();
+  const domain = updates?.domain ? getSpaceDomainFromName(updates?.domain) : undefined;
 
   if (domain) {
     const existingSpace = await getSpaceByDomain(domain);
