@@ -37,7 +37,7 @@ export type SpaceSubscriptionInfo = {
 function getEngine(input: Pick<Space, 'paidTier' | 'id'>): SpaceSubscriptionInfo {
   return {
     spaceId: input.id,
-    tier: input.paidTier ?? 'pro'
+    tier: input.paidTier ?? 'community'
   };
 }
 

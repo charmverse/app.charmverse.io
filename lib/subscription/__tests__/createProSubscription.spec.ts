@@ -87,7 +87,7 @@ describe('createProSubscription', () => {
     const { clientSecret, paymentIntentStatus } = await createProSubscription({
       period: 'monthly',
       spaceId: space.id,
-      productId: 'community_5k',
+      blockQuota: 1,
       billingEmail: 'test@gmail.com',
       coupon: ''
     });
@@ -109,7 +109,7 @@ describe('createProSubscription', () => {
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
       coupon: '',
       metadata: {
-        tier: 'pro',
+        tier: 'comunity',
         period: 'monthly',
         spaceId: space.id,
         productId: 'community_5k'
@@ -136,7 +136,7 @@ describe('createProSubscription', () => {
       createProSubscription({
         period: 'monthly',
         spaceId: v4(),
-        productId: 'community_5k',
+        blockQuota: 1,
         billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
@@ -154,7 +154,7 @@ describe('createProSubscription', () => {
       createProSubscription({
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k',
+        blockQuota: 1,
         billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);

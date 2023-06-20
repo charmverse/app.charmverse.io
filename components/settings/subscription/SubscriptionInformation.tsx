@@ -8,18 +8,20 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { LoadingSubscriptionSkeleton } from 'components/settings/subscription/LoadingSkeleton';
 import { useMembers } from 'hooks/useMembers';
-import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
+import { communityProduct } from 'lib/subscription/constants';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import { capitalize } from 'lib/utilities/strings';
 
 export function SubscriptionInformation({
   space,
   spaceSubscription,
-  isLoading
+  isLoading,
+  blockQuota
 }: {
   space: Space;
-  spaceSubscription?: SpaceSubscription | null;
+  spaceSubscription: SpaceSubscription;
   isLoading: boolean;
+  blockQuota: number;
 }) {
   const { members } = useMembers();
 
@@ -37,10 +39,6 @@ export function SubscriptionInformation({
     }
   }, [spaceSubscription?.status]);
 
-  if (spaceSubscription === undefined) {
-    return null;
-  }
-
   if (isLoading) {
     return <LoadingSubscriptionSkeleton isLoading={isLoading} />;
   }
@@ -48,7 +46,7 @@ export function SubscriptionInformation({
   return (
     <>
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
-        {spaceSubscription === null ? 'Upgrade to Community' : 'Space subscription'}
+        Plan & Billing
       </Legend>
       <Typography>
         More blocks, user roles, guests, custom domains and more.{' '}
@@ -70,10 +68,9 @@ export function SubscriptionInformation({
         <Stack>
           <InputLabel>Plan</InputLabel>
           <Stack>
-            <Typography>Blocks: 0/{SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].blockLimit}</Typography>
+            <Typography>Blocks: 0/{(communityProduct.blockLimit ?? 0) * blockQuota}</Typography>
             <Typography>
-              Members: {members.length}/
-              {SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].monthlyActiveUserLimit}
+              Members: {members.length}/{communityProduct.monthlyActiveUserLimit}
             </Typography>
           </Stack>
         </Stack>

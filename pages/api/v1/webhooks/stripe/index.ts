@@ -149,7 +149,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           spaceId,
           productId,
           period,
-          tier: 'pro',
+          tier: stripeSubscription.metadata.tier as SubscriptionTier,
           result: 'success'
         });
 

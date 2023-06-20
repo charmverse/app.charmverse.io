@@ -9,7 +9,8 @@ export const DOMAIN_BLACKLIST = [
   'join',
   'share',
   'signup',
-  'u'
+  'u',
+  'loop'
 ];
 
 export const staticSpaceTemplates = [
