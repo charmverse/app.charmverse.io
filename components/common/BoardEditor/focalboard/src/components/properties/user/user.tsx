@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton } from '@mui/material';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import { Box, Stack } from '@mui/system';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IconButton, Box, Stack, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
+import { isTruthy } from 'lib/utilities/types';
+
+import { SelectPreviewContainer } from '../SelectProperty/SelectProperty';
 
 type Props = {
   memberIds: string[];
@@ -20,90 +20,80 @@ type Props = {
   wrapColumn?: boolean;
 };
 
+type ContainerProps = {
+  displayType?: PropertyValueDisplayType;
+};
+
 const StyledUserPropertyContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'hideInput' && prop !== 'hideOverflow'
-})<{
-  hideOverflow: boolean;
-  hideInput?: boolean;
-}>`
-  width: 100%;
-  height: 100%;
-  overflow: ${({ hideOverflow }) => (hideOverflow ? 'hidden' : 'initial')};
-  & .MuiInputBase-root,
-  & input.MuiInputBase-input {
-    background: inherit;
-    /** this overflows to the next line on smaller width */
-    position: ${({ hideInput }) => (!hideInput ? `inherit` : 'absolute')};
+  shouldForwardProp: (prop) => prop !== 'displayType'
+})<ContainerProps>`
+  flex-grow: 1;
+
+  ${(props) =>
+    props.displayType === 'details'
+      ? `
+      .MuiInputBase-root {
+        padding: 4px 8px;
+      }
+      `
+      : ''}
+
+  // override styles from focalboard
+  .MuiInputBase-input {
+    background: transparent;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
-  & .MuiAutocomplete-inputRoot.MuiInputBase-root.MuiOutlinedInput-root {
-    padding: 2px;
-  }
+  // dont let the input extend over neighbor columns in table mode when it is expanded
+  overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
 
-  & fieldset.MuiOutlinedInput-notchedOutline {
-    border: none;
-    outline: none;
-  }
-
-  & button.MuiButtonBase-root[title='Open'],
-  & button.MuiButtonBase-root[title='Close'] {
-    display: none;
-  }
-
-  & .MuiAutocomplete-tag {
-    margin: 2px;
-  }
+  ${(props) =>
+    props.displayType !== 'table'
+      ? `
+        // & .MuiInputBase-root,
+        // & input.MuiInputBase-input {
+        //   /** this overflows to the next line on smaller width */
+        //   position: absolute;
+        // }
+      `
+      : ''}
 `;
-
-function arrayEquals<T>(a: T[], b: T[]) {
-  return a.length === b.length && a.every((val, index) => val === b[index]);
-}
-
 function MembersDisplay({
   memberIds,
-  clicked,
   readOnly,
   setMemberIds,
   wrapColumn
 }: {
   wrapColumn: boolean;
   readOnly: boolean;
-  clicked: boolean;
   memberIds: string[];
   setMemberIds: (memberIds: string[]) => void;
 }) {
   const { membersRecord } = useMembers();
 
-  const enableDelete = !readOnly && clicked;
-
   function removeMember(memberId: string) {
-    setMemberIds(memberIds.filter((_memberId) => _memberId !== memberId));
+    if (!readOnly) {
+      setMemberIds(memberIds.filter((_memberId) => _memberId !== memberId));
+    }
   }
 
-  return memberIds.length === 0 ? null : (
-    <Stack flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
-      {memberIds.map((memberId) => {
-        const user = membersRecord[memberId];
-        if (!user) {
-          return null;
-        }
+  const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
 
+  return memberIds.length === 0 ? null : (
+    <Stack flexDirection='row' gap={1} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
+      {members.map((user) => {
         return (
           <Stack
             alignItems='center'
             flexDirection='row'
             key={user.id}
             gap={0.5}
-            sx={
-              wrapColumn
-                ? { width: '100%', justifyContent: 'space-between', overflowX: 'hidden' }
-                : { overflowX: 'hidden' }
-            }
-            onClick={enableDelete ? () => removeMember(user.id) : undefined}
+            sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
           >
             <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
-            {enableDelete && (
-              <IconButton size='small'>
+            {!readOnly && (
+              <IconButton size='small' onClick={() => removeMember(user.id)}>
                 <CloseIcon
                   sx={{
                     fontSize: 14
@@ -111,7 +101,6 @@ function MembersDisplay({
                   cursor='pointer'
                   fontSize='small'
                   color='secondary'
-                  onClick={() => removeMember(user.id)}
                 />
               </IconButton>
             )}
@@ -122,118 +111,71 @@ function MembersDisplay({
   );
 }
 
-function UserProperty(props: Props): JSX.Element | null {
-  const { membersRecord } = useMembers();
-  const [memberIds, setMemberIds] = useState(getFilteredMemberIds(props.memberIds, membersRecord));
-  const [clicked, setClicked] = useState(false);
-  const membersValue = useMemo(
-    () => memberIds.map((memberId) => membersRecord[memberId]).filter((member) => member !== undefined),
-    [memberIds, membersRecord]
-  );
-
+export function UserProperty({
+  displayType,
+  memberIds,
+  onChange,
+  readOnly,
+  showEmptyPlaceholder,
+  wrapColumn
+}: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
-  const updateMemberIds = useCallback(
-    (unfilteredIds: string[]) => {
-      setMemberIds(getFilteredMemberIds(unfilteredIds, membersRecord));
+  const _onChange = useCallback(
+    (newMemberIds: string[]) => {
+      if (!readOnly) {
+        onChange(newMemberIds);
+      }
     },
-    [membersRecord]
+    [readOnly]
   );
 
-  useEffect(() => {
-    updateMemberIds(props.memberIds);
-  }, [props.memberIds, updateMemberIds]);
-
-  function saveUsers(_memberIds: string[]) {
-    if (!props.readOnly && !arrayEquals(_memberIds, props.memberIds)) {
-      props.onChange(_memberIds);
+  const onClickToEdit = useCallback(() => {
+    if (!readOnly) {
+      setIsOpen(true);
     }
-  }
+  }, [readOnly]);
 
-  if (props.readOnly || !isOpen) {
+  if (!isOpen) {
     return (
-      <div
-        style={{ width: '100%', height: '100%', minHeight: '30px', overflow: 'hidden' }}
-        onClick={
-          !props.readOnly
-            ? () => {
-                setClicked(true);
-                setIsOpen(true);
-              }
-            : undefined
-        }
-      >
-        {props.displayType === 'details' && memberIds.length === 0 ? (
-          <div
-            className='octo-propertyvalue'
-            style={{
-              color: 'var(--text-gray)'
-            }}
-          >
+      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
+        {showEmptyPlaceholder && memberIds.length === 0 ? (
+          <Typography component='span' variant='subtitle2' color='secondary'>
             Empty
-          </div>
+          </Typography>
         ) : (
           <MembersDisplay
-            wrapColumn={props.wrapColumn ?? false}
-            readOnly={props.readOnly}
-            clicked={clicked}
+            wrapColumn={wrapColumn ?? false}
+            readOnly={true}
             memberIds={memberIds}
-            setMemberIds={updateMemberIds}
+            setMemberIds={_onChange}
           />
         )}
-      </div>
+      </SelectPreviewContainer>
     );
   }
   return (
-    <ClickAwayListener
-      onClickAway={(ev) => {
-        setClicked(false);
-        setIsOpen(false);
-        saveUsers(memberIds);
-      }}
-    >
-      <StyledUserPropertyContainer
-        hideOverflow={props.displayType === 'table'}
-        onClick={() => {
-          // Only register click if display type is details or table
-          if (!props.readOnly) {
-            setIsOpen(true);
-            setClicked(true);
-          }
-        }}
-        hideInput={props.readOnly || (props.displayType !== 'details' && !clicked)}
-      >
-        <InputSearchMemberMultiple
-          // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
-          disableClearable
-          open={isOpen}
-          openOnFocus
-          disableCloseOnSelect
-          defaultValue={memberIds}
-          value={membersValue}
-          onChange={(_memberIds) => {
-            updateMemberIds(_memberIds);
-          }}
-          getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
-          readOnly={props.readOnly}
-          placeholder={props.showEmptyPlaceholder && memberIds.length === 0 ? 'Empty' : ''}
-          renderTags={() => (
-            <MembersDisplay
-              wrapColumn={true}
-              readOnly={props.readOnly}
-              clicked={clicked}
-              memberIds={memberIds}
-              setMemberIds={updateMemberIds}
-            />
-          )}
-        />
-      </StyledUserPropertyContainer>
-    </ClickAwayListener>
+    <StyledUserPropertyContainer displayType={displayType}>
+      <InputSearchMemberMultiple
+        // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
+        disableClearable
+        clearOnBlur
+        open
+        openOnFocus
+        disableCloseOnSelect
+        defaultValue={memberIds}
+        onClose={() => setIsOpen(false)}
+        fullWidth
+        onChange={_onChange}
+        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+        readOnly={readOnly}
+        placeholder={memberIds.length === 0 ? 'Search for an option...' : ''}
+        inputVariant='standard'
+        forcePopupIcon={false}
+        renderTags={() => (
+          <MembersDisplay wrapColumn={true} readOnly={readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+        )}
+      />
+    </StyledUserPropertyContainer>
   );
 }
-
-function getFilteredMemberIds(memberIds: string[], membersRecord: Record<string, Member>): string[] {
-  return memberIds.filter((memberId) => membersRecord[memberId] !== undefined);
-}
-
-export default UserProperty;

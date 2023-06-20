@@ -21,13 +21,15 @@ export function boardWithCardsArgs({
   spaceId,
   parentId,
   cardCount = 2,
-  addPageContent
+  addPageContent,
+  views = 1
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
   addPageContent?: boolean;
+  views?: number;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -247,39 +249,7 @@ export function boardWithCardsArgs({
           columnCalculations: []
         }
       },
-      views: [
-        {
-          id: v4(),
-          deletedAt: null,
-          createdAt: '2022-08-25T17:31:46.424Z',
-          createdBy,
-          updatedAt: '2022-08-26T09:57:01.617Z',
-          updatedBy: createdBy,
-          spaceId,
-          parentId: boardId,
-          rootId: boardId,
-          schema: 1,
-          type: 'view',
-          title: 'My entries',
-          fields: {
-            filter: {
-              filters: [],
-              operation: 'and'
-            },
-            viewType: 'gallery',
-            cardOrder: [cardIds[1], cardIds[0]],
-            sortOptions: [],
-            columnWidths: {},
-            hiddenOptionIds: [],
-            visibleOptionIds: [],
-            defaultTemplateId: '',
-            collapsedOptionIds: [],
-            columnCalculations: {},
-            kanbanCalculations: {},
-            visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
-          }
-        }
-      ]
+      views: [] as Block[]
     }
   };
 
@@ -296,6 +266,42 @@ export function boardWithCardsArgs({
     } else {
       cardPages.push({ ...cardPages[1], id: cardIds[i] });
     }
+  }
+
+  rootBoardNode.blocks.views = rootBoardNode.blocks.views.splice(0, views);
+
+  for (let i = 0; i < views; i++) {
+    rootBoardNode.blocks.views.push({
+      id: v4(),
+      deletedAt: null,
+      createdAt: new Date(),
+      createdBy,
+      updatedAt: new Date(),
+      updatedBy: createdBy,
+      spaceId,
+      parentId: boardId,
+      rootId: boardId,
+      schema: 1,
+      type: 'view',
+      title: `My entries - ${i + 1}`,
+      fields: {
+        filter: {
+          filters: [],
+          operation: 'and'
+        },
+        viewType: 'gallery',
+        cardOrder: [cardIds[1], cardIds[0]],
+        sortOptions: [],
+        columnWidths: {},
+        hiddenOptionIds: [],
+        visibleOptionIds: [],
+        defaultTemplateId: '',
+        collapsedOptionIds: [],
+        columnCalculations: {},
+        kanbanCalculations: {},
+        visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
+      }
+    });
   }
 
   const pageContent: Pick<Prisma.PageCreateInput, 'content' | 'contentText'> = addPageContent

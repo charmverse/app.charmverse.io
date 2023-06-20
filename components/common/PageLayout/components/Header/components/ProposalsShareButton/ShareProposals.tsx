@@ -18,7 +18,7 @@ import { TogglePublicProposalsInvite } from 'components/common/PageLayout/compon
 import { ConfirmInviteLinkDeletion } from 'components/settings/invites/components/InviteLinks/components/ConfirmInviteLinkDeletion';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -56,7 +56,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
   const { setSpace } = useSpaces();
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
   const {
     isOpen,
     close: closeConfirmDeleteModal,
@@ -117,25 +117,22 @@ export default function ShareProposals({ padding = 1 }: Props) {
         </Grid>
         <Grid item>
           <Switch
-            checked={proposalsArePublic || isPublicSpace}
-            disabled={!isAdmin || isPublicSpace}
+            checked={proposalsArePublic || isFreeSpace}
+            disabled={!isAdmin || isFreeSpace}
             onChange={togglePublicProposals}
           />
         </Grid>
       </Grid>
       <Grid item>
-        <Typography variant='body2' color='secondary'>
-          {proposalsArePublic
-            ? 'Anyone outside this space can view proposals, except drafts.'
-            : 'Proposals can only be seen by space members.'}
-        </Typography>
+        {!isFreeSpace && (
+          <Typography variant='body2' color='secondary'>
+            {proposalsArePublic
+              ? 'Anyone outside this space can view proposals, except drafts.'
+              : 'Proposals can only be seen by space members.'}
+          </Typography>
+        )}
+        {isFreeSpace && <Alert severity='info'>All proposals in free spaces are publicly visible, except drafts</Alert>}
       </Grid>
-
-      {isPublicSpace && (
-        <Grid item>
-          <Alert severity='info'>All proposals in public spaces are publicly visible, except drafts</Alert>
-        </Grid>
-      )}
       <Grid item>
         <Collapse in={proposalsArePublic}>
           {shareLink && (

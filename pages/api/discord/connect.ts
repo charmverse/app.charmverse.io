@@ -4,11 +4,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -43,8 +43,7 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   let discordAccount: DiscordAccount;
 
   try {
-    const domain = isProdEnv || isStagingEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
-    discordAccount = await getDiscordAccount({ code, redirectUrl: `${domain}/api/discord/callback` });
+    discordAccount = await getDiscordAccount({ code, redirectUrl: getDiscordCallbackUrl(req.headers.host) });
   } catch (error) {
     log.warn('Error while connecting to Discord', error);
     res.status(400).json({

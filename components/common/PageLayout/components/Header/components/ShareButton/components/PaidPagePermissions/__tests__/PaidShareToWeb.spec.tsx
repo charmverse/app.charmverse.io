@@ -4,13 +4,12 @@ import { v4 as uuid, v4 } from 'uuid';
 
 // Import hooks to mock
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
-// import { usePages } from 'hooks/usePages';
 import { useProposal } from 'hooks/useProposal';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
-import ShareToWeb from '../ShareToWeb';
+import PaidShareToWeb from '../PaidShareToWeb';
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({
@@ -28,10 +27,16 @@ jest.mock('hooks/useProposal', () => ({
 }));
 jest.mock('charmClient');
 jest.mock('hooks/useCurrentSpace');
-jest.mock('hooks/usePagePermissions');
-jest.mock('hooks/usePages', () => ({
-  usePages: jest.fn(() => ({
-    pages: {}
+jest.mock('hooks/usePagePermissions', () => ({
+  usePagePermissions: jest.fn(() => ({
+    permissions: new AvailablePagePermissions().empty
+  }))
+}));
+jest.mock('hooks/usePage', () => ({
+  usePage: jest.fn(() => ({
+    page: {
+      type: 'page'
+    }
   }))
 }));
 jest.mock('hooks/useCurrentSpace', () => ({
@@ -42,8 +47,8 @@ afterAll(() => {
   jest.resetModules();
 });
 
-describe('shareToWeb', () => {
-  it('should render the toggle as checked if no public permission exists or as unchecked if a public permission exists', async () => {
+describe('PaidShareToWeb', () => {
+  it('should render the toggle as checked if a public permission exists or as unchecked if no public permission exists', async () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<ReturnType<typeof usePagePermissions>>).mockReturnValueOnce({
@@ -51,7 +56,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     let toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -67,7 +72,7 @@ describe('shareToWeb', () => {
 
     // Re-render this with a public permission
     resultWithPermissions.rerender(
-      <ShareToWeb
+      <PaidShareToWeb
         pageId={pageId}
         pagePermissions={[
           {
@@ -97,7 +102,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -115,7 +120,7 @@ describe('shareToWeb', () => {
     });
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -137,11 +142,9 @@ describe('shareToWeb', () => {
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'proposal'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'proposal'
       }
     });
 
@@ -152,7 +155,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -175,11 +178,9 @@ describe('shareToWeb', () => {
       } as any
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'proposal'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'proposal'
       }
     });
 
@@ -190,7 +191,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
@@ -208,11 +209,9 @@ describe('shareToWeb', () => {
       permissions: new AvailablePagePermissions().full
     });
 
-    (usePages as jest.Mock).mockReturnValueOnce({
-      pages: {
-        [pageId]: {
-          type: 'page'
-        }
+    (usePage as jest.Mock).mockReturnValueOnce({
+      page: {
+        type: 'page'
       }
     });
 
@@ -223,7 +222,7 @@ describe('shareToWeb', () => {
     );
 
     const resultWithPermissions = render(
-      <ShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
+      <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
     const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);

@@ -20,7 +20,7 @@ import { InputSearchReviewers } from 'components/common/form/InputSearchReviewer
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -64,7 +64,7 @@ export default function BountyProperties(props: {
   const [capSubmissions, setCapSubmissions] = useState(false);
   const { space } = useCurrentSpace();
 
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { user } = useUser();
   const isRewardAmountInvalid = useMemo(
@@ -430,7 +430,7 @@ export default function BountyProperties(props: {
             readOnly={readOnly}
           />
         </div>
-        {!isPublicSpace && (
+        {!isFreeSpace && (
           <div
             className='octo-propertyrow'
             style={{
