@@ -159,8 +159,8 @@ export class DocumentEventHandler {
         message
       });
       // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
-      // check if there are at least 10 updates and ask the user to refresh
-      if (message.type === 'diff' && message.ds.length > 10) {
+      // check if there are at least a few updates and ask the user to refresh
+      if (message.type === 'diff' && message.ds.length > 30) {
         this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
       }
       return;
@@ -486,7 +486,11 @@ export class DocumentEventHandler {
     const toSend = this.messages.server - from;
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
+      log.warn('Unfixable: Too many messages to resend. Send full document', {
+        toSend,
+        from,
+        ...this.getSessionMeta()
+      });
       this.unfixable();
     } else {
       const lastTen = this.messages.lastTen.slice(-toSend);
@@ -541,7 +545,7 @@ export class DocumentEventHandler {
       s: this.messages.server
     };
     this.messages.lastTen.push(message);
-    this.messages.lastTen = this.messages.lastTen.slice(-10);
+    this.messages.lastTen = this.messages.lastTen.slice(-30); // changed from 10 to 30 to be safe
     try {
       this.socket.emit(this.socketEvent, wrappedMessage);
     } catch (err) {
