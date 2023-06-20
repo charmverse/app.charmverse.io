@@ -9,7 +9,8 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 export const upgradeMessages = {
   pagePermissions: 'Upgrade to a paid plan to change page permissions',
   forumPermissions: 'Upgrade to a paid plan to change post category permissions',
-  customRoles: 'Upgrade to a paid plan to use custom roles'
+  customRoles: 'Upgrade to a paid plan to use custom roles',
+  customiseMemberProperty: 'Upgrade to a paid plan to use this member property'
 };
 
 type Props = {
