@@ -1,6 +1,6 @@
-import { testUtilsMembers, testUtilsUser } from '@charmverse/core/dist/cjs/test';
 import type { Role, Space, TokenGate, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
