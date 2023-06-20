@@ -60,14 +60,14 @@ services:
   prd-sockets:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    command: ['sh', '-c', 'node --require dd-trace/init ./.next/server/websockets.js']
     profiles:
       - prd-sockets
 
   stg-sockets:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    command: ['sh', '-c', 'node --require dd-trace/init ./.next/server/websockets.js']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
@@ -90,12 +90,7 @@ services:
 
   permissions-api:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
-    command:
-      [
-        'sh',
-        '-c',
-        'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js',
-      ]
+    command: ['sh', '-c', 'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js']
     env_file:
       - '.env'
     environment:
