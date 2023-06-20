@@ -102,8 +102,11 @@ export async function createProSubscription({
 
   let subscription: Stripe.Subscription | undefined;
   try {
-    // Case if user downgrades or upgrades or user has an expired subscription and purchases again
-    if (existingStripeSubscription) {
+    // Case when the user is updating his subscription in checkout
+    if (
+      existingStripeSubscription &&
+      (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
+    ) {
       subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
         coupon,
         expand: ['latest_invoice.payment_intent'],
