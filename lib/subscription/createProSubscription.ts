@@ -64,6 +64,9 @@ export async function createProSubscription({
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
+      metadata: {
+        spaceId: space.id
+      },
       name: name || space.name,
       ...(address && { address }),
       ...(billingEmail && { email: billingEmail })
@@ -108,15 +111,25 @@ export async function createProSubscription({
       (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
     ) {
       subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        coupon,
-        expand: ['latest_invoice.payment_intent'],
+        metadata: {
+          productId,
+          period,
+          tier: 'pro',
+          spaceId: space.id
+        },
         items: [
           {
             id: existingStripeSubscription.items.data[0].id,
             price: productPrice.id,
             quantity: blockQuota
           }
-        ]
+        ],
+        coupon,
+        payment_settings: {
+          save_default_payment_method: 'on_subscription'
+        },
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent']
       });
     } else {
       subscription = await stripeClient.subscriptions.create({
