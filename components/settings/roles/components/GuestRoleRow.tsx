@@ -1,3 +1,4 @@
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 
 import { RoleRowBase } from './RoleRowBase';
@@ -5,11 +6,14 @@ import { RoleRowBase } from './RoleRowBase';
 export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
   const { guests, members, makeGuest } = useMembers();
 
+  const { isFreeSpace } = useIsFreeSpace();
   // there must always be at least one admin
   const includeAdmins = members.filter((member) => !member.isBot && member.isAdmin).length > 1;
-  const eligibleMembers = members.filter(
-    (member) => !member.isBot && (includeAdmins || !member.isAdmin) && !member.isGuest
-  );
+
+  // Don't show any guests in free spaces
+  const eligibleMembers = isFreeSpace
+    ? []
+    : members.filter((member) => !member.isBot && (includeAdmins || !member.isAdmin) && !member.isGuest);
   return (
     <RoleRowBase
       title='Guest'

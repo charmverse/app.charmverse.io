@@ -111,7 +111,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
             <LockIcon />
           </ListItemIcon>
           <Typography variant='subtitle1' gap={1} display='flex'>
-            Permissions <UpgradeChip />
+            Permissions <UpgradeChip upgradeContext='forumPermissions' />
           </Typography>
         </MenuItem>
         <Tooltip title='Receive notifications when new posts are created in this category'>
