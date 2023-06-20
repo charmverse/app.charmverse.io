@@ -1,9 +1,13 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
+import type { SpaceSettingsSection } from 'components/settings/config';
+import { premiumSettingSections } from 'components/settings/config';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 
 export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   padding-left: ${theme.spacing(2)};
@@ -47,6 +51,7 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
 export function SidebarLink({
   icon,
   label,
+  section,
   ...props
 }: {
   active: boolean;
@@ -56,11 +61,21 @@ export function SidebarLink({
   target?: string;
   onClick?: () => void;
   className?: string;
+  section?: SpaceSettingsSection;
 }) {
   return (
     <StyledSidebarLink {...props}>
-      {icon}
-      {label}
+      <Box sx={{ justifyContent: 'space-between', display: 'flex', width: '100%' }}>
+        <Box sx={{ justifyContent: 'flex-start', display: 'flex' }}>
+          {icon}
+          {label}
+        </Box>
+        {section && premiumSettingSections.includes(section) && (
+          <span style={{ paddingLeft: 10 }}>
+            <UpgradeChip upgradeContext='customRoles' />
+          </span>
+        )}
+      </Box>
     </StyledSidebarLink>
   );
 }

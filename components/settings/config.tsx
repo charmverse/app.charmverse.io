@@ -11,6 +11,9 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'api', 'subscription'] as const;
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
+
+export const premiumSettingSections: SpaceSettingsSection[] = ['roles'];
+
 type SettingsTab<T extends string> = {
   icon: JSX.Element;
   path: T;

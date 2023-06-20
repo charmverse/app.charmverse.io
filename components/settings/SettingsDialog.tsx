@@ -26,6 +26,7 @@ import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
+import { UpgradeChip } from './subscription/UpgradeWrapper';
 
 interface TabPanelProps extends BoxProps {
   children?: ReactNode;
@@ -156,6 +157,7 @@ export function SpaceSettingsDialog() {
                 icon={tab.icon}
                 onClick={() => onClick(tab.path)}
                 active={activePath === tab.path}
+                section={tab.path}
               />
             ))}
         </Box>
