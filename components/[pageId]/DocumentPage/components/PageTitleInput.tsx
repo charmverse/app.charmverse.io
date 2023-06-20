@@ -1,7 +1,7 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import type { TextFieldProps } from '@mui/material';
 import { TextField, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
@@ -64,13 +64,26 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
     }
   }, [value, updatedAtExternal]);
 
-  function _onChange(event: ChangeEvent<HTMLInputElement>) {
-    const _title = event.target.value;
+  function updateTitle(newTitle: string) {
     const _updatedAt = new Date().toISOString();
-    setTitle(_title);
+    setTitle(newTitle);
     setUpdatedAt(_updatedAt);
-    onChange({ title: _title, updatedAt: _updatedAt });
+    onChange({ title: newTitle, updatedAt: _updatedAt });
   }
+
+  const handleKeyDown: TextFieldProps['onKeyDown'] = (event) => {
+    const pressedEnter = event.key === 'Enter';
+    const pressedCtrl = event.ctrlKey;
+    if (pressedEnter) {
+      if (!pressedCtrl) {
+        event.preventDefault();
+        insertAndFocusFirstLine(view);
+      } else {
+        const inputElement = event.target as HTMLInputElement;
+        updateTitle(`${inputElement.value}\n`);
+      }
+    }
+  };
 
   if (readOnly) {
     return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
@@ -88,10 +101,13 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
         inputRef={titleInput}
         value={title}
         multiline
-        onChange={_onChange}
         placeholder='Untitled'
         autoFocus={!value && !readOnly && !isTouchScreen()}
         variant='standard'
+        onKeyDown={handleKeyDown}
+        onChange={(e) => {
+          updateTitle(e.target.value);
+        }}
       />
     </form>
   );

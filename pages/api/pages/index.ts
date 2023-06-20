@@ -74,7 +74,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
 
-  const page: Page = await createPage({
+  const page = await createPage({
     data: {
       spaceId,
       createdBy,
@@ -128,7 +128,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
 }
 
 async function deletePages(req: NextApiRequest, res: NextApiResponse) {
-  const pageIds = (req.body || []) as string[];
+  const pageIds = req.query.pageIds as string[];
   const userId = req.session.user.id;
 
   for (const pageId of pageIds) {

@@ -250,6 +250,21 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'oeth'
+  },
+  ZKSYNC: {
+    chainId: 324,
+    chainName: 'zkSync Era',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+    },
+    rpcUrls: ['https://mainnet.era.zksync.io'],
+    blockExplorerUrls: ['https://explorer.zksync.io'],
+    iconUrl: '/images/cryptoLogos/zksync-era-logo.png',
+    shortName: 'era'
   }
 } as const;
 
@@ -314,7 +329,8 @@ const supportedChains: Blockchain[] = [
   'GOERLI',
   'OPTIMISM',
   'SEPOLIA',
-  'MUMBAI'
+  'MUMBAI',
+  'ZKSYNC'
 ];
 
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
@@ -393,6 +409,9 @@ export function getChainExplorerLink(
 
     case '10':
       return `https://optimistic.etherscan.io/${path}/${transactionOrContractId}`;
+
+    case '324':
+      return `https://explorer.zksync.io/${path}/${transactionOrContractId}`;
 
     default:
       return '';

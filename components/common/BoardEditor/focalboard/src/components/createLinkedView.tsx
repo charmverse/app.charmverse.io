@@ -9,8 +9,8 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { StyledSidebar } from './viewSidebar/viewSidebar';
-import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions';
-import { ViewSourceOptions } from './viewSidebar/viewSourceOptions';
+import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions/components/CharmVerseDatabases';
+import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOptions';
 
 type CreateLinkedViewProps = DatabaseSourceProps & {
   readOnly: boolean;

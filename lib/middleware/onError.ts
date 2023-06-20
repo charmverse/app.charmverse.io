@@ -14,7 +14,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 
   if (errorAsSystemError.code === 500) {
-    // err.error?.message is for errors from adapters/http/fetch.server
+    // err.error?.message is for errors from @charmverse/core/http
     log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,

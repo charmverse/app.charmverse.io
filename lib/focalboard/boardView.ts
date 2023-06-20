@@ -8,7 +8,7 @@ import { createFilterGroup } from 'lib/focalboard/filterGroup';
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
 
-export type ViewSourceType = 'board_page' | 'google_form';
+export type ViewSourceType = 'board_page' | 'google_form' | 'proposals';
 
 export type GoogleFormSourceData = {
   credentialId: string;

@@ -7,7 +7,7 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 export function useSpaceGatesReevaluate() {
   const { user, refreshUser } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { getStoredSignature, account } = useWeb3AuthSig();
 
   useEffect(() => {

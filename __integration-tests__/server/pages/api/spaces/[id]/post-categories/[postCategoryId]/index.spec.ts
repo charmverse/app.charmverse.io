@@ -89,7 +89,6 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
     await request(baseUrl)
       .delete(`/api/spaces/${firstSpace.id}/post-categories/${postCategory.id}`)
       .set('Cookie', adminUserCookie)
-      .send()
       .expect(200);
 
     const category = await prisma.postCategory.findUnique({
@@ -115,7 +114,6 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
     await request(baseUrl)
       .delete(`/api/spaces/${firstSpace.id}/post-categories/${postCategory.id}`)
       .set('Cookie', userCookie)
-      .send()
       .expect(401);
   });
 });

@@ -61,7 +61,7 @@ export function plugins({ key }: { key: PluginKey }) {
         }
       },
       props: {
-        handleClick: (view, _pos, event) => {
+        handleClickOn: (view, _pos, _node, _nodePos, event) => {
           const { schema } = view.state;
           const markType = schema.marks.link;
           let marks: Mark[] = [];
@@ -72,6 +72,7 @@ export function plugins({ key }: { key: PluginKey }) {
           if (attrs.href) {
             event.stopPropagation();
             window.open(attrs.href, '_blank');
+            return true;
           }
           return false;
         },

@@ -20,6 +20,7 @@ import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
 import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
 import ShareButton from './components/ShareButton';
 
 export const headerHeight = 56;
@@ -39,7 +40,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const { user } = useUser();
   const basePageId = usePageIdFromPath();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { page: basePage } = usePage({
     pageIdOrPath: currentSpace ? basePageId : undefined,
     spaceId: currentSpace?.id
@@ -48,6 +49,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
   const isBountyBoard = router.route === '/[domain]/bounties';
+  const isProposalsPage = router.route === '/[domain]/proposals';
   const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
   return (
     <StyledToolbar variant='dense'>
@@ -80,19 +82,13 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
+          {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 
           {basePage && (
             <>
               {isBasePageDocument && <DocumentParticipants />}
               {isBasePageDocument && <EditingModeToggle />}
-              {!basePage?.deletedAt && (
-                <ShareButton
-                  headerHeight={headerHeight}
-                  pageId={basePage.id}
-                  pageType={basePage.type}
-                  proposalId={basePage.proposalId}
-                />
-              )}
+              {!basePage?.deletedAt && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
             </>
           )}
 

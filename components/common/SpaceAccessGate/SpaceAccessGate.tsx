@@ -3,13 +3,14 @@ import { useRouter } from 'next/router';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
-import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
@@ -56,7 +57,8 @@ export function SpaceAccessGate({
     if (onSuccess) {
       onSuccess();
     } else {
-      router.push(`/${space.domain}`);
+      const spaceUrl = getSpaceUrl(space);
+      router.push(spaceUrl);
     }
   }
 

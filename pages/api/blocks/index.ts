@@ -19,7 +19,9 @@ import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
@@ -38,7 +40,10 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
-  const spaceDomain = getValidSubdomain(req.headers.host) || pathnameParts[1];
+  const domain = getValidSubdomain(req.headers.host) || pathnameParts[1];
+  const customDomain = getValidCustomDomain(req.headers.host);
+  const spaceDomain = customDomain || domain;
+
   if (!spaceDomain) {
     throw new InvalidStateError('invalid referrer url');
   }
@@ -64,11 +69,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
     // WARNING: patchBlock api method does not pass in spaceId, so this is needed.
     if (!spaceId) {
-      const space = await prisma.space.findUnique({
-        where: {
-          domain: spaceDomain
-        }
-      });
+      const space = await getSpaceByDomain(spaceDomain);
       spaceId = space?.id;
     }
 
@@ -98,7 +99,10 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  let spaceDomain = getValidSubdomain(req.headers.host);
+  const domain = getValidSubdomain(req.headers.host);
+  const customDomain = getValidCustomDomain(req.headers.host);
+  let spaceDomain = customDomain || domain;
+
   if (!spaceDomain) {
     spaceDomain = referer ? url.pathname.split('/')[1] : null;
   }
@@ -106,11 +110,11 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   if (!spaceDomain) {
     return res.status(200).json(data);
   }
-  const space = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: spaceDomain
-    }
-  });
+
+  const space = await getSpaceByDomain(spaceDomain);
+  if (!space) {
+    throw new NotFoundError('space not found');
+  }
 
   const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId: space.id });
   if (error) {
@@ -299,7 +303,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 }
 
 async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
-  const blockIds: string[] = req.body ?? [];
+  // TODO: remove use of req.body after browsers update - 06/2023
+  const blockIds: string[] = (req.query.blockIds || req.body) ?? [];
   const userId = req.session.user.id as string | undefined;
 
   const blocks = await prisma.block.findMany({

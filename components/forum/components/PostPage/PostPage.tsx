@@ -7,8 +7,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import Button from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -66,7 +66,7 @@ export function PostPage({
   showOtherCategoryPosts,
   newPostCategory
 }: Props) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
   const { categories, getForumCategoryById } = useForumCategories();
   const { showMessage } = useSnackbar();

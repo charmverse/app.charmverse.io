@@ -24,7 +24,7 @@ interface Props {
 export function PublishToSnapshot({ pageId, snapshotProposalId, renderContent, onPublish = () => null }: Props) {
   const [checkingProposal, setCheckingProposal] = useState(!!snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const { isOpen, open, close } = usePopupState({ variant: 'popover', popupId: 'publish-proposal' });
 

@@ -1,13 +1,15 @@
 import { Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
@@ -20,7 +22,7 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
+import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -49,7 +51,8 @@ function PropertyValueElement(props: Props) {
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
-
+  const router = useRouter();
+  const domain = router.query.domain as string;
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
@@ -124,7 +127,7 @@ function PropertyValueElement(props: Props) {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         wrapColumn={props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {
@@ -166,28 +169,33 @@ function PropertyValueElement(props: Props) {
     );
   }
 
-  if (editableFields.includes(propertyTemplate.type)) {
-    const commonProps = {
-      className: 'octo-propertyvalue',
-      placeholderText: emptyDisplayValue,
-      readOnly,
-      value: value.toString(),
-      autoExpand: true,
-      onChange: setValue,
-      multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-      onSave: () => {
-        mutator.changePropertyValue(card, propertyTemplate.id, value);
-      },
-      onCancel: () => setValue(propertyValue || ''),
-      validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-      spellCheck: propertyTemplate.type === 'text'
-    };
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: emptyDisplayValue,
+    readOnly,
+    value: value.toString(),
+    autoExpand: true,
+    onChange: setValue,
+    displayType,
+    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    onSave: () => {
+      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    },
+    onCancel: () => setValue(propertyValue || ''),
+    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false
+  };
 
+  if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+    propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
   } else if (propertyValueElement === null) {
     propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
   }
@@ -210,4 +218,4 @@ function PropertyValueElement(props: Props) {
   return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);

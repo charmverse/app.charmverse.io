@@ -22,7 +22,7 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view: 'Space members can only view pages.'
 };
 export function DefaultPagePermissions() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
@@ -37,9 +37,14 @@ export function DefaultPagePermissions() {
       (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustomAndProposalEditor) ?? 'full_access'
     );
   const [defaultPublicPages, setDefaultPublicPages] = useState<boolean>(space?.defaultPublicPages ?? false);
+  const [requireProposalTemplate, setRequireProposalTemplate] = useState<boolean>(
+    space?.requireProposalTemplate ?? false
+  );
 
   const settingsChanged =
-    space?.defaultPublicPages !== defaultPublicPages || selectedPagePermission !== space?.defaultPagePermissionGroup;
+    space?.defaultPublicPages !== defaultPublicPages ||
+    selectedPagePermission !== space?.defaultPagePermissionGroup ||
+    space?.requireProposalTemplate !== requireProposalTemplate;
 
   async function updateSpaceDefaultPagePermission() {
     if (space && selectedPagePermission !== space?.defaultPagePermissionGroup) {
@@ -56,8 +61,19 @@ export function DefaultPagePermissions() {
 
   async function updateSpaceDefaultPublicPages() {
     if (space && defaultPublicPages !== space?.defaultPublicPages) {
-      const updatedSpace = await charmClient.setDefaultPublicPages({
+      const updatedSpace = await charmClient.spaces.setDefaultPublicPages({
         defaultPublicPages,
+        spaceId: space.id
+      });
+
+      setSpace(updatedSpace);
+    }
+  }
+
+  async function updateSpaceRequireProposalTemplate() {
+    if (space && requireProposalTemplate !== space?.requireProposalTemplate) {
+      const updatedSpace = await charmClient.spaces.setRequireProposalTemplate({
+        requireProposalTemplate,
         spaceId: space.id
       });
 
@@ -68,6 +84,7 @@ export function DefaultPagePermissions() {
   function updateSpaceDefaults() {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
+    updateSpaceRequireProposalTemplate();
     setTouched(false);
   }
 
@@ -116,6 +133,25 @@ export function DefaultPagePermissions() {
           />
         }
         label='Accessible to public'
+        labelPlacement='start'
+      />
+      <FormControlLabel
+        sx={{
+          margin: 0,
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+        control={
+          <Switch
+            disabled={!isAdmin}
+            onChange={(ev) => {
+              setRequireProposalTemplate(ev.target.checked);
+              setTouched(true);
+            }}
+            defaultChecked={requireProposalTemplate}
+          />
+        }
+        label='Require proposal template'
         labelPlacement='start'
       />
       {isAdmin && (

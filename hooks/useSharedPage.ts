@@ -6,10 +6,13 @@ import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
+const PROPOSALS_PATH = '/[domain]/proposals';
 const BOUNTIES_PATH = '/[domain]/bounties';
 const DOCUMENT_PATH = '/[domain]/[pageId]';
 const FORUM_PATH = '/[domain]/forum';
-const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH];
+const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH, PROPOSALS_PATH];
+
+type PublicPageType = 'forum' | 'proposals' | 'bounties';
 
 export const useSharedPage = () => {
   const { pathname, query, isReady: isRouterReady } = useRouter();
@@ -17,6 +20,7 @@ export const useSharedPage = () => {
   const isPublicPath = isPublicPagePath(pathname);
   const isBountiesPath = isPublicPath && isBountiesPagePath(pathname);
   const isForumPath = isPublicPath && isForumPagePath(pathname);
+  const isProposalsPath = isPublicPath && isProposalsPagePath(pathname);
 
   const { spaces, isLoaded: spacesLoaded } = useSpaces();
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
@@ -34,6 +38,10 @@ export const useSharedPage = () => {
 
     if (isForumPath) {
       return `${spaceDomain}/forum`;
+    }
+
+    if (isProposalsPath) {
+      return `${spaceDomain}/proposals`;
     }
 
     return `${spaceDomain}/${pagePath}`;
@@ -61,7 +69,12 @@ export const useSharedPage = () => {
 
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';
-  const hasSharedPageAccess = !!publicPage || !!hasPublicBounties || isForumPagePath(pathname);
+  const hasPublicProposals = space?.publicProposals || space?.paidTier === 'free';
+  const hasSharedPageAccess =
+    !!publicPage ||
+    (!!hasPublicBounties && isBountiesPagePath(pathname)) ||
+    isForumPagePath(pathname) ||
+    (!!hasPublicProposals && isProposalsPagePath(pathname));
   const accessChecked = isRouterReady && !isSpaceLoading && !isPublicPageLoading;
 
   return {
@@ -69,7 +82,14 @@ export const useSharedPage = () => {
     hasError,
     hasSharedPageAccess,
     publicSpace: space,
-    publicPage
+    publicPage,
+    publicPageType: (isBountiesPath
+      ? 'bounties'
+      : isProposalsPath
+      ? 'proposals'
+      : isForumPath
+      ? 'forum'
+      : null) as PublicPageType | null
   };
 };
 
@@ -87,4 +107,8 @@ export function isBountiesPagePath(path: string): boolean {
 
 export function isForumPagePath(path: string): boolean {
   return path.startsWith(FORUM_PATH);
+}
+
+export function isProposalsPagePath(path: string): boolean {
+  return path.startsWith(PROPOSALS_PATH);
 }

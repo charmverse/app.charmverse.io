@@ -47,7 +47,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
@@ -61,6 +61,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
 
       const pagesRes = await charmClient.pages.getPages(currentSpace.id);
+
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;

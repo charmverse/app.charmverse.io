@@ -394,6 +394,7 @@ interface CharmEditorProps {
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
   disableNestedPages?: boolean;
+  onConnectionError?: (error: Error) => void;
 }
 
 function CharmEditor({
@@ -419,12 +420,13 @@ function CharmEditor({
   focusOnInit,
   onParticipantUpdate,
   disableRowHandles = false,
-  disableNestedPages = false
+  disableNestedPages = false,
+  onConnectionError
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
@@ -569,6 +571,7 @@ function CharmEditor({
       trackChanges
       readOnly={readOnly}
       enableComments={enableComments}
+      onConnectionError={onConnectionError}
       style={{
         ...(style ?? {}),
         width: '100%',

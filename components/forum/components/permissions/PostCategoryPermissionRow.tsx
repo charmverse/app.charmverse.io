@@ -40,10 +40,10 @@ export function PostCategoryRolePermissionRow({
   deletePermission
 }: Props) {
   const roles = useRoles();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const defaultExists = !!defaultPermissionLevel;
-  const usingDefault = defaultExists && defaultPermissionLevel === permissionLevel;
+  const usingDefault = defaultExists && !existingPermissionId;
 
   const friendlyLabels = {
     ...forumMemberPermissionOptions,

@@ -1,16 +1,19 @@
+import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 import type { WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
 
 import { getPagePath } from '../pages';
+
+import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
 type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
 
@@ -19,6 +22,7 @@ export type CreateProposalInput = {
   pageProps?: PageProps;
   categoryId: string;
   reviewers?: TargetPermissionGroup<'role' | 'user'>[];
+  authors?: string[];
   userId: string;
   spaceId: string;
 };
@@ -29,7 +33,14 @@ export type CreatedProposal = {
   workspaceEvent: WorkspaceEvent;
 };
 
-export async function createProposal({ userId, spaceId, categoryId, pageProps, reviewers }: CreateProposalInput) {
+export async function createProposal({
+  userId,
+  spaceId,
+  categoryId,
+  pageProps,
+  authors,
+  reviewers
+}: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
@@ -37,6 +48,17 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, r
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = 'draft';
 
+  const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+
+  const validation = await validateProposalAuthorsAndReviewers({
+    authors: authorsList,
+    reviewers: reviewers ?? [],
+    spaceId
+  });
+
+  if (!validation.valid) {
+    throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
+  }
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
     prisma.proposal.create({
@@ -48,8 +70,8 @@ export async function createProposal({ userId, spaceId, categoryId, pageProps, r
         status: proposalStatus,
         category: { connect: { id: categoryId } },
         authors: {
-          create: {
-            userId
+          createMany: {
+            data: authorsList.map((author) => ({ userId: author }))
           }
         },
         reviewers: reviewers

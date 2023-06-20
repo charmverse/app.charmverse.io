@@ -6,13 +6,14 @@ import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
+import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
+import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
 import { ProposalsTable } from './components/ProposalsTable';
 import { ProposalsViewOptions } from './components/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
@@ -20,19 +21,19 @@ import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
+  const { isFreeSpace } = useIsFreeSpace();
   const {
     data,
     mutate: mutateProposals,
     isLoading
-  } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
+  } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
+    charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
+
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
-
   useEffect(() => {
     if (currentSpace?.id) {
       charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
@@ -41,19 +42,21 @@ export function ProposalsPage() {
 
   const loadingData = !data;
 
-  const { hasAccess: canSeeProposals, isLoadingAccess } = useHasMemberLevel('member');
+  const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
+
+  const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
 
   if (isLoadingAccess) {
     return null;
   }
 
   if (!canSeeProposals) {
-    return <ErrorPage message='Guests cannot access proposals' />;
+    return <ErrorPage message='You cannot access proposals for this space' />;
   }
 
   return (
     <CenteredPageContent>
-      <PageDialogProvider>
+      <ProposalDialogProvider>
         <Grid container mb={6}>
           <Grid item xs={12}>
             <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
@@ -116,8 +119,8 @@ export function ProposalsPage() {
             </Grid>
           )}
         </Grid>
-        <PageDialogGlobal />
-      </PageDialogProvider>
+        <ProposalDialogGlobal />
+      </ProposalDialogProvider>
     </CenteredPageContent>
   );
 }

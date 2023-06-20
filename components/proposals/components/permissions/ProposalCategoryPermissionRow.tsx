@@ -37,20 +37,20 @@ export function ProposalCategoryRolePermissionRow({
   deletePermission
 }: Props) {
   const roles = useRoles();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
-  const usingDefault = (defaultPermissionLevel && !permissionLevel) || (!defaultPermissionLevel && !permissionLevel);
+  const defaultExists = !!defaultPermissionLevel;
+  const usingDefault = defaultExists && !existingPermissionId;
 
   const friendlyLabels = {
     ...proposalCategoryPermissionLabels,
-    delete: (defaultPermissionLevel ? (
+    delete: (assignee.group !== 'space' && defaultExists ? (
       <em>Default: {proposalCategoryPermissionLabels[defaultPermissionLevel]}</em>
     ) : (
       'Remove'
     )) as string | ReactNode | undefined,
     '': (defaultPermissionLevel && proposalCategoryPermissionLabels[defaultPermissionLevel]) || 'No access'
   };
-
   // remove delete option if there is no existing permission
   if (!existingPermissionId) {
     delete friendlyLabels.delete;

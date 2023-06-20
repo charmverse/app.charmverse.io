@@ -7,14 +7,12 @@ import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import reactDOM from 'react-dom';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PagesMap } from 'lib/pages';
 
 import type { PluginState } from './rowActions';
 
@@ -33,7 +31,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, pages } = usePages();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
@@ -107,7 +105,7 @@ function Component({ menuState }: { menuState: PluginState }) {
     const node = _getNode();
     const tr = view.state.tr;
     if (node?.node.type.name === 'page') {
-      if (currentSpace && node?.node.attrs.id) {
+      if (currentSpace && node.node.attrs.id) {
         const { rootPageId } = await charmClient.pages.duplicatePage({
           pageId: node?.node.attrs.id
         });
@@ -116,15 +114,17 @@ function Component({ menuState }: { menuState: PluginState }) {
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        await mutate(
-          `pages/${currentSpace.id}`,
-          (_pages: PagesMap | undefined) => {
-            return _pages ?? {};
-          },
-          {
-            revalidate: true
-          }
-        );
+      }
+    } else if (node?.node.type.name === 'inlineDatabase') {
+      if (currentSpace && node.node.attrs.pageId) {
+        const { rootPageId: newPageId } = await charmClient.pages.duplicatePage({
+          pageId: node.node.attrs.pageId
+        });
+        const newNode = view.state.schema.nodes.inlineDatabase.create({
+          pageId: newPageId
+        });
+        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+        view.dispatch(newTr.scrollIntoView());
       }
     } else if (node) {
       const copy = node.node.copy(node.node.content);

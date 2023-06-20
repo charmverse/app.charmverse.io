@@ -50,6 +50,10 @@ export const colors = {
     dark: '#81730E',
     light: '#EFE9CB'
   },
+  green: {
+    dark: '#1D7324',
+    light: '#D0EFD6'
+  },
   teal: {
     dark: '#007C8F',
     light: '#D0F4F1'
@@ -85,6 +89,7 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',
   propColorGray: 'gray',
   propColorTurquoise: 'turquoise',
+  propColorGreen: 'green',
   propColorOrange: 'orange',
   propColorYellow: 'yellow',
   propColorTeal: 'teal',

@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   // Might need better ACL in the future
   const { data: categories, mutate } = useSWR(
     () => (currentSpace ? `proposals/${currentSpace.id}/categories` : null),

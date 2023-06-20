@@ -30,7 +30,7 @@ export function useEditorItems({
   pageId?: string;
 }) {
   const { addNestedPage } = useNestedPage(pageId);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();

@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
-import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
+import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -107,7 +107,7 @@ function CenterPanel(props: Props) {
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
@@ -148,11 +148,15 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards
-    .map((card) => ({ card, page: pages[card.id]! }))
-    .filter(({ page }) => !!page && !page.deletedAt);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
@@ -329,7 +333,9 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      e.stopPropagation();
+      if (activeView?.fields.viewType !== 'table') {
+        e.stopPropagation();
+      }
     },
     [activeView]
   );
@@ -724,8 +730,8 @@ export function groupCardsByOptions(
   for (const optionId of optionIds) {
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
-      if (option) {
-        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty!.id]);
+      if (groupByProperty && option) {
+        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
           option,
           cardPages: c,

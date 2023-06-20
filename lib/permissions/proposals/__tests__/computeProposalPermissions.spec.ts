@@ -91,7 +91,7 @@ describe('computeProposalPermissions', () => {
     });
   });
 
-  it('should allow the admin to always see proposals, but only edit the proposal during the discussion, review and reviewed stages', async () => {
+  it('should allow the admin to always see proposals, but only edit the proposal during the draft, discussion, review and reviewed stages', async () => {
     const testedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
@@ -106,7 +106,7 @@ describe('computeProposalPermissions', () => {
       userId: adminUser.id
     });
 
-    expect(permissions.edit).toBe(false);
+    expect(permissions.edit).toBe(true);
 
     const editableStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed'];
 

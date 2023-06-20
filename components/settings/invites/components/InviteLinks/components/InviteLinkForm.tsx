@@ -46,7 +46,7 @@ const maxUsesOptions: { value: FormValues['maxUses']; label: string }[] = [
   { value: 100, label: '100 uses' }
 ];
 
-export default function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
+export function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
   const defaultMaxAge = maxAgeOptions[maxAgeOptions.length - 2].value; // the longest duration thats not infinite
   const defaultMaxUses = maxUsesOptions[0].value; // no limit
 
