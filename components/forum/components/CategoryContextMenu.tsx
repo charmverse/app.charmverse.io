@@ -18,8 +18,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
-import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissions';
-import { PostCategoryPermissionsDialogPublic } from './permissions/PostCategoryPermissionsPublic';
+import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissionsContainer';
 
 type Props = {
   category: PostCategory;
@@ -101,7 +100,6 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
         </Tooltip>
         <MenuItem
           data-test={`open-category-permissions-dialog-${category.id}`}
-          disabled={!permissions.manage_permissions}
           onClick={() => setPermissionsDialogIsOpen(true)}
           sx={{
             py: 1,
@@ -111,7 +109,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <ListItemIcon>
             <LockIcon />
           </ListItemIcon>
-          <Typography variant='subtitle1'>Manage permissions</Typography>
+          <Typography variant='subtitle1'>Permissions</Typography>
         </MenuItem>
         <Tooltip title='Receive notifications when new posts are created in this category'>
           <MenuItem
@@ -166,20 +164,9 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
-      {isFreeSpace ? (
-        <PostCategoryPermissionsDialogPublic
-          postCategory={category}
-          onClose={closeDialog}
-          open={permissionsDialogIsOpen}
-        />
-      ) : (
-        <PostCategoryPermissionsDialog
-          permissions={permissions}
-          onClose={closeDialog}
-          open={permissionsDialogIsOpen}
-          postCategory={category}
-        />
-      )}
+
+      <PostCategoryPermissionsDialog postCategory={category} onClose={closeDialog} open={permissionsDialogIsOpen} />
+
       <EditCategoryDialog
         onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
         category={category}

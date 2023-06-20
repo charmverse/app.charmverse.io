@@ -1,5 +1,3 @@
-import { useTheme } from '@emotion/react';
-import type { PaletteMode } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
@@ -9,7 +7,9 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 export const upgradeMessages = {
-  pagePermissions: 'Upgrade to a paid plan to change page permissions'
+  pagePermissions: 'Upgrade to a paid plan to change page permissions',
+  forumPermissions: 'Upgrade to a paid plan to change post category permissions',
+  customRoles: 'Upgrade to a paid plan to use custom roles'
 };
 
 type Props = {
