@@ -41,7 +41,7 @@ interface Props extends Omit<LinkProps, 'href'> {
 }
 
 export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   if (!href) {
     return (

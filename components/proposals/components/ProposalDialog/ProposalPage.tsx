@@ -34,7 +34,7 @@ type Props = {
 };
 
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
   const [_, { width: containerWidth }] = useElementSize();
@@ -56,6 +56,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
       setIsCreatingProposal(true);
       const createdProposal = await charmClient.proposals
         .createProposal({
+          authors: formInputs.authors,
           categoryId: formInputs.categoryId,
           pageProps: {
             content: formInputs.content,

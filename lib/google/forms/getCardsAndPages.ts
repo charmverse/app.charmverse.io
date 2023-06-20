@@ -34,8 +34,6 @@ type CharmVerseModelOutput = {
 // map Google data model to CharmVerse models
 export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
   const { cardParentId, rootId, createdBy, form, responses, permissions, spaceId } = data;
-  let nextIndex = data.nextIndex;
-
   const cardProperties = getCardProperties(form);
 
   const cardBlocks: PrismaBlockSortOf[] = [];
@@ -99,7 +97,7 @@ export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
       },
       createdAt: prismaBlock.createdAt,
       hasContent: true,
-      title: `Response ${nextIndex}`,
+      title: `Response`,
       type: 'card_synced',
       contentText: '',
       parentId: rootId, // important to inherit permissions
@@ -110,7 +108,6 @@ export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
       }
     };
     cardPages.push(cardPage);
-    nextIndex += 1;
   }
 
   return { cardProperties, cards: cardBlocks, pages: cardPages };

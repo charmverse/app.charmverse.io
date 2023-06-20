@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { isTestEnv } from 'config/constants';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
+import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -23,10 +24,9 @@ handler.get(async (req, res) => {
   const cookies = new Cookies(req, res);
   const state = JSON.parse(decodeURIComponent(req.query.state as string));
   const type: 'connect' | 'server' | 'login' = state.type ?? 'connect';
-
   // sanitize the redirect path in case of invalid characters
   const redirectPath = (state?.redirect as string) || '/';
-  const redirectUrl = new URL(redirectPath, 'https://tacos4everyone.net');
+  const redirectUrl = getDiscordRedirectUrl(req.headers.host, redirectPath);
   const subdomain = getValidSubdomain(redirectUrl.host);
   const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
 

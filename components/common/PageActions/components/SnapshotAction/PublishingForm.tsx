@@ -51,7 +51,7 @@ const MIN_VOTING_OPTIONS = 2;
 export function PublishingForm({ onSubmit, pageId }: Props) {
   const { account, library } = useWeb3AuthSig();
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { members } = useMembers();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);

@@ -65,15 +65,6 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
             (event.target as HTMLElement).className +
             ((event.target as HTMLElement).parentNode as HTMLElement).className;
 
-          // Sometimes, inline comments are overlaid on links, which blocks proper behaviour. This allows links to open
-          const href = getLinkElement({
-            htmlElement: event.target as HTMLElement
-          })?.getAttribute('href');
-
-          if (href) {
-            window.open(href, '_blank');
-          }
-
           if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,

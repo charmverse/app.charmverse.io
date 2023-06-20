@@ -7,9 +7,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
@@ -25,6 +22,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
+import { countSpaceBlocks, countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -57,8 +55,7 @@ export async function createWorkspace({
   webhookUrl,
   userId,
   spaceTemplate = 'default',
-  extraAdmins = [],
-  skipTracking
+  extraAdmins = []
 }: CreateSpaceProps) {
   let domain = spaceData.domain;
 
@@ -238,12 +235,10 @@ export async function createWorkspace({
     await subscribeToAllEvents({ spaceId: space.id, userId });
   }
 
-  if (!skipTracking) {
-    logSpaceCreation(space);
-    updateTrackGroupProfile(space);
-    updateTrackUserProfileById(userId);
-    trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: spaceTemplate });
-  }
+  // Generate the first count
+  await countSpaceBlocksAndSave({ spaceId: space.id });
+
+  logSpaceCreation(space);
 
   return updatedSpace;
 }

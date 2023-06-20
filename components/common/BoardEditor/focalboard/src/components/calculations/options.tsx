@@ -169,6 +169,8 @@ type CommonCalculationOptionProps = {
   anchorEl: HTMLElement | null;
   menuOpen: boolean;
   menuItemComponent?: (props: { data: any; onClick: (e: MouseEvent) => void }) => JSX.Element;
+  // eslint-disable-next-line react/no-unused-prop-types
+  property?: { type: string };
 };
 
 // Props used by the base calculation option component

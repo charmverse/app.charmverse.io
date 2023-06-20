@@ -10,8 +10,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { NewProposalButton } from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
-import { usePages } from 'hooks/usePages';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
@@ -22,9 +21,8 @@ import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
-  const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { space: currentSpace } = useCurrentSpace();
+  const { isFreeSpace } = useIsFreeSpace();
   const {
     data,
     mutate: mutateProposals,
@@ -32,6 +30,7 @@ export function ProposalsPage() {
   } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
     charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
   );
+
   const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
     data ?? []
   );
@@ -45,7 +44,7 @@ export function ProposalsPage() {
 
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
 
-  const canSeeProposals = hasAccess || isPublicSpace || currentSpace?.publicProposals === true;
+  const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
 
   if (isLoadingAccess) {
     return null;

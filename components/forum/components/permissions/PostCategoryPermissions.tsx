@@ -42,7 +42,7 @@ function PostCategoryPermissions({ postCategory, permissions }: Props) {
   const { roles } = useRoles();
   const addRolesDialog = usePopupState({ variant: 'popover', popupId: 'add-roles-dialog' });
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   async function deletePermission(id: string) {
     await charmClient.permissions.forum.deletePostCategoryPermission(id);
     mutatePermissions((list) => list?.filter((p) => p.id !== id));

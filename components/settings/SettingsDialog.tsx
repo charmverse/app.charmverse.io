@@ -23,7 +23,7 @@ import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, getSettingsTabs } from './config';
 import { ImportSettings } from './import/ImportSettings';
-import Invites from './invites/Invites';
+import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 
@@ -95,7 +95,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export function SpaceSettingsDialog() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();

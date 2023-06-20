@@ -158,6 +158,11 @@ export class DocumentEventHandler {
         ...logData,
         message
       });
+      // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
+      // check if there are at least a few updates and ask the user to refresh
+      if (message.type === 'diff' && message.ds.length > 30) {
+        this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      }
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
@@ -170,7 +175,7 @@ export class DocumentEventHandler {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.warn('Resend messages to client', { message, ...logData });
+      log.warn('Resend messages to client', { message, messagesToSend: this.messages.lastTen.length, ...logData });
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -361,6 +366,14 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoom();
     if (message.v === room?.doc.version) {
       this.sendUpdatesToOthers(message);
+    } else {
+      log.debug('Ignoring selection change because version is out of date', {
+        socketId: this.id,
+        pageId: room?.doc.id,
+        version: message.v,
+        docVersion: room?.doc.version,
+        userId: this.getSession().user.id
+      });
     }
   }
 
@@ -409,7 +422,7 @@ export class DocumentEventHandler {
         }
       }
       room.doc.diffs.push(message);
-      room.doc.diffs = room.doc.diffs.slice(this.historyLength);
+      room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
       if (room.doc.version % this.docSaveInterval === 0) {
         await this.saveDocument();
@@ -424,12 +437,12 @@ export class DocumentEventHandler {
         log.debug('Client is behind. Resend document diffs', {
           ...logMeta,
           roomDiffs: room.doc.diffs.length,
-          diffsToSend
+          diffsToSend: diffsToSend * -1
         });
         const messages = room.doc.diffs.slice(diffsToSend);
         for (const m of messages) {
           const newMessage = { ...m, server_fix: true };
-          await this.sendMessage(newMessage);
+          this.sendMessage(newMessage);
         }
       } else {
         log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
@@ -473,10 +486,15 @@ export class DocumentEventHandler {
     const toSend = this.messages.server - from;
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
+      log.warn('Unfixable: Too many messages to resend. Send full document', {
+        toSend,
+        from,
+        ...this.getSessionMeta()
+      });
       this.unfixable();
     } else {
-      for (const message of this.messages.lastTen.slice(-toSend)) {
+      const lastTen = this.messages.lastTen.slice(-toSend);
+      for (const message of lastTen) {
         this.sendMessage(message);
       }
     }
@@ -527,7 +545,7 @@ export class DocumentEventHandler {
       s: this.messages.server
     };
     this.messages.lastTen.push(message);
-    this.messages.lastTen = this.messages.lastTen.slice(-10);
+    this.messages.lastTen = this.messages.lastTen.slice(-30); // changed from 10 to 30 to be safe
     try {
       this.socket.emit(this.socketEvent, wrappedMessage);
     } catch (err) {
@@ -572,7 +590,12 @@ export class DocumentEventHandler {
     if (room) {
       room.participants.delete(this.id);
       if (room.participants.size === 0) {
-        docRooms.delete(room.doc.id);
+        // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
+        setTimeout(() => {
+          if (room.participants.size === 0) {
+            docRooms.delete(room.doc.id);
+          }
+        }, 100);
       } else {
         this.sendParticipantList();
       }

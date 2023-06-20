@@ -36,7 +36,7 @@ import mutator from '../../mutator';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
-import { ViewSourceOptions } from './viewSourceOptions';
+import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
   board?: Board;

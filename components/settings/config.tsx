@@ -30,7 +30,7 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
 
 export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
   return SETTINGS_TABS.filter((settingsTab) =>
-    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') : true
+    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') || space.paidTier === 'free' : true
   ).map((settingsTab) =>
     settingsTab.path === 'subscription'
       ? { ...settingsTab, label: space.paidTier === 'free' ? 'Upgrade' : 'Plans & Billings' }

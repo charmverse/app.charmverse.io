@@ -89,6 +89,7 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',
   propColorGray: 'gray',
   propColorTurquoise: 'turquoise',
+  propColorGreen: 'green',
   propColorOrange: 'orange',
   propColorYellow: 'yellow',
   propColorTeal: 'teal',

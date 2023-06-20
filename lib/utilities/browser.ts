@@ -1,4 +1,4 @@
-import { baseUrl } from 'config/constants';
+import { appSubdomain, baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
@@ -247,8 +247,28 @@ export function getSubdomainPath(path: string, config?: { domain: string; custom
   return path;
 }
 
-export function getSpaceUrl(domain: string) {
+export function getSpaceUrl(config: { domain: string; customDomain?: string | null }) {
+  const { domain } = config;
   const subdomain = getValidSubdomain();
+  const customDomain = getValidCustomDomain();
+
+  if (isLocalhostAlias()) {
+    return `/${domain}`;
+  }
+
+  // we are on proper space custom domain
+  if (customDomain && config.customDomain && customDomain === config.customDomain) {
+    return '/';
+  }
+
+  // we are on custom domain but we want to redirect to a different space
+  if (customDomain) {
+    // TODO: enable subdomains
+    return getDefaultSpaceUrl({ domain });
+  }
+
+  // TODO - redirect to different custom domain
+
   if (!subdomain) return `/${domain}`;
   if (subdomain === domain) return '/';
 
@@ -274,4 +294,86 @@ export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
   }
 
   return absolutePath;
+}
+
+export function getCustomDomainUrl(customDomain: string, path = '/') {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${customDomain}${path}`;
+  }
+
+  const protocol = isDevEnv ? 'http:' : 'https:';
+
+  return `${protocol}//${customDomain}${path}`;
+}
+
+export function getDefaultSpaceUrl({
+  domain,
+  path = '/',
+  useSubdomain = false
+}: {
+  domain: string;
+  path?: string;
+  useSubdomain?: boolean;
+}) {
+  let protocol = isDevEnv ? 'http:' : 'https:';
+  let port = '';
+  const appDomain = getAppApexDomain();
+
+  if (typeof window !== 'undefined') {
+    protocol = window.location.protocol;
+    port = window.location.port ? `:${window.location.port}` : '';
+  }
+
+  if (appDomain) {
+    return useSubdomain
+      ? `${protocol}//${domain}.${appDomain}${port}${path}`
+      : `${protocol}//app.${appDomain}${port}/${domain}${path}`;
+  }
+
+  return `/${domain}${path}`;
+}
+
+export function shouldRedirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const isSubdomainUrl = !!getValidSubdomain();
+  const appDomain = getAppApexDomain();
+
+  return isSubdomainUrl && !!appDomain;
+}
+
+export function getAppUrl() {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const appDomain = getAppApexDomain();
+
+  if (appDomain) {
+    const port = window.location.port ? `:${window.location.port}` : '';
+    return new URL(`${window.location.protocol}//${appSubdomain}.${appDomain}${port}/`);
+  }
+
+  return '';
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appUrl = getAppUrl();
+
+  if (appUrl) {
+    const returnUrl = window.location.href;
+
+    appUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = appUrl.toString();
+
+    return true;
+  }
+
+  return false;
 }

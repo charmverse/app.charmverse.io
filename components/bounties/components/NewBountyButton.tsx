@@ -13,7 +13,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 export function NewBountyButton() {
   const { user } = useUser();
   const router = useRouter();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();

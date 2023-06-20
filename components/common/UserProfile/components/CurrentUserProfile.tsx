@@ -32,7 +32,7 @@ export function CurrentUserProfile({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
 
   const [userDetails, setUserDetails] = useState<EditableFields>({});
