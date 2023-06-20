@@ -28,7 +28,7 @@ export function MentionSuggest({ pluginKey }: { pluginKey: PluginKey<MentionPlug
   return null;
 }
 
-const DEFAULT_ITEM_LIMIT = 3;
+const DEFAULT_ITEM_LIMIT = 5;
 
 function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { members } = useMembers();
