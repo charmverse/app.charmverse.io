@@ -3,7 +3,7 @@ import { Alert, Box, Card, Divider } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
@@ -42,7 +42,9 @@ export default function JoinWorkspace() {
     data: spaceFromPath,
     isLoading: isSpaceLoading,
     error: spaceError
-  } = useSWR(domain ? `space/${domain}` : null, () => charmClient.spaces.searchByDomain(stripUrlParts(domain || '')));
+  } = useSWRImmutable(domain ? `space/${domain}` : null, () =>
+    charmClient.spaces.searchByDomain(stripUrlParts(domain || ''))
+  );
 
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
