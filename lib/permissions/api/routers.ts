@@ -324,6 +324,31 @@ export async function isVoteSpaceOptedIn({ resourceId }: Resource): Promise<Spac
   return getEngine(vote.space);
 }
 
+export async function isRoleSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const role = await prisma.role.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!role) {
+    throw new DataNotFoundError(resourceId);
+  }
+
+  return getEngine(role.space);
+}
+
 export type ResourceIdEntity =
   | 'space'
   | 'post'
@@ -335,7 +360,8 @@ export type ResourceIdEntity =
   | 'page'
   | 'pagePermission'
   | 'bounty'
-  | 'vote';
+  | 'vote'
+  | 'role';
 export type GetPermissionClient = {
   resourceId: string;
   resourceIdType: ResourceIdEntity;
@@ -368,6 +394,8 @@ export async function checkSpaceSpaceSubscriptionInfo({
       ? isBountySpaceOptedIn
       : resourceIdType === 'vote'
       ? isVoteSpaceOptedIn
+      : resourceIdType === 'role'
+      ? isRoleSpaceOptedIn
       : null;
 
   if (!engineResolver) {

@@ -3,12 +3,12 @@ import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid, v4 } from 'uuid';
 
 import type { RoleAssignment } from 'lib/roles';
-import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-describe('POST /api/roles/assignment - Assign a user to a role', () => {
+describe('PUT /api/roles/[id] - Update a role', () => {
   let space: Space;
   let adminUser: User;
   let nonAdminUser: User;
@@ -30,40 +30,45 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
     });
   });
 
-  it('should succeed if the requesting user is a space admin, and respond 201', async () => {
-    const roleAssignment: RoleAssignment = {
-      roleId: role.id,
-      userId: nonAdminUser.id
-    };
-
+  it('should succeed if the requesting user is a space admin, only updating the role name, and respond 200', async () => {
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl).post('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(201);
+    const newName = `New Role Name - ${uuid()}`;
 
-    const userRoleRecord = await prisma.spaceRoleToRole.count({
-      where: {
-        roleId: role.id,
-        spaceRole: {
-          userId: nonAdminUser.id
-        }
-      }
-    });
-    expect(userRoleRecord).toBe(1);
+    const updatedRole = (
+      await request(baseUrl)
+        .put(`/api/roles/${role.id}`)
+        .set('Cookie', adminCookie)
+        .send({
+          name: newName,
+          // This update should not be applied
+          spaceId: v4()
+        })
+        .expect(200)
+    ).body;
+
+    expect(updatedRole).toMatchObject(
+      expect.objectContaining({
+        spaceId: space.id,
+        name: newName
+      })
+    );
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
-    const roleAssignment: RoleAssignment = {
-      roleId: role.id,
-      userId: nonAdminUser.id
-    };
-
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
-    await request(baseUrl).post('/api/roles/assignment').set('Cookie', nonAdminCookie).send(roleAssignment).expect(401);
+    const newName = `New Role Name - ${uuid()}`;
+
+    await request(baseUrl)
+      .put(`/api/roles/${role.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({ name: newName })
+      .expect(401);
   });
 });
 
-describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
+describe('DELETE /api/roles/[id] - Delete a role', () => {
   let space: Space;
   let adminUser: User;
   let nonAdminUser: User;
@@ -85,24 +90,15 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
       spaceId: space.id,
       assigneeUserIds: [nonAdminUser.id]
     });
-
-    const roleAssignment: RoleAssignment = {
-      roleId: role.id,
-      userId: nonAdminUser.id
-    };
-
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).query(roleAssignment).expect(200);
-    const userRoleRecord = await prisma.spaceRoleToRole.count({
+    await request(baseUrl).delete(`/api/roles/${role.id}`).set('Cookie', adminCookie).expect(200);
+    const roleAfterDelete = await prisma.role.findUnique({
       where: {
-        roleId: role.id,
-        spaceRole: {
-          userId: nonAdminUser.id
-        }
+        id: role.id
       }
     });
-    expect(userRoleRecord).toBe(0);
+    expect(roleAfterDelete).toBeNull();
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
@@ -111,14 +107,8 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
       spaceId: space.id,
       assigneeUserIds: [nonAdminUser.id]
     });
-
-    const roleAssignment: RoleAssignment = {
-      roleId: role.id,
-      userId: nonAdminUser.id
-    };
-
     const userCookie = await loginUser(nonAdminUser.id);
 
-    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', userCookie).query(roleAssignment).expect(401);
+    await request(baseUrl).delete(`/api/roles/${role.id}`).set('Cookie', userCookie).expect(401);
   });
 });
