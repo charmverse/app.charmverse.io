@@ -14,7 +14,6 @@ import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
