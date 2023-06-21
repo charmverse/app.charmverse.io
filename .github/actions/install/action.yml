@@ -31,6 +31,7 @@ runs:
       run: npm ci --no-audit --no-fund
 
     - name: Upgrade to specific version of Core package
+      shell: bash
       if: ${{ inputs.core_pkg_version }}
       run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
