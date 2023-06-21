@@ -118,7 +118,7 @@ describe('createProSubscription', () => {
       items: [
         {
           price: priceId,
-          quantity: 1
+          quantity: 10
         }
       ],
       payment_settings: {

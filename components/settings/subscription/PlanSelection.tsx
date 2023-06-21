@@ -49,20 +49,20 @@ export function PlanSelection({
       <Stack>
         <InputLabel>Usage</InputLabel>
         <Stack spacing={2} direction='row' alignItems='center' mx={2} mb={1}>
-          <Typography>${communityProduct.pricing[period]}/mo</Typography>
+          <Typography>${(communityProduct.pricing[period] ?? 0) * 10}/mo</Typography>
           <Slider
             disabled={disabled}
             size='small'
             aria-label='Quantity slider'
             valueLabelDisplay='off'
             value={blockQuota}
-            step={1}
-            min={1}
-            max={50}
+            step={10}
+            min={10}
+            max={500}
             onChange={(_, value) => onSelect(value as number, null)}
             onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
-          <Typography>${(communityProduct.pricing[period] ?? 0) * 50}/mo</Typography>
+          <Typography>${(communityProduct.pricing[period] ?? 0) * 500}/mo</Typography>
         </Stack>
       </Stack>
       <Stack

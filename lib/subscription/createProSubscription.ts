@@ -97,7 +97,10 @@ export async function createProSubscription({
     throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
   }
 
-  const productPrice = prices.find((price) => price.recurring?.interval === stripePeriod);
+  const productPrice = prices.find(
+    (price) =>
+      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 10 === communityProduct.pricing[period]
+  );
 
   if (!productPrice) {
     throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
@@ -125,10 +128,6 @@ export async function createProSubscription({
           }
         ],
         coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent']
       });
     } else {

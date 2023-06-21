@@ -96,7 +96,7 @@ export function CheckoutForm({
     }
   );
 
-  const changePaymentType = (event: SyntheticEvent, newValue: PaymentType) => {
+  const changePaymentType = (_event: SyntheticEvent, newValue: PaymentType) => {
     setPaymentType(newValue);
   };
 
@@ -248,7 +248,7 @@ export function CheckoutForm({
                   <Typography>Total</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>${(communityProduct.pricing[period] ?? 0) * 12 * blockQuota}</Typography>
+                  <Typography>${(communityProduct.pricing[period] ?? 0) * blockQuota}</Typography>
                 </Stack>
               </Stack>
               <PaymentTabPanel value={paymentType} index='card'>

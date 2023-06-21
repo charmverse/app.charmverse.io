@@ -46,7 +46,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   );
 
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
-  const [blockQuota, setblockQuota] = useState(1);
+  const [blockQuota, setblockQuota] = useState(10);
 
   useEffect(() => {
     charmClient.track.trackAction('view_subscription', {

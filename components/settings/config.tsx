@@ -25,16 +25,12 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <GroupAddOutlinedIcon fontSize='small' />, path: 'invites', label: 'Invites' },
   { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
-  { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Subscription' }
+  { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
 ];
 
 export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
   return SETTINGS_TABS.filter((settingsTab) =>
     settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') || space.paidTier === 'free' : true
-  ).map((settingsTab) =>
-    settingsTab.path === 'subscription'
-      ? { ...settingsTab, label: space.paidTier === 'free' ? 'Upgrade' : 'Plan & Billing' }
-      : settingsTab
   );
 }
 

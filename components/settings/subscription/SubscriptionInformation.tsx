@@ -109,7 +109,8 @@ export function SubscriptionInformation({
             K blocks
           </Typography>
           <Typography>
-            ${communityProduct.pricing[spaceSubscription.period]} per month billed {spaceSubscription.period}
+            ${(communityProduct.pricing[spaceSubscription.period] ?? 0) * spaceSubscription.blockQuota} per month billed{' '}
+            {spaceSubscription.period}
           </Typography>
           <Typography>Your plan renews on July 3, 2024</Typography>
           {status && <Typography>Status: {status}</Typography>}
