@@ -14,6 +14,7 @@ import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -37,11 +38,13 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { user } = useUser();
+  // only load drafts if user is logged in
   const {
     data: draftedPosts = [],
     isLoading: isDraftsLoading,
     mutate: mutateDraftPosts
-  } = useSWR(spaceId ? `${spaceId}/drafted-posts` : null, () =>
+  } = useSWR(spaceId && user ? `${spaceId}/drafted-posts` : null, () =>
     charmClient.forum.listDraftPosts({ spaceId: spaceId! })
   );
 
