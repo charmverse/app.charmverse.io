@@ -54,12 +54,11 @@ export async function createProSubscription({
     expand: ['data.customer']
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.[0];
+  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.find(
+    (sub) => sub.status === 'incomplete' && (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true
+  );
 
-  const existingStripeCustomer = pendingStripeSubscription.data?.find((sub) => {
-    const _customer = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
-    return _customer.deleted !== true && (sub.status === 'trialing' || sub.status === 'incomplete');
-  })?.customer as Stripe.Customer | undefined;
+  const existingStripeCustomer = existingStripeSubscription?.customer as Stripe.Customer | undefined;
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
