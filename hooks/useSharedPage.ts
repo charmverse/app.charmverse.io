@@ -54,7 +54,8 @@ export const useSharedPage = () => {
     }
 
     return !loadedSpace;
-  }, [spacesLoaded, isPublicPath, spaces, spaceDomain]);
+  }, [spacesLoaded, isPublicPath, loadedSpace]);
+
   const {
     data: publicPage,
     isLoading: isPublicPageLoading,
