@@ -3,24 +3,13 @@ import { getSpaceDomainFromName } from 'lib/spaces/utils';
 
 async function getInvalidSpaceDomains() {
   const spaces = await prisma.space.findMany({});
-  const invalidCharacterSpaces = await prisma.space.findMany({
-    where: {
-      OR: [
-        { domain: {  contains: '.' } },
-        { domain: {  contains: ' ' } },
-      ]
-    },
-    select: { domain: true }
-  });
-  const invalidCharacterDomains = invalidCharacterSpaces.map(space => space.domain);
-
   const spaceMap: Record<string, number> = {};
-  const wrongCaseDomains: string[] = [];
+  const invalidSpaceDomains: string[] = [];
 
   for (const space of spaces) {
     const domain = getSpaceDomainFromName(space.domain);
     if (domain !== space.domain) {
-      wrongCaseDomains.push(space.domain);
+      invalidSpaceDomains.push(space.domain);
     }
 
     if (spaceMap[domain]) {
@@ -33,10 +22,10 @@ async function getInvalidSpaceDomains() {
     spaceMap[domain] = 1;
   }
 
-  console.log('🔥 number of invalid space domains:', wrongCaseDomains.length);
-  console.log('🔥 invalid space domains:', wrongCaseDomains);
+  console.log('🔥 number of invalid space domains:', invalidSpaceDomains.length);
+  console.log('🔥 invalid space domains:', invalidSpaceDomains);
 
-  return [...new Set([ ...wrongCaseDomains, ...invalidCharacterDomains])];
+  return invalidSpaceDomains;
 }
 
 async function fixSpaceDomainNames() {
