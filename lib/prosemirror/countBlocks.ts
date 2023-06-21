@@ -48,13 +48,13 @@ export function countBlocks(pageContent: any | null, spaceId?: string) {
       }
     } catch (error) {
       // assume that spaceId is passed if we care about logging
-      // if (spaceId) {
-      log.error('Error counting prosemirror blocks', {
-        error,
-        pageContent,
-        spaceId
-      });
-      //  }
+      if (spaceId) {
+        log.error('Error counting prosemirror blocks', {
+          error,
+          pageContent,
+          spaceId
+        });
+      }
     }
   }
   return count;
