@@ -26,7 +26,7 @@ const io = new Server(server, {
       if (
         requestOrigin?.endsWith('.charmverse.co') ||
         requestOrigin?.endsWith('.charmverse.io') ||
-        requestOrigin?.endsWith('wiki.0xepicode.com') // TEMP for demo
+        requestOrigin?.endsWith('.0xepicode.com') // TEMP for demo
       ) {
         callback(null, requestOrigin);
       } else if (isDevEnv) {
