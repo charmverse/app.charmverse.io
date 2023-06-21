@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
@@ -24,6 +25,8 @@ class AllowedOriginsCache {
     const customOrigins = spaceCustomDomains.map((space) => space.customDomain).filter(isTruthy);
 
     this.allowedOrigins = [...DEFAULT_ORIGINS, ...customOrigins];
+
+    log.debug('Allowed origins refreshed', { allowedOrigins: this.allowedOrigins });
   }
 }
 
