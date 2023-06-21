@@ -99,7 +99,7 @@ export async function createProSubscription({
 
   const productPrice = prices.find(
     (price) =>
-      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 10 === communityProduct.pricing[period]
+      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 100 === communityProduct.pricing[period]
   );
 
   if (!productPrice) {

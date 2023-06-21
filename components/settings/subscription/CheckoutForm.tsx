@@ -97,7 +97,9 @@ export function CheckoutForm({
   );
 
   const changePaymentType = (_event: SyntheticEvent, newValue: PaymentType) => {
-    setPaymentType(newValue);
+    if (newValue !== null) {
+      setPaymentType(newValue);
+    }
   };
 
   useEffect(() => {
@@ -211,7 +213,7 @@ export function CheckoutForm({
               Billing Information
             </Typography>
             <Stack gap={0.5} my={2}>
-              <InputLabel>Email</InputLabel>
+              <InputLabel>Email (required)</InputLabel>
               <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('email')} />
             </Stack>
           </Stack>
