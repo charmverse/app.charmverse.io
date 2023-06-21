@@ -358,7 +358,7 @@ export async function generateImportWorkspacePages({
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
-          spaceId: space.id,
+          spaceId: bountyPermission.spaceId ? space.id : null,
           bountyId: oldNewPageIdHashMap[node.id]
         });
       });
