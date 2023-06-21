@@ -6,7 +6,6 @@ const fileName = `./.next/trace`;
 const pathName = path.join(process.cwd(), fileName);
 function readJson(): Promise<any[]> {
   return fs.readFile(pathName).then((file) => {
-    console.log(file.toString().indexOf(']\n['));
     const json = JSON.parse(`{"traces": [${file.toString().replaceAll(']\n[', '],[')}] }`);
     return json.traces.flat();
   });
