@@ -7,6 +7,7 @@ import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
 import { appEnv, isDevEnv } from 'config/constants';
+import { allowedOriginsCache } from 'lib/middleware/allowedOriginsCache';
 import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 
@@ -22,10 +23,12 @@ const io = new Server(server, {
     allowedHeaders: ['authorization'],
     credentials: true,
     origin: (requestOrigin, callback) => {
-      // support any subdomain for staging
-      if (requestOrigin?.endsWith('.charmverse.co') || requestOrigin?.endsWith('.charmverse.io')) {
+      if (isDevEnv) {
         callback(null, requestOrigin);
-      } else if (isDevEnv) {
+      } else if (!allowedOriginsCache.allowedOrigins) {
+        // custom origins did not load yet, allow all origins temporarily
+        callback(null, '*');
+      } else if (allowedOriginsCache.allowedOrigins.some((origin) => requestOrigin?.endsWith(origin))) {
         callback(null, requestOrigin);
       } else {
         callback(new Error('Not allowed by CORS'));
