@@ -34,23 +34,21 @@ export async function updateProSubscription({
     await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
       cancel_at_period_end: payload.status === 'cancelAtEnd'
     });
-  }
 
-  if (email) {
-    await stripeClient.customers.update(spaceSubscription.customerId, {
-      email: payload.email
-    });
-  }
-
-  if (restPayload && Object.keys(restPayload).length > 0) {
     await prisma.stripeSubscription.update({
       where: {
         id: spaceSubscription.id,
         spaceId
       },
       data: {
-        ...payload
+        status: payload.status
       }
+    });
+  }
+
+  if (email) {
+    await stripeClient.customers.update(spaceSubscription.customerId, {
+      email: payload.email
     });
   }
 }
