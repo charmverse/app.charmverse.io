@@ -35,6 +35,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   showTooltip?: boolean;
   wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
 };
 
 function PropertyValueElement(props: Props) {
@@ -184,7 +185,8 @@ function PropertyValueElement(props: Props) {
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
     spellCheck: propertyTemplate.type === 'text',
-    wrapColumn: props.wrapColumn ?? false
+    wrapColumn: props.wrapColumn ?? false,
+    columnRef: props.columnRef
   };
 
   if (editableFields.includes(propertyTemplate.type)) {

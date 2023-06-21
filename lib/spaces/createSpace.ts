@@ -22,7 +22,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
-import { countSpaceBlocks, countSpaceBlocksAndSave } from './countSpaceBlocks';
+import { countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -57,7 +57,7 @@ export async function createWorkspace({
   spaceTemplate = 'default',
   extraAdmins = []
 }: CreateSpaceProps) {
-  let domain = spaceData.domain;
+  let domain = spaceData.domain?.toLowerCase();
 
   if (!domain) {
     domain = await getAvailableDomainName(spaceData.name);
