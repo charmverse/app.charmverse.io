@@ -1,4 +1,5 @@
 import type { Space, SubscriptionPeriod } from '@charmverse/core/prisma';
+import { useTheme } from '@emotion/react';
 import Typography from '@mui/material/Typography';
 import { Stack } from '@mui/system';
 import { Elements } from '@stripe/react-stripe-js';
@@ -120,6 +121,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   };
 
+  const theme = useTheme();
+
   const stripePromise = loadStripe();
 
   if (!showCheckoutForm) {
@@ -166,7 +169,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           <Elements
             stripe={stripePromise}
             options={{
-              clientSecret: initialSubscriptionData.clientSecret
+              clientSecret: initialSubscriptionData.clientSecret,
+              appearance: {
+                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+              }
             }}
           >
             <CheckoutForm

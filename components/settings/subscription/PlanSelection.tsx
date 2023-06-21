@@ -1,4 +1,5 @@
 import type { SubscriptionPeriod } from '@charmverse/core/prisma-client';
+import { useTheme } from '@emotion/react';
 import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
@@ -22,6 +23,8 @@ export function PlanSelection({
   period: SubscriptionPeriod;
   blockQuota: number;
 }) {
+  const theme = useTheme();
+
   return (
     <>
       <Stack my={2}>
@@ -70,7 +73,7 @@ export function PlanSelection({
         maxWidth='400px'
         padding={2}
         mt={2}
-        sx={{ border: '1px solid #000' }}
+        sx={{ border: `1px solid ${theme.palette.secondary.main}` }}
       >
         <Stack>
           <Typography variant='h6' mb={2}>
