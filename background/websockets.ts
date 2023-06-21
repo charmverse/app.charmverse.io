@@ -1,3 +1,6 @@
+// init app instrumentation
+import './server/datadog';
+
 import { createServer } from 'http';
 
 import { log } from '@charmverse/core/log';
