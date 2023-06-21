@@ -80,6 +80,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
           expand: ['plan']
         });
+        const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
 
         const spaceId = stripeSubscription.metadata.spaceId;
         // @ts-ignore The plan exists
@@ -121,7 +122,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: stripeSubscription.metadata.tier as SubscriptionTier
+              paidTier
             }
           })
         ]);
@@ -157,7 +158,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           {
             type: 'space_subscription',
             payload: {
-              type: 'activated'
+              type: 'activated',
+              paidTier
             }
           },
           spaceId
@@ -204,7 +206,9 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             {
               type: 'space_subscription',
               payload: {
-                type: 'updated'
+                type: 'updated',
+                // TODO: Update the paid tier
+                paidTier: null
               }
             },
             spaceId
@@ -259,7 +263,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           {
             type: 'space_subscription',
             payload: {
-              type: 'cancelled'
+              type: 'cancelled',
+              paidTier: 'free'
             }
           },
           spaceId

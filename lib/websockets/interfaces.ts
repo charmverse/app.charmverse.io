@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
+import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
@@ -105,6 +105,7 @@ type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
     type: 'activated' | 'cancelled' | 'updated';
+    paidTier: SubscriptionTier | null;
   };
 };
 
