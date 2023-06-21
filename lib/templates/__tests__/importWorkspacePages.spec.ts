@@ -7,7 +7,7 @@ import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
@@ -24,7 +24,7 @@ let totalSourcePages = 0;
 let totalSourceBlocks = 0;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   space = generated.space;
   user = generated.user;
 
@@ -73,7 +73,7 @@ beforeAll(async () => {
 
 describe('importWorkspacePages', () => {
   it('should import data from the export function into the target workspace', async () => {
-    const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
+    const { space: targetSpace } = await generateUserAndSpace();
 
     const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain
@@ -101,7 +101,7 @@ describe('importWorkspacePages', () => {
   });
 
   it('should accept a filename as the source data input', async () => {
-    const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
+    const { space: targetSpace } = await generateUserAndSpace();
 
     const exportName = `test-${v4()}`;
 
