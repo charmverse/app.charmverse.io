@@ -47,7 +47,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     userId: req.botUser.id
   });
 
-  premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',
     pageId: card.id
   });
