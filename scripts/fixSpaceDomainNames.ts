@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getSpaceDomainFromName } from 'lib/spaces/utils';
 
 async function getInvalidSpaceDomains() {
   const spaces = await prisma.space.findMany({});
@@ -17,7 +18,7 @@ async function getInvalidSpaceDomains() {
   const wrongCaseDomains: string[] = [];
 
   for (const space of spaces) {
-    const domain = space.domain.toLowerCase();
+    const domain = getSpaceDomainFromName(space.domain);
     if (domain !== space.domain) {
       wrongCaseDomains.push(space.domain);
     }
@@ -33,8 +34,9 @@ async function getInvalidSpaceDomains() {
   }
 
   console.log('🔥 number of invalid space domains:', wrongCaseDomains.length);
+  console.log('🔥 invalid space domains:', wrongCaseDomains);
 
-  return [...new Set([ ...invalidCharacterDomains])];
+  return [...new Set([ ...wrongCaseDomains, ...invalidCharacterDomains])];
 }
 
 async function fixSpaceDomainNames() {
