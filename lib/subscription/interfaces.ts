@@ -37,4 +37,6 @@ export type CreateCryptoSubscriptionRequest = {
   email: string;
 };
 
-export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>>;
+export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>> & {
+  email?: string;
+};

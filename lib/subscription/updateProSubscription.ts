@@ -12,6 +12,7 @@ export async function updateProSubscription({
   spaceId: string;
   payload: UpdateSubscriptionRequest;
 }) {
+  const { email, ...restPayload } = payload;
   const spaceSubscription = await prisma.stripeSubscription.findFirst({
     where: {
       spaceId,
@@ -35,13 +36,21 @@ export async function updateProSubscription({
     });
   }
 
-  await prisma.stripeSubscription.update({
-    where: {
-      id: spaceSubscription.id,
-      spaceId
-    },
-    data: {
-      ...payload
-    }
-  });
+  if (email) {
+    await stripeClient.customers.update(spaceSubscription.customerId, {
+      email: payload.email
+    });
+  }
+
+  if (restPayload && Object.keys(restPayload).length > 0) {
+    await prisma.stripeSubscription.update({
+      where: {
+        id: spaceSubscription.id,
+        spaceId
+      },
+      data: {
+        ...payload
+      }
+    });
+  }
 }
