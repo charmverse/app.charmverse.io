@@ -3,7 +3,6 @@ import { useTheme } from '@emotion/react';
 import { List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
@@ -18,6 +17,7 @@ import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { loadStripe } from './loadStripe';
 import { PlanSelection } from './PlanSelection';
 import { SubscriptionActions } from './SubscriptionActions';
@@ -27,14 +27,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
   const { setSpace } = useSpaces();
 
-  const {
-    data: spaceSubscription,
-    isLoading,
-    mutate: refetchSpaceSubscription
-  } = useSWR(`${space.id}-subscription`, () => charmClient.subscription.getSpaceSubscription({ spaceId: space.id }), {
-    shouldRetryOnError: false,
-    revalidateOnFocus: false
-  });
+  const { spaceSubscription, isLoading, refetchSpaceSubscription } = useSpaceSubscription();
 
   const { trigger: updateSpaceSubscription, isMutating: isLoadingUpdate } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
@@ -43,9 +36,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     {
       onError() {
         showMessage('Updating failed! Please try again', 'error');
-      },
-      async onSuccess() {
-        await refetchSpaceSubscription();
       }
     }
   );
