@@ -38,7 +38,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
       .send({
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(401);
   });
@@ -58,7 +58,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
       .send({
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(400);
   });

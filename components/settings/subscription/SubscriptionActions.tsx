@@ -8,14 +8,12 @@ import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 export function SubscriptionActions({
   spaceSubscription,
   loading,
-  onCreate,
   onDelete,
   onCancelAtEnd,
   onReactivation
 }: {
   spaceSubscription: SpaceSubscription | null | undefined;
   loading: boolean;
-  onCreate: () => void;
   onDelete: () => void;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
@@ -28,11 +26,6 @@ export function SubscriptionActions({
 
   return (
     <Stack flexDirection='row' gap={1} mb={1}>
-      {spaceSubscription === null && (
-        <Button disabled={loading} sx={{ width: 'fit-content' }} onClick={onCreate}>
-          Create a Plan
-        </Button>
-      )}
       {spaceSubscription?.status === 'cancelAtEnd' && (
         <Button disabled={loading} onClick={onReactivation} variant='outlined'>
           Reactivate Plan

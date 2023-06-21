@@ -5,20 +5,21 @@ import type { Stripe } from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
-import type { CreateSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
+import { communityProduct } from './constants';
+import type { CreateProSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
 import { stripeClient } from './stripe';
 
 export async function createProSubscription({
   spaceId,
   period,
-  productId,
+  blockQuota,
   billingEmail,
   name,
   address,
   coupon = ''
 }: {
   spaceId: string;
-} & CreateSubscriptionRequest): Promise<ProSubscriptionResponse> {
+} & CreateProSubscriptionRequest): Promise<ProSubscriptionResponse> {
   const space = await prisma.space.findUnique({
     where: { id: spaceId },
     select: {
@@ -27,6 +28,8 @@ export async function createProSubscription({
       name: true
     }
   });
+
+  const productId = communityProduct.id;
 
   if (!space) {
     throw new NotFoundError('Space not found');
@@ -42,34 +45,16 @@ export async function createProSubscription({
     }
   });
 
-  const activeSpaceSubscription = spaceSubscription?.productId === productId && spaceSubscription.period === period;
-
-  if (activeSpaceSubscription) {
-    throw new InvalidStateError(
-      `Space already has an active subscription with the id ${spaceSubscription.id} with the same product price`
-    );
-  }
-
-  // Find an existing customer, otherwise create it
-  const existingSpaceCustomer = spaceSubscription
-    ? await stripeClient.customers.retrieve(spaceSubscription.customerId)
-    : null;
-
-  if (existingSpaceCustomer && !existingSpaceCustomer?.deleted) {
-    await stripeClient.customers.update(existingSpaceCustomer.id, {
-      metadata: {
-        spaceId: space.id
-      },
-      address,
-      name: name || space.name,
-      email: billingEmail
-    });
+  if (spaceSubscription) {
+    throw new InvalidStateError(`Space already has an active subscription with the id ${spaceSubscription.id}`);
   }
 
   const pendingStripeSubscription = await stripeClient.subscriptions.search({
     query: `metadata['spaceId']:'${spaceId}'`,
     expand: ['data.customer']
   });
+
+  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.[0];
 
   const existingStripeCustomer = pendingStripeSubscription.data?.find((sub) => {
     const _customer = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
@@ -82,14 +67,13 @@ export async function createProSubscription({
       metadata: {
         spaceId: space.id
       },
-      address,
       name: name || space.name,
-      email: billingEmail
+      ...(address && { address }),
+      ...(billingEmail && { email: billingEmail })
     });
   }
 
   const customer =
-    existingSpaceCustomer ||
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
@@ -110,51 +94,42 @@ export async function createProSubscription({
   });
 
   if (prices?.length === 0) {
-    throw new InvalidStateError(`No prices found in Stripe for the product ${productId}`);
+    throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
   }
 
   const productPrice = prices.find((price) => price.recurring?.interval === stripePeriod);
 
   if (!productPrice) {
-    throw new InvalidStateError(`No price  ${productId}`);
+    throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
   }
 
   let subscription: Stripe.Subscription | undefined;
   try {
-    // Case if user downgrades or upgrades or user has an expired subscription and purchases again
-    if (spaceSubscription && (spaceSubscription.productId !== productId || spaceSubscription.period !== period)) {
-      const oldSubscription = await stripeClient.subscriptions.retrieve(spaceSubscription.subscriptionId);
-      subscription = await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+    // Case when the user is updating his subscription in checkout
+    if (
+      existingStripeSubscription &&
+      (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
+    ) {
+      subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
         metadata: {
           productId,
           period,
           tier: 'pro',
           spaceId: space.id
         },
+        items: [
+          {
+            id: existingStripeSubscription.items.data[0].id,
+            price: productPrice.id,
+            quantity: blockQuota
+          }
+        ],
         coupon,
         payment_settings: {
           save_default_payment_method: 'on_subscription'
         },
-        expand: ['latest_invoice.payment_intent'],
-        cancel_at_period_end: false,
-        proration_behavior: 'create_prorations',
-        items: [
-          {
-            id: oldSubscription.items.data[0].id,
-            price: productPrice.id
-          }
-        ]
-      });
-      await prisma.stripeSubscription.update({
-        where: {
-          id: spaceSubscription.id
-        },
-        data: {
-          period,
-          productId,
-          priceId: productPrice.id,
-          deletedAt: null
-        }
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent']
       });
     } else {
       subscription = await stripeClient.subscriptions.create({
@@ -167,7 +142,8 @@ export async function createProSubscription({
         customer: customer.id,
         items: [
           {
-            price: productPrice.id
+            price: productPrice.id,
+            quantity: blockQuota
           }
         ],
         coupon,
@@ -194,14 +170,19 @@ export async function createProSubscription({
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
 
+  if (!paymentIntent?.client_secret) {
+    throw new ExternalServiceError('Failed to create subscription. The client secret is missing.');
+  }
+
   return {
     subscriptionId: subscription.id,
     priceId: productPrice.id,
     productId,
+    blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent?.id,
-    paymentIntentStatus: paymentIntent?.status,
-    clientSecret: paymentIntent?.client_secret || undefined
+    paymentIntentId: paymentIntent.id,
+    paymentIntentStatus: paymentIntent.status,
+    clientSecret: paymentIntent.client_secret
   };
 }

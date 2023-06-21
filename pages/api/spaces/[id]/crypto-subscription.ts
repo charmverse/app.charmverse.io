@@ -4,13 +4,13 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createCryptoSubscription } from 'lib/subscription/createCryptoSubscription';
-import type { CreateCryptoSubscriptionResponse, CreateSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { CreateCryptoSubscriptionRequest, CreateCryptoSubscriptionResponse } from 'lib/subscription/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['period', 'productId', 'billingEmail'], 'body'))
+  .use(requireKeys(['subscriptionId', 'email'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createCryptoSubscriptionIntent);
 
@@ -18,17 +18,11 @@ async function createCryptoSubscriptionIntent(
   req: NextApiRequest,
   res: NextApiResponse<CreateCryptoSubscriptionResponse>
 ) {
-  const { id: spaceId } = req.query as { id: string };
-  const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
+  const { email, subscriptionId } = req.body as CreateCryptoSubscriptionRequest;
 
   const cryptoUrl = await createCryptoSubscription({
-    spaceId,
-    period,
-    productId,
-    billingEmail,
-    name,
-    address,
-    coupon
+    subscriptionId,
+    email
   });
 
   res.status(200).json(cryptoUrl);

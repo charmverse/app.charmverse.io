@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
+import { communityProduct } from '../constants';
 import { getSpaceSubscription } from '../getSpaceSubscription';
 
 describe('getSpaceSubscription', () => {
@@ -24,7 +25,7 @@ describe('getSpaceSubscription', () => {
       subscriptionId,
       createdBy: user.id,
       period: 'monthly',
-      productId: 'community_5k'
+      productId: communityProduct.id
     });
 
     const spaceSubscription = await getSpaceSubscription({ spaceId: space.id });
@@ -34,7 +35,7 @@ describe('getSpaceSubscription', () => {
         subscriptionId,
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k'
+        productId: 'community'
       })
     );
   });

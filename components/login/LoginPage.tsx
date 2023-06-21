@@ -53,10 +53,14 @@ export function LoginPageView() {
 
   useEffect(() => {
     const account = router.query.account;
+    const subscription = router.query.subscription;
 
     if (!isSettingsDialogOpen && router.isReady) {
       if (account) {
         openSettingsModal('account');
+      }
+      if (subscription) {
+        openSettingsModal('subscription');
       }
     }
   }, [
