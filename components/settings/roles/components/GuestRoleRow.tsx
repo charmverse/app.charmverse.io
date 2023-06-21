@@ -28,7 +28,7 @@ export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
       members={guests}
       eligibleMembers={eligibleMembers}
       onAddMembers={!readOnly ? makeGuest : undefined}
-      upgradeContext='inviteGuests'
+      upgradeContext='invite_guests'
     />
   );
 }

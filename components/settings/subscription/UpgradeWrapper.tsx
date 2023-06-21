@@ -8,14 +8,14 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 export const upgradeMessages = {
-  pagePermissions: 'Upgrade to a paid plan to change page permissions',
-  forumPermissions: 'Upgrade to a paid plan to change forum permissions',
-  proposalPermissions: 'Upgrade to a paid plan to change proposal permissions',
-  bountyPermissions: 'Upgrade to a paid plan to change bounty permissions',
-  customRoles: 'Upgrade to a paid plan to use custom roles',
-  inviteGuests: 'Upgrade to a paid plan to invite members with guest-level access',
-  customiseMemberProperty: 'Upgrade to a paid plan to use this member property',
-  apiAccess: 'Upgrade to a paid plan to get access to the API'
+  page_permissions: 'Upgrade to a paid plan to change page permissions',
+  forum_permissions: 'Upgrade to a paid plan to change forum permissions',
+  proposal_permissions: 'Upgrade to a paid plan to change proposal permissions',
+  bounty_permissions: 'Upgrade to a paid plan to change bounty permissions',
+  custom_roles: 'Upgrade to a paid plan to use custom roles',
+  invite_guests: 'Upgrade to a paid plan to invite members with guest-level access',
+  customise_member_property: 'Upgrade to a paid plan to use this member property',
+  api_access: 'Upgrade to a paid plan to get access to the API'
 };
 
 export type UpgradeContext = keyof typeof upgradeMessages;

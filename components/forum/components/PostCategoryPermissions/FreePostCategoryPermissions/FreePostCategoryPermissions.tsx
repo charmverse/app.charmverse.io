@@ -28,12 +28,12 @@ export function FreePostCategoryPermissions({ postCategoryId }: Props) {
           postCategoryId={postCategoryId}
           defaultPermissionLevel='full_access'
           assignee={{ group: 'space', id: space?.id as string }}
-          disabledTooltip={upgradeMessages.forumPermissions}
+          disabledTooltip={upgradeMessages.forum_permissions}
         />
       </Grid>
 
       <Grid item xs={12}>
-        <UpgradeWrapper upgradeContext='customRoles'>
+        <UpgradeWrapper upgradeContext='forum_permissions'>
           <AddRolesRow disabled />
         </UpgradeWrapper>
       </Grid>

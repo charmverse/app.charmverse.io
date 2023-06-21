@@ -20,8 +20,8 @@ export function SharePostCategoryToWeb({ disabled, isChecked, disabledTooltip, o
 
         <Tooltip title={disabledTooltip && disabled ? disabledTooltip : ''}>
           <Box display='flex' alignItems='center'>
-            <UpgradeChip upgradeContext='forumPermissions' />
-            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'forumPermissions' : undefined}>
+            <UpgradeChip upgradeContext='forum_permissions' />
+            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'forum_permissions' : undefined}>
               <Switch data-test='toggle-public-page' checked={isChecked} disabled={disabled} onChange={onChange} />
             </UpgradeWrapper>
           </Box>

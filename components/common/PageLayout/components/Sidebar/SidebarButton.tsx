@@ -66,13 +66,13 @@ export function SidebarLink({
   return (
     <StyledSidebarLink {...props}>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', width: '100%' }}>
-        <Box sx={{ justifyContent: 'flex-start', display: 'flex' }}>
+        <div style={{ justifyContent: 'flex-start', display: 'flex' }}>
           {icon}
           {label}
-        </Box>
+        </div>
         {section && premiumSettingSections.includes(section) && (
           <span style={{ paddingLeft: 10 }}>
-            <UpgradeChip upgradeContext='customRoles' />
+            <UpgradeChip upgradeContext='custom_roles' />
           </span>
         )}
       </Box>

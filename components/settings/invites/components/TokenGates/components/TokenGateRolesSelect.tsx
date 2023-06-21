@@ -66,7 +66,7 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
   if (isFreeSpace) {
     return (
       <Box display='flex' justifyContent='center'>
-        <UpgradeChip upgradeContext='customRoles' />
+        <UpgradeChip upgradeContext='custom_roles' />
       </Box>
     );
   }

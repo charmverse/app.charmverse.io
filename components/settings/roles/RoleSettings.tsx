@@ -71,8 +71,8 @@ export function RoleSettings({ space }: { space: Space }) {
         Roles
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
-            <UpgradeChip upgradeContext='customRoles' />
-            <UpgradeWrapper upgradeContext='customRoles'>
+            <UpgradeChip upgradeContext='custom_roles' />
+            <UpgradeWrapper upgradeContext='custom_roles'>
               <Button
                 onClick={() => {
                   setAnchorEl(buttonRef?.current);
@@ -85,7 +85,7 @@ export function RoleSettings({ space }: { space: Space }) {
                 Import roles
               </Button>
             </UpgradeWrapper>
-            <UpgradeWrapper upgradeContext='customRoles'>
+            <UpgradeWrapper upgradeContext='custom_roles'>
               <Button onClick={showCreateRoleForm} disabled={isValidating || isFreeSpace}>
                 Add a role
               </Button>
@@ -104,7 +104,7 @@ export function RoleSettings({ space }: { space: Space }) {
 
       <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
         Custom roles
-        <UpgradeChip upgradeContext='customRoles' />
+        <UpgradeChip upgradeContext='custom_roles' />
       </Typography>
 
       <Typography variant='caption'>Custom role permissions override Default.</Typography>

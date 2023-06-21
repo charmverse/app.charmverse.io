@@ -65,7 +65,7 @@ export function MemberPropertyItem({ type, name }: Props) {
         }}
       >
         {name ?? MEMBER_PROPERTY_CONFIG[type]?.label}
-        {PREMIUM_MEMBER_PROPERTIES.includes(type) && <UpgradeChip upgradeContext='customRoles' />}
+        {PREMIUM_MEMBER_PROPERTIES.includes(type) && <UpgradeChip upgradeContext='custom_roles' />}
       </ListItemText>
     </>
   );

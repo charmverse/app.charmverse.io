@@ -237,7 +237,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
           <Grid item xs={12} md={12}>
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Pages
-              <UpgradeChip upgradeContext='forumPermissions' />
+              <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             <PermissionToggle
               data-test='space-operation-createPage'
@@ -249,12 +249,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createPage', nowHasAccess);
               }}
-              upgradeContext='pagePermissions'
+              upgradeContext='page_permissions'
             />
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Bounties
-              <UpgradeChip upgradeContext='forumPermissions' />
+              <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             <PermissionToggle
               data-test='space-operation-createBounty'
@@ -266,12 +266,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createBounty', nowHasAccess);
               }}
-              upgradeContext='bountyPermissions'
+              upgradeContext='bounty_permissions'
             />
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Proposals
-              <UpgradeChip upgradeContext='forumPermissions' />
+              <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             <PermissionToggle
               data-test='space-operation-reviewProposals'
@@ -283,7 +283,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('reviewProposals', nowHasAccess);
               }}
-              upgradeContext='proposalPermissions'
+              upgradeContext='proposal_permissions'
             />
             <Typography sx={{ my: 1 }}>Access to categories</Typography>
             <Box display='flex' gap={3} mb={2}>
@@ -326,7 +326,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Forums
-              <UpgradeChip upgradeContext='forumPermissions' />
+              <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             {targetGroup !== 'space' && (
               <PermissionToggle

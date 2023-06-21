@@ -343,7 +343,7 @@ export async function isRoleSpaceOptedIn({ resourceId }: Resource): Promise<Spac
   });
 
   if (!role) {
-    throw new DataNotFoundError(resourceId);
+    throw new DataNotFoundError(`Role with id ${resourceId} not found`);
   }
 
   return getEngine(role.space);

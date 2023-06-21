@@ -108,7 +108,7 @@ export function DefaultPagePermissions() {
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
         <Typography>Default access level for Members</Typography>
         <Box display='flex' gap={1} alignItems='center'>
-          <UpgradeChip upgradeContext='pagePermissions' />
+          <UpgradeChip upgradeContext='page_permissions' />
           <Button
             color='secondary'
             variant='outlined'
@@ -130,7 +130,7 @@ export function DefaultPagePermissions() {
         }}
         control={
           <Box display='flex' gap={5.5} alignItems='center'>
-            <UpgradeChip upgradeContext='pagePermissions' />
+            <UpgradeChip upgradeContext='page_permissions' />
             <Switch
               disabled={!isAdmin || isFreeSpace}
               onChange={(ev) => {
@@ -155,7 +155,7 @@ export function DefaultPagePermissions() {
         }}
         control={
           <Box display='flex' gap={5.5} alignItems='center'>
-            <UpgradeChip upgradeContext='proposalPermissions' />
+            <UpgradeChip upgradeContext='proposal_permissions' />
             <Switch
               disabled={!isAdmin || isFreeSpace}
               onChange={(ev) => {
