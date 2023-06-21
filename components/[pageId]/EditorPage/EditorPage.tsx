@@ -45,6 +45,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   useEffect(() => {
     return () => {
       setCurrentPageId('');
+      resetPageProps();
     };
   }, []);
 
@@ -64,10 +65,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // pass editMode thru to fix hot-reloading which resets the prop
       setPageProps({ permissions: page.permissionFlags, editMode });
     }
-    return () => {
-      resetPageProps();
-    };
-  }, [page?.permissionFlags]);
+  }, [page?.permissionFlags.edit_content]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {

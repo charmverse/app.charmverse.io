@@ -86,12 +86,12 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'Custom Availability Zones',
-        value: 'us-east-1a,us-east-1b,us-east-1c'
+        value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
       },
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3.small'
+        value: 't3a.small,t3.small'
       },
       {
         // ALB health check

@@ -13,6 +13,7 @@ export type TextInputProps = EditableProps & {
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
 };
 
 const StyledInput = styled(InputBase)`
@@ -25,11 +26,18 @@ const StyledInput = styled(InputBase)`
 `;
 
 function Editable(
-  { multiline, wrapColumn, displayType, ..._props }: TextInputProps,
+  { multiline, columnRef, wrapColumn, displayType, ..._props }: TextInputProps,
   ref: React.Ref<Focusable>
 ): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
+
+  const memoizedHeight = React.useMemo(() => {
+    if (wrapColumn && columnRef?.current) {
+      return `${columnRef?.current?.clientHeight}px`;
+    }
+    return 'fit-content';
+  }, [wrapColumn, columnRef?.current]);
 
   // Keep it as before for card modal view
   if (displayType === 'details') {
@@ -51,7 +59,7 @@ function Editable(
       paperSx={{
         width: 350,
         p: 2,
-        height: wrapColumn ? 'calc(100vh - 32px)' : 'fit-content'
+        height: memoizedHeight
       }}
       popoverProps={{
         anchorOrigin: {
@@ -59,7 +67,7 @@ function Editable(
           horizontal: 'left'
         },
         transformOrigin: {
-          vertical: 'center',
+          vertical: 'bottom',
           horizontal: 'left'
         }
       }}

@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
+import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
+import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
 const discordUrl = `https://discord.com/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
@@ -23,11 +23,8 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
   };
 
   const host = req.headers.host;
-  const subdomain = getValidSubdomain(host);
-  const protocol = isProdEnv || isStagingEnv ? `https://` : `http://`;
-  const redirect = subdomain ? `${protocol}${host}${req.query.redirect}` : req.query.redirect;
-  const callbackDomain = subdomain ? `${protocol}${host?.replace(subdomain, 'app')}` : `${protocol}${host}`;
-  const callbackUrl = `${callbackDomain}/api/discord/callback`;
+  const redirect = getDiscordRedirectUrl(host, query.redirect);
+  const callbackUrl = getDiscordCallbackUrl(host);
 
   const state = encodeURIComponent(
     JSON.stringify({
