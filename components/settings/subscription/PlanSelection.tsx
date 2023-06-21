@@ -24,7 +24,7 @@ export function PlanSelection({
   blockQuota: number;
 }) {
   const theme = useTheme();
-
+  const periodNaming = period === 'annual' ? 'yr' : 'mo';
   return (
     <>
       <Stack my={2}>
@@ -49,7 +49,9 @@ export function PlanSelection({
       <Stack>
         <InputLabel>Usage</InputLabel>
         <Stack spacing={2} direction='row' alignItems='center' mx={2} mb={1}>
-          <Typography>${(communityProduct.pricing[period] ?? 0) * 10}/mo</Typography>
+          <Typography>
+            ${(communityProduct.pricing[period] ?? 0) * 10}/{periodNaming}
+          </Typography>
           <Slider
             disabled={disabled}
             size='small'
@@ -62,7 +64,9 @@ export function PlanSelection({
             onChange={(_, value) => onSelect(value as number, null)}
             onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
-          <Typography>${(communityProduct.pricing[period] ?? 0) * 500}/mo</Typography>
+          <Typography>
+            ${(communityProduct.pricing[period] ?? 0) * 500}/{periodNaming}
+          </Typography>
         </Stack>
       </Stack>
       <Stack
@@ -79,8 +83,8 @@ export function PlanSelection({
           <Typography variant='h6' mb={2}>
             Current selection
           </Typography>
-          <Typography>{`$${(communityProduct.pricing[period] ?? 0) * blockQuota}/mo`}</Typography>
-          <Typography>{`${communityProduct.blockLimit * blockQuota} blocks`}</Typography>
+          <Typography>{`$${(communityProduct.pricing[period] ?? 0) * blockQuota}/${periodNaming}`}</Typography>
+          <Typography>{`${String(communityProduct.blockLimit * blockQuota).slice(0, -3)}K blocks`}</Typography>
         </Stack>
         <Stack>
           <AiOutlineUnlock size={100} />
