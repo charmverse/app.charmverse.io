@@ -1,6 +1,6 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { SubscriptionTier } from '@charmverse/core/prisma-client';
+import type { Prisma, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
@@ -96,16 +96,21 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const period = subscriptionPlan.interval === 'month' ? ('monthly' as const) : ('annual' as const);
         const productId = subscriptionPlan.product as string;
 
-        const newData = {
+        // console.log({ stripeEvent: JSON.stringify(event, null, 2) });
+
+        const newData: Omit<Prisma.StripeSubscriptionCreateInput, 'space' | 'status'> = {
           customerId: invoice.customer as string,
           subscriptionId: invoice.subscription as string,
           period,
           productId: subscriptionPlan.product as string,
           priceId: subscriptionPlan.id as string,
-          spaceId,
-          status: 'active' as const,
           deletedAt: null
         };
+
+        const isFreeTrial =
+          !Number.isNaN(stripeSubscription.trial_end) &&
+          (stripeSubscription.trial_end as number) * 1000 > Date.now() &&
+          invoice.total === 0;
 
         await prisma.$transaction([
           prisma.stripeSubscription.upsert({
@@ -113,8 +118,16 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               subscriptionId: stripeSubscription.id,
               spaceId
             },
-            create: newData,
-            update: newData
+            create: {
+              ...newData,
+              space: { connect: { id: spaceId } },
+              status: isFreeTrial ? 'free_trial' : 'active'
+            },
+            update: {
+              ...newData,
+              // Always reactivate subscriptions when an invoice payment is received
+              status: 'active'
+            }
           }),
           prisma.space.update({
             where: {
