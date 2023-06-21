@@ -1,178 +1,102 @@
-import * as specs from 'testing/prosemirror';
+import type { NodeType, Builder } from 'testing/prosemirror';
+import { builders as _, jsonDoc } from 'testing/prosemirror';
 
 import { countBlocks } from '../countBlocks';
 
 describe('countBlocks()', () => {
-  it('Should extract first few text blocks', () => {
-    const contents = [specs.heading('Every'), specs.p('good')];
-    const node = specs.doc(...contents).toJSON();
-    const result = countBlocks(node);
-    expect(result).toBe(2);
+  it('Should return 0 for an empty doc', () => {
+    const doc = jsonDoc();
+    const result = countBlocks(doc);
+    expect(result).toBe(0);
   });
 
-  const content = {
-    type: 'doc',
-    content: [
-      {
-        type: 'heading',
-        attrs: { level: 3, track: [], collapseContent: null },
-        content: [
-          {
-            text: 'Please follow these onboarding steps:',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-15T21:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              }
-            ]
-          }
-        ]
-      },
-      { type: 'paragraph', attrs: { track: [] } },
-      {
-        type: 'blockquote',
-        attrs: { emoji: '1️⃣', track: [] },
-        content: [
-          {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Nunc faucibus lectus tellus, vitae ullamcorper ipsum placerat ac.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-16T12:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  { type: 'text-color', attrs: { color: null, bgColor: null } }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'blockquote',
-        attrs: { emoji: '2️⃣', track: [] },
-        content: [
-          {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Sed pretium, ipsum nec elementum porttitor, purus ipsum hendrerit elit, vitae semper dolor velit id ligula.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-16T12:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  { type: 'text-color', attrs: { color: null, bgColor: null } }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'blockquote',
-        attrs: { emoji: '3️⃣', track: [] },
-        content: [
-          {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Mauris iaculis dolor quis turpis consectetur, ut placerat odio sodales.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-16T12:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  { type: 'text-color', attrs: { color: null, bgColor: null } }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'blockquote',
-        attrs: { emoji: '4️⃣', track: [] },
-        content: [
-          {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Vivamus varius scelerisque nibh eu egestas. Suspendisse non cursus massa, ut suscipit velit. Phasellus gravida tempor efficitur.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-16T12:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  { type: 'text-color', attrs: { color: null, bgColor: null } }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'paragraph',
-        attrs: { track: [] },
-        content: [
-          {
-            type: 'hardBreak',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-15T21:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              }
-            ]
-          }
-        ]
-      },
-      { type: 'paragraph', attrs: { track: [] } }
-    ]
+  it('Should not fail, and instead return 0 for an invalid doc', () => {
+    const result = countBlocks('foobar');
+    expect(result).toBe(0);
+  });
+
+  it('Should count multiple nodes in one document', () => {
+    const nodes = [_.heading('some'), _.blockquote(_.p('some')), _.p(_.hardBreak()), _.img()];
+    const doc = jsonDoc(...nodes);
+    const result = countBlocks(doc);
+    expect(result).toBe(5);
+  });
+});
+
+describe('countBlocks() - all nodes', () => {
+  const expectedCounts = {
+    blockquote: 1,
+    bold: 0,
+    bookmark: 1,
+    bulletList: 1,
+    checkbox: 1,
+    code: 0,
+    codeBlock: 1,
+    columnLayout: 1,
+    columnBlock: 0,
+    cryptoPrice: 1,
+    date: 0,
+    deletion: 0,
+    disclosure: 0,
+    disclosureDetails: 1,
+    disclosureSummary: 0,
+    doc: 0,
+    emoji: 0,
+    emojiSuggest: 0,
+    file: 1,
+    format_change: 0,
+    hardBreak: 0,
+    heading: 1,
+    horizontalRule: 1,
+    iframe: 1,
+    image: 1,
+    in: 0,
+    'inline-comment': 0,
+    'inline-vote': 0,
+    'inline-command-palette-pale': 0,
+    'inline-command-palette-paletteMark': 0,
+    inlineDatabase: 1,
+    insertion: 0,
+    italic: 0,
+    label: 0,
+    link: 0,
+    listItem: 1,
+    mention: 0,
+    mentionSuggest: 0,
+    nestedPageSuggest: 0,
+    nft: 1,
+    orderedList: 1,
+    page: 1,
+    paragraph: 1,
+    pdf: 1,
+    poll: 1,
+    quote: 1,
+    strike: 0,
+    tabIndent: 0,
+    table: 1,
+    table_row: 1,
+    table_cell: 0,
+    table_header: 0,
+    tableOfContents: 1,
+    'text-color': 0,
+    tooltip: 0,
+    'tooltip-marker': 0,
+    tweet: 1,
+    video: 1,
+    underline: 0
   };
 
-  it('Should extract first few text blocks', () => {
-    const result = countBlocks(content);
-    expect(result).toBe(12);
+  const testedNodeTypes = Object.keys(_.schema.nodes)
+    .filter(
+      (nodeType) =>
+        nodeType !== 'doc' &&
+        // the builder for "text" type does not work
+        nodeType !== 'text'
+    )
+    .map((nodeType) => [nodeType, _[nodeType as NodeType]] as [NodeType, Builder]);
+
+  test.each(testedNodeTypes)('returns the correct result for node type: %s', (nodeType, builder) => {
+    const result = countBlocks(jsonDoc(builder()));
+    expect(result).toBe(expectedCounts[nodeType as keyof typeof expectedCounts]);
   });
 });

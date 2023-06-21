@@ -7,6 +7,7 @@ const INLINE_NODES_TO_IGNORE = [
   'bold',
   'code',
   'columnBlock',
+  'date',
   'deletion',
   'disclosureSummary',
   'doc',
@@ -40,16 +41,20 @@ export function countBlocks(pageContent: any | null, spaceId?: string) {
       const doc = getNodeFromJson(pageContent);
       if (doc) {
         doc.nodesBetween(0, doc.content.size, (node) => {
-          if (INLINE_NODES_TO_IGNORE.includes(node.type.name)) {
-            return false;
-          }
-          if (node.type) {
+          if (node.type && !INLINE_NODES_TO_IGNORE.includes(node.type.name)) {
             count += 1;
           }
         });
       }
     } catch (error) {
-      log.error('Error counting prosemirror blocks', { error, pageContent, spaceId });
+      // assume that spaceId is passed if we care about logging
+      // if (spaceId) {
+      log.error('Error counting prosemirror blocks', {
+        error,
+        pageContent,
+        spaceId
+      });
+      //  }
     }
   }
   return count;
