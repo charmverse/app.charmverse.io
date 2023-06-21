@@ -19,7 +19,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
-import { PostCategoryPermissionsDialog } from './permissions/PostCategoryPermissionsContainer';
+import { PostCategoryPermissionsDialog } from './PostCategoryPermissions/PostCategoryPermissionsContainer';
 
 type Props = {
   category: PostCategory;

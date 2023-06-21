@@ -9,8 +9,8 @@ import { usePostCategoryPermissionsList } from 'components/forum/hooks/usePostCa
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 
-import { AddRolesRow } from '../common/AddRolesRow';
-import { PostCategoryRolePermissionRow } from '../common/PostCategoryPermissionRow';
+import { AddRolesRow } from '../components/AddRolesRow';
+import { PostCategoryRolePermissionRow } from '../components/PostCategoryPermissionRow';
 
 import { PostCategoryPermissionsAddRoles } from './PostCategoryPermissionAddRolesDialog';
 

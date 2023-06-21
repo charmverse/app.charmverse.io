@@ -1,7 +1,7 @@
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
 import { usePostCategoryPermissionsList } from 'components/forum/hooks/usePostCategoryPermissionsList';
 
-import { SharePostCategoryToWeb } from '../common/SharePostCategoryToWeb';
+import { SharePostCategoryToWeb } from '../components/SharePostCategoryToWeb';
 
 type Props = {
   postCategoryId: string;

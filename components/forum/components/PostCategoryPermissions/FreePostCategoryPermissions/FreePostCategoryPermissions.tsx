@@ -3,8 +3,8 @@ import Grid from '@mui/material/Grid';
 import { UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
-import { AddRolesRow } from '../common/AddRolesRow';
-import { PostCategoryRolePermissionRow } from '../common/PostCategoryPermissionRow';
+import { AddRolesRow } from '../components/AddRolesRow';
+import { PostCategoryRolePermissionRow } from '../components/PostCategoryPermissionRow';
 
 /**
  * @permissions The actions a user can perform on a post category
