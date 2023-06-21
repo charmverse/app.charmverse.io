@@ -26,7 +26,7 @@ import { usePostDialog } from './hooks/usePostDialog';
 interface Props {
   post?: PostWithVotes | null;
   isLoading: boolean;
-  spaceId: string;
+  spaceId?: string;
   onClose: () => void;
   newPostCategory?: PostCategory | null;
 }
@@ -41,7 +41,9 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     data: draftedPosts = [],
     isLoading: isDraftsLoading,
     mutate: mutateDraftPosts
-  } = useSWR(spaceId ? `${spaceId}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
+  } = useSWR(spaceId ? `${spaceId}/drafted-posts` : null, () =>
+    charmClient.forum.listDraftPosts({ spaceId: spaceId! })
+  );
 
   const { showPost, createPost } = usePostDialog();
   const isMobile = useSmallScreen();
@@ -86,7 +88,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
         },
         { revalidate: false }
       );
-      if (post?.id === postId) {
+      if (spaceId && post?.id === postId) {
         createPost({ spaceId, category: newPostCategory || null });
       }
     });
@@ -140,7 +142,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
         }
       }}
     >
-      {!isLoading && (
+      {!isLoading && spaceId && (
         <PostPage
           formInputs={formInputs}
           setFormInputs={(_formInputs) => {
