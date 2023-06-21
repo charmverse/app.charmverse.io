@@ -14,8 +14,8 @@ export function getSpaceByDomainWhere(spaceDomainOrCustomDomain: string): {
   customDomain: string | undefined;
 } {
   if (isCustomDomain(spaceDomainOrCustomDomain)) {
-    return { customDomain: spaceDomainOrCustomDomain, domain: undefined };
+    return { customDomain: spaceDomainOrCustomDomain.toLowerCase(), domain: undefined };
   }
 
-  return { domain: spaceDomainOrCustomDomain, customDomain: undefined };
+  return { domain: spaceDomainOrCustomDomain.toLowerCase(), customDomain: undefined };
 }

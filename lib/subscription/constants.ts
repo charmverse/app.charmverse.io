@@ -1,95 +1,63 @@
-import type { SubscriptionTier } from '@charmverse/core/prisma-client';
-
 import { isProdEnv } from 'config/constants';
 
 // Stripe Constants
 
-export const SUBSCRIPTION_PRODUCT_IDS = [
-  'community_5k',
-  'community_10k',
-  'community_25k',
-  'community_50k',
-  'community_100k'
-] as const;
-export type SubscriptionProductId = (typeof SUBSCRIPTION_PRODUCT_IDS)[number];
-
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
-export const SUBSCRIPTION_PRODUCTS_RECORD: Record<
-  SubscriptionProductId,
-  {
-    id: string;
-    name: string;
-    tier: SubscriptionTier;
-    blockLimit: number;
-    monthlyActiveUserLimit: number;
-    guestLimit: number;
-    pricing: Record<SubscriptionPeriod, number>;
+export const communityProduct = {
+  id: 'community',
+  tier: 'pro',
+  name: 'CharmVerse Community',
+  guestLimit: 100,
+  blockLimit: 10000,
+  trial: 90,
+  monthlyActiveUserLimit: 25,
+  pricing: {
+    annual: 10,
+    monthly: 12
   }
-> = {
-  community_5k: {
-    id: 'community_5k',
-    tier: 'pro',
-    name: 'CharmVerse Community: 5,000 blocks',
-    guestLimit: 25,
-    blockLimit: 5000,
-    monthlyActiveUserLimit: 25,
-    pricing: {
-      annual: 8,
-      monthly: 10
-    }
-  },
-  community_10k: {
-    id: 'community_10k',
-    tier: 'pro',
-    name: 'CharmVerse Community: 10,000 blocks',
-    guestLimit: 50,
-    blockLimit: 10000,
-    monthlyActiveUserLimit: 50,
-    pricing: {
-      annual: 16,
-      monthly: 20
-    }
-  },
-  community_25k: {
-    id: 'community_25k',
-    tier: 'pro',
-    name: 'CharmVerse Community: 25,000 blocks',
-    guestLimit: 75,
-    blockLimit: 25000,
-    monthlyActiveUserLimit: 75,
-    pricing: {
-      annual: 24,
-      monthly: 30
-    }
-  },
-  community_50k: {
-    id: 'community_50k',
-    tier: 'pro',
-    name: 'CharmVerse Community: 50,000 blocks',
-    guestLimit: 100,
-    blockLimit: 50000,
-    monthlyActiveUserLimit: 100,
-    pricing: {
-      annual: 32,
-      monthly: 40
-    }
-  },
-  community_100k: {
-    id: 'community_100k',
-    tier: 'pro',
-    name: 'CharmVerse Community: 100,000 blocks',
-    guestLimit: 150,
-    blockLimit: 100000,
-    monthlyActiveUserLimit: 150,
-    pricing: {
-      annual: 40,
-      monthly: 50
-    }
-  }
-};
+} as const;
+
+export type SubscriptionProductId = typeof communityProduct.id;
 
 // Loop constants
 
 export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';
 export const loopApiUrl = isProdEnv ? 'https://api.loopcrypto.xyz' : 'https://demo.api.loopcrypto.xyz';
+
+// General subscription info
+
+export const subscriptionDetails = {
+  free: [
+    '100% space viewable by anyone on the Internet',
+    'Docs, Database, Forums. Member Directory, Proposal Builder',
+    'Up to 200 monhthly active members',
+    'Integrate with Discord, Snapshot, SAFE , NFTs & POAPS'
+  ],
+  community: [
+    'Everything in Free and',
+    'Comprehensive access control & unlimited roles',
+    'Invite 100 guetss',
+    'Custom domain',
+    'API  access'
+  ],
+  enterprise: [
+    'Everything in Community and',
+    '200+ monthly active members',
+    'Custom guest limit',
+    'Dedicated success manager'
+  ]
+};
+
+export const subscriptionCancellationDetails = {
+  first:
+    'Cancelling CharmVerse Community Edition will revert this space to the Free Plan at the end of the current billing period. The following changes will be made: ',
+  list: [
+    'All content will be made public and shared on the web',
+    'All custom roles will be removed',
+    'All users will have the default member role',
+    'Custom domains will be removed',
+    'API access will be removed'
+  ],
+  last: 'You will still be able to use CharmVerse for your community but you will be working in public.'
+};

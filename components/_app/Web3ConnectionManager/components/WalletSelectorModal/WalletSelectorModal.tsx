@@ -16,6 +16,7 @@ import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/LoginButton';
+import { useCustomDomain } from 'hooks/useCustomDomain';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import { getAppUrl } from 'lib/utilities/browser';
@@ -30,10 +31,10 @@ import processConnectionError from './utils/processConnectionError';
 
 type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 
-interface Props {
+type Props = {
   loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
   onError?: (err: DisabledAccountError) => void;
-}
+};
 
 export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const {
@@ -47,6 +48,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   } = useContext(Web3Connection);
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
+  const { isOnCustomDomain } = useCustomDomain();
 
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
   const handleConnect = (_connector: AbstractConnector) => {
@@ -151,22 +153,24 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
             isLoading={activatingConnector === walletLink}
           />
         </Grid>
-        <Grid item xs={12}>
-          <ConnectorButton
-            name='Unstoppable Domains'
-            onClick={handleUnstoppableDomainsLogin}
-            iconUrl='unstoppable-domains.png'
-            disabled={false}
-            isActive={false}
-            isLoading={isConnectingIdentity}
-          />
-          {uAuthPopupError && (
-            <Alert severity='warning'>
-              Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
-              browser.
-            </Alert>
-          )}
-        </Grid>
+        {!isOnCustomDomain && (
+          <Grid item xs={12}>
+            <ConnectorButton
+              name='Unstoppable Domains'
+              onClick={handleUnstoppableDomainsLogin}
+              iconUrl='unstoppable-domains.png'
+              disabled={false}
+              isActive={false}
+              isLoading={isConnectingIdentity}
+            />
+            {uAuthPopupError && (
+              <Alert severity='warning'>
+                Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
+                browser.
+              </Alert>
+            )}
+          </Grid>
+        )}
         <Grid item>
           <Typography variant='caption' align='center'>
             New to Ethereum wallets?{' '}

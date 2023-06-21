@@ -2,15 +2,15 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
-  CreatePaymentSubscriptionResponse,
-  CreateSubscriptionRequest,
+  CreateProSubscriptionResponse,
+  CreateProSubscriptionRequest,
   UpdateSubscriptionRequest
 } from 'lib/subscription/interfaces';
 import { updateProSubscription } from 'lib/subscription/updateProSubscription';
@@ -27,9 +27,10 @@ handler
   )
   .get(getSpaceSubscriptionController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .post(createPaymentSubscription)
   .delete(deletePaymentSubscription)
-  .put(updatePaymentSubscription);
+  .put(updatePaymentSubscription)
+  .use(requireKeys(['period', 'blockQuota'], 'body'))
+  .post(createPaymentSubscription);
 
 async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
   const { id: spaceId } = req.query as { id: string };
@@ -41,15 +42,15 @@ async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiR
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreatePaymentSubscriptionResponse>) {
+async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
-  const { period, productId, billingEmail, name, address, coupon } = req.body as CreateSubscriptionRequest;
+  const { period, blockQuota, billingEmail, name, address, coupon } = req.body as CreateProSubscriptionRequest;
 
-  const { clientSecret, paymentIntentStatus } = await createProSubscription({
+  const { clientSecret, paymentIntentStatus, subscriptionId } = await createProSubscription({
     spaceId,
     period,
-    productId,
+    blockQuota,
     billingEmail,
     name,
     address,
@@ -59,6 +60,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
   log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
   res.status(200).json({
+    subscriptionId,
     paymentIntentStatus,
     clientSecret
   });

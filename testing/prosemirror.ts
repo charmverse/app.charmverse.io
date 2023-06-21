@@ -1,10 +1,91 @@
 import type { Node } from 'prosemirror-model';
-import { builders } from 'prosemirror-test-builder';
+import { builders as makeBuilders } from 'prosemirror-test-builder';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
-type Builder = (...args: (string | Node | object)[]) => Node;
+export type Builder = (...args: (string | Node | object)[]) => Node;
 
-const builderMap = builders(specRegistry.schema) as any as Record<string, Builder>;
+// TODO: find an automated way to get these types
+export type NodeType =
+  | 'blockquote'
+  | 'bold'
+  | 'bookmark'
+  | 'bulletList'
+  | 'checkbox'
+  | 'code'
+  | 'codeBlock'
+  | 'columnLayout'
+  | 'columnBlock'
+  | 'cryptoPrice'
+  | 'date'
+  | 'deletion'
+  | 'disclosure'
+  | 'disclosureDetails'
+  | 'disclosureSummary'
+  | 'doc'
+  | 'emoji'
+  | 'emojiSuggest'
+  | 'file'
+  | 'format_change'
+  | 'hardBreak'
+  | 'heading'
+  | 'horizontalRule'
+  | 'iframe'
+  | 'image'
+  | 'img'
+  | 'in'
+  | 'inline-comment'
+  | 'inline-vote'
+  | 'inline-command-palette-pale'
+  | 'inline-command-palette-paletteMark'
+  | 'inlineDatabase'
+  | 'insertion'
+  | 'italic'
+  | 'label'
+  | 'link'
+  | 'listItem'
+  | 'mention'
+  | 'mentionSuggest'
+  | 'nestedPageSuggest'
+  | 'nft'
+  | 'orderedList'
+  | 'p'
+  | 'page'
+  | 'paragraph'
+  | 'pdf'
+  | 'poll'
+  | 'quote'
+  | 'strike'
+  | 'tabIndent'
+  | 'table'
+  | 'table_row'
+  | 'table_cell'
+  | 'table_header'
+  | 'tableOfContents'
+  | 'text-color'
+  | 'tooltip'
+  | 'tooltip-marker'
+  | 'tweet'
+  | 'video'
+  | 'underline';
 
-export const { doc, paragraph: p, heading, image: img, poll } = builderMap;
+const defaultBuilders = makeBuilders(specRegistry.schema) as any as Record<NodeType, Builder> & {
+  schema: { nodes: Record<NodeType, any> };
+};
+
+// add shortcuts
+const shortcuts = {
+  p: defaultBuilders.paragraph,
+  img: defaultBuilders.image
+};
+Object.assign(defaultBuilders, shortcuts);
+
+export const builders = {
+  ...defaultBuilders,
+  schema: defaultBuilders.schema,
+  ...shortcuts
+};
+
+export function jsonDoc(...args: (string | Node | object)[]) {
+  return builders.doc(...args).toJSON();
+}

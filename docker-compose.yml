@@ -39,6 +39,8 @@ services:
         '-c',
         'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
+    # environment:
+    #   - FORCE_SUBDOMAINS=true
     profiles:
       - prd-webapp
 
@@ -90,12 +92,7 @@ services:
 
   permissions-api:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
-    command:
-      [
-        'sh',
-        '-c',
-        'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js',
-      ]
+    command: ['sh', '-c', 'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js']
     env_file:
       - '.env'
     environment:

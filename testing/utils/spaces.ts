@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import type { SubscriptionProductId } from 'lib/subscription/constants';
+import { communityProduct, type SubscriptionProductId } from 'lib/subscription/constants';
 import type { LoggedInUser } from 'models';
 
 /**
@@ -87,7 +87,7 @@ export async function addSpaceSubscription({
   spaceId,
   customerId = v4(),
   period = 'monthly',
-  productId = 'community_5k',
+  productId = communityProduct.id,
   subscriptionId = v4(),
   deletedAt = null,
   priceId = v4(),

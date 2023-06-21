@@ -8,6 +8,7 @@ import type Stripe from 'stripe';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { stripeClient } from 'lib/subscription/stripe';
+import { relay } from 'lib/websockets/relay';
 
 // Stripe requires the raw body to construct the event. https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
 export const config = { api: { bodyParser: false } };
@@ -76,10 +77,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     switch (event.type) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-
         const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
           expand: ['plan']
         });
+        const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
 
         const spaceId = stripeSubscription.metadata.spaceId;
         // @ts-ignore The plan exists
@@ -121,7 +122,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: stripeSubscription.metadata.tier as SubscriptionTier
+              paidTier
             }
           })
         ]);
@@ -149,18 +150,29 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           spaceId,
           productId,
           period,
-          tier: 'pro',
+          tier: stripeSubscription.metadata.tier as SubscriptionTier,
           result: 'success'
         });
+
+        relay.broadcast(
+          {
+            type: 'space_subscription',
+            payload: {
+              type: 'activated',
+              paidTier
+            }
+          },
+          spaceId
+        );
 
         break;
       }
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
-
+        const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -189,16 +201,29 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               status: subscription.cancel_at_period_end ? 'cancelAtEnd' : 'active'
             }
           });
+
+          relay.broadcast(
+            {
+              type: 'space_subscription',
+              payload: {
+                type: 'updated',
+                // TODO: Update the paid tier
+                paidTier: null
+              }
+            },
+            spaceId
+          );
         }
 
         break;
       }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-
+        const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -216,7 +241,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         await prisma.stripeSubscription.update({
           where: {
-            spaceId: subscription.metadata.spaceId as string,
+            spaceId,
             subscriptionId: subscription.id,
             deletedAt: null,
             status: {
@@ -233,6 +258,17 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           }
         });
+
+        relay.broadcast(
+          {
+            type: 'space_subscription',
+            payload: {
+              type: 'cancelled',
+              paidTier: 'free'
+            }
+          },
+          spaceId
+        );
 
         break;
       }

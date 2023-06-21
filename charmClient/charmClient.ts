@@ -37,7 +37,7 @@ import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -121,7 +121,7 @@ class CharmClient {
   subscription = new SubscriptionApi();
 
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
