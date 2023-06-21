@@ -29,7 +29,7 @@ jest.mock('../stripe', () => ({
 }));
 
 describe('createProSubscription', () => {
-  it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
+  it('should successfully create pro subscription for space and return client secret and payment intent', async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
     const subscriptionId = v4();
@@ -101,7 +101,7 @@ describe('createProSubscription', () => {
     });
 
     expect(listPricesMockFn).toHaveBeenCalledWith({
-      product: 'community_5k',
+      product: 'community',
       type: 'recurring',
       active: true
     });
@@ -112,12 +112,13 @@ describe('createProSubscription', () => {
         tier: 'pro',
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k'
+        productId: 'community'
       },
       customer: customerId,
       items: [
         {
-          price: priceId
+          price: priceId,
+          quantity: 1
         }
       ],
       payment_settings: {

@@ -35,7 +35,7 @@ describe('getSpaceSubscription', () => {
         subscriptionId,
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k'
+        productId: 'community'
       })
     );
   });
