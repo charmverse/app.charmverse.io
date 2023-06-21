@@ -38,12 +38,11 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const { user } = useUser();
   const {
     data: draftedPosts = [],
     isLoading: isDraftsLoading,
     mutate: mutateDraftPosts
-  } = useSWR(user ? `/users/${user.id}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
+  } = useSWR(spaceId ? `${spaceId}/drafted-posts` : null, () => charmClient.forum.listDraftPosts({ spaceId }));
 
   const { showPost, createPost } = usePostDialog();
   const isMobile = useSmallScreen();
