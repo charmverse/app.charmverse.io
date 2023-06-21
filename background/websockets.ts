@@ -25,10 +25,12 @@ const io = new Server(server, {
     origin: (requestOrigin, callback) => {
       if (isDevEnv) {
         callback(null, requestOrigin);
-      } else if (!allowedOriginsCache.allowedOrigins) {
+      } else if (
         // custom origins did not load yet, allow all origins temporarily
-        callback(null, '*');
-      } else if (allowedOriginsCache.allowedOrigins.some((origin) => requestOrigin?.endsWith(origin))) {
+        !allowedOriginsCache.allowedOrigins ||
+        // check if request origin ends with any of the allowed origins
+        allowedOriginsCache.allowedOrigins.some((origin) => requestOrigin?.endsWith(origin))
+      ) {
         callback(null, requestOrigin);
       } else {
         callback(new Error('Not allowed by CORS'));
