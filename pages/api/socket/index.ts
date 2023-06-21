@@ -9,7 +9,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { config } from 'lib/websockets/config';
-import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SealedUserId, SocketAuthResponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -30,7 +30,7 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
 const sevenDaysInSeconds = 7 * 24 * 60 * 60;
 
 // Subscribe user to messages
-async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
+async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthResponse>) {
   // capture value of userId on connect
   const userId = req.session.user.id;
 
