@@ -7,10 +7,11 @@ import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
 export type CreateSubscriptionRequest = {
   productId: SubscriptionProductId;
   period: SubscriptionPeriod;
-  billingEmail: string;
+  billingEmail?: string;
   name?: string;
   address?: AddressParam;
   coupon?: string;
+  freeTrial?: boolean;
 };
 
 export type ProSubscriptionResponse = {

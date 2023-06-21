@@ -5,6 +5,7 @@ import type { Stripe } from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
+import { defaultTrialDurationInDays } from './constants';
 import type { CreateSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
 import { stripeClient } from './stripe';
 
@@ -15,7 +16,8 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon = ''
+  coupon = '',
+  freeTrial
 }: {
   spaceId: string;
 } & CreateSubscriptionRequest): Promise<ProSubscriptionResponse> {
@@ -164,6 +166,7 @@ export async function createProSubscription({
           tier: 'pro',
           spaceId: space.id
         },
+        trial_period_days: freeTrial ? defaultTrialDurationInDays : undefined,
         customer: customer.id,
         items: [
           {

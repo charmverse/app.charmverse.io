@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -14,6 +15,7 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
@@ -229,6 +231,23 @@ export async function createWorkspace({
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
+
+  try {
+    await createProSubscription({
+      //    billingEmail: undefined as any,
+      period: 'monthly',
+      productId: 'community_25k',
+      spaceId: space.id,
+      name: spaceData.name,
+      freeTrial: true
+    });
+  } catch (err) {
+    log.error('Error creating pro subscription', {
+      spaceId: space.id,
+      productId: 'community_25k',
+      period: 'monthly'
+    });
+  }
 
   // Add default subscriptions
   if (webhookUrl) {
