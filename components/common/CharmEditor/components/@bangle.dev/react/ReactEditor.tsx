@@ -80,7 +80,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
-  const [isLoading, setIsLoading] = useState(enableFidusEditor);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
@@ -124,9 +123,11 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       // for now, just use a standard error message to be over-cautious
       showMessage(error.message, 'warning');
     }
-    log.error('[ws/ceditor]: Error message displayed to user', { error });
-    if (isLoading) {
-      setIsLoading(false);
+    log.error('[ws/ceditor]: Error message displayed to user', {
+      pageId,
+      error
+    });
+    if (isLoadingRef.current) {
       isLoadingRef.current = false;
       setEditorContent(_editor, initialContent);
     }
@@ -173,7 +174,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
 
     if (isContentControlled) {
-      setIsLoading(false);
+      isLoadingRef.current = false;
     } else if (useSockets) {
       if (authResponse) {
         log.info('Init FidusEditor');
@@ -182,7 +183,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           docId: pageId,
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
-            setIsLoading(false);
             isLoadingRef.current = false;
           },
           onParticipantUpdate
@@ -190,12 +190,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
-        setIsLoading(false);
         isLoadingRef.current = false;
         setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
-      setIsLoading(false);
       isLoadingRef.current = false;
       setEditorContent(_editor, initialContent);
     }
@@ -222,10 +220,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className='bangle-editor-core'
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '200px' : undefined, cursor: readOnly ? 'default' : 'text' }}
+        style={{
+          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
+          cursor: readOnly ? 'default' : 'text'
+        }}
         onClick={() => !readOnly && editor?.view.focus()}
       >
-        <StyledLoadingComponent isLoading={showLoader && isLoading} />
+        <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
       {nodeViews.map((nodeView) => {

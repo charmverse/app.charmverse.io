@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -43,6 +44,7 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
   }
 
   await deleteThread(threadId);
+  log.info(`Deleted page inline comment thread`, { userId, pageId: thread.pageId, threadId });
 
   return res.status(200).json({ ok: true });
 }

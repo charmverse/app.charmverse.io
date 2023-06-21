@@ -149,6 +149,7 @@ export class Merge {
     } else {
       // The server seems to have lost some data. We reset.
       this.mod.doc.loadDocument(data);
+      log.error('Server has lost data, reset the document');
     }
   }
 

@@ -37,6 +37,7 @@ export default function IdentityProviderItem({
 
   return (
     <ListItem
+      sx={{ justifyContent: 'space-between', gap: 1 }}
       disableGutters
       secondaryAction={
         !!actions && (
@@ -50,20 +51,23 @@ export default function IdentityProviderItem({
         )
       }
     >
-      <Box display='flex' alignItems='center'>
-        <ListItemIcon>
-          <IdentityIcon type={type} />
-        </ListItemIcon>
-        <ListItemText
-          primaryTypographyProps={{ ml: 1 }}
-          primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
-        />
-        {active && <Chip size='small' sx={{ ml: 1 }} label='Active' variant='outlined' />}
+      <Box display='flex' alignItems='center' flex={1} justifyContent='space-between'>
+        <Box display='flex' alignItems='center'>
+          <ListItemIcon>
+            <IdentityIcon type={type} />
+          </ListItemIcon>
+          <ListItemText
+            primaryTypographyProps={{ ml: 1 }}
+            primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
+          />
+          {active && <Chip size='small' sx={{ ml: 1 }} label='Active' variant='outlined' />}
+        </Box>
+
+        <Box px={1}>
+          <LoadingComponent isLoading={loading} size={15} />
+        </Box>
       </Box>
 
-      <Box px={1}>
-        <LoadingComponent isLoading={loading} size={15} />
-      </Box>
       {error}
       {children}
       <Menu

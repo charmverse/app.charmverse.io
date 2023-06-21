@@ -16,6 +16,7 @@ import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { getAppUrl } from 'lib/utilities/browser';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
 import type { AnyIdLogin } from '../components/login/LoginButton';
@@ -131,7 +132,8 @@ export function useFirebaseAuth() {
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
-    const url = new URL(`${window.location.origin}/authenticate`);
+    const url = new URL(`${getAppUrl()}authenticate`);
+
     if (connectToExistingAccount) {
       url.searchParams.set('connectToExistingAccount', 'true');
     }
