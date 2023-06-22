@@ -1,6 +1,7 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, Grid, List, ListItem, ListItemText, Stack, TextField, Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,9 +13,11 @@ import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { subscriptionCancellationDetails, communityProduct } from 'lib/subscription/constants';
+import { useUserPreferences } from 'hooks/useUserPreferences';
+import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
+import { formatDate, getTimeDifference } from 'lib/utilities/dates';
 
 import { SubscriptionActions } from './SubscriptionActions';
 
@@ -37,6 +40,7 @@ export function SubscriptionInformation({
 }) {
   const { showMessage } = useSnackbar();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { userPreferences } = useUserPreferences();
 
   const {
     register,
@@ -96,6 +100,20 @@ export function SubscriptionInformation({
     }
   }, [spaceSubscription?.status]);
 
+  const freeTrialEnds =
+    spaceSubscription.status === 'free_trial'
+      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
+      : undefined;
+  const freeTrialLabel =
+    spaceSubscription.status === 'free_trial'
+      ? (freeTrialEnds as number) > 0
+        ? `Free trial - ${freeTrialEnds} days left`
+        : `Free trial finished`
+      : '';
+
+  const nextBillingDate = spaceSubscription?.renewalDate
+    ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
+    : null;
   return (
     <>
       <Legend whiteSpace='normal'>Plan & Billing</Legend>
@@ -103,16 +121,22 @@ export function SubscriptionInformation({
         <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
           <Typography variant='h6' mb={1}>
             Current plan
+            {spaceSubscription.status === 'free_trial' && (
+              <Chip
+                sx={{ ml: 2 }}
+                size='small'
+                color={(freeTrialEnds as number) > 0 ? 'green' : 'orange'}
+                label={freeTrialLabel}
+              />
+            )}
           </Typography>
-          <Typography>
-            Community Edition - {String((communityProduct.blockLimit ?? 0) * spaceSubscription.blockQuota).slice(0, -3)}
-            K blocks
-          </Typography>
+          <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
+
           <Typography>
             ${(communityProduct.pricing[spaceSubscription.period] ?? 0) * spaceSubscription.blockQuota} per month billed{' '}
             {spaceSubscription.period}
           </Typography>
-          <Typography>Your plan renews on July 3, 2024</Typography>
+          {nextBillingDate && <Typography>Renews on {nextBillingDate}</Typography>}
           {status && <Typography>Status: {status}</Typography>}
         </Grid>
         <Grid item xs={12} sm={4}>

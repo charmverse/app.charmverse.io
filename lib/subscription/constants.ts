@@ -12,7 +12,9 @@ export const communityProduct = {
   tier: 'pro',
   name: 'CharmVerse Community',
   guestLimit: 100,
-  blockLimit: 1000,
+  // This is base number we use to calculate block limits. We multiply this by the quantity in Stripe.
+  // For example, 30k blocks = 30 quantity * 1000 blockQuotaIncrement
+  blockQuotaIncrement: 1000,
   monthlyActiveUserLimit: 25,
   trial: 90,
   pricing: {

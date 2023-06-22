@@ -2,6 +2,8 @@
 import { log } from '@charmverse/core/log';
 import type Stripe from 'stripe';
 
+import { coerceToMilliseconds } from 'lib/utilities/dates';
+
 import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';
 
 function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusType {
@@ -73,7 +75,6 @@ export function mapStripeFields({
       customerId: subscription.customer.id
     });
   }
-
   const fields: SubscriptionFieldsFromStripe = {
     period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
@@ -81,8 +82,10 @@ export function mapStripeFields({
     status: mapStripeStatus(subscription),
     paymentMethod: null,
     billingEmail: subscription.customer.email,
-    expiresOn: subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined,
-    renewalDate: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : undefined
+    expiresOn: subscription.trial_end ? new Date(coerceToMilliseconds(subscription.trial_end)) : undefined,
+    renewalDate: subscription.current_period_end
+      ? new Date(coerceToMilliseconds(subscription.current_period_end))
+      : undefined
   };
 
   return fields;

@@ -86,7 +86,7 @@ export function PlanSelection({
           <Typography>{`$${
             (communityProduct.pricing[period] ?? 0) * blockQuotaInThousands
           }/${periodNaming}`}</Typography>
-          <Typography>{`${String(communityProduct.blockLimit * blockQuotaInThousands).slice(
+          <Typography>{`${String(communityProduct.blockQuotaIncrement * blockQuotaInThousands).slice(
             0,
             -3
           )}K blocks`}</Typography>
