@@ -50,16 +50,17 @@ export async function createProSubscription({
   }
 
   const pendingStripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}'`,
+    query: `metadata['spaceId']:'${spaceId}' AND status:"incomplete"`,
     expand: ['data.customer']
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.[0];
+  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.find(
+    (sub) =>
+      (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
+      (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
+  );
 
-  const existingStripeCustomer = pendingStripeSubscription.data?.find((sub) => {
-    const _customer = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
-    return _customer.deleted !== true && (sub.status === 'trialing' || sub.status === 'incomplete');
-  })?.customer as Stripe.Customer | undefined;
+  const existingStripeCustomer = existingStripeSubscription?.customer as Stripe.Customer | undefined;
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
@@ -97,7 +98,10 @@ export async function createProSubscription({
     throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
   }
 
-  const productPrice = prices.find((price) => price.recurring?.interval === stripePeriod);
+  const productPrice = prices.find(
+    (price) =>
+      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 100 === communityProduct.pricing[period]
+  );
 
   if (!productPrice) {
     throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
@@ -106,54 +110,31 @@ export async function createProSubscription({
   let subscription: Stripe.Subscription | undefined;
   try {
     // Case when the user is updating his subscription in checkout
-    if (
-      existingStripeSubscription &&
-      (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
-    ) {
-      subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        items: [
-          {
-            id: existingStripeSubscription.items.data[0].id,
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent']
-      });
-    } else {
-      subscription = await stripeClient.subscriptions.create({
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        customer: customer.id,
-        items: [
-          {
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent']
-      });
+    if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
+      await stripeClient.subscriptions.del(existingStripeSubscription.id);
     }
+
+    subscription = await stripeClient.subscriptions.create({
+      metadata: {
+        productId,
+        period,
+        tier: 'pro',
+        spaceId: space.id
+      },
+      customer: customer.id,
+      items: [
+        {
+          price: productPrice.id,
+          quantity: blockQuota
+        }
+      ],
+      coupon,
+      payment_settings: {
+        save_default_payment_method: 'on_subscription'
+      },
+      payment_behavior: 'default_incomplete',
+      expand: ['latest_invoice.payment_intent']
+    });
   } catch (error: any) {
     log.error(`[stripe]: Failed to create subscription. ${error.message}`, {
       spaceId,

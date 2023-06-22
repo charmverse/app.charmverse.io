@@ -1,6 +1,6 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { SubscriptionTier } from '@charmverse/core/prisma-client';
+import type { StripeSubscription, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
@@ -77,14 +77,14 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
     switch (event.type) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-        const stripeSubscription = await stripeClient.subscriptions.retrieve(invoice.subscription as string, {
-          expand: ['plan']
-        });
+        const subscriptionId = invoice.subscription as string;
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
         const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
-
         const spaceId = stripeSubscription.metadata.spaceId;
-        // @ts-ignore The plan exists
-        const subscriptionPlan = stripeSubscription.plan as Stripe.Plan;
+        const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
+        const productId = subscriptionData?.price?.product as string | undefined;
+        const customerId = invoice.customer as string;
+        const priceInterval = subscriptionData?.price?.recurring?.interval;
 
         const space = await prisma.space.findUnique({
           where: { id: spaceId, deletedAt: null }
@@ -94,18 +94,24 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           log.warn(`Can't update the user subscription. Space not found for subscription ${stripeSubscription.id}`);
           break;
         }
-        const period = subscriptionPlan.interval === 'month' ? ('monthly' as const) : ('annual' as const);
-        const productId = subscriptionPlan.product as string;
 
-        const newData = {
-          customerId: invoice.customer as string,
-          subscriptionId: invoice.subscription as string,
+        if (!subscriptionData || !subscriptionData.price || !productId || !spaceId || !priceInterval) {
+          log.warn(`Can't update the user subscription. Subscription with id ${stripeSubscription.id} has no data`);
+          break;
+        }
+
+        const period = priceInterval === 'month' ? ('monthly' as const) : ('annual' as const);
+
+        const newData: Omit<StripeSubscription, 'id' | 'createdAt'> = {
+          customerId,
+          subscriptionId,
           period,
-          productId: subscriptionPlan.product as string,
-          priceId: subscriptionPlan.id as string,
+          productId,
+          priceId: subscriptionData?.price?.id,
           spaceId,
           status: 'active' as const,
-          deletedAt: null
+          deletedAt: null,
+          blockQuota: invoice.lines.data[0].quantity ?? 0
         };
 
         await prisma.$transaction([
@@ -182,9 +188,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         if (!spaceSubscription) {
-          log.warn(
-            `Can't update the user subscription. Space subscription not found for subscription ${subscription.id}`
-          );
+          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`);
           break;
         }
 
@@ -207,8 +211,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               type: 'space_subscription',
               payload: {
                 type: 'updated',
-                // TODO: Update the paid tier
-                paidTier: null
+                paidTier: subscription.metadata.tier as SubscriptionTier
               }
             },
             spaceId

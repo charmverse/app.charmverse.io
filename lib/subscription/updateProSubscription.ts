@@ -12,6 +12,7 @@ export async function updateProSubscription({
   spaceId: string;
   payload: UpdateSubscriptionRequest;
 }) {
+  const { email, status } = payload;
   const spaceSubscription = await prisma.stripeSubscription.findFirst({
     where: {
       spaceId,
@@ -29,19 +30,25 @@ export async function updateProSubscription({
     throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
   }
 
-  if (payload.status) {
+  if (status) {
     await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
-      cancel_at_period_end: payload.status === 'cancelAtEnd'
+      cancel_at_period_end: status === 'cancelAtEnd'
+    });
+
+    await prisma.stripeSubscription.update({
+      where: {
+        id: spaceSubscription.id,
+        spaceId
+      },
+      data: {
+        status
+      }
     });
   }
 
-  await prisma.stripeSubscription.update({
-    where: {
-      id: spaceSubscription.id,
-      spaceId
-    },
-    data: {
-      ...payload
-    }
-  });
+  if (email) {
+    await stripeClient.customers.update(spaceSubscription.customerId, {
+      email: payload.email
+    });
+  }
 }
