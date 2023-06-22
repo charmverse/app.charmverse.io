@@ -1,6 +1,6 @@
 import type { Block } from '@charmverse/core/prisma';
 
-import type { CardPage, PageContentFormats, PageProperty } from './interfaces';
+import type { BoardPropertyValue, CardPage, PageContentFormats, PageProperty } from './interfaces';
 
 /**
  * @content markdown - Should be generated externally and assigned to the key
@@ -44,7 +44,7 @@ export class PageFromBlock implements CardPage {
    * @param propertySchemas
    */
   private parseProperties(
-    properties: Record<string, string | number>,
+    properties: Record<string, BoardPropertyValue>,
     propertySchemas: PageProperty[]
   ): Record<string, string | number> {
     const values: any = Object.keys(properties).reduce((constructedObj, propertyId) => {
@@ -52,8 +52,12 @@ export class PageFromBlock implements CardPage {
 
       if (matchedSchema) {
         const valueToAssign =
-          matchedSchema.type === 'select' || matchedSchema.type === 'multiSelect'
+          matchedSchema.type === 'select'
             ? matchedSchema.options.find((option) => option.id === properties[propertyId])?.value
+            : matchedSchema.type === 'multiSelect'
+            ? (properties[propertyId] as string[])
+                .map((value) => matchedSchema.options.find((op) => op.id === value)?.value)
+                .filter((value) => !!value)
             : properties[propertyId];
 
         const humanFriendlyPropertyKey = matchedSchema.name;

@@ -9,7 +9,8 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 import { DatabasePageNotFoundError } from './errors';
-import type { PageProperty } from './interfaces';
+import type { BoardPropertyValue, PageProperty } from './interfaces';
+import { mapProperties } from './mapProperties';
 import { PageFromBlock } from './pageFromBlock.class';
 
 export async function createDatabase(
@@ -76,7 +77,7 @@ export async function createDatabase(
 
 export async function createDatabaseCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, string | string[]>;
+    properties: Record<string, BoardPropertyValue>;
   } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>>
 ): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);
@@ -103,6 +104,8 @@ export async function createDatabaseCardPage(
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
+  const mappedProperties = mapProperties(pageInfo.properties ?? {}, boardSchema);
+
   const cardBlock = await prisma.block.create({
     data: {
       id: v4(),
@@ -127,7 +130,7 @@ export async function createDatabaseCardPage(
         headerImage: null,
         icon: '',
         isTemplate: false,
-        properties: pageInfo.properties ?? {}
+        properties: mappedProperties
       }
     }
   });

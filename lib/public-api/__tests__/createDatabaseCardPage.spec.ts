@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -86,7 +86,7 @@ describe('createDatabaseCardPage', () => {
     try {
       await createDatabaseCardPage({
         title: 'Example title',
-        boardId: v4(),
+        boardId: uuid(),
         properties: {},
         spaceId: space.id,
         createdBy: user.id
@@ -158,5 +158,55 @@ describe('createDatabaseCardPage', () => {
     });
 
     expect(createdPage).toBeInstanceOf(PageFromBlock);
+  });
+
+  it('should pass properties when creating the card', async () => {
+    const database = await createDatabase(
+      {
+        title: 'My database',
+        createdBy: user.id,
+        spaceId: space.id
+      },
+      [
+        {
+          id: uuid(),
+          name: 'Priority',
+          type: 'select',
+          options: [{ id: uuid(), color: 'propColorTeal', value: 'High' }]
+        },
+        {
+          id: uuid(),
+          name: 'MultiSelect',
+          type: 'multiSelect',
+          options: [
+            { id: uuid(), color: 'propColorTeal', value: 'Alice' },
+            { id: uuid(), color: 'propColorTeal', value: 'Bob' },
+            { id: uuid(), color: 'propColorTeal', value: 'Carl' }
+          ]
+        },
+        {
+          id: uuid(),
+          name: 'Amount',
+          type: 'number',
+          options: []
+        }
+      ]
+    );
+
+    const cardProps = {
+      Priority: 'High',
+      Amount: 5,
+      MultiSelect: ['Alice', 'Bob']
+    };
+
+    const card = await createDatabaseCardPage({
+      boardId: database.id,
+      createdBy: user.id,
+      properties: cardProps,
+      spaceId: space.id,
+      title: 'Example title'
+    });
+
+    expect(card.properties).toEqual(cardProps);
   });
 });

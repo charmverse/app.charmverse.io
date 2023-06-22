@@ -400,3 +400,5 @@ export type UserProfile = {
   username: string;
   email: string;
 };
+
+export type BoardPropertyValue = string | string[] | number;
