@@ -117,7 +117,7 @@ export function ForumPage() {
     }
   }
   useEffect(() => {
-    if (typeof router.query.postId === 'string') {
+    if (router.isReady && typeof router.query.postId === 'string') {
       showPost({
         postId: router.query.postId,
         onClose() {
@@ -125,7 +125,7 @@ export function ForumPage() {
         }
       });
     }
-  }, [router.query.postId]);
+  }, [router.isReady, router.query.postId]);
 
   useEffect(() => {
     if (currentSpace) {

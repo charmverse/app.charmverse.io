@@ -25,18 +25,18 @@ export function SubscriptionActions({
   }
 
   return (
-    <Stack flexDirection='row' gap={1} mb={1}>
+    <Stack flexDirection='column' gap={1} mb={1}>
       {spaceSubscription?.status === 'cancelAtEnd' && (
-        <Button disabled={loading} onClick={onReactivation} variant='outlined'>
+        <Button disabled={loading} onClick={onReactivation}>
           Reactivate Plan
         </Button>
       )}
       {spaceSubscription?.status === 'active' && (
         <>
-          <Button disabled={loading} onClick={() => {}} variant='outlined'>
-            Upgrade/Downgrade Plan
+          <Button disabled={loading} onClick={() => {}}>
+            Update Plan
           </Button>
-          <Button disabled={loading} onClick={onCancelAtEnd} color='error' variant='outlined'>
+          <Button disabled={loading} onClick={onCancelAtEnd} variant='text'>
             Cancel Plan
           </Button>
           {!isProdEnv && (

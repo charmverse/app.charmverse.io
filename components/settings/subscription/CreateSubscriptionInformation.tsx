@@ -28,7 +28,7 @@ export function CreateSubscriptionInformation({ onClick }: { onClick: () => void
           <Typography variant='h6' mb={1}>
             Collaborate in public
           </Typography>
-          <List>
+          <List dense>
             {subscriptionDetails.free.map((detail) => (
               <ListItem key={detail}>
                 <ListItemIcon>
@@ -57,7 +57,7 @@ export function CreateSubscriptionInformation({ onClick }: { onClick: () => void
           <Typography variant='h6' mb={1}>
             Onboard & Engage Community Members
           </Typography>
-          <List>
+          <List dense>
             {subscriptionDetails.community.map((detail) => (
               <ListItem key={detail}>
                 <ListItemIcon>
@@ -84,7 +84,7 @@ export function CreateSubscriptionInformation({ onClick }: { onClick: () => void
           <Typography variant='h6' mb={1}>
             Advanced control and support for large Communities
           </Typography>
-          <List>
+          <List dense>
             {subscriptionDetails.community.map((detail) => (
               <ListItem key={detail}>
                 <ListItemIcon>
