@@ -6,6 +6,7 @@ import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
+import { communityProduct } from '../constants';
 import { createProSubscription } from '../createProSubscription';
 import { stripeClient } from '../stripe';
 
@@ -29,7 +30,7 @@ jest.mock('../stripe', () => ({
 }));
 
 describe('createProSubscription', () => {
-  it('should successfully create pro subscription for space and return client secret and payment intent', async () => {
+  it('should successfully create pro subscription in Stripe and return client secret and payment intent', async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
     const subscriptionId = v4();
@@ -51,7 +52,7 @@ describe('createProSubscription', () => {
     });
 
     const listPricesMockFn = jest.fn().mockResolvedValue({
-      data: [{ id: priceId, recurring: { interval: 'month' } }]
+      data: [{ id: priceId, recurring: { interval: 'month' }, unit_amount: 120 }]
     });
 
     const createSubscriptionsMockFn = jest.fn().mockResolvedValue({
@@ -62,12 +63,24 @@ describe('createProSubscription', () => {
           status: 'incomplete',
           id: paymentId
         }
+      },
+      metadata: {
+        spaceId: space.id,
+        tier: 'pro',
+        period: 'monthly',
+        productId: communityProduct.id
+      },
+      customer: {
+        id: customerId,
+        metadata: {
+          spaceId: space.id
+        }
       }
     });
 
     const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
       id: subscriptionId,
-      data: [{ customer: customerId }],
+      data: [],
       latest_invoice: {
         payment_intent: {
           client_secret,
@@ -87,7 +100,7 @@ describe('createProSubscription', () => {
     const { clientSecret, paymentIntentStatus } = await createProSubscription({
       period: 'monthly',
       spaceId: space.id,
-      blockQuota: 1,
+      blockQuota: 10,
       billingEmail: 'test@gmail.com',
       coupon: ''
     });
@@ -112,7 +125,7 @@ describe('createProSubscription', () => {
         tier: 'pro',
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community'
+        productId: communityProduct.id
       },
       customer: customerId,
       items: [
@@ -137,7 +150,7 @@ describe('createProSubscription', () => {
       createProSubscription({
         period: 'monthly',
         spaceId: v4(),
-        blockQuota: 1,
+        blockQuota: 10,
         billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
@@ -155,7 +168,7 @@ describe('createProSubscription', () => {
       createProSubscription({
         period: 'monthly',
         spaceId: space.id,
-        blockQuota: 1,
+        blockQuota: 10,
         billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
