@@ -15,6 +15,7 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { communityProduct } from 'lib/subscription/constants';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -236,10 +237,10 @@ export async function createWorkspace({
     await createProSubscription({
       //    billingEmail: undefined as any,
       period: 'monthly',
-      productId: 'community_25k',
       spaceId: space.id,
       name: spaceData.name,
-      freeTrial: true
+      freeTrial: true,
+      blockQuota: 30
     });
   } catch (err) {
     log.error('Error creating pro subscription', {

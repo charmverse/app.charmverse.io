@@ -124,7 +124,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             space={space}
             spaceSubscription={spaceSubscription}
             isLoading={isLoading}
-            blockQuota={blockQuota}
+            blockQuota={spaceSubscription.blockQuota}
           />
         ) : (
           <CreateSubscriptionInformation onClick={handleShowCheckoutForm} />

@@ -38,7 +38,7 @@ export const subscriptionDetails = {
   community: [
     'Everything in Free and',
     'Comprehensive access control & unlimited roles',
-    'Invite 100 guetss',
+    'Invite 100 guests',
     'Custom domain',
     'API  access'
   ],

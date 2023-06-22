@@ -2,6 +2,7 @@ import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SubscriptionProductId } from './constants';
+import { stripeClient } from './stripe';
 
 export type SpaceSubscription = Omit<StripeSubscription, 'productId'> & { productId: SubscriptionProductId };
 
@@ -29,5 +30,9 @@ export async function getSpaceSubscription({ spaceId }: { spaceId: string }) {
     return null;
   }
 
-  return activeSpaceSubscription as SpaceSubscription;
+  const subscriptionInStripe = await stripeClient.subscriptions.retrieve(activeSpaceSubscription.subscriptionId);
+
+  const blockQuota = subscriptionInStripe.items.data[0].quantity;
+
+  return { ...activeSpaceSubscription, blockQuota } as SpaceSubscription;
 }
