@@ -6,7 +6,7 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getSpaceSubscription';
 import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
   CreateProSubscriptionResponse,
@@ -32,7 +32,10 @@ handler
   .use(requireKeys(['period', 'blockQuota'], 'body'))
   .post(createPaymentSubscription);
 
-async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
+async function getSpaceSubscriptionController(
+  req: NextApiRequest,
+  res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
+) {
   const { id: spaceId } = req.query as { id: string };
 
   const spaceSubscription = await getSpaceSubscription({

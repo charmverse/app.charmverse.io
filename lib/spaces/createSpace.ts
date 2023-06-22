@@ -245,7 +245,7 @@ export async function createWorkspace({
   } catch (err) {
     log.error('Error creating pro subscription', {
       spaceId: space.id,
-      productId: 'community_25k',
+      productId: communityProduct.id,
       period: 'monthly'
     });
   }

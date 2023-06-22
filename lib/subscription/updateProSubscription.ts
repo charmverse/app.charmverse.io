@@ -32,7 +32,7 @@ export async function updateProSubscription({
 
   if (status) {
     await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
-      cancel_at_period_end: status === 'cancelAtEnd'
+      cancel_at_period_end: status === 'cancel_at_end'
     });
 
     await prisma.stripeSubscription.update({

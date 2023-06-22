@@ -13,7 +13,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionCancellationDetails, communityProduct } from 'lib/subscription/constants';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import { SubscriptionActions } from './SubscriptionActions';
@@ -32,8 +32,8 @@ export function SubscriptionInformation({
   refetchSpaceSubscription
 }: {
   space: Space;
-  spaceSubscription: SpaceSubscription;
-  refetchSpaceSubscription: () => Promise<SpaceSubscription | null | undefined>;
+  spaceSubscription: SpaceSubscriptionWithStripeData;
+  refetchSpaceSubscription: () => Promise<SpaceSubscriptionWithStripeData | null | undefined>;
 }) {
   const { showMessage } = useSnackbar();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -88,7 +88,7 @@ export function SubscriptionInformation({
         return 'Active';
       case 'pending':
         return 'Pending';
-      case 'cancelAtEnd':
+      case 'cancel_at_end':
         return 'Your subscription was cancelled and will end on the next billing date. You can reactivate it by clicking the button below.';
       case 'cancelled':
       default:
@@ -144,7 +144,7 @@ export function SubscriptionInformation({
                 <Typography>Do you still want to Cancel?</Typography>
               </>
             }
-            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancelAtEnd' } })}
+            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onClose={() => setShowConfirmDialog(false)}
             disabled={isLoadingUpdate || isLoadingDeletion}
           />
