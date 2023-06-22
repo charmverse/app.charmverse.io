@@ -2,7 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -23,7 +23,7 @@ export function BountySignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const { space } = useCurrentSpace();
-  const { data: spaceWithGates } = useSWR(space ? `spaceByDomain/${space.domain}` : null, () =>
+  const { data: spaceWithGates } = useSWRImmutable(space ? `spaceByDomain/${space.domain}` : null, () =>
     charmClient.spaces.searchByDomain(space!.domain)
   );
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });

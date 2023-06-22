@@ -54,13 +54,13 @@ export function ProposalsTable({
   }
 
   useEffect(() => {
-    if (typeof router.query.id === 'string') {
+    if (router.isReady && typeof router.query.id === 'string') {
       showProposal({
         pageId: router.query.id,
         onClose
       });
     }
-  }, [router.query.id]);
+  }, [router.isReady, router.query.id]);
 
   return (
     <>

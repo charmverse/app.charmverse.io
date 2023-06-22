@@ -1,4 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { ExpectedAnError } from 'testing/errors';
@@ -28,6 +29,25 @@ describe('createDatabase', () => {
 
     expect(createdDb.type).toBe('board');
     expect(createdDb.boardId).toBeDefined();
+  });
+
+  it('should not setup page permissions', async () => {
+    const createdDb = await createDatabase({
+      title: 'Example',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    expect(createdDb.type).toBe('board');
+    expect(createdDb.boardId).toBeDefined();
+
+    const permissions = await prisma.pagePermission.count({
+      where: {
+        pageId: createdDb.id
+      }
+    });
+
+    expect(permissions).toEqual(0);
   });
 
   it('should assign the database schema correctly', async () => {
@@ -94,6 +114,31 @@ describe('createDatabaseCardPage', () => {
     });
 
     expect(createdPage).toBeInstanceOf(PageFromBlock);
+  });
+
+  it('should not setup any page permissions', async () => {
+    const database = await createDatabase({
+      title: 'My database',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const createdPage = await createDatabaseCardPage({
+      title: 'Example title',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      boardId: database.boardId!,
+      properties: {},
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    const permissions = await prisma.pagePermission.count({
+      where: {
+        pageId: createdPage.id
+      }
+    });
+
+    expect(permissions).toEqual(0);
   });
 
   it('should handle creation when properties are undefined', async () => {

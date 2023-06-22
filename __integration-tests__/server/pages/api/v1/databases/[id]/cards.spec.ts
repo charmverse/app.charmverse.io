@@ -1,8 +1,7 @@
-import type { Space, User, Page, SpaceApiToken } from '@charmverse/core/prisma';
+import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Response } from 'supertest';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
@@ -42,7 +41,7 @@ beforeAll(async () => {
   failedCreateResponse = await invalidCreateRequest();
 });
 
-describe('POST /databases/{id}/pages', () => {
+describe('POST /databases/{id}/cards', () => {
   it('should create a new card in the database', async () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/cards`)
