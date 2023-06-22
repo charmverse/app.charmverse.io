@@ -432,7 +432,7 @@ export class DocumentEventHandler {
         this.confirmDiff(message.rid);
         this.sendUpdatesToOthers(message);
       } catch (error) {
-        log.error('Could not save document', { error, ...logMeta });
+        log.error('Error when saving changes to the db', { error, ...logMeta });
         this.sendError('There was an error saving your changes! Please refresh and try again.');
       }
     } else if (clientV < serverV) {
