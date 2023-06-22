@@ -48,8 +48,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
     const userCookie = await loginUser(user.id);
 
     await addSpaceSubscription({
-      spaceId: space.id,
-      createdBy: user.id
+      spaceId: space.id
     });
 
     await request(baseUrl)

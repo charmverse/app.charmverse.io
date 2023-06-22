@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import Button from 'components/common/Button';
 import { isProdEnv } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 
 export function SubscriptionActions({
   spaceSubscription,

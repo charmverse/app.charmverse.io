@@ -13,8 +13,8 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionCancellationDetails, communityProduct } from 'lib/subscription/constants';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getSpaceSubscription';
-import type { UpdateSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 import { SubscriptionActions } from './SubscriptionActions';
 
@@ -179,7 +179,9 @@ export function SubscriptionInformation({
             />
             <Button
               disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
-              onClick={() => updateSpaceSubscription({ spaceId: space.id, payload: { email: getValues().email } })}
+              onClick={() =>
+                updateSpaceSubscription({ spaceId: space.id, payload: { billingEmail: getValues().email } })
+              }
               sx={{ maxWidth: '100px', mt: 2 }}
               fullWidth={false}
             >

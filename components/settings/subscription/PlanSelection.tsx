@@ -1,4 +1,3 @@
-import type { SubscriptionPeriod } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -8,20 +7,21 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { AiOutlineUnlock } from 'react-icons/ai';
 
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
 
 export function PlanSelection({
   disabled,
   period,
-  blockQuota,
+  blockQuotaInThousands,
   onSelect,
   onSelectCommited
 }: {
   disabled: boolean;
-  onSelect: (blockQuota: number | null, period: SubscriptionPeriod | null) => void;
-  onSelectCommited: (quanity: number | null, period: SubscriptionPeriod | null) => void;
+  onSelect: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
+  onSelectCommited: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
   period: SubscriptionPeriod;
-  blockQuota: number;
+  blockQuotaInThousands: number;
 }) {
   const theme = useTheme();
   const periodNaming = period === 'annual' ? 'yr' : 'mo';
@@ -57,7 +57,7 @@ export function PlanSelection({
             size='small'
             aria-label='Quantity slider'
             valueLabelDisplay='off'
-            value={blockQuota}
+            value={blockQuotaInThousands}
             step={10}
             min={10}
             max={500}
@@ -83,8 +83,13 @@ export function PlanSelection({
           <Typography variant='h6' mb={2}>
             Current selection
           </Typography>
-          <Typography>{`$${(communityProduct.pricing[period] ?? 0) * blockQuota}/${periodNaming}`}</Typography>
-          <Typography>{`${String(communityProduct.blockLimit * blockQuota).slice(0, -3)}K blocks`}</Typography>
+          <Typography>{`$${
+            (communityProduct.pricing[period] ?? 0) * blockQuotaInThousands
+          }/${periodNaming}`}</Typography>
+          <Typography>{`${String(communityProduct.blockLimit * blockQuotaInThousands).slice(
+            0,
+            -3
+          )}K blocks`}</Typography>
         </Stack>
         <Stack>
           <AiOutlineUnlock size={100} />

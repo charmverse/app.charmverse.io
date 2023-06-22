@@ -3,14 +3,13 @@ import { v4 } from 'uuid';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
-import { communityProduct } from '../constants';
-import { getSpaceSubscription } from '../getSpaceSubscription';
+import { getActiveSpaceSubscription } from '../getActiveSpaceSubscription';
 
-describe('getSpaceSubscription', () => {
+describe('getActiveSpaceSubscription', () => {
   it(`Should return null if space subscription doesn't exist`, async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
-    const spaceSubscription = await getSpaceSubscription({ spaceId: space.id });
+    const spaceSubscription = await getActiveSpaceSubscription({ spaceId: space.id });
 
     expect(spaceSubscription).toBeNull();
   });
@@ -22,13 +21,10 @@ describe('getSpaceSubscription', () => {
 
     await addSpaceSubscription({
       spaceId: space.id,
-      subscriptionId,
-      createdBy: user.id,
-      period: 'monthly',
-      productId: communityProduct.id
+      subscriptionId
     });
 
-    const spaceSubscription = await getSpaceSubscription({ spaceId: space.id });
+    const spaceSubscription = await getActiveSpaceSubscription({ spaceId: space.id });
 
     expect(spaceSubscription).toMatchObject(
       expect.objectContaining({

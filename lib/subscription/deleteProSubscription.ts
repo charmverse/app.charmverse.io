@@ -28,8 +28,7 @@ export async function deleteProSubscription({ spaceId, userId }: { spaceId: stri
       spaceId
     },
     data: {
-      deletedAt: new Date(),
-      status: 'cancelled'
+      deletedAt: new Date()
     }
   });
 
