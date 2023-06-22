@@ -50,12 +50,14 @@ export async function createProSubscription({
   }
 
   const pendingStripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}'`,
+    query: `metadata['spaceId']:'${spaceId}' AND status:"incomplete"`,
     expand: ['data.customer']
   });
 
   const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.find(
-    (sub) => sub.status === 'incomplete' && (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true
+    (sub) =>
+      (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
+      (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
   );
 
   const existingStripeCustomer = existingStripeSubscription?.customer as Stripe.Customer | undefined;
@@ -108,50 +110,31 @@ export async function createProSubscription({
   let subscription: Stripe.Subscription | undefined;
   try {
     // Case when the user is updating his subscription in checkout
-    if (
-      existingStripeSubscription &&
-      (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
-    ) {
-      subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        items: [
-          {
-            id: existingStripeSubscription.items.data[0].id,
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        expand: ['latest_invoice.payment_intent']
-      });
-    } else {
-      subscription = await stripeClient.subscriptions.create({
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        customer: customer.id,
-        items: [
-          {
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent']
-      });
+    if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
+      await stripeClient.subscriptions.del(existingStripeSubscription.id);
     }
+
+    subscription = await stripeClient.subscriptions.create({
+      metadata: {
+        productId,
+        period,
+        tier: 'pro',
+        spaceId: space.id
+      },
+      customer: customer.id,
+      items: [
+        {
+          price: productPrice.id,
+          quantity: blockQuota
+        }
+      ],
+      coupon,
+      payment_settings: {
+        save_default_payment_method: 'on_subscription'
+      },
+      payment_behavior: 'default_incomplete',
+      expand: ['latest_invoice.payment_intent']
+    });
   } catch (error: any) {
     log.error(`[stripe]: Failed to create subscription. ${error.message}`, {
       spaceId,
