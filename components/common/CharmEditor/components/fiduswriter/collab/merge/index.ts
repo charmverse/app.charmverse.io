@@ -1,7 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
+import type { Selection } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
+import type { StepMap } from 'prosemirror-transform';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
 
 import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
@@ -131,7 +133,7 @@ export class Merge {
         }
       } else {
         try {
-          this.autoMerge(unconfirmedTr, lostTr, data);
+          this.autoMerge(unconfirmedTr, lostTr, data, this.mod.editor.view.state.selection);
         } catch (error) {
           this.handleMergeFailure(error, unconfirmedTr.doc, toDoc);
         }
@@ -153,20 +155,18 @@ export class Merge {
     }
   }
 
-  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
+  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage, selection?: Selection) {
     /* This automerges documents incase of no conflicts */
     const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
-    const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
+    const rebasedTr = EditorState.create({ doc: toDoc, selection }).tr.setMeta('remote', true);
     const maps = new Mapping(
-      []
+      ([] as StepMap[])
         .concat(
-          // @ts-ignore
           unconfirmedTr.mapping.maps
             .slice()
             .reverse()
             .map((map) => map.invert())
         )
-        // @ts-ignore
         .concat(lostTr.mapping.maps.slice())
     );
 
