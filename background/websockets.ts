@@ -31,7 +31,7 @@ const io = new Server(server, {
       } else {
         const isCustomOriginAllowed = await verifyCustomOrigin(requestOrigin);
         if (!isCustomOriginAllowed) {
-          log.warn('Not allowed by CORS');
+          log.warn('Not allowed by CORS', { requestOrigin });
 
           callback(new Error('Not allowed by CORS'));
         } else {
