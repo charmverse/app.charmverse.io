@@ -24,11 +24,7 @@ const io = new Server(server, {
     credentials: true,
     origin: async (requestOrigin, callback) => {
       // support any subdomain for staging
-      if (
-        requestOrigin?.endsWith('.charmverse.co') ||
-        requestOrigin?.endsWith('.charmverse.io') ||
-        requestOrigin?.endsWith('.0xepicode.com') // TEMP for demo
-      ) {
+      if (requestOrigin?.endsWith('.charmverse.co') || requestOrigin?.endsWith('.charmverse.io')) {
         callback(null, requestOrigin);
       } else if (isDevEnv) {
         callback(null, requestOrigin);
