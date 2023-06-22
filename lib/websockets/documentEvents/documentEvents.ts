@@ -424,12 +424,17 @@ export class DocumentEventHandler {
       room.doc.diffs.push(message);
       room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
-      if (room.doc.version % this.docSaveInterval === 0) {
-        await this.saveDocument();
+      try {
+        await this.saveDiff(message);
+        if (room.doc.version % this.docSaveInterval === 0) {
+          await this.saveDocument();
+        }
+        this.confirmDiff(message.rid);
+        this.sendUpdatesToOthers(message);
+      } catch (error) {
+        log.error('Could not save document', { error, ...logMeta });
+        this.sendError('There was an error saving your changes! Please refresh and try again.');
       }
-      await this.saveDiff(message);
-      this.confirmDiff(message.rid);
-      this.sendUpdatesToOthers(message);
     } else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
         // We have enough diffs stored to fix it.
