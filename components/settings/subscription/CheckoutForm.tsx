@@ -96,8 +96,10 @@ export function CheckoutForm({
     }
   );
 
-  const changePaymentType = (event: SyntheticEvent, newValue: PaymentType) => {
-    setPaymentType(newValue);
+  const changePaymentType = (_event: SyntheticEvent, newValue: PaymentType) => {
+    if (newValue !== null) {
+      setPaymentType(newValue);
+    }
   };
 
   useEffect(() => {
@@ -196,6 +198,8 @@ export function CheckoutForm({
     setPendingPayment(true);
   };
 
+  const periodNaming = period === 'annual' ? 'yr' : 'mo';
+
   return (
     <>
       {pendingPayment && (
@@ -211,7 +215,7 @@ export function CheckoutForm({
               Billing Information
             </Typography>
             <Stack gap={0.5} my={2}>
-              <InputLabel>Email</InputLabel>
+              <InputLabel>Email (required)</InputLabel>
               <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('email')} />
             </Stack>
           </Stack>
@@ -239,7 +243,9 @@ export function CheckoutForm({
                   <Typography variant='body2'>Billed {period}</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>${(communityProduct.pricing[period] ?? 0) * blockQuota}/mo</Typography>
+                  <Typography>
+                    ${(communityProduct.pricing[period] ?? 0) * blockQuota}/{periodNaming}
+                  </Typography>
                 </Stack>
               </Stack>
               <Divider sx={{ my: 2 }} />
@@ -248,7 +254,7 @@ export function CheckoutForm({
                   <Typography>Total</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>${(communityProduct.pricing[period] ?? 0) * 12 * blockQuota}</Typography>
+                  <Typography>${(communityProduct.pricing[period] ?? 0) * blockQuota}</Typography>
                 </Stack>
               </Stack>
               <PaymentTabPanel value={paymentType} index='card'>

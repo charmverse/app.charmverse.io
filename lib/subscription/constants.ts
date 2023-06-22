@@ -9,12 +9,12 @@ export const communityProduct = {
   tier: 'pro',
   name: 'CharmVerse Community',
   guestLimit: 100,
-  blockLimit: 10000,
-  trial: 90,
+  blockLimit: 1000,
   monthlyActiveUserLimit: 25,
+  trial: 90,
   pricing: {
     annual: 10,
-    monthly: 12
+    monthly: 1.2
   }
 } as const;
 
@@ -24,26 +24,25 @@ export type SubscriptionProductId = typeof communityProduct.id;
 
 export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';
 export const loopApiUrl = isProdEnv ? 'https://api.loopcrypto.xyz' : 'https://demo.api.loopcrypto.xyz';
-export const defaultTrialDurationInDays = 90;
 
 // General subscription info
 
 export const subscriptionDetails = {
   free: [
-    '100% space viewable by anyone on the Internet',
+    'All spaces are viewable by anyone on the Internet',
     'Docs, Database, Forums. Member Directory, Proposal Builder',
     'Up to 200 monhthly active members',
     'Integrate with Discord, Snapshot, SAFE , NFTs & POAPS'
   ],
   community: [
-    'Everything in Free and',
-    'Comprehensive access control & unlimited roles',
-    'Invite 100 guests',
+    'Everything included in Free plus',
+    'Comprehensive access control, roles, guests, custom domain, API access and more',
+    'Invite 100 guetss',
     'Custom domain',
     'API  access'
   ],
   enterprise: [
-    'Everything in Community and',
+    'Everything included in Community Edition plus',
     '200+ monthly active members',
     'Custom guest limit',
     'Dedicated success manager'
