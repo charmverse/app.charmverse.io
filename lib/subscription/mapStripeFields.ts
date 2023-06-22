@@ -8,7 +8,10 @@ import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';
 
 function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusType {
   const { status, trial_end } = subscription;
-  if (
+
+  if (subscription.cancel_at_period_end) {
+    return 'cancel_at_end';
+  } else if (
     trial_end &&
     // Stripe value is in seconds
     (trial_end && 1000) > Date.now()
@@ -54,8 +57,8 @@ export type SubscriptionFieldsFromStripe = {
   blockQuota: number;
   priceInCents: number;
   billingEmail?: string | null;
-  expiresOn?: Date;
-  renewalDate?: Date;
+  expiresOn?: Date | null;
+  renewalDate?: Date | null;
   paymentMethod?: PaymentMethod | null;
 };
 export function mapStripeFields({
@@ -75,14 +78,23 @@ export function mapStripeFields({
       customerId: subscription.customer.id
     });
   }
+
+  const status = mapStripeStatus(subscription);
+  const expiryDate =
+    status === 'cancel_at_end'
+      ? subscription.current_period_end
+      : status === 'free_trial'
+      ? subscription.trial_end
+      : null;
+
   const fields: SubscriptionFieldsFromStripe = {
     period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
     blockQuota,
-    status: mapStripeStatus(subscription),
+    status,
     paymentMethod: null,
     billingEmail: subscription.customer.email,
-    expiresOn: subscription.trial_end ? new Date(coerceToMilliseconds(subscription.trial_end)) : undefined,
+    expiresOn: typeof expiryDate === 'number' ? new Date(coerceToMilliseconds(expiryDate)) : null,
     renewalDate: subscription.current_period_end
       ? new Date(coerceToMilliseconds(subscription.current_period_end))
       : undefined

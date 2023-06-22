@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, Grid, List, ListItem, ListItemText, Stack, TextField, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -12,8 +12,12 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUserPreferences } from 'hooks/useUserPreferences';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
@@ -39,8 +43,10 @@ export function SubscriptionInformation({
   refetchSpaceSubscription: () => Promise<SpaceSubscriptionWithStripeData | null | undefined>;
 }) {
   const { showMessage } = useSnackbar();
+  const { refreshCurrentSpace } = useCurrentSpace();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { userPreferences } = useUserPreferences();
+  const isAdmin = useIsAdmin();
 
   const {
     register,
@@ -53,6 +59,19 @@ export function SubscriptionInformation({
     resolver: yupResolver(schema())
   });
   const email = watch('email');
+
+  const { subscribe } = useWebSocketClient();
+
+  useEffect(() => {
+    const unsubscribe = subscribe('space_subscription', async () => {
+      await refetchSpaceSubscription().catch();
+      await refreshCurrentSpace();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const { trigger: updateSpaceSubscription, isMutating: isLoadingUpdate } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
@@ -138,6 +157,19 @@ export function SubscriptionInformation({
           </Typography>
           {nextBillingDate && <Typography>Renews on {nextBillingDate}</Typography>}
           {status && <Typography>Status: {status}</Typography>}
+
+          {space.paidTier !== 'free' && (
+            <Button
+              disabled={!isAdmin}
+              onClick={() => {
+                charmClient.subscription
+                  .switchToFreeTier(space.id)
+                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
+              }}
+            >
+              Use free plan
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions

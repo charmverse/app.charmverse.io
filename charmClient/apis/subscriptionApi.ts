@@ -1,3 +1,5 @@
+import type { Space } from '@charmverse/core/prisma-client';
+
 import * as http from 'adapters/http';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type {
@@ -27,5 +29,9 @@ export class SubscriptionApi {
 
   updateSpaceSubscription(spaceId: string, payload: UpdateSubscriptionRequest) {
     return http.PUT<void>(`/api/spaces/${spaceId}/subscription`, payload);
+  }
+
+  switchToFreeTier(spaceId: string) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-free-tier`);
   }
 }

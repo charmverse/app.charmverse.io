@@ -19,9 +19,6 @@ export async function getActiveSpaceSubscription({
     },
     select: {
       stripeSubscription: {
-        where: {
-          deletedAt: null
-        },
         take: 1,
         orderBy: {
           createdAt: 'desc'
@@ -45,14 +42,14 @@ export async function getActiveSpaceSubscription({
     subscription: subscriptionInStripe as Stripe.Subscription & { customer: Stripe.Customer }
   });
 
+  if (stripeData.status === 'cancelled') {
+    return null;
+  }
+
   const enrichedSubscriptionData: StripeSubscription & SubscriptionFieldsFromStripe = {
     ...activeSpaceSubscription,
     ...stripeData
   };
-
-  if (stripeData.status === 'cancelled') {
-    return null;
-  }
 
   return enrichedSubscriptionData;
 }

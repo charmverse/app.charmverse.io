@@ -36,13 +36,13 @@ export const subscriptionDetails = {
   free: [
     'All spaces are viewable by anyone on the Internet',
     'Docs, Database, Forums. Member Directory, Proposal Builder',
-    'Up to 200 monhthly active members',
+    'Up to 200 monthly active members',
     'Integrate with Discord, Snapshot, SAFE , NFTs & POAPS'
   ],
   community: [
     'Everything included in Free plus',
     'Comprehensive access control, roles, guests, custom domain, API access and more',
-    'Invite 100 guetss',
+    'Invite 100 guests',
     'Custom domain',
     'API  access'
   ],
