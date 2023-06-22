@@ -7,7 +7,7 @@ import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
 import { appEnv, isDevEnv } from 'config/constants';
-import { allowedOriginsCache } from 'lib/middleware/allowedOriginsCache';
+import { verifyCustomOrigin } from 'lib/middleware/verifyCustomOrigin';
 import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 
@@ -22,18 +22,23 @@ const io = new Server(server, {
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
-    origin: (requestOrigin, callback) => {
-      if (isDevEnv) {
-        callback(null, requestOrigin);
-      } else if (
-        // custom origins did not load yet, allow all origins temporarily
-        !allowedOriginsCache.allowedOrigins ||
-        // check if request origin ends with any of the allowed origins
-        allowedOriginsCache.allowedOrigins.some((origin) => requestOrigin?.endsWith(origin))
+    origin: async (requestOrigin, callback) => {
+      // support any subdomain for staging
+      if (
+        requestOrigin?.endsWith('.charmverse.co') ||
+        requestOrigin?.endsWith('.charmverse.io') ||
+        requestOrigin?.endsWith('.0xepicode.com') // TEMP for demo
       ) {
         callback(null, requestOrigin);
+      } else if (isDevEnv) {
+        callback(null, requestOrigin);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        const isCustomOriginAllowed = await verifyCustomOrigin(requestOrigin);
+        if (!isCustomOriginAllowed) {
+          log.warn('Not allowed by CORS');
+        }
+
+        callback(null, requestOrigin);
       }
     }
   }
