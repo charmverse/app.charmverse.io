@@ -171,47 +171,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         break;
       }
 
-      // We don't seem to have a case for using this right now
-
-      // case 'customer.subscription.updated': {
-      //   const subscription = event.data.object as Stripe.Subscription;
-      //   const spaceId = subscription.metadata.spaceId as string;
-      //   const spaceSubscription = await prisma.stripeSubscription.findUnique({
-      //     where: {
-      //       spaceId,
-      //       subscriptionId: subscription.id,
-      //       deletedAt: null,
-      //       status: {
-      //         not: 'cancelled'
-      //       }
-      //     }
-      //   });
-
-      //   if (!spaceSubscription) {
-      //     log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`);
-      //     break;
-      //   }
-
-      //   const isStatusUpdate =
-      //     (subscription.cancel_at_period_end && subscription.status === 'active') ||
-      //     (!subscription.cancel_at_period_end && spaceSubscription.status === 'cancel_at_end');
-
-      //   if (isStatusUpdate) {
-      //     relay.broadcast(
-      //       {
-      //         type: 'space_subscription',
-      //         payload: {
-      //           type: 'updated',
-      //           paidTier: subscription.metadata.tier as SubscriptionTier
-      //         }
-      //       },
-      //       spaceId
-      //     );
-      //   }
-
-      //   break;
-      // }
-
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
