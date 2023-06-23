@@ -7,7 +7,8 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { CustomRolesInfoModal } from 'components/settings/roles/CustomRolesInfoModal';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -27,7 +28,7 @@ export function DefaultPagePermissions() {
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
   const { isFreeSpace } = useIsFreeSpace();
-
+  const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'role-info-popup' });
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
   const isAdmin = useIsAdmin();
@@ -100,26 +101,30 @@ export function DefaultPagePermissions() {
   return (
     <>
       <Box mb={2}>
-        <Typography fontWeight='bold'>Default permissions for new pages</Typography>
+        <Typography fontWeight='bold' display='flex' alignItems='center' gap={2}>
+          Default permissions for new pages
+          <UpgradeChip upgradeContext='page_permissions' onClick={rolesInfoPopup.open} />
+        </Typography>
         <Typography variant='caption'>
           This applies to top-level pages only. Subpages will inherit permissions from their parent.
         </Typography>
       </Box>
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
         <Typography>Default access level for Members</Typography>
-        <Box display='flex' gap={1} alignItems='center'>
-          <UpgradeChip upgradeContext='page_permissions' />
-          <Button
-            color='secondary'
-            variant='outlined'
-            disabled={isUpdatingPagePermission || !isAdmin || isFreeSpace}
-            loading={isUpdatingPagePermission}
-            endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-            {...bindTrigger(popupState)}
-          >
-            {isFreeSpace ? pagePermissionLevels.editor : pagePermissionLevels[selectedPagePermission]}
-          </Button>
-        </Box>
+        <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Button
+              color='secondary'
+              variant='outlined'
+              disabled={isUpdatingPagePermission || !isAdmin || isFreeSpace}
+              loading={isUpdatingPagePermission}
+              endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
+              {...bindTrigger(popupState)}
+            >
+              {isFreeSpace ? pagePermissionLevels.editor : pagePermissionLevels[selectedPagePermission]}
+            </Button>
+          </Box>
+        </UpgradeWrapper>
       </Box>
 
       <FormControlLabel
@@ -129,20 +134,21 @@ export function DefaultPagePermissions() {
           justifyContent: 'space-between'
         }}
         control={
-          <Box display='flex' gap={5.5} alignItems='center'>
-            <UpgradeChip upgradeContext='page_permissions' />
-            <Switch
-              disabled={!isAdmin || isFreeSpace}
-              onChange={(ev) => {
-                if (!isFreeSpace) {
-                  const { checked: publiclyAccessible } = ev.target;
-                  setDefaultPublicPages(publiclyAccessible);
-                  setTouched(true);
-                }
-              }}
-              defaultChecked={defaultPublicPages || isFreeSpace}
-            />
-          </Box>
+          <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+            <Box display='flex' gap={5.5} alignItems='center'>
+              <Switch
+                disabled={!isAdmin || isFreeSpace}
+                onChange={(ev) => {
+                  if (!isFreeSpace) {
+                    const { checked: publiclyAccessible } = ev.target;
+                    setDefaultPublicPages(publiclyAccessible);
+                    setTouched(true);
+                  }
+                }}
+                defaultChecked={defaultPublicPages || isFreeSpace}
+              />
+            </Box>
+          </UpgradeWrapper>
         }
         label='Accessible to public'
         labelPlacement='start'
@@ -154,17 +160,18 @@ export function DefaultPagePermissions() {
           justifyContent: 'space-between'
         }}
         control={
-          <Box display='flex' gap={5.5} alignItems='center'>
-            <UpgradeChip upgradeContext='proposal_permissions' />
-            <Switch
-              disabled={!isAdmin || isFreeSpace}
-              onChange={(ev) => {
-                setRequireProposalTemplate(ev.target.checked);
-                setTouched(true);
-              }}
-              defaultChecked={requireProposalTemplate && !isFreeSpace}
-            />
-          </Box>
+          <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+            <Box display='flex' gap={5.5} alignItems='center'>
+              <Switch
+                disabled={!isAdmin || isFreeSpace}
+                onChange={(ev) => {
+                  setRequireProposalTemplate(ev.target.checked);
+                  setTouched(true);
+                }}
+                defaultChecked={requireProposalTemplate && !isFreeSpace}
+              />
+            </Box>
+          </UpgradeWrapper>
         }
         label='Require proposal template'
         labelPlacement='start'
@@ -208,6 +215,7 @@ export function DefaultPagePermissions() {
           );
         })}
       </Menu>
+      <CustomRolesInfoModal isOpen={rolesInfoPopup.isOpen} onClose={rolesInfoPopup.close} />
     </>
   );
 }

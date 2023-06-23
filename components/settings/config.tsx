@@ -12,7 +12,7 @@ export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'ap
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
 
-export const premiumSettingSections: SpaceSettingsSection[] = ['roles'];
+export const premiumSettingSections: Extract<SpaceSettingsSection, 'roles'>[] = ['roles'];
 
 type SettingsTab<T extends string> = {
   icon: JSX.Element;

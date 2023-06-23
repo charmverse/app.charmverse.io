@@ -3,26 +3,26 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
-  Box,
-  Grid,
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Typography,
+  Box,
   Chip,
   Divider,
+  Grid,
   Paper,
   Tab,
-  Tabs
+  Tabs,
+  Typography
 } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 
 import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
-import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
+import type { Props as UpgradeProps } from 'components/settings/subscription/UpgradeWrapper';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Member } from 'lib/members/interfaces';
@@ -39,7 +39,7 @@ type RoleRowProps = {
   permissions?: ReactNode;
   roleActions?: ReactNode;
   memberRoleId?: string;
-  upgradeContext?: UpgradeContext;
+  upgradeProps?: UpgradeProps;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -58,7 +58,7 @@ export function RoleRowBase({
   permissions,
   onAddMembers,
   members,
-  upgradeContext
+  upgradeProps
 }: RoleRowProps) {
   const [openTab, setOpenTab] = useState(0);
 
@@ -75,7 +75,9 @@ export function RoleRowBase({
               <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {title}
                 <Chip size='small' label={members.length} />
-                {upgradeContext && <UpgradeChip upgradeContext={upgradeContext} />}
+                {upgradeProps?.upgradeContext && (
+                  <UpgradeChip upgradeContext={upgradeProps.upgradeContext} onClick={upgradeProps.onClick} />
+                )}
               </Typography>
             </Box>
             <div onClick={(e) => e.stopPropagation()}>{roleActions}</div>

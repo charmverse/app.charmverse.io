@@ -20,14 +20,19 @@ export const upgradeMessages = {
 
 export type UpgradeContext = keyof typeof upgradeMessages;
 
-type Props = {
+/**
+ * @onClick By default, this opens the settings dialog on the billing tab. Pass a custom handler to override this and provide your own selling flow.
+ */
+export type Props = {
   upgradeContext?: UpgradeContext;
   forceDisplay?: boolean;
+  onClick?: () => void;
 };
 
 export function UpgradeWrapper({
   children,
   upgradeContext,
+  onClick,
   forceDisplay,
   tooltipProps
 }: Props & { children: ReactNode; tooltipProps?: TooltipProps }) {
@@ -38,7 +43,11 @@ export function UpgradeWrapper({
   function handleClick(ev: SyntheticEvent) {
     ev.preventDefault();
     ev.stopPropagation();
-    openUpgradeSubscription();
+    if (onClick) {
+      onClick();
+    } else {
+      openUpgradeSubscription();
+    }
   }
 
   if (!isFreeSpace && !forceDisplay) {
@@ -53,7 +62,7 @@ export function UpgradeWrapper({
   );
 }
 
-export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
+export function UpgradeChip({ upgradeContext, forceDisplay, onClick }: Props) {
   const { isFreeSpace } = useIsFreeSpace();
 
   if (!isFreeSpace && !forceDisplay) {
@@ -61,7 +70,7 @@ export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
   }
 
   return (
-    <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay>
+    <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay onClick={onClick}>
       <Chip
         color='warning'
         variant='outlined'

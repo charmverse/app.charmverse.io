@@ -2,11 +2,11 @@ import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
 import type { SpaceSettingsSection } from 'components/settings/config';
 import { premiumSettingSections } from 'components/settings/config';
+import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 
 export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
@@ -48,6 +48,10 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
   }
 `;
 
+const premiumSectionToUpgradeContext: Record<(typeof premiumSettingSections)[number], UpgradeContext> = {
+  roles: 'custom_roles'
+};
+
 export function SidebarLink({
   icon,
   label,
@@ -70,9 +74,11 @@ export function SidebarLink({
           {icon}
           {label}
         </div>
-        {section && premiumSettingSections.includes(section) && (
+        {section && (premiumSettingSections as SpaceSettingsSection[]).includes(section) && (
           <span style={{ paddingLeft: 10 }}>
-            <UpgradeChip upgradeContext='custom_roles' />
+            <UpgradeChip
+              upgradeContext={(premiumSectionToUpgradeContext as Record<SpaceSettingsSection, UpgradeContext>)[section]}
+            />
           </span>
         )}
       </Box>
