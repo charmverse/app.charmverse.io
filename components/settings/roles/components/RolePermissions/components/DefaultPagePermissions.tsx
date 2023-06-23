@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { CustomRolesInfoModal } from 'components/settings/roles/CustomRolesInfoModal';
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -103,7 +103,6 @@ export function DefaultPagePermissions() {
       <Box mb={2}>
         <Typography fontWeight='bold' display='flex' alignItems='center' gap={2}>
           Default permissions for new pages
-          <UpgradeChip upgradeContext='page_permissions' onClick={rolesInfoPopup.open} />
         </Typography>
         <Typography variant='caption'>
           This applies to top-level pages only. Subpages will inherit permissions from their parent.

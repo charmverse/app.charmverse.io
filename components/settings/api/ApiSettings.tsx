@@ -85,9 +85,11 @@ export function ApiSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend>API Settings</Legend>
+      <Legend sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        API Settings <UpgradeChip upgradeContext='api_access' />
+      </Legend>
       <Typography variant='h6' sx={{ display: 'flex', alignContent: 'center', gap: 1 }}>
-        API Endpoints <UpgradeChip />
+        API Endpoints
       </Typography>
       <Typography>
         Our API endpoints enable you to access and create content in your space. View the{' '}
