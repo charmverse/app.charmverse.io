@@ -4,6 +4,7 @@ import type { TooltipProps } from '@mui/material/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode, SyntheticEvent } from 'react';
 
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
@@ -22,6 +23,7 @@ export type UpgradeContext = keyof typeof upgradeMessages;
 
 /**
  * @onClick By default, this opens the settings dialog on the billing tab. Pass a custom handler to override this and provide your own selling flow.
+ * User needs to be an admin
  */
 export type Props = {
   upgradeContext?: UpgradeContext;
@@ -39,10 +41,17 @@ export function UpgradeWrapper({
   const { openUpgradeSubscription } = useSettingsDialog();
 
   const { isFreeSpace } = useIsFreeSpace();
+  const isAdmin = useIsAdmin();
 
   function handleClick(ev: SyntheticEvent) {
     ev.preventDefault();
     ev.stopPropagation();
+
+    // Don't perform any actions for non-admins
+    if (!isAdmin) {
+      return;
+    }
+
     if (onClick) {
       onClick();
     } else {
