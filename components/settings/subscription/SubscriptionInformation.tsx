@@ -119,6 +119,9 @@ export function SubscriptionInformation({
     }
   }, [spaceSubscription?.status]);
 
+  const price =
+    spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+
   const freeTrialEnds =
     spaceSubscription.status === 'free_trial'
       ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
@@ -152,8 +155,7 @@ export function SubscriptionInformation({
           <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
 
           <Typography>
-            ${(communityProduct.pricing[spaceSubscription.period] ?? 0) * spaceSubscription.blockQuota} per month billed{' '}
-            {spaceSubscription.period}
+            ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
           </Typography>
           {nextBillingDate && <Typography>Renews on {nextBillingDate}</Typography>}
           {status && <Typography>Status: {status}</Typography>}
