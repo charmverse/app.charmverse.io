@@ -3,6 +3,7 @@ import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
+  Box,
   FormControlLabel,
   IconButton,
   ListItem,
@@ -11,8 +12,7 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography,
-  Box
+  Typography
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTime } from 'luxon';
@@ -20,11 +20,14 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { emptyDocument } from 'lib/prosemirror/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 interface InlineVoteOptionsProps {
@@ -114,12 +117,15 @@ export function CreateVoteModal({
   proposalFlowFlags
 }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
-  const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const { createVote } = useVotes({ pageId, postId });
+  const [voteContent, setVoteContent] = useState<{ content: PageContent; contentText: string }>({
+    content: emptyDocument,
+    contentText: ''
+  });
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -156,7 +162,8 @@ export function CreateVoteModal({
       deadline: deadline.toJSDate(),
       voteOptions: options.map((option) => option.name),
       title: voteTitle,
-      description: voteDescription,
+      content: voteContent.content,
+      contentText: voteContent.contentText,
       pageId,
       postId,
       threshold: +passThreshold,
@@ -199,13 +206,24 @@ export function CreateVoteModal({
 
         {!proposal && (
           <Box flexDirection='column' display='flex'>
-            <TextField
-              placeholder='Details (Optional)'
-              multiline
-              rows={3}
-              value={voteDescription}
-              onChange={(e) => {
-                setVoteDescription(e.target.value);
+            <CharmEditor
+              disablePageSpecificFeatures
+              disableRowHandles
+              style={{
+                left: 0,
+                minHeight: 75,
+                backgroundColor: 'var(--input-bg)'
+              }}
+              placeholderText='Details (Optional)'
+              content={voteContent.content as PageContent}
+              enableVoting={false}
+              disableNestedPages
+              isContentControlled
+              onContentChange={(content) => {
+                setVoteContent({
+                  content: content.doc,
+                  contentText: content.rawText
+                });
               }}
             />
           </Box>

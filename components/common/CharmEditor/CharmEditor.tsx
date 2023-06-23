@@ -715,21 +715,23 @@ function CharmEditor({
       {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
-          <SidebarDrawer
-            id='page-action-sidebar'
-            title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
-            open={!!pageActionDisplay}
-          >
-            {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
-              <SuggestionsSidebar
-                pageId={pageId}
-                spaceId={currentSpace.id}
-                readOnly={!pagePermissions?.edit_content}
-                state={suggestionState}
-              />
-            )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
-          </SidebarDrawer>
+          {(enableComments || enableSuggestingMode) && (
+            <SidebarDrawer
+              id='page-action-sidebar'
+              title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
+              open={!!pageActionDisplay}
+            >
+              {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
+                <SuggestionsSidebar
+                  pageId={pageId}
+                  spaceId={currentSpace.id}
+                  readOnly={!pagePermissions?.edit_content}
+                  state={suggestionState}
+                />
+              )}
+              {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+            </SidebarDrawer>
+          )}
           <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
