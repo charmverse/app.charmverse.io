@@ -9,10 +9,10 @@ export function filterSpaceByDomain(spaces: Space[], domainOrCustomDomain: strin
 
   const space = spaces.find((s) => {
     if (isCustomDomain(domainOrCustomDomain)) {
-      return !!s.customDomain && s.customDomain === domainOrCustomDomain;
+      return !!s.customDomain && s.customDomain.toLowerCase() === domainOrCustomDomain.toLowerCase();
     }
 
-    return s.domain === domainOrCustomDomain;
+    return s.domain.toLowerCase() === domainOrCustomDomain.toLowerCase();
   });
 
   return space;
