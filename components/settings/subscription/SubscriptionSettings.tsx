@@ -105,7 +105,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     <Stack gap={1}>
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
-      <Typography>Comprehensive access control & unlimited roles, guests, custom domain and API access</Typography>
+      <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
       <PlanSelection
         disabled={isInitialSubscriptionLoading}
         onSelect={handlePlanSelect}
