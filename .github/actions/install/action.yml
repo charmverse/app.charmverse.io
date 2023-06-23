@@ -40,5 +40,5 @@ runs:
     # 2. Set core branch
     # - name: Install special core library
     #   shell: bash
-    #   if: github.head_ref == 'feat/count-blocks'
-    #   run: npm install github:charmverse/core#feat/count-blocks
+    #   if: github.head_ref == 'paid/free-trials'
+    #   run: npm install github:charmverse/core#paid/free-trials

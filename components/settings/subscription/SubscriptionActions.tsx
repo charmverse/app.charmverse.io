@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import Button from 'components/common/Button';
 import { isProdEnv } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 
 export function SubscriptionActions({
   spaceSubscription,
@@ -12,7 +12,7 @@ export function SubscriptionActions({
   onCancelAtEnd,
   onReactivation
 }: {
-  spaceSubscription: SpaceSubscription | null | undefined;
+  spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
   loading: boolean;
   onDelete: () => void;
   onCancelAtEnd: () => void;
@@ -26,7 +26,7 @@ export function SubscriptionActions({
 
   return (
     <Stack flexDirection='column' gap={1} mb={1}>
-      {spaceSubscription?.status === 'cancelAtEnd' && (
+      {spaceSubscription?.status === 'cancel_at_end' && (
         <Button disabled={loading} onClick={onReactivation}>
           Reactivate Plan
         </Button>

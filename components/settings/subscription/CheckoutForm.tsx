@@ -18,7 +18,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import type { PaymentType } from './PaymentTabs';
@@ -45,7 +45,7 @@ export function CheckoutForm({
   period: SubscriptionPeriod;
   subscriptionId: string;
   onCancel: VoidFunction;
-  refetch: KeyedMutator<SpaceSubscription | null>;
+  refetch: KeyedMutator<SpaceSubscriptionWithStripeData | null>;
 }) {
   const stripe = useStripe();
   const elements = useElements();

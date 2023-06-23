@@ -73,7 +73,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
   try {
     const body = await buffer(req);
     const event: Stripe.Event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
-
     switch (event.type) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
@@ -102,16 +101,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         const period = priceInterval === 'month' ? ('monthly' as const) : ('annual' as const);
 
-        const newData: Omit<StripeSubscription, 'id' | 'createdAt'> = {
+        const newData: Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'> = {
           customerId,
           subscriptionId,
-          period,
-          productId,
-          priceId: subscriptionData?.price?.id,
-          spaceId,
-          status: 'active' as const,
-          deletedAt: null,
-          blockQuota: invoice.lines.data[0].quantity ?? 0
+          deletedAt: null
         };
 
         await prisma.$transaction([
@@ -120,8 +113,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               subscriptionId: stripeSubscription.id,
               spaceId
             },
-            create: newData,
-            update: newData
+            create: {
+              ...newData,
+              spaceId
+            },
+            update: {}
           }),
           prisma.space.update({
             where: {
@@ -173,6 +169,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
@@ -180,9 +177,14 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           where: {
             spaceId,
             subscriptionId: subscription.id,
-            deletedAt: null,
-            status: {
-              not: 'cancelled'
+            deletedAt: null
+          },
+          include: {
+            space: {
+              select: {
+                id: true,
+                paidTier: true
+              }
             }
           }
         });
@@ -192,46 +194,53 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           break;
         }
 
-        const isStatusUpdate =
-          (subscription.cancel_at_period_end && subscription.status === 'active') ||
-          (!subscription.cancel_at_period_end && spaceSubscription.status === 'cancelAtEnd');
+        let space = spaceSubscription.space;
 
-        if (isStatusUpdate) {
+        if (subscription.status === 'canceled') {
           await prisma.stripeSubscription.update({
             where: {
-              id: spaceSubscription.id
+              id: subscription.id
             },
             data: {
-              status: subscription.cancel_at_period_end ? 'cancelAtEnd' : 'active'
+              deletedAt: new Date()
             }
           });
 
-          relay.broadcast(
-            {
-              type: 'space_subscription',
-              payload: {
-                type: 'updated',
-                paidTier: subscription.metadata.tier as SubscriptionTier
+          if (space.paidTier !== 'free') {
+            space = await prisma.space.update({
+              where: {
+                id: space.id
+              },
+              data: {
+                paidTier: 'cancelled'
               }
-            },
-            spaceId
-          );
+            });
+          }
         }
+
+        relay.broadcast(
+          {
+            type: 'space_subscription',
+            payload: {
+              type: 'updated',
+              paidTier: space.paidTier as SubscriptionTier
+            }
+          },
+          spaceId
+        );
 
         break;
       }
-
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            spaceId,
-            subscriptionId: subscription.id,
-            deletedAt: null,
-            status: {
-              not: 'cancelled'
-            }
+            subscriptionId: subscription.id
+          },
+          select: {
+            id: true,
+            deletedAt: true
           }
         });
 
@@ -242,32 +251,40 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           break;
         }
 
-        await prisma.stripeSubscription.update({
+        const afterUpdate = await prisma.stripeSubscription.update({
           where: {
             spaceId,
-            subscriptionId: subscription.id,
-            deletedAt: null,
-            status: {
-              not: 'cancelled'
-            }
+            subscriptionId: subscription.id
           },
           data: {
-            deletedAt: new Date(),
-            status: 'cancelled',
+            deletedAt: new Date()
+          },
+          select: {
             space: {
-              update: {
-                paidTier: 'free'
+              select: {
+                paidTier: true
               }
             }
           }
         });
+
+        if (afterUpdate.space.paidTier !== 'free') {
+          await prisma.space.update({
+            where: {
+              id: spaceId
+            },
+            data: {
+              paidTier: 'cancelled'
+            }
+          });
+        }
 
         relay.broadcast(
           {
             type: 'space_subscription',
             payload: {
               type: 'cancelled',
-              paidTier: 'free'
+              paidTier: 'cancelled'
             }
           },
           spaceId
