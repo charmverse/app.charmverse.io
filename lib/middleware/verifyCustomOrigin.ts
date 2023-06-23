@@ -26,7 +26,7 @@ export async function verifyCustomOrigin(origin: string | undefined) {
 
     return cache[origin]?.isValid ?? false;
   } catch (error) {
-    log.error('Error veryfing custom cors origin', { error });
+    log.error('Error veryfing custom cors origin', { error, origin });
 
     return false;
   }

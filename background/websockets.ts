@@ -29,7 +29,14 @@ const io = new Server(server, {
       } else if (isDevEnv) {
         callback(null, requestOrigin);
       } else {
-        const isCustomOriginAllowed = await verifyCustomOrigin(requestOrigin);
+        let isCustomOriginAllowed = false;
+
+        try {
+          isCustomOriginAllowed = await verifyCustomOrigin(requestOrigin);
+        } catch (error) {
+          log.error('Error verifying custom cors origin', { error, requestOrigin });
+        }
+
         if (!isCustomOriginAllowed) {
           log.warn('Not allowed by CORS', { requestOrigin });
 
