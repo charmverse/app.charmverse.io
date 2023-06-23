@@ -12,6 +12,10 @@ import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spa
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
 export class SpacesApi {
+  getSpace(spaceId: string) {
+    return http.GET<Space>(`/api/spaces/${spaceId}`);
+  }
+
   searchByDomain(search: string) {
     return http.GET<SpaceWithGates | null>('/api/spaces/search-domain', { search });
   }

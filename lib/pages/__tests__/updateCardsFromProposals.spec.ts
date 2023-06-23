@@ -1,8 +1,11 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import type { Block, Page, Space, User } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { prismaToBlock } from 'lib/focalboard/block';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
@@ -223,6 +226,28 @@ describe('updateCardsFromProposals', () => {
     });
 
     expect(deletedCard).toBeFalsy();
+  });
+
+  it('should not update cards if none of the view is connected to a proposal source', async () => {
+    const views = await prisma.block.findMany({
+      where: {
+        type: 'view',
+        parentId: board.id
+      }
+    });
+
+    for (const view of views) {
+      await prisma.block.update({
+        where: {
+          id: view.id
+        },
+        data: { ...view, fields: { ...(view as unknown as BoardView).fields, sourceType: undefined } }
+      });
+    }
+
+    await expect(
+      updateCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
   it('should not create cards from proposals if board is not found', async () => {

@@ -6,13 +6,10 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import type {
-  CreateProSubscriptionResponse,
-  CreateProSubscriptionRequest,
-  UpdateSubscriptionRequest
-} from 'lib/subscription/interfaces';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
+import type { CreateProSubscriptionResponse, CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { updateProSubscription } from 'lib/subscription/updateProSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -32,10 +29,13 @@ handler
   .use(requireKeys(['period', 'blockQuota'], 'body'))
   .post(createPaymentSubscription);
 
-async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
+async function getSpaceSubscriptionController(
+  req: NextApiRequest,
+  res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
+) {
   const { id: spaceId } = req.query as { id: string };
 
-  const spaceSubscription = await getSpaceSubscription({
+  const spaceSubscription = await getActiveSpaceSubscription({
     spaceId
   });
 

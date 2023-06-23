@@ -16,7 +16,8 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon = ''
+  coupon = '',
+  freeTrial
 }: {
   spaceId: string;
 } & CreateProSubscriptionRequest): Promise<ProSubscriptionResponse> {
@@ -121,6 +122,7 @@ export async function createProSubscription({
         tier: 'pro',
         spaceId: space.id
       },
+      trial_period_days: freeTrial ? communityProduct.trial : undefined,
       customer: customer.id,
       items: [
         {

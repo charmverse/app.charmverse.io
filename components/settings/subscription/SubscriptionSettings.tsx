@@ -1,4 +1,4 @@
-import type { Space, SubscriptionPeriod } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import Legend from '../Legend';
@@ -104,12 +105,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     <Stack gap={1}>
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
-      <Typography>Comprehensive access control & unlimited roles, guests, custom domain and API access</Typography>
+      <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
       <PlanSelection
         disabled={isInitialSubscriptionLoading}
         onSelect={handlePlanSelect}
         onSelectCommited={handlePlanSelectCommited}
-        blockQuota={blockQuota}
+        blockQuotaInThousands={blockQuota}
         period={period}
       />
       <LoadingComponent isLoading={isInitialSubscriptionLoading} />

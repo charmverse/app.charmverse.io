@@ -1,7 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
+import type { Selection } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
+import type { StepMap } from 'prosemirror-transform';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
 
 import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
@@ -131,7 +133,7 @@ export class Merge {
         }
       } else {
         try {
-          this.autoMerge(unconfirmedTr, lostTr, data);
+          this.autoMerge(unconfirmedTr, lostTr, data, this.mod.editor.view.state.selection);
         } catch (error) {
           this.handleMergeFailure(error, unconfirmedTr.doc, toDoc);
         }
@@ -153,20 +155,18 @@ export class Merge {
     }
   }
 
-  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
+  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage, selection?: Selection) {
     /* This automerges documents incase of no conflicts */
     const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
-    const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
+    const rebasedTr = EditorState.create({ doc: toDoc, selection }).tr.setMeta('remote', true);
     const maps = new Mapping(
-      []
+      ([] as StepMap[])
         .concat(
-          // @ts-ignore
           unconfirmedTr.mapping.maps
             .slice()
             .reverse()
             .map((map) => map.invert())
         )
-        // @ts-ignore
         .concat(lostTr.mapping.maps.slice())
     );
 
@@ -182,42 +182,45 @@ export class Merge {
       }
     });
 
-    let tracked;
-    let rebasedTrackedTr; // offline steps to be tracked
-    if (
-      // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
-      // &&
-      unconfirmedTr.steps.length > this.trackOfflineLimit ||
-      lostTr.steps.length > this.remoteTrackOfflineLimit
-    ) {
-      tracked = true;
-      // Either this user has made 50 changes since going offline,
-      // or the document has 20 changes to it. Therefore we add tracking
-      // to the changes of this user and ask user to clean up.
-      rebasedTrackedTr = trackedTransaction(
-        rebasedTr,
-        this.mod.editor.view.state,
-        this.mod.editor.user,
-        false,
-        new Date(Date.now() - this.mod.editor.clientTimeAdjustment)
-      );
-    } else {
-      tracked = false;
-      rebasedTrackedTr = rebasedTr;
-    }
+    // disable the following code which turns a users edits into suggestions.
+    // In testing, the user was not able to accept the suggesitons, and it might be better to just let them undo changes via history UI
+
+    // let tracked;
+    // let rebasedTrackedTr; // offline steps to be tracked
+    // if (
+    //   // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
+    //   // &&
+    //   unconfirmedTr.steps.length > this.trackOfflineLimit ||
+    //   lostTr.steps.length > this.remoteTrackOfflineLimit
+    // ) {
+    //   tracked = true;
+    //   // Either this user has made 50 changes since going offline,
+    //   // or the document has 20 changes to it. Therefore we add tracking
+    //   // to the changes of this user and ask user to clean up.
+    //   rebasedTrackedTr = trackedTransaction(
+    //     rebasedTr,
+    //     this.mod.editor.view.state,
+    //     this.mod.editor.user,
+    //     false,
+    //     new Date(Date.now() - this.mod.editor.clientTimeAdjustment)
+    //   );
+    // } else {
+    //   tracked = false;
+    //   rebasedTrackedTr = rebasedTr;
+    // }
 
     // this.mod.editor.docInfo.version = data.doc.v
-    rebasedTrackedTr.setMeta('remote', true);
-    this.mod.editor.view.dispatch(rebasedTrackedTr);
+    rebasedTr.setMeta('remote', true);
+    this.mod.editor.view.dispatch(rebasedTr);
 
-    if (tracked) {
-      log.warn(
-        'Showed alert to user after auto-merge: The document was modified substantially by other users while you were offline'
-      );
-      alert(
-        'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
-      );
-    }
+    // if (tracked) {
+    //   log.warn(
+    //     'Showed alert to user after auto-merge: The document was modified substantially by other users while you were offline'
+    //   );
+    //   alert(
+    //     'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
+    //   );
+    // }
   }
 
   getDocData(offlineDoc: Node) {

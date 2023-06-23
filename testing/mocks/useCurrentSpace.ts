@@ -7,6 +7,7 @@ import { createMockSpace } from './space';
 export const mockCurrentSpaceContext = (space?: Partial<Space>): ReturnType<typeof useCurrentSpace> => {
   return {
     space: createMockSpace(space),
-    isLoading: false
+    isLoading: false,
+    refreshCurrentSpace: () => null
   };
 };
