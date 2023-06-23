@@ -12,7 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import { forumMemberPermissionOptions, postCategoryPermissionLabels } from './shared';
+import { forumMemberPermissionOptions, postCategoryPermissionLabels } from '../shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
@@ -23,8 +23,8 @@ type Props = {
   postCategoryId: string;
   canEdit: boolean;
   disabledTooltip?: string;
-  updatePermission: (newPermission: PostCategoryPermissionAssignment & { id?: string }) => void;
-  deletePermission: (permissionId: string) => void;
+  updatePermission?: (newPermission: PostCategoryPermissionAssignment & { id?: string }) => void;
+  deletePermission?: (permissionId: string) => void;
 };
 
 export function PostCategoryRolePermissionRow({
@@ -39,7 +39,7 @@ export function PostCategoryRolePermissionRow({
   updatePermission,
   deletePermission
 }: Props) {
-  const roles = useRoles();
+  const { roles } = useRoles();
   const { space } = useCurrentSpace();
 
   const defaultExists = !!defaultPermissionLevel;
@@ -61,14 +61,14 @@ export function PostCategoryRolePermissionRow({
   }
 
   const assigneeName = useMemo(() => {
-    return assignee.group === 'space' ? `Default permissions` : roles.roles?.find((r) => r.id === assignee.id)?.name;
+    return assignee.group === 'space' ? `Default permissions` : roles?.find((r) => r.id === assignee.id)?.name;
   }, [roles, space]);
 
   function handleUpdate(level: keyof typeof friendlyLabels) {
     if (level === 'delete' && existingPermissionId) {
-      deletePermission(existingPermissionId);
+      deletePermission?.(existingPermissionId);
     } else if (level !== 'delete' && level !== '') {
-      updatePermission({ id: existingPermissionId, permissionLevel: level, postCategoryId, assignee });
+      updatePermission?.({ id: existingPermissionId, permissionLevel: level, postCategoryId, assignee });
     }
   }
 

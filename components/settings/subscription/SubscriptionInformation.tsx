@@ -157,7 +157,11 @@ export function SubscriptionInformation({
           <Typography>
             ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
           </Typography>
-          {nextBillingDate && <Typography>Renews on {nextBillingDate}</Typography>}
+          {nextBillingDate && (
+            <Typography>
+              {spaceSubscription.status === 'free_trial' ? 'First payment' : 'Renews'} on {nextBillingDate}
+            </Typography>
+          )}
           {status && <Typography>Status: {status}</Typography>}
 
           {space.paidTier !== 'free' && (

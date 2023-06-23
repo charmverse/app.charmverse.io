@@ -13,4 +13,3 @@ export const postCategoryPermissionLabels: Record<PostCategoryPermissionLevel, s
 const { category_admin, moderator, custom, ...options } = postCategoryPermissionLabels;
 
 export const forumMemberPermissionOptions = options;
-export type BulkRolePostCategoryPermissionUpsert = { permissionLevel: PostCategoryPermissionLevel; roleIds: string[] };

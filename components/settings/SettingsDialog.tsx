@@ -160,6 +160,7 @@ export function SpaceSettingsDialog() {
                   icon={tab.icon}
                   onClick={() => onClick(tab.path)}
                   active={activePath === tab.path}
+                  section={tab.path}
                 />
               ))}
         </Box>

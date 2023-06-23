@@ -32,9 +32,10 @@ const StyledBox = styled(Box)`
   cursor: pointer;
 `;
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
-  const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+  const visibleProperties = getDisplayProperties('gallery');
+  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
     return record;
   }, {} as any);
@@ -91,12 +92,8 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
           showDiscord={!isDiscordHidden}
           showTwitter={!isTwitterHidden}
         />
-        {properties.map((property) => {
+        {visibleProperties.map((property) => {
           const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);
-          const hiddenInGallery = !property.enabledViews.includes('gallery');
-          if (hiddenInGallery) {
-            return null;
-          }
           switch (property.type) {
             case 'bio': {
               return (
