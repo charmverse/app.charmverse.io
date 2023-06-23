@@ -1,31 +1,37 @@
+import type { Space } from '@charmverse/core/prisma-client';
+
 import * as http from 'adapters/http';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type {
+  CreateCryptoSubscriptionRequest,
   CreateCryptoSubscriptionResponse,
-  CreatePaymentSubscriptionResponse,
-  CreateSubscriptionRequest,
-  UpdateSubscriptionRequest
+  CreateProSubscriptionRequest,
+  CreateProSubscriptionResponse
 } from 'lib/subscription/interfaces';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 export class SubscriptionApi {
-  createSubscription(spaceId: string, payload: CreateSubscriptionRequest) {
-    return http.POST<CreatePaymentSubscriptionResponse>(`/api/spaces/${spaceId}/subscription`, payload);
+  createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
+    return http.POST<CreateProSubscriptionResponse>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {
-    return http.GET<SpaceSubscription | null>(`/api/spaces/${spaceId}/subscription`);
+    return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
   }
 
-  createCryptoSubscription(spaceId: string, payload: CreateSubscriptionRequest) {
+  createCryptoSubscription(spaceId: string, payload: CreateCryptoSubscriptionRequest) {
     return http.POST<CreateCryptoSubscriptionResponse>(`/api/spaces/${spaceId}/crypto-subscription`, payload);
   }
 
-  // @TODO Delete this when all is done
   deleteSpaceSubscription(spaceId: string) {
     return http.DELETE<void>(`/api/spaces/${spaceId}/subscription`);
   }
 
   updateSpaceSubscription(spaceId: string, payload: UpdateSubscriptionRequest) {
     return http.PUT<void>(`/api/spaces/${spaceId}/subscription`, payload);
+  }
+
+  switchToFreeTier(spaceId: string) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-free-tier`);
   }
 }

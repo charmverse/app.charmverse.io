@@ -15,6 +15,7 @@ import { WalletSelector } from 'components/_app/Web3ConnectionManager/components
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
+import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -92,6 +93,7 @@ function LoginHandler(props: DialogProps) {
   const router = useRouter();
   const returnUrl = router.query.returnUrl;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
+  const { isOnCustomDomain } = useCustomDomain();
 
   const [showLoginError, setShowLoginError] = useState(false);
 
@@ -101,6 +103,7 @@ function LoginHandler(props: DialogProps) {
 
   const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
+
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
@@ -188,56 +191,60 @@ function LoginHandler(props: DialogProps) {
               </ListItem>
             )}
 
-            <DialogTitle sx={{ mt: -1 }} textAlign='left'>
-              Connect Account
-            </DialogTitle>
+            {!isOnCustomDomain && (
+              <>
+                <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+                  Connect Account
+                </DialogTitle>
 
-            <Link
-              data-test='connect-discord'
-              href={
-                typeof window !== 'undefined'
-                  ? `/api/discord/oauth?type=login&redirect=${returnUrl ?? redirectUrl ?? '/'}`
-                  : ''
-              }
-            >
-              <ListItem>
-                <ConnectorButton
-                  name='Connect with Discord'
-                  disabled={false}
-                  isActive={false}
-                  isLoading={false}
-                  icon={
-                    <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2' }}>
-                      <DiscordIcon />
-                    </SvgIcon>
+                <Link
+                  data-test='connect-discord'
+                  href={
+                    typeof window !== 'undefined'
+                      ? `/api/discord/oauth?type=login&redirect=${returnUrl ?? redirectUrl ?? '/'}`
+                      : ''
                   }
-                />
-              </ListItem>
-            </Link>
+                >
+                  <ListItem>
+                    <ConnectorButton
+                      name='Connect with Discord'
+                      disabled={false}
+                      isActive={false}
+                      isLoading={false}
+                      icon={
+                        <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2' }}>
+                          <DiscordIcon />
+                        </SvgIcon>
+                      }
+                    />
+                  </ListItem>
+                </Link>
 
-            {/* Google login method */}
-            <ListItem>
-              <ConnectorButton
-                onClick={handleGoogleLogin}
-                name='Connect with Google'
-                iconUrl='Google_G.png'
-                disabled={false}
-                isActive={false}
-                isLoading={false}
-              />
-            </ListItem>
+                {/* Google login method */}
+                <ListItem>
+                  <ConnectorButton
+                    onClick={handleGoogleLogin}
+                    name='Connect with Google'
+                    iconUrl='Google_G.png'
+                    disabled={false}
+                    isActive={false}
+                    isLoading={false}
+                  />
+                </ListItem>
 
-            {/** Connect with email address */}
-            <ListItem>
-              <ConnectorButton
-                onClick={() => toggleEmailDialog('open')}
-                name='Connect with email'
-                icon={<EmailIcon />}
-                disabled={false}
-                isActive={false}
-                isLoading={false}
-              />
-            </ListItem>
+                {/** Connect with email address */}
+                <ListItem>
+                  <ConnectorButton
+                    onClick={() => toggleEmailDialog('open')}
+                    name='Connect with email'
+                    icon={<EmailIcon />}
+                    disabled={false}
+                    isActive={false}
+                    isLoading={false}
+                  />
+                </ListItem>
+              </>
+            )}
           </List>
         )}
         {loginMethod === 'email' && (

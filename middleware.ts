@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -44,8 +43,6 @@ export async function middleware(req: NextRequest) {
     const baseUrl = `${url.protocol}//${subdomainHost}${port}`;
     const redirectUrl = new URL(pathWithoutSpaceDomain, baseUrl);
 
-    console.debug(`>>> Redirecting to subdomain url: ${url.pathname} to ${redirectUrl.toString()}`);
-
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -53,7 +50,6 @@ export async function middleware(req: NextRequest) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
     const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
 
-    console.debug(`>>> Redirecting: ${url.pathname} to ${pathWithoutSpaceDomain}`);
     url.pathname = pathWithoutSpaceDomain;
 
     return NextResponse.redirect(url);
@@ -62,9 +58,8 @@ export async function middleware(req: NextRequest) {
   const rewriteDomain = customDomain || subdomain;
   if (rewriteDomain) {
     // Subdomain available, rewriting
-
-    console.debug(`>>> Rewriting: ${url.pathname} to /${rewriteDomain}${url.pathname}`);
     url.pathname = `/${rewriteDomain}${url.pathname}`;
+
     return NextResponse.rewrite(url);
   }
 }

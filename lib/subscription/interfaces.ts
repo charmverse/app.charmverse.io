@@ -1,30 +1,39 @@
-import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 
-import type { SubscriptionPeriod, SubscriptionProductId } from './constants';
+import type { SubscriptionPeriod } from './constants';
+import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
 
-export type CreateSubscriptionRequest = {
-  productId: SubscriptionProductId;
+export type CreateProSubscriptionRequest = {
+  blockQuota: number;
   period: SubscriptionPeriod;
-  billingEmail: string;
+  billingEmail?: string;
   name?: string;
   address?: AddressParam;
   coupon?: string;
+  freeTrial?: boolean;
 };
 
 export type ProSubscriptionResponse = {
   subscriptionId: string;
-  priceId?: string;
+  priceId: string;
   invoiceId: string;
+  blockQuota: number;
   productId: string;
   customerId: string;
-  paymentIntentId?: string;
-  clientSecret?: string;
-  paymentIntentStatus?: Stripe.PaymentIntent.Status;
+  paymentIntentId: string;
+  clientSecret: string;
+  paymentIntentStatus: Stripe.PaymentIntent.Status;
 };
 
-export type CreateCryptoSubscriptionResponse = string;
-export type CreatePaymentSubscriptionResponse = Pick<ProSubscriptionResponse, 'paymentIntentStatus' | 'clientSecret'>;
+export type CreateProSubscriptionResponse = Pick<
+  ProSubscriptionResponse,
+  'clientSecret' | 'subscriptionId' | 'paymentIntentStatus'
+>;
 
-export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>>;
+export type CreateCryptoSubscriptionResponse = string;
+
+export type CreateCryptoSubscriptionRequest = {
+  subscriptionId: string;
+  email: string;
+};

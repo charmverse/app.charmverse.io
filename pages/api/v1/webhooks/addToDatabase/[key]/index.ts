@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { requireKeys } from 'lib/middleware';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { defaultHandler } from 'lib/public-api/handler';
 import { updateDatabaseBlocks } from 'lib/public-api/updateDatabaseBlocks';
@@ -98,6 +99,11 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     boardId: board.id,
     spaceId,
     createdBy: apiPageKeyWithSpaceId.createdBy
+  });
+
+  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+    event: 'created',
+    pageId: card.id
   });
 
   return res.status(201).json(card);

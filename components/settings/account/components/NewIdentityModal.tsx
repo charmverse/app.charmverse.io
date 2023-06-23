@@ -8,6 +8,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
 import { CollectEmail } from 'components/login/CollectEmail';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
+import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -42,6 +43,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
+  const { isOnCustomDomain } = useCustomDomain();
 
   const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
     '/profile/add-wallets',
@@ -147,7 +149,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {!isConnected && (
+          {!isConnected && !isOnCustomDomain && (
             <IdentityProviderItem type='Discord'>
               <PrimaryButton
                 size='small'
@@ -161,7 +163,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {!telegramAccount && (
+          {!telegramAccount && !isOnCustomDomain && (
             <IdentityProviderItem type='Telegram'>
               <PrimaryButton
                 disabled={!TELEGRAM_BOT_ID}
@@ -177,7 +179,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
+          {(!user?.googleAccounts || user.googleAccounts.length === 0) && !isOnCustomDomain && (
             <IdentityProviderItem type='Google'>
               <PrimaryButton
                 size='small'
@@ -192,11 +194,13 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
             </IdentityProviderItem>
           )}
 
-          <IdentityProviderItem type='VerifiedEmail'>
-            <PrimaryButton size='small' onClick={() => setIdentityToAdd('email')} disabled={isConnectingGoogle}>
-              Connect
-            </PrimaryButton>
-          </IdentityProviderItem>
+          {!isOnCustomDomain && (
+            <IdentityProviderItem type='VerifiedEmail'>
+              <PrimaryButton size='small' onClick={() => setIdentityToAdd('email')} disabled={isConnectingGoogle}>
+                Connect
+              </PrimaryButton>
+            </IdentityProviderItem>
+          )}
         </List>
       )}
 

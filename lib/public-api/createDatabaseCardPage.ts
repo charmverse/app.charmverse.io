@@ -160,15 +160,7 @@ export async function createDatabaseCardPage(
           id: pageInfo.spaceId
         }
       },
-      syncWithPageId: pageInfo.syncWithPageId,
-      permissions: {
-        create: [
-          {
-            permissionLevel: 'full_access',
-            spaceId: pageInfo.spaceId
-          }
-        ]
-      }
+      syncWithPageId: pageInfo.syncWithPageId
     }
   });
 

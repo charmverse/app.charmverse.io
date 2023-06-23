@@ -1,59 +1,99 @@
-import type { SubscriptionPeriod } from '@charmverse/core/prisma-client';
-import Box from '@mui/material/Box';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { useTheme } from '@emotion/react';
+import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { AiOutlineUnlock } from 'react-icons/ai';
 
-import type { SubscriptionProductId } from 'lib/subscription/constants';
-import { SUBSCRIPTION_PRODUCTS_RECORD, SUBSCRIPTION_PRODUCT_IDS } from 'lib/subscription/constants';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import { communityProduct } from 'lib/subscription/constants';
 
 export function PlanSelection({
   disabled,
   period,
-  productId,
-  onSelect
+  blockQuotaInThousands,
+  onSelect,
+  onSelectCommited
 }: {
   disabled: boolean;
-  onSelect: (productId: SubscriptionProductId | null, period: SubscriptionPeriod | null) => void;
+  onSelect: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
+  onSelectCommited: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
   period: SubscriptionPeriod;
-  productId: SubscriptionProductId;
+  blockQuotaInThousands: number;
 }) {
+  const theme = useTheme();
+  const periodNaming = period === 'annual' ? 'yr' : 'mo';
   return (
     <>
+      <Stack my={2}>
+        <ToggleButtonGroup
+          value={period}
+          exclusive
+          disabled={disabled}
+          onChange={(_e, _period) => {
+            onSelect(null, _period);
+            onSelectCommited(null, _period);
+          }}
+          aria-label='annual or monthly selection'
+        >
+          <ToggleButton value='annual' aria-label='left aligned'>
+            Yearly (17% off)
+          </ToggleButton>
+          <ToggleButton value='monthly' aria-label='centered'>
+            Monthly
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Stack>
       <Stack>
         <InputLabel>Usage</InputLabel>
-        <Box mx={2}>
+        <Stack spacing={2} direction='row' alignItems='center' mx={2} mb={1}>
+          <Typography>
+            ${(communityProduct.pricing[period] ?? 0) * 10}/{periodNaming}
+          </Typography>
           <Slider
             disabled={disabled}
             size='small'
-            aria-label='Product Id'
+            aria-label='Quantity slider'
             valueLabelDisplay='off'
-            value={SUBSCRIPTION_PRODUCT_IDS.indexOf(productId)}
-            marks={SUBSCRIPTION_PRODUCT_IDS.map((_productId, index) => ({
-              value: index,
-              label: `$${SUBSCRIPTION_PRODUCTS_RECORD[_productId].pricing[period]}/${period === 'annual' ? 'yr' : 'mo'}`
-            }))}
-            min={0}
-            max={SUBSCRIPTION_PRODUCT_IDS.length - 1}
-            onChange={(_, value) => onSelect(SUBSCRIPTION_PRODUCT_IDS[value as number], null)}
+            value={blockQuotaInThousands}
+            step={10}
+            min={10}
+            max={500}
+            onChange={(_, value) => onSelect(value as number, null)}
+            onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
-        </Box>
+          <Typography>
+            ${(communityProduct.pricing[period] ?? 0) * 500}/{periodNaming}
+          </Typography>
+        </Stack>
       </Stack>
-      <Stack>
-        <InputLabel>Billing Period</InputLabel>
-        <FormControlLabel
-          sx={{ width: 'fit-content' }}
-          control={
-            <Switch
-              checked={period === 'annual'}
-              onChange={(e) => onSelect(null, e.target.checked ? 'annual' : 'monthly')}
-              disabled={disabled}
-            />
-          }
-          label='Annual'
-        />
+      <Stack
+        display='flex'
+        justifyContent='space-between'
+        flexDirection='row'
+        alignItems='center'
+        maxWidth='400px'
+        padding={2}
+        mt={2}
+        sx={{ border: `1px solid ${theme.palette.secondary.main}` }}
+      >
+        <Stack>
+          <Typography variant='h6' mb={2}>
+            Current selection
+          </Typography>
+          <Typography>{`$${
+            (communityProduct.pricing[period] ?? 0) * blockQuotaInThousands
+          }/${periodNaming}`}</Typography>
+          <Typography>{`${String(communityProduct.blockQuotaIncrement * blockQuotaInThousands).slice(
+            0,
+            -3
+          )}K blocks`}</Typography>
+        </Stack>
+        <Stack>
+          <AiOutlineUnlock size={100} />
+        </Stack>
       </Stack>
     </>
   );

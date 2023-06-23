@@ -1,21 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
-import {
-  Divider,
-  Drawer,
-  IconButton,
-  InputLabel,
-  List,
-  ListItemText,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
-import { styled } from '@mui/system';
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Iframe from 'react-iframe';
 import type { KeyedMutator } from 'swr';
@@ -27,28 +16,18 @@ import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { SUBSCRIPTION_PRODUCTS_RECORD, loopCheckoutUrl } from 'lib/subscription/constants';
-import type { SubscriptionProductId, SubscriptionPeriod } from 'lib/subscription/constants';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import type { CreateSubscriptionRequest } from 'lib/subscription/interfaces';
+import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
-import { PlanSelection } from './PlanSelection';
-
-const StyledList = styled(List)`
-  list-style-type: disc;
-  padding-inline-start: 40px;
-`;
-
-const StyledListItemText = styled(ListItemText)`
-  display: list-item;
-`;
 
 const schema = () => {
   return yup
     .object({
-      billingEmail: yup.string().email().required()
+      email: yup.string().email().required()
     })
     .strict();
 };
@@ -57,12 +36,16 @@ export function CheckoutForm({
   onCancel,
   refetch,
   show,
-  spaceSubscription
+  period,
+  blockQuota,
+  subscriptionId
 }: {
-  spaceSubscription: null | SpaceSubscription;
   show: boolean;
+  blockQuota: number;
+  period: SubscriptionPeriod;
+  subscriptionId: string;
   onCancel: VoidFunction;
-  refetch: KeyedMutator<SpaceSubscription | null>;
+  refetch: KeyedMutator<SpaceSubscriptionWithStripeData | null>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -72,10 +55,10 @@ export function CheckoutForm({
     getValues,
     watch,
     formState: { errors }
-  } = useForm<{ billingEmail: string }>({
+  } = useForm<{ email: string }>({
     mode: 'onChange',
     defaultValues: {
-      billingEmail: ''
+      email: ''
     },
     resolver: yupResolver(schema())
   });
@@ -83,23 +66,20 @@ export function CheckoutForm({
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);
 
-  const billingEmail = watch('billingEmail');
+  const email = watch('email');
 
   const { space } = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
-  const [period, setPeriod] = useState<SubscriptionPeriod>('monthly');
-  const [productId, setProductId] = useState<SubscriptionProductId>('community_5k');
   const [pendingPayment, setPendingPayment] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const {
     data: checkoutUrl,
     trigger: createCryptoSubscription,
     isMutating: isLoadingCreateSubscriptionIntent
   } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateSubscriptionRequest } }>) =>
+    `/api/spaces/${space?.id}/crypto-subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateCryptoSubscriptionRequest } }>) =>
       charmClient.subscription.createCryptoSubscription(arg.spaceId, arg.payload),
     {
       onError(error) {
@@ -116,16 +96,11 @@ export function CheckoutForm({
     }
   );
 
-  const changePaymentType = (event: SyntheticEvent, newValue: PaymentType) => {
-    setPaymentType(newValue);
-  };
-
-  useEffect(() => {
-    if (spaceSubscription) {
-      setPeriod(spaceSubscription.period);
-      setProductId(spaceSubscription.productId);
+  const changePaymentType = (_event: SyntheticEvent, newValue: PaymentType) => {
+    if (newValue !== null) {
+      setPaymentType(newValue);
     }
-  }, [spaceSubscription]);
+  };
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -142,7 +117,7 @@ export function CheckoutForm({
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  const cardError = errors.billingEmail || billingEmail.length === 0;
+  const emailError = errors.email || email.length === 0;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -152,50 +127,44 @@ export function CheckoutForm({
       return;
     }
 
-    const cardElement = elements?.getElement(CardElement);
-
-    if (!cardElement) {
-      return;
-    }
-
     const paymentDetails = getValues();
 
     const paymentErrorMetadata = {
       spaceId: space.id,
       period,
-      billingEmail: paymentDetails.billingEmail
+      email: paymentDetails.email
     };
+
     try {
+      const { error } = await elements.submit();
+
+      if (error) {
+        return;
+      }
+
       setIsProcessing(true);
-      const { clientSecret, paymentIntentStatus } = await charmClient.subscription.createSubscription(space.id, {
-        period,
-        productId,
-        billingEmail: paymentDetails.billingEmail
+      // @TODO update billing email
+      const { error: confirmPaymentError } = await stripe.confirmPayment({
+        elements,
+        // There are some paym,ent methods that require the user to open another page and then redirect back to the app
+        redirect: 'if_required',
+        confirmParams: {
+          return_url: `${window.location.href}?subscription=true`,
+          receipt_email: paymentDetails.email
+        }
       });
 
-      if (clientSecret && paymentIntentStatus) {
-        if (paymentIntentStatus !== 'succeeded') {
-          const { error: confirmCardPaymentError } = await stripe.confirmCardPayment(clientSecret, {
-            receipt_email: paymentDetails.billingEmail,
-            payment_method: {
-              card: cardElement
-            }
-          });
-
-          if (confirmCardPaymentError) {
-            showMessage('Payment failed! Please try again', 'error');
-            log.error(`[stripe]: Failed to confirm card payment. ${confirmCardPaymentError.message}`, {
-              ...paymentErrorMetadata,
-              errorType: confirmCardPaymentError.type,
-              errorCode: confirmCardPaymentError.code
-            });
-          } else {
-            showMessage('Payment successful! Community subscription active.', 'success');
-          }
-        } else {
-          showMessage('Payment successful! Community subscription active.', 'success');
-        }
+      if (confirmPaymentError) {
+        showMessage('Payment failed! Please try again', 'error');
+        log.error(`[stripe]: Failed to confirm payment. ${confirmPaymentError.message}`, {
+          ...paymentErrorMetadata,
+          errorType: confirmPaymentError.type,
+          errorCode: confirmPaymentError.code
+        });
+      } else {
+        showMessage('Payment successful! Community subscription active.', 'success');
       }
+      onCancel();
     } catch (error: any) {
       showMessage('Payment failed! Please try again', 'error');
       log.error(`[stripe]: Payment failed. ${error.message}`, {
@@ -203,11 +172,10 @@ export function CheckoutForm({
         errorType: error.type,
         errorCode: error.code
       });
+      onCancel();
     }
 
     setIsProcessing(false);
-    await refetch();
-    onCancel();
   };
 
   const startCryptoPayment = async () => {
@@ -223,21 +191,14 @@ export function CheckoutForm({
     await createCryptoSubscription({
       spaceId: space.id,
       payload: {
-        period,
-        productId,
-        billingEmail: paymentDetails.billingEmail
+        subscriptionId,
+        email: paymentDetails.email
       }
     });
     setPendingPayment(true);
   };
 
-  const handlePlanSelect = (_productId: SubscriptionProductId | null, _period: SubscriptionPeriod | null) => {
-    if (_productId) {
-      setProductId(_productId);
-    } else if (_period) {
-      setPeriod(_period);
-    }
-  };
+  const periodNaming = period === 'annual' ? 'yr' : 'mo';
 
   return (
     <>
@@ -246,79 +207,83 @@ export function CheckoutForm({
           <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>
         </Stack>
       )}
+
       {show && (
-        <Stack onSubmit={createSubscription} gap={1}>
-          <PlanSelection disabled={isProcessing} onSelect={handlePlanSelect} productId={productId} period={period} />
-          <Divider sx={{ mb: 1 }} />
-          <Stack>
+        <>
+          <Stack maxWidth='400px'>
             <Typography variant='h6' mb={1}>
               Billing Information
             </Typography>
             <Stack gap={0.5} my={2}>
-              <InputLabel>Email</InputLabel>
-              <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('billingEmail')} />
+              <InputLabel>Email (required)</InputLabel>
+              <TextField disabled={isProcessing} placeholder='johndoe@gmail.com' {...register('email')} />
             </Stack>
           </Stack>
           <Divider sx={{ mb: 1 }} />
-          <Typography variant='h6'>Payment method</Typography>
-          <PaymentTabs value={paymentType} onChange={changePaymentType} />
-          <PaymentTabPanel value={paymentType} index='card'>
-            <CardElement />
-          </PaymentTabPanel>
-          <PaymentTabPanel value={paymentType} index='crypto'>
-            <Typography mb={1}>
-              We accept crypto payments through our partner Loop. After you click Upgrade a popup will appear with
-              instructions on finishing your payment.
-            </Typography>
-          </PaymentTabPanel>
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant='h6'>Order Summary</Typography>
-          <Typography>Paid plan: ${SUBSCRIPTION_PRODUCTS_RECORD[productId].pricing[period]}/mo</Typography>
-          <StyledList>
-            <StyledListItemText>{SUBSCRIPTION_PRODUCTS_RECORD[productId].blockLimit} blocks</StyledListItemText>
-            <StyledListItemText>
-              {SUBSCRIPTION_PRODUCTS_RECORD[productId].monthlyActiveUserLimit} Active users
-            </StyledListItemText>
-            <StyledListItemText>Billed {period === 'annual' ? 'annually' : 'monthly'}</StyledListItemText>
-          </StyledList>
-          <PaymentTabPanel value={paymentType} index='card'>
-            <Stack gap={1} display='flex' flexDirection='row'>
-              <Button
-                onClick={createSubscription}
-                sx={{ width: 'fit-content' }}
-                loading={isProcessing}
-                disabled={cardError || !billingEmail || isProcessing || !stripe || !elements || !space}
-              >
-                {isProcessing ? 'Processing ... ' : 'Upgrade'}
-              </Button>
-              <Button
-                disabled={isProcessing}
-                onClick={onCancel}
-                sx={{ width: 'fit-content' }}
-                color='secondary'
-                variant='outlined'
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </PaymentTabPanel>
-          <PaymentTabPanel value={paymentType} index='crypto'>
-            <Stack gap={1} display='flex' flexDirection='row'>
-              <Button onClick={() => startCryptoPayment()} disabled={!billingEmail}>
-                Upgrade
-              </Button>
-              <Button
-                disabled={isProcessing}
-                onClick={onCancel}
-                sx={{ width: 'fit-content' }}
-                color='secondary'
-                variant='outlined'
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </PaymentTabPanel>
-        </Stack>
+          <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
+            <Grid item xs={12} sm={8} onSubmit={createSubscription}>
+              <PaymentTabs value={paymentType} onChange={changePaymentType} />
+              <PaymentTabPanel value={paymentType} index='card'>
+                <PaymentElement />
+              </PaymentTabPanel>
+              <PaymentTabPanel value={paymentType} index='crypto'>
+                <Typography mb={1}>
+                  We accept crypto payments through our partner Loop. After you click Upgrade a popup will appear with
+                  instructions on finishing your payment.
+                </Typography>
+              </PaymentTabPanel>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Typography variant='h6' mb={2}>
+                Order Summary
+              </Typography>
+              <Stack display='flex' flexDirection='row' justifyContent='space-between'>
+                <Stack>
+                  <Typography mb={1}>Community Edition</Typography>
+                  <Typography variant='body2'>Billed {period}</Typography>
+                </Stack>
+                <Stack>
+                  <Typography>
+                    ${(communityProduct.pricing[period] ?? 0) * blockQuota}/{periodNaming}
+                  </Typography>
+                </Stack>
+              </Stack>
+              <Divider sx={{ my: 2 }} />
+              <Stack display='flex' flexDirection='row' justifyContent='space-between'>
+                <Stack>
+                  <Typography>Total</Typography>
+                </Stack>
+                <Stack>
+                  <Typography>${(communityProduct.pricing[period] ?? 0) * blockQuota}</Typography>
+                </Stack>
+              </Stack>
+              <PaymentTabPanel value={paymentType} index='card'>
+                <Stack gap={1} display='flex' flexDirection='column'>
+                  <Button
+                    onClick={createSubscription}
+                    loading={isProcessing}
+                    disabled={emailError || !email || isProcessing || !stripe || !elements || !space}
+                  >
+                    {isProcessing ? 'Processing ... ' : 'Upgrade'}
+                  </Button>
+                  <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
+                    Cancel
+                  </Button>
+                </Stack>
+              </PaymentTabPanel>
+              <PaymentTabPanel value={paymentType} index='crypto'>
+                <Stack gap={1} display='flex' flexDirection='column'>
+                  <Button onClick={() => startCryptoPayment()} disabled={!email}>
+                    Upgrade
+                  </Button>
+                  <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
+                    Cancel
+                  </Button>
+                </Stack>
+              </PaymentTabPanel>
+            </Grid>
+          </Grid>
+        </>
       )}
       <Drawer
         anchor='right'
@@ -347,9 +312,7 @@ export function CheckoutForm({
           <CloseIcon fontSize='small' />
         </IconButton>
         {checkoutUrl && <Iframe loading='lazy' url={checkoutUrl} position='relative' width='100%' height='100%' />}
-        {isLoadingCreateSubscriptionIntent && (
-          <LoadingComponent height='100%' isLoading={isLoadingCreateSubscriptionIntent} />
-        )}
+        <LoadingComponent height='100%' isLoading={isLoadingCreateSubscriptionIntent} />
       </Drawer>
     </>
   );

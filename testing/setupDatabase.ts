@@ -231,9 +231,9 @@ export async function generateBounty({
   contentText = '',
   spaceId,
   createdBy,
-  status,
+  status = 'open',
   maxSubmissions,
-  approveSubmitters,
+  approveSubmitters = false,
   title = 'Example',
   rewardToken = 'ETH',
   rewardAmount = 1,
@@ -243,8 +243,10 @@ export async function generateBounty({
   page = {},
   type = 'bounty',
   id
-}: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> &
-  Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> &
+}: Pick<Bounty, 'createdBy' | 'spaceId'> &
+  Partial<
+    Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'status' | 'approveSubmitters'>
+  > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];

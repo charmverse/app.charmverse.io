@@ -1,5 +1,10 @@
 name: 'Install dependencies'
 
+inputs:
+  core_pkg_version:
+    description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
+    required: false
+
 runs:
   using: 'composite'
   steps:
@@ -25,10 +30,15 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    - name: Upgrade to specific version of Core package
+      shell: bash
+      if: ${{ inputs.core_pkg_version }}
+      run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
     # Include this step to deploy and test a different branch of core
     # 1. Set the webapp branch
     # 2. Set core branch
     # - name: Install special core library
     #   shell: bash
-    #   if: github.head_ref == 'feat/count-blocks'
-    #   run: npm install github:charmverse/core#feat/count-blocks
+    #   if: github.head_ref == 'paid/free-trials'
+    #   run: npm install github:charmverse/core#paid/free-trials

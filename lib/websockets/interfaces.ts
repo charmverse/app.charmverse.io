@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
+import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
@@ -13,7 +13,7 @@ export type SealedUserId = {
   userId: string;
 };
 
-export type SocketAuthReponse = {
+export type SocketAuthResponse = {
   authToken: string;
 };
 
@@ -98,7 +98,15 @@ type SubscribeToWorkspace = {
   type: 'subscribe';
   payload: {
     spaceId: string;
-  } & SocketAuthReponse;
+  } & SocketAuthResponse;
+};
+
+type SpaceSubscriptionUpdated = {
+  type: 'space_subscription';
+  payload: {
+    type: 'activated' | 'cancelled' | 'updated';
+    paidTier: SubscriptionTier | null;
+  };
 };
 
 export type ClientMessage = SubscribeToWorkspace;
@@ -116,7 +124,8 @@ export type ServerMessage =
   | VotesUpdated
   | PostPublished
   | PostUpdated
-  | PostDeleted;
+  | PostDeleted
+  | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

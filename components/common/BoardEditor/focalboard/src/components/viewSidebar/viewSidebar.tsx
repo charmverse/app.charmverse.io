@@ -126,10 +126,10 @@ function ViewSidebar(props: Props) {
   }, [props.isOpen]);
 
   useEffect(() => {
-    if (props.pageId && props.view.fields.sourceType === 'proposals') {
+    if (props.pageId && props.view.fields.sourceType === 'proposals' && props.view.parentId === props.pageId) {
       updateProposalSource({ pageId: props.pageId });
     }
-  }, [props.pageId]);
+  }, [props.pageId, props.view.parentId, props.view.fields.sourceType]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
