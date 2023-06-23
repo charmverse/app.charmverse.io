@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 
 let cache: Record<string, { isValid: boolean }> = {};
 let intervalId: NodeJS.Timer;
@@ -13,13 +14,11 @@ export async function verifyCustomOrigin(origin: string | undefined) {
     return false;
   }
 
+  const originName = origin.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
   try {
     if (!cache[origin]) {
-      const space = await prisma.space.findFirst({
-        where: {
-          customDomain: { endsWith: origin }
-        }
-      });
+      const space = await getSpaceByDomain(originName);
 
       cache[origin] = { isValid: !!space };
     }
