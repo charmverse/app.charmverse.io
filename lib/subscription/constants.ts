@@ -4,12 +4,17 @@ import { isProdEnv } from 'config/constants';
 
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
+// Equivalent to 30k
+export const defaultFreeTrialBlockQuota = 30;
+
 export const communityProduct = {
   id: 'community',
   tier: 'pro',
   name: 'CharmVerse Community',
   guestLimit: 100,
-  blockLimit: 1000,
+  // This is base number we use to calculate block limits. We multiply this by the quantity in Stripe.
+  // For example, 30k blocks = 30 quantity * 1000 blockQuotaIncrement
+  blockQuotaIncrement: 1000,
   monthlyActiveUserLimit: 25,
   trial: 90,
   pricing: {
@@ -66,3 +71,14 @@ export const subscriptionCancellationDetails = {
   ],
   last: 'You will still be able to use CharmVerse for your community but you will be working in public.'
 };
+
+export const SubscriptionStatus = {
+  active: 'active',
+  past_due: 'past_due',
+  pending: 'pending',
+  cancelled: 'cancelled',
+  cancel_at_end: 'cancel_at_end',
+  free_trial: 'free_trial'
+};
+
+export type SubscriptionStatusType = keyof typeof SubscriptionStatus;

@@ -1,8 +1,9 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, Grid, List, ListItem, ListItemText, Stack, TextField, Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -11,10 +12,16 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { subscriptionCancellationDetails, communityProduct } from 'lib/subscription/constants';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import type { UpdateSubscriptionRequest } from 'lib/subscription/interfaces';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUserPreferences } from 'hooks/useUserPreferences';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
+import { formatDate, getTimeDifference } from 'lib/utilities/dates';
 
 import { SubscriptionActions } from './SubscriptionActions';
 
@@ -32,11 +39,14 @@ export function SubscriptionInformation({
   refetchSpaceSubscription
 }: {
   space: Space;
-  spaceSubscription: SpaceSubscription;
-  refetchSpaceSubscription: () => Promise<SpaceSubscription | null | undefined>;
+  spaceSubscription: SpaceSubscriptionWithStripeData;
+  refetchSpaceSubscription: () => Promise<SpaceSubscriptionWithStripeData | null | undefined>;
 }) {
   const { showMessage } = useSnackbar();
+  const { refreshCurrentSpace } = useCurrentSpace();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { userPreferences } = useUserPreferences();
+  const isAdmin = useIsAdmin();
 
   const {
     register,
@@ -49,6 +59,19 @@ export function SubscriptionInformation({
     resolver: yupResolver(schema())
   });
   const email = watch('email');
+
+  const { subscribe } = useWebSocketClient();
+
+  useEffect(() => {
+    const unsubscribe = subscribe('space_subscription', async () => {
+      await refetchSpaceSubscription().catch();
+      await refreshCurrentSpace();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const { trigger: updateSpaceSubscription, isMutating: isLoadingUpdate } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
@@ -88,7 +111,7 @@ export function SubscriptionInformation({
         return 'Active';
       case 'pending':
         return 'Pending';
-      case 'cancelAtEnd':
+      case 'cancel_at_end':
         return 'Your subscription was cancelled and will end on the next billing date. You can reactivate it by clicking the button below.';
       case 'cancelled':
       default:
@@ -99,6 +122,20 @@ export function SubscriptionInformation({
   const price =
     spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
+  const freeTrialEnds =
+    spaceSubscription.status === 'free_trial'
+      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
+      : undefined;
+  const freeTrialLabel =
+    spaceSubscription.status === 'free_trial'
+      ? (freeTrialEnds as number) > 0
+        ? `Free trial - ${freeTrialEnds} days left`
+        : `Free trial finished`
+      : '';
+
+  const nextBillingDate = spaceSubscription?.renewalDate
+    ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
+    : null;
   return (
     <>
       <Legend whiteSpace='normal'>Plan & Billing</Legend>
@@ -106,16 +143,35 @@ export function SubscriptionInformation({
         <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
           <Typography variant='h6' mb={1}>
             Current plan
+            {spaceSubscription.status === 'free_trial' && (
+              <Chip
+                sx={{ ml: 2 }}
+                size='small'
+                color={(freeTrialEnds as number) > 0 ? 'green' : 'orange'}
+                label={freeTrialLabel}
+              />
+            )}
           </Typography>
-          <Typography>
-            Community Edition - {String((communityProduct.blockLimit ?? 0) * spaceSubscription.blockQuota).slice(0, -3)}
-            K blocks
-          </Typography>
+          <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
+
           <Typography>
             ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
           </Typography>
-          <Typography>Your plan renews on July 3, 2024</Typography>
+          {nextBillingDate && <Typography>Renews on {nextBillingDate}</Typography>}
           {status && <Typography>Status: {status}</Typography>}
+
+          {space.paidTier !== 'free' && (
+            <Button
+              disabled={!isAdmin}
+              onClick={() => {
+                charmClient.subscription
+                  .switchToFreeTier(space.id)
+                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
+              }}
+            >
+              Use free plan
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions
@@ -146,7 +202,7 @@ export function SubscriptionInformation({
                 <Typography>Do you still want to Cancel?</Typography>
               </>
             }
-            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancelAtEnd' } })}
+            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onClose={() => setShowConfirmDialog(false)}
             disabled={isLoadingUpdate || isLoadingDeletion}
           />
@@ -181,7 +237,9 @@ export function SubscriptionInformation({
             />
             <Button
               disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
-              onClick={() => updateSpaceSubscription({ spaceId: space.id, payload: { email: getValues().email } })}
+              onClick={() =>
+                updateSpaceSubscription({ spaceId: space.id, payload: { billingEmail: getValues().email } })
+              }
               sx={{ maxWidth: '100px', mt: 2 }}
               fullWidth={false}
             >

@@ -157,11 +157,10 @@ describe('createProSubscription', () => {
   });
 
   it('should throw error if space already has an active subscription', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space } = await generateUserAndSpaceWithApiToken();
 
     await addSpaceSubscription({
-      spaceId: space.id,
-      createdBy: user.id
+      spaceId: space.id
     });
 
     await expect(

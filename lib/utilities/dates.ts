@@ -8,6 +8,7 @@ export type DateTimeFormat = 'relative' | 'absolute';
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 export type DateFormatConfig = {
+  month?: Intl.DateTimeFormatOptions['month'];
   withYear?: boolean;
 };
 
@@ -166,7 +167,11 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
 
   return getFormattedDateTime(
     dateInput,
-    { day: 'numeric', month: 'short', year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined },
+    {
+      day: 'numeric',
+      month: config?.month ?? 'short',
+      year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined
+    },
     locale
   );
 }

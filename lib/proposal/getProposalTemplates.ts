@@ -35,7 +35,7 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
   let categoryIds: string[] | undefined;
 
   // If this is a paid space, we only want to provide the user with templates within categories where they can create a proposal
-  if (space?.paidTier === 'pro' || space?.paidTier === 'enterprise') {
+  if (space?.paidTier !== 'free') {
     const accessibleCategories = await premiumPermissionsApiClient.proposals
       .getAccessibleProposalCategories({
         spaceId,

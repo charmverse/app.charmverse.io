@@ -1,8 +1,8 @@
-import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 
 import type { SubscriptionPeriod } from './constants';
+import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
 
 export type CreateProSubscriptionRequest = {
   blockQuota: number;
@@ -11,6 +11,7 @@ export type CreateProSubscriptionRequest = {
   name?: string;
   address?: AddressParam;
   coupon?: string;
+  freeTrial?: boolean;
 };
 
 export type ProSubscriptionResponse = {
@@ -35,8 +36,4 @@ export type CreateCryptoSubscriptionResponse = string;
 export type CreateCryptoSubscriptionRequest = {
   subscriptionId: string;
   email: string;
-};
-
-export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>> & {
-  email?: string;
 };
