@@ -5,10 +5,11 @@ import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { AiOutlineUnlock } from 'react-icons/ai';
 
 import { communityProduct } from 'lib/subscription/constants';
+
+import { StyledToggleButtonGroup } from './PaymentTabs';
 
 export function PlanSelection({
   disabled,
@@ -24,11 +25,12 @@ export function PlanSelection({
   blockQuota: number;
 }) {
   const theme = useTheme();
-  const periodNaming = period === 'annual' ? 'yr' : 'mo';
+  const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+
   return (
     <>
       <Stack my={2}>
-        <ToggleButtonGroup
+        <StyledToggleButtonGroup
           value={period}
           exclusive
           disabled={disabled}
@@ -44,18 +46,16 @@ export function PlanSelection({
           <ToggleButton value='monthly' aria-label='centered'>
             Monthly
           </ToggleButton>
-        </ToggleButtonGroup>
+        </StyledToggleButtonGroup>
       </Stack>
       <Stack>
         <InputLabel>Usage</InputLabel>
         <Stack spacing={2} direction='row' alignItems='center' mx={2} mb={1}>
-          <Typography>
-            ${(communityProduct.pricing[period] ?? 0) * 10}/{periodNaming}
-          </Typography>
+          <Typography>${price * 10}/mo</Typography>
           <Slider
             disabled={disabled}
             size='small'
-            aria-label='Quantity slider'
+            aria-label='Block quota slider'
             valueLabelDisplay='off'
             value={blockQuota}
             step={10}
@@ -64,9 +64,7 @@ export function PlanSelection({
             onChange={(_, value) => onSelect(value as number, null)}
             onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
-          <Typography>
-            ${(communityProduct.pricing[period] ?? 0) * 500}/{periodNaming}
-          </Typography>
+          <Typography>${price * 500}/mo</Typography>
         </Stack>
       </Stack>
       <Stack
@@ -83,7 +81,7 @@ export function PlanSelection({
           <Typography variant='h6' mb={2}>
             Current selection
           </Typography>
-          <Typography>{`$${(communityProduct.pricing[period] ?? 0) * blockQuota}/${periodNaming}`}</Typography>
+          <Typography>{`$${price * blockQuota}/mo`}</Typography>
           <Typography>{`${String(communityProduct.blockLimit * blockQuota).slice(0, -3)}K blocks`}</Typography>
         </Stack>
         <Stack>

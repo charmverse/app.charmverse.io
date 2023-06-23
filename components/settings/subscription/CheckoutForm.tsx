@@ -198,7 +198,7 @@ export function CheckoutForm({
     setPendingPayment(true);
   };
 
-  const periodNaming = period === 'annual' ? 'yr' : 'mo';
+  const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
   return (
     <>
@@ -243,9 +243,7 @@ export function CheckoutForm({
                   <Typography variant='body2'>Billed {period}</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>
-                    ${(communityProduct.pricing[period] ?? 0) * blockQuota}/{periodNaming}
-                  </Typography>
+                  <Typography>${price * blockQuota}/mo</Typography>
                 </Stack>
               </Stack>
               <Divider sx={{ my: 2 }} />
