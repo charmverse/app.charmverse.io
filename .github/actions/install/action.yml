@@ -1,4 +1,4 @@
-name: 'Install dependencies'
+name: "Install dependencies"
 
 inputs:
   core_pkg_version:
@@ -6,7 +6,7 @@ inputs:
     required: false
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: actions/checkout@v3
 
@@ -38,7 +38,7 @@ runs:
     # Include this step to deploy and test a different branch of core
     # 1. Set the webapp branch
     # 2. Set core branch
-    # - name: Install special core library
-    #   shell: bash
-    #   if: github.head_ref == 'paid/free-trials'
-    #   run: npm install github:charmverse/core#paid/free-trials
+    - name: Install special core library
+      shell: bash
+      if: github.head_ref == 'feat/proposal-description-json'
+      run: npm install github:charmverse/core#feat/proposal-description-json
