@@ -41,4 +41,4 @@ runs:
     - name: Install special core library
       shell: bash
       if: github.head_ref == 'policies/converted-to-proposal'
-      run: npm install github:charmverse#policies/converted-to-proposal
+      run: npm install github:charmverse/core#policies/converted-to-proposal
