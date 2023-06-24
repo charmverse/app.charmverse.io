@@ -66,7 +66,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     return () => {
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, user, spaces, router.query]);
+  }, [isLoading, user, spaces, router.query?.returnUrl]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
