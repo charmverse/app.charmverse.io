@@ -66,7 +66,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     return () => {
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, user, spaces]);
+  }, [isLoading, user, spaces, router.query]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
@@ -101,13 +101,21 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       }
 
       log.info('[RouteGuard]: redirect to login');
-      return {
-        authorized: true,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
+
+      // Don't return a redirect if we already have a return url
+      if (router.query.returnUrl) {
+        return {
+          authorized: true
+        };
+      } else {
+        return {
+          authorized: true,
+          redirect: {
+            pathname: '/',
+            query: { returnUrl: router.asPath }
+          }
+        };
+      }
     }
     // condition: trying to access a space without access
     else if (!isAvailableToLoggedInUsers && hasSpaceDomain && !filterSpaceByDomain(spaces, spaceDomain)) {
