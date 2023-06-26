@@ -1,5 +1,6 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { SubscriptionTier as SubscriptionTierEnum } from '@charmverse/core/prisma';
 import type { StripeSubscription, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -116,8 +117,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           deletedAt: null
         };
 
-        await prisma.$transaction(async (tx) => {
-          await tx.stripeSubscription.upsert({
+        await prisma.$transaction([
+          prisma.stripeSubscription.upsert({
             where: {
               subscriptionId: stripeSubscription.id,
               spaceId
@@ -127,17 +128,16 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               spaceId
             },
             update: {}
-          });
-
-          await tx.space.update({
+          }),
+          prisma.space.update({
             where: {
               id: space.id
             },
             data: {
-              paidTier
+              paidTier: !paidTier || !SubscriptionTierEnum[paidTier] ? 'pro' : paidTier
             }
-          });
-        });
+          })
+        ]);
 
         if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
           // The subscription automatically activates after successful payment
