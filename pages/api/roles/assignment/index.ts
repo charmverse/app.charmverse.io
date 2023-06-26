@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole, unassignRole } from 'lib/roles';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -15,6 +16,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    requirePaidPermissionsSubscription({
+      key: 'roleId',
+      resourceIdType: 'role'
+    })
+  )
   .use(requireKeys<SpaceRoleToRole & SpaceRole>(['roleId', 'userId']))
   .post(assignRoleController)
   .delete(unassignRoleController);

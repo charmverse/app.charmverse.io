@@ -101,10 +101,10 @@ export default function ShareToWeb({
             {toggleChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
           </Typography>
         </Box>
-        <UpgradeChip upgradeContext='pagePermissions' />
+        <UpgradeChip upgradeContext='page_permissions' />
         <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
           <Box>
-            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'pagePermissions' : undefined}>
+            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
               <Switch
                 data-test='toggle-public-page'
                 checked={toggleChecked}

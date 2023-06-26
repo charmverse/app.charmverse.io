@@ -43,6 +43,14 @@ async function switchToFreeTier(req: NextApiRequest, res: NextApiResponse<Space>
           comment: 'Downgraded to free plan'
         }
       });
+      await prisma.stripeSubscription.update({
+        where: {
+          subscriptionId: subscription.subscriptionId
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      });
     }
   } catch (err) {
     log.error(`Error downgrading space ${spaceId} to free plan: ${err}`);

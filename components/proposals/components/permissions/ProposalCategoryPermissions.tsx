@@ -69,7 +69,7 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
     return alwaysList;
   }
 
-  async function addMultiplePermissions(input: BulkRoleProposalCategoryPermissionUpsert) {
+  async function addPermissions(input: BulkRoleProposalCategoryPermissionUpsert) {
     const newPermissions = await Promise.all(
       input.roleIds.map((id) =>
         charmClient.permissions.proposals.upsertProposalCategoryPermission({
@@ -198,7 +198,7 @@ function ProposalCategoryPermissions({ proposalCategory, permissions }: Props) {
           <Grid item xs>
             <Divider sx={{ my: 2 }} />
             <ProposalCategoryPermissionsAddRoles
-              onSave={addMultiplePermissions}
+              onSave={addPermissions}
               onClose={addRolesDialog.close}
               roleIdsToHide={mappedPermissions.roles.map((r) => r.assignee.id)}
             />
