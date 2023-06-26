@@ -32,7 +32,7 @@ runs:
 
     - name: Install specific version of Core 
       shell: bash
-      if: inputs.core_pkg_version and inputs.core_pkg_version != 'latest'
+      if: inputs.core_pkg_version && inputs.core_pkg_version != 'latest'
       run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
     - name: Upgrade to latest version of Core package then commit back to repo
