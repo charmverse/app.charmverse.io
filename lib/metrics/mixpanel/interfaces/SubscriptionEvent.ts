@@ -1,5 +1,5 @@
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
-import type { PaymentMethod, PaymentMethodType } from 'lib/subscription/mapStripeFields';
+import type { PaymentMethodType } from 'lib/subscription/mapStripeFields';
 
 import type { BaseEvent } from './BaseEvent';
 
@@ -24,7 +24,7 @@ export type UpdateSubscriptionEvent = BaseEvent & {
 
 export type SubscriptionPaymentEvent = BaseEvent & {
   subscriptionId: string;
-  paymentMethod: PaymentMethod;
+  paymentMethod: PaymentMethodType;
   blockQuota: number;
   period: SubscriptionPeriod;
   status: 'success' | 'failure';

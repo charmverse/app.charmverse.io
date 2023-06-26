@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import log from 'loglevel';
 import type { Stripe } from 'stripe';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
@@ -109,10 +110,22 @@ export async function createProSubscription({
   }
 
   let subscription: Stripe.Subscription | undefined;
+  let updatingSubscription: boolean = false;
   try {
     // Case when the user is updating his subscription in checkout
     if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
       await stripeClient.subscriptions.del(existingStripeSubscription.id);
+      updatingSubscription = true;
+      trackUserAction('update_subscription', {
+        blockQuota,
+        period,
+        previousBlockQuota: existingStripeSubscription.items.data[0].quantity as number,
+        previousPeriod:
+          existingStripeSubscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
+        subscriptionId: existingStripeSubscription.id,
+        spaceId,
+        userId: ''
+      });
     }
 
     subscription = await stripeClient.subscriptions.create({
@@ -143,6 +156,16 @@ export async function createProSubscription({
       period,
       billingEmail,
       error
+    });
+  }
+
+  if (!updatingSubscription) {
+    trackUserAction('create_subscription', {
+      blockQuota,
+      period,
+      spaceId,
+      paymentMethod: 'card',
+      userId: ''
     });
   }
 

@@ -7,6 +7,7 @@ import type Stripe from 'stripe';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
+import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
@@ -143,18 +144,23 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
         }
 
+        const subscription = await getActiveSpaceSubscription({ spaceId });
+
+        if (subscription) {
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota: subscription?.blockQuota,
+            period,
+            status: 'success',
+            subscriptionId: subscription.subscriptionId,
+            paymentMethod: 'card',
+            userId: ''
+          });
+        }
+
         log.info(
           `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
         );
-
-        trackUserAction('checkout_subscription', {
-          userId: space.updatedBy,
-          spaceId,
-          productId,
-          period,
-          tier: stripeSubscription.metadata.tier as SubscriptionTier,
-          result: 'success'
-        });
 
         relay.broadcast(
           {
