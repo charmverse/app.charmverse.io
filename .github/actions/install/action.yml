@@ -32,17 +32,17 @@ runs:
 
     - name: Install specific version of Core 
       shell: bash
-      if: inputs.core_pkg_version and inputs.core_pkg_version != "latest"
+      if: inputs.core_pkg_version and inputs.core_pkg_version != 'latest'
       run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
     - name: Upgrade to latest version of Core package then commit back to repo
       shell: bash
-      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == "latest"
+      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == 'latest'
       run: |
         npm update @charmverse/core@${{ inputs.core_pkg_version }}
 
     - name: Commit package and lock file back into repo
-      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == "latest"
+      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == 'latest'
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: "Github action: automated Core pk upgrade to latest"
