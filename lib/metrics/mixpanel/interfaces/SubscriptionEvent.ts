@@ -1,21 +1,47 @@
-import type { SubscriptionTier } from '@charmverse/core/prisma-client';
-
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import type { PaymentMethod, PaymentMethodType } from 'lib/subscription/mapStripeFields';
 
 import type { BaseEvent } from './BaseEvent';
 
-export type ViewSubscriptionEvent = BaseEvent;
-export type InitiateSubscriptionEvent = BaseEvent;
-
-export type CheckoutSubscriptionEvent = BaseEvent & {
-  productId: string;
+export type CreateSubscriptionEvent = BaseEvent & {
+  paymentMethod: PaymentMethodType;
+  blockQuota: number;
   period: SubscriptionPeriod;
-  tier: SubscriptionTier;
-  result: 'success' | 'failure' | 'pending';
 };
 
+export type CancelSubscriptionEvent = BaseEvent & {
+  subscriptionId: string;
+  blockQuota: number;
+};
+
+export type UpdateSubscriptionEvent = BaseEvent & {
+  subscriptionId: string;
+  blockQuota: number;
+  period: SubscriptionPeriod;
+  previousBlockQuota: number;
+  previousPeriod: SubscriptionPeriod;
+};
+
+export type SubscriptionPaymentEvent = BaseEvent & {
+  subscriptionId: string;
+  paymentMethod: PaymentMethod;
+  blockQuota: number;
+  period: SubscriptionPeriod;
+  status: 'success' | 'failure';
+};
+
+export type ClickBillingSettingsEvent = BaseEvent;
+
+export type ViewSubscriptionMarketingScreen = BaseEvent;
+
+export type ViewCheckoutScreen = BaseEvent;
+
 export type SubscriptionEventMap = {
-  view_subscription: ViewSubscriptionEvent;
-  initiate_subscription: InitiateSubscriptionEvent;
-  checkout_subscription: CheckoutSubscriptionEvent;
+  create_subscription: CreateSubscriptionEvent;
+  cancel_subscription: CancelSubscriptionEvent;
+  update_subscription: UpdateSubscriptionEvent;
+  subscription_payment: SubscriptionPaymentEvent;
+  click_billing_settings: ClickBillingSettingsEvent;
+  view_subscription_marketing_screen: ViewSubscriptionMarketingScreen;
+  view_checkout_screen: ViewCheckoutScreen;
 };
