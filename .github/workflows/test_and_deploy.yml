@@ -182,8 +182,8 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     # Re-enable condition before merge
-    if: ( github.event_name == "push" && github.ref == 'refs/heads/main' ) ||
-        ( github.event_name == "workflow_dispatch" && inputs.deploy_to_prd )
+    if: ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) ||
+        ( github.event_name == 'workflow_dispatch' && inputs.deploy_to_prd )
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
