@@ -2,7 +2,6 @@ import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 
 import type { SubscriptionPeriod } from './constants';
-import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
 
 export type CreateProSubscriptionRequest = {
   blockQuota: number;
@@ -14,13 +13,8 @@ export type CreateProSubscriptionRequest = {
   freeTrial?: boolean;
 };
 
-export type ProSubscriptionResponse = {
+export type SubscriptionPaymentIntent = {
   subscriptionId: string;
-  priceId: string;
-  invoiceId: string;
-  blockQuota: number;
-  productId: string;
-  customerId: string;
   paymentIntentId: string;
   clientSecret: string;
   paymentIntentStatus: Stripe.PaymentIntent.Status;
@@ -28,14 +22,25 @@ export type ProSubscriptionResponse = {
   totalPrice: number;
 };
 
-export type CreateProSubscriptionResponse = Pick<
-  ProSubscriptionResponse,
-  'clientSecret' | 'subscriptionId' | 'paymentIntentStatus' | 'totalPrice' | 'subTotalPrice'
->;
+export type ProSubscriptionResponse = {
+  subscriptionId: string;
+  priceId: string;
+  invoiceId: string;
+  blockQuota: number;
+  productId: string;
+  customerId: string;
 
+  // These values are only sent back when creating a subscription with the user present
+  paymentIntent?: SubscriptionPaymentIntent;
+};
 export type CreateCryptoSubscriptionResponse = string;
 
 export type CreateCryptoSubscriptionRequest = {
   subscriptionId: string;
   email: string;
+};
+
+export type StripeMetadataKeys = {
+  domain: string;
+  spaceId: string;
 };

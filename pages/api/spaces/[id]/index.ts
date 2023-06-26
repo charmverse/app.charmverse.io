@@ -1,3 +1,5 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -8,6 +10,7 @@ import { SpaceNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
+import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -35,7 +38,34 @@ async function getSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
 async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const spaceId = req.query.id as string;
 
+  const existingSpace = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    },
+    select: {
+      domain: true
+    }
+  });
+
+  if (!existingSpace) {
+    throw new DataNotFoundError(`Space with id ${spaceId} not found`);
+  }
+
   const updatedSpace = await updateSpace(spaceId, req.body);
+  if (updatedSpace.domain !== existingSpace.domain) {
+    try {
+      await updateCustomerStripeInfo({
+        spaceId,
+        update: {
+          metadata: {
+            domain: updatedSpace.domain
+          }
+        }
+      });
+    } catch (err) {
+      log.error(`Error updating stripe customer details`, { spaceId, err });
+    }
+  }
 
   res.status(200).send(updatedSpace);
 }

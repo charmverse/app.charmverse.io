@@ -73,7 +73,8 @@ describe('createProSubscription', () => {
       customer: {
         id: customerId,
         metadata: {
-          spaceId: space.id
+          spaceId: space.id,
+          domain: space.domain
         }
       }
     });
@@ -109,7 +110,8 @@ describe('createProSubscription', () => {
       name: space.name,
       email: 'test@gmail.com',
       metadata: {
-        spaceId: space.id
+        spaceId: space.id,
+        domain: space.domain
       }
     });
 
