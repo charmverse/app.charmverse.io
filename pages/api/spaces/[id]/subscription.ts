@@ -8,7 +8,7 @@ import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
-import type { CreateProSubscriptionResponse, CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { updateProSubscription } from 'lib/subscription/updateProSubscription';
 
@@ -42,12 +42,12 @@ async function getSpaceSubscriptionController(
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
+async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<SubscriptionPaymentIntent>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
   const { period, blockQuota, billingEmail, name, address, coupon } = req.body as CreateProSubscriptionRequest;
 
-  const { clientSecret, paymentIntentStatus, subscriptionId, totalPrice, subTotalPrice } = await createProSubscription({
+  const { paymentIntent } = await createProSubscription({
     spaceId,
     period,
     blockQuota,
@@ -59,13 +59,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
-  res.status(200).json({
-    subscriptionId,
-    paymentIntentStatus,
-    clientSecret,
-    totalPrice,
-    subTotalPrice
-  });
+  res.status(200).json(paymentIntent ?? ({} as SubscriptionPaymentIntent));
 }
 
 async function deletePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
