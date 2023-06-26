@@ -155,10 +155,6 @@ export async function createProSubscription({
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
 
-  if (!paymentIntent?.client_secret) {
-    throw new ExternalServiceError('Failed to create subscription. The client secret is missing.');
-  }
-
   return {
     subscriptionId: subscription.id,
     priceId: productPrice.id,
@@ -166,8 +162,8 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent.id,
-    paymentIntentStatus: paymentIntent.status,
-    clientSecret: paymentIntent.client_secret
+    paymentIntentId: paymentIntent?.id,
+    paymentIntentStatus: paymentIntent?.status,
+    clientSecret: paymentIntent?.client_secret
   };
 }
