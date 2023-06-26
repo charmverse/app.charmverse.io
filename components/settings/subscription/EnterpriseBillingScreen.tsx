@@ -20,9 +20,7 @@ export function EnterpriseBillingScreen() {
       <Legend whiteSpace='normal'>Plan & Billing</Legend>
       <Grid container spacing={5} alignItems='center'>
         <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
-          <Typography>
-            Enterprise Edition - {spaceSubscription ? `${spaceSubscription.blockQuota}K blocks` : ''}
-          </Typography>
+          <Typography>Enterprise Edition</Typography>
         </Grid>
         <Grid container item>
           <Grid item xs={2}>
