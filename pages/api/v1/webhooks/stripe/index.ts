@@ -130,6 +130,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           })
         ]);
 
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+
         if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
           // The subscription automatically activates after successful payment
           // Set the payment method used to pay the first invoice
@@ -142,21 +144,25 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               default_payment_method: paymentIntent.payment_method
             });
           }
-        }
 
-        const subscription = await getActiveSpaceSubscription({ spaceId });
-
-        if (subscription) {
-          trackUserAction('subscription_payment', {
-            spaceId,
-            blockQuota: subscription?.blockQuota,
+          trackUserAction('create_subscription', {
+            blockQuota,
             period,
-            status: 'success',
-            subscriptionId: subscription.subscriptionId,
+            spaceId,
             paymentMethod: 'card',
             userId: ''
           });
         }
+
+        trackUserAction('subscription_payment', {
+          spaceId,
+          blockQuota,
+          period,
+          status: 'success',
+          subscriptionId: stripeSubscription.id,
+          paymentMethod: 'card',
+          userId: ''
+        });
 
         log.info(
           `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
@@ -222,6 +228,19 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               }
             });
           }
+        } else {
+          const activeSubscription = await getActiveSpaceSubscription({ spaceId });
+          if (activeSubscription) {
+            trackUserAction('update_subscription', {
+              blockQuota: subscription.items.data[0].quantity as number,
+              period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
+              previousBlockQuota: activeSubscription.blockQuota,
+              previousPeriod: activeSubscription.period,
+              subscriptionId: activeSubscription.id,
+              spaceId,
+              userId: ''
+            });
+          }
         }
 
         relay.broadcast(
@@ -282,6 +301,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             data: {
               paidTier: 'cancelled'
             }
+          });
+
+          trackUserAction('cancel_subscription', {
+            blockQuota: subscription.items.data[0].quantity as number,
+            subscriptionId: subscription.id,
+            spaceId,
+            userId: ''
           });
         }
 
