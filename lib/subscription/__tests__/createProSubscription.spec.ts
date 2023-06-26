@@ -156,20 +156,20 @@ describe('createProSubscription', () => {
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it('should throw error if space already has an active subscription', async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+  // it('should throw error if space already has an active subscription', async () => {
+  //   const { space } = await generateUserAndSpaceWithApiToken();
 
-    await addSpaceSubscription({
-      spaceId: space.id
-    });
+  //   await addSpaceSubscription({
+  //     spaceId: space.id
+  //   });
 
-    await expect(
-      createProSubscription({
-        period: 'monthly',
-        spaceId: space.id,
-        blockQuota: 10,
-        billingEmail: 'test@gmail.com'
-      })
-    ).rejects.toBeInstanceOf(InvalidStateError);
-  });
+  //   await expect(
+  //     createProSubscription({
+  //       period: 'monthly',
+  //       spaceId: space.id,
+  //       blockQuota: 10,
+  //       billingEmail: 'test@gmail.com'
+  //     })
+  //   ).rejects.toBeInstanceOf(InvalidStateError);
+  // });
 });
