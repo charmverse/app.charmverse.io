@@ -109,7 +109,44 @@ describe('baseComputePagePermissions', () => {
 });
 
 describe('computePagePermissions - with proposal policy', () => {
-  it('should return only read permissions if page has been converted to a proposal', async () => {
+  it('should return unmodified permissions for admins if page has been converted to a proposal', async () => {
+    const { user: localAdminUser, space: localSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const spaceMember = await testUtilsUser.generateSpaceUser({
+      spaceId: localSpace.id,
+      isAdmin: false
+    });
+
+    const categoryName = 'Example category';
+
+    const category = await testUtilsProposals.generateProposalCategory({
+      spaceId: localSpace.id,
+      title: categoryName
+    });
+
+    const testPage = await testUtilsPages.generatePage({
+      createdBy: spaceMember.id,
+      spaceId: localSpace.id
+    });
+
+    const permissions = await computePagePermissions({
+      resourceId: testPage.id,
+      userId: localAdminUser.id
+    });
+
+    await convertPageToProposal({
+      page: testPage,
+      categoryId: category.id,
+      userId: spaceMember.id
+    });
+
+    const permissionsAfterConverting = await computePagePermissions({
+      resourceId: testPage.id,
+      userId: localAdminUser.id
+    });
+
+    expect(permissionsAfterConverting).toMatchObject(permissions);
+  });
+  it('should return only read permissions for space members if page has been converted to a proposal', async () => {
     const { user: nonAdminUser, space: localSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
 
     const categoryName = 'Example category';
