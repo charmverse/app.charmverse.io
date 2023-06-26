@@ -1,10 +1,7 @@
 import CheckIcon from '@mui/icons-material/Check';
 import { Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import { getTimeDifference } from 'lib/utilities/dates';
@@ -21,18 +18,6 @@ export function CreateSubscriptionInformation({
   onClick: () => void;
   spaceSubscription?: SpaceSubscriptionWithStripeData | null;
 }) {
-  const { showMessage } = useSnackbar();
-
-  const { trigger: switchToFreeTier, isMutating: isSwitchLoading } = useSWRMutation(
-    `/api/spaces/${spaceSubscription?.spaceId}/subscription`,
-    (_url, { arg }: Readonly<{ arg: string }>) => charmClient.subscription.switchToFreeTier(arg),
-    {
-      onError() {
-        showMessage('Updating failed! Please try again', 'error');
-      }
-    }
-  );
-
   const freeTrialEnds =
     spaceSubscription?.status === 'free_trial'
       ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
@@ -56,15 +41,7 @@ export function CreateSubscriptionInformation({
             Free Plan
           </Typography>
           {spaceSubscription?.status === 'free_trial' ? null : <Chip size='small' label='Current Plan' />}
-          <Free width='140px' height='140px' />
-          {/* <Typography variant='body1' mb={1}>
-            You can cancel the free trial and go directly to a free plan.
-          </Typography> */}
-          {spaceSubscription?.status === 'free_trial' && (
-            <Button disabled={isSwitchLoading} onClick={() => switchToFreeTier(spaceSubscription.spaceId)}>
-              Use free plan
-            </Button>
-          )}
+          <Free width='140px' height='140px' style={{ margin: 'auto' }} />
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography variant='h6' mb={1}>
@@ -93,11 +70,10 @@ export function CreateSubscriptionInformation({
           ) : (
             <Chip size='small' label='Recommended Plan' variant='outlined' />
           )}
-          <Community width='150px' height='150px' />
-          <Typography variant='body1' mb={1}>
-            Starts at $10/month
-          </Typography>
-          <Button onClick={onClick}>Upgrade</Button>
+          <Community width='150px' height='150px' style={{ margin: 'auto' }} />
+          <Button fullWidth onClick={onClick}>
+            Upgrade $10/month
+          </Button>
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography variant='h6' mb={1}>
@@ -117,12 +93,12 @@ export function CreateSubscriptionInformation({
       </Grid>
       <Divider sx={{ mb: 1 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
+        <Grid item xs={12} sm={4} display='flex' flexDirection='column' gap={1}>
           <Typography variant='h6' mb={1}>
             Enterprise Edition
           </Typography>
-          <Enterprise width='150px' height='150px' />
-          <Button variant='text' href='mailto:hello@charmverse.io'>
+          <Enterprise width='150px' height='150px' style={{ margin: 'auto' }} />
+          <Button variant='outlined' href='mailto:hello@charmverse.io'>
             Contact us
           </Button>
         </Grid>
