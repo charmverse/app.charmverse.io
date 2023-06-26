@@ -202,7 +202,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         if (!spaceSubscription) {
-          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`);
+          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`, {
+            spaceId,
+            subscriptionId: subscription.id
+          });
           break;
         }
 
