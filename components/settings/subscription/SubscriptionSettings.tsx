@@ -50,16 +50,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [blockQuota, setblockQuota] = useState(10);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
+    charmClient.track.trackAction('click_billing_settings', {
       spaceId: space.id
     });
   }, []);
 
   async function handleShowCheckoutForm() {
     setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
     await createSubscription({ spaceId: space.id, payload: { period, blockQuota } });
   }
 

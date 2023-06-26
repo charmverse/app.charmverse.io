@@ -49,6 +49,7 @@ export function CheckoutForm({
 }) {
   const stripe = useStripe();
   const elements = useElements();
+  const { space } = useCurrentSpace();
 
   const {
     register,
@@ -63,12 +64,19 @@ export function CheckoutForm({
     resolver: yupResolver(schema())
   });
 
+  useEffect(() => {
+    if (space) {
+      charmClient.track.trackAction('view_checkout_screen', {
+        spaceId: space.id
+      });
+    }
+  }, [space]);
+
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);
 
   const email = watch('email');
 
-  const { space } = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
   const [pendingPayment, setPendingPayment] = useState(false);

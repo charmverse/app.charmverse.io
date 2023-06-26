@@ -4,13 +4,26 @@ import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import { Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { subscriptionDetails } from 'lib/subscription/constants';
 
 import Legend from '../Legend';
 
 export function CreateSubscriptionInformation({ onClick }: { onClick: () => void }) {
+  const { space } = useCurrentSpace();
+
+  useEffect(() => {
+    if (space) {
+      charmClient.track.trackAction('view_subscription_marketing_screen', {
+        spaceId: space.id
+      });
+    }
+  }, [space]);
+
   return (
     <>
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
