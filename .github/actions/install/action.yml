@@ -30,15 +30,27 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    - name: Upgrade to specific version of Core package
+    - name: Install specific version of Core 
       shell: bash
-      if: ${{ inputs.core_pkg_version }}
+      if: inputs.core_pkg_version and inputs.core_pkg_version != "latest"
       run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
+    - name: Upgrade to latest version of Core package then commit back to repo
+      shell: bash
+      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == "latest"
+      run: |
+        npm update @charmverse/core@${{ inputs.core_pkg_version }}
+
+    - name: Commit package and lock file back into repo
+      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.core_pkg_version == "latest"
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Github action: automated Core pk upgrade to latest"
 
     # Include this step to deploy and test a different branch of core
     # 1. Set the webapp branch
     # 2. Set core branch
     # - name: Install special core library
     #   shell: bash
-    #   if: github.head_ref == 'policies/converted-to-proposal'
-    #   run: npm install github:charmverse/core#policies/converted-to-proposal
+    #   if: github.head_ref == 'feat/count-blocks'
+    #   run: npm install github:charmverse/core#feat/count-blocks
