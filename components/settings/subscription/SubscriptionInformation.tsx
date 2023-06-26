@@ -164,19 +164,18 @@ export function SubscriptionInformation({
           )}
           {status && <Typography>Status: {status}</Typography>}
 
-          {space.paidTier === 'cancelled' ||
-            (space.paidTier === 'pro' && spaceSubscription.status === 'free_trial' && (
-              <Button
-                disabled={!isAdmin}
-                onClick={() => {
-                  charmClient.subscription
-                    .switchToFreeTier(space.id)
-                    .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-                }}
-              >
-                Use free plan
-              </Button>
-            ))}
+          {space.paidTier === 'cancelled' && (
+            <Button
+              disabled={!isAdmin}
+              onClick={() => {
+                charmClient.subscription
+                  .switchToFreeTier(space.id)
+                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
+              }}
+            >
+              Use free plan
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions
