@@ -1,6 +1,5 @@
 import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { SubscriptionTier as SubscriptionTierEnum } from '@charmverse/core/prisma';
 import type { StripeSubscription, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -134,7 +133,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: !paidTier || !SubscriptionTierEnum[paidTier] ? 'pro' : paidTier
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
             }
           })
         ]);
