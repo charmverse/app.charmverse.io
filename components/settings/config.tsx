@@ -31,10 +31,10 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
 ];
 
-export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
-  return SETTINGS_TABS.filter((settingsTab) =>
-    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') || space.paidTier === 'free' : true
-  );
+export function getSettingsTabs({ isAdmin, space }: { space: Space; isAdmin: boolean }): SpaceSettingsTab[] {
+  return SETTINGS_TABS.filter((tab) => {
+    return tab.path === 'subscription' ? !!isAdmin : false;
+  });
 }
 
 export const accountSettingsSections = ['account', 'profile'] as const;
