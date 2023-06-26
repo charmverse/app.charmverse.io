@@ -36,12 +36,12 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
       return 'pending';
   }
 }
-export type PaymentMethodType = 'card' | 'ach';
 
 export type PaymentMethod = {
   id: string;
-  type: PaymentMethodType;
-  digits: string;
+  type: Stripe.PaymentMethod.Type;
+  digits?: string;
+  brand?: string;
 };
 
 /**
@@ -60,6 +60,7 @@ export type SubscriptionFieldsFromStripe = {
   expiresOn?: Date | null;
   renewalDate?: Date | null;
   paymentMethod?: PaymentMethod | null;
+  coupon?: string;
 };
 export function mapStripeFields({
   subscription,
@@ -78,6 +79,18 @@ export function mapStripeFields({
       customerId: subscription.customer.id
     });
   }
+  const paymentDetails = subscription.default_payment_method as Stripe.PaymentMethod | null;
+  const paymentType = paymentDetails?.type;
+  const paymentCard = paymentDetails?.card?.brand;
+  const last4 = paymentDetails?.card?.last4;
+  const paymentMethod = paymentDetails
+    ? ({
+        id: paymentDetails.id,
+        brand: paymentCard,
+        digits: last4,
+        type: paymentType
+      } as PaymentMethod)
+    : null;
 
   const status = mapStripeStatus(subscription);
   const expiryDate =
@@ -92,7 +105,7 @@ export function mapStripeFields({
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
     blockQuota,
     status,
-    paymentMethod: null,
+    paymentMethod,
     billingEmail: subscription.customer.email,
     expiresOn: typeof expiryDate === 'number' ? new Date(coerceToMilliseconds(expiryDate)) : null,
     renewalDate: subscription.current_period_end

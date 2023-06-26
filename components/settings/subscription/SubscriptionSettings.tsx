@@ -3,6 +3,7 @@ import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
@@ -46,8 +47,16 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   );
 
+  const { data: blockCountData } = useSWR(space.id ? `space-block-count-${space.id}` : null, () =>
+    charmClient.spaces.getBlockCount({ spaceId: space.id })
+  );
+
+  const blockCount = blockCountData?.count || 0;
+
+  const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
+
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
-  const [blockQuota, setblockQuota] = useState(10);
+  const [blockQuota, setBlockQuota] = useState(10);
 
   useEffect(() => {
     charmClient.track.trackAction('view_subscription', {
@@ -56,16 +65,24 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   }, []);
 
   async function handleShowCheckoutForm() {
+    if (minimumBlockQuota > blockQuota) {
+      setBlockQuota(minimumBlockQuota);
+    }
+
     setShowCheckoutForm(true);
     charmClient.track.trackAction('initiate_subscription', {
       spaceId: space.id
     });
-    await createSubscription({ spaceId: space.id, payload: { period, blockQuota } });
+
+    await createSubscription({
+      spaceId: space.id,
+      payload: { period, blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota }
+    });
   }
 
   const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
     if (_blockQuota) {
-      setblockQuota(_blockQuota);
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
     } else if (_period) {
       setPeriod(_period);
     }
@@ -73,7 +90,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const handlePlanSelectCommited = async (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
     if (_blockQuota) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota: _blockQuota, period } });
+      await createSubscription({
+        spaceId: space.id,
+        payload: { blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota, period }
+      });
     } else if (_period) {
       await createSubscription({ spaceId: space.id, payload: { blockQuota, period: _period } });
     }
@@ -88,14 +108,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoading ? (
           <LoadingSubscriptionSkeleton isLoading={isLoading} />
-        ) : spaceSubscription ? (
+        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             space={space}
             spaceSubscription={spaceSubscription}
             refetchSpaceSubscription={refetchSpaceSubscription}
           />
         ) : (
-          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} />
+          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} spaceSubscription={spaceSubscription} />
         )}
       </Stack>
     );
@@ -106,13 +126,15 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
       <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
-      <PlanSelection
-        disabled={isInitialSubscriptionLoading}
-        onSelect={handlePlanSelect}
-        onSelectCommited={handlePlanSelectCommited}
-        blockQuotaInThousands={blockQuota}
-        period={period}
-      />
+      {!!blockCountData && (
+        <PlanSelection
+          disabled={isInitialSubscriptionLoading}
+          onSelect={handlePlanSelect}
+          onSelectCommited={handlePlanSelectCommited}
+          blockQuotaInThousands={blockQuota}
+          period={period}
+        />
+      )}
       <LoadingComponent isLoading={isInitialSubscriptionLoading} />
       {!isLoading &&
         !isInitialSubscriptionLoading &&

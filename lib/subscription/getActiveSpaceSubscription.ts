@@ -34,7 +34,7 @@ export async function getActiveSpaceSubscription({
   }
 
   const subscriptionInStripe = await stripeClient.subscriptions.retrieve(activeSpaceSubscription.subscriptionId, {
-    expand: ['customer']
+    expand: ['customer', 'default_payment_method']
   });
 
   const stripeData = mapStripeFields({

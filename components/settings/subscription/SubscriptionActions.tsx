@@ -31,7 +31,9 @@ export function SubscriptionActions({
           Reactivate Plan
         </Button>
       )}
-      {spaceSubscription?.status === 'active' && (
+      {(spaceSubscription?.status === 'active' ||
+        spaceSubscription?.status === 'cancelled' ||
+        spaceSubscription?.status === 'free_trial') && (
         <>
           <Button disabled={loading} onClick={() => {}}>
             Update Plan

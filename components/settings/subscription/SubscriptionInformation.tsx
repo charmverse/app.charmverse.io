@@ -15,13 +15,13 @@ import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaces } from 'hooks/useSpaces';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { formatDate, getTimeDifference } from 'lib/utilities/dates';
+import { capitalize } from 'lib/utilities/strings';
 
 import { SubscriptionActions } from './SubscriptionActions';
 
@@ -55,7 +55,7 @@ export function SubscriptionInformation({
     formState: { errors }
   } = useForm<{ email: string }>({
     mode: 'onChange',
-    defaultValues: { email: '' },
+    defaultValues: { email: spaceSubscription.billingEmail ?? '' },
     resolver: yupResolver(schema())
   });
   const email = watch('email');
@@ -164,18 +164,19 @@ export function SubscriptionInformation({
           )}
           {status && <Typography>Status: {status}</Typography>}
 
-          {space.paidTier !== 'free' && (
-            <Button
-              disabled={!isAdmin}
-              onClick={() => {
-                charmClient.subscription
-                  .switchToFreeTier(space.id)
-                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-              }}
-            >
-              Use free plan
-            </Button>
-          )}
+          {space.paidTier === 'cancelled' ||
+            (space.paidTier === 'pro' && spaceSubscription.status === 'free_trial' && (
+              <Button
+                disabled={!isAdmin}
+                onClick={() => {
+                  charmClient.subscription
+                    .switchToFreeTier(space.id)
+                    .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
+                }}
+              >
+                Use free plan
+              </Button>
+            ))}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions
@@ -218,7 +219,13 @@ export function SubscriptionInformation({
           <Typography variant='h6' mb={1}>
             Payment Method
           </Typography>
-          <Typography>Visa **** 4641</Typography>
+          <Typography>
+            {spaceSubscription.paymentMethod?.type === 'card'
+              ? `${capitalize(spaceSubscription.paymentMethod?.brand || '')} **** ${
+                  spaceSubscription.paymentMethod?.digits
+                }`
+              : `${spaceSubscription.paymentMethod?.type}`}
+          </Typography>
           <Typography>
             <u>change payment method</u>
           </Typography>

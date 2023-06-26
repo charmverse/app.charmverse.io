@@ -6,6 +6,7 @@ import type { Stripe } from 'stripe';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
+import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
 import type { CreateProSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
 import { stripeClient } from './stripe';
 
@@ -36,26 +37,26 @@ export async function createProSubscription({
     throw new NotFoundError('Space not found');
   }
 
-  const spaceSubscription = await prisma.stripeSubscription.findFirst({
-    where: {
-      spaceId,
-      deletedAt: null
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
+  const spaceSubscriptionWithDetails = await getActiveSpaceSubscription({ spaceId });
 
-  if (spaceSubscription) {
-    throw new InvalidStateError(`Space already has an active subscription with the id ${spaceSubscription.id}`);
+  if (freeTrial && spaceSubscriptionWithDetails?.status === 'free_trial') {
+    throw new InvalidStateError(
+      `Space already has an active free trial with the id ${spaceSubscriptionWithDetails.id}`
+    );
   }
 
-  const pendingStripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}' AND status:"incomplete"`,
+  if (spaceSubscriptionWithDetails?.status === 'active') {
+    throw new InvalidStateError(
+      `Space already has an active subscription with the id ${spaceSubscriptionWithDetails.id}`
+    );
+  }
+
+  const stripeSubscription = await stripeClient.subscriptions.search({
+    query: `metadata['spaceId']:'${spaceId}'`,
     expand: ['data.customer']
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.find(
+  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.find(
     (sub) =>
       (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
       (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
