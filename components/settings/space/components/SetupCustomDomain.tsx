@@ -76,7 +76,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
           <Stack direction='row' alignItems='start' spacing={1}>
             <TextField
               {...register('customDomain', {
-                validate: (value) => isValidDomainName(value) || 'Please provide valid domain name.'
+                validate: (value) => !!value || isValidDomainName(value) || 'Please provide valid domain name.'
               })}
               InputProps={{
                 startAdornment: <InputAdornment position='start'>https://</InputAdornment>
