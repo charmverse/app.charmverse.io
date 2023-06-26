@@ -8,7 +8,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
@@ -21,6 +23,7 @@ type FormValues = {
 
 export function SetupCustomDomain({ space }: { space: Space }) {
   const { setSpace } = useSpaces();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
@@ -57,40 +60,47 @@ export function SetupCustomDomain({ space }: { space: Space }) {
 
   return (
     <Stack mt={3}>
-      <FieldLabel>Custom space URL domain</FieldLabel>
+      <Stack direction='row' gap={1}>
+        <FieldLabel>Custom space URL domain</FieldLabel>
+        <Stack mt={-0.1}>
+          <UpgradeChip upgradeContext='custom_domain' />
+        </Stack>
+      </Stack>
       <Typography variant='caption' color='text.secondary' mb={1}>
         Add a custom domain you own to access your app thorugh it. You will be prompted with further instructions after
         saving.
       </Typography>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack direction='row' alignItems='start' spacing={1}>
-          <TextField
-            {...register('customDomain', {
-              validate: (value) => isValidDomainName(value) || 'Please provide valid domain name.'
-            })}
-            InputProps={{
-              startAdornment: <InputAdornment position='start'>https://</InputAdornment>
-            }}
-            disabled={!isAdmin}
-            fullWidth
-            error={!!errors.customDomain}
-            helperText={errors.customDomain?.message || ''}
-            data-test='space-custom-domain-input'
-            placeholder='dao.example.com'
-          />
+      <UpgradeWrapper upgradeContext='custom_domain'>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack direction='row' alignItems='start' spacing={1}>
+            <TextField
+              {...register('customDomain', {
+                validate: (value) => isValidDomainName(value) || 'Please provide valid domain name.'
+              })}
+              InputProps={{
+                startAdornment: <InputAdornment position='start'>https://</InputAdornment>
+              }}
+              disabled={!isAdmin || isFreeSpace}
+              fullWidth
+              error={!!errors.customDomain}
+              helperText={errors.customDomain?.message || ''}
+              data-test='space-custom-domain-input'
+              placeholder='dao.example.com'
+            />
 
-          <Button
-            disableElevation
-            data-test='submit-space-custom-domain'
-            disabled={!isDirty || isSubmitting}
-            type='submit'
-            size='large'
-          >
-            Save domain
-          </Button>
-        </Stack>
-      </form>
+            <Button
+              disableElevation
+              data-test='submit-space-custom-domain'
+              disabled={!isDirty || isSubmitting || isFreeSpace}
+              type='submit'
+              size='large'
+            >
+              Save domain
+            </Button>
+          </Stack>
+        </form>
+      </UpgradeWrapper>
 
       <Typography variant='caption' mt={0.5}>
         You will need to point your domain to our app. You can find out on how to do that{' '}
