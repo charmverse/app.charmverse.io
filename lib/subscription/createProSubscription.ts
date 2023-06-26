@@ -167,6 +167,8 @@ export async function createProSubscription({
     customerId: customer.id,
     paymentIntentId: paymentIntent.id,
     paymentIntentStatus: paymentIntent.status,
-    clientSecret: paymentIntent.client_secret
+    clientSecret: paymentIntent.client_secret,
+    subTotalPrice: ((subscription.latest_invoice as Stripe.Invoice).subtotal || 0) / 100,
+    totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100
   };
 }

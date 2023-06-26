@@ -1,6 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
-import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import {
+  Divider,
+  Drawer,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
@@ -19,9 +30,10 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
-import type { CreateCryptoSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { CreateCryptoSubscriptionRequest, CreateProSubscriptionResponse } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
+import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
@@ -37,17 +49,21 @@ const schema = () => {
 export function CheckoutForm({
   onCancel,
   refetch,
+  handleCoupon,
   show,
   period,
   blockQuota,
-  subscriptionId
+  subscription,
+  isLoading
 }: {
   show: boolean;
   blockQuota: number;
   period: SubscriptionPeriod;
-  subscriptionId: string;
+  subscription: CreateProSubscriptionResponse;
+  isLoading: boolean;
   onCancel: VoidFunction;
   refetch: KeyedMutator<SpaceSubscriptionWithStripeData | null>;
+  handleCoupon: (coupon: string) => Promise<void>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -160,7 +176,10 @@ export function CheckoutForm({
 
       await updateSpaceSubscription({
         spaceId: space.id,
-        payload: { billingEmail: paymentDetails.email, coupon: paymentDetails.coupon, subscriptionId }
+        payload: {
+          billingEmail: paymentDetails.email,
+          subscriptionId: subscription.subscriptionId
+        }
       });
 
       const { error: confirmPaymentError } = await stripe.confirmPayment({
@@ -215,7 +234,7 @@ export function CheckoutForm({
     await createCryptoSubscription({
       spaceId: space.id,
       payload: {
-        subscriptionId,
+        subscriptionId: subscription.subscriptionId,
         email: paymentDetails.email
       }
     });
@@ -243,7 +262,8 @@ export function CheckoutForm({
       <Divider sx={{ mb: 1 }} />
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
-          {show && (
+          {isLoading && <LoadingSubscriptionSkeleton isLoading={isLoading} />}
+          {!isLoading && show && (
             <>
               <PaymentTabs value={paymentType} onChange={changePaymentType} />
               <PaymentTabPanel value={paymentType} index='card'>
@@ -274,15 +294,43 @@ export function CheckoutForm({
           <Divider sx={{ my: 2 }} />
           <Stack gap={0.5} my={2}>
             <Typography>Coupon code</Typography>
-            <TextField disabled={isProcessing} {...register('coupon')} />
+            <Stack>
+              <TextField
+                disabled={isProcessing}
+                {...register('coupon')}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={() => handleCoupon(getValues().coupon)} disabled={isLoading}>
+                        <SendIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
+          {subscription.totalPrice !== subscription.subTotalPrice && (
+            <>
+              <Stack display='flex' flexDirection='row' justifyContent='space-between'>
+                <Stack>
+                  <Typography>Subtotal</Typography>
+                </Stack>
+                <Stack>
+                  <Typography>${subscription.subTotalPrice || 0}</Typography>
+                </Stack>
+              </Stack>
+              <Divider sx={{ my: 2 }} />
+            </>
+          )}
+
           <Stack display='flex' flexDirection='row' justifyContent='space-between'>
             <Stack>
               <Typography>Total</Typography>
             </Stack>
             <Stack>
-              <Typography>${(communityProduct.pricing[period] ?? 0) * blockQuota}</Typography>
+              <Typography>${subscription.totalPrice || 0}</Typography>
             </Stack>
           </Stack>
           <PaymentTabPanel value={paymentType} index='card'>

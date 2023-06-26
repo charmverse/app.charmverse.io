@@ -101,7 +101,7 @@ export function CreateSubscriptionInformation({
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography variant='h6' mb={1}>
-            Onboard & Engage Community Members
+            Onboard & engage community members
           </Typography>
           <List dense>
             {subscriptionDetails.community.map((detail) => (
@@ -128,7 +128,7 @@ export function CreateSubscriptionInformation({
         </Grid>
         <Grid item xs={12} sm={8}>
           <Typography variant='h6' mb={1}>
-            Advanced control and support for large Communities
+            Advanced control and support for large communities
           </Typography>
           <List dense>
             {subscriptionDetails.enterprise.map((detail) => (

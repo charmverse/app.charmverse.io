@@ -24,11 +24,13 @@ export type ProSubscriptionResponse = {
   paymentIntentId: string;
   clientSecret: string;
   paymentIntentStatus: Stripe.PaymentIntent.Status;
+  subTotalPrice: number;
+  totalPrice: number;
 };
 
 export type CreateProSubscriptionResponse = Pick<
   ProSubscriptionResponse,
-  'clientSecret' | 'subscriptionId' | 'paymentIntentStatus'
+  'clientSecret' | 'subscriptionId' | 'paymentIntentStatus' | 'totalPrice' | 'subTotalPrice'
 >;
 
 export type CreateCryptoSubscriptionResponse = string;

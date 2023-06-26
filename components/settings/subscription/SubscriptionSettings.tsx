@@ -99,6 +99,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   };
 
+  const handleCoupon = async (coupon: string) => {
+    await createSubscription({
+      spaceId: space.id,
+      payload: { blockQuota, period, coupon }
+    });
+  };
+
   const theme = useTheme();
 
   const stripePromise = loadStripe();
@@ -106,9 +113,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>
-        {isLoading ? (
-          <LoadingSubscriptionSkeleton isLoading={isLoading} />
-        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
+        {spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             space={space}
             spaceSubscription={spaceSubscription}
@@ -135,30 +140,28 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           period={period}
         />
       )}
-      <LoadingComponent isLoading={isInitialSubscriptionLoading} />
-      {!isLoading &&
-        !isInitialSubscriptionLoading &&
-        spaceSubscription !== undefined &&
-        initialSubscriptionData?.clientSecret && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret: initialSubscriptionData.clientSecret,
-              appearance: {
-                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-              }
-            }}
-          >
-            <CheckoutForm
-              show={showCheckoutForm}
-              blockQuota={blockQuota}
-              period={period}
-              subscriptionId={initialSubscriptionData.subscriptionId}
-              refetch={refetchSpaceSubscription}
-              onCancel={() => setShowCheckoutForm(false)}
-            />
-          </Elements>
-        )}
+      {spaceSubscription !== undefined && initialSubscriptionData?.clientSecret && (
+        <Elements
+          stripe={stripePromise}
+          options={{
+            clientSecret: initialSubscriptionData.clientSecret,
+            appearance: {
+              theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+            }
+          }}
+        >
+          <CheckoutForm
+            show={showCheckoutForm}
+            blockQuota={blockQuota}
+            period={period}
+            subscription={initialSubscriptionData}
+            handleCoupon={handleCoupon}
+            refetch={refetchSpaceSubscription}
+            onCancel={() => setShowCheckoutForm(false)}
+            isLoading={isLoading || isInitialSubscriptionLoading}
+          />
+        </Elements>
+      )}
     </Stack>
   );
 }
