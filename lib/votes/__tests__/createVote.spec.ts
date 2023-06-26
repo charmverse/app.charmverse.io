@@ -17,7 +17,8 @@ describe('createVote', () => {
     const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: {},
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
@@ -54,7 +55,8 @@ describe('createVote', () => {
     await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: {},
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
@@ -68,7 +70,8 @@ describe('createVote', () => {
       createVoteService({
         createdBy: user.id,
         deadline: new Date(),
-        description: null,
+        content: {},
+        contentText: '',
         pageId: page.id,
         spaceId: space.id,
         threshold: 50,
