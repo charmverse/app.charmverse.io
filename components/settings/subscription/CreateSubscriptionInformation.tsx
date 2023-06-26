@@ -98,7 +98,7 @@ export function CreateSubscriptionInformation({
             Enterprise Edition
           </Typography>
           <Enterprise width='150px' height='150px' style={{ margin: 'auto' }} />
-          <Button variant='outlined' href='mailto:hello@charmverse.io'>
+          <Button variant='outlined' fullWidth href='mailto:hello@charmverse.io'>
             Contact us
           </Button>
         </Grid>
