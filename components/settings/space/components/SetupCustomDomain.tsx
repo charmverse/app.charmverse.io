@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/src/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import { InputAdornment, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useState } from 'react';
