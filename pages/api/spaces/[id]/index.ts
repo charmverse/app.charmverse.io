@@ -36,7 +36,6 @@ async function getSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
 
 async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const spaceId = req.query.id as string;
-  const { domain } = req.body;
 
   const existingSpace = await prisma.space.findUnique({
     where: {
@@ -52,12 +51,14 @@ async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<S
   }
 
   const updatedSpace = await updateSpace(spaceId, req.body);
-  if (domain && existingSpace.domain !== domain) {
+  if (updatedSpace.domain !== existingSpace.domain) {
     try {
       await updateCustomerStripeInfo({
         spaceId,
         update: {
-          name: domain
+          metadata: {
+            domain: updatedSpace.domain
+          }
         }
       });
     } catch (err) {

@@ -3,11 +3,17 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type Stripe from 'stripe';
 
 import { getStripeCustomerBySpaceId } from './getStripeCustomerBySpaceId';
+import type { StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
-type UpdateableCustomerInfo = Pick<Stripe.Customer, 'name'>;
+type UpdateableMetadataKeys = Pick<StripeMetadataKeys, 'domain'>;
 
-const validUpdateKeys: (keyof UpdateableCustomerInfo)[] = ['name'];
+type UpdateableCustomerInfo = Pick<Stripe.Customer, 'name' | 'metadata'> & {
+  metadata: Partial<UpdateableMetadataKeys>;
+};
+
+const validUpdateKeys: (keyof UpdateableCustomerInfo)[] = ['name', 'metadata'];
+const validMetadataUpdateKeys: (keyof UpdateableMetadataKeys)[] = ['domain'];
 
 type StripeCustomerUpdate = {
   spaceId: string;
@@ -30,7 +36,16 @@ export async function updateCustomerStripeInfo({ update, spaceId }: StripeCustom
   const sanitizedUpdateContent: Partial<UpdateableCustomerInfo> = {};
 
   for (const key of validUpdateKeys) {
-    if (update[key] !== null) {
+    if (key === 'metadata') {
+      sanitizedUpdateContent.metadata = {};
+
+      for (const metaKey of validMetadataUpdateKeys) {
+        if (update.metadata?.[metaKey] !== null) {
+          (sanitizedUpdateContent.metadata as Record<keyof UpdateableMetadataKeys, any>)[metaKey] =
+            update.metadata?.[metaKey];
+        }
+      }
+    } else if (update[key] !== null) {
       sanitizedUpdateContent[key] = update[key];
     }
   }

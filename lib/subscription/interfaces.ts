@@ -37,3 +37,8 @@ export type CreateCryptoSubscriptionRequest = {
   subscriptionId: string;
   email: string;
 };
+
+export type StripeMetadataKeys = {
+  domain: string;
+  spaceId: string;
+};
