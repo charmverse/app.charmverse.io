@@ -292,7 +292,7 @@ export function CheckoutForm({
             </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
-          <Stack gap={0.5} my={2}>
+          {/* <Stack gap={0.5} my={2}>
             <Typography>Coupon code</Typography>
             <Stack>
               <TextField
@@ -310,7 +310,7 @@ export function CheckoutForm({
               />
             </Stack>
           </Stack>
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} /> */}
           {subscription.totalPrice !== subscription.subTotalPrice && (
             <>
               <Stack display='flex' flexDirection='row' justifyContent='space-between'>
