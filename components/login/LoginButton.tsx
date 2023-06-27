@@ -6,7 +6,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import SvgIcon from '@mui/material/SvgIcon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
@@ -14,16 +13,14 @@ import { useRef, useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
-import Link from 'components/common/Link';
+import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
-import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { CollectEmail } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
@@ -104,7 +101,6 @@ function LoginHandler(props: DialogProps) {
 
   const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
-
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
@@ -191,36 +187,14 @@ function LoginHandler(props: DialogProps) {
                 />
               </ListItem>
             )}
+            <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+              Connect Account
+            </DialogTitle>
+
+            <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />
 
             {!isOnCustomDomain && (
               <>
-                <DialogTitle sx={{ mt: -1 }} textAlign='left'>
-                  Connect Account
-                </DialogTitle>
-
-                <Link
-                  data-test='connect-discord'
-                  href={
-                    typeof window !== 'undefined'
-                      ? getDiscordLoginPath({ type: 'login', redirectUrl: returnUrl ?? redirectUrl ?? '/' })
-                      : ''
-                  }
-                >
-                  <ListItem>
-                    <ConnectorButton
-                      name='Connect with Discord'
-                      disabled={false}
-                      isActive={false}
-                      isLoading={false}
-                      icon={
-                        <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2' }}>
-                          <DiscordIcon />
-                        </SvgIcon>
-                      }
-                    />
-                  </ListItem>
-                </Link>
-
                 {/* Google login method */}
                 <ListItem>
                   <ConnectorButton

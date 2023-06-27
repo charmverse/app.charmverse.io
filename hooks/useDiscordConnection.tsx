@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
@@ -18,10 +19,12 @@ type IDiscordConnectionContext = {
   isLoading: boolean;
   connect: VoidFunction;
   error?: string;
+  popupLogin: (redirectUrl: string) => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
   connect: () => {},
+  popupLogin: () => {},
   error: undefined,
   isConnected: false,
   isLoading: false
@@ -32,12 +35,12 @@ export function DiscordProvider({ children }: Props) {
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
   const authError = getCookie(AUTH_ERROR_COOKIE);
-
   const [discordError, setDiscordError] = useState('');
   const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
 
   const connectedWithDiscord = Boolean(user?.discordUser);
+  const { openPopupLogin } = usePopupLogin<{ code: string }>();
 
   async function connect() {
     if (!isConnectDiscordLoading) {
@@ -69,6 +72,25 @@ export function DiscordProvider({ children }: Props) {
       .finally(() => {
         setIsDisconnectingDiscord(false);
       });
+  }
+
+  function popupLogin(redirectUrl: string) {
+    const discordLoginPath = getDiscordLoginPath({
+      type: 'login',
+      authFlowType: 'popup',
+      redirectUrl
+    });
+
+    const onSuccess = async ({ code }: { code: string }) => {
+      try {
+        const loggedInUser = await charmClient.discord.loginWithDiscordCode(code, 'login');
+        setUser(loggedInUser);
+      } catch (e: any) {
+        showMessage(e.message || 'Failed to login with discord');
+      }
+    };
+
+    openPopupLogin(discordLoginPath, onSuccess);
   }
 
   useEffect(() => {
@@ -112,7 +134,8 @@ export function DiscordProvider({ children }: Props) {
       isLoading,
       isConnected,
       connect,
-      error
+      error,
+      popupLogin
     }),
     [isConnected, isLoading, error]
   );
