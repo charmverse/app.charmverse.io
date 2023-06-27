@@ -164,7 +164,7 @@ export function SubscriptionInformation({
           )}
           {status && <Typography>Status: {status}</Typography>}
 
-          {space.paidTier === 'cancelled' && (
+          {(space.paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
             <Button
               disabled={!isAdmin}
               onClick={() => {
