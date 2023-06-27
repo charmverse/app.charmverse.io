@@ -27,13 +27,7 @@ export class DiscordApi {
     return http.POST<Space>('/api/discord/gate/verify', body);
   }
 
-  loginWithDiscordCode(code: string, type: 'login' | 'connect') {
-    const state = encodeURIComponent(
-      JSON.stringify({
-        type
-      })
-    );
-
-    return http.POST<LoggedInUser>(`/api/discord/login?state=${state}`, { code });
+  loginWithDiscordCode(code: string) {
+    return http.POST<LoggedInUser>(`/api/discord/login`, { code });
   }
 }
