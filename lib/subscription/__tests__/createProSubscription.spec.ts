@@ -98,7 +98,7 @@ describe('createProSubscription', () => {
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
     (stripeClient.prices.list as jest.Mock<any, any>) = listPricesMockFn;
 
-    const { clientSecret, paymentIntentStatus } = await createProSubscription({
+    const { paymentIntent } = await createProSubscription({
       period: 'monthly',
       spaceId: space.id,
       blockQuota: 10,
@@ -143,8 +143,8 @@ describe('createProSubscription', () => {
       expand: ['latest_invoice.payment_intent']
     });
 
-    expect(paymentIntentStatus).toStrictEqual('incomplete');
-    expect(clientSecret).toStrictEqual(client_secret);
+    expect(paymentIntent?.paymentIntentStatus).toStrictEqual('incomplete');
+    expect(paymentIntent?.clientSecret).toStrictEqual(client_secret);
   });
 
   it("should throw error if space doesn't exist", async () => {

@@ -6,13 +6,13 @@ import type {
   CreateCryptoSubscriptionRequest,
   CreateCryptoSubscriptionResponse,
   CreateProSubscriptionRequest,
-  CreateProSubscriptionResponse
+  SubscriptionPaymentIntent
 } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 export class SubscriptionApi {
   createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
-    return http.POST<CreateProSubscriptionResponse>(`/api/spaces/${spaceId}/subscription`, payload);
+    return http.POST<SubscriptionPaymentIntent>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {

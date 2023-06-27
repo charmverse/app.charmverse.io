@@ -1,23 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
-import {
-  Divider,
-  Drawer,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Iframe from 'react-iframe';
+import Stripe from 'stripe';
 import type { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -27,10 +17,10 @@ import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
-import type { CreateCryptoSubscriptionRequest, CreateProSubscriptionResponse } from 'lib/subscription/interfaces';
+import type { CreateCryptoSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
@@ -59,7 +49,7 @@ export function CheckoutForm({
   show: boolean;
   blockQuota: number;
   period: SubscriptionPeriod;
-  subscription: CreateProSubscriptionResponse;
+  subscription: SubscriptionPaymentIntent;
   isLoading: boolean;
   onCancel: VoidFunction;
   refetch: KeyedMutator<SpaceSubscriptionWithStripeData | null>;
@@ -267,7 +257,7 @@ export function CheckoutForm({
             <>
               <PaymentTabs value={paymentType} onChange={changePaymentType} />
               <PaymentTabPanel value={paymentType} index='card'>
-                <PaymentElement />
+                <PaymentElement options={{ paymentMethodOrder: ['card', 'us_bank_account'] }} />
               </PaymentTabPanel>
               <PaymentTabPanel value={paymentType} index='crypto'>
                 <Typography mb={1}>
