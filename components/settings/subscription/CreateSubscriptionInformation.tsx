@@ -18,8 +18,9 @@ export function CreateSubscriptionInformation({ onClick }: { onClick: () => void
 
   useEffect(() => {
     if (space) {
-      charmClient.track.trackAction('view_subscription_marketing_screen', {
-        spaceId: space.id
+      charmClient.track.trackAction('page_view', {
+        spaceId: space.id,
+        type: 'billing/marketing'
       });
     }
   }, [space]);

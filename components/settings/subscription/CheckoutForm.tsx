@@ -66,8 +66,9 @@ export function CheckoutForm({
 
   useEffect(() => {
     if (space) {
-      charmClient.track.trackAction('view_checkout_screen', {
-        spaceId: space.id
+      charmClient.track.trackAction('page_view', {
+        spaceId: space.id,
+        type: 'billing/checkout'
       });
     }
   }, [space]);

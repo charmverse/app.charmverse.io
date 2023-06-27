@@ -51,8 +51,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [blockQuota, setblockQuota] = useState(10);
 
   useEffect(() => {
-    charmClient.track.trackAction('click_billing_settings', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 

@@ -158,20 +158,23 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             blockQuota,
             period,
             spaceId,
-            paymentMethod: 'card',
-            userId: ''
+            userId: '',
+            subscriptionId: stripeSubscription.id
           });
         }
 
-        trackUserAction('subscription_payment', {
-          spaceId,
-          blockQuota,
-          period,
-          status: 'success',
-          subscriptionId: stripeSubscription.id,
-          paymentMethod: 'card',
-          userId: ''
-        });
+        if (invoice.charge) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'success',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: charge.payment_method_details?.type?.startsWith('ach') ? 'ach' : 'card',
+            userId: ''
+          });
+        }
 
         log.info(
           `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
@@ -333,6 +336,48 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+        const period = stripeSubscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual';
+        const customerId = invoice.customer;
+        const paymentMethodId = invoice.default_payment_method;
+        const amountDue = invoice.amount_due;
+
+        if (invoice.charge) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'failure',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: charge.payment_method_details?.type?.startsWith('ach') ? 'ach' : 'card',
+            userId: ''
+          });
+        }
+
+        const lastFinalizationError = invoice.last_finalization_error;
+        log.error(`Invoice payment failed for invoice ${invoice.id} for the subscription ${stripeSubscription.id}`, {
+          spaceId,
+          blockQuota,
+          period,
+          customerId,
+          paymentMethodId,
+          amountDue,
+          invoiceId: invoice.id,
+          subscriptionId,
+          message: lastFinalizationError?.message,
+          code: lastFinalizationError?.code,
+          type: lastFinalizationError?.type
+        });
+        break;
+      }
+
       default: {
         log.debug(`Unhandled event type in stripe webhook: ${event.type}`);
         break;
