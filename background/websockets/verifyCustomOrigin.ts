@@ -40,3 +40,8 @@ function invalidateCache() {
     intervalId = setInterval(clearCache, INVALIDATE_CACHE_INTERVAL);
   }
 }
+
+// allow app and tests to shut the process down properly
+export function cleanup() {
+  clearInterval(intervalId);
+}
