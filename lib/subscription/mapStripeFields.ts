@@ -73,6 +73,8 @@ export function mapStripeFields({
 }): SubscriptionFieldsFromStripe {
   // We expect to always have a quantity, but we'll log an error if we don't
   const blockQuota = subscription.items.data[0].quantity as number;
+  // We will temorarely check the subscription metadata for the block quota
+  const metaDataBlockQuota = subscription.metadata.blocks;
 
   if (!blockQuota) {
     log.error(`No block quota found for subscription ${subscription.id}`, {
@@ -105,7 +107,7 @@ export function mapStripeFields({
   const fields: SubscriptionFieldsFromStripe = {
     period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
-    blockQuota,
+    blockQuota: blockQuota >= 10 ? blockQuota : Number(metaDataBlockQuota) ? Number(metaDataBlockQuota) : 10,
     status,
     paymentMethod,
     billingEmail: subscription.customer.email,
