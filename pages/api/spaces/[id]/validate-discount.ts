@@ -1,7 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import type Stripe from 'stripe';
 
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

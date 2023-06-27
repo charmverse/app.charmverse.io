@@ -1,10 +1,13 @@
 import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
-import { Stack, Typography } from '@mui/material';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Divider, InputLabel, Stack, TextField, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -23,12 +26,36 @@ import { loadStripe } from './loadStripe';
 import { PlanSelection } from './PlanSelection';
 import { SubscriptionInformation } from './SubscriptionInformation';
 
+const schema = () => {
+  return yup
+    .object({
+      email: yup.string().email().required(),
+      coupon: yup.string().optional()
+    })
+    .strict();
+};
+
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
   const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+
+  const {
+    register,
+    watch,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm<{ email: string; coupon: string }>({
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      coupon: ''
+    },
+    resolver: yupResolver(schema())
+  });
 
   const {
     data: initialSubscriptionData,
@@ -42,11 +69,16 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       onError() {
         showMessage('Checkout failed! Please try again', 'error');
       },
-      async onSuccess() {
+      async onSuccess(data) {
         setShowCheckoutForm(true);
+        setValue('coupon', data.coupon || '');
+        setValue('email', data.email || '');
       }
     }
   );
+
+  const emailField = watch('email');
+  const couponField = watch('coupon');
 
   const { trigger: validateCoupon, isMutating: isValidationLoading } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
@@ -55,6 +87,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     {
       onError() {
         showMessage('Your coupon is not valid', 'error');
+        setValue('coupon', '');
       }
     }
   );
@@ -69,6 +102,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
   const [blockQuota, setBlockQuota] = useState(10);
+
+  // useLayoutEffect(() => {
+  //   reset({ email: initialSubscriptionData?.email || '', coupon: initialSubscriptionData?.coupon || '' });
+  // }, [initialSubscriptionData?.coupon, initialSubscriptionData?.email, isInitialSubscriptionLoading]);
 
   useEffect(() => {
     charmClient.track.trackAction('view_subscription', {
@@ -88,7 +125,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
     await createSubscription({
       spaceId: space.id,
-      payload: { period, blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota }
+      payload: {
+        period,
+        blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota,
+        billingEmail: emailField
+      }
     });
   }
 
@@ -104,10 +145,18 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     if (_blockQuota) {
       await createSubscription({
         spaceId: space.id,
-        payload: { blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota, period }
+        payload: {
+          blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota,
+          period,
+          billingEmail: emailField,
+          coupon: couponField
+        }
       });
     } else if (_period) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota, period: _period } });
+      await createSubscription({
+        spaceId: space.id,
+        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: couponField }
+      });
     }
   };
 
@@ -121,7 +170,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
     await createSubscription({
       spaceId: space.id,
-      payload: { blockQuota, period, coupon }
+      payload: { blockQuota, period, coupon, billingEmail: emailField }
     });
   };
 
@@ -166,6 +215,21 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           period={period}
         />
       )}
+      <Stack maxWidth='400px'>
+        <Typography variant='h6' mb={1}>
+          Billing Information
+        </Typography>
+        <Stack gap={0.5} my={2}>
+          <InputLabel>Email (required)</InputLabel>
+          <TextField
+            {...register('email')}
+            placeholder='johndoe@gmail.com'
+            error={!!errors.email}
+            disabled={isLoading}
+          />
+        </Stack>
+      </Stack>
+      <Divider sx={{ mb: 1 }} />
       <LoadingComponent isLoading={isLoading} />
       {!isLoading && spaceSubscription !== undefined && initialSubscriptionData?.clientSecret && (
         <Elements
@@ -178,14 +242,16 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           }}
         >
           <CheckoutForm
-            show={showCheckoutForm}
+            emailField={emailField}
+            couponField={couponField}
+            space={space}
             blockQuota={blockQuota}
             period={period}
             subscription={initialSubscriptionData}
             handleCoupon={handleCoupon}
-            refetch={refetchSpaceSubscription}
             onCancel={() => setShowCheckoutForm(false)}
-            isLoading={isLoading}
+            errors={errors}
+            registerCoupon={{ ...register('coupon') }}
           />
         </Elements>
       )}
