@@ -135,6 +135,14 @@ export async function createProSubscription({
       payment_settings: {
         save_default_payment_method: 'on_subscription'
       },
+      // This ensures the subscription will expire after the trial and is not accidentally billed
+      trial_settings: freeTrial
+        ? {
+            end_behavior: {
+              missing_payment_method: 'cancel'
+            }
+          }
+        : undefined,
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent']
     });
