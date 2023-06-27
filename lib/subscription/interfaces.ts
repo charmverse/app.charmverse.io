@@ -13,6 +13,9 @@ export type CreateProSubscriptionRequest = {
   freeTrial?: boolean;
 };
 
+/**
+ * subtotalPrice and totalPrice expressed in USD, with cents after the decimal
+ */
 export type SubscriptionPaymentIntent = {
   subscriptionId: string;
   paymentIntentId: string;

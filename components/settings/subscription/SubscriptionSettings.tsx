@@ -49,7 +49,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     setValue,
     formState: { errors }
   } = useForm<{ email: string; coupon: string }>({
-    mode: 'onChange',
     defaultValues: {
       email: '',
       coupon: ''

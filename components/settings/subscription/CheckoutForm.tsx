@@ -250,7 +250,7 @@ export function CheckoutForm({
               <Typography variant='body2'>Billed {period}</Typography>
             </Stack>
             <Stack>
-              <Typography>${price * blockQuota}/mo</Typography>
+              <Typography>${(price * blockQuota).toFixed(2)}/mo</Typography>
             </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
@@ -293,7 +293,7 @@ export function CheckoutForm({
                   <Typography>Subtotal</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>${subscription.subTotalPrice || 0}</Typography>
+                  <Typography>${(subscription.subTotalPrice || 0).toFixed(2)}</Typography>
                 </Stack>
               </Stack>
               <Stack display='flex' flexDirection='row' justifyContent='space-between'>
@@ -301,7 +301,7 @@ export function CheckoutForm({
                   <Typography>Discount</Typography>
                 </Stack>
                 <Stack>
-                  <Typography>${(subscription.subTotalPrice - subscription.totalPrice).toFixed(1)}</Typography>
+                  <Typography>${(subscription.subTotalPrice - subscription.totalPrice).toFixed(2)}</Typography>
                 </Stack>
               </Stack>
               <Divider sx={{ my: 2 }} />
@@ -312,7 +312,7 @@ export function CheckoutForm({
               <Typography>Total</Typography>
             </Stack>
             <Stack>
-              <Typography>${subscription.totalPrice || 0}</Typography>
+              <Typography>${(subscription.totalPrice || 0).toFixed(2)}</Typography>
             </Stack>
           </Stack>
           <PaymentTabPanel value={paymentType} index='card'>
