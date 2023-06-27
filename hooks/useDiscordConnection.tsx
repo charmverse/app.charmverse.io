@@ -5,6 +5,7 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
+import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
@@ -43,9 +44,12 @@ export function DiscordProvider({ children }: Props) {
       if (connectedWithDiscord) {
         await disconnect();
       } else {
-        window.location.replace(
-          `/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`
-        );
+        const discordLoginPath = getDiscordLoginPath({
+          type: 'connect',
+          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
+        });
+
+        window.location.replace(discordLoginPath);
       }
     }
     setIsDisconnectingDiscord(false);
