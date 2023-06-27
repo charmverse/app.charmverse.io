@@ -20,6 +20,7 @@ export type SubscriptionPaymentIntent = {
   paymentIntentStatus: Stripe.PaymentIntent.Status;
   subTotalPrice: number;
   totalPrice: number;
+  coupon?: string;
 };
 
 export type ProSubscriptionResponse = {
@@ -29,7 +30,7 @@ export type ProSubscriptionResponse = {
   blockQuota: number;
   productId: string;
   customerId: string;
-
+  email?: string;
   // These values are only sent back when creating a subscription with the user present
   paymentIntent?: SubscriptionPaymentIntent;
 };

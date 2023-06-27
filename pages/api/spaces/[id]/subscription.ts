@@ -42,12 +42,15 @@ async function getSpaceSubscriptionController(
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<SubscriptionPaymentIntent>) {
+async function createPaymentSubscription(
+  req: NextApiRequest,
+  res: NextApiResponse<SubscriptionPaymentIntent & { email?: string }>
+) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
   const { period, blockQuota, billingEmail, name, address, coupon } = req.body as CreateProSubscriptionRequest;
 
-  const { paymentIntent } = await createProSubscription({
+  const { paymentIntent, email } = await createProSubscription({
     spaceId,
     period,
     blockQuota,
@@ -59,7 +62,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
-  res.status(200).json(paymentIntent ?? ({} as SubscriptionPaymentIntent));
+  res.status(200).json({ ...(paymentIntent || ({} as SubscriptionPaymentIntent)), email });
 }
 
 async function deletePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {

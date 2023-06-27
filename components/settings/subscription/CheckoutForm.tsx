@@ -1,13 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
-import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import {
+  Divider,
+  Drawer,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Iframe from 'react-iframe';
-import Stripe from 'stripe';
 import type { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -49,11 +59,11 @@ export function CheckoutForm({
   show: boolean;
   blockQuota: number;
   period: SubscriptionPeriod;
-  subscription: SubscriptionPaymentIntent;
+  subscription: SubscriptionPaymentIntent & { email?: string };
   isLoading: boolean;
   onCancel: VoidFunction;
   refetch: KeyedMutator<SpaceSubscriptionWithStripeData | null>;
-  handleCoupon: (coupon: string) => Promise<void>;
+  handleCoupon: (coupon: string | undefined) => Promise<void>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -63,11 +73,11 @@ export function CheckoutForm({
     getValues,
     watch,
     formState: { errors }
-  } = useForm<{ email: string; coupon: '' }>({
+  } = useForm<{ email: string; coupon: string }>({
     mode: 'onChange',
     defaultValues: {
-      email: '',
-      coupon: ''
+      email: subscription.email || '',
+      coupon: subscription.coupon || ''
     },
     resolver: yupResolver(schema())
   });
@@ -75,7 +85,8 @@ export function CheckoutForm({
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);
 
-  const email = watch('email');
+  const emailField = watch('email');
+  const couponField = watch('coupon');
 
   const { space } = useCurrentSpace();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -137,7 +148,7 @@ export function CheckoutForm({
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  const emailError = errors.email || email.length === 0;
+  const emailError = errors.email || emailField.length === 0;
 
   const createSubscription = async (e: FormEvent) => {
     e.preventDefault();
@@ -282,25 +293,40 @@ export function CheckoutForm({
             </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
-          {/* <Stack gap={0.5} my={2}>
+          <Stack gap={0.5} my={2}>
             <Typography>Coupon code</Typography>
             <Stack>
               <TextField
-                disabled={isProcessing}
+                disabled={isProcessing || !!subscription.coupon}
                 {...register('coupon')}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton onClick={() => handleCoupon(getValues().coupon)} disabled={isLoading}>
-                        <SendIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  )
+                  ...(subscription.coupon
+                    ? {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton onClick={() => handleCoupon(undefined)} disabled={isLoading}>
+                              <CloseIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }
+                    : {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              onClick={() => handleCoupon(getValues().coupon)}
+                              disabled={isLoading || !couponField}
+                            >
+                              <SendIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      })
                 }}
               />
             </Stack>
           </Stack>
-          <Divider sx={{ my: 2 }} /> */}
+          <Divider sx={{ my: 2 }} />
           {subscription.totalPrice !== subscription.subTotalPrice && (
             <>
               <Stack display='flex' flexDirection='row' justifyContent='space-between'>
@@ -311,10 +337,17 @@ export function CheckoutForm({
                   <Typography>${subscription.subTotalPrice || 0}</Typography>
                 </Stack>
               </Stack>
+              <Stack display='flex' flexDirection='row' justifyContent='space-between'>
+                <Stack>
+                  <Typography>Discount</Typography>
+                </Stack>
+                <Stack>
+                  <Typography>${(subscription.subTotalPrice - subscription.totalPrice).toFixed(1)}</Typography>
+                </Stack>
+              </Stack>
               <Divider sx={{ my: 2 }} />
             </>
           )}
-
           <Stack display='flex' flexDirection='row' justifyContent='space-between'>
             <Stack>
               <Typography>Total</Typography>
@@ -328,7 +361,7 @@ export function CheckoutForm({
               <Button
                 onClick={createSubscription}
                 loading={isProcessing}
-                disabled={emailError || !email || isProcessing || !stripe || !elements || !space}
+                disabled={emailError || !emailField || isProcessing || !stripe || !elements || !space}
               >
                 {isProcessing ? 'Processing ... ' : 'Upgrade'}
               </Button>
@@ -339,7 +372,7 @@ export function CheckoutForm({
           </PaymentTabPanel>
           <PaymentTabPanel value={paymentType} index='crypto'>
             <Stack gap={1} display='flex' flexDirection='column'>
-              <Button onClick={() => startCryptoPayment()} disabled={!email || isProcessing}>
+              <Button onClick={() => startCryptoPayment()} disabled={!emailField || isProcessing}>
                 Upgrade
               </Button>
               <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>

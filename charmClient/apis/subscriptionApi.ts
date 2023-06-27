@@ -12,7 +12,7 @@ import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscr
 
 export class SubscriptionApi {
   createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
-    return http.POST<SubscriptionPaymentIntent>(`/api/spaces/${spaceId}/subscription`, payload);
+    return http.POST<SubscriptionPaymentIntent & { email?: string }>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
   getSpaceSubscription({ spaceId }: { spaceId: string }) {
@@ -33,5 +33,9 @@ export class SubscriptionApi {
 
   switchToFreeTier(spaceId: string) {
     return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-free-tier`);
+  }
+
+  validateDiscount(spaceId: string, payload: { coupon: string }) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
 }

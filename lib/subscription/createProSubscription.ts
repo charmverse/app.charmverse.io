@@ -17,7 +17,7 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon = '',
+  coupon,
   freeTrial
 }: {
   spaceId: string;
@@ -30,7 +30,6 @@ export async function createProSubscription({
       name: true
     }
   });
-
   const productId = communityProduct.id;
 
   if (!space) {
@@ -51,24 +50,23 @@ export async function createProSubscription({
     );
   }
 
-  const stripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}'`,
-    expand: ['data.customer']
+  const existingCustomer = await stripeClient.customers.search({
+    query: `metadata['spaceId']:'${spaceId}'`
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.find(
-    (sub) =>
-      (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
-      (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
-  );
+  const stripeSubscription = await stripeClient.subscriptions.search({
+    query: `metadata['spaceId']:'${spaceId}' AND status:'incomplete'`
+  });
 
-  const existingStripeCustomer = existingStripeSubscription?.customer as Stripe.Customer | undefined;
+  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.[0];
+
+  const existingStripeCustomer = existingCustomer?.data.find((cus) => !cus.deleted);
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
-        spaceId: space.id,
+        spaceId,
         domain: space.domain
       } as StripeMetadataKeys,
       name: name || space.name,
@@ -81,7 +79,7 @@ export async function createProSubscription({
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
-        spaceId: space.id,
+        spaceId,
         domain: space.domain
       } as StripeMetadataKeys,
       address,
@@ -123,7 +121,7 @@ export async function createProSubscription({
         productId,
         period,
         tier: 'pro',
-        spaceId: space.id
+        spaceId
       },
       trial_period_days: freeTrial ? communityProduct.trial : undefined,
       customer: customer.id,
@@ -155,6 +153,7 @@ export async function createProSubscription({
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
+  const discountCoupon = invoice.discount?.coupon?.id;
 
   return {
     subscriptionId: subscription.id,
@@ -163,6 +162,7 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
+    email: customer.email || undefined,
     paymentIntent: paymentIntent
       ? {
           subscriptionId: subscription.id,
@@ -170,7 +170,8 @@ export async function createProSubscription({
           paymentIntentStatus: paymentIntent.status,
           clientSecret: paymentIntent.client_secret as string,
           subTotalPrice: ((subscription.latest_invoice as Stripe.Invoice).subtotal || 0) / 100,
-          totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100
+          totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100,
+          coupon: discountCoupon
         }
       : undefined
   };

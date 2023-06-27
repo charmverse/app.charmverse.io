@@ -26,7 +26,7 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
-  const { spaceSubscription, isLoading, refetchSpaceSubscription } = useSpaceSubscription();
+  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
@@ -44,6 +44,17 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       },
       async onSuccess() {
         setShowCheckoutForm(true);
+      }
+    }
+  );
+
+  const { trigger: validateCoupon, isMutating: isValidationLoading } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: { coupon: string } } }>) =>
+      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
+    {
+      onError() {
+        showMessage('Your coupon is not valid', 'error');
       }
     }
   );
@@ -100,7 +111,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   };
 
-  const handleCoupon = async (coupon: string) => {
+  const handleCoupon = async (coupon: string | undefined) => {
+    if (coupon) {
+      await validateCoupon({
+        spaceId: space.id,
+        payload: { coupon }
+      });
+    }
+
     await createSubscription({
       spaceId: space.id,
       payload: { blockQuota, period, coupon }
@@ -114,11 +132,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   if (space.paidTier === 'enterprise') {
     return <EnterpriseBillingScreen />;
   }
+
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>
-        {isLoading ? (
-          <LoadingSubscriptionSkeleton isLoading={isLoading} />
+        {isLoadingSpaceSubscription ? (
+          <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             space={space}
@@ -131,6 +150,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       </Stack>
     );
   }
+  const isLoading = isValidationLoading || isInitialSubscriptionLoading || isLoadingSpaceSubscription;
 
   return (
     <Stack gap={1}>
@@ -146,32 +166,29 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           period={period}
         />
       )}
-      <LoadingComponent isLoading={isInitialSubscriptionLoading} />
-      {!isInitialSubscriptionLoading &&
-        !isLoading &&
-        spaceSubscription !== undefined &&
-        initialSubscriptionData?.clientSecret && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret: initialSubscriptionData.clientSecret,
-              appearance: {
-                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-              }
-            }}
-          >
-            <CheckoutForm
-              show={showCheckoutForm}
-              blockQuota={blockQuota}
-              period={period}
-              subscription={initialSubscriptionData}
-              handleCoupon={handleCoupon}
-              refetch={refetchSpaceSubscription}
-              onCancel={() => setShowCheckoutForm(false)}
-              isLoading={isLoading || isInitialSubscriptionLoading}
-            />
-          </Elements>
-        )}
+      <LoadingComponent isLoading={isLoading} />
+      {!isLoading && spaceSubscription !== undefined && initialSubscriptionData?.clientSecret && (
+        <Elements
+          stripe={stripePromise}
+          options={{
+            clientSecret: initialSubscriptionData.clientSecret,
+            appearance: {
+              theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+            }
+          }}
+        >
+          <CheckoutForm
+            show={showCheckoutForm}
+            blockQuota={blockQuota}
+            period={period}
+            subscription={initialSubscriptionData}
+            handleCoupon={handleCoupon}
+            refetch={refetchSpaceSubscription}
+            onCancel={() => setShowCheckoutForm(false)}
+            isLoading={isLoading}
+          />
+        </Elements>
+      )}
     </Stack>
   );
 }
