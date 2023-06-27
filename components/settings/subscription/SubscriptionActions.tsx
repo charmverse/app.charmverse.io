@@ -8,15 +8,19 @@ import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActive
 export function SubscriptionActions({
   spaceSubscription,
   loading,
+  paidTier,
   onDelete,
   onCancelAtEnd,
-  onReactivation
+  onReactivation,
+  handleFreeTier
 }: {
   spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
   loading: boolean;
+  paidTier: string;
   onDelete: () => void;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
+  handleFreeTier: () => void;
 }) {
   const isAdmin = useIsAdmin();
 
@@ -47,6 +51,11 @@ export function SubscriptionActions({
             </Button>
           )}
         </>
+      )}
+      {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
+        <Button disabled={!isAdmin} onClick={handleFreeTier} variant='outlined'>
+          Use free plan
+        </Button>
       )}
     </Stack>
   );

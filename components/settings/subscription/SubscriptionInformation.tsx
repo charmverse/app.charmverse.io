@@ -46,7 +46,6 @@ export function SubscriptionInformation({
   const { refreshCurrentSpace } = useCurrentSpace();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { userPreferences } = useUserPreferences();
-  const isAdmin = useIsAdmin();
 
   const {
     register,
@@ -163,28 +162,18 @@ export function SubscriptionInformation({
             </Typography>
           )}
           {status && <Typography>Status: {status}</Typography>}
-
-          {(space.paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
-            <Button
-              disabled={!isAdmin}
-              onClick={() => {
-                charmClient.subscription
-                  .switchToFreeTier(space.id)
-                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-              }}
-            >
-              Use free plan
-            </Button>
-          )}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions
+            paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
             loading={isLoadingUpdate || isLoadingDeletion}
             onDelete={handleDeleteSubs}
-            onCancelAtEnd={() => setShowConfirmDialog(true)}
+            onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
+            handleFreeTier={() => setShowConfirmDialog(true)}
           />
+
           <ConfirmDeleteModal
             title='Cancelling Community Edition'
             size='large'
@@ -206,7 +195,11 @@ export function SubscriptionInformation({
                 <Typography>Do you still want to Cancel?</Typography>
               </>
             }
-            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
+            onConfirm={() =>
+              charmClient.subscription
+                .switchToFreeTier(space.id)
+                .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'))
+            }
             onClose={() => setShowConfirmDialog(false)}
             disabled={isLoadingUpdate || isLoadingDeletion}
           />
