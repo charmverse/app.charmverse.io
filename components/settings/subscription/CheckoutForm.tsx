@@ -229,7 +229,8 @@ export function CheckoutForm({
       )}
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
-          <PaymentTabs value={paymentType} onChange={changePaymentType} />
+          {/* @TODO - Reactivate this once Loop works */}
+          {/* <PaymentTabs value={paymentType} onChange={changePaymentType} /> */}
           <PaymentTabPanel value={paymentType} index='card'>
             <PaymentElement options={{ paymentMethodOrder: ['card', 'us_bank_account'] }} />
           </PaymentTabPanel>
