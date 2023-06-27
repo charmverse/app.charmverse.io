@@ -2,19 +2,21 @@ import type { AddressInfo } from 'net';
 
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
+import request from 'supertest';
 
 import { httpServer, socketServer } from '../websockets/app';
 import { cleanup } from '../websockets/verifyCustomOrigin';
 
 let client: Socket;
-let httpServerAddr: AddressInfo;
+let socketUrl: string;
 
 /**
  * Setup WS & HTTP servers
  */
 beforeAll((done) => {
   httpServer.listen(done);
-  httpServerAddr = httpServer.address() as AddressInfo;
+  const httpServerAddr = httpServer.address() as AddressInfo;
+  socketUrl = `http://[${httpServerAddr.address}]:${httpServerAddr.port}`;
 });
 
 /**
@@ -31,7 +33,7 @@ afterAll((done) => {
 beforeEach((done) => {
   // Setup
   // Do not hardcode server port and address, square brackets are used for IPv6
-  client = io(`http://[${httpServerAddr.address}]:${httpServerAddr.port}`, {
+  client = io(socketUrl, {
     transports: ['websocket']
   });
   client.on('connect', () => {
@@ -50,7 +52,12 @@ afterEach((done) => {
   done();
 });
 
-describe('basic socket.io example', () => {
+describe('Web Socket server', () => {
+  test('should respond to a basic health check', async () => {
+    const response = await request(socketUrl).get(`/socket.io/?EIO=4&transport=polling`).expect(200);
+    expect(response.text).toEqual(expect.stringContaining('0{"sid":'));
+  });
+
   test('should communicate', (done) => {
     client.on('connection', (socket) => {
       expect(socket).toBeDefined();
