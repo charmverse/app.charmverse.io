@@ -83,7 +83,7 @@ export function DiscordProvider({ children }: Props) {
 
     const onSuccess = async ({ code }: { code: string }) => {
       try {
-        const loggedInUser = await charmClient.discord.loginWithDiscordCode(code, 'login');
+        const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
         setUser(loggedInUser);
       } catch (e: any) {
         showMessage(e.message || 'Failed to login with discord');
