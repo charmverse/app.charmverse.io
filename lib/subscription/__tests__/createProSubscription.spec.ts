@@ -80,12 +80,10 @@ describe('createProSubscription', () => {
     });
 
     const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
-      id: subscriptionId,
       data: []
     });
 
     const searchCustomersMockFn = jest.fn().mockResolvedValue({
-      id: subscriptionId,
       data: []
     });
 
