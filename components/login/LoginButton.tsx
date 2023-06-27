@@ -20,6 +20,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -91,7 +92,7 @@ function LoginHandler(props: DialogProps) {
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
   const router = useRouter();
-  const returnUrl = router.query.returnUrl;
+  const returnUrl = typeof router.query.returnUrl === 'string' ? router.query.returnUrl : undefined;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
   const { isOnCustomDomain } = useCustomDomain();
 
@@ -201,7 +202,7 @@ function LoginHandler(props: DialogProps) {
                   data-test='connect-discord'
                   href={
                     typeof window !== 'undefined'
-                      ? `/api/discord/oauth?type=login&redirect=${returnUrl ?? redirectUrl ?? '/'}`
+                      ? getDiscordLoginPath({ type: 'login', redirectUrl: returnUrl ?? redirectUrl ?? '/' })
                       : ''
                   }
                 >
