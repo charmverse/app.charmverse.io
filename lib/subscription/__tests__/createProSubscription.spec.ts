@@ -81,14 +81,7 @@ describe('createProSubscription', () => {
 
     const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
       id: subscriptionId,
-      data: [],
-      latest_invoice: {
-        payment_intent: {
-          client_secret,
-          status: 'pending',
-          id: paymentId
-        }
-      }
+      data: []
     });
 
     const searchCustomersMockFn = jest.fn().mockResolvedValue({
