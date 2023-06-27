@@ -12,6 +12,7 @@ import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
@@ -33,6 +34,8 @@ export interface ConnectDiscordResponse {
 // TODO: Add nonce for oauth state
 async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | { error: string }>) {
   const { code } = req.body as ConnectDiscordPayload;
+  const authFlowType = req.query.authFlowType as OauthFlowType;
+
   if (!code) {
     res.status(400).json({
       error: 'Missing code to connect'
@@ -43,7 +46,10 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   let discordAccount: DiscordAccount;
 
   try {
-    discordAccount = await getDiscordAccount({ code, redirectUrl: getDiscordCallbackUrl(req.headers.host) });
+    discordAccount = await getDiscordAccount({
+      code,
+      redirectUrl: getDiscordCallbackUrl(req.headers.host, authFlowType)
+    });
   } catch (error) {
     log.warn('Error while connecting to Discord', error);
     res.status(400).json({

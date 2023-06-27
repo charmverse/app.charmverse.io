@@ -19,7 +19,7 @@ type IDiscordConnectionContext = {
   isLoading: boolean;
   connect: VoidFunction;
   error?: string;
-  popupLogin: (redirectUrl: string) => void;
+  popupLogin: (redirectUrl: string, type?: 'login' | 'connect') => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
@@ -74,17 +74,28 @@ export function DiscordProvider({ children }: Props) {
       });
   }
 
-  function popupLogin(redirectUrl: string) {
+  function popupLogin(redirectUrl: string, type: 'login' | 'connect' = 'login') {
     const discordLoginPath = getDiscordLoginPath({
-      type: 'login',
-      authFlowType: 'popup',
-      redirectUrl
+      type,
+      redirectUrl,
+      authFlowType: 'popup'
     });
 
     const onSuccess = async ({ code }: { code: string }) => {
       try {
-        const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
-        setUser(loggedInUser);
+        if (type === 'connect') {
+          const updatedUser = await charmClient.discord.connectDiscord(
+            {
+              code
+            },
+            'popup'
+          );
+
+          setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser }));
+        } else {
+          const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
+          setUser(loggedInUser);
+        }
       } catch (e: any) {
         showMessage(e.message || 'Failed to login with discord');
       }

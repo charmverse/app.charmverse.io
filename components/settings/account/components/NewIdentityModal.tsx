@@ -80,7 +80,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     });
   }
 
-  const { connect, isConnected, isLoading: isDiscordLoading } = useDiscordConnection();
+  const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
@@ -149,12 +149,17 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {!isConnected && !isOnCustomDomain && (
+          {!isConnected && (
             <IdentityProviderItem type='Discord'>
               <PrimaryButton
                 size='small'
                 onClick={() => {
-                  connect();
+                  if (isOnCustomDomain) {
+                    popupLogin('/', 'connect');
+                  } else {
+                    connect();
+                  }
+
                   onClose();
                 }}
                 disabled={isDiscordLoading}
