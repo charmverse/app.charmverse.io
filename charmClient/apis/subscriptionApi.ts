@@ -1,7 +1,10 @@
 import type { Space } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type {
+  SpaceSubscriptionRequest,
+  SpaceSubscriptionWithStripeData
+} from 'lib/subscription/getActiveSpaceSubscription';
 import type {
   CreateCryptoSubscriptionRequest,
   CreateCryptoSubscriptionResponse,
@@ -15,8 +18,10 @@ export class SubscriptionApi {
     return http.POST<SubscriptionPaymentIntent & { email?: string }>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
-  getSpaceSubscription({ spaceId }: { spaceId: string }) {
-    return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
+  getSpaceSubscription({ spaceId, returnUrl }: SpaceSubscriptionRequest) {
+    return http.GET<SpaceSubscriptionWithStripeData | null>(
+      `/api/spaces/${spaceId}/subscription?returnUrl=${returnUrl}`
+    );
   }
 
   createCryptoSubscription(spaceId: string, payload: CreateCryptoSubscriptionRequest) {

@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+
 import { log } from '@charmverse/core/log';
 import type Stripe from 'stripe';
 
@@ -37,11 +38,12 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
   }
 }
 
-export type PaymentMethod = {
+export type PaymentMethodWithUpdateUrl = {
   id: string;
   type: Stripe.PaymentMethod.Type;
   digits?: string;
   brand?: string;
+  updateUrl?: string;
 };
 
 /**
@@ -59,7 +61,7 @@ export type SubscriptionFieldsFromStripe = {
   billingEmail?: string | null;
   expiresOn?: Date | null;
   renewalDate?: Date | null;
-  paymentMethod?: PaymentMethod | null;
+  paymentMethod?: PaymentMethodWithUpdateUrl | null;
   coupon?: string;
 };
 export function mapStripeFields({
@@ -81,15 +83,15 @@ export function mapStripeFields({
   }
   const paymentDetails = subscription.default_payment_method as Stripe.PaymentMethod | null;
   const paymentType = paymentDetails?.type;
-  const paymentCard = paymentDetails?.card?.brand;
-  const last4 = paymentDetails?.card?.last4;
+  const paymentCard = paymentDetails?.card?.brand ?? paymentDetails?.us_bank_account?.bank_name;
+  const last4 = paymentDetails?.card?.last4 ?? paymentDetails?.us_bank_account?.last4;
   const paymentMethod = paymentDetails
     ? ({
         id: paymentDetails.id,
         brand: paymentCard,
         digits: last4,
         type: paymentType
-      } as PaymentMethod)
+      } as PaymentMethodWithUpdateUrl)
     : null;
 
   const status = mapStripeStatus(subscription);

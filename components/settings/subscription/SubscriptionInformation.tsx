@@ -23,6 +23,7 @@ import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscr
 import { formatDate, getTimeDifference } from 'lib/utilities/dates';
 import { capitalize } from 'lib/utilities/strings';
 
+import { PaymentMethod } from './PaymentMethod';
 import { SubscriptionActions } from './SubscriptionActions';
 
 const schema = () => {
@@ -206,23 +207,9 @@ export function SubscriptionInformation({
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
-      {spaceSubscription.paymentMethod && (
+      {spaceSubscription?.paymentMethod && (
         <>
-          <Grid container alignItems='center'>
-            <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
-              <Typography variant='h6' mb={1}>
-                Payment Method
-              </Typography>
-              <Typography>
-                {spaceSubscription.paymentMethod?.type === 'card'
-                  ? `${capitalize(spaceSubscription.paymentMethod?.brand || '')} **** ${
-                      spaceSubscription.paymentMethod?.digits
-                    }`
-                  : `${spaceSubscription.paymentMethod?.type}`}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={4} />
-          </Grid>
+          <PaymentMethod paymentMethod={spaceSubscription.paymentMethod} />
           <Divider sx={{ my: 2 }} />
         </>
       )}

@@ -3,6 +3,7 @@ import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, InputLabel, Stack, TextField, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
@@ -15,6 +16,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
+import type { SpaceSettingsTab } from '../config';
+import { SETTINGS_TABS } from '../config';
 import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -38,7 +41,17 @@ const schema = () => {
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
-  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
+  const router = useRouter();
+
+  const {
+    spaceSubscription,
+    isLoading: isLoadingSpaceSubscription,
+    refetchSpaceSubscription
+  } = useSpaceSubscription({
+    returnUrl: `${window?.location.origin}/${router.asPath}?settingTab=${
+      SETTINGS_TABS.find((tab) => tab.path === 'subscription')?.path
+    }`
+  });
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 

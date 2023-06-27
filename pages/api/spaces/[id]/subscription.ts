@@ -6,7 +6,10 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type {
+  SpaceSubscriptionRequest,
+  SpaceSubscriptionWithStripeData
+} from 'lib/subscription/getActiveSpaceSubscription';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
@@ -33,10 +36,11 @@ async function getSpaceSubscriptionController(
   req: NextApiRequest,
   res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
 ) {
-  const { id: spaceId } = req.query as { id: string };
+  const { id: spaceId, returnUrl } = req.query as { id: string } & Pick<SpaceSubscriptionRequest, 'returnUrl'>;
 
   const spaceSubscription = await getActiveSpaceSubscription({
-    spaceId
+    spaceId,
+    returnUrl
   });
 
   return res.status(200).json(spaceSubscription);
