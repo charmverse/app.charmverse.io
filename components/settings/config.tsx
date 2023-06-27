@@ -33,7 +33,7 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
 
 export function getSettingsTabs({ isAdmin, space }: { space: Space; isAdmin: boolean }): SpaceSettingsTab[] {
   return SETTINGS_TABS.filter((tab) => {
-    return tab.path === 'subscription' ? !!isAdmin : false;
+    return tab.path === 'subscription' ? !!isAdmin : true;
   });
 }
 
