@@ -1,7 +1,8 @@
-import { appSubdomain, baseUrl, isDevEnv } from 'config/constants';
+import { baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
+import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
@@ -353,14 +354,9 @@ export function getAppUrl() {
     return new URL(window.location.origin);
   }
 
-  const appDomain = getAppApexDomain();
+  const port = window.location.port ? `:${window.location.port}` : '';
 
-  if (appDomain) {
-    const port = window.location.port ? `:${window.location.port}` : '';
-    return new URL(`${window.location.protocol}//${appSubdomain}.${appDomain}${port}/`);
-  }
-
-  return '';
+  return getAppOriginURL({ port, protocol: window.location.protocol });
 }
 
 export function redirectToAppLogin() {

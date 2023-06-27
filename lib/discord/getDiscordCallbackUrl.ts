@@ -1,6 +1,8 @@
 import { appSubdomain, isProdEnv, isStagingEnv } from 'config/constants';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const callbackPaths: Record<OauthFlowType, string> = {
@@ -19,6 +21,10 @@ function getCallbackDomain(host: string | undefined) {
 
   if (!host) {
     return `${protocol}//${appSubdomain}.${getAppApexDomain()}`;
+  }
+
+  if (getValidCustomDomain(host)) {
+    return getAppOriginURL({ protocol, host }).toString().replace(/\/$/, '');
   }
 
   const subdomain = getValidSubdomain(host);
