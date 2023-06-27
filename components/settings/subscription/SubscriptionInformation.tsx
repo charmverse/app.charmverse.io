@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Divider, Grid, List, ListItem, ListItemText, Stack, TextField, Typography } from '@mui/material';
+import { Divider, Grid, Stack, TextField, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,18 +10,15 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
+import { communityProduct } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { formatDate, getTimeDifference } from 'lib/utilities/dates';
-import { capitalize } from 'lib/utilities/strings';
 
 import { PaymentMethod } from './PaymentMethod';
 import { SubscriptionActions } from './SubscriptionActions';
@@ -45,7 +42,7 @@ export function SubscriptionInformation({
 }) {
   const { showMessage } = useSnackbar();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showConfirmFreeDowngradeDialog, setShowConfirmFreeDowngradeDialog] = useState(false);
   const { userPreferences } = useUserPreferences();
 
   const {
@@ -172,37 +169,11 @@ export function SubscriptionInformation({
             onDelete={handleDeleteSubs}
             onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
-            handleFreeTier={() => setShowConfirmDialog(true)}
-          />
-
-          <ConfirmDeleteModal
-            title='Cancelling Community Edition'
-            size='large'
-            open={showConfirmDialog}
-            buttonText='Yes'
-            secondaryButtonText='No'
-            question={
-              <>
-                <Typography>{subscriptionCancellationDetails.first}</Typography>
-                <List dense sx={{ listStyle: 'disc' }}>
-                  {subscriptionCancellationDetails.list.map((item) => (
-                    <ListItem key={item} sx={{ display: 'list-item', ml: '15px' }}>
-                      <ListItemText>{item}</ListItemText>
-                    </ListItem>
-                  ))}
-                </List>
-                <Typography>{subscriptionCancellationDetails.last}</Typography>
-                <br />
-                <Typography>Do you still want to Cancel?</Typography>
-              </>
-            }
-            onConfirm={() =>
+            confirmFreeTierDowngrade={() => {
               charmClient.subscription
                 .switchToFreeTier(space.id)
-                .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'))
-            }
-            onClose={() => setShowConfirmDialog(false)}
-            disabled={isLoadingUpdate || isLoadingDeletion}
+                .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
+            }}
           />
         </Grid>
       </Grid>

@@ -59,20 +59,6 @@ export const subscriptionDetails = {
   ]
 };
 
-export const subscriptionCancellationDetails = {
-  first:
-    'Cancelling CharmVerse Community Edition will revert this space to the Free Plan at the end of the current billing period. The following changes will be made: ',
-  list: [
-    'All content will be public and shared on the web',
-    'Custom roles will no longer apply',
-    'All users will have the default member role',
-    'Custom domains will be removed',
-    'You will no longer have access to the public API',
-    'You will still be able to use CharmVerse for your community but you will be working in public'
-  ],
-  last: 'If you upgrade to a paid plan in the future, all current permissions will be restored.'
-};
-
 export const SubscriptionStatus = {
   active: 'active',
   past_due: 'past_due',
