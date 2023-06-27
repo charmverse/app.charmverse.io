@@ -24,7 +24,7 @@ export type UpdateSubscriptionEvent = StripeBaseEvent & {
 };
 
 export type SubscriptionPaymentEvent = StripeBaseEvent & {
-  paymentMethod: PaymentMethodType;
+  paymentMethod: PaymentMethodType | 'crypto';
   blockQuota: number;
   period: SubscriptionPeriod;
   status: 'success' | 'failure';

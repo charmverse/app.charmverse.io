@@ -171,7 +171,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             period,
             status: 'success',
             subscriptionId: stripeSubscription.id,
-            paymentMethod: charge.payment_method_details?.type?.startsWith('ach') ? 'ach' : 'card',
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
             userId: ''
           });
         }
@@ -359,7 +363,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             period,
             status: 'failure',
             subscriptionId: stripeSubscription.id,
-            paymentMethod: charge.payment_method_details?.type?.startsWith('ach') ? 'ach' : 'card',
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
             userId: ''
           });
         }
