@@ -11,7 +11,7 @@
     "noEmit": false
   },
   "include": [
-    "background/websockets.ts",
+    "background/initWebsockets.ts",
     "theme/index.ts",
     "next-env.d.ts"
   ],

@@ -5,7 +5,7 @@ const esbuild = require('esbuild');
 const { nodeExternalsPlugin } = require('esbuild-node-externals');
 
 esbuild.build({
-  entryPoints: ['./background/websockets.ts'],
+  entryPoints: ['./background/initWebsockets.ts'],
   outfile: './dist/websockets.js',
   bundle: true,
   platform: 'node',
