@@ -15,6 +15,7 @@ import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
@@ -80,6 +81,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const stripePromise = loadStripe();
 
+  if (space.paidTier === 'enterprise') {
+    return <EnterpriseBillingScreen />;
+  }
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>

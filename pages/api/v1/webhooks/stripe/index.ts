@@ -7,6 +7,7 @@ import type Stripe from 'stripe';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
+import { communityProduct } from 'lib/subscription/constants';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
@@ -79,10 +80,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = invoice.subscription as string;
         const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
-        const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
+        let paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const productId = subscriptionData?.price?.product as string | undefined;
+
+        if (productId && productId !== communityProduct.id) {
+          const product = await stripeClient.products.retrieve(productId);
+          if (product?.name && product.name.toLowerCase().match('enterprise')) {
+            paidTier = 'enterprise';
+          }
+        }
+
         const customerId = invoice.customer as string;
         const priceInterval = subscriptionData?.price?.recurring?.interval;
 
@@ -125,7 +134,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
             }
           })
         ]);
@@ -218,7 +227,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           });
 
-          if (space.paidTier !== 'free') {
+          if (space.paidTier !== 'free' && space.paidTier !== 'enterprise') {
             space = await prisma.space.update({
               where: {
                 id: space.id
@@ -293,7 +302,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
         });
 
-        if (afterUpdate.space.paidTier !== 'free') {
+        if (afterUpdate.space.paidTier !== 'free' && afterUpdate.space.paidTier !== 'enterprise') {
           await prisma.space.update({
             where: {
               id: spaceId

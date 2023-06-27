@@ -6,7 +6,7 @@ import type { Stripe } from 'stripe';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
-import type { CreateProSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
+import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
 export async function createProSubscription({
@@ -67,8 +67,9 @@ export async function createProSubscription({
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
-        spaceId: space.id
-      },
+        spaceId: space.id,
+        domain: space.domain
+      } as StripeMetadataKeys,
       name: name || space.name,
       ...(address && { address }),
       ...(billingEmail && { email: billingEmail })
@@ -79,8 +80,9 @@ export async function createProSubscription({
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
-        spaceId: space.id
-      },
+        spaceId: space.id,
+        domain: space.domain
+      } as StripeMetadataKeys,
       address,
       name: name || space.name,
       email: billingEmail
@@ -153,10 +155,6 @@ export async function createProSubscription({
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
 
-  if (!paymentIntent?.client_secret) {
-    throw new ExternalServiceError('Failed to create subscription. The client secret is missing.');
-  }
-
   return {
     subscriptionId: subscription.id,
     priceId: productPrice.id,
@@ -164,8 +162,8 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent.id,
-    paymentIntentStatus: paymentIntent.status,
-    clientSecret: paymentIntent.client_secret
+    paymentIntentId: paymentIntent?.id,
+    paymentIntentStatus: paymentIntent?.status,
+    clientSecret: paymentIntent?.client_secret
   };
 }
