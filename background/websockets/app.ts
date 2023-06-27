@@ -3,16 +3,17 @@ import { createServer } from 'http';
 import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
-import { isDevEnv } from 'config/constants';
-import { verifyCustomOrigin } from 'lib/middleware/verifyCustomOrigin';
+import { isDevEnv, isTestEnv } from 'config/constants';
 import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 
 import app from '../healthCheck/app';
 
-const server = createServer(app.callback());
+import { verifyCustomOrigin } from './verifyCustomOrigin';
 
-const io = new Server(server, {
+const httpServer = createServer(app.callback());
+
+const socketServer = new Server(httpServer, {
   ...config,
   cors: {
     allowedHeaders: ['authorization'],
@@ -25,7 +26,7 @@ const io = new Server(server, {
         requestOrigin?.endsWith('.0xepicode.com') // TEMP for demo
       ) {
         callback(null, requestOrigin);
-      } else if (isDevEnv) {
+      } else if (isDevEnv || isTestEnv) {
         callback(null, requestOrigin);
       } else {
         let isCustomOriginAllowed = false;
@@ -48,6 +49,6 @@ const io = new Server(server, {
   }
 });
 
-relay.bindServer(io);
+relay.bindServer(socketServer);
 
-export { server, io };
+export { httpServer, socketServer };
