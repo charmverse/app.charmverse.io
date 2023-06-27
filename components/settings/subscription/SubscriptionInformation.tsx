@@ -3,6 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, Grid, Stack, TextField, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
@@ -10,17 +11,21 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import ConfirmUpgradeModal from 'components/common/Modal/ConfirmUpgradeModal';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { formatDate, getTimeDifference } from 'lib/utilities/dates';
+import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
 
 import { PaymentMethod } from './PaymentMethod';
+import { PlanSelection } from './PlanSelection';
 import { SubscriptionActions } from './SubscriptionActions';
 
 const schema = () => {
@@ -34,16 +39,22 @@ const schema = () => {
 export function SubscriptionInformation({
   space,
   spaceSubscription,
+  minimumBlockQuota,
   refetchSpaceSubscription
 }: {
   space: Space;
   spaceSubscription: SpaceSubscriptionWithStripeData;
+  minimumBlockQuota: number;
   refetchSpaceSubscription: () => Promise<SpaceSubscriptionWithStripeData | null | undefined>;
 }) {
   const { showMessage } = useSnackbar();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const [showConfirmFreeDowngradeDialog, setShowConfirmFreeDowngradeDialog] = useState(false);
   const { userPreferences } = useUserPreferences();
+  const {
+    isOpen: isConfirmUpgradeDialogOpen,
+    close: closeUpgradeDialog,
+    open: openUpgradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'upgrade-susbcription' });
 
   const {
     register,
@@ -58,6 +69,17 @@ export function SubscriptionInformation({
   const email = watch('email');
 
   const { subscribe } = useWebSocketClient();
+
+  const [period, setPeriod] = useState<SubscriptionPeriod>(spaceSubscription.period);
+  const [blockQuota, setBlockQuota] = useState(spaceSubscription.blockQuota);
+
+  const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
+    if (_blockQuota) {
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
+    } else if (_period) {
+      setPeriod(_period);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = subscribe('space_subscription', async () => {
@@ -84,6 +106,21 @@ export function SubscriptionInformation({
     }
   );
 
+  const { trigger: upgradeSpaceSubscription, isMutating: isLoadingUpgrade } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpgradeSubscriptionRequest } }>) =>
+      charmClient.subscription.upgradeSpaceSubscription(arg.spaceId, arg.payload),
+    {
+      onError() {
+        showMessage('Upgrading failed! Please try again', 'error');
+      },
+      async onSuccess() {
+        await refetchSpaceSubscription();
+        showMessage('Subscription change succeeded!', 'success');
+      }
+    }
+  );
+
   const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription-intent`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
@@ -97,10 +134,6 @@ export function SubscriptionInformation({
       }
     }
   );
-
-  async function handleDeleteSubs() {
-    await deleteSubscription({ spaceId: space.id });
-  }
 
   const status = useMemo(() => {
     switch (spaceSubscription?.status) {
@@ -133,6 +166,7 @@ export function SubscriptionInformation({
   const nextBillingDate = spaceSubscription?.renewalDate
     ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
     : null;
+
   return (
     <>
       <Legend whiteSpace='normal'>Plan & Billing</Legend>
@@ -165,15 +199,35 @@ export function SubscriptionInformation({
           <SubscriptionActions
             paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
-            loading={isLoadingUpdate || isLoadingDeletion}
-            onDelete={handleDeleteSubs}
+            loading={isLoadingUpdate || isLoadingDeletion || isLoadingUpgrade}
+            onDelete={() => deleteSubscription({ spaceId: space.id })}
             onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
+            onUpgrade={() => openUpgradeDialog()}
             confirmFreeTierDowngrade={() => {
               charmClient.subscription
                 .switchToFreeTier(space.id)
                 .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
             }}
+          />
+          <ConfirmUpgradeModal
+            title='Upgrade Community Edition'
+            size='large'
+            open={isConfirmUpgradeDialogOpen}
+            buttonText='Change subscription'
+            secondaryButtonText='No'
+            question={
+              <PlanSelection
+                blockQuotaInThousands={blockQuota}
+                period={period}
+                disabled={false}
+                onSelect={handlePlanSelect}
+                onSelectCommited={() => {}}
+              />
+            }
+            onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
+            onClose={closeUpgradeDialog}
+            disabled={isLoadingUpgrade}
           />
         </Grid>
       </Grid>

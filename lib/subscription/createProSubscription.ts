@@ -1,12 +1,11 @@
-import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import log from 'loglevel';
 import type { Stripe } from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
+import { getCommunityPrice } from './getProductPrice';
 import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
@@ -87,27 +86,8 @@ export async function createProSubscription({
       email: billingEmail
     }));
 
-  const stripePeriod = period === 'monthly' ? 'month' : 'year';
-
   // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
-  const { data: prices } = await stripeClient.prices.list({
-    product: productId,
-    type: 'recurring',
-    active: true
-  });
-
-  if (prices?.length === 0) {
-    throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
-  }
-
-  const productPrice = prices.find(
-    (price) =>
-      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 100 === communityProduct.pricing[period]
-  );
-
-  if (!productPrice) {
-    throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
-  }
+  const productPrice = await getCommunityPrice(productId, period, spaceId);
 
   // Case when the user is updating his subscription in checkout
   if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {

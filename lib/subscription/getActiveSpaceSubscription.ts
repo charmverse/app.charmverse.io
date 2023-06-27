@@ -45,10 +45,10 @@ export async function getActiveSpaceSubscription({
     expand: ['customer', 'default_payment_method']
   });
 
-  await fs.writeFile(
-    `${path.resolve('jsonoutputs')}/${Date.now()}.json`,
-    JSON.stringify(subscriptionInStripe, null, 2)
-  );
+  // await fs.writeFile(
+  //   `${path.resolve('jsonoutputs')}/${Date.now()}.json`,
+  //   JSON.stringify(subscriptionInStripe, null, 2)
+  // );
 
   const stripeData = mapStripeFields({
     spaceId,
@@ -57,9 +57,9 @@ export async function getActiveSpaceSubscription({
 
   if (stripeData.paymentMethod) {
     const updateUrl = await stripeClient.paymentMethods.retrieve(stripeData.paymentMethod.id);
-    await fs.writeFile(`${path.resolve('jsonoutputs')}/payment-${Date.now()}.json`, JSON.stringify(updateUrl, null, 2));
+    // await fs.writeFile(`${path.resolve('jsonoutputs')}/payment-${Date.now()}.json`, JSON.stringify(updateUrl, null, 2));
     const customer = await getStripeCustomerBySpaceId({ spaceId });
-    await fs.writeFile(`${path.resolve('jsonoutputs')}/customer-${Date.now()}.json`, JSON.stringify(customer, null, 2));
+    // await fs.writeFile(`${path.resolve('jsonoutputs')}/customer-${Date.now()}.json`, JSON.stringify(customer, null, 2));
 
     if (customer) {
       const portal = await stripeClient.billingPortal.sessions.create({ customer: customer.id, return_url: returnUrl });

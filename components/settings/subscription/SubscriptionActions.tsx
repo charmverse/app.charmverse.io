@@ -15,6 +15,7 @@ export function SubscriptionActions({
   onDelete,
   onCancelAtEnd,
   onReactivation,
+  onUpgrade,
   confirmFreeTierDowngrade
 }: {
   spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
@@ -23,6 +24,7 @@ export function SubscriptionActions({
   onDelete: () => void;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
+  onUpgrade: () => void;
   confirmFreeTierDowngrade: () => void;
 }) {
   const isAdmin = useIsAdmin();
@@ -44,11 +46,9 @@ export function SubscriptionActions({
           Reactivate Plan
         </Button>
       )}
-      {(spaceSubscription?.status === 'active' ||
-        spaceSubscription?.status === 'cancelled' ||
-        spaceSubscription?.status === 'free_trial') && (
+      {(spaceSubscription?.status === 'active' || spaceSubscription?.status === 'cancelled') && (
         <>
-          <Button disabled={loading} onClick={() => {}}>
+          <Button disabled={loading} onClick={onUpgrade}>
             Update Plan
           </Button>
           <Button disabled={loading} onClick={onCancelAtEnd} variant='text'>

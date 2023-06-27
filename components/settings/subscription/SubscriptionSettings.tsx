@@ -16,7 +16,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
-import type { SpaceSettingsTab } from '../config';
 import { SETTINGS_TABS } from '../config';
 import Legend from '../Legend';
 
@@ -201,6 +200,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
+            minimumBlockQuota={minimumBlockQuota}
             space={space}
             spaceSubscription={spaceSubscription}
             refetchSpaceSubscription={refetchSpaceSubscription}
