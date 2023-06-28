@@ -53,14 +53,15 @@ export async function createProSubscription({
     query: `metadata['spaceId']:'${spaceId}'`
   });
 
-  const stripeSubscriptions = await stripeClient.subscriptions.list({
-    status: 'incomplete',
-    customer: existingCustomer.data?.[0]?.id || 'customer' // if we don't have a customer I added a dummy name so the array returned will be empty
-  });
+  let existingStripeSubscription: Stripe.Subscription | undefined;
+  if (existingCustomer.data?.[0]?.id) {
+    const stripeSubscriptions = await stripeClient.subscriptions.list({
+      status: 'incomplete',
+      customer: existingCustomer.data?.[0]?.id
+    });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscriptions.data?.find(
-    (sub) => sub.metadata.spaceId === spaceId
-  );
+    existingStripeSubscription = stripeSubscriptions.data?.find((sub) => sub.metadata.spaceId === spaceId);
+  }
 
   const existingStripeCustomer = existingCustomer?.data.find((cus) => !cus.deleted);
 
