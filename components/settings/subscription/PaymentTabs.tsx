@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
@@ -9,6 +10,15 @@ interface TabPanelProps extends BoxProps {
   index: PaymentType;
   value: PaymentType;
 }
+
+export const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  '& .MuiToggleButton-root': {
+    borderColor: theme.palette.primary.main,
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main
+    }
+  }
+}));
 
 export function PaymentTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -35,7 +45,7 @@ export default function PaymentTabs({
   onChange: (_event: SyntheticEvent, newValue: PaymentType) => void;
 }) {
   return (
-    <ToggleButtonGroup
+    <StyledToggleButtonGroup
       exclusive
       value={value}
       onChange={onChange}
@@ -47,6 +57,6 @@ export default function PaymentTabs({
       <ToggleButton value='crypto' aria-label='crypto'>
         Crypto
       </ToggleButton>
-    </ToggleButtonGroup>
+    </StyledToggleButtonGroup>
   );
 }

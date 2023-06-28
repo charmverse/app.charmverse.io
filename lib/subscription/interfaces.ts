@@ -21,9 +21,10 @@ export type ProSubscriptionResponse = {
   blockQuota: number;
   productId: string;
   customerId: string;
-  paymentIntentId: string;
-  clientSecret: string;
-  paymentIntentStatus: Stripe.PaymentIntent.Status;
+  // These values are only sent back when creating a subscription with the user present
+  paymentIntentId?: string;
+  clientSecret?: string | null;
+  paymentIntentStatus?: Stripe.PaymentIntent.Status;
 };
 
 export type CreateProSubscriptionResponse = Pick<
@@ -36,4 +37,9 @@ export type CreateCryptoSubscriptionResponse = string;
 export type CreateCryptoSubscriptionRequest = {
   subscriptionId: string;
   email: string;
+};
+
+export type StripeMetadataKeys = {
+  domain: string;
+  spaceId: string;
 };

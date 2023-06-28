@@ -4,6 +4,7 @@ import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import type { SubscriptionStatusType } from './constants';
 import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
+import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
 import { stripeClient } from './stripe';
 
 export type UpdateSubscriptionRequest = Partial<
@@ -19,35 +20,30 @@ export async function updateProSubscription({
   payload: UpdateSubscriptionRequest;
 }) {
   const { billingEmail, status } = payload;
-  const spaceSubscription = await prisma.stripeSubscription.findFirst({
-    where: {
-      spaceId,
-      deletedAt: null
-    }
+
+  const subscription = await getActiveSpaceSubscription({
+    spaceId
   });
 
-  if (!spaceSubscription) {
+  if (!subscription) {
     throw new NotFoundError(`Subscription not found for space ${spaceId}`);
   }
-
-  const subscription = await stripeClient.subscriptions.retrieve(spaceSubscription.subscriptionId);
-
-  if (subscription.status !== 'active') {
+  if (subscription.status === 'cancelled') {
     throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
   }
 
   if (status === 'cancel_at_end') {
-    await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+    await stripeClient.subscriptions.update(subscription.subscriptionId, {
       cancel_at_period_end: true
     });
   } else if (status === 'active') {
-    await stripeClient.subscriptions.update(spaceSubscription.subscriptionId, {
+    await stripeClient.subscriptions.update(subscription.subscriptionId, {
       cancel_at_period_end: false
     });
   }
 
   if (billingEmail) {
-    await stripeClient.customers.update(spaceSubscription.customerId, {
+    await stripeClient.customers.update(subscription.customerId, {
       email: billingEmail
     });
   }

@@ -14,6 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 
 import Legend from '../Legend';
+import { UpgradeChip } from '../subscription/UpgradeWrapper';
 
 export const schema = yup.object({
   webhookUrl: yup.string().nullable(true),
@@ -85,7 +86,9 @@ export function ApiSettings({ space }: { space: Space }) {
   return (
     <>
       <Legend>API Settings</Legend>
-      <Typography variant='h6'>API Endpoints</Typography>
+      <Typography variant='h6' sx={{ display: 'flex', alignContent: 'center', gap: 1 }}>
+        API Endpoints <UpgradeChip />
+      </Typography>
       <Typography>
         Our API endpoints enable you to access and create content in your space. View the{' '}
         <Link href='/api-docs' target='_blank'>

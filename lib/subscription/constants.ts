@@ -18,7 +18,7 @@ export const communityProduct = {
   monthlyActiveUserLimit: 25,
   trial: 90,
   pricing: {
-    annual: 10,
+    annual: 12,
     monthly: 1.2
   }
 } as const;
@@ -34,22 +34,27 @@ export const loopApiUrl = isProdEnv ? 'https://api.loopcrypto.xyz' : 'https://de
 
 export const subscriptionDetails = {
   free: [
-    'All spaces are viewable by anyone on the Internet',
-    'Docs, Database, Forums. Member Directory, Proposal Builder',
+    'Community space with docs, databases, & forum',
+    'Member Directory, Proposal Builder, & crypto payments',
     'Up to 200 monthly active members',
-    'Integrate with Discord, Snapshot, SAFE , NFTs & POAPS'
+    'Integrate with Discord, Snapshot, Safe, & NFTs/POAPs',
+    'Compatible with most EVM chains',
+    'Upload limit/video: 20MB'
   ],
   community: [
-    'Everything included in Free plus',
-    'Comprehensive access control, roles, guests, custom domain, API access and more',
+    'Everything in Free, and',
+    'Comprehensive access control. Unlimited roles',
     'Invite 100 guests',
     'Custom domain',
-    'API  access'
+    'API access',
+    'Upload limit/video: 1GB'
   ],
   enterprise: [
-    'Everything included in Community Edition plus',
+    'Everything in Community, and',
     '200+ monthly active members',
     'Custom guest limit',
+    'Custom video upload limit',
+    'Usage & engagement analytics',
     'Dedicated success manager'
   ]
 };

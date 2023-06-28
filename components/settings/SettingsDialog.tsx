@@ -14,6 +14,7 @@ import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/Sid
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
@@ -100,6 +101,7 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
+  const isAdmin = useIsAdmin();
 
   return (
     <Dialog
@@ -148,16 +150,19 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs(currentSpace).map((tab) => (
-              <SidebarLink
-                data-test={`space-settings-tab-${tab.path}`}
-                key={tab.path}
-                label={tab.label}
-                icon={tab.icon}
-                onClick={() => onClick(tab.path)}
-                active={activePath === tab.path}
-              />
-            ))}
+            getSettingsTabs(currentSpace)
+              .filter((item) => (item.path === 'subscription' ? isAdmin : true))
+              .map((tab) => (
+                <SidebarLink
+                  data-test={`space-settings-tab-${tab.path}`}
+                  key={tab.path}
+                  label={tab.label}
+                  icon={tab.icon}
+                  onClick={() => onClick(tab.path)}
+                  active={activePath === tab.path}
+                  section={tab.path}
+                />
+              ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (

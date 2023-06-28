@@ -15,6 +15,7 @@ import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
@@ -83,6 +84,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const stripePromise = loadStripe();
 
+  if (space.paidTier === 'enterprise') {
+    return <EnterpriseBillingScreen />;
+  }
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>
@@ -105,7 +109,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     <Stack gap={1}>
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
-      <Typography>Comprehensive access control & unlimited roles, guests, custom domain and API access</Typography>
+      <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
       <PlanSelection
         disabled={isInitialSubscriptionLoading}
         onSelect={handlePlanSelect}

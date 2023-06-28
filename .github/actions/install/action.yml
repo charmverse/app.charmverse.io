@@ -4,6 +4,11 @@ inputs:
   core_pkg_version:
     description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
     required: false
+  commit_core_pkg_upgrade:
+    type: boolean
+    description: "Whether commit the update to core package back to branch"
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -30,10 +35,23 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    - name: Upgrade to specific version of Core package
+    # - name: Install specific version of Core
+    #   shell: bash
+    #   if: inputs.core_pkg_version && inputs.core_pkg_version != 'latest'
+    #   run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
+    - name: Upgrade to latest version of Core package then commit back to repo
       shell: bash
-      if: ${{ inputs.core_pkg_version }}
-      run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
+      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version
+      run: |
+        npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
+    - name: Commit package and lock file back into repo
+      if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        file_pattern: "package*.json"
+        commit_message: "Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}"
 
     # Include this step to deploy and test a different branch of core
     # 1. Set the webapp branch
