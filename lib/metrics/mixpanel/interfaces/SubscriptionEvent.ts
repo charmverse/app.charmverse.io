@@ -1,5 +1,4 @@
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
-import type { PaymentMethodType } from 'lib/subscription/mapStripeFields';
 
 import type { BaseEvent } from './BaseEvent';
 
@@ -24,7 +23,7 @@ export type UpdateSubscriptionEvent = StripeBaseEvent & {
 };
 
 export type SubscriptionPaymentEvent = StripeBaseEvent & {
-  paymentMethod: PaymentMethodType | 'crypto';
+  paymentMethod: 'card' | 'ach' | 'crypto';
   blockQuota: number;
   period: SubscriptionPeriod;
   status: 'success' | 'failure';
