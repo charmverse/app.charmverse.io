@@ -277,13 +277,20 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
       case 'invoice.finalized': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = invoice.subscription as string;
+        const subscriptionId = invoice.subscription as string | null;
+
+        if (!subscriptionId) {
+          log.warn(`The invoice ${invoice.id} does not have a subscription attached to it`);
+          break;
+        }
+
         const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
           expand: ['customer']
         });
+
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
-        const priceId = subscriptionData?.price?.id as string | undefined;
+        const priceId = subscriptionData?.price?.id;
         const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
 
         if (!stripeSubscription.metadata.loopCheckout && priceId) {
