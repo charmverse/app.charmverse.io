@@ -57,7 +57,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const {
     register,
     watch,
-    reset,
     setValue,
     formState: { errors }
   } = useForm<{ email: string; coupon: string }>({
@@ -119,8 +118,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   // }, [initialSubscriptionData?.coupon, initialSubscriptionData?.email, isInitialSubscriptionLoading]);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 
@@ -130,9 +130,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
 
     setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
 
     await createSubscription({
       spaceId: space.id,

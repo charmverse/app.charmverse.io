@@ -1,5 +1,7 @@
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 import type { NextApiRequest } from 'next';
 import { v4 } from 'uuid';
 
@@ -134,6 +136,27 @@ describe('requireApiKey', () => {
     const mockedNext = jest.fn();
     await expect(requireApiKey(testReq, {} as any, mockedNext)).rejects.toBeInstanceOf(InvalidApiKeyError);
     expect(mockedNext).not.toBeCalled();
+  });
+
+  it('should throw an error if the space is a free space', async () => {
+    const { space: freeSpace } = await testUtilsUser.generateUserAndSpace({
+      spacePaidTier: 'free'
+    });
+    const freeSpaceApiKey = await prisma.spaceApiToken.create({
+      data: {
+        token: v4(),
+        space: { connect: { id: freeSpace.id } }
+      }
+    });
+    const testReq: NextApiRequest = {
+      headers: {
+        authorization: `Bearer ${freeSpaceApiKey.token}`
+      }
+    } as any;
+
+    const mockedNext = jest.fn();
+
+    await expect(requireApiKey(testReq, {} as any, mockedNext)).rejects.toBeInstanceOf(SubscriptionRequiredError);
   });
 
   it('should throw an error if no api key or an invalid API key is provided', async () => {

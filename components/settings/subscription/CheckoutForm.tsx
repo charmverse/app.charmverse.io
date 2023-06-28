@@ -20,7 +20,7 @@ import type { CreateCryptoSubscriptionRequest, SubscriptionPaymentIntent } from 
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 import type { PaymentType } from './PaymentTabs';
-import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
+import { PaymentTabPanel } from './PaymentTabs';
 
 export function CheckoutForm({
   onCancel,
@@ -64,6 +64,13 @@ export function CheckoutForm({
   //   },
   //   resolver: yupResolver(schema())
   // });
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/checkout'
+    });
+  }, []);
 
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);

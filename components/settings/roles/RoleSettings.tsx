@@ -67,13 +67,15 @@ export function RoleSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Roles & Permissions</Legend>
+      <Legend sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        Roles & Permissions
+        <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
+      </Legend>
       <DefaultPagePermissions />
       <Divider sx={{ my: 2 }} />
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
         <Box gap={2} display='flex' justifyContent='space-between'>
           Roles
-          <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
         </Box>
 
         {isAdmin && (
@@ -105,36 +107,40 @@ export function RoleSettings({ space }: { space: Space }) {
       </Typography>
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
       <AdminRoleRow readOnly={!isAdmin} />
-      <GuestRoleRow readOnly={!isAdmin || isFreeSpace} />
-      <Divider sx={{ my: 2 }} />
 
-      <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
-        Custom roles
-        <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
-      </Typography>
+      {!isFreeSpace && (
+        <>
+          <GuestRoleRow readOnly={!isAdmin || isFreeSpace} />
+          <Divider sx={{ my: 2 }} />
 
-      <Typography variant='caption'>Custom role permissions override Default.</Typography>
-      {!isFreeSpace &&
-        roles?.map((role) => (
-          <RoleRow
-            readOnly={!isAdmin}
-            assignRoles={assignRoles}
-            deleteRole={deleteRole}
-            refreshRoles={refreshRoles}
-            role={role}
-            key={role.id}
-          />
-        ))}
-      {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (
-        <Box p={3} mt={2} sx={{ border: '1px solid var(--input-border)', textAlign: 'center' }}>
-          <Typography sx={{ mb: 2 }} variant='body2' color='secondary'>
-            No roles have been created yet.
+          <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
+            Custom roles
           </Typography>
-          <Button onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
-            Add a role
-          </Button>
-        </Box>
+
+          <Typography variant='caption'>Custom role permissions override Default.</Typography>
+          {roles?.map((role) => (
+            <RoleRow
+              readOnly={!isAdmin}
+              assignRoles={assignRoles}
+              deleteRole={deleteRole}
+              refreshRoles={refreshRoles}
+              role={role}
+              key={role.id}
+            />
+          ))}
+          {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (
+            <Box p={3} mt={2} sx={{ border: '1px solid var(--input-border)', textAlign: 'center' }}>
+              <Typography sx={{ mb: 2 }} variant='body2' color='secondary'>
+                No roles have been created yet.
+              </Typography>
+              <Button onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
+                Add a role
+              </Button>
+            </Box>
+          )}
+        </>
       )}
+
       {isCreateFormVisible && (
         <Box mt={2}>
           <CreateRoleForm onCancel={hideCreateRoleForm} onSubmit={createNewRole} />
