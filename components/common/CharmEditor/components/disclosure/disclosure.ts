@@ -16,9 +16,9 @@ function summarySpec(): RawSpecs {
     schema: {
       content: '(paragraph | heading)',
       group: 'block',
-      parseDOM: [{ tag: 'div.summary' }],
+      parseDOM: [{ tag: 'summary' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div.summary', 0];
+        return ['summary', 0];
       }
     },
     markdown: {
@@ -39,9 +39,9 @@ function detailsSpec(): RawSpecs {
       content: 'disclosureSummary block+',
       defining: true,
       group: 'block',
-      parseDOM: [{ tag: 'div.summary-details' }],
+      parseDOM: [{ tag: 'details' }],
       toDOM: (): DOMOutputSpec => {
-        return ['div.summary-details', 0];
+        return ['details', 0];
       }
     },
     markdown: {
