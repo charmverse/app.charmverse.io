@@ -1,17 +1,16 @@
 import Box from '@mui/material/Box';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import getLayout from 'components/common/BaseLayout/BaseLayout';
-import { LoginPageContent } from 'components/login';
-import type { PopupLoginState } from 'hooks/usePopupLogin';
+import LoadingComponent from 'components/common/LoadingComponent';
+import type { OauthLoginState } from 'lib/oauth/interfaces';
 
 export default function Oauth() {
   useEffect(() => {
     const listener = (event: MessageEvent<any>) => {
       if (event.source && event.origin) {
         const code = new URLSearchParams(window.location.search).get('code');
-        const message: PopupLoginState & { code: string | null } = {
+        const message: OauthLoginState<{ code: string | null }> = {
           status: code ? 'success' : 'error',
           code
         };
@@ -26,8 +25,8 @@ export default function Oauth() {
   }, []);
 
   return getLayout(
-    <Box height='100%' display='flex' flexDirection='column'>
-      <LoginPageContent hideLoginOptions isLoggingIn />
+    <Box height='100vh' width='100vw' display='flex' alignItems='center' justifyContent='center'>
+      <LoadingComponent isLoading />
     </Box>
   );
 }
