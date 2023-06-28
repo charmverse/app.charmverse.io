@@ -54,7 +54,7 @@ export async function createProSubscription({
   });
 
   const stripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}' AND status:'incomplete'`
+    query: `metadata["spaceId"]:"${spaceId}" AND status:"incomplete"`
   });
 
   const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.[0];
