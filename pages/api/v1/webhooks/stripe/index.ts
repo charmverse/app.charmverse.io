@@ -164,6 +164,17 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             for (const sub of otherSubscriptions) {
               await stripeClient.subscriptions.del(sub);
             }
+
+            await prisma.stripeSubscription.updateMany({
+              where: {
+                subscriptionId: {
+                  in: otherSubscriptions
+                }
+              },
+              data: {
+                deletedAt: new Date()
+              }
+            });
           }
         }
 
