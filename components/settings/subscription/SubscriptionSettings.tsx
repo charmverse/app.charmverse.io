@@ -32,10 +32,13 @@ const schema = () => {
   return yup
     .object({
       email: yup.string().email().required(),
-      coupon: yup.string().optional()
+      coupon: yup.string().optional(),
+      validatedCouponId: yup.string().optional()
     })
     .strict();
 };
+
+type FormValues = yup.InferType<ReturnType<typeof schema>>;
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
@@ -59,10 +62,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     watch,
     setValue,
     formState: { errors }
-  } = useForm<{ email: string; coupon: string }>({
+  } = useForm<FormValues>({
     defaultValues: {
       email: '',
-      coupon: ''
+      coupon: '',
+      validatedCouponId: ''
     },
     resolver: yupResolver(schema())
   });
@@ -81,7 +85,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       },
       async onSuccess(data) {
         setShowCheckoutForm(true);
-        setValue('coupon', data.coupon || '');
+        setValue('validatedCouponId', data.coupon || '');
         setValue('email', data.email || '');
       }
     }
@@ -89,15 +93,20 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const emailField = watch('email');
   const couponField = watch('coupon');
+  const validatedCoupon = watch('validatedCouponId');
 
   const { trigger: validateCoupon, isMutating: isValidationLoading } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: { coupon: string } } }>) =>
-      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
+      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload).then((coupon) => {
+        setValue('validatedCouponId', coupon.couponId);
+        return coupon;
+      }),
     {
       onError() {
         showMessage('Your coupon is not valid', 'error');
         setValue('coupon', '');
+        setValue('validatedCouponId', '');
       }
     }
   );
@@ -136,7 +145,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       payload: {
         period,
         blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota,
-        billingEmail: emailField
+        billingEmail: emailField,
+        coupon: validatedCoupon
       }
     });
   }
@@ -157,28 +167,29 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota,
           period,
           billingEmail: emailField,
-          coupon: couponField
+          coupon: validatedCoupon
         }
       });
     } else if (_period) {
       await createSubscription({
         spaceId: space.id,
-        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: couponField }
+        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: validatedCoupon }
       });
     }
   };
 
   const handleCoupon = async (coupon: string | undefined) => {
+    let applicableCouponId: string | undefined;
     if (coupon) {
-      await validateCoupon({
+      applicableCouponId = await validateCoupon({
         spaceId: space.id,
         payload: { coupon }
-      });
+      }).then((validated) => validated?.couponId);
     }
 
     await createSubscription({
       spaceId: space.id,
-      payload: { blockQuota, period, coupon, billingEmail: emailField }
+      payload: { blockQuota, period, coupon: applicableCouponId, billingEmail: emailField }
     });
   };
 
@@ -252,7 +263,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         >
           <CheckoutForm
             emailField={emailField}
-            couponField={couponField}
+            couponField={couponField ?? ''}
             space={space}
             blockQuota={blockQuota}
             period={period}
