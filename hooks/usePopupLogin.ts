@@ -2,9 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 
 const windowParams = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=650,left=50%,top=50%`;
 
+export type PopupLoginState = {
+  status: 'success' | 'error';
+};
+
 export function usePopupLogin<T>() {
   const [popupWindow, setPopupWindow] = useState<Window | null>(null);
-  const onSuccessRef = useRef<(data: T) => void>();
+  const loginCallbackRef = useRef<(data: PopupLoginState & T) => void>();
 
   useEffect(() => {
     if (popupWindow) {
@@ -14,7 +18,7 @@ export function usePopupLogin<T>() {
 
         if (popupWindow.closed) {
           setPopupWindow(null);
-          onSuccessRef.current = undefined;
+          loginCallbackRef.current = undefined;
         }
       }, 1000);
 
@@ -25,15 +29,15 @@ export function usePopupLogin<T>() {
   useEffect(() => {
     if (popupWindow) {
       // listen to message from popup window
-      const listener = (event: MessageEvent<{ success: boolean } & T>) => {
+      const listener = (event: MessageEvent<PopupLoginState & T>) => {
         const { data } = event;
 
-        if (data.success) {
+        if (data.status) {
           setPopupWindow(null);
           popupWindow.close();
 
-          onSuccessRef.current?.(data);
-          onSuccessRef.current = undefined;
+          loginCallbackRef.current?.(data);
+          loginCallbackRef.current = undefined;
         }
       };
 
@@ -43,9 +47,9 @@ export function usePopupLogin<T>() {
     }
   }, [popupWindow]);
 
-  const openPopupLogin = (url: string, onSuccess: (data: T) => void) => {
+  const openPopupLogin = (url: string, loginCallback: (data: T) => void) => {
     if (typeof window !== 'undefined') {
-      onSuccessRef.current = onSuccess;
+      loginCallbackRef.current = loginCallback;
       const popup = window.open(url, 'Login to CharmVerse', windowParams);
 
       setPopupWindow(popup);
