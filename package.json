@@ -84,7 +84,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "github:charmverse/core#main",
+    "@charmverse/core": "^1.0.13-rc-fixing-triggering-permission-api-workflow2.0",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@date-io/luxon": "^2.13.1",
