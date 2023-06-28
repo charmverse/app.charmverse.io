@@ -146,11 +146,37 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           // Set the payment method used to pay the first invoice
           // as the default payment method for that subscription
 
-          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string);
+          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string, {
+            expand: ['latest_invoice']
+          });
 
           if (typeof paymentIntent.payment_method === 'string') {
             await stripeClient.subscriptions.update(invoice.subscription as string, {
               default_payment_method: paymentIntent.payment_method
+            });
+          }
+          // Make sure we're not triggering any actions for free trials
+          if (invoice.total > 0) {
+            const otherSubscriptions = await stripeClient.subscriptions
+              .list({
+                customer: customerId
+              })
+              // Cancel any subscriptions with an invoice value of 0 - This should cover the free trial case
+              .then((data) => data.data.filter((sub) => sub.id !== invoice.subscription).map((sub) => sub.id));
+
+            for (const sub of otherSubscriptions) {
+              await stripeClient.subscriptions.del(sub);
+            }
+
+            await prisma.stripeSubscription.updateMany({
+              where: {
+                subscriptionId: {
+                  in: otherSubscriptions
+                }
+              },
+              data: {
+                deletedAt: new Date()
+              }
             });
           }
 
