@@ -17,7 +17,7 @@ const vote: Vote = {
   description: '',
   type: 'Approval',
   context: 'proposal',
-  content: {},
+  content: null,
   contentText: ''
 };
 

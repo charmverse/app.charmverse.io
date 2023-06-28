@@ -17,7 +17,7 @@ describe('createVote', () => {
     const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      content: {},
+      content: null,
       contentText: '',
       pageId: page.id,
       spaceId: space.id,
@@ -55,7 +55,7 @@ describe('createVote', () => {
     await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      content: {},
+      content: null,
       contentText: '',
       pageId: page.id,
       spaceId: space.id,
@@ -70,7 +70,7 @@ describe('createVote', () => {
       createVoteService({
         createdBy: user.id,
         deadline: new Date(),
-        content: {},
+        content: null,
         contentText: '',
         pageId: page.id,
         spaceId: space.id,
