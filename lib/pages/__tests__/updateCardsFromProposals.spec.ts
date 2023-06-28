@@ -82,7 +82,7 @@ describe('updateCardsFromProposals()', () => {
   it('should create cards from proposals if there are new proposals added', async () => {
     await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
@@ -97,7 +97,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
@@ -155,7 +155,7 @@ describe('updateCardsFromProposals()', () => {
   it('should delete cards from proposals', async () => {
     const pageProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
@@ -197,7 +197,7 @@ describe('updateCardsFromProposals()', () => {
   it('should permanently delete cards from proposals', async () => {
     const pageProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
