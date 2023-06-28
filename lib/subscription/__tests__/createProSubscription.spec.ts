@@ -91,7 +91,7 @@ describe('createProSubscription', () => {
     (stripeClient.customers.update as jest.Mock<any, any>) = updateCustomersMockFn;
     (stripeClient.customers.search as jest.Mock<any, any>) = searchCustomersMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
-    (stripeClient.subscriptions.search as jest.Mock<any, any>) = searchSubscriptionsMockFn;
+    (stripeClient.subscriptions.list as jest.Mock<any, any>) = searchSubscriptionsMockFn;
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
     (stripeClient.prices.list as jest.Mock<any, any>) = listPricesMockFn;
 
