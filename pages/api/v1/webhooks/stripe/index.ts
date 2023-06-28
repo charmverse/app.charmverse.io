@@ -158,7 +158,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             blockQuota,
             period,
             spaceId,
-            userId: '',
+            userId: space.createdBy,
             subscriptionId: stripeSubscription.id
           });
         }
@@ -176,7 +176,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               : charge.payment_method_details?.type?.startsWith('ach')
               ? 'ach'
               : 'card',
-            userId: ''
+            userId: space.createdBy
           });
         }
 
@@ -211,7 +211,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             space: {
               select: {
                 id: true,
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
@@ -257,7 +258,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               previousPeriod: activeSubscription.period,
               subscriptionId: activeSubscription.id,
               spaceId,
-              userId: ''
+              userId: space.createdBy
             });
           }
         }
@@ -306,7 +307,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           select: {
             space: {
               select: {
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
@@ -326,7 +328,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             blockQuota: subscription.items.data[0].quantity as number,
             subscriptionId: subscription.id,
             spaceId,
-            userId: ''
+            userId: afterUpdate.space.createdBy
           });
         }
 
@@ -355,7 +357,16 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const paymentMethodId = invoice.default_payment_method;
         const amountDue = invoice.amount_due;
 
-        if (invoice.charge) {
+        const space = await prisma.space.findUnique({
+          where: {
+            id: spaceId
+          },
+          select: {
+            createdBy: true
+          }
+        });
+
+        if (invoice.charge && space) {
           const charge = await stripeClient.charges.retrieve(invoice.charge as string);
           trackUserAction('subscription_payment', {
             spaceId,
@@ -368,12 +379,12 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               : charge.payment_method_details?.type?.startsWith('ach')
               ? 'ach'
               : 'card',
-            userId: ''
+            userId: space.createdBy
           });
         }
 
         const lastFinalizationError = invoice.last_finalization_error;
-        log.error(`Invoice payment failed for invoice ${invoice.id} for the subscription ${stripeSubscription.id}`, {
+        log.warn(`Invoice payment failed for invoice ${invoice.id} for the subscription ${stripeSubscription.id}`, {
           spaceId,
           blockQuota,
           period,
