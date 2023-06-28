@@ -61,7 +61,7 @@ export function SubscriptionActions({
           )}
         </>
       )}
-      {/* {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
+      {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
         <>
           <Button disabled={!isAdmin} onClick={openConfirmFreeTierDowngradeDialog} variant='outlined'>
             Use free plan
@@ -73,7 +73,7 @@ export function SubscriptionActions({
             onConfirmDowngrade={confirmFreeTierDowngrade}
           />
         </>
-      )} */}
+      )}
     </Stack>
   );
 }

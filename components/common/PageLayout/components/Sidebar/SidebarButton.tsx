@@ -49,7 +49,8 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
 `;
 
 const premiumSectionToUpgradeContext: Record<(typeof premiumSettingSections)[number], UpgradeContext> = {
-  roles: 'custom_roles'
+  roles: 'custom_roles',
+  api: 'api_access'
 };
 
 export function SidebarLink({
