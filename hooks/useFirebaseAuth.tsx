@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
+import type { UserCredential } from 'firebase/auth';
 import {
   getAuth,
   getRedirectResult,
@@ -21,7 +22,6 @@ import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { GooglePopupLoginState } from 'lib/oauth/interfaces';
-import { OauthLoginState } from 'lib/oauth/interfaces';
 import { getAppUrl } from 'lib/utilities/browser';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
@@ -75,13 +75,7 @@ export function useFirebaseAuth() {
       throw new ExternalServiceError(`Could not authenticate with Google`);
     }
 
-    const displayName = result.user.displayName ?? (result.user.email as string);
-
-    return {
-      accessToken: credential?.idToken as string,
-      displayName,
-      avatarUrl: result.user.photoURL as string
-    };
+    return getGoogleCredentials(result);
   }
 
   async function getGoogleToken(): Promise<LoginWithGoogleRequest> {
@@ -91,22 +85,7 @@ export function useFirebaseAuth() {
 
       const result = await signInWithPopup(auth, provider);
 
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-
-      if (!credential) {
-        throw new ExternalServiceError(`Could not authenticate with Google`);
-      }
-
-      const displayName = result.user.displayName ?? (result.user.email as string);
-
-      return {
-        accessToken: credential?.idToken as string,
-        displayName,
-        avatarUrl: result.user.photoURL as string
-      };
-
-      // ...
+      return getGoogleCredentials(result);
     } catch (error: any) {
       if (error instanceof SystemError) {
         throw error;
@@ -122,8 +101,24 @@ export function useFirebaseAuth() {
       log.debug({ errorCode, errorMessage, email, receivedCreds: credential });
 
       throw error;
-      // ...
     }
+  }
+
+  function getGoogleCredentials(googleResult: UserCredential): LoginWithGoogleRequest {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(googleResult);
+
+    if (!credential) {
+      throw new ExternalServiceError(`Could not authenticate with Google`);
+    }
+
+    const displayName = googleResult.user.displayName ?? (googleResult.user.email as string);
+
+    return {
+      accessToken: credential?.idToken as string,
+      displayName,
+      avatarUrl: googleResult.user.photoURL as string
+    };
   }
 
   async function loginWithGoogle(): Promise<AnyIdLogin> {
