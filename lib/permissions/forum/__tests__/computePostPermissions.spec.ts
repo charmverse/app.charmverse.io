@@ -212,12 +212,17 @@ describe('computePostPermissions - with editable by author policy', () => {
 });
 
 describe('computePostPermissions - with proposal permission filtering policy', () => {
-  it('should return delete_post and view_post permissions of a proposal converted post for admins', async () => {
+  it('should return unmodifed permissions of a proposal converted post for admins', async () => {
     const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
     const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
+    });
+
+    const permissions = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
     });
 
     await convertPostToProposal({
@@ -226,18 +231,12 @@ describe('computePostPermissions - with proposal permission filtering policy', (
       categoryId: proposalCategory.id
     });
 
-    const permissions = await computePostPermissions({
+    const permissionsAfterConversion = await computePostPermissions({
       resourceId: post.id,
       userId: adminUser.id
     });
 
-    postOperationsWithoutEdit.forEach((op) => {
-      if (op === 'delete_post' || op === 'view_post') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
-    });
+    expect(permissionsAfterConversion).toMatchObject(permissions);
   });
 
   it('should return delete_post and view_post permissions of a proposal converted post for author', async () => {

@@ -6,7 +6,7 @@ import type { Stripe } from 'stripe';
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
-import type { CreateProSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
+import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
 export async function createProSubscription({
@@ -67,8 +67,9 @@ export async function createProSubscription({
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
-        spaceId: space.id
-      },
+        spaceId: space.id,
+        domain: space.domain
+      } as StripeMetadataKeys,
       name: name || space.name,
       ...(address && { address }),
       ...(billingEmail && { email: billingEmail })
@@ -79,8 +80,9 @@ export async function createProSubscription({
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
-        spaceId: space.id
-      },
+        spaceId: space.id,
+        domain: space.domain
+      } as StripeMetadataKeys,
       address,
       name: name || space.name,
       email: billingEmail
@@ -108,54 +110,36 @@ export async function createProSubscription({
     throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
   }
 
-  let subscription: Stripe.Subscription | undefined;
-  try {
-    // Case when the user is updating his subscription in checkout
-    if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
-      await stripeClient.subscriptions.del(existingStripeSubscription.id);
-    }
+  // Case when the user is updating his subscription in checkout
+  if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
+    await stripeClient.subscriptions.del(existingStripeSubscription.id);
+  }
 
-    subscription = await stripeClient.subscriptions.create({
-      metadata: {
-        productId,
-        period,
-        tier: 'pro',
-        spaceId: space.id
-      },
-      trial_period_days: freeTrial ? communityProduct.trial : undefined,
-      customer: customer.id,
-      items: [
-        {
-          price: productPrice.id,
-          quantity: blockQuota
-        }
-      ],
-      coupon,
-      payment_settings: {
-        save_default_payment_method: 'on_subscription'
-      },
-      payment_behavior: 'default_incomplete',
-      expand: ['latest_invoice.payment_intent']
-    });
-  } catch (error: any) {
-    log.error(`[stripe]: Failed to create subscription. ${error.message}`, {
-      spaceId,
+  const subscription = await stripeClient.subscriptions.create({
+    metadata: {
+      productId,
       period,
-      billingEmail,
-      error
-    });
-  }
-
-  if (!subscription) {
-    throw new ExternalServiceError('Failed to create subscription');
-  }
+      tier: 'pro',
+      spaceId: space.id
+    },
+    trial_period_days: freeTrial ? communityProduct.trial : undefined,
+    customer: customer.id,
+    items: [
+      {
+        price: productPrice.id,
+        quantity: blockQuota
+      }
+    ],
+    coupon,
+    payment_settings: {
+      save_default_payment_method: 'on_subscription'
+    },
+    payment_behavior: 'default_incomplete',
+    expand: ['latest_invoice.payment_intent']
+  });
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
-
-  if (!paymentIntent?.client_secret) {
-    throw new ExternalServiceError('Failed to create subscription. The client secret is missing.');
-  }
 
   return {
     subscriptionId: subscription.id,
@@ -164,8 +148,8 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent.id,
-    paymentIntentStatus: paymentIntent.status,
-    clientSecret: paymentIntent.client_secret
+    paymentIntentId: paymentIntent?.id,
+    paymentIntentStatus: paymentIntent?.status,
+    clientSecret: paymentIntent?.client_secret
   };
 }

@@ -171,7 +171,7 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/websockets.ts',
+            websockets: './background/initWebsockets.ts',
             countSpaceData: './scripts/countSpaceData.ts',
             importFromDiscourse: './scripts/importFromDiscourse.ts'
           };
