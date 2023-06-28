@@ -101,7 +101,7 @@ export function DiscordProvider({ children }: Props) {
           setUser(loggedInUser);
         }
       } catch (e: any) {
-        showMessage(e.message || 'Failed to login with discord');
+        showMessage(e.message || 'Failed to login with discord', 'error');
       }
     };
 
