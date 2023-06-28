@@ -16,13 +16,17 @@ function summarySpec(): RawSpecs {
     schema: {
       content: '(paragraph | heading)',
       group: 'block',
-      parseDOM: [{ tag: 'summary' }],
+      parseDOM: [{ tag: 'div.summary' }],
       toDOM: (): DOMOutputSpec => {
-        return ['summary'];
+        return ['div.summary', 0];
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        state.text(node.textContent, false);
+        state.ensureNewLine();
+        state.closeBlock(node);
+      }
     }
   };
 }
@@ -35,13 +39,17 @@ function detailsSpec(): RawSpecs {
       content: 'disclosureSummary block+',
       defining: true,
       group: 'block',
-      parseDOM: [{ tag: 'details' }],
+      parseDOM: [{ tag: 'div.summary-details' }],
       toDOM: (): DOMOutputSpec => {
-        return ['details', 0];
+        return ['div.summary-details', 0];
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        state.text(node.textContent, false);
+        state.ensureNewLine();
+        state.closeBlock(node);
+      }
     }
   };
 }
