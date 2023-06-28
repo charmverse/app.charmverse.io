@@ -13,21 +13,6 @@ on:
       core_pkg_version:
         description: 'Core pkg version to update to'
         required: true
-      run_integration_test:
-        type: boolean
-        description: 'Whether to run integration tests'
-        required: false
-        default: true
-      run_e2e_browser_test:
-        type: boolean
-        description: 'Whether to run e2e/browser tests'
-        required: false
-        default: false
-      deploy_to_prd:
-        type: boolean
-        description: 'Whether to deploy to prd servers'
-        required: false
-        default: false
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
@@ -192,8 +177,7 @@ jobs:
     permissions:
       contents: write
     # Re-enable condition before merge
-    if: ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) ||
-        ( github.event_name == 'workflow_dispatch' && inputs.deploy_to_prd )
+    if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
