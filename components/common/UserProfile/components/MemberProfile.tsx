@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import OpenInFullIcon from '@mui/icons-material/Launch';
-import { Box, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { Box, Divider, Grid, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
@@ -17,8 +17,8 @@ import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
 
 import { MemberProperties } from './MemberProperties';
 import { NftsList } from './NftsList';
-import { OrgsList } from './OrgsList';
 import { PoapsList } from './PoapsList';
+import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 const ContentContainer = styled(Container)`
   width: 100%;
@@ -76,7 +76,7 @@ export function MemberProfile({
         <UserDetailsReadonly showSocials={false} user={member} />
         <MultiTabs
           tabs={[
-            ['Profile', <Typography key='profile'>Profile</Typography>],
+            ['Profile', <ProfileWidgets key='profile' userId={member.id} />],
             ['Organization', <UserSpacesList key='organization' userId={member.id} />]
           ]}
         />
