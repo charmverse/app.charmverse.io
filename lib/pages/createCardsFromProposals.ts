@@ -23,7 +23,15 @@ export async function createCardsFromProposals({
     where: {
       spaceId,
       type: 'proposal',
+      proposal: {
+        status: {
+          not: 'draft'
+        }
+      },
       deletedAt: null
+    },
+    include: {
+      workspaceEvents: true
     }
   });
   const board = (await prisma.block.findUnique({

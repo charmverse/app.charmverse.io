@@ -49,7 +49,15 @@ export async function updateCardsFromProposals({
   const pageProposals = await prisma.page.findMany({
     where: {
       spaceId,
-      type: 'proposal'
+      type: 'proposal',
+      proposal: {
+        status: {
+          not: 'draft'
+        }
+      }
+    },
+    include: {
+      workspaceEvents: true
     }
   });
 
