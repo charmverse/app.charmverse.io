@@ -81,7 +81,11 @@ export function DiscordProvider({ children }: Props) {
       authFlowType: 'popup'
     });
 
-    const onSuccess = async ({ code }: { code: string }) => {
+    const loginCallback = async ({ code }: { code: string | null }) => {
+      if (!code) {
+        return;
+      }
+
       try {
         if (type === 'connect') {
           const updatedUser = await charmClient.discord.connectDiscord(
@@ -101,7 +105,7 @@ export function DiscordProvider({ children }: Props) {
       }
     };
 
-    openPopupLogin(discordLoginPath, onSuccess);
+    openPopupLogin(discordLoginPath, loginCallback);
   }
 
   useEffect(() => {

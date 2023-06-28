@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { LoginPageContent } from 'components/login';
+import type { PopupLoginState } from 'hooks/usePopupLogin';
 
 export default function Oauth() {
   const router = useRouter();
@@ -13,13 +14,13 @@ export default function Oauth() {
   useEffect(() => {
     const listener = (event: MessageEvent<any>) => {
       if (event.source && event.origin) {
-        event.source.postMessage(
-          {
-            success: true,
-            code: new URLSearchParams(window.location.search).get('code')
-          },
-          { targetOrigin: event.origin }
-        );
+        const code = new URLSearchParams(window.location.search).get('code');
+        const message: PopupLoginState & { code: string | null } = {
+          status: code ? 'success' : 'error',
+          code
+        };
+
+        event.source.postMessage(message, { targetOrigin: event.origin });
       }
     };
 
@@ -29,7 +30,7 @@ export default function Oauth() {
   }, []);
 
   if (error) {
-    return <ErrorPage message={typeof error === 'string' ? error : 'Failed to login with discord'}></ErrorPage>;
+    return <ErrorPage message='Failed to login with discord'></ErrorPage>;
   }
 
   return getLayout(
