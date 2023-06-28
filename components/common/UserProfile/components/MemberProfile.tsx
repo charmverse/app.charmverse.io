@@ -1,13 +1,15 @@
 import styled from '@emotion/styled';
 import OpenInFullIcon from '@mui/icons-material/Launch';
-import { Box, Divider, Grid, Stack, useMediaQuery } from '@mui/material';
+import { Box, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
+import MultiTabs from 'components/common/MultiTabs';
 import Legend from 'components/settings/Legend';
 import { UserDetailsReadonly } from 'components/u/components/UserDetails/UserDetailsReadonly';
+import { UserSpacesList } from 'components/u/components/UserSpacesList/UserSpacesList';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
@@ -71,7 +73,13 @@ export function MemberProfile({
       }
     >
       <ContentContainer top={20}>
-        <UserDetailsReadonly user={member} />
+        <UserDetailsReadonly showSocials={false} user={member} />
+        <MultiTabs
+          tabs={[
+            ['Profile', <Typography key='profile'>Profile</Typography>],
+            ['Organization', <UserSpacesList key='organization' userId={member.id} />]
+          ]}
+        />
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <Legend mt={4} mb={3}>
@@ -88,7 +96,6 @@ export function MemberProfile({
             <Stack gap={3}>
               <Divider sx={{ display: { xs: 'block', md: 'none' } }} />
               <NftsList userId={member.id} readOnly />
-              <OrgsList userId={member.id} readOnly />
               <PoapsList userId={member.id} />
             </Stack>
           </Grid>
