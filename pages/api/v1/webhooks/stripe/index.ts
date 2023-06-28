@@ -335,7 +335,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
           if (!loopItem) {
             log.warn(
-              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId} and space ${spaceId}`
+              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId}`,
+              { spaceId }
             );
             break;
           }
