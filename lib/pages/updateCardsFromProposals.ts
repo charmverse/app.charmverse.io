@@ -147,10 +147,14 @@ export async function updateCardsFromProposals({
    */
   const newCards: { page: Page; block: Block }[] = [];
   for (const pageProposal of newPageProposals) {
+    const createdAt = pageProposal.workspaceEvents.find(
+      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
+    )?.createdAt;
     const _card = await createCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
+      createdAt,
       createdBy: userId,
       properties: { [boardCardProp?.id || '']: `${pageProposal.path}` },
       hasContent: pageProposal.hasContent,
