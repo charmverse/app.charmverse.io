@@ -1,10 +1,14 @@
 import { Grid } from '@mui/material';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
 import { CollectionWidget } from './CollectionWidget';
 import { SocialWidget } from './SocialWidget';
 import { SpaceMemberPropertyWidget } from './SpaceMemberPropertyWidget';
 
 export function ProfileWidgets({ userId }: { userId: string }) {
+  const { space } = useCurrentSpace();
+
   const profileComponents = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
 
   return (
@@ -25,11 +29,11 @@ export function ProfileWidgets({ userId }: { userId: string }) {
             );
 
           case 'charmverse':
-            return (
+            return space ? (
               <Grid item xs={12} md={6} alignItems='stretch'>
                 <SpaceMemberPropertyWidget userId={userId} />
               </Grid>
-            );
+            ) : null;
           default:
             return null;
         }

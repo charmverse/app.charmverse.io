@@ -6,12 +6,8 @@ import { useTheme } from '@mui/material/styles';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import Button from 'components/common/Button';
-import MultiTabs from 'components/common/MultiTabs';
-import { UserDetailsReadonly } from 'components/u/components/UserDetails/UserDetailsReadonly';
-import { UserSpacesList } from 'components/u/components/UserSpacesList/UserSpacesList';
+import { PublicProfile } from 'components/u/PublicProfile';
 import type { Member } from 'lib/members/interfaces';
-
-import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 const ContentContainer = styled(Container)`
   width: 100%;
@@ -51,13 +47,7 @@ export function MemberProfile({
       }
     >
       <ContentContainer top={20}>
-        <UserDetailsReadonly showSocials={false} user={member} />
-        <MultiTabs
-          tabs={[
-            ['Profile', <ProfileWidgets key='profile' userId={member.id} />],
-            ['Organization', <UserSpacesList key='organization' userId={member.id} />]
-          ]}
-        />
+        <PublicProfile hideAggregateData user={member} readOnly />
       </ContentContainer>
     </Dialog>
   );
