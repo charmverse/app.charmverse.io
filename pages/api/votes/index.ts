@@ -75,7 +75,7 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
                 content: [
                   {
                     type: 'text',
-                    content: vote.description
+                    text: vote.description
                   }
                 ]
               }

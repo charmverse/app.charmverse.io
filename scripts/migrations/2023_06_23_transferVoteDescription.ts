@@ -17,12 +17,13 @@ async function init() {
                 content: [
                   {
                     type: 'text',
-                    content: vote.description
+                    text: vote.description
                   }
                 ]
               }
             ]
           },
+          description: null,
           contentText: vote.description
         },
         where: {
