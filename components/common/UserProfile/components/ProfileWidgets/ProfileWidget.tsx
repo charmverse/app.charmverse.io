@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/materia
 
 export function ProfileWidget({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Card>
+    <Card sx={{ height: '100%' }}>
       <CardHeader
         sx={{
           pb: 0

@@ -9,10 +9,7 @@ import Button from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { UserDetailsReadonly } from 'components/u/components/UserDetails/UserDetailsReadonly';
 import { UserSpacesList } from 'components/u/components/UserSpacesList/UserSpacesList';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
-
-import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
 
 import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
@@ -31,21 +28,6 @@ export function MemberProfile({
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
-
-  const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
-  const { getDisplayProperties } = useMemberProperties();
-
-  const visibleProperties = getDisplayProperties('profile');
-
-  const currentSpacePropertyValues = memberPropertyValues.find(
-    (memberPropertyValue) => memberPropertyValue.spaceId === space?.id
-  );
-
-  if (currentSpacePropertyValues?.properties) {
-    currentSpacePropertyValues.properties = currentSpacePropertyValues.properties.filter((propertyValue) => {
-      return visibleProperties.some((prop) => prop.id === propertyValue.memberPropertyId);
-    });
-  }
 
   if (!space) {
     return null;
@@ -76,7 +58,6 @@ export function MemberProfile({
             ['Organization', <UserSpacesList key='organization' userId={member.id} />]
           ]}
         />
-        {/* <MemberProperties properties={currentSpacePropertyValues?.properties ?? []} /> */}
       </ContentContainer>
     </Dialog>
   );

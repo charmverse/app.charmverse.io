@@ -139,7 +139,7 @@ export function SocialIcons({
       {showGithub &&
         (social.githubURL ? (
           <Link href={social.githubURL} target='_blank' display='flex'>
-            <GitHubIcon style={{ color: '#888', height: iconHeight }} />
+            <GitHubIcon style={{ color: '#141414', height: iconHeight }} />
           </Link>
         ) : (
           <GitHubIcon color='disabled' style={{ height: iconHeight }} />
