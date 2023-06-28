@@ -5,9 +5,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
+import { getLoopProducts } from 'lib/loop/loop';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
-import { communityProduct } from 'lib/subscription/constants';
+import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
@@ -93,6 +94,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         const customerId = invoice.customer as string;
         const priceInterval = subscriptionData?.price?.recurring?.interval;
+
+        if (!spaceId) {
+          log.warn(
+            `Can't create the user subscription. SpaceId was not defined in the metadata for subscription ${stripeSubscription.id}`
+          );
+          break;
+        }
 
         const space = await prisma.space.findUnique({
           where: { id: spaceId, deletedAt: null }
@@ -266,6 +274,46 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.finalized': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
+          expand: ['customer']
+        });
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
+        const priceId = subscriptionData?.price?.id as string | undefined;
+        const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
+
+        if (!stripeSubscription.metadata.loopCheckout && priceId) {
+          const loopItems = await getLoopProducts();
+          const loopItem = loopItems.find((product) => product.externalId === priceId);
+
+          if (!loopItem) {
+            log.warn(
+              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId} and space ${spaceId}`
+            );
+            break;
+          }
+
+          const loopUrl = loopItem.url
+            ? `${loopItem.url}?cartEnabled=false&email=${email}&sub=${subscriptionId}`
+            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
+
+          await stripeClient.subscriptions.update(subscriptionId, {
+            metadata: {
+              ...(stripeSubscription.metadata || {}),
+              loopCheckout: loopUrl
+            }
+          });
+
+          log.info(`Loop checkout url was succesfully added in stripe metadata for the space ${spaceId}`);
+        }
+
+        break;
+      }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
