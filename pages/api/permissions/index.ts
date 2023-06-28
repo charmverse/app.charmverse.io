@@ -21,7 +21,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  //  .use(requireSpaceMembership)
   .get(
     requirePaidPermissionsSubscription({ key: 'pageId', location: 'query', resourceIdType: 'page' }),
     findPagePermissions

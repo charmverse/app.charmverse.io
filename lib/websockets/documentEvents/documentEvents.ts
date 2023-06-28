@@ -40,6 +40,7 @@ type DocumentRoom = {
   participants: Map<string, DocumentEventHandler>;
   doc: {
     id: string;
+    spaceId: string;
     version: number;
     content: any;
     type: string;
@@ -82,6 +83,7 @@ export class DocumentEventHandler {
       socketId: this.id,
       userId: session.user?.id,
       pageId: session.documentId,
+      spaceId: docRoom?.doc.spaceId,
       pageVersion: docRoom?.doc.version,
       serverMessages: this.messages.server,
       clientMessages: this.messages.client
@@ -302,6 +304,7 @@ export class DocumentEventHandler {
         const room: DocumentRoom = {
           doc: {
             id: page.id,
+            spaceId: page.spaceId,
             content,
             type: page.type,
             galleryImage: page.galleryImage,
@@ -380,8 +383,13 @@ export class DocumentEventHandler {
   // We need to filter out marks from the suggested-tooltip plugin (supports mentions, slash command, etc). This way the tooltip doesn't show up for others.
   // (Not sure this is the best fix, but it's the only way I could think of for now)
   removeTooltipMarks(diff: ProsemirrorJSONStep) {
-    if (diff.slice?.content?.[0]?.marks?.length) {
-      diff.slice.content[0].marks = diff.slice.content[0].marks.filter((mark) => !mark.attrs?.trigger);
+    const content = diff.slice?.content;
+    if (content) {
+      for (const node of content) {
+        if (node.marks?.length) {
+          node.marks = node.marks.filter((mark) => !mark.attrs?.trigger);
+        }
+      }
     }
     return diff;
   }
@@ -394,6 +402,7 @@ export class DocumentEventHandler {
       socketId: this.id,
       userId: this.getSession().user.id,
       pageId: room.doc.id,
+      spaceId: room.doc.spaceId,
       v: clientV,
       c: message.c,
       s: message.s,
@@ -424,12 +433,17 @@ export class DocumentEventHandler {
       room.doc.diffs.push(message);
       room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
-      if (room.doc.version % this.docSaveInterval === 0) {
-        await this.saveDocument();
+      try {
+        await this.saveDiff(message);
+        if (room.doc.version % this.docSaveInterval === 0) {
+          await this.saveDocument();
+        }
+        this.confirmDiff(message.rid);
+        this.sendUpdatesToOthers(message);
+      } catch (error) {
+        log.error('Error when saving changes to the db', { error, ...logMeta });
+        this.sendError('There was an error saving your changes! Please refresh and try again.');
       }
-      await this.saveDiff(message);
-      this.confirmDiff(message.rid);
-      this.sendUpdatesToOthers(message);
     } else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
         // We have enough diffs stored to fix it.
@@ -460,7 +474,7 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room?.doc.version;
-    const logData = { clientV, serverV, pageId: room?.doc.id, userId: session.user.id };
+    const logData = { clientV, serverV, pageId: room?.doc.id, spaceId: room?.doc.spaceId, userId: session.user.id };
     log.debug('Check version of document', logData);
     if (clientV === serverV) {
       this.sendMessage({ type: 'confirm_version', v: clientV });
@@ -623,7 +637,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
+    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id, spaceId: room.doc.spaceId });
 
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed

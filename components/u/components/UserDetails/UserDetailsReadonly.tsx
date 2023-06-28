@@ -32,7 +32,7 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
   const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
     return user.profile || (currentUser?.id === user.id && charmClient.getUserDetails());
   });
-  const socialDetails = userDetails?.social as Social | undefined;
+  const socialDetails = (userDetails?.social as Social | undefined) ?? {};
 
   const hideSocials =
     socialDetails?.discordUsername?.length === 0 &&

@@ -2,18 +2,36 @@ import type { SubscriptionPeriod } from 'lib/subscription/constants';
 
 import type { BaseEvent } from './BaseEvent';
 
-export type ViewSubscriptionEvent = BaseEvent;
-export type InitiateSubscriptionEvent = BaseEvent;
+type StripeBaseEvent = BaseEvent & {
+  subscriptionId: string;
+};
 
-export type CheckoutSubscriptionEvent = BaseEvent & {
-  productId: string;
+export type CreateSubscriptionEvent = StripeBaseEvent & {
+  blockQuota: number;
   period: SubscriptionPeriod;
-  tier: 'pro';
-  result: 'success' | 'failure' | 'pending';
+};
+
+export type CancelSubscriptionEvent = StripeBaseEvent & {
+  blockQuota: number;
+};
+
+export type UpdateSubscriptionEvent = StripeBaseEvent & {
+  blockQuota: number;
+  period: SubscriptionPeriod;
+  previousBlockQuota: number;
+  previousPeriod: SubscriptionPeriod;
+};
+
+export type SubscriptionPaymentEvent = StripeBaseEvent & {
+  paymentMethod: 'card' | 'ach' | 'crypto';
+  blockQuota: number;
+  period: SubscriptionPeriod;
+  status: 'success' | 'failure';
 };
 
 export type SubscriptionEventMap = {
-  view_subscription: ViewSubscriptionEvent;
-  initiate_subscription: InitiateSubscriptionEvent;
-  checkout_subscription: CheckoutSubscriptionEvent;
+  create_subscription: CreateSubscriptionEvent;
+  cancel_subscription: CancelSubscriptionEvent;
+  update_subscription: UpdateSubscriptionEvent;
+  subscription_payment: SubscriptionPaymentEvent;
 };

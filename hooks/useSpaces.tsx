@@ -13,7 +13,7 @@ import { useUser } from './useUser';
 type IContext = {
   spaces: Space[];
   memberSpaces: Space[];
-  setSpace: (spaces: Space) => void;
+  setSpace: (space: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
   createNewSpace: (data: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => Promise<Space>;

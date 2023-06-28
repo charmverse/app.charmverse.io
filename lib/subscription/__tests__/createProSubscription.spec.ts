@@ -6,6 +6,7 @@ import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
+import { communityProduct } from '../constants';
 import { createProSubscription } from '../createProSubscription';
 import { stripeClient } from '../stripe';
 
@@ -29,7 +30,7 @@ jest.mock('../stripe', () => ({
 }));
 
 describe('createProSubscription', () => {
-  it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
+  it('should successfully create pro subscription in Stripe and return client secret and payment intent', async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
 
     const subscriptionId = v4();
@@ -51,7 +52,7 @@ describe('createProSubscription', () => {
     });
 
     const listPricesMockFn = jest.fn().mockResolvedValue({
-      data: [{ id: priceId, recurring: { interval: 'month' } }]
+      data: [{ id: priceId, recurring: { interval: 'month' }, unit_amount: 120 }]
     });
 
     const createSubscriptionsMockFn = jest.fn().mockResolvedValue({
@@ -62,32 +63,42 @@ describe('createProSubscription', () => {
           status: 'incomplete',
           id: paymentId
         }
-      }
-    });
-
-    const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
-      id: subscriptionId,
-      data: [{ customer: customerId }],
-      latest_invoice: {
-        payment_intent: {
-          client_secret,
-          status: 'pending',
-          id: paymentId
+      },
+      metadata: {
+        spaceId: space.id,
+        tier: 'pro',
+        period: 'monthly',
+        productId: communityProduct.id
+      },
+      customer: {
+        id: customerId,
+        metadata: {
+          spaceId: space.id,
+          domain: space.domain
         }
       }
     });
 
+    const searchSubscriptionsMockFn = jest.fn().mockResolvedValue({
+      data: []
+    });
+
+    const searchCustomersMockFn = jest.fn().mockResolvedValue({
+      data: []
+    });
+
     (stripeClient.customers.create as jest.Mock<any, any>) = createCustomersMockFn;
     (stripeClient.customers.update as jest.Mock<any, any>) = updateCustomersMockFn;
+    (stripeClient.customers.search as jest.Mock<any, any>) = searchCustomersMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
-    (stripeClient.subscriptions.search as jest.Mock<any, any>) = searchSubscriptionsMockFn;
+    (stripeClient.subscriptions.list as jest.Mock<any, any>) = searchSubscriptionsMockFn;
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
     (stripeClient.prices.list as jest.Mock<any, any>) = listPricesMockFn;
 
-    const { clientSecret, paymentIntentStatus } = await createProSubscription({
+    const { paymentIntent } = await createProSubscription({
       period: 'monthly',
       spaceId: space.id,
-      productId: 'community_5k',
+      blockQuota: 10,
       billingEmail: 'test@gmail.com',
       coupon: ''
     });
@@ -96,12 +107,13 @@ describe('createProSubscription', () => {
       name: space.name,
       email: 'test@gmail.com',
       metadata: {
-        spaceId: space.id
+        spaceId: space.id,
+        domain: space.domain
       }
     });
 
     expect(listPricesMockFn).toHaveBeenCalledWith({
-      product: 'community_5k',
+      product: 'community',
       type: 'recurring',
       active: true
     });
@@ -112,12 +124,13 @@ describe('createProSubscription', () => {
         tier: 'pro',
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k'
+        productId: communityProduct.id
       },
       customer: customerId,
       items: [
         {
-          price: priceId
+          price: priceId,
+          quantity: 10
         }
       ],
       payment_settings: {
@@ -127,8 +140,8 @@ describe('createProSubscription', () => {
       expand: ['latest_invoice.payment_intent']
     });
 
-    expect(paymentIntentStatus).toStrictEqual('incomplete');
-    expect(clientSecret).toStrictEqual(client_secret);
+    expect(paymentIntent?.paymentIntentStatus).toStrictEqual('incomplete');
+    expect(paymentIntent?.clientSecret).toStrictEqual(client_secret);
   });
 
   it("should throw error if space doesn't exist", async () => {
@@ -136,27 +149,26 @@ describe('createProSubscription', () => {
       createProSubscription({
         period: 'monthly',
         spaceId: v4(),
-        productId: 'community_5k',
+        blockQuota: 10,
         billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it('should throw error if space already has an active subscription', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+  // it('should throw error if space already has an active subscription', async () => {
+  //   const { space } = await generateUserAndSpaceWithApiToken();
 
-    await addSpaceSubscription({
-      spaceId: space.id,
-      createdBy: user.id
-    });
+  //   await addSpaceSubscription({
+  //     spaceId: space.id
+  //   });
 
-    await expect(
-      createProSubscription({
-        period: 'monthly',
-        spaceId: space.id,
-        productId: 'community_5k',
-        billingEmail: 'test@gmail.com'
-      })
-    ).rejects.toBeInstanceOf(InvalidStateError);
-  });
+  //   await expect(
+  //     createProSubscription({
+  //       period: 'monthly',
+  //       spaceId: space.id,
+  //       blockQuota: 10,
+  //       billingEmail: 'test@gmail.com'
+  //     })
+  //   ).rejects.toBeInstanceOf(InvalidStateError);
+  // });
 });

@@ -8,6 +8,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import { UserDetailsReadonly } from 'components/u/components/UserDetails/UserDetailsReadonly';
+import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
@@ -34,9 +35,19 @@ export function MemberProfile({
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
   const { memberPropertyValues = [] } = useMemberPropertyValues(member.id);
+  const { getDisplayProperties } = useMemberProperties();
+
+  const visibleProperties = getDisplayProperties('profile');
+
   const currentSpacePropertyValues = memberPropertyValues.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === space?.id
   );
+
+  if (currentSpacePropertyValues?.properties) {
+    currentSpacePropertyValues.properties = currentSpacePropertyValues.properties.filter((propertyValue) => {
+      return visibleProperties.some((prop) => prop.id === propertyValue.memberPropertyId);
+    });
+  }
 
   if (!space) {
     return null;

@@ -1,41 +1,30 @@
-import { ExternalServiceError } from '@charmverse/core/errors';
-
 import { getLoopProducts } from 'lib/loop/loop';
 import { NotFoundError } from 'lib/middleware';
 
 import { loopCheckoutUrl } from './constants';
-import { createProSubscription } from './createProSubscription';
-import type { CreateCryptoSubscriptionResponse, CreateSubscriptionRequest } from './interfaces';
+import type { CreateCryptoSubscriptionRequest, CreateCryptoSubscriptionResponse } from './interfaces';
+import { stripeClient } from './stripe';
 
 export async function createCryptoSubscription({
-  spaceId,
-  period,
-  productId,
-  billingEmail,
-  name,
-  address,
-  coupon = ''
-}: {
-  spaceId: string;
-} & CreateSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
-  const subscriptionData = await createProSubscription({
-    spaceId,
-    period,
-    productId,
-    billingEmail,
-    name,
-    address,
-    coupon
+  subscriptionId,
+  email
+}: CreateCryptoSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
+  const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+
+  const priceId = subscription.items.data[0].price.id;
+
+  await stripeClient.customers.update(subscription.customer as string, {
+    email
   });
 
   const loopItems = await getLoopProducts();
-  const loopItem = loopItems.find((product) => product.externalId === subscriptionData?.priceId);
+  const loopItem = loopItems.find((product) => product.externalId === priceId);
 
   if (!loopItem) {
     throw new NotFoundError('Loop item not found');
   }
 
   return loopItem.url
-    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${billingEmail}&sub=${subscriptionData.subscriptionId}`
-    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${billingEmail}&sub=${subscriptionData.subscriptionId}`;
+    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${email}&sub=${subscriptionId}`
+    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
 }

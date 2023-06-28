@@ -349,6 +349,10 @@ export function getAppUrl() {
     return '';
   }
 
+  if (isLocalhostAlias()) {
+    return new URL(window.location.origin);
+  }
+
   const appDomain = getAppApexDomain();
 
   if (appDomain) {

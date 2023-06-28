@@ -54,14 +54,14 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
   }
 
   useEffect(() => {
-    if (typeof router.query.bountyId === 'string') {
+    if (router.isReady && typeof router.query.bountyId === 'string') {
       showPage({
         bountyId: router.query.bountyId,
         readOnly: publicMode,
         onClose
       });
     }
-  }, [router.query.bountyId]);
+  }, [router.isReady, router.query.bountyId]);
 
   return (
     <div className='Kanban'>

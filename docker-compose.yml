@@ -39,6 +39,8 @@ services:
         '-c',
         'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
+    # environment:
+    #   - FORCE_SUBDOMAINS=true
     profiles:
       - prd-webapp
 

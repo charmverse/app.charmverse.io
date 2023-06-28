@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
 import type { SyntheticEvent } from 'react';
 
 export type PaymentType = 'card' | 'crypto';
@@ -10,6 +10,15 @@ interface TabPanelProps extends BoxProps {
   index: PaymentType;
   value: PaymentType;
 }
+
+export const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  '& .MuiToggleButton-root': {
+    borderColor: theme.palette.primary.main,
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main
+    }
+  }
+}));
 
 export function PaymentTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -28,14 +37,6 @@ export function PaymentTabPanel(props: TabPanelProps) {
   );
 }
 
-function a11yProps(index: PaymentType) {
-  return {
-    id: `payment-tab-${index}`,
-    'aria-controls': `payment-tabpanel-${index}`,
-    value: index
-  };
-}
-
 export default function PaymentTabs({
   value,
   onChange
@@ -44,18 +45,18 @@ export default function PaymentTabs({
   onChange: (_event: SyntheticEvent, newValue: PaymentType) => void;
 }) {
   return (
-    <Tabs
+    <StyledToggleButtonGroup
+      exclusive
       value={value}
       onChange={onChange}
       aria-label='payment options for monthly or annual subscription'
-      sx={{
-        '& > div': {
-          flex: '0 0 auto'
-        }
-      }}
     >
-      <Tab label='Card' {...a11yProps('card')} />
-      <Tab label='Crypto' {...a11yProps('crypto')} />
-    </Tabs>
+      <ToggleButton value='card' aria-label='card'>
+        Card
+      </ToggleButton>
+      <ToggleButton value='crypto' aria-label='crypto'>
+        Crypto
+      </ToggleButton>
+    </StyledToggleButtonGroup>
   );
 }

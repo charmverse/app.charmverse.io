@@ -2,9 +2,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
-  PagePermissionFlags,
-  PagePermissionWithSource,
-  PermissionCompute
+  PagePermissionWithSource
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -37,7 +35,7 @@ import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -121,7 +119,7 @@ class CharmClient {
   subscription = new SubscriptionApi();
 
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
@@ -244,7 +242,7 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.PUT<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
@@ -422,7 +420,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
