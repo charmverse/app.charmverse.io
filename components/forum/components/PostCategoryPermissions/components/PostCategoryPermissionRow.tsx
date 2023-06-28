@@ -61,8 +61,9 @@ export function PostCategoryRolePermissionRow({
   }
 
   const assigneeName = useMemo(() => {
+    if (label) return label;
     return assignee.group === 'space' ? `Default permissions` : roles?.find((r) => r.id === assignee.id)?.name;
-  }, [roles, space]);
+  }, [label, roles, space]);
 
   function handleUpdate(level: keyof typeof friendlyLabels) {
     if (level === 'delete' && existingPermissionId) {
@@ -73,7 +74,7 @@ export function PostCategoryRolePermissionRow({
   }
 
   const tooltip = !canEdit
-    ? disabledTooltip || 'You do not have permission to edit this permission'
+    ? disabledTooltip || 'You cannot edit permissions for this category'
     : usingDefault
     ? 'Default setting'
     : '';

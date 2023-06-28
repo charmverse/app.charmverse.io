@@ -9,6 +9,7 @@ import { getLoopProducts } from 'lib/loop/loop';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
+import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
@@ -146,6 +147,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           })
         ]);
 
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+
         if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
           // The subscription automatically activates after successful payment
           // Set the payment method used to pay the first invoice
@@ -184,20 +187,36 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               }
             });
           }
+
+          trackUserAction('create_subscription', {
+            blockQuota,
+            period,
+            spaceId,
+            userId: space.createdBy,
+            subscriptionId: stripeSubscription.id
+          });
+        }
+
+        if (invoice.charge) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'success',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
+            userId: space.createdBy
+          });
         }
 
         log.info(
           `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
         );
-
-        trackUserAction('checkout_subscription', {
-          userId: space.updatedBy,
-          spaceId,
-          productId,
-          period,
-          tier: stripeSubscription.metadata.tier as SubscriptionTier,
-          result: 'success'
-        });
 
         relay.broadcast(
           {
@@ -226,14 +245,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             space: {
               select: {
                 id: true,
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
         });
 
         if (!spaceSubscription) {
-          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`);
+          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`, {
+            spaceId,
+            subscriptionId: subscription.id
+          });
           break;
         }
 
@@ -257,6 +280,19 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               data: {
                 paidTier: 'cancelled'
               }
+            });
+          }
+        } else {
+          const activeSubscription = await getActiveSpaceSubscription({ spaceId });
+          if (activeSubscription) {
+            trackUserAction('update_subscription', {
+              blockQuota: subscription.items.data[0].quantity as number,
+              period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
+              previousBlockQuota: activeSubscription.blockQuota,
+              previousPeriod: activeSubscription.period,
+              subscriptionId: activeSubscription.id,
+              spaceId,
+              userId: space.createdBy
             });
           }
         }
@@ -352,7 +388,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           select: {
             space: {
               select: {
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
@@ -366,6 +403,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             data: {
               paidTier: 'cancelled'
             }
+          });
+
+          trackUserAction('cancel_subscription', {
+            blockQuota: subscription.items.data[0].quantity as number,
+            subscriptionId: subscription.id,
+            spaceId,
+            userId: afterUpdate.space.createdBy
           });
         }
 
@@ -382,6 +426,61 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+        const period = stripeSubscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual';
+        const customerId = invoice.customer;
+        const paymentMethodId = invoice.default_payment_method;
+        const amountDue = invoice.amount_due;
+
+        const space = await prisma.space.findUnique({
+          where: {
+            id: spaceId
+          },
+          select: {
+            createdBy: true
+          }
+        });
+
+        if (invoice.charge && space) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'failure',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
+            userId: space.createdBy
+          });
+        }
+
+        const lastFinalizationError = invoice.last_finalization_error;
+        log.warn(`Invoice payment failed for invoice ${invoice.id} for the subscription ${stripeSubscription.id}`, {
+          spaceId,
+          blockQuota,
+          period,
+          customerId,
+          paymentMethodId,
+          amountDue,
+          invoiceId: invoice.id,
+          subscriptionId,
+          message: lastFinalizationError?.message,
+          code: lastFinalizationError?.code,
+          type: lastFinalizationError?.type
+        });
+        break;
+      }
+
       default: {
         log.debug(`Unhandled event type in stripe webhook: ${event.type}`);
         break;
