@@ -50,23 +50,27 @@ export function NftsList({ userId, readOnly = false }: Props) {
           <LoadingComponent isLoading />
         ) : (
           <Stack gap={2} display='flex' flexDirection='row'>
-            {pinnedNfts
-              .sort((nft1, nft2) => (nft1.title > nft2.title ? 1 : -1))
-              .map((nft) => {
-                const nftData = transformNft(nft);
-                return (
-                  <ProfileItemContainer key={nft.id}>
-                    {!readOnly && (
-                      <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
-                    )}
-                    <Tooltip title={nftData.title}>
-                      <Link href={nftData.link} target='_blank' display='flex'>
-                        <Avatar size='large' isNft avatar={nftData.image} />
-                      </Link>
-                    </Tooltip>
-                  </ProfileItemContainer>
-                );
-              })}
+            {pinnedNfts.length === 0 ? (
+              <Typography color='secondary'>No pinned NFTs</Typography>
+            ) : (
+              pinnedNfts
+                .sort((nft1, nft2) => (nft1.title > nft2.title ? 1 : -1))
+                .map((nft) => {
+                  const nftData = transformNft(nft);
+                  return (
+                    <ProfileItemContainer key={nft.id}>
+                      {!readOnly && (
+                        <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
+                      )}
+                      <Tooltip title={nftData.title}>
+                        <Link href={nftData.link} target='_blank' display='flex'>
+                          <Avatar size='large' isNft avatar={nftData.image} />
+                        </Link>
+                      </Tooltip>
+                    </ProfileItemContainer>
+                  );
+                })
+            )}
             {currentUser?.id === userId && emptyNftsCount !== 0 ? (
               <Tooltip title='Add upto 5 NFTs'>
                 <div>

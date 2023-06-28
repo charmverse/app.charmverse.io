@@ -8,7 +8,8 @@ import { ProfileWidget } from './ProfileWidget';
 
 export function SpaceMemberPropertyWidget({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
-  const { memberPropertyValues = [] } = useMemberPropertyValues(userId);
+  const { memberPropertyValues } = useMemberPropertyValues(userId);
+
   const { getDisplayProperties } = useMemberProperties();
 
   const visibleProperties = getDisplayProperties('profile');
@@ -17,7 +18,7 @@ export function SpaceMemberPropertyWidget({ userId }: { userId: string }) {
     return null;
   }
 
-  const currentSpacePropertyValues = memberPropertyValues.find(
+  const currentSpacePropertyValues = memberPropertyValues?.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === space?.id
   );
 

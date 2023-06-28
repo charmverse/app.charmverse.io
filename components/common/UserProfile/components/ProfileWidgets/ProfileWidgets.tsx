@@ -5,7 +5,7 @@ import { SocialWidget } from './SocialWidget';
 import { SpaceMemberPropertyWidget } from './SpaceMemberPropertyWidget';
 
 export function ProfileWidgets({ userId }: { userId: string }) {
-  const profileComponents = ['collection', 'ens', 'social', 'charmverse', 'lens'] as const;
+  const profileComponents = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
 
   return (
     <Grid container spacing={4}>
