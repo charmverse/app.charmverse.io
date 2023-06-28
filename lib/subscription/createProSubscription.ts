@@ -55,7 +55,7 @@ export async function createProSubscription({
 
   const stripeSubscriptions = await stripeClient.subscriptions.list({
     status: 'incomplete',
-    customer: existingCustomer.data?.[0]?.id || 'customer'
+    customer: existingCustomer.data?.[0]?.id || 'customer' // if we don't have a customer I added a dummy name so the array returned will be empty
   });
 
   const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscriptions.data?.find(
