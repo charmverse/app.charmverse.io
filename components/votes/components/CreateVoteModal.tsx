@@ -214,6 +214,8 @@ export function CreateVoteModal({
                 minHeight: 75,
                 backgroundColor: 'var(--input-bg)'
               }}
+              isPollOrVote
+              colorMode='dark'
               placeholderText='Details (Optional)'
               content={voteContent.content as PageContent}
               enableVoting={false}
