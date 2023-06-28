@@ -5,8 +5,9 @@ inputs:
     description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
     required: false
   commit_core_pkg_upgrade:
-    required: false
     type: boolean
+    description: 'Once updated core whether to commit the changed package.json'
+    required: false
     default: false
 
 runs:
