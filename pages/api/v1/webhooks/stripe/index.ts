@@ -146,9 +146,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           // Set the payment method used to pay the first invoice
           // as the default payment method for that subscription
 
-          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string, {
-            expand: ['latest_invoice']
-          });
+          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string);
 
           if (typeof paymentIntent.payment_method === 'string') {
             await stripeClient.subscriptions.update(invoice.subscription as string, {

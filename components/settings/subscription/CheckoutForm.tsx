@@ -270,25 +270,16 @@ export function CheckoutForm({
                 {...registerCoupon}
                 error={!!errors.coupon}
                 InputProps={{
-                  ...(subscription.coupon
-                    ? {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton onClick={() => handleCoupon(undefined)}>
-                              <CloseIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }
-                    : {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton onClick={() => handleCoupon(couponField)} disabled={!couponField}>
-                              <SendIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      })
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton
+                        onClick={subscription?.coupon ? undefined : () => handleCoupon(couponField)}
+                        disabled={!!(subscription?.coupon || !couponField)}
+                      >
+                        <SendIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
                 }}
               />
             </Stack>
