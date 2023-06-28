@@ -5,8 +5,9 @@ inputs:
     description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
     required: false
   commit_core_pkg_upgrade:
-    required: false
     type: boolean
+    description: 'Whether commit the update to core package back to branch'
+    required: false
     default: false
 
 runs:
@@ -46,7 +47,7 @@ runs:
         npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
     - name: Commit package and lock file back into repo
-      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         file_pattern: 'package*.json'
