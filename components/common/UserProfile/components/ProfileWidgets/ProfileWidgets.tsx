@@ -1,6 +1,7 @@
 import { Grid } from '@mui/material';
 
-import { CollectionProfileWidget } from './CollectionProfileWidget';
+import { CollectionWidget } from './CollectionWidget';
+import { SocialWidget } from './SocialWidget';
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const profileComponents = ['collection', 'ens', 'social', 'charmverse', 'lens'];
@@ -10,11 +11,15 @@ export function ProfileWidgets({ userId }: { userId: string }) {
       {profileComponents.map((profileComponent) => {
         switch (profileComponent) {
           case 'collection':
-          case 'ens':
+            return (
+              <Grid item xs={12} md={6}>
+                <CollectionWidget userId={userId} />
+              </Grid>
+            );
           case 'social':
             return (
               <Grid item xs={12} md={6}>
-                <CollectionProfileWidget userId={userId} />
+                <SocialWidget userId={userId} />
               </Grid>
             );
           default:

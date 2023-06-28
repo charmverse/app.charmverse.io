@@ -1,10 +1,6 @@
 import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
 
-import { NftsList } from '../NftsList';
-import { PoapsList } from '../PoapsList';
-
-export function CollectionProfileWidget({ userId }: { userId: string }) {
+export function ProfileWidget({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Card>
       <CardHeader
@@ -13,7 +9,7 @@ export function CollectionProfileWidget({ userId }: { userId: string }) {
         }}
         title={
           <Typography variant='h6' fontWeight={700}>
-            Collection
+            {title}
           </Typography>
         }
       />
@@ -27,10 +23,7 @@ export function CollectionProfileWidget({ userId }: { userId: string }) {
             mb: 1
           }}
         />
-        <Stack spacing={2}>
-          <NftsList userId={userId} readOnly />
-          <PoapsList userId={userId} />
-        </Stack>
+        {children}
       </CardContent>
     </Card>
   );
