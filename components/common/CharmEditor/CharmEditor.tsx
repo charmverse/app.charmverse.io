@@ -121,8 +121,10 @@ export function charmEditorPlugins({
   pageId = null,
   spaceId = null,
   placeholderText,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableMention = false
 }: {
+  disableMention?: boolean;
   disableRowHandles?: boolean;
   spaceId?: string | null;
   pageId?: string | null;
@@ -171,10 +173,20 @@ export function charmEditorPlugins({
     }),
     imagePlugins({
       handleDragAndDrop: false
-    }),
-    mentionPlugins({
-      key: mentionPluginKey
-    }),
+    })
+  ];
+
+  // Breaking the array in order to make sure the plugins order is correct
+
+  if (!disableMention) {
+    basePlugins.push(
+      mentionPlugins({
+        key: mentionPluginKey
+      })
+    );
+  }
+
+  basePlugins.push(
     inlinePalettePlugins({ key: inlinePalettePluginKey }),
     bold.plugins(),
     bulletList.plugins(),
@@ -191,7 +203,7 @@ export function charmEditorPlugins({
     columnLayout.plugins(),
     paragraph.plugins(),
     strike.plugins(),
-    underline.plugins(),
+    underline.plugins() as RawPlugins,
     emoji.plugins({
       key: emojiPluginKey
     }),
@@ -253,7 +265,7 @@ export function charmEditorPlugins({
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText)
-  ];
+  );
 
   if (!readOnly && !disableRowHandles) {
     basePlugins.push(
@@ -396,6 +408,7 @@ interface CharmEditorProps {
   disableNestedPages?: boolean;
   onConnectionError?: (error: Error) => void;
   isPollOrVote?: boolean;
+  disableMention?: boolean;
 }
 
 function CharmEditor({
@@ -423,7 +436,8 @@ function CharmEditor({
   disableRowHandles = false,
   disableNestedPages = false,
   onConnectionError,
-  isPollOrVote = false
+  isPollOrVote = false,
+  disableMention = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -521,7 +535,8 @@ function CharmEditor({
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      disableMention
     });
   }
 
@@ -654,7 +669,7 @@ function CharmEditor({
             return <iframe.Component {...allProps} />;
           }
           case 'mention': {
-            return <Mention {...props}>{_children}</Mention>;
+            return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
             return <NestedPage currentPageId={pageId} {...props} />;
@@ -703,7 +718,7 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
-      <MentionSuggest pluginKey={mentionPluginKey} />
+      {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
