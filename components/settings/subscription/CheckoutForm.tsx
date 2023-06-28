@@ -32,7 +32,8 @@ export function CheckoutForm({
   blockQuota,
   subscription,
   emailField,
-  couponField
+  couponField,
+  validating
 }: {
   emailField: string;
   couponField: string;
@@ -44,26 +45,13 @@ export function CheckoutForm({
     email: string;
     coupon: string;
   }>;
+  validating: boolean;
   registerCoupon: UseFormRegisterReturn<'coupon'>;
   onCancel: VoidFunction;
   handleCoupon: (coupon: string | undefined) => Promise<void>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
-
-  // const {
-  //   register,
-  //   getValues,
-  //   watch,
-  //   formState: { errors }
-  // } = useForm<{ email: string; coupon: string }>({
-  //   mode: 'onChange',
-  //   defaultValues: {
-  //     email: subscription.email || '',
-  //     coupon: subscription.coupon || ''
-  //   },
-  //   resolver: yupResolver(schema())
-  // });
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', {
@@ -222,7 +210,6 @@ export function CheckoutForm({
         email: emailField
       }
     });
-    setPendingPayment(true);
   };
 
   const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
@@ -273,10 +260,10 @@ export function CheckoutForm({
                   endAdornment: (
                     <InputAdornment position='end'>
                       <IconButton
-                        onClick={subscription?.coupon ? undefined : () => handleCoupon(couponField)}
-                        disabled={!!(subscription?.coupon || !couponField)}
+                        onClick={() => (subscription?.coupon ? handleCoupon(undefined) : handleCoupon(couponField))}
+                        disabled={(subscription?.coupon ? false : !couponField) || validating}
                       >
-                        <SendIcon />
+                        {subscription?.coupon ? <CloseIcon /> : <SendIcon />}
                       </IconButton>
                     </InputAdornment>
                   )

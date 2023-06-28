@@ -43,7 +43,7 @@ export class SubscriptionApi {
   }
 
   validateDiscount(spaceId: string, payload: { coupon: string }) {
-    return http.POST<ValidatedCoupon>(`/api/spaces/${spaceId}/validate-discount`, payload);
+    return http.POST<void>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
 
   upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {
