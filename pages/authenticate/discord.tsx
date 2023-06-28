@@ -3,14 +3,10 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import getLayout from 'components/common/BaseLayout/BaseLayout';
-import ErrorPage from 'components/common/errors/ErrorPage';
 import { LoginPageContent } from 'components/login';
 import type { PopupLoginState } from 'hooks/usePopupLogin';
 
 export default function Oauth() {
-  const router = useRouter();
-  const { error } = router.query;
-
   useEffect(() => {
     const listener = (event: MessageEvent<any>) => {
       if (event.source && event.origin) {
@@ -28,10 +24,6 @@ export default function Oauth() {
 
     return () => window.removeEventListener('message', listener);
   }, []);
-
-  if (error) {
-    return <ErrorPage message='Failed to login with discord'></ErrorPage>;
-  }
 
   return getLayout(
     <Box height='100%' display='flex' flexDirection='column'>
