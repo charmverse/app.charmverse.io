@@ -1,11 +1,11 @@
-import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import log from 'loglevel';
 import type { Stripe } from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
+import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
+import { getCommunityPrice } from './getProductPrice';
 import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
@@ -16,7 +16,7 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon = '',
+  coupon,
   freeTrial
 }: {
   spaceId: string;
@@ -29,45 +29,43 @@ export async function createProSubscription({
       name: true
     }
   });
-
   const productId = communityProduct.id;
 
   if (!space) {
     throw new NotFoundError('Space not found');
   }
 
-  const spaceSubscription = await prisma.stripeSubscription.findFirst({
-    where: {
-      spaceId,
-      deletedAt: null
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
+  const spaceSubscriptionWithDetails = await getActiveSpaceSubscription({ spaceId });
 
-  if (spaceSubscription) {
-    throw new InvalidStateError(`Space already has an active subscription with the id ${spaceSubscription.id}`);
+  if (freeTrial && spaceSubscriptionWithDetails?.status === 'free_trial') {
+    throw new InvalidStateError(
+      `Space already has an active free trial with the id ${spaceSubscriptionWithDetails.id}`
+    );
   }
 
-  const pendingStripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}' AND status:"incomplete"`,
-    expand: ['data.customer']
+  if (spaceSubscriptionWithDetails?.status === 'active') {
+    throw new InvalidStateError(
+      `Space already has an active subscription with the id ${spaceSubscriptionWithDetails.id}`
+    );
+  }
+
+  const existingCustomer = await stripeClient.customers.search({
+    query: `metadata['spaceId']:'${spaceId}'`
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.find(
-    (sub) =>
-      (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
-      (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
-  );
+  const stripeSubscription = await stripeClient.subscriptions.search({
+    query: `metadata['spaceId']:'${spaceId}' AND status:'incomplete'`
+  });
 
-  const existingStripeCustomer = existingStripeSubscription?.customer as Stripe.Customer | undefined;
+  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.[0];
+
+  const existingStripeCustomer = existingCustomer?.data.find((cus) => !cus.deleted);
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
-        spaceId: space.id,
+        spaceId,
         domain: space.domain
       } as StripeMetadataKeys,
       name: name || space.name,
@@ -80,7 +78,7 @@ export async function createProSubscription({
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
-        spaceId: space.id,
+        spaceId,
         domain: space.domain
       } as StripeMetadataKeys,
       address,
@@ -88,27 +86,8 @@ export async function createProSubscription({
       email: billingEmail
     }));
 
-  const stripePeriod = period === 'monthly' ? 'month' : 'year';
-
   // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
-  const { data: prices } = await stripeClient.prices.list({
-    product: productId,
-    type: 'recurring',
-    active: true
-  });
-
-  if (prices?.length === 0) {
-    throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
-  }
-
-  const productPrice = prices.find(
-    (price) =>
-      price.recurring?.interval === stripePeriod && (price.unit_amount || 0) / 100 === communityProduct.pricing[period]
-  );
-
-  if (!productPrice) {
-    throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
-  }
+  const productPrice = await getCommunityPrice(productId, period, spaceId);
 
   // Case when the user is updating his subscription in checkout
   if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
@@ -120,7 +99,7 @@ export async function createProSubscription({
       productId,
       period,
       tier: 'pro',
-      spaceId: space.id
+      spaceId
     },
     trial_period_days: freeTrial ? communityProduct.trial : undefined,
     customer: customer.id,
@@ -134,12 +113,21 @@ export async function createProSubscription({
     payment_settings: {
       save_default_payment_method: 'on_subscription'
     },
+    // This ensures the subscription will expire after the trial and is not accidentally billed
+    trial_settings: freeTrial
+      ? {
+          end_behavior: {
+            missing_payment_method: 'cancel'
+          }
+        }
+      : undefined,
     payment_behavior: 'default_incomplete',
     expand: ['latest_invoice.payment_intent']
   });
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
+  const discountCoupon = invoice.discount?.coupon?.id;
 
   return {
     subscriptionId: subscription.id,
@@ -148,8 +136,17 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent?.id,
-    paymentIntentStatus: paymentIntent?.status,
-    clientSecret: paymentIntent?.client_secret
+    email: customer.email || undefined,
+    paymentIntent: paymentIntent
+      ? {
+          subscriptionId: subscription.id,
+          paymentIntentId: paymentIntent.id,
+          paymentIntentStatus: paymentIntent.status,
+          clientSecret: paymentIntent.client_secret as string,
+          subTotalPrice: ((subscription.latest_invoice as Stripe.Invoice).subtotal || 0) / 100,
+          totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100,
+          coupon: discountCoupon
+        }
+      : undefined
   };
 }
