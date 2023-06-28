@@ -11,6 +11,9 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'api', 'subscription'] as const;
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
+
+export const premiumSettingSections: Extract<SpaceSettingsSection, 'roles'>[] = ['roles'];
+
 type SettingsTab<T extends string> = {
   icon: JSX.Element;
   path: T;
@@ -28,10 +31,10 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
 ];
 
-export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
-  return SETTINGS_TABS.filter((settingsTab) =>
-    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') || space.paidTier === 'free' : true
-  );
+export function getSettingsTabs({ isAdmin, space }: { space: Space; isAdmin: boolean }): SpaceSettingsTab[] {
+  return SETTINGS_TABS.filter((tab) => {
+    return tab.path === 'subscription' ? !!isAdmin && space.domain.startsWith('cvt-') : true;
+  });
 }
 
 export const accountSettingsSections = ['account', 'profile'] as const;

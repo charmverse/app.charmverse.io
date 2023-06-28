@@ -1,15 +1,19 @@
-import type { Space, Role } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Card, CircularProgress, Divider, Menu, Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { scrollIntoView } from 'lib/utilities/browser';
+
+import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
 
 import { AdminRoleRow } from './components/AdminRoleRow';
 import type { CreateRoleInput } from './components/CreateRoleForm';
@@ -19,6 +23,7 @@ import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem'
 import { MemberRoleRow } from './components/MemberRoleRow';
 import { DefaultPagePermissions } from './components/RolePermissions/components/DefaultPagePermissions';
 import { RoleRow } from './components/RoleRow';
+import { CustomRolesInfoModal } from './CustomRolesInfoModal';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 const formAnchorId = 'new-role-form-anchor';
@@ -26,6 +31,8 @@ const formAnchorId = 'new-role-form-anchor';
 export function RoleSettings({ space }: { space: Space }) {
   const { assignRoles, createRole, deleteRole, refreshRoles, roles } = useRoles();
   const isAdmin = useIsAdmin();
+  const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'roles-info-popup' });
+  const { isFreeSpace } = useIsFreeSpace();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
   const { mutateMembers } = useMembers();
@@ -64,23 +71,31 @@ export function RoleSettings({ space }: { space: Space }) {
       <DefaultPagePermissions />
       <Divider sx={{ my: 2 }} />
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
-        Roles
+        <Box gap={2} display='flex' justifyContent='space-between'>
+          Roles
+          <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
+        </Box>
+
         {isAdmin && (
           <Box component='span' display='flex' gap={1}>
-            <Button
-              onClick={() => {
-                setAnchorEl(buttonRef?.current);
-              }}
-              ref={buttonRef}
-              variant='outlined'
-              endIcon={<KeyboardArrowDownIcon />}
-              disabled={isValidating}
-            >
-              Import roles
-            </Button>
-            <Button onClick={showCreateRoleForm} disabled={isValidating}>
-              Add a role
-            </Button>
+            <UpgradeWrapper upgradeContext='custom_roles' onClick={rolesInfoPopup.open}>
+              <Button
+                onClick={() => {
+                  setAnchorEl(buttonRef?.current);
+                }}
+                ref={buttonRef}
+                variant='outlined'
+                endIcon={<KeyboardArrowDownIcon />}
+                disabled={isValidating || isFreeSpace}
+              >
+                Import roles
+              </Button>
+            </UpgradeWrapper>
+            <UpgradeWrapper upgradeContext='custom_roles' onClick={rolesInfoPopup.open}>
+              <Button onClick={showCreateRoleForm} disabled={isValidating || isFreeSpace}>
+                Add a role
+              </Button>
+            </UpgradeWrapper>
           </Box>
         )}
       </Legend>
@@ -90,23 +105,27 @@ export function RoleSettings({ space }: { space: Space }) {
       </Typography>
       <MemberRoleRow readOnly={!isAdmin} spaceId={space.id} />
       <AdminRoleRow readOnly={!isAdmin} />
-      <GuestRoleRow readOnly={!isAdmin} />
+      <GuestRoleRow readOnly={!isAdmin || isFreeSpace} />
       <Divider sx={{ my: 2 }} />
-      <Typography variant='body2' fontWeight='bold' color='secondary'>
+
+      <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
         Custom roles
+        <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
       </Typography>
+
       <Typography variant='caption'>Custom role permissions override Default.</Typography>
-      {roles?.map((role) => (
-        <RoleRow
-          readOnly={!isAdmin}
-          assignRoles={assignRoles}
-          deleteRole={deleteRole}
-          refreshRoles={refreshRoles}
-          role={role}
-          key={role.id}
-        />
-      ))}
-      {roles?.length === 0 && !isCreateFormVisible && (
+      {!isFreeSpace &&
+        roles?.map((role) => (
+          <RoleRow
+            readOnly={!isAdmin}
+            assignRoles={assignRoles}
+            deleteRole={deleteRole}
+            refreshRoles={refreshRoles}
+            role={role}
+            key={role.id}
+          />
+        ))}
+      {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (
         <Box p={3} mt={2} sx={{ border: '1px solid var(--input-border)', textAlign: 'center' }}>
           <Typography sx={{ mb: 2 }} variant='body2' color='secondary'>
             No roles have been created yet.
@@ -136,6 +155,8 @@ export function RoleSettings({ space }: { space: Space }) {
         <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
+
+      <CustomRolesInfoModal onClose={rolesInfoPopup.close} isOpen={rolesInfoPopup.isOpen} />
     </>
   );
 }

@@ -36,8 +36,9 @@ interface TabPanelProps extends BoxProps {
 
 function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
+  const isAdmin = useIsAdmin();
 
-  const settingsTab = getSettingsTabs(space).find((settingTab) => settingTab.path === tab.path);
+  const settingsTab = getSettingsTabs({ space, isAdmin }).find((settingTab) => settingTab.path === tab.path);
   const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
 
   if (!settingsTab && !accountsTab) {
@@ -150,18 +151,17 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs(currentSpace)
-              .filter((item) => (item.path === 'subscription' ? isAdmin : true))
-              .map((tab) => (
-                <SidebarLink
-                  data-test={`space-settings-tab-${tab.path}`}
-                  key={tab.path}
-                  label={tab.label}
-                  icon={tab.icon}
-                  onClick={() => onClick(tab.path)}
-                  active={activePath === tab.path}
-                />
-              ))}
+            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
+              <SidebarLink
+                data-test={`space-settings-tab-${tab.path}`}
+                key={tab.path}
+                label={tab.label}
+                icon={tab.icon}
+                onClick={() => onClick(tab.path)}
+                active={activePath === tab.path}
+                section={tab.path}
+              />
+            ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (
@@ -185,7 +185,7 @@ export function SpaceSettingsDialog() {
             </Box>
           )}
           {currentSpace &&
-            getSettingsTabs(currentSpace).map((tab) => (
+            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
               <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>

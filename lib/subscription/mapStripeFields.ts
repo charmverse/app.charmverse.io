@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+
 import { log } from '@charmverse/core/log';
 import type Stripe from 'stripe';
 
@@ -36,12 +37,13 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
       return 'pending';
   }
 }
-export type PaymentMethodType = 'card' | 'ach';
 
-export type PaymentMethod = {
+export type PaymentMethodWithUpdateUrl = {
   id: string;
-  type: PaymentMethodType;
-  digits: string;
+  type: Stripe.PaymentMethod.Type;
+  digits?: string;
+  brand?: string;
+  updateUrl?: string;
 };
 
 /**
@@ -59,7 +61,8 @@ export type SubscriptionFieldsFromStripe = {
   billingEmail?: string | null;
   expiresOn?: Date | null;
   renewalDate?: Date | null;
-  paymentMethod?: PaymentMethod | null;
+  paymentMethod?: PaymentMethodWithUpdateUrl | null;
+  coupon?: string;
 };
 export function mapStripeFields({
   subscription,
@@ -78,6 +81,18 @@ export function mapStripeFields({
       customerId: subscription.customer.id
     });
   }
+  const paymentDetails = subscription.default_payment_method as Stripe.PaymentMethod | null;
+  const paymentType = paymentDetails?.type;
+  const paymentCard = paymentDetails?.card?.brand ?? paymentDetails?.us_bank_account?.bank_name;
+  const last4 = paymentDetails?.card?.last4 ?? paymentDetails?.us_bank_account?.last4;
+  const paymentMethod = paymentDetails
+    ? ({
+        id: paymentDetails.id,
+        brand: paymentCard,
+        digits: last4,
+        type: paymentType
+      } as PaymentMethodWithUpdateUrl)
+    : null;
 
   const status = mapStripeStatus(subscription);
   const expiryDate =
@@ -92,7 +107,7 @@ export function mapStripeFields({
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
     blockQuota,
     status,
-    paymentMethod: null,
+    paymentMethod,
     billingEmail: subscription.customer.email,
     expiresOn: typeof expiryDate === 'number' ? new Date(coerceToMilliseconds(expiryDate)) : null,
     renewalDate: subscription.current_period_end

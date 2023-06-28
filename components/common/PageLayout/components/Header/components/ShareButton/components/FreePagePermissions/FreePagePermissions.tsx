@@ -20,12 +20,12 @@ export default function FreePagePermissions({ pageId }: Props) {
 
   return (
     <Box>
-      <UpgradeWrapper upgradeContext='pagePermissions'>
+      <UpgradeWrapper upgradeContext='page_permissions'>
         <AddPagePermissionsInput />
       </UpgradeWrapper>
 
       <Box display='block' py={0.5}>
-        <UpgradeWrapper upgradeContext='pagePermissions'>
+        <UpgradeWrapper upgradeContext='page_permissions'>
           <ReadonlyPagePermissionRow assignee='Default permissions' value='Editor' />
         </UpgradeWrapper>
       </Box>

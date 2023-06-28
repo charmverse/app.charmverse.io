@@ -5,6 +5,8 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import Tooltip from '@mui/material/Tooltip';
 import { useMemo } from 'react';
 
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useRoles } from 'hooks/useRoles';
 import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -38,6 +40,8 @@ const StyledFormControl = styled(FormControl)`
 export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
   const { roles } = useRoles();
 
+  const { isFreeSpace } = useIsFreeSpace();
+
   const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(
     () =>
       roles
@@ -57,6 +61,14 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
     if (Array.isArray(ev.target.value)) {
       onChange(ev.target.value);
     }
+  }
+
+  if (isFreeSpace) {
+    return (
+      <Box display='flex' justifyContent='center'>
+        <UpgradeChip upgradeContext='custom_roles' />
+      </Box>
+    );
   }
 
   if (roles?.length === 0) {

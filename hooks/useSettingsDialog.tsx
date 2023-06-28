@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
-import type { SETTINGS_TABS, ACCOUNT_TABS } from 'components/settings/config';
+import type { ACCOUNT_TABS } from 'components/settings/config';
+import { SETTINGS_TABS } from 'components/settings/config';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
@@ -50,6 +52,11 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         onClose();
       }
     };
+
+    if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
+      onClick(router.query.settingTab as string);
+      setUrlWithoutRerender(router.pathname, { settingTab: null });
+    }
     // If the user clicks a link inside the modal, close the modal only
     router.events.on('routeChangeStart', close);
 

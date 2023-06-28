@@ -5,9 +5,9 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import type { BulkRolePostCategoryPermissionUpsert } from 'components/forum/hooks/usePostCategoryPermissionsList';
 
-import type { BulkRolePostCategoryPermissionUpsert } from './shared';
-import { forumMemberPermissionOptions } from './shared';
+import { forumMemberPermissionOptions } from '../shared';
 
 type Props = {
   onClose: () => void;

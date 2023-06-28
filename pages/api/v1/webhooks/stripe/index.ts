@@ -7,6 +7,7 @@ import type Stripe from 'stripe';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
+import { communityProduct } from 'lib/subscription/constants';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
@@ -78,10 +79,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = invoice.subscription as string;
         const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
-        const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
+        let paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const productId = subscriptionData?.price?.product as string | undefined;
+
+        if (productId && productId !== communityProduct.id) {
+          const product = await stripeClient.products.retrieve(productId);
+          if (product?.name && product.name.toLowerCase().match('enterprise')) {
+            paidTier = 'enterprise';
+          }
+        }
+
         const customerId = invoice.customer as string;
         const priceInterval = subscriptionData?.price?.recurring?.interval;
 
@@ -124,7 +133,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
             }
           })
         ]);
@@ -134,11 +143,37 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           // Set the payment method used to pay the first invoice
           // as the default payment method for that subscription
 
-          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string);
+          const paymentIntent = await stripeClient.paymentIntents.retrieve(invoice.payment_intent as string, {
+            expand: ['latest_invoice']
+          });
 
           if (typeof paymentIntent.payment_method === 'string') {
             await stripeClient.subscriptions.update(invoice.subscription as string, {
               default_payment_method: paymentIntent.payment_method
+            });
+          }
+          // Make sure we're not triggering any actions for free trials
+          if (invoice.total > 0) {
+            const otherSubscriptions = await stripeClient.subscriptions
+              .list({
+                customer: customerId
+              })
+              // Cancel any subscriptions with an invoice value of 0 - This should cover the free trial case
+              .then((data) => data.data.filter((sub) => sub.id !== invoice.subscription).map((sub) => sub.id));
+
+            for (const sub of otherSubscriptions) {
+              await stripeClient.subscriptions.del(sub);
+            }
+
+            await prisma.stripeSubscription.updateMany({
+              where: {
+                subscriptionId: {
+                  in: otherSubscriptions
+                }
+              },
+              data: {
+                deletedAt: new Date()
+              }
             });
           }
         }
@@ -206,7 +241,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           });
 
-          if (space.paidTier !== 'free') {
+          if (space.paidTier !== 'free' && space.paidTier !== 'enterprise') {
             space = await prisma.space.update({
               where: {
                 id: space.id
@@ -268,7 +303,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
         });
 
-        if (afterUpdate.space.paidTier !== 'free') {
+        if (afterUpdate.space.paidTier !== 'free' && afterUpdate.space.paidTier !== 'enterprise') {
           await prisma.space.update({
             where: {
               id: spaceId
