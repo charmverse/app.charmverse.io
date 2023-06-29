@@ -1,7 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Divider, Grid, Stack, TextField, Typography } from '@mui/material';
-import Chip from '@mui/material/Chip';
 import InputLabel from '@mui/material/InputLabel';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,7 +20,7 @@ import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
-import { formatDate, getTimeDifference } from 'lib/utilities/dates';
+import { formatDate } from 'lib/utilities/dates';
 import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
 
 import { PaymentMethod } from './PaymentMethod';
@@ -51,10 +50,16 @@ export function SubscriptionInformation({
   const { refreshCurrentSpace } = useCurrentSpace();
   const { userPreferences } = useUserPreferences();
   const {
-    isOpen: isConfirmUpgradeDialogOpen,
+    isOpen: isUpgradeDialogOpen,
     close: closeUpgradeDialog,
     open: openUpgradeDialog
   } = usePopupState({ variant: 'popover', popupId: 'upgrade-susbcription' });
+
+  const {
+    isOpen: isConfirmUpgradeDialogOpen,
+    close: closeConfirmUpgradeDialog,
+    open: openConfirmUpgradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'confirm-upgrade-susbcription' });
 
   const {
     register,
@@ -152,17 +157,6 @@ export function SubscriptionInformation({
   const price =
     spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
-  const freeTrialEnds =
-    spaceSubscription.status === 'free_trial'
-      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
-      : undefined;
-  const freeTrialLabel =
-    spaceSubscription.status === 'free_trial'
-      ? (freeTrialEnds as number) > 0
-        ? `Free trial - ${freeTrialEnds} days left`
-        : `Free trial finished`
-      : '';
-
   const nextBillingDate = spaceSubscription?.renewalDate
     ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
     : null;
@@ -174,23 +168,14 @@ export function SubscriptionInformation({
         <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
           <Typography variant='h6' mb={1}>
             Current plan
-            {spaceSubscription.status === 'free_trial' && (
-              <Chip
-                sx={{ ml: 2 }}
-                size='small'
-                color={(freeTrialEnds as number) > 0 ? 'green' : 'orange'}
-                label={freeTrialLabel}
-              />
-            )}
           </Typography>
           <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
-
           <Typography>
             ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
           </Typography>
           {nextBillingDate && (
             <Typography>
-              {spaceSubscription.status === 'free_trial' ? 'First payment' : 'Renews'} on {nextBillingDate}
+              {spaceSubscription.status === 'cancel_at_end' ? 'Ends' : 'Renews'} on {nextBillingDate}
             </Typography>
           )}
           {status && <Typography>Status: {status}</Typography>}
@@ -213,9 +198,9 @@ export function SubscriptionInformation({
           <ConfirmUpgradeModal
             title='Upgrade Community Edition'
             size='large'
-            open={isConfirmUpgradeDialogOpen}
+            open={isUpgradeDialogOpen}
             buttonText='Change subscription'
-            secondaryButtonText='No'
+            secondaryButtonText='Cancel'
             question={
               <PlanSelection
                 blockQuotaInThousands={blockQuota}
@@ -225,8 +210,21 @@ export function SubscriptionInformation({
                 onSelectCommited={() => {}}
               />
             }
-            onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
+            onConfirm={openConfirmUpgradeDialog}
             onClose={closeUpgradeDialog}
+            disabled={
+              isLoadingUpgrade || (period === spaceSubscription.period && blockQuota === spaceSubscription.blockQuota)
+            }
+          />
+          <ConfirmUpgradeModal
+            title='Confirm plan changes'
+            size='large'
+            open={isConfirmUpgradeDialogOpen}
+            buttonText='Confirm'
+            secondaryButtonText='Cancel'
+            question='You are about to change the subscription of your space. This will automatically charge your payment method.'
+            onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
+            onClose={closeConfirmUpgradeDialog}
             disabled={isLoadingUpgrade}
           />
         </Grid>

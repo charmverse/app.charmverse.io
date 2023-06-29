@@ -48,7 +48,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     isLoading: isLoadingSpaceSubscription,
     refetchSpaceSubscription
   } = useSpaceSubscription({
-    returnUrl: `${window?.location.origin}/${router.asPath}?settingTab=subscription`
+    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
   });
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
