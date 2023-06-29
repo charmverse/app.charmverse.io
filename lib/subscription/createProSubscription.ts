@@ -5,7 +5,7 @@ import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
-import { getCouponId } from './getCouponId';
+import { getCouponDetails } from './getCouponDetails';
 import { getCommunityPrice } from './getProductPrice';
 import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
@@ -101,7 +101,7 @@ export async function createProSubscription({
 
   let promoCodeData;
   if (coupon) {
-    promoCodeData = await getCouponId(coupon);
+    promoCodeData = await getCouponDetails(coupon);
   }
 
   const subscription = await stripeClient.subscriptions.create({

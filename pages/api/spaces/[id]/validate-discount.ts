@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getCouponId } from 'lib/subscription/getCouponId';
+import { getCouponDetails } from 'lib/subscription/getCouponDetails';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,7 +28,7 @@ async function validateDiscount(req: NextApiRequest, res: NextApiResponse<Valida
   const couponCode = req.body.coupon;
   const spaceId = req.query.id as string;
 
-  const coupon = await getCouponId(couponCode);
+  const coupon = await getCouponDetails(couponCode);
 
   if (!coupon) {
     throw new InvalidInputError(`Invalid promotional code ${couponCode} for space ${spaceId}`);
