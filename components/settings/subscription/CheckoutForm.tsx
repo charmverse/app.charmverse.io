@@ -251,24 +251,18 @@ export function CheckoutForm({
           <Divider sx={{ my: 2 }} />
           <Stack gap={0.5} my={2}>
             <Typography>Coupon code</Typography>
-            <Stack>
+            <Stack display='flex' flexDirection='row' gap={1}>
               <TextField
-                disabled={isProcessing || !!subscription.coupon}
+                disabled={isProcessing || !!subscription.coupon || validating}
                 {...registerCoupon}
                 error={!!errors.coupon}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton
-                        onClick={() => (subscription?.coupon ? handleCoupon(undefined) : handleCoupon(couponField))}
-                        disabled={(subscription?.coupon ? false : !couponField) || validating}
-                      >
-                        {subscription?.coupon ? <CloseIcon /> : <SendIcon />}
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
               />
+              <Button
+                onClick={() => (subscription?.coupon ? handleCoupon(undefined) : handleCoupon(couponField))}
+                disabled={isProcessing || validating || !couponField}
+              >
+                {subscription?.coupon ? 'Remove' : 'Apply'}
+              </Button>
             </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
@@ -306,18 +300,21 @@ export function CheckoutForm({
               <Button
                 onClick={createSubscription}
                 loading={isProcessing}
-                disabled={emailError || !emailField || isProcessing || !stripe || !elements}
+                disabled={emailError || !emailField || isProcessing || !stripe || !elements || validating}
               >
                 {isProcessing ? 'Processing ... ' : 'Upgrade'}
               </Button>
-              <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
+              <Button disabled={isProcessing || validating} onClick={onCancel} color='secondary' variant='text'>
                 Cancel
               </Button>
             </Stack>
           </PaymentTabPanel>
           <PaymentTabPanel value={paymentType} index='crypto'>
             <Stack gap={1} display='flex' flexDirection='column'>
-              <Button onClick={() => startCryptoPayment()} disabled={emailError || !emailField || isProcessing}>
+              <Button
+                onClick={() => startCryptoPayment()}
+                disabled={emailError || !emailField || isProcessing || validating}
+              >
                 Upgrade
               </Button>
               <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
