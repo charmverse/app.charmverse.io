@@ -100,8 +100,8 @@ export function PublicProfile(props: {
         tabs={[
           ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />],
           [
-            'Organization',
-            <Stack key='organization'>
+            'Organizations',
+            <Stack key='organizations'>
               <UserSpacesList userId={props.user.id} />
               <SectionHeader title='My Organizations' count={data ? allCommunities.length : undefined} />
               <LoadingComponent isLoading={isLoading} minHeight={300}>

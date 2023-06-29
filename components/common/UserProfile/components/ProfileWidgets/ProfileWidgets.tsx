@@ -9,12 +9,12 @@ import { SpaceMemberPropertyWidget } from './SpaceMemberPropertyWidget';
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
 
-  const profileComponents = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
+  const profileWidgets = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
 
   return (
     <Grid container spacing={4}>
-      {profileComponents.map((profileComponent) => {
-        switch (profileComponent) {
+      {profileWidgets.map((profileWidget) => {
+        switch (profileWidget) {
           case 'collection':
             return (
               <Grid item xs={12} md={6} alignItems='stretch'>
