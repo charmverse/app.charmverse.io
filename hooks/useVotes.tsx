@@ -22,7 +22,7 @@ type IContext = {
   isLoading: boolean;
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
-  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
   castVote: (voteId: string, option: string) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
@@ -190,7 +190,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     return userVote;
   }
 
-  async function createVote(votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+  async function createVote(
+    votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>
+  ): Promise<ExtendedVote> {
     if (!user || !currentSpace) {
       throw new Error('Missing user or space');
     }

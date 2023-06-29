@@ -185,6 +185,8 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Re-enable condition before merge
     if: ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) ||
         ( github.event_name == 'workflow_dispatch' && inputs.deploy_to_prd )

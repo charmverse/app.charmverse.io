@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utilities/errors';
@@ -8,8 +8,20 @@ import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
 export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
-  const { spaceId, createdBy, pageId, postId, title, threshold, description, deadline, type, voteOptions, context } =
-    vote;
+  const {
+    spaceId,
+    createdBy,
+    pageId,
+    postId,
+    title,
+    threshold,
+    content,
+    contentText,
+    deadline,
+    type,
+    voteOptions,
+    context
+  } = vote;
 
   if (pageId) {
     const page = await prisma.page.findUnique({
@@ -40,7 +52,8 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
 
   const dbVote = await prisma.vote.create({
     data: {
-      description,
+      content: content ?? Prisma.DbNull,
+      contentText,
       title,
       threshold: +threshold ?? DEFAULT_THRESHOLD,
       deadline: new Date(deadline),
