@@ -222,7 +222,9 @@ export function SubscriptionInformation({
             open={isConfirmUpgradeDialogOpen}
             buttonText='Confirm'
             secondaryButtonText='Cancel'
-            question='You are about to change the subscription of your space. This will automatically charge your payment method.'
+            question={`You are about to change your plan. ${
+              spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''
+            }`}
             onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
             onClose={closeConfirmUpgradeDialog}
             disabled={isLoadingUpgrade}
