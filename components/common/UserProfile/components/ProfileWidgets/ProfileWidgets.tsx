@@ -3,6 +3,7 @@ import { Grid } from '@mui/material';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { CollectionWidget } from './CollectionWidget';
+import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { SocialWidget } from './SocialWidget';
 import { SpaceMemberPropertyWidget } from './SpaceMemberPropertyWidget';
 
@@ -34,6 +35,13 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                 <SpaceMemberPropertyWidget userId={userId} />
               </Grid>
             ) : null;
+
+          case 'lens':
+            return (
+              <Grid item xs={12} md={6} alignItems='stretch'>
+                <LensDefaultProfileWidget userId={userId} />
+              </Grid>
+            );
           default:
             return null;
         }

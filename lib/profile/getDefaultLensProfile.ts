@@ -1,10 +1,10 @@
-import { prisma } from '@charmverse/core/src/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ProfileFragment } from '@lens-protocol/client';
 /* eslint-disable-next-line */
-import { LensClient, development } from '@lens-protocol/client';
+import { LensClient, production } from '@lens-protocol/client';
 
 const lensClient = new LensClient({
-  environment: development
+  environment: production
 });
 
 export async function getDefaultLensProfile(userId: string): Promise<ProfileFragment | null> {

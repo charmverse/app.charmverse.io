@@ -1,4 +1,5 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
+import type { ProfileFragment } from '@lens-protocol/client';
 
 import * as http from 'adapters/http';
 import type { UserCommunity } from 'lib/profile';
@@ -30,5 +31,9 @@ export class ProfileApi {
 
   setForumCategoryNotification(input: Omit<SetForumCategoryNotificationInput, 'userId'>) {
     return http.PUT('/api/profile/space-notifications/set-forum-category', input);
+  }
+
+  getLensDefaultProfile(userId: string) {
+    return http.GET<ProfileFragment | null>(`/api/lens/profile/${userId}`);
   }
 }
