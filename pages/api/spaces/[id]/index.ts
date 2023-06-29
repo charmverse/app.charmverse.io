@@ -9,6 +9,7 @@ import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { SpaceNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
+import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -70,6 +71,11 @@ async function updateSpaceController(req: NextApiRequest, res: NextApiResponse<S
 }
 
 async function deleteSpace(req: NextApiRequest, res: NextApiResponse) {
+  const spaceId = req.query.id as string;
+  const userId = req.session.user.id;
+
+  await deleteProSubscription({ spaceId, userId }).catch();
+
   await prisma.space.delete({
     where: {
       id: req.query.id as string

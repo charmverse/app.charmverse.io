@@ -6,9 +6,12 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+import type {
+  SpaceSubscriptionRequest,
+  SpaceSubscriptionWithStripeData
+} from 'lib/subscription/getActiveSpaceSubscription';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
-import type { CreateProSubscriptionResponse, CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { updateProSubscription } from 'lib/subscription/updateProSubscription';
 
@@ -33,21 +36,25 @@ async function getSpaceSubscriptionController(
   req: NextApiRequest,
   res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
 ) {
-  const { id: spaceId } = req.query as { id: string };
+  const { id: spaceId, returnUrl } = req.query as { id: string } & Pick<SpaceSubscriptionRequest, 'returnUrl'>;
 
   const spaceSubscription = await getActiveSpaceSubscription({
-    spaceId
+    spaceId,
+    returnUrl
   });
 
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
+async function createPaymentSubscription(
+  req: NextApiRequest,
+  res: NextApiResponse<SubscriptionPaymentIntent & { email?: string }>
+) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
   const { period, blockQuota, billingEmail, name, address, coupon } = req.body as CreateProSubscriptionRequest;
 
-  const { clientSecret, paymentIntentStatus, subscriptionId } = await createProSubscription({
+  const { paymentIntent, email } = await createProSubscription({
     spaceId,
     period,
     blockQuota,
@@ -59,11 +66,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
-  res.status(200).json({
-    subscriptionId,
-    paymentIntentStatus,
-    clientSecret
-  });
+  res.status(200).json({ ...(paymentIntent || ({} as SubscriptionPaymentIntent)), email });
 }
 
 async function deletePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {

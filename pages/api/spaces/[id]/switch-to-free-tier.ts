@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
