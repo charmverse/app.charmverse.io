@@ -44,67 +44,59 @@ export function SocialIcons({
   if (view === 'detailed') {
     return (
       <Stack direction={direction} gap={2} my={1} {...props}>
-        <Stack direction='row' gap={1}>
-          {showDiscord &&
-            (social?.discordUsername ? (
-              <DiscordSocialIcon showLabel showUsername username={social.discordUsername} />
-            ) : (
-              <SvgIcon color='disabled' sx={{ height: iconHeight }}>
-                <DiscordIcon />
-              </SvgIcon>
-            ))}
-        </Stack>
+        {showDiscord &&
+          (social?.discordUsername ? (
+            <DiscordSocialIcon showLabel showUsername username={social.discordUsername} />
+          ) : (
+            <SvgIcon color='disabled' sx={{ height: iconHeight }}>
+              <DiscordIcon />
+            </SvgIcon>
+          ))}
 
-        <Stack direction='row' gap={1}>
-          {showTwitter &&
-            (social.twitterURL ? (
-              <Stack direction='row' alignItems='center' spacing={0.5}>
-                <Link href={social.twitterURL} target='_blank' display='flex'>
-                  <TwitterIcon style={{ color: '#00ACEE', height: iconHeight }} />
-                </Link>
-                <Typography variant='body2' fontWeight='bold'>
-                  Twitter:
-                </Typography>
-                <Typography variant='body2'>@{social.twitterURL.split('/').at(-1)}</Typography>
-              </Stack>
-            ) : (
-              <TwitterIcon color='disabled' style={{ height: iconHeight }} />
-            ))}
-        </Stack>
+        {showTwitter &&
+          (social.twitterURL ? (
+            <Stack direction='row' alignItems='center' spacing={0.5}>
+              <Link href={social.twitterURL} target='_blank' display='flex'>
+                <TwitterIcon style={{ color: '#00ACEE', height: iconHeight }} />
+              </Link>
+              <Typography variant='body2' fontWeight='bold'>
+                Twitter:
+              </Typography>
+              <Typography variant='body2'>@{social.twitterURL.split('/').at(-1)}</Typography>
+            </Stack>
+          ) : (
+            <TwitterIcon color='disabled' style={{ height: iconHeight }} />
+          ))}
 
-        <Stack direction='row' gap={1}>
-          {showLinkedIn &&
-            (social.linkedinURL ? (
-              <Stack direction='row' alignItems='center' spacing={0.5}>
-                <Link href={social.linkedinURL} target='_blank' display='flex'>
-                  <LinkedInIcon style={{ color: '#0072B1', height: iconHeight }} />
-                </Link>
-                <Typography variant='body2' fontWeight='bold'>
-                  LinkedIn:
-                </Typography>
-                <Typography variant='body2'>{social.linkedinURL.split('/').at(-1)}</Typography>
-              </Stack>
-            ) : (
-              <LinkedInIcon color='disabled' style={{ height: iconHeight }} />
-            ))}
-        </Stack>
+        {showLinkedIn &&
+          (social.linkedinURL ? (
+            <Stack direction='row' alignItems='center' spacing={0.5}>
+              <Link href={social.linkedinURL} target='_blank' display='flex'>
+                <LinkedInIcon style={{ color: '#0072B1', height: iconHeight }} />
+              </Link>
+              <Typography variant='body2' fontWeight='bold'>
+                LinkedIn:
+              </Typography>
+              <Typography variant='body2'>{social.linkedinURL.split('/').at(-1)}</Typography>
+            </Stack>
+          ) : (
+            <LinkedInIcon color='disabled' style={{ height: iconHeight }} />
+          ))}
 
-        <Stack direction='row' gap={1}>
-          {showGithub &&
-            (social.githubURL ? (
-              <Stack direction='row' alignItems='center' spacing={0.5}>
-                <Link href={social.githubURL} target='_blank' display='flex'>
-                  <GitHubIcon style={{ color: '#141414', height: iconHeight }} />
-                </Link>
-                <Typography variant='body2' fontWeight='bold'>
-                  Github:
-                </Typography>
-                <Typography variant='body2'>@{social.githubURL.split('/').at(-1)}</Typography>
-              </Stack>
-            ) : (
-              <GitHubIcon color='disabled' style={{ height: iconHeight }} />
-            ))}
-        </Stack>
+        {showGithub &&
+          (social.githubURL ? (
+            <Stack direction='row' alignItems='center' spacing={0.5}>
+              <Link href={social.githubURL} target='_blank' display='flex'>
+                <GitHubIcon style={{ color: '#141414', height: iconHeight }} />
+              </Link>
+              <Typography variant='body2' fontWeight='bold'>
+                Github:
+              </Typography>
+              <Typography variant='body2'>@{social.githubURL.split('/').at(-1)}</Typography>
+            </Stack>
+          ) : (
+            <GitHubIcon color='disabled' style={{ height: iconHeight }} />
+          ))}
         {children}
       </Stack>
     );
