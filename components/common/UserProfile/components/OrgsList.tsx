@@ -52,6 +52,7 @@ export function OrgsList({ userId, readOnly = false }: Props) {
           <LoadingComponent isLoading />
         ) : (
           <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
+            {readOnly && pinnedOrgs.length === 0 && <Typography color='secondary'>No pinned Orgs</Typography>}
             {pinnedOrgs
               .sort((org1, org2) => (org1.name > org2.name ? 1 : -1))
               .map((pinnedOrg) => {

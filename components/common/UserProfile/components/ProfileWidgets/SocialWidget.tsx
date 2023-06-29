@@ -30,10 +30,10 @@ export function SocialWidget({ userId }: { userId: string }) {
         ) : (
           <SocialIcons
             social={socialDetails}
-            showDiscord={socialDetails.discordUsername?.length !== 0}
-            showTwitter={socialDetails.twitterURL?.length !== 0}
-            showLinkedIn={socialDetails.linkedinURL?.length !== 0}
-            showGithub={socialDetails.githubURL?.length !== 0}
+            showDiscord={!!socialDetails.discordUsername && socialDetails.discordUsername?.length !== 0}
+            showTwitter={!!socialDetails.twitterURL && socialDetails.twitterURL?.length !== 0}
+            showLinkedIn={!!socialDetails.linkedinURL && socialDetails.linkedinURL?.length !== 0}
+            showGithub={!!socialDetails.githubURL && socialDetails.githubURL?.length !== 0}
             direction='column'
             view='detailed'
           />
