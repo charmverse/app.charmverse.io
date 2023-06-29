@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';

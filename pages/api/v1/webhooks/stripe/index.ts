@@ -5,8 +5,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
+import { getLoopProducts } from 'lib/loop/loop';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
+import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
+import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
@@ -78,12 +81,27 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = invoice.subscription as string;
         const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
-        const paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
+        let paidTier = stripeSubscription.metadata.tier as SubscriptionTier;
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const productId = subscriptionData?.price?.product as string | undefined;
+
+        if (productId && productId !== communityProduct.id) {
+          const product = await stripeClient.products.retrieve(productId);
+          if (product?.name && product.name.toLowerCase().match('enterprise')) {
+            paidTier = 'enterprise';
+          }
+        }
+
         const customerId = invoice.customer as string;
         const priceInterval = subscriptionData?.price?.recurring?.interval;
+
+        if (!spaceId) {
+          log.warn(
+            `Can't create the user subscription. SpaceId was not defined in the metadata for subscription ${stripeSubscription.id}`
+          );
+          break;
+        }
 
         const space = await prisma.space.findUnique({
           where: { id: spaceId, deletedAt: null }
@@ -124,10 +142,12 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
             }
           })
         ]);
+
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
 
         if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
           // The subscription automatically activates after successful payment
@@ -141,20 +161,60 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               default_payment_method: paymentIntent.payment_method
             });
           }
+          // Make sure we're not triggering any actions for free trials
+          if (invoice.total > 0) {
+            const otherSubscriptions = await stripeClient.subscriptions
+              .list({
+                customer: customerId
+              })
+              // Cancel any subscriptions with an invoice value of 0 - This should cover the free trial case
+              .then((data) => data.data.filter((sub) => sub.id !== invoice.subscription).map((sub) => sub.id));
+
+            for (const sub of otherSubscriptions) {
+              await stripeClient.subscriptions.del(sub);
+            }
+
+            await prisma.stripeSubscription.updateMany({
+              where: {
+                subscriptionId: {
+                  in: otherSubscriptions
+                }
+              },
+              data: {
+                deletedAt: new Date()
+              }
+            });
+          }
+
+          trackUserAction('create_subscription', {
+            blockQuota,
+            period,
+            spaceId,
+            userId: space.createdBy,
+            subscriptionId: stripeSubscription.id
+          });
+        }
+
+        if (invoice.charge) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'success',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
+            userId: space.createdBy
+          });
         }
 
         log.info(
           `The invoice number ${invoice.id} for the subscription ${stripeSubscription.id} was paid for the spaceId ${spaceId}`
         );
-
-        trackUserAction('checkout_subscription', {
-          userId: space.updatedBy,
-          spaceId,
-          productId,
-          period,
-          tier: stripeSubscription.metadata.tier as SubscriptionTier,
-          result: 'success'
-        });
 
         relay.broadcast(
           {
@@ -183,14 +243,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             space: {
               select: {
                 id: true,
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
         });
 
         if (!spaceSubscription) {
-          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`);
+          log.warn(`Can't update the space subscription. Space subscription not found with id ${subscription.id}`, {
+            spaceId,
+            subscriptionId: subscription.id
+          });
           break;
         }
 
@@ -206,7 +270,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           });
 
-          if (space.paidTier !== 'free') {
+          if (space.paidTier !== 'free' && space.paidTier !== 'enterprise') {
             space = await prisma.space.update({
               where: {
                 id: space.id
@@ -214,6 +278,19 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               data: {
                 paidTier: 'cancelled'
               }
+            });
+          }
+        } else {
+          const activeSubscription = await getActiveSpaceSubscription({ spaceId });
+          if (activeSubscription) {
+            trackUserAction('update_subscription', {
+              blockQuota: subscription.items.data[0].quantity as number,
+              period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
+              previousBlockQuota: activeSubscription.blockQuota,
+              previousPeriod: activeSubscription.period,
+              subscriptionId: activeSubscription.id,
+              spaceId,
+              userId: space.createdBy
             });
           }
         }
@@ -231,6 +308,54 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.finalized': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string | null;
+
+        if (!subscriptionId) {
+          log.warn(`The invoice ${invoice.id} does not have a subscription attached to it`);
+          break;
+        }
+
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
+          expand: ['customer']
+        });
+
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
+        const priceId = subscriptionData?.price?.id;
+        const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
+
+        if (!stripeSubscription.metadata.loopCheckout && priceId) {
+          const loopItems = await getLoopProducts();
+          const loopItem = loopItems.find((product) => product.externalId === priceId);
+
+          if (!loopItem) {
+            log.warn(
+              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId}`,
+              { spaceId }
+            );
+            break;
+          }
+
+          const loopUrl = loopItem.url
+            ? `${loopItem.url}?cartEnabled=false&email=${email}&sub=${subscriptionId}`
+            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
+
+          await stripeClient.subscriptions.update(subscriptionId, {
+            metadata: {
+              ...(stripeSubscription.metadata || {}),
+              loopCheckout: loopUrl
+            }
+          });
+
+          log.info(`Loop checkout url was succesfully added in stripe metadata`, { spaceId, priceId, subscriptionId });
+        }
+
+        break;
+      }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
@@ -262,13 +387,14 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           select: {
             space: {
               select: {
-                paidTier: true
+                paidTier: true,
+                createdBy: true
               }
             }
           }
         });
 
-        if (afterUpdate.space.paidTier !== 'free') {
+        if (afterUpdate.space.paidTier !== 'free' && afterUpdate.space.paidTier !== 'enterprise') {
           await prisma.space.update({
             where: {
               id: spaceId
@@ -276,6 +402,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             data: {
               paidTier: 'cancelled'
             }
+          });
+
+          trackUserAction('cancel_subscription', {
+            blockQuota: subscription.items.data[0].quantity as number,
+            subscriptionId: subscription.id,
+            spaceId,
+            userId: afterUpdate.space.createdBy
           });
         }
 
@@ -292,6 +425,61 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+        const period = stripeSubscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual';
+        const customerId = invoice.customer;
+        const paymentMethodId = invoice.default_payment_method;
+        const amountDue = invoice.amount_due;
+
+        const space = await prisma.space.findUnique({
+          where: {
+            id: spaceId
+          },
+          select: {
+            createdBy: true
+          }
+        });
+
+        if (invoice.charge && space) {
+          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+          trackUserAction('subscription_payment', {
+            spaceId,
+            blockQuota,
+            period,
+            status: 'failure',
+            subscriptionId: stripeSubscription.id,
+            paymentMethod: invoice.metadata?.transaction_hash
+              ? 'crypto'
+              : charge.payment_method_details?.type?.startsWith('ach')
+              ? 'ach'
+              : 'card',
+            userId: space.createdBy
+          });
+        }
+
+        const lastFinalizationError = invoice.last_finalization_error;
+        log.warn(`Invoice payment failed for invoice ${invoice.id} for the subscription ${stripeSubscription.id}`, {
+          spaceId,
+          blockQuota,
+          period,
+          customerId,
+          paymentMethodId,
+          amountDue,
+          invoiceId: invoice.id,
+          subscriptionId,
+          message: lastFinalizationError?.message,
+          code: lastFinalizationError?.code,
+          type: lastFinalizationError?.type
+        });
+        break;
+      }
+
       default: {
         log.debug(`Unhandled event type in stripe webhook: ${event.type}`);
         break;
