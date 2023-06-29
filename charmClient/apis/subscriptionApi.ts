@@ -13,6 +13,7 @@ import type {
 } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
+import type { ValidatedCoupon } from 'pages/api/spaces/[id]/validate-discount';
 
 export class SubscriptionApi {
   createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
@@ -42,7 +43,7 @@ export class SubscriptionApi {
   }
 
   validateDiscount(spaceId: string, payload: { coupon: string }) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/validate-discount`, payload);
+    return http.POST<ValidatedCoupon>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
 
   upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {

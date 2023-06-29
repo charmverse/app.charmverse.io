@@ -6,7 +6,7 @@ export const DEFAULT_THRESHOLD = 50;
 
 export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as const;
 
-export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'postId' | 'pageId'> {
+export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'postId' | 'pageId' | 'description'> {
   pageId?: string | null;
   postId?: string | null;
   voteOptions: string[];
