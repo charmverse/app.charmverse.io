@@ -326,6 +326,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const priceId = subscriptionData?.price?.id;
         const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
+        const encodedEmail = email ? `&email=${encodeURIComponent(email)}` : '';
 
         if (!stripeSubscription.metadata.loopCheckout && priceId) {
           const loopItems = await getLoopProducts();
@@ -340,8 +341,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
 
           const loopUrl = loopItem.url
-            ? `${loopItem.url}?cartEnabled=false&email=${email}&sub=${subscriptionId}`
-            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
+            ? `${loopItem.url}?cartEnabled=false${encodedEmail}&sub=${subscriptionId}`
+            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false${encodedEmail}&sub=${subscriptionId}`;
 
           await stripeClient.subscriptions.update(subscriptionId, {
             metadata: {

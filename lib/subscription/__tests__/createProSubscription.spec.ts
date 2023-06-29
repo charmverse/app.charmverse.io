@@ -119,7 +119,8 @@ describe('createProSubscription', () => {
     });
 
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
-      coupon: '',
+      coupon: undefined,
+      promotion_code: undefined,
       metadata: {
         tier: 'pro',
         period: 'monthly',
@@ -136,6 +137,8 @@ describe('createProSubscription', () => {
       payment_settings: {
         save_default_payment_method: 'on_subscription'
       },
+      trial_period_days: undefined,
+      trial_settings: undefined,
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent']
     });
