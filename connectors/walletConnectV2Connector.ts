@@ -13,8 +13,6 @@ export class WalletConnectV2Connector extends AbstractConnector {
     super({ supportedChainIds: Object.keys(options.rpcMap || {}).map((k) => Number(k)) });
 
     this.options = options;
-
-    console.log('Connector', this);
   }
 
   static clearStorage = (storage: Storage) => {
@@ -47,7 +45,8 @@ export class WalletConnectV2Connector extends AbstractConnector {
           'eth_requestAccounts',
           'eth_sendRawTransaction',
           'eth_signTransaction',
-          'wallet_switchEthereumChain'
+          'wallet_switchEthereumChain',
+          'eth_signTypedData_v4'
         ],
         events: ['chainChanged', 'accountsChanged'],
         optionalEvents: ['disconnect']

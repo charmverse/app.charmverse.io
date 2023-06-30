@@ -141,8 +141,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
             name='WalletConnect'
             onClick={() => handleConnect(walletConnect)}
             iconUrl='walletconnect.svg'
-            // disabled={connector === walletConnect || !!activatingConnector}
-            disabled
+            disabled={connector === walletConnect || !!activatingConnector}
             isActive={connector === walletConnect}
             isLoading={activatingConnector === walletConnect}
           />
