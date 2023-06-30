@@ -43,7 +43,7 @@ const RPC = {
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    rpcUrls: ['https://main-light.eth.linkpool.io'],
+    rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth'
   },
   BSC: {
@@ -341,18 +341,16 @@ const injected = new InjectedConnector({ supportedChainIds });
 
 // WalletConnect Web3 Connector
 const walletConnect = new WalletConnectV2Connector({
-  chains: supportedChainIds.filter((c) => c === 1),
+  chains: supportedChainIds,
   relayUrl: 'wss://relay.walletconnect.com',
-  rpcMap: Object.keys(RPC)
-    .filter((k) => k === 'ETHEREUM')
-    .reduce(
-      (obj, chainName: string) => ({
-        ...obj,
-        // @ts-ignore
-        [RPC[chainName].chainId]: RPC[chainName].rpcUrls[0]
-      }),
-      {}
-    ),
+  rpcMap: Object.keys(RPC).reduce(
+    (obj, chainName: string) => ({
+      ...obj,
+      // @ts-ignore
+      [RPC[chainName].chainId]: RPC[chainName].rpcUrls[0]
+    }),
+    {}
+  ),
   showQrModal: true,
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECTID as string
 });
