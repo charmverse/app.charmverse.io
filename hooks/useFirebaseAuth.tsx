@@ -132,16 +132,19 @@ export function useFirebaseAuth() {
     }
   }
 
-  async function loginWithGooglePopup() {
-    setIsConnectingGoogle(true);
-
+  async function loginWithGooglePopup(type: 'login' | 'connect' = 'login') {
     const loginCallback = async (state: GooglePopupLoginState) => {
       if ('googleToken' in state) {
         try {
-          const loggedInUser = await charmClient.google.login(state.googleToken);
-          setUser(loggedInUser);
-        } finally {
-          setIsConnectingGoogle(false);
+          if (type === 'login') {
+            const loggedInUser = await charmClient.google.login(state.googleToken);
+            setUser(loggedInUser);
+          } else {
+            const loggedInUser = await charmClient.google.connectAccount(state.googleToken);
+            setUser(loggedInUser);
+          }
+        } catch (error: any) {
+          log.debug({ error });
         }
       }
     };
