@@ -1,8 +1,9 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 
 import { uniqueValues } from 'lib/utilities/array';
+
+import { WalletConnectV2Connector } from './walletConnectV2Connector';
 
 export interface IChainDetails {
   chainId: number;
@@ -339,17 +340,21 @@ const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
 const injected = new InjectedConnector({ supportedChainIds });
 
 // WalletConnect Web3 Connector
-const walletConnect = new WalletConnectConnector({
-  supportedChainIds,
-  rpc: Object.keys(RPC).reduce(
-    (obj, chainName: string) => ({
-      ...obj,
-      // @ts-ignore
-      [RPC[chainName].chainId]: RPC[chainName].rpcUrls[0]
-    }),
-    {}
-  ),
-  qrcode: true
+const walletConnect = new WalletConnectV2Connector({
+  chains: supportedChainIds.filter((c) => c === 1),
+  relayUrl: 'wss://relay.walletconnect.com',
+  rpcMap: Object.keys(RPC)
+    .filter((k) => k === 'ETHEREUM')
+    .reduce(
+      (obj, chainName: string) => ({
+        ...obj,
+        // @ts-ignore
+        [RPC[chainName].chainId]: RPC[chainName].rpcUrls[0]
+      }),
+      {}
+    ),
+  showQrModal: true,
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECTID as string
 });
 
 // Coinbase Web3 Connector

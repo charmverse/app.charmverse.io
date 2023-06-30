@@ -53,7 +53,9 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
+    console.log('ACTIVATING', _connector);
     activate(_connector, undefined, true).catch((err) => {
+      console.log('ERROR Detected', err);
       setActivatingConnector(undefined);
       // We need to reset walletconnect if users have closed the modal
       resetWalletConnector(_connector);
