@@ -1,3 +1,4 @@
+import type { MemberPropertyType } from '@charmverse/core/src/prisma-client';
 import { Grid, Stack } from '@mui/material';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -6,9 +7,11 @@ import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMemberProperties } from 'hooks/useMemberProperties';
 
 import { useMemberCollections } from '../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
+import { MemberProperties } from '../MemberProperties';
 import { NftsList } from '../NftsList';
 import { OrgsList } from '../OrgsList';
 import { PoapsList } from '../PoapsList';
@@ -16,7 +19,6 @@ import { PoapsList } from '../PoapsList';
 import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { ProfileWidget } from './ProfileWidget';
 import { SocialWidget } from './SocialWidget';
-import { SpaceMemberPropertyWidget } from './SpaceMemberPropertyWidget';
 
 const profileWidgets = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
 
@@ -46,11 +48,32 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     poapsError
   } = useMemberCollections({ memberId: userId });
 
-  const socialDetails = (userDetails?.social as Social | undefined) ?? {};
+  const { getDisplayProperties } = useMemberProperties();
+
+  const visibleProperties = getDisplayProperties('profile');
+
+  if (!space) {
+    return null;
+  }
 
   const currentSpacePropertyValues = memberPropertyValues?.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === space?.id
   );
+
+  const currentSpacePropertyNonEmptyValues = (
+    currentSpacePropertyValues?.properties.filter((propertyValue) =>
+      visibleProperties.some((prop) => prop.id === propertyValue.memberPropertyId)
+    ) ?? []
+  ).filter(
+    (property) =>
+      (Array.isArray(property.value) ? property.value.length !== 0 : !!property.value) &&
+      // These are not shown in member properties, so even if their value exist we don't want to show them
+      !(['bio', 'discord', 'twitter', 'linked_in', 'github', 'timezone'] as MemberPropertyType[]).includes(
+        property.type
+      )
+  );
+
+  const socialDetails = (userDetails?.social as Social | undefined) ?? {};
 
   const hideSocials =
     !userDetails?.social ||
@@ -59,7 +82,9 @@ export function ProfileWidgets({ userId }: { userId: string }) {
       socialDetails?.twitterURL?.length === 0 &&
       socialDetails?.linkedinURL?.length === 0);
 
-  const hideCollections = nfts.length === 0 && orgs.length === 0 && poaps.length === 0;
+  const pinnedOrgs = orgs.filter((org) => org.isPinned);
+  const pinnedNfts = nfts.filter((nft) => nft.isPinned);
+  const hideCollections = pinnedNfts.length === 0 && pinnedOrgs.length === 0 && poaps.length === 0;
 
   const isLoading =
     isFetchingNfts ||
@@ -79,10 +104,10 @@ export function ProfileWidgets({ userId }: { userId: string }) {
         switch (profileWidget) {
           case 'collection':
             return hideCollections ? null : (
-              <Grid item xs={12} md={6} alignItems='stretch'>
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
                 <ProfileWidget title='Collection'>
                   <Stack spacing={2}>
-                    {nftsError || nfts.length === 0 ? null : (
+                    {nftsError || pinnedNfts.length === 0 ? null : (
                       <NftsList
                         userId={userId}
                         nfts={nfts}
@@ -93,7 +118,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                       />
                     )}
 
-                    {orgsError || orgs.length === 0 ? null : (
+                    {orgsError || pinnedOrgs.length === 0 ? null : (
                       <OrgsList
                         userId={userId}
                         orgs={orgs}
@@ -114,7 +139,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
 
           case 'social':
             return hideSocials ? null : (
-              <Grid item xs={12} md={6} alignItems='stretch'>
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
                 <SocialWidget socialDetails={socialDetails} />
               </Grid>
             );
@@ -123,15 +148,18 @@ export function ProfileWidgets({ userId }: { userId: string }) {
             return space &&
               memberPropertyValues &&
               currentSpacePropertyValues &&
-              currentSpacePropertyValues.properties.length !== 0 ? (
-              <Grid item xs={12} md={6} alignItems='stretch'>
-                <SpaceMemberPropertyWidget memberPropertyValues={memberPropertyValues} />
+              currentSpacePropertyValues.properties.length !== 0 &&
+              currentSpacePropertyNonEmptyValues.length !== 0 ? (
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
+                <ProfileWidget title='CharmVerse Details'>
+                  <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
+                </ProfileWidget>
               </Grid>
             ) : null;
 
           case 'lens':
             return defaultLensProfile ? (
-              <Grid item xs={12} md={6} alignItems='stretch'>
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
                 <LensDefaultProfileWidget lensProfile={defaultLensProfile} />
               </Grid>
             ) : null;
