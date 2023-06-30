@@ -2,14 +2,28 @@ import type { MediaSetFragment, ProfileFragment } from '@lens-protocol/client';
 import LanguageIcon from '@mui/icons-material/Language';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
 
 import Avatar from 'components/common/Avatar';
 
 import { ProfileWidget } from './ProfileWidget';
 
+function LensProfileAttributes({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
+  return (
+    <Link href={href} target='_blank' display='flex'>
+      <Stack direction='row' spacing={0.5}>
+        {icon}
+        <Typography color='initial' variant='subtitle2'>
+          {label}
+        </Typography>
+      </Stack>
+    </Link>
+  );
+}
+
 export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
   return (
-    <ProfileWidget title='Lens Protocol'>
+    <ProfileWidget title='Lens Protocol' avatarSrc='/images/lens_logo.svg'>
       <Stack spacing={1}>
         <Stack direction='row' spacing={1}>
           <Avatar
@@ -36,28 +50,23 @@ export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: Profile
         {(lensProfile?.attributes ?? []).map((attribute) => {
           if (attribute.key === 'website') {
             return (
-              <Link key={attribute.key} href={attribute.value} target='_blank' display='flex'>
-                <Stack direction='row' spacing={0.5}>
-                  <LanguageIcon fontSize='small' />
-                  <Typography color='initial' variant='subtitle2'>
-                    Website: {attribute.value}
-                  </Typography>
-                </Stack>
-              </Link>
+              <LensProfileAttributes
+                href={attribute.value}
+                key={attribute.key}
+                icon={<LanguageIcon fontSize='small' />}
+                label={`Website: ${attribute.value}`}
+              />
             );
           } else if (attribute.key === 'twitter') {
             return (
-              <Link key={attribute.key} href={`https://twitter.com/${attribute.value}`} target='_blank' display='flex'>
-                <Stack direction='row' spacing={0.5}>
-                  <TwitterIcon style={{ color: '#00ACEE', height: 20 }} />
-                  <Typography color='initial' variant='subtitle2'>
-                    Twitter: {attribute.value}
-                  </Typography>
-                </Stack>
-              </Link>
+              <LensProfileAttributes
+                key={attribute.key}
+                href={`https://twitter.com/${attribute.value}`}
+                icon={<TwitterIcon style={{ color: '#00ACEE', height: 20 }} />}
+                label={`Twitter: ${attribute.value}`}
+              />
             );
           }
-
           return null;
         })}
       </Stack>
