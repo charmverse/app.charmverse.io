@@ -341,7 +341,8 @@ const injected = new InjectedConnector({ supportedChainIds });
 
 // WalletConnect Web3 Connector
 const walletConnect = new WalletConnectV2Connector({
-  chains: supportedChainIds,
+  chains: [1],
+  optionalChains: supportedChainIds.filter((c) => c !== 1),
   relayUrl: 'wss://relay.walletconnect.com',
   rpcMap: Object.keys(RPC).reduce(
     (obj, chainName: string) => ({

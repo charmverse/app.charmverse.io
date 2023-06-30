@@ -1,5 +1,4 @@
 import type WalletConnectProvider from '@walletconnect/ethereum-provider';
-import {} from '@walletconnect/ethereum-provider';
 import type { EthereumProviderOptions } from '@walletconnect/ethereum-provider/dist/types/EthereumProvider';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import type { ConnectorUpdate } from '@web3-react/types';
@@ -16,7 +15,13 @@ export class WalletConnectV2Connector extends AbstractConnector {
   }
 
   static clearStorage = (storage: Storage) => {
-    storage.removeRegExp(/^wc@2:/);
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (key && key.match(/^wc@2:/)) {
+        storage.removeItem(key);
+        i -= 1;
+      }
+    }
   };
 
   activate = async (): Promise<ConnectorUpdate<string | number>> => {
@@ -25,6 +30,7 @@ export class WalletConnectV2Connector extends AbstractConnector {
         projectId: this.options.projectId,
         rpcMap: this.options.rpcMap || {},
         chains: this.options.chains,
+        optionalChains: this.options.optionalChains,
         relayUrl: this.options.relayUrl,
         showQrModal: true,
         // RPCs may not support the `test` method used for the ping.

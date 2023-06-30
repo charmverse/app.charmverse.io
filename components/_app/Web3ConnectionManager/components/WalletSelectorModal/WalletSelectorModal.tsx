@@ -9,6 +9,7 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
+import { WalletConnectV2Connector } from 'connectors/walletConnectV2Connector';
 import { useContext, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -139,7 +140,10 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
         <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
-            onClick={() => handleConnect(walletConnect)}
+            onClick={() => {
+              WalletConnectV2Connector.clearStorage(window.localStorage);
+              handleConnect(walletConnect);
+            }}
             iconUrl='walletconnect.svg'
             disabled={connector === walletConnect || !!activatingConnector}
             isActive={connector === walletConnect}
