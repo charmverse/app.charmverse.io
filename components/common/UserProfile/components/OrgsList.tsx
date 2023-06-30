@@ -1,10 +1,9 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Grid, Tooltip, Typography, Stack } from '@mui/material';
+import { Grid, Stack, Tooltip, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import type { KeyedMutator } from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
@@ -16,18 +15,17 @@ import { updateProfileItem } from './utils';
 
 const totalShownOrgs = 5;
 
-type Props = { userId: string; readOnly?: boolean };
+type Props = {
+  readOnly?: boolean;
+  isFetchingOrgs: boolean;
+  orgsError: any;
+  orgs: UserCommunity[];
+  userId: string;
+  mutateOrgs: KeyedMutator<UserCommunity[]>;
+};
 
-export function OrgsList({ userId, readOnly = false }: Props) {
+export function OrgsList({ userId, readOnly = false, isFetchingOrgs, mutateOrgs, orgs, orgsError }: Props) {
   const { user: currentUser } = useUser();
-  const {
-    data: orgs = [],
-    mutate: mutateOrgs,
-    isLoading: isFetchingOrgs,
-    error
-  } = useSWRImmutable(`/orgs/${userId}`, () => {
-    return charmClient.profile.getOrgs(userId);
-  });
 
   const pinnedOrgs = orgs.filter((org) => org.isPinned);
   const nonPinnedOrgs = orgs.filter((org) => !org.isPinned);
@@ -42,12 +40,12 @@ export function OrgsList({ userId, readOnly = false }: Props) {
   return (
     <Stack gap={1} data-test='member-profile-org-list'>
       <Typography variant='h6'>Organizations</Typography>
-      {error && (
+      {orgsError && (
         <Grid item>
           <Alert severity='error'>Failed to fetch your token organizations</Alert>
         </Grid>
       )}
-      {!error &&
+      {!orgsError &&
         (isFetchingOrgs ? (
           <LoadingComponent isLoading />
         ) : (

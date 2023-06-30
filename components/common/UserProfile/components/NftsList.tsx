@@ -1,9 +1,8 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Alert, Grid, Link, Tooltip, Typography, Stack } from '@mui/material';
+import { Alert, Grid, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import type { KeyedMutator } from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
@@ -11,24 +10,24 @@ import type { NftData } from 'lib/blockchain/interfaces';
 import { transformNft } from 'lib/blockchain/transformNft';
 
 import { NftAvatarGalleryPopup } from './NftAvatarGallery/NftAvatarGalleryPopup';
-import { ProfileItemContainer, NonPinnedItem } from './ProfileItemContainer';
+import { NonPinnedItem, ProfileItemContainer } from './ProfileItemContainer';
 import { updateProfileItem } from './utils';
 
 const totalShownNfts = 5;
 
-type Props = { userId: string; readOnly?: boolean };
+type Props = {
+  userId: string;
+  readOnly?: boolean;
+  isFetchingNfts: boolean;
+  mutateNfts: KeyedMutator<NftData[]>;
+  nftsError: any;
+  nfts: NftData[];
+};
 
-export function NftsList({ userId, readOnly = false }: Props) {
+export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts, nfts, nftsError }: Props) {
   const { user: currentUser } = useUser();
   const [showingNftGallery, setIsShowingNftGallery] = useState(false);
-  const {
-    data: nfts = [],
-    mutate: mutateNfts,
-    isLoading: isFetchingNfts,
-    error
-  } = useSWRImmutable(`/nfts/${userId}`, () => {
-    return charmClient.blockchain.listNFTs(userId);
-  });
+
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
@@ -40,12 +39,12 @@ export function NftsList({ userId, readOnly = false }: Props) {
   return (
     <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>
-      {error && (
+      {nftsError && (
         <Grid item>
           <Alert severity='error'>Failed to fetch your NFTs</Alert>
         </Grid>
       )}
-      {!error &&
+      {!nftsError &&
         (isFetchingNfts ? (
           <LoadingComponent isLoading />
         ) : (

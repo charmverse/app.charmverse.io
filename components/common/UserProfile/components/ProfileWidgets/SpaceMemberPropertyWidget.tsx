@@ -1,14 +1,17 @@
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import type { MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 
-import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
 import { MemberProperties } from '../MemberProperties';
 
 import { ProfileWidget } from './ProfileWidget';
 
-export function SpaceMemberPropertyWidget({ userId }: { userId: string }) {
+export function SpaceMemberPropertyWidget({
+  memberPropertyValues
+}: {
+  memberPropertyValues: MemberPropertyValuesBySpace[];
+}) {
   const { space } = useCurrentSpace();
-  const { memberPropertyValues } = useMemberPropertyValues(userId);
 
   const { getDisplayProperties } = useMemberProperties();
 
