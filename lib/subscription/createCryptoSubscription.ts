@@ -9,6 +9,7 @@ export async function createCryptoSubscription({
   subscriptionId,
   email
 }: CreateCryptoSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
+  const encodedEmail = encodeURIComponent(email);
   const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
 
   const priceId = subscription.items.data[0].price.id;
@@ -25,6 +26,6 @@ export async function createCryptoSubscription({
   }
 
   return loopItem.url
-    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${email}&sub=${subscriptionId}`
-    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
+    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${subscriptionId}`
+    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${subscriptionId}`;
 }

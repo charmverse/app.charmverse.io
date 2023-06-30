@@ -53,8 +53,10 @@ export type ProsemirrorJSONStep = {
   slice?: {
     content?: {
       type: string;
+      attrs?: any;
       marks?: { type: string; attrs: any }[];
-      text: string;
+      content?: any[];
+      text?: string;
     }[];
   };
 };

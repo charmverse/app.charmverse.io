@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -8,6 +9,7 @@ import type { NextHandler } from 'next-connect';
 
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { uid } from 'lib/utilities/strings';
 
 declare module 'http' {
@@ -138,6 +140,12 @@ export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, n
   try {
     await setRequestSpaceFromApiKey(req);
 
+    const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
+
+    if (client.type === 'free') {
+      throw new SubscriptionRequiredError();
+    }
+
     const querySpaceId = req.query?.spaceId;
 
     if (querySpaceId && querySpaceId !== req.authorizedSpaceId) {
@@ -160,6 +168,10 @@ export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, n
 
     req.botUser = botUser;
   } catch (error) {
+    if (error instanceof SubscriptionRequiredError) {
+      throw error;
+    }
+
     log.warn('Found error', error);
     throw new InvalidApiKeyError();
   }

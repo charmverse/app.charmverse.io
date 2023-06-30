@@ -1,13 +1,13 @@
 import { useTheme } from '@emotion/react';
-import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
-import { AiOutlineUnlock } from 'react-icons/ai';
+import Typography from '@mui/material/Typography';
 
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
+import Lock from 'public/images/subscriptions/lock.svg';
 
 import { StyledToggleButtonGroup } from './PaymentTabs';
 
@@ -56,7 +56,8 @@ export function PlanSelection({
             disabled={disabled}
             size='small'
             aria-label='Block quota slider'
-            valueLabelDisplay='off'
+            valueLabelDisplay='auto'
+            valueLabelFormat={(value) => `${value}K`}
             value={blockQuotaInThousands}
             step={10}
             min={10}
@@ -88,7 +89,7 @@ export function PlanSelection({
           )}K blocks`}</Typography>
         </Stack>
         <Stack>
-          <AiOutlineUnlock size={100} />
+          <Lock width='100px' height='100px' />
         </Stack>
       </Stack>
     </>

@@ -1,6 +1,7 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
@@ -9,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -88,23 +90,21 @@ export function ProposalCategoryContextMenu({ category }: Props) {
             </div>
           </Tooltip>
         )}
-        <Tooltip title={!permissions.manage_permissions ? 'Only space admins can manage permisions' : ''}>
-          <div>
-            <MenuItem
-              data-test={`open-category-permissions-dialog-${category.id}`}
-              disabled={!permissions.manage_permissions}
-              onClick={() => setPermissionsDialogIsOpen(true)}
-              sx={{
-                py: 1
-              }}
-            >
-              <ListItemIcon>
-                <Edit fontSize='small' />
-              </ListItemIcon>
-              <Typography variant='subtitle1'>Manage permissions</Typography>
-            </MenuItem>
-          </div>
-        </Tooltip>
+
+        <MenuItem
+          data-test={`open-category-permissions-dialog-${category.id}`}
+          onClick={() => setPermissionsDialogIsOpen(true)}
+          sx={{
+            py: 1
+          }}
+        >
+          <ListItemIcon>
+            <LockIcon />
+          </ListItemIcon>
+          <Typography variant='subtitle1' display='flex' gap={2} alignItems='center'>
+            Permissions <UpgradeChip upgradeContext='proposal_permissions' />
+          </Typography>
+        </MenuItem>
       </MenuList>
     ),
     [category, tempName]

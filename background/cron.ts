@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 
-import app from './server/app';
+import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
