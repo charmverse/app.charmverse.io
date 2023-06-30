@@ -54,9 +54,9 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
-    console.log('ACTIVATING', _connector);
     activate(_connector, undefined, true).catch((err) => {
-      console.log('ERROR Detected', err);
+      // eslint-disable-next-line no-console
+      console.log('CONNECTION ERROR', { err });
       setActivatingConnector(undefined);
       // We need to reset walletconnect if users have closed the modal
       resetWalletConnector(_connector);
@@ -137,19 +137,15 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
         </Grid>
 
         <Grid item xs={12}>
-          <Tooltip title='This signin method is unavailable while we migrate WalletConnect to the new version'>
-            <div>
-              <ConnectorButton
-                name='WalletConnect'
-                onClick={() => handleConnect(walletConnect)}
-                iconUrl='walletconnect.svg'
-                // disabled={connector === walletConnect || !!activatingConnector}
-                disabled
-                isActive={connector === walletConnect}
-                isLoading={activatingConnector === walletConnect}
-              />
-            </div>
-          </Tooltip>
+          <ConnectorButton
+            name='WalletConnect'
+            onClick={() => handleConnect(walletConnect)}
+            iconUrl='walletconnect.svg'
+            // disabled={connector === walletConnect || !!activatingConnector}
+            disabled
+            isActive={connector === walletConnect}
+            isLoading={activatingConnector === walletConnect}
+          />
         </Grid>
         <Grid item xs={12}>
           <ConnectorButton
