@@ -105,7 +105,7 @@ export function CreateSubscriptionInformation({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1 }} />
+      <Divider sx={{ mb: 1, mt: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4} display='flex' flexDirection='column' gap={1}>
           <Typography variant='h6' mb={1}>

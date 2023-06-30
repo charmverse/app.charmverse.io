@@ -10,7 +10,6 @@ import type {
   Page,
   Post,
   PostComment,
-  Prisma,
   ProposalStatus,
   Role,
   RoleSource,
@@ -21,6 +20,7 @@ import type {
   Vote,
   WorkspaceEvent
 } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
@@ -675,7 +675,8 @@ export async function createVote({
   status = 'InProgress',
   title = 'Vote Title',
   context = 'inline',
-  description = null
+  content,
+  contentText = null
 }: Partial<Vote> &
   Pick<Vote, 'spaceId' | 'createdBy'> & {
     pageId?: string | null;
@@ -730,7 +731,8 @@ export async function createVote({
         }
       },
       type: 'Approval',
-      description
+      content: content ?? Prisma.DbNull,
+      contentText
     },
     include: {
       voteOptions: true

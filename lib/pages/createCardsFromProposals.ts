@@ -23,7 +23,15 @@ export async function createCardsFromProposals({
     where: {
       spaceId,
       type: 'proposal',
+      proposal: {
+        status: {
+          not: 'draft'
+        }
+      },
       deletedAt: null
+    },
+    include: {
+      workspaceEvents: true
     }
   });
   const board = (await prisma.block.findUnique({
@@ -92,10 +100,14 @@ export async function createCardsFromProposals({
 
   const cards: { page: Page; block: Block }[] = [];
   for (const pageProposal of pageProposals) {
+    const createdAt = pageProposal.workspaceEvents.find(
+      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
+    )?.createdAt;
     const _card = await createCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
+      createdAt,
       createdBy: userId,
       properties: { [newBoardField.id]: `${pageProposal.path}` },
       hasContent: pageProposal.hasContent,

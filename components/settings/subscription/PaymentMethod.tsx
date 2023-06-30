@@ -15,7 +15,7 @@ export function PaymentMethod({ paymentMethod }: { paymentMethod: PaymentMethodW
         <Typography>
           {paymentMethod.type === 'card' &&
             `${stringUtils.capitalize(paymentMethod?.brand || '')} **** ${paymentMethod.digits}`}
-          {paymentMethod.type === 'us_bank_account' && `${'ACH Debit'} **** ${paymentMethod.digits}`}
+          {paymentMethod.type === 'us_bank_account' && `ACH Debit **** ${paymentMethod.digits}`}
         </Typography>
         {paymentMethod.updateUrl && (
           <Link external href={paymentMethod.updateUrl}>

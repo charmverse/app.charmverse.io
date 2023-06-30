@@ -6,8 +6,7 @@ import Typography from '@mui/material/Typography';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 
 const subscriptionCancellationDetails = {
-  first:
-    'Cancelling CharmVerse Community Edition will revert this space to the Free Plan at the end of the current billing period. The following changes will be made: ',
+  first: 'If you use the Free Edition, the following changes will apply: ',
   list: [
     'All content will be public and shared on the web',
     'Custom roles will no longer apply',
@@ -27,11 +26,11 @@ type Props = {
 export function ConfirmFreeDowngradeModal({ isOpen, onClose, onConfirmDowngrade, disabled }: Props) {
   return (
     <ConfirmDeleteModal
-      title='Cancelling Community Edition'
+      title='Confirm Free Edition downgrade'
       size='large'
       open={isOpen}
-      buttonText='Yes'
-      secondaryButtonText='No'
+      buttonText='Downgrade to Free Edition'
+      secondaryButtonText='Keep current plan'
       question={
         <>
           <Typography>{subscriptionCancellationDetails.first}</Typography>
@@ -43,8 +42,6 @@ export function ConfirmFreeDowngradeModal({ isOpen, onClose, onConfirmDowngrade,
             ))}
           </List>
           <Typography>{subscriptionCancellationDetails.last}</Typography>
-          <br />
-          <Typography>Do you still want to Cancel?</Typography>
         </>
       }
       onConfirm={onConfirmDowngrade}

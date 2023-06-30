@@ -13,6 +13,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { isProdEnv } from 'config/constants';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
@@ -20,7 +21,7 @@ import type { CreateCryptoSubscriptionRequest, SubscriptionPaymentIntent } from 
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 
 import type { PaymentType } from './PaymentTabs';
-import { PaymentTabPanel } from './PaymentTabs';
+import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
 export function CheckoutForm({
   onCancel,
@@ -32,7 +33,8 @@ export function CheckoutForm({
   blockQuota,
   subscription,
   emailField,
-  couponField
+  couponField,
+  validating
 }: {
   emailField: string;
   couponField: string;
@@ -44,26 +46,13 @@ export function CheckoutForm({
     email: string;
     coupon: string;
   }>;
+  validating: boolean;
   registerCoupon: UseFormRegisterReturn<'coupon'>;
   onCancel: VoidFunction;
   handleCoupon: (coupon: string | undefined) => Promise<void>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
-
-  // const {
-  //   register,
-  //   getValues,
-  //   watch,
-  //   formState: { errors }
-  // } = useForm<{ email: string; coupon: string }>({
-  //   mode: 'onChange',
-  //   defaultValues: {
-  //     email: subscription.email || '',
-  //     coupon: subscription.coupon || ''
-  //   },
-  //   resolver: yupResolver(schema())
-  // });
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', {
@@ -222,7 +211,6 @@ export function CheckoutForm({
         email: emailField
       }
     });
-    setPendingPayment(true);
   };
 
   const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
@@ -236,8 +224,7 @@ export function CheckoutForm({
       )}
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
-          {/* @TODO - Reactivate this once Loop works */}
-          {/* <PaymentTabs value={paymentType} onChange={changePaymentType} /> */}
+          {!isProdEnv && <PaymentTabs value={paymentType} onChange={changePaymentType} />}
           <PaymentTabPanel value={paymentType} index='card'>
             <PaymentElement options={{ paymentMethodOrder: ['card', 'us_bank_account'] }} />
           </PaymentTabPanel>
@@ -264,24 +251,18 @@ export function CheckoutForm({
           <Divider sx={{ my: 2 }} />
           <Stack gap={0.5} my={2}>
             <Typography>Coupon code</Typography>
-            <Stack>
+            <Stack display='flex' flexDirection='row' gap={1}>
               <TextField
-                disabled={isProcessing || !!subscription.coupon}
+                disabled={isProcessing || !!subscription.coupon || validating}
                 {...registerCoupon}
                 error={!!errors.coupon}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton
-                        onClick={subscription?.coupon ? undefined : () => handleCoupon(couponField)}
-                        disabled={!!(subscription?.coupon || !couponField)}
-                      >
-                        <SendIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
               />
+              <Button
+                onClick={() => (subscription?.coupon ? handleCoupon(undefined) : handleCoupon(couponField))}
+                disabled={isProcessing || validating || !couponField}
+              >
+                {subscription?.coupon ? 'Remove' : 'Apply'}
+              </Button>
             </Stack>
           </Stack>
           <Divider sx={{ my: 2 }} />
@@ -319,18 +300,21 @@ export function CheckoutForm({
               <Button
                 onClick={createSubscription}
                 loading={isProcessing}
-                disabled={emailError || !emailField || isProcessing || !stripe || !elements}
+                disabled={emailError || !emailField || isProcessing || !stripe || !elements || validating}
               >
                 {isProcessing ? 'Processing ... ' : 'Upgrade'}
               </Button>
-              <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
+              <Button disabled={isProcessing || validating} onClick={onCancel} color='secondary' variant='text'>
                 Cancel
               </Button>
             </Stack>
           </PaymentTabPanel>
           <PaymentTabPanel value={paymentType} index='crypto'>
             <Stack gap={1} display='flex' flexDirection='column'>
-              <Button onClick={() => startCryptoPayment()} disabled={emailError || !emailField || isProcessing}>
+              <Button
+                onClick={() => startCryptoPayment()}
+                disabled={emailError || !emailField || isProcessing || validating}
+              >
                 Upgrade
               </Button>
               <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
