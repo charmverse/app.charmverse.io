@@ -9,9 +9,6 @@ on:
       core_pkg_version:
         description: 'Core pkg version'
         required: true
-      permission_api_tag:
-        description: 'Permission api image tag'
-        required: false
 
 jobs:
   build-test-env:
@@ -73,6 +70,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
