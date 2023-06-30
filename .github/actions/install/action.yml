@@ -41,7 +41,7 @@ runs:
 
     - name: Upgrade to latest version of Core package then commit back to repo
       shell: bash
-      if: github.ref == 'refs/heads/main' && inputs.core_pkg_version
+      if: inputs.core_pkg_version
       run: |
         npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
