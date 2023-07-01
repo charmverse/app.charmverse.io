@@ -34,12 +34,7 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    # - name: Install specific version of Core
-    #   shell: bash
-    #   if: inputs.core_pkg_version && inputs.core_pkg_version != 'latest'
-    #   run: npm install @charmverse/core@${{ inputs.core_pkg_version }}
-
-    - name: Upgrade to latest version of Core package then commit back to repo
+    - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
       shell: bash
       if: inputs.core_pkg_version
       run: |
