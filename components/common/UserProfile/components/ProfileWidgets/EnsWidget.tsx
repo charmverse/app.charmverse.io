@@ -66,18 +66,9 @@ export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
           />
         ) : null}
 
-        {showEmails && (
-          <Stack spacing={1}>
-            <Typography variant='subtitle2'>Accounts</Typography>
-            <StyledChipStack direction='row' flexWrap='wrap'>
-              <CustomChip label='Email' value={email} />
-            </StyledChipStack>
-          </Stack>
-        )}
-
         {showAccounts && (
           <Stack spacing={1}>
-            <Typography variant='subtitle2'>Other Records</Typography>
+            <Typography variant='subtitle2'>Accounts</Typography>
             <StyledChipStack direction='row' flexWrap='wrap'>
               {discord && <CustomChip label='Discord' value={discord} icon={<DiscordIcon />} />}
               {twitter && (
@@ -92,6 +83,15 @@ export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
               {linkedin && (
                 <CustomChip label='Linkedin' value={linkedin} icon={<LinkedInIcon style={{ color: '#0072B1' }} />} />
               )}
+            </StyledChipStack>
+          </Stack>
+        )}
+
+        {showEmails && (
+          <Stack spacing={1}>
+            <Typography variant='subtitle2'>Other Records</Typography>
+            <StyledChipStack direction='row' flexWrap='wrap'>
+              <CustomChip label='Email' value={email} />
             </StyledChipStack>
           </Stack>
         )}
