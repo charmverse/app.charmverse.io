@@ -16,6 +16,7 @@ import { NftsList } from '../NftsList';
 import { OrgsList } from '../OrgsList';
 import { PoapsList } from '../PoapsList';
 
+import { EnsWidget } from './EnsWidget';
 import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { ProfileWidget } from './ProfileWidget';
 import { SocialWidget } from './SocialWidget';
@@ -28,6 +29,11 @@ export function ProfileWidgets({ userId }: { userId: string }) {
   const { data: defaultLensProfile, isLoading: isLoadingLensProfile } = useSWR(`lens/profile/${userId}`, () =>
     charmClient.profile.getLensDefaultProfile(userId)
   );
+
+  const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`ens/profile/${userId}`, () =>
+    charmClient.profile.getEnsProfile(userId)
+  );
+
   const { memberPropertyValues, isLoading: isLoadingSpaceMemberPropertyValues } = useMemberPropertyValues(userId);
 
   const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/userDetails/${userId}`, () => {
@@ -51,10 +57,6 @@ export function ProfileWidgets({ userId }: { userId: string }) {
   const { getDisplayProperties } = useMemberProperties();
 
   const visibleProperties = getDisplayProperties('profile');
-
-  if (!space) {
-    return null;
-  }
 
   const currentSpacePropertyValues = memberPropertyValues?.find(
     (memberPropertyValue) => memberPropertyValue.spaceId === space?.id
@@ -92,7 +94,8 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     isFetchingPoaps ||
     isLoadingLensProfile ||
     isLoadingUserDetails ||
-    isLoadingSpaceMemberPropertyValues;
+    isLoadingSpaceMemberPropertyValues ||
+    isLoadingEnsProfile;
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
@@ -102,6 +105,13 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     <Grid container spacing={4}>
       {profileWidgets.map((profileWidget) => {
         switch (profileWidget) {
+          case 'ens':
+            return ensProfile ? (
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
+                <EnsWidget ensProfile={ensProfile} />
+              </Grid>
+            ) : null;
+
           case 'collection':
             return hideCollections ? null : (
               <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>

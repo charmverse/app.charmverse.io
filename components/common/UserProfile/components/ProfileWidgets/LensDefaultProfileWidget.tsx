@@ -45,7 +45,7 @@ export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: Profile
           </Typography>
         </Stack>
         <Divider />
-        <Typography>{lensProfile?.bio}</Typography>
+        <Typography variant='subtitle1'>{lensProfile?.bio}</Typography>
 
         {(lensProfile?.attributes ?? []).map((attribute) => {
           if (attribute.key === 'website') {
