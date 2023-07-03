@@ -218,7 +218,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    <PaidAnnouncementBanner />
+                    {space && <PaidAnnouncementBanner spaceId={space.id} />}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer
