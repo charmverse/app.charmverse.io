@@ -8,20 +8,16 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 
-import charmClient from 'charmClient';
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/LoginButton';
-import { useCustomDomain } from 'hooks/useCustomDomain';
-import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
-import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
+import { useUnstoppableDomains } from 'hooks/useUnstoppableDomains';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { DisabledAccountError } from 'lib/utilities/errors';
-import { BrowserPopupError } from 'lib/utilities/errors';
 
 import { Web3Connection } from '../../Web3ConnectionManager';
 
@@ -38,17 +34,15 @@ type Props = {
 export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const {
     setActivatingConnector,
-    isWalletSelectorModalOpen,
     closeWalletSelectorModal,
     openNetworkModal,
-    setIsConnectingIdentity,
     isConnectingIdentity,
     activatingConnector
   } = useContext(Web3Connection);
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
+  const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
 
-  const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
     activate(_connector, undefined, true).catch((err) => {
@@ -73,47 +67,17 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   }, [active]);
 
   useEffect(() => {
-    if (!isWalletSelectorModalOpen) {
-      setUAuthPopupError(null);
-    }
-  }, [isWalletSelectorModalOpen]);
-
-  useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
       closeWalletSelectorModal();
       openNetworkModal();
     }
   }, [error, openNetworkModal, closeWalletSelectorModal]);
 
-  const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
   const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
   log.info('Connect redirectUri', redirectUri);
 
   async function handleUnstoppableDomainsLogin() {
-    const UAuth = (await import('@uauth/js')).default;
-    const uauth = new UAuth({
-      clientID,
-      redirectUri,
-      scope: 'openid wallet'
-    });
-
-    setIsConnectingIdentity(true);
-    try {
-      const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
-      const user = await charmClient.unstoppableDomains.login({ authSig });
-
-      const domain = extractDomainFromProof(authSig);
-
-      loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
-    } catch (err) {
-      if ((err as DisabledAccountError)?.errorType === 'Disabled account') {
-        onError(err as DisabledAccountError);
-      } else if ((err as Error).message.match('failed to be constructed')) {
-        setUAuthPopupError(new BrowserPopupError());
-      }
-      setIsConnectingIdentity(false);
-      log.error(err);
-    }
+    unstoppableDomainsLogin({ loginSuccess, onError });
   }
 
   return (

@@ -7,11 +7,11 @@ import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 export function getCallbackDomain(host: string | undefined) {
   const protocol = isProdEnv || isStagingEnv ? `https://` : `http://`;
 
-  if (!host) {
-    if (isDevEnv) {
-      return `http://localhost:3000/`;
-    }
+  if (isDevEnv) {
+    return `http://localhost:3000`;
+  }
 
+  if (!host) {
     return `${protocol}//${appSubdomain}.${getAppApexDomain()}`;
   }
 
