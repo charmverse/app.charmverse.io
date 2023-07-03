@@ -7,8 +7,8 @@ import Button from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
-export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
-  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
+export function PaidAnnouncementBanner() {
+  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage('show-paid-banner', true);
   const { onClick } = useSettingsDialog();
 
   return showPaidAnnouncementBar ? (
