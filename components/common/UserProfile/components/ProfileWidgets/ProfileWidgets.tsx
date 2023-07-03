@@ -21,7 +21,7 @@ import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { ProfileWidget } from './ProfileWidget';
 import { SocialWidget } from './SocialWidget';
 
-const profileWidgets = ['charmverse', 'collection', 'ens', 'social', 'lens'] as const;
+const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens'] as const;
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();

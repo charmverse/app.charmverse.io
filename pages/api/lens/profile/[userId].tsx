@@ -13,9 +13,9 @@ handler.get(getLensProfileController);
 async function getLensProfileController(req: NextApiRequest, res: NextApiResponse<ProfileFragment | null>) {
   const userId = req.query.userId as string;
 
-  const nfts = await getDefaultLensProfile(userId);
+  const defaultLensProfile = await getDefaultLensProfile(userId);
 
-  res.status(200).json(nfts);
+  res.status(200).json(defaultLensProfile);
 }
 
 export default withSessionRoute(handler);
