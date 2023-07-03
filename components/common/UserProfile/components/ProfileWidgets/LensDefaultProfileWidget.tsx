@@ -32,22 +32,27 @@ export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: Profile
             avatar={(lensProfile.picture as MediaSetFragment)?.original?.url}
             variant='circular'
           />
-          <Stack spacing={0.5}>
-            <Typography variant='body1' fontWeight='bold'>
-              {lensProfile?.name ?? lensProfile?.handle}
-            </Typography>
-            <Typography variant='subtitle2'>{lensProfile?.id}</Typography>
+          <Stack>
+            <Stack direction='row' gap={0.5} alignItems='flex-end'>
+              <Typography variant='body1' fontWeight='bold'>
+                {lensProfile.name ?? lensProfile.handle}
+              </Typography>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                #{lensProfile.id}
+              </Typography>
+            </Stack>
+            <Typography variant='subtitle1'>{lensProfile.handle}</Typography>
           </Stack>
         </Stack>
         <Stack direction='row'>
           <Typography variant='body2'>
-            Followers: {lensProfile?.stats?.totalFollowers ?? 0} | Following: {lensProfile?.stats?.totalFollowing ?? 0}
+            Followers: {lensProfile.stats?.totalFollowers ?? 0} | Following: {lensProfile.stats?.totalFollowing ?? 0}
           </Typography>
         </Stack>
         <Divider />
-        <Typography variant='subtitle1'>{lensProfile?.bio}</Typography>
+        <Typography variant='subtitle1'>{lensProfile.bio}</Typography>
 
-        {(lensProfile?.attributes ?? []).map((attribute) => {
+        {(lensProfile.attributes ?? []).map((attribute) => {
           if (attribute.key === 'website') {
             return (
               <LensProfileAttributes
