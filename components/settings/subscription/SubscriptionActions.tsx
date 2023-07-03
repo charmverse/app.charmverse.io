@@ -7,6 +7,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 
 import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
+import { ConfirmPlanCancellationModal } from './ConfirmPlanCancellation';
 
 export function SubscriptionActions({
   spaceSubscription,
@@ -35,6 +36,12 @@ export function SubscriptionActions({
     open: openConfirmFreeTierDowngradeDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
+  const {
+    isOpen: isConfirmCancelPlanDialogOpen,
+    close: closeConfirmCancelPlanDialog,
+    open: openConfirmCancelPlanDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
+
   if (!isAdmin) {
     return null;
   }
@@ -51,9 +58,15 @@ export function SubscriptionActions({
           <Button disabled={loading} onClick={onUpgrade}>
             Update Plan
           </Button>
-          <Button disabled={loading} onClick={onCancelAtEnd} variant='text'>
+          <Button disabled={loading} onClick={openConfirmCancelPlanDialog} variant='text'>
             Cancel Plan
           </Button>
+          <ConfirmPlanCancellationModal
+            disabled={!isAdmin}
+            onConfirmCancellation={onCancelAtEnd}
+            onClose={closeConfirmCancelPlanDialog}
+            isOpen={isConfirmCancelPlanDialogOpen}
+          />
           {!isProdEnv && (
             <Button disabled={loading} onClick={onDelete} color='error' variant='outlined'>
               Delete Plan

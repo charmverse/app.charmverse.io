@@ -98,7 +98,8 @@ export function CurrentUserProfile({
     if (currentStep === 'email_step') {
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
-      title = `Welcome to ${currentSpace.name}! Set up your profile`;
+      // wrap hyphens with word joiner so that it doesn't wrap: https://en.wikipedia.org/wiki/Word_joiner
+      title = `Welcome to ${currentSpace.name.replace(/-/g, '\ufeff-\ufeff')}! Set up your profile`;
     }
   }
 

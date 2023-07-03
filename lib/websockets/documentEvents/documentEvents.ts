@@ -383,8 +383,13 @@ export class DocumentEventHandler {
   // We need to filter out marks from the suggested-tooltip plugin (supports mentions, slash command, etc). This way the tooltip doesn't show up for others.
   // (Not sure this is the best fix, but it's the only way I could think of for now)
   removeTooltipMarks(diff: ProsemirrorJSONStep) {
-    if (diff.slice?.content?.[0]?.marks?.length) {
-      diff.slice.content[0].marks = diff.slice.content[0].marks.filter((mark) => !mark.attrs?.trigger);
+    const content = diff.slice?.content;
+    if (content) {
+      for (const node of content) {
+        if (node.marks?.length) {
+          node.marks = node.marks.filter((mark) => !mark.attrs?.trigger);
+        }
+      }
     }
     return diff;
   }

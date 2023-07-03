@@ -91,7 +91,7 @@ describe('createProSubscription', () => {
     (stripeClient.customers.update as jest.Mock<any, any>) = updateCustomersMockFn;
     (stripeClient.customers.search as jest.Mock<any, any>) = searchCustomersMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
-    (stripeClient.subscriptions.search as jest.Mock<any, any>) = searchSubscriptionsMockFn;
+    (stripeClient.subscriptions.list as jest.Mock<any, any>) = searchSubscriptionsMockFn;
     (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
     (stripeClient.prices.list as jest.Mock<any, any>) = listPricesMockFn;
 
@@ -119,7 +119,8 @@ describe('createProSubscription', () => {
     });
 
     expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
-      coupon: '',
+      coupon: undefined,
+      promotion_code: undefined,
       metadata: {
         tier: 'pro',
         period: 'monthly',
@@ -136,6 +137,8 @@ describe('createProSubscription', () => {
       payment_settings: {
         save_default_payment_method: 'on_subscription'
       },
+      trial_period_days: undefined,
+      trial_settings: undefined,
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent']
     });

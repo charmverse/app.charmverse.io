@@ -1,7 +1,10 @@
 import CheckIcon from '@mui/icons-material/Check';
 import { Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { subscriptionDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import { getTimeDifference } from 'lib/utilities/dates';
@@ -29,6 +32,17 @@ export function CreateSubscriptionInformation({
         ? `Free trial - ${freeTrialEnds} days left`
         : `Free trial finished`
       : '';
+
+  const { space } = useCurrentSpace();
+
+  useEffect(() => {
+    if (space) {
+      charmClient.track.trackAction('page_view', {
+        spaceId: space.id,
+        type: 'billing/marketing'
+      });
+    }
+  }, [space]);
 
   return (
     <>
@@ -91,7 +105,7 @@ export function CreateSubscriptionInformation({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1 }} />
+      <Divider sx={{ mb: 1, mt: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4} display='flex' flexDirection='column' gap={1}>
           <Typography variant='h6' mb={1}>

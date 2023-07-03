@@ -16,7 +16,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
-import { SETTINGS_TABS } from '../config';
 import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -37,6 +36,8 @@ const schema = () => {
     .strict();
 };
 
+type FormValues = yup.InferType<ReturnType<typeof schema>>;
+
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
@@ -47,9 +48,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     isLoading: isLoadingSpaceSubscription,
     refetchSpaceSubscription
   } = useSpaceSubscription({
-    returnUrl: `${window?.location.origin}/${router.asPath}?settingTab=${
-      SETTINGS_TABS.find((tab) => tab.path === 'subscription')?.path
-    }`
+    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
   });
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
@@ -57,10 +56,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const {
     register,
     watch,
-    reset,
     setValue,
     formState: { errors }
-  } = useForm<{ email: string; coupon: string }>({
+  } = useForm<FormValues>({
     defaultValues: {
       email: '',
       coupon: ''
@@ -119,8 +117,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   // }, [initialSubscriptionData?.coupon, initialSubscriptionData?.email, isInitialSubscriptionLoading]);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 
@@ -130,16 +129,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
 
     setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
 
     await createSubscription({
       spaceId: space.id,
       payload: {
         period,
         blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota,
-        billingEmail: emailField
+        billingEmail: emailField,
+        coupon: initialSubscriptionData?.coupon
       }
     });
   }
@@ -160,13 +157,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota,
           period,
           billingEmail: emailField,
-          coupon: couponField
+          coupon: initialSubscriptionData?.coupon
         }
       });
     } else if (_period) {
       await createSubscription({
         spaceId: space.id,
-        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: couponField }
+        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: initialSubscriptionData?.coupon }
       });
     }
   };
@@ -255,7 +252,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         >
           <CheckoutForm
             emailField={emailField}
-            couponField={couponField}
+            couponField={couponField ?? ''}
             space={space}
             blockQuota={blockQuota}
             period={period}
@@ -264,6 +261,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             onCancel={() => setShowCheckoutForm(false)}
             errors={errors}
             registerCoupon={{ ...register('coupon') }}
+            validating={isValidationLoading}
           />
         </Elements>
       )}

@@ -1,9 +1,10 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { stripeClient } from 'lib/subscription/stripe';
+import { getCouponDetails } from 'lib/subscription/getCouponDetails';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,10 +19,20 @@ handler
   .use(requireKeys(['coupon'], 'body'))
   .post(validateDiscount);
 
-async function validateDiscount(req: NextApiRequest, res: NextApiResponse<{ valid: boolean }>) {
-  const coupon = req.body.coupon;
+export type ValidatedCoupon = {
+  valid: boolean;
+  couponId: string;
+};
 
-  await stripeClient.coupons.retrieve(coupon);
+async function validateDiscount(req: NextApiRequest, res: NextApiResponse<ValidatedCoupon>) {
+  const couponCode = req.body.coupon;
+  const spaceId = req.query.id as string;
+
+  const coupon = await getCouponDetails(couponCode);
+
+  if (!coupon) {
+    throw new InvalidInputError(`Invalid promotional code ${couponCode} for space ${spaceId}`);
+  }
 
   res.status(200).end();
 }

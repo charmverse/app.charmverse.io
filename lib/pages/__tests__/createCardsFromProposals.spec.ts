@@ -8,7 +8,7 @@ import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } fro
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
-describe('createCardsFromProposals', () => {
+describe('createCardsFromProposals()', () => {
   let user: User;
   let space: Space;
   let board: Page;
@@ -25,28 +25,13 @@ describe('createCardsFromProposals', () => {
   });
 
   beforeEach(async () => {
-    await prisma.$transaction([
-      prisma.page.deleteMany({
-        where: {
-          id: {
-            not: undefined
-          }
-        }
-      }),
-      prisma.proposal.deleteMany({
-        where: {
-          id: {
-            not: undefined
-          }
-        }
-      })
-    ]);
+    await prisma.$transaction([prisma.page.deleteMany(), prisma.proposal.deleteMany()]);
   });
 
   it('should create cards from proposals', async () => {
     const newProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
@@ -71,6 +56,20 @@ describe('createCardsFromProposals', () => {
           isEqual(newProposal.content, card.content)
       )
     ).toBeTruthy();
+  });
+
+  it('should not create cards from draft proposals', async () => {
+    await generateProposal({
+      authors: [],
+      proposalStatus: 'draft',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+
+    expect(cards.length).toBe(0);
   });
 
   it('should not create cards from proposals if board is not found', async () => {

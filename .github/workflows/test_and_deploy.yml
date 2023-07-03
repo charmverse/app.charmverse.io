@@ -13,21 +13,6 @@ on:
       core_pkg_version:
         description: 'Core pkg version to update to'
         required: true
-      run_integration_test:
-        type: boolean
-        description: 'Whether to run integration tests'
-        required: false
-        default: true
-      run_e2e_browser_test:
-        type: boolean
-        description: 'Whether to run e2e/browser tests'
-        required: false
-        default: false
-      deploy_to_prd:
-        type: boolean
-        description: 'Whether to deploy to prd servers'
-        required: false
-        default: false
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
@@ -37,6 +22,10 @@ jobs:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
+      - env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
       - uses: actions/checkout@v3
 
       - name: Debug
@@ -185,9 +174,10 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Re-enable condition before merge
-    if: ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) ||
-        ( github.event_name == 'workflow_dispatch' && inputs.deploy_to_prd )
+    if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
@@ -220,6 +210,7 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image

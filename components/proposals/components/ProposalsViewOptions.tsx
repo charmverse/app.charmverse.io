@@ -89,7 +89,7 @@ export function ProposalsViewOptions({
           {categories.map((category) => (
             <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
               <ProposalCategoryChip color={category.color} title={category.title} />
-              {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
+              <ProposalCategoryContextMenu category={category} key={category.id} />
             </MenuItem>
           ))}
           <MenuItem

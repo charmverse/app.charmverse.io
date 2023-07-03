@@ -121,8 +121,10 @@ export function charmEditorPlugins({
   pageId = null,
   spaceId = null,
   placeholderText,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableMention = false
 }: {
+  disableMention?: boolean;
   disableRowHandles?: boolean;
   spaceId?: string | null;
   pageId?: string | null;
@@ -171,10 +173,20 @@ export function charmEditorPlugins({
     }),
     imagePlugins({
       handleDragAndDrop: false
-    }),
-    mentionPlugins({
-      key: mentionPluginKey
-    }),
+    })
+  ];
+
+  // Breaking the array in order to make sure the plugins order is correct
+
+  if (!disableMention) {
+    basePlugins.push(
+      mentionPlugins({
+        key: mentionPluginKey
+      })
+    );
+  }
+
+  basePlugins.push(
     inlinePalettePlugins({ key: inlinePalettePluginKey }),
     bold.plugins(),
     bulletList.plugins(),
@@ -191,7 +203,7 @@ export function charmEditorPlugins({
     columnLayout.plugins(),
     paragraph.plugins(),
     strike.plugins(),
-    underline.plugins(),
+    underline.plugins() as RawPlugins,
     emoji.plugins({
       key: emojiPluginKey
     }),
@@ -253,7 +265,7 @@ export function charmEditorPlugins({
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText)
-  ];
+  );
 
   if (!readOnly && !disableRowHandles) {
     basePlugins.push(
@@ -395,6 +407,8 @@ interface CharmEditorProps {
   disableRowHandles?: boolean;
   disableNestedPages?: boolean;
   onConnectionError?: (error: Error) => void;
+  isPollOrVote?: boolean;
+  disableMention?: boolean;
 }
 
 function CharmEditor({
@@ -421,7 +435,9 @@ function CharmEditor({
   onParticipantUpdate,
   disableRowHandles = false,
   disableNestedPages = false,
-  onConnectionError
+  onConnectionError,
+  isPollOrVote = false,
+  disableMention = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -519,7 +535,8 @@ function CharmEditor({
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      disableMention
     });
   }
 
@@ -647,12 +664,12 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
+              return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
           case 'mention': {
-            return <Mention {...props}>{_children}</Mention>;
+            return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
             return <NestedPage currentPageId={pageId} {...props} />;
@@ -682,7 +699,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
+            return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
           }
           default: {
             return null;
@@ -701,7 +718,7 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
-      <MentionSuggest pluginKey={mentionPluginKey} />
+      {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
@@ -715,21 +732,23 @@ function CharmEditor({
       {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
-          <SidebarDrawer
-            id='page-action-sidebar'
-            title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
-            open={!!pageActionDisplay}
-          >
-            {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
-              <SuggestionsSidebar
-                pageId={pageId}
-                spaceId={currentSpace.id}
-                readOnly={!pagePermissions?.edit_content}
-                state={suggestionState}
-              />
-            )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
-          </SidebarDrawer>
+          {(enableComments || enableSuggestingMode) && (
+            <SidebarDrawer
+              id='page-action-sidebar'
+              title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
+              open={!!pageActionDisplay}
+            >
+              {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
+                <SuggestionsSidebar
+                  pageId={pageId}
+                  spaceId={currentSpace.id}
+                  readOnly={!pagePermissions?.edit_content}
+                  state={suggestionState}
+                />
+              )}
+              {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+            </SidebarDrawer>
+          )}
           <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup

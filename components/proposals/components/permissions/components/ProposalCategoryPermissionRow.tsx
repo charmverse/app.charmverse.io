@@ -11,16 +11,17 @@ import { useRoles } from 'hooks/useRoles';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
-import { proposalCategoryPermissionLabels } from './shared';
+import { proposalCategoryPermissionLabels } from '../shared';
 
 type Props = {
   assignee: TargetPermissionGroup<'role' | 'space'>;
   existingPermissionId?: string;
-  label?: string;
   permissionLevel?: ProposalCategoryPermissionLevel;
   defaultPermissionLevel?: ProposalCategoryPermissionLevel;
+  label?: string;
   proposalCategoryId: string;
   canEdit: boolean;
+  disabledTooltip?: string;
   updatePermission: (newPermission: ProposalCategoryPermissionInput & { id?: string }) => void;
   deletePermission?: (permissionId: string) => void;
 };
@@ -33,6 +34,7 @@ export function ProposalCategoryRolePermissionRow({
   defaultPermissionLevel,
   canEdit,
   label,
+  disabledTooltip,
   updatePermission,
   deletePermission
 }: Props) {
@@ -52,7 +54,7 @@ export function ProposalCategoryRolePermissionRow({
     '': (defaultPermissionLevel && proposalCategoryPermissionLabels[defaultPermissionLevel]) || 'No access'
   };
   // remove delete option if there is no existing permission
-  if (!existingPermissionId) {
+  if (!existingPermissionId && !defaultExists) {
     delete friendlyLabels.delete;
   }
 
@@ -70,7 +72,7 @@ export function ProposalCategoryRolePermissionRow({
   }
 
   const tooltip = !canEdit
-    ? 'You do not have permission to edit this permission'
+    ? disabledTooltip || 'You cannot edit permissions for this category'
     : usingDefault
     ? 'Default setting'
     : permissionLevel === 'full_access'
