@@ -60,7 +60,30 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   }
 
   const votes = await getVotesByPage({ pageId, postId, userId });
-  return res.status(200).json(votes);
+  return res.status(200).json(
+    votes.map((vote) => ({
+      ...vote,
+      contentText: vote.contentText ?? vote.description ?? '',
+      content: vote.content
+        ? vote.content
+        : vote.description
+        ? {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: vote.description
+                  }
+                ]
+              }
+            ]
+          }
+        : null
+    }))
+  );
 }
 
 async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {

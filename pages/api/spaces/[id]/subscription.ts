@@ -6,13 +6,13 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
-import { getSpaceSubscription } from 'lib/subscription/getSpaceSubscription';
 import type {
-  CreateProSubscriptionResponse,
-  CreateProSubscriptionRequest,
-  UpdateSubscriptionRequest
-} from 'lib/subscription/interfaces';
+  SpaceSubscriptionRequest,
+  SpaceSubscriptionWithStripeData
+} from 'lib/subscription/getActiveSpaceSubscription';
+import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
+import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { updateProSubscription } from 'lib/subscription/updateProSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -32,22 +32,31 @@ handler
   .use(requireKeys(['period', 'blockQuota'], 'body'))
   .post(createPaymentSubscription);
 
-async function getSpaceSubscriptionController(req: NextApiRequest, res: NextApiResponse<SpaceSubscription | null>) {
-  const { id: spaceId } = req.query as { id: string };
+async function getSpaceSubscriptionController(
+  req: NextApiRequest,
+  res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
+) {
+  const { id: spaceId, returnUrl } = req.query as { id: string } & Pick<SpaceSubscriptionRequest, 'returnUrl'>;
 
-  const spaceSubscription = await getSpaceSubscription({
-    spaceId
+  const spaceSubscription = await getActiveSpaceSubscription({
+    spaceId,
+    returnUrl,
+    // We only want to provide the customer portal link to admins, since it creates a fully trusted session on stripe portal
+    requestCustomerPortal: req.isAdmin
   });
 
   return res.status(200).json(spaceSubscription);
 }
 
-async function createPaymentSubscription(req: NextApiRequest, res: NextApiResponse<CreateProSubscriptionResponse>) {
+async function createPaymentSubscription(
+  req: NextApiRequest,
+  res: NextApiResponse<SubscriptionPaymentIntent & { email?: string }>
+) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
   const { period, blockQuota, billingEmail, name, address, coupon } = req.body as CreateProSubscriptionRequest;
 
-  const { clientSecret, paymentIntentStatus, subscriptionId } = await createProSubscription({
+  const { paymentIntent, email } = await createProSubscription({
     spaceId,
     period,
     blockQuota,
@@ -59,11 +68,7 @@ async function createPaymentSubscription(req: NextApiRequest, res: NextApiRespon
 
   log.info(`Subscription creation process started for space ${spaceId} by user ${userId}`);
 
-  res.status(200).json({
-    subscriptionId,
-    paymentIntentStatus,
-    clientSecret
-  });
+  res.status(200).json({ ...(paymentIntent || ({} as SubscriptionPaymentIntent)), email });
 }
 
 async function deletePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {

@@ -32,8 +32,9 @@ export function VideoNodeView({
   view,
   selected,
   updateAttrs,
-  isPost = false
-}: CharmNodeViewProps & { isPost?: boolean }) {
+  isPost = false,
+  isPollOrVote = false
+}: CharmNodeViewProps & { isPost?: boolean; isPollOrVote?: boolean }) {
   const attrs = node.attrs as VideoNodeAttrs;
   const { space } = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
@@ -64,7 +65,7 @@ export function VideoNodeView({
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly || (!pageId && !isPost)) {
+    if (readOnly || (!pageId && !isPost && !isPollOrVote)) {
       // hide the row completely
       return <div />;
     } else {

@@ -30,7 +30,7 @@ export function ProposalsTable({
 }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const { showProposal } = useProposalDialog();
+  const { showProposal, hideProposal } = useProposalDialog();
   const router = useRouter();
   const { formatDateTime, formatDate } = useDateFormatter();
 
@@ -38,12 +38,14 @@ export function ProposalsTable({
     setUrlWithoutRerender(router.pathname, { id: null });
     mutateProposals();
     mutateTasks();
+    hideProposal();
   }
 
   function openPage(pageId: string) {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, id: pageId }
+    setUrlWithoutRerender(router.pathname, { id: pageId });
+    showProposal({
+      pageId,
+      onClose
     });
   }
 

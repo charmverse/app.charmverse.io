@@ -1,4 +1,3 @@
-import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import type { AddressParam } from '@stripe/stripe-js';
 import type { Stripe } from 'stripe';
 
@@ -11,6 +10,20 @@ export type CreateProSubscriptionRequest = {
   name?: string;
   address?: AddressParam;
   coupon?: string;
+  freeTrial?: boolean;
+};
+
+/**
+ * subtotalPrice and totalPrice expressed in USD, with cents after the decimal
+ */
+export type SubscriptionPaymentIntent = {
+  subscriptionId: string;
+  paymentIntentId: string;
+  clientSecret: string;
+  paymentIntentStatus: Stripe.PaymentIntent.Status;
+  subTotalPrice: number;
+  totalPrice: number;
+  coupon?: string;
 };
 
 export type ProSubscriptionResponse = {
@@ -20,16 +33,10 @@ export type ProSubscriptionResponse = {
   blockQuota: number;
   productId: string;
   customerId: string;
-  paymentIntentId: string;
-  clientSecret: string;
-  paymentIntentStatus: Stripe.PaymentIntent.Status;
+  email?: string;
+  // These values are only sent back when creating a subscription with the user present
+  paymentIntent?: SubscriptionPaymentIntent;
 };
-
-export type CreateProSubscriptionResponse = Pick<
-  ProSubscriptionResponse,
-  'clientSecret' | 'subscriptionId' | 'paymentIntentStatus'
->;
-
 export type CreateCryptoSubscriptionResponse = string;
 
 export type CreateCryptoSubscriptionRequest = {
@@ -37,4 +44,7 @@ export type CreateCryptoSubscriptionRequest = {
   email: string;
 };
 
-export type UpdateSubscriptionRequest = Partial<Omit<StripeSubscription, 'id' | 'createdAt' | 'spaceId'>>;
+export type StripeMetadataKeys = {
+  domain: string;
+  spaceId: string;
+};

@@ -1,61 +1,70 @@
-import type { Space, SubscriptionPeriod } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
-import { List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Divider, InputLabel, Stack, TextField, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaces } from 'hooks/useSpaces';
-import { subscriptionCancellationDetails } from 'lib/subscription/constants';
-import type { UpdateSubscriptionRequest, CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
 import { PlanSelection } from './PlanSelection';
-import { SubscriptionActions } from './SubscriptionActions';
 import { SubscriptionInformation } from './SubscriptionInformation';
+
+const schema = () => {
+  return yup
+    .object({
+      email: yup.string().email().required(),
+      coupon: yup.string().optional()
+    })
+    .strict();
+};
+
+type FormValues = yup.InferType<ReturnType<typeof schema>>;
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
-  const { setSpace } = useSpaces();
 
-  const { spaceSubscription, isLoading, refetchSpaceSubscription } = useSpaceSubscription();
+  const router = useRouter();
 
-  const { trigger: updateSpaceSubscription, isMutating: isLoadingUpdate } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpdateSubscriptionRequest } }>) =>
-      charmClient.subscription.updateSpaceSubscription(arg.spaceId, arg.payload),
-    {
-      onError() {
-        showMessage('Updating failed! Please try again', 'error');
-      }
-    }
-  );
-
-  const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
-      charmClient.subscription.deleteSpaceSubscription(arg.spaceId),
-    {
-      onError() {
-        showMessage('Deletion failed! Please try again', 'error');
-      },
-      async onSuccess() {
-        await refetchSpaceSubscription();
-        setSpace({ ...space, paidTier: 'free' });
-      }
-    }
-  );
+  const {
+    spaceSubscription,
+    isLoading: isLoadingSpaceSubscription,
+    refetchSpaceSubscription
+  } = useSpaceSubscription({
+    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
+  });
 
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors }
+  } = useForm<FormValues>({
+    defaultValues: {
+      email: '',
+      coupon: ''
+    },
+    resolver: yupResolver(schema())
+  });
 
   const {
     data: initialSubscriptionData,
@@ -69,36 +78,72 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       onError() {
         showMessage('Checkout failed! Please try again', 'error');
       },
-      async onSuccess() {
+      async onSuccess(data) {
         setShowCheckoutForm(true);
+        setValue('coupon', data.coupon || '');
+        setValue('email', data.email || '');
       }
     }
   );
 
+  const emailField = watch('email');
+  const couponField = watch('coupon');
+
+  const { trigger: validateCoupon, isMutating: isValidationLoading } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: { coupon: string } } }>) =>
+      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
+    {
+      onError() {
+        showMessage('Your coupon is not valid', 'error');
+        setValue('coupon', '');
+      }
+    }
+  );
+
+  const { data: blockCountData } = useSWR(space.id ? `space-block-count-${space.id}` : null, () =>
+    charmClient.spaces.getBlockCount({ spaceId: space.id })
+  );
+
+  const blockCount = blockCountData?.count || 0;
+
+  const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
+
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
-  const [blockQuota, setblockQuota] = useState(1);
+  const [blockQuota, setBlockQuota] = useState(10);
+
+  // useLayoutEffect(() => {
+  //   reset({ email: initialSubscriptionData?.email || '', coupon: initialSubscriptionData?.coupon || '' });
+  // }, [initialSubscriptionData?.coupon, initialSubscriptionData?.email, isInitialSubscriptionLoading]);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 
   async function handleShowCheckoutForm() {
-    setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
-    await createSubscription({ spaceId: space.id, payload: { period, blockQuota } });
-  }
+    if (minimumBlockQuota > blockQuota) {
+      setBlockQuota(minimumBlockQuota);
+    }
 
-  async function handleDeleteSubs() {
-    await deleteSubscription({ spaceId: space.id });
+    setShowCheckoutForm(true);
+
+    await createSubscription({
+      spaceId: space.id,
+      payload: {
+        period,
+        blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota,
+        billingEmail: emailField,
+        coupon: initialSubscriptionData?.coupon
+      }
+    });
   }
 
   const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
     if (_blockQuota) {
-      setblockQuota(_blockQuota);
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
     } else if (_period) {
       setPeriod(_period);
     }
@@ -106,101 +151,121 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const handlePlanSelectCommited = async (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
     if (_blockQuota) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota: _blockQuota, period } });
+      await createSubscription({
+        spaceId: space.id,
+        payload: {
+          blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota,
+          period,
+          billingEmail: emailField,
+          coupon: initialSubscriptionData?.coupon
+        }
+      });
     } else if (_period) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota, period: _period } });
+      await createSubscription({
+        spaceId: space.id,
+        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: initialSubscriptionData?.coupon }
+      });
     }
   };
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  const handleCoupon = async (coupon: string | undefined) => {
+    if (coupon) {
+      await validateCoupon({
+        spaceId: space.id,
+        payload: { coupon }
+      });
+    }
+
+    await createSubscription({
+      spaceId: space.id,
+      payload: { blockQuota, period, coupon, billingEmail: emailField }
+    });
+  };
+
   const theme = useTheme();
 
   const stripePromise = loadStripe();
 
+  if (space.paidTier === 'enterprise') {
+    return <EnterpriseBillingScreen />;
+  }
+
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>
-        {spaceSubscription ? (
+        {isLoadingSpaceSubscription ? (
+          <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
+        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
+            minimumBlockQuota={minimumBlockQuota}
             space={space}
             spaceSubscription={spaceSubscription}
-            isLoading={isLoading}
-            blockQuota={blockQuota}
+            refetchSpaceSubscription={refetchSpaceSubscription}
           />
         ) : (
-          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} />
+          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} spaceSubscription={spaceSubscription} />
         )}
-        <SubscriptionActions
-          spaceSubscription={spaceSubscription}
-          loading={isLoading || isLoadingUpdate || isLoadingDeletion}
-          onDelete={handleDeleteSubs}
-          onCancelAtEnd={() => setShowConfirmDialog(true)}
-          onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
-        />
-        <ConfirmDeleteModal
-          title='Cancelling Community Edition'
-          size='large'
-          open={showConfirmDialog}
-          buttonText='Yes'
-          secondaryButtonText='No'
-          question={
-            <>
-              <Typography>{subscriptionCancellationDetails.first}</Typography>
-              <List dense sx={{ listStyle: 'disc' }}>
-                {subscriptionCancellationDetails.list.map((item) => (
-                  <ListItem key={item} sx={{ display: 'list-item', ml: '15px' }}>
-                    <ListItemText>{item}</ListItemText>
-                  </ListItem>
-                ))}
-              </List>
-              <Typography>{subscriptionCancellationDetails.last}</Typography>
-              <br />
-              <Typography>Do you still want to Cancel?</Typography>
-            </>
-          }
-          onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancelAtEnd' } })}
-          onClose={() => setShowConfirmDialog(false)}
-          disabled={isLoadingUpdate || isLoadingDeletion}
-        />
       </Stack>
     );
   }
+
+  const isLoading = isInitialSubscriptionLoading || isLoadingSpaceSubscription;
 
   return (
     <Stack gap={1}>
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
-      <Typography>Comprehensive access control & unlimited roles, guests, custom domain and API access</Typography>
-      <PlanSelection
-        disabled={isInitialSubscriptionLoading}
-        onSelect={handlePlanSelect}
-        onSelectCommited={handlePlanSelectCommited}
-        blockQuota={blockQuota}
-        period={period}
-      />
-      <LoadingComponent isLoading={isInitialSubscriptionLoading} />
-      {!isLoading &&
-        !isInitialSubscriptionLoading &&
-        spaceSubscription !== undefined &&
-        initialSubscriptionData?.clientSecret && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret: initialSubscriptionData.clientSecret,
-              appearance: {
-                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-              }
-            }}
-          >
-            <CheckoutForm
-              show={showCheckoutForm}
-              blockQuota={blockQuota}
-              period={period}
-              subscriptionId={initialSubscriptionData.subscriptionId}
-              refetch={refetchSpaceSubscription}
-              onCancel={() => setShowCheckoutForm(false)}
-            />
-          </Elements>
-        )}
+      <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
+      {!!blockCountData && (
+        <PlanSelection
+          disabled={isInitialSubscriptionLoading}
+          onSelect={handlePlanSelect}
+          onSelectCommited={handlePlanSelectCommited}
+          blockQuotaInThousands={blockQuota}
+          period={period}
+        />
+      )}
+      <Stack maxWidth='400px'>
+        <Typography variant='h6' mb={1}>
+          Billing Information
+        </Typography>
+        <Stack gap={0.5} my={2}>
+          <InputLabel>Email (required)</InputLabel>
+          <TextField
+            {...register('email')}
+            placeholder='johndoe@gmail.com'
+            error={!!errors.email}
+            disabled={isLoading}
+          />
+        </Stack>
+      </Stack>
+      <Divider sx={{ mb: 1 }} />
+      <LoadingComponent isLoading={isLoading} />
+      {!isLoading && spaceSubscription !== undefined && initialSubscriptionData?.clientSecret && (
+        <Elements
+          stripe={stripePromise}
+          options={{
+            clientSecret: initialSubscriptionData.clientSecret,
+            appearance: {
+              theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+            }
+          }}
+        >
+          <CheckoutForm
+            emailField={emailField}
+            couponField={couponField ?? ''}
+            space={space}
+            blockQuota={blockQuota}
+            period={period}
+            subscription={initialSubscriptionData}
+            handleCoupon={handleCoupon}
+            onCancel={() => setShowCheckoutForm(false)}
+            errors={errors}
+            registerCoupon={{ ...register('coupon') }}
+            validating={isValidationLoading}
+          />
+        </Elements>
+      )}
     </Stack>
   );
 }

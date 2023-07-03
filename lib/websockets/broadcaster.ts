@@ -9,7 +9,7 @@ import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';
 import { config } from './config';
-import { DocumentEventHandler } from './documentEvents';
+import { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ServerMessage } from './interfaces';
 import { SpaceEventHandler } from './spaceEvents';
 

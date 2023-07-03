@@ -1,34 +1,36 @@
-import type { SubscriptionPeriod } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
-import { Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { AiOutlineUnlock } from 'react-icons/ai';
+import Typography from '@mui/material/Typography';
 
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
+import Lock from 'public/images/subscriptions/lock.svg';
+
+import { StyledToggleButtonGroup } from './PaymentTabs';
 
 export function PlanSelection({
   disabled,
   period,
-  blockQuota,
+  blockQuotaInThousands,
   onSelect,
   onSelectCommited
 }: {
   disabled: boolean;
-  onSelect: (blockQuota: number | null, period: SubscriptionPeriod | null) => void;
-  onSelectCommited: (quanity: number | null, period: SubscriptionPeriod | null) => void;
+  onSelect: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
+  onSelectCommited: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
   period: SubscriptionPeriod;
-  blockQuota: number;
+  blockQuotaInThousands: number;
 }) {
   const theme = useTheme();
+  const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
   return (
     <>
       <Stack my={2}>
-        <ToggleButtonGroup
+        <StyledToggleButtonGroup
           value={period}
           exclusive
           disabled={disabled}
@@ -44,25 +46,26 @@ export function PlanSelection({
           <ToggleButton value='monthly' aria-label='centered'>
             Monthly
           </ToggleButton>
-        </ToggleButtonGroup>
+        </StyledToggleButtonGroup>
       </Stack>
       <Stack>
         <InputLabel>Usage</InputLabel>
         <Stack spacing={2} direction='row' alignItems='center' mx={2} mb={1}>
-          <Typography>${communityProduct.pricing[period]}/mo</Typography>
+          <Typography>${price * 10}/mo</Typography>
           <Slider
             disabled={disabled}
             size='small'
-            aria-label='Quantity slider'
-            valueLabelDisplay='off'
-            value={blockQuota}
-            step={1}
-            min={1}
-            max={50}
+            aria-label='Block quota slider'
+            valueLabelDisplay='auto'
+            valueLabelFormat={(value) => `${value}K`}
+            value={blockQuotaInThousands}
+            step={10}
+            min={10}
+            max={500}
             onChange={(_, value) => onSelect(value as number, null)}
             onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
-          <Typography>${(communityProduct.pricing[period] ?? 0) * 50}/mo</Typography>
+          <Typography>${price * 500}/mo</Typography>
         </Stack>
       </Stack>
       <Stack
@@ -79,11 +82,14 @@ export function PlanSelection({
           <Typography variant='h6' mb={2}>
             Current selection
           </Typography>
-          <Typography>{`$${(communityProduct.pricing[period] ?? 0) * blockQuota}/mo`}</Typography>
-          <Typography>{`${communityProduct.blockLimit * blockQuota} blocks`}</Typography>
+          <Typography>{`$${price * blockQuotaInThousands}/mo`}</Typography>
+          <Typography>{`${String(communityProduct.blockQuotaIncrement * blockQuotaInThousands).slice(
+            0,
+            -3
+          )}K blocks`}</Typography>
         </Stack>
         <Stack>
-          <AiOutlineUnlock size={100} />
+          <Lock width='100px' height='100px' />
         </Stack>
       </Stack>
     </>

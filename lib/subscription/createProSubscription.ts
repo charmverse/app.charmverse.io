@@ -1,12 +1,13 @@
-import { ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import log from 'loglevel';
 import type { Stripe } from 'stripe';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
-import type { CreateProSubscriptionRequest, ProSubscriptionResponse } from './interfaces';
+import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
+import { getCouponDetails } from './getCouponDetails';
+import { getCommunityPrice } from './getProductPrice';
+import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
 
 export async function createProSubscription({
@@ -16,7 +17,8 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon = ''
+  coupon,
+  freeTrial
 }: {
   spaceId: string;
 } & CreateProSubscriptionRequest): Promise<ProSubscriptionResponse> {
@@ -28,45 +30,49 @@ export async function createProSubscription({
       name: true
     }
   });
-
   const productId = communityProduct.id;
 
   if (!space) {
     throw new NotFoundError('Space not found');
   }
 
-  const spaceSubscription = await prisma.stripeSubscription.findFirst({
-    where: {
-      spaceId,
-      deletedAt: null
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
+  const spaceSubscriptionWithDetails = await getActiveSpaceSubscription({ spaceId });
 
-  if (spaceSubscription) {
-    throw new InvalidStateError(`Space already has an active subscription with the id ${spaceSubscription.id}`);
+  if (freeTrial && spaceSubscriptionWithDetails?.status === 'free_trial') {
+    throw new InvalidStateError(
+      `Space already has an active free trial with the id ${spaceSubscriptionWithDetails.id}`
+    );
   }
 
-  const pendingStripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}'`,
-    expand: ['data.customer']
+  if (spaceSubscriptionWithDetails?.status === 'active') {
+    throw new InvalidStateError(
+      `Space already has an active subscription with the id ${spaceSubscriptionWithDetails.id}`
+    );
+  }
+
+  const existingCustomer = await stripeClient.customers.search({
+    query: `metadata['spaceId']:'${spaceId}'`
   });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = pendingStripeSubscription.data?.[0];
+  let existingStripeSubscription: Stripe.Subscription | undefined;
+  if (existingCustomer.data?.[0]?.id) {
+    const stripeSubscriptions = await stripeClient.subscriptions.list({
+      status: 'incomplete',
+      customer: existingCustomer.data?.[0]?.id
+    });
 
-  const existingStripeCustomer = pendingStripeSubscription.data?.find((sub) => {
-    const _customer = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
-    return _customer.deleted !== true && (sub.status === 'trialing' || sub.status === 'incomplete');
-  })?.customer as Stripe.Customer | undefined;
+    existingStripeSubscription = stripeSubscriptions.data?.find((sub) => sub.metadata.spaceId === spaceId);
+  }
+
+  const existingStripeCustomer = existingCustomer?.data.find((cus) => !cus.deleted);
 
   // A failed payment will already have a customer & subscription
   if (existingStripeCustomer && !existingStripeCustomer?.deleted) {
     await stripeClient.customers.update(existingStripeCustomer.id, {
       metadata: {
-        spaceId: space.id
-      },
+        spaceId,
+        domain: space.domain
+      } as StripeMetadataKeys,
       name: name || space.name,
       ...(address && { address }),
       ...(billingEmail && { email: billingEmail })
@@ -77,102 +83,67 @@ export async function createProSubscription({
     existingStripeCustomer ||
     (await stripeClient.customers.create({
       metadata: {
-        spaceId: space.id
-      },
+        spaceId,
+        domain: space.domain
+      } as StripeMetadataKeys,
       address,
       name: name || space.name,
       email: billingEmail
     }));
 
-  const stripePeriod = period === 'monthly' ? 'month' : 'year';
-
   // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
-  const { data: prices } = await stripeClient.prices.list({
-    product: productId,
-    type: 'recurring',
-    active: true
-  });
+  const productPrice = await getCommunityPrice(productId, period, spaceId);
 
-  if (prices?.length === 0) {
-    throw new InvalidStateError(`No prices found in Stripe for the product ${productId} and space ${spaceId}`);
+  // Case when the user is updating his subscription in checkout
+  if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
+    await stripeClient.subscriptions.del(existingStripeSubscription.id);
   }
 
-  const productPrice = prices.find((price) => price.recurring?.interval === stripePeriod);
-
-  if (!productPrice) {
-    throw new InvalidStateError(`No price for product ${productId} and space ${spaceId}`);
+  let promoCodeData;
+  if (coupon) {
+    promoCodeData = await getCouponDetails(coupon);
   }
 
-  let subscription: Stripe.Subscription | undefined;
-  try {
-    // Case when the user is updating his subscription in checkout
-    if (
-      existingStripeSubscription &&
-      (existingStripeSubscription.status === 'trialing' || existingStripeSubscription.status === 'incomplete')
-    ) {
-      subscription = await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        items: [
-          {
-            id: existingStripeSubscription.items.data[0].id,
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent']
-      });
-    } else {
-      subscription = await stripeClient.subscriptions.create({
-        metadata: {
-          productId,
-          period,
-          tier: 'pro',
-          spaceId: space.id
-        },
-        customer: customer.id,
-        items: [
-          {
-            price: productPrice.id,
-            quantity: blockQuota
-          }
-        ],
-        coupon,
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent']
-      });
-    }
-  } catch (error: any) {
-    log.error(`[stripe]: Failed to create subscription. ${error.message}`, {
-      spaceId,
+  const subscription = await stripeClient.subscriptions.create({
+    metadata: {
+      productId,
       period,
-      billingEmail,
-      error
-    });
-  }
-
-  if (!subscription) {
-    throw new ExternalServiceError('Failed to create subscription');
-  }
+      tier: 'pro',
+      spaceId
+    },
+    trial_period_days: freeTrial ? communityProduct.trial : undefined,
+    customer: customer.id,
+    items: [
+      {
+        price: productPrice.id,
+        quantity: blockQuota
+      }
+    ],
+    ...(promoCodeData
+      ? {
+          [promoCodeData.type]: promoCodeData.id
+        }
+      : {
+          coupon: undefined,
+          promotion_code: undefined
+        }),
+    payment_settings: {
+      save_default_payment_method: 'on_subscription'
+    },
+    // This ensures the subscription will expire after the trial and is not accidentally billed
+    trial_settings: freeTrial
+      ? {
+          end_behavior: {
+            missing_payment_method: 'cancel'
+          }
+        }
+      : undefined,
+    payment_behavior: 'default_incomplete',
+    expand: ['latest_invoice.payment_intent']
+  });
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
-
-  if (!paymentIntent?.client_secret) {
-    throw new ExternalServiceError('Failed to create subscription. The client secret is missing.');
-  }
 
   return {
     subscriptionId: subscription.id,
@@ -181,8 +152,17 @@ export async function createProSubscription({
     blockQuota,
     invoiceId: invoice.id,
     customerId: customer.id,
-    paymentIntentId: paymentIntent.id,
-    paymentIntentStatus: paymentIntent.status,
-    clientSecret: paymentIntent.client_secret
+    email: customer.email || undefined,
+    paymentIntent: paymentIntent
+      ? {
+          subscriptionId: subscription.id,
+          paymentIntentId: paymentIntent.id,
+          paymentIntentStatus: paymentIntent.status,
+          clientSecret: paymentIntent.client_secret as string,
+          subTotalPrice: ((subscription.latest_invoice as Stripe.Invoice).subtotal || 0) / 100,
+          totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100,
+          coupon
+        }
+      : undefined
   };
 }
