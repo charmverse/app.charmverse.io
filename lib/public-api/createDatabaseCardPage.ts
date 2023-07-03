@@ -68,7 +68,7 @@ export async function createDatabaseCardPage(
         headerImage: null,
         icon: '',
         isTemplate: false,
-        properties: mappedProperties
+        properties: mappedProperties as any
       }
     }
   });
