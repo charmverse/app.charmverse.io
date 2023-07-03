@@ -1,11 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProfileFragment } from '@lens-protocol/client';
-/* eslint-disable-next-line */
-import { LensClient, production } from '@lens-protocol/client';
 
-const lensClient = new LensClient({
-  environment: production
-});
+import { lensClient } from './lensClient';
 
 export async function getDefaultLensProfile(userId: string): Promise<ProfileFragment | null> {
   const user = await prisma.user.findUnique({
