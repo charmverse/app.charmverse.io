@@ -14,8 +14,8 @@ const UpgradeButton = styled(Button)`
   padding-top: 0;
 `;
 
-export function PaidAnnouncementBanner() {
-  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage('show-paid-banner', true);
+export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
+  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
   const { onClick } = useSettingsDialog();
 
   return showPaidAnnouncementBar ? (
