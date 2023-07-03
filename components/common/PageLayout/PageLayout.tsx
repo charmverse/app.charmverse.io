@@ -13,6 +13,7 @@ import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDi
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useResize } from 'hooks/useResize';
@@ -139,6 +140,7 @@ function PageLayout({ children }: PageLayoutProps) {
   const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobile);
   const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 300);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isAdmin = useIsAdmin();
 
   const {
     width: resizableSidebarWidth,
@@ -218,7 +220,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    {space?.paidTier === 'pro' && <PaidAnnouncementBanner spaceId={space.id} />}
+                    {isAdmin && space?.paidTier === 'pro' && <PaidAnnouncementBanner spaceId={space.id} />}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer
