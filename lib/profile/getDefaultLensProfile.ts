@@ -31,7 +31,7 @@ export async function getDefaultLensProfile(userId: string): Promise<ProfileFrag
 
   for (const walletAddress of walletAddresses) {
     const ownedProfiles = await lensClient.profile.fetchAll({
-      ownedBy: [walletAddress],
+      ownedBy: ['0x2b3DaEB14f069dB301cEAD63338a56d27A982CED'],
       limit: 1
     });
 

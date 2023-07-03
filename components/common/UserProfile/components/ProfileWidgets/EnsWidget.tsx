@@ -49,7 +49,11 @@ export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
   const showAccounts = !!discord || !!twitter || !!github || !!reddit || !!linkedin;
 
   return (
-    <ProfileWidget title='Ethereum Naming Service' avatarSrc='/images/ens_logo.svg'>
+    <ProfileWidget
+      link={`https://${ensProfile.ensname}.xyz`}
+      title='Ethereum Naming Service'
+      avatarSrc='/images/ens_logo.svg'
+    >
       <Stack spacing={2}>
         <Stack spacing={1}>
           <Avatar size='large' name={ensProfile.ensname ?? ''} avatar={ensProfile.avatar} variant='circular' />
