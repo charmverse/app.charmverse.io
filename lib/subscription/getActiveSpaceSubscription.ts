@@ -1,11 +1,7 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type Stripe from 'stripe';
 
-import { getStripeCustomerBySpaceId } from './getStripeCustomerBySpaceId';
 import type { SubscriptionFieldsFromStripe } from './mapStripeFields';
 import { mapStripeFields } from './mapStripeFields';
 import { stripeClient } from './stripe';
@@ -48,11 +44,6 @@ export async function getActiveSpaceSubscription({
     // Never pass the values inline. Use subscriptionExpandFields variable instead so we can unit test its value.
     expand: subscriptionExpandFields
   });
-
-  // await fs.writeFile(
-  //   `${path.resolve('jsonoutputs')}/${Date.now()}.json`,
-  //   JSON.stringify(subscriptionInStripe, null, 2)
-  // );
 
   const stripeData = mapStripeFields({
     spaceId,

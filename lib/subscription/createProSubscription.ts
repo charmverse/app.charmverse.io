@@ -144,7 +144,6 @@ export async function createProSubscription({
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
-  const discountCoupon = invoice.discount?.coupon?.id;
 
   return {
     subscriptionId: subscription.id,
