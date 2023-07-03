@@ -1,5 +1,6 @@
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
@@ -13,6 +14,22 @@ import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
 
 import Legend from '../Legend';
+
+function MobileIconContainer({ children }: { children: ReactNode }) {
+  return (
+    <Box sx={{ display: { xs: 'flex', lg: 'none' } }} my={2} justifyContent='center'>
+      {children}
+    </Box>
+  );
+}
+
+function DesktopIconContainer({ children }: { children: ReactNode }) {
+  return (
+    <Box style={{ float: 'left' }} sx={{ display: { xs: 'none', lg: 'block' } }} width='100px'>
+      {children}
+    </Box>
+  );
+}
 
 export function CreateSubscriptionInformation({
   onClick,
@@ -51,13 +68,18 @@ export function CreateSubscriptionInformation({
       </Legend>
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
-          <Box style={{ float: 'left' }} mt={-1} width='100px'>
-            <FreeIcon width='100px' height='100px' />
-          </Box>
+          <DesktopIconContainer>
+            <Box mt={-1}>
+              <FreeIcon width='100px' height='100px' />
+            </Box>
+          </DesktopIconContainer>
           <Typography variant='h6' mb={1}>
             Free Plan
           </Typography>
           {spaceSubscription?.status === 'free_trial' ? null : <Chip size='small' label='Current Plan' />}
+          <MobileIconContainer>
+            <FreeIcon width='140px' height='140px' />
+          </MobileIconContainer>
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography variant='h6' mb={1}>
@@ -79,9 +101,9 @@ export function CreateSubscriptionInformation({
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
-            <Box style={{ float: 'left' }} width='100px'>
+            <DesktopIconContainer>
               <CommunityIcon width='100px' height='100px' />
-            </Box>
+            </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
               Community Edition
             </Typography>
@@ -91,6 +113,9 @@ export function CreateSubscriptionInformation({
               <Chip size='small' label='Recommended Plan' variant='outlined' />
             )}
           </div>
+          <MobileIconContainer>
+            <CommunityIcon width='150px' height='150px' />
+          </MobileIconContainer>
           <Button fullWidth onClick={onClick}>
             Upgrade $10/month
           </Button>
@@ -115,12 +140,15 @@ export function CreateSubscriptionInformation({
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
-            <Box style={{ float: 'left' }} width='100px'>
+            <DesktopIconContainer>
               <EnterpriseIcon width='90px' height='90px' />
-            </Box>
+            </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
               Enterprise Edition
             </Typography>
+            <MobileIconContainer>
+              <EnterpriseIcon width='150px' height='150px' />
+            </MobileIconContainer>
           </div>
           <Button variant='outlined' fullWidth href='mailto:hello@charmverse.io'>
             Contact us
