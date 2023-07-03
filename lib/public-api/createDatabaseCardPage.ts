@@ -10,70 +10,8 @@ import { relay } from 'lib/websockets/relay';
 
 import { DatabasePageNotFoundError } from './errors';
 import type { BoardPropertyValue, PageProperty } from './interfaces';
-import { mapProperties } from './mapProperties';
+import { mapPropertiesToSystemFormat } from './mapPropertiesToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
-
-export async function createDatabase(
-  boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>,
-  boardSchema: PageProperty[] = []
-): Promise<Page> {
-  const boardId = v4();
-
-  const database = await createPage({
-    data: {
-      id: boardId,
-      title: 'Example title',
-      path: `path-${v4()}`,
-      type: 'board',
-      contentText: '',
-      boardId,
-      space: {
-        connect: {
-          id: boardInfo.spaceId
-        }
-      },
-      author: {
-        connect: {
-          id: boardInfo.createdBy
-        }
-      },
-      updatedBy: boardInfo.createdBy
-    }
-  });
-
-  await prisma.block.create({
-    data: {
-      id: boardId,
-      user: {
-        connect: {
-          id: boardInfo.createdBy
-        }
-      },
-      updatedBy: boardInfo.createdBy,
-      type: 'board',
-      parentId: '',
-      rootId: boardId,
-      title: boardInfo.title,
-      space: {
-        connect: {
-          id: boardInfo.spaceId
-        }
-      },
-      schema: 1,
-      fields: {
-        icon: '',
-        isTemplate: false,
-        description: '',
-        headerImage: null,
-        cardProperties: boardSchema as any,
-        showDescription: false,
-        columnCalculations: []
-      }
-    }
-  });
-
-  return database;
-}
 
 export async function createDatabaseCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
@@ -104,7 +42,7 @@ export async function createDatabaseCardPage(
 
   const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
-  const mappedProperties = mapProperties(pageInfo.properties ?? {}, boardSchema);
+  const mappedProperties = mapPropertiesToSystemFormat(pageInfo.properties ?? {}, boardSchema);
 
   const cardBlock = await prisma.block.create({
     data: {

@@ -1,9 +1,32 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
+import type { PropertyType } from 'lib/focalboard/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    PagePropertyOption:
+ *     type: object
+ *     properties:
+ *      id:
+ *        type: string
+ *        example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+ *      color:
+ *        type: string
+ *        example: propColorTeal
+ *      value:
+ *        type: string
+ *        example: Complete
+ */
+
+export interface PagePropertyOption {
+  id: string;
+  color: string;
+  value: string;
+}
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
  *
  * @swagger
  * components:
@@ -22,31 +45,17 @@ import type { APISpaceTemplateType } from 'lib/spaces/config';
  *          type: string
  *          example: select
  *        options:
- *          required: false
  *          type: array
  *          items:
  *            type: object
- *            properties:
- *               id:
- *                 type: string
- *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
- *               color:
- *                 type: string
- *                 example: propColorTeal
- *               value:
- *                 type: string
- *                 example: Complete
+ *            $ref: '#/components/schemas/PagePropertyOption'
  */
 
-export interface PageProperty {
+export interface PageProperty<T extends PropertyType = PropertyType> {
   id: string;
   name: string;
-  type: string;
-  options: {
-    id: string;
-    color: string;
-    value: string;
-  }[];
+  type: T;
+  options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
 }
 
 /**
@@ -401,4 +410,4 @@ export type UserProfile = {
   email: string;
 };
 
-export type BoardPropertyValue = string | string[] | number;
+export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;

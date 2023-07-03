@@ -8,7 +8,7 @@ import type { BoardPropertyValue, PageProperty } from './interfaces';
  * @param props
  * @param cardPropertySchema Custom properties for cards are defined in a parent board
  */
-export function mapProperties(
+export function mapPropertiesToSystemFormat(
   properties: Record<string, BoardPropertyValue>,
   cardPropertySchema: PageProperty[]
 ): Record<string, BoardPropertyValue> {
@@ -39,7 +39,7 @@ export function mapProperties(
       if (value instanceof Array) {
         const assignedValues = [];
         for (const valueItem of value) {
-          const matchedOption = propertySchema.options.find((option) => option.value === valueItem);
+          const matchedOption = propertySchema.options?.find((option) => option.value === valueItem);
 
           if (!matchedOption) {
             throw new InvalidCustomPropertyValueError({
@@ -53,7 +53,7 @@ export function mapProperties(
         }
         value = assignedValues;
       } else {
-        const matchedOption = propertySchema.options.find((option) => option.value === value);
+        const matchedOption = propertySchema.options?.find((option) => option.value === value);
 
         if (!matchedOption) {
           throw new InvalidCustomPropertyValueError({ key: property, value, boardSchema: cardPropertySchema });
