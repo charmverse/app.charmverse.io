@@ -58,8 +58,6 @@ const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
-const MAX_DESCRIPTION_LENGTH = 200;
-
 export function VoteDetail({
   cancelVote,
   castVote,
@@ -70,7 +68,7 @@ export function VoteDetail({
   isProposal,
   disableVote
 }: VoteDetailProps) {
-  const { deadline, totalVotes, content, contentText, id, title, userChoice, voteOptions, aggregatedResult } = vote;
+  const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
@@ -100,7 +98,6 @@ export function VoteDetail({
     userVotes && user ? userVotes.find((userVote) => userVote.userId === user.id)?.choice ?? userChoice : userChoice;
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
-  const isDescriptionAbove = contentText ? contentText.length > MAX_DESCRIPTION_LENGTH : false;
 
   function removeFromPage(voteId: string) {
     if (view) {
