@@ -4,7 +4,6 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import { getEnsProfile } from 'lib/profile/getEnsProfile';
-import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,4 +17,4 @@ async function getEnsProfileController(req: NextApiRequest, res: NextApiResponse
   res.status(200).json(ensProfile);
 }
 
-export default withSessionRoute(handler);
+export default handler;

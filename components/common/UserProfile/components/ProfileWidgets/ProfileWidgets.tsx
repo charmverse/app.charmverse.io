@@ -26,12 +26,12 @@ const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens'] as 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
 
-  const { data: defaultLensProfile, isLoading: isLoadingLensProfile } = useSWR(`lens/profile/${userId}`, () =>
-    charmClient.profile.getLensDefaultProfile(userId)
+  const { data: defaultLensProfile, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
+    charmClient.publicProfile.getLensProfile(userId)
   );
 
-  const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`ens/profile/${userId}`, () =>
-    charmClient.profile.getEnsProfile(userId)
+  const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
+    charmClient.publicProfile.getEnsProfile(userId)
   );
 
   const { memberPropertyValues, isLoading: isLoadingSpaceMemberPropertyValues } = useMemberPropertyValues(userId);

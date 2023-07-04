@@ -1,9 +1,7 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
-import type { ProfileFragment } from '@lens-protocol/client';
 
 import * as http from 'adapters/http';
 import type { UserCommunity } from 'lib/profile';
-import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
 import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import type { UserAvatar } from 'lib/users/interfaces';
@@ -32,13 +30,5 @@ export class ProfileApi {
 
   setForumCategoryNotification(input: Omit<SetForumCategoryNotificationInput, 'userId'>) {
     return http.PUT('/api/profile/space-notifications/set-forum-category', input);
-  }
-
-  getLensDefaultProfile(userId: string) {
-    return http.GET<ProfileFragment | null>(`/api/lens/profile/${userId}`);
-  }
-
-  getEnsProfile(userId: string) {
-    return http.GET<EnsProfile | null>(`/api/profile/ens/${userId}`);
   }
 }

@@ -27,19 +27,14 @@ export async function getDefaultLensProfile(userId: string): Promise<ProfileFrag
   }
 
   // test wallet: 0x2b3DaEB14f069dB301cEAD63338a56d27A982CED
-  let ownedProfile: ProfileFragment | null = null;
+  const ownedProfiles = await lensClient.profile.fetchAll({
+    ownedBy: walletAddresses,
+    limit: 1
+  });
 
-  for (const walletAddress of walletAddresses) {
-    const ownedProfiles = await lensClient.profile.fetchAll({
-      ownedBy: ['0x2b3DaEB14f069dB301cEAD63338a56d27A982CED'],
-      limit: 1
-    });
-
-    if (ownedProfiles.items.length !== 0) {
-      ownedProfile = ownedProfiles.items[0];
-      break;
-    }
+  if (ownedProfiles.items.length !== 0) {
+    return ownedProfiles.items[0];
   }
 
-  return ownedProfile;
+  return null;
 }

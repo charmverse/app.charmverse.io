@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { getDefaultLensProfile } from 'lib/profile/getDefaultLensProfile';
-import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -18,4 +17,4 @@ async function getLensProfileController(req: NextApiRequest, res: NextApiRespons
   res.status(200).json(defaultLensProfile);
 }
 
-export default withSessionRoute(handler);
+export default handler;

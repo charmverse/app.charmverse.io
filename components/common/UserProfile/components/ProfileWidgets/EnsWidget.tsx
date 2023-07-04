@@ -50,9 +50,9 @@ export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
 
   return (
     <ProfileWidget
-      link={`https://${ensProfile.ensname}.xyz`}
+      link={`https://app.ens.domains/${ensProfile.ensname}`}
       title='Ethereum Naming Service'
-      avatarSrc='/images/ens_logo.svg'
+      avatarSrc='/images/logos/ens_logo.svg'
     >
       <Stack spacing={2}>
         <Stack spacing={1}>

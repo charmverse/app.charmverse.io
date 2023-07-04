@@ -50,6 +50,10 @@ import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
+import 'prosemirror-menu/style/menu.css';
+import 'theme/@bangle.dev/styles.scss';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
+import 'theme/print.scss';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -76,8 +80,8 @@ import 'components/common/BoardEditor/focalboard/src/components/table/table.scss
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
+import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -90,15 +94,11 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
-import 'lit-share-modal-v3/dist/ShareModal.css';
-import 'prosemirror-menu/style/menu.css';
-import 'react-resizable/css/styles.css';
-import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
+import 'lit-share-modal-v3/dist/ShareModal.css';
+import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
-import 'theme/print.scss';
-import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
