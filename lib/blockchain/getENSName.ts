@@ -40,11 +40,13 @@ export async function getENSDetails(ensName?: string | null) {
   try {
     const resolver = await provider.getResolver(ensName);
     const avatar = await provider.getAvatar(ensName);
-    const [description, discord, github, twitter] = await Promise.all(
-      ['description', 'com.discord', 'com.github', 'com.twitter'].map((text) => resolver?.getText(text))
+    const [description, discord, github, twitter, reddit, linkedin, emails] = await Promise.all(
+      ['description', 'com.discord', 'com.github', 'com.twitter', 'com.reddit', 'com.linkedin', 'emails'].map((text) =>
+        resolver?.getText(text)
+      )
     );
 
-    return { avatar, description, discord, github, twitter };
+    return { avatar, description, discord, github, twitter, reddit, linkedin, emails };
   } catch (error) {
     log.warn(`Error looking up ENS details for ens name ${ensName}`, { error });
     return null;
