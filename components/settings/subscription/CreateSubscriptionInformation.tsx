@@ -82,9 +82,6 @@ export function CreateSubscriptionInformation({
           </MobileIconContainer>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <Typography variant='h6' mb={1}>
-            Collaborate in public
-          </Typography>
           <List dense>
             {subscriptionDetails.free.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
@@ -116,14 +113,9 @@ export function CreateSubscriptionInformation({
           <MobileIconContainer>
             <CommunityIcon width='150px' height='150px' />
           </MobileIconContainer>
-          <Button fullWidth onClick={onClick}>
-            Upgrade $10/month
-          </Button>
+          <Button onClick={onClick}>Upgrade $10/month</Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <Typography variant='h6' mb={1}>
-            Onboard & engage community members
-          </Typography>
           <List dense>
             {subscriptionDetails.community.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
@@ -150,14 +142,11 @@ export function CreateSubscriptionInformation({
               <EnterpriseIcon width='150px' height='150px' />
             </MobileIconContainer>
           </div>
-          <Button variant='outlined' fullWidth href='mailto:hello@charmverse.io'>
+          <Button variant='outlined' href='mailto:hello@charmverse.io'>
             Contact us
           </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <Typography variant='h6' mb={1}>
-            Advanced control and support for large communities
-          </Typography>
           <List dense>
             {subscriptionDetails.enterprise.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
