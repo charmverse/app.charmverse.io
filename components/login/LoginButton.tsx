@@ -99,7 +99,7 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { loginWithGoogle, requestMagicLinkViaFirebase, loginWithGooglePopup } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
@@ -107,6 +107,10 @@ function LoginHandler(props: DialogProps) {
   }
 
   async function handleGoogleLogin() {
+    if (isOnCustomDomain) {
+      return loginWithGooglePopup();
+    }
+
     try {
       const googleLoginResult = await loginWithGoogle();
       handleLogin(googleLoginResult);
@@ -193,20 +197,19 @@ function LoginHandler(props: DialogProps) {
 
             <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />
 
+            {/* Google login method */}
+            <ListItem>
+              <ConnectorButton
+                onClick={handleGoogleLogin}
+                name='Connect with Google'
+                iconUrl='Google_G.png'
+                disabled={false}
+                isActive={false}
+                isLoading={false}
+              />
+            </ListItem>
             {!isOnCustomDomain && (
               <>
-                {/* Google login method */}
-                <ListItem>
-                  <ConnectorButton
-                    onClick={handleGoogleLogin}
-                    name='Connect with Google'
-                    iconUrl='Google_G.png'
-                    disabled={false}
-                    isActive={false}
-                    isLoading={false}
-                  />
-                </ListItem>
-
                 {/** Connect with email address */}
                 <ListItem>
                   <ConnectorButton
