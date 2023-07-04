@@ -63,7 +63,7 @@ export function CreateSubscriptionInformation({
 
   return (
     <>
-      <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
+      <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
@@ -82,7 +82,7 @@ export function CreateSubscriptionInformation({
           </MobileIconContainer>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <List dense>
+          <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.free.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
@@ -116,7 +116,7 @@ export function CreateSubscriptionInformation({
           <Button onClick={onClick}>Upgrade $10/month</Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <List dense>
+          <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.community.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
@@ -142,12 +142,12 @@ export function CreateSubscriptionInformation({
               <EnterpriseIcon width='150px' height='150px' />
             </MobileIconContainer>
           </div>
-          <Button variant='outlined' href='mailto:hello@charmverse.io'>
+          <Button fullWidth variant='outlined' href='mailto:hello@charmverse.io'>
             Contact us
           </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
-          <List dense>
+          <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.enterprise.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
