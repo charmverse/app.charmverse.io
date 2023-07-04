@@ -138,6 +138,37 @@ describe('requireApiKey', () => {
     expect(mockedNext).not.toBeCalled();
   });
 
+  it('should not throw an error if the space is a free space, but the request is made with a partner API Key', async () => {
+    const { space: freeSpace } = await testUtilsUser.generateUserAndSpace({
+      spacePaidTier: 'free'
+    });
+    const partnerApiKey = await prisma.superApiToken.create({
+      data: {
+        token: v4(),
+        name: `Partner API key - ${v4()}`,
+        spaces: {
+          connect: {
+            id: freeSpace.id
+          }
+        }
+      }
+    });
+    const testReq: NextApiRequest = {
+      headers: {
+        authorization: `Bearer ${partnerApiKey.token}`
+      },
+      query: {
+        spaceId: freeSpace.id
+      }
+    } as any;
+
+    const mockedNext = jest.fn();
+    await requireApiKey(testReq, {} as any, mockedNext);
+
+    // Simulate calling Next.js next() handler when a middleware call succeeds
+    expect(mockedNext).toBeCalled();
+  });
+
   it('should throw an error if the space is a free space', async () => {
     const { space: freeSpace } = await testUtilsUser.generateUserAndSpace({
       spacePaidTier: 'free'

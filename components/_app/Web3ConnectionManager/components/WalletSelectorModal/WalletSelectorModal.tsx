@@ -2,12 +2,14 @@ import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import Alert from '@mui/material/Alert';
+import Tooltip from '@mui/material/Tooltip';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
+import { WalletConnectV2Connector } from 'connectors/walletConnectV2Connector';
 import { useContext, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -54,6 +56,8 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
     activate(_connector, undefined, true).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.log('CONNECTION ERROR', { err });
       setActivatingConnector(undefined);
       // We need to reset walletconnect if users have closed the modal
       resetWalletConnector(_connector);
@@ -136,7 +140,10 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
         <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
-            onClick={() => handleConnect(walletConnect)}
+            onClick={() => {
+              WalletConnectV2Connector.clearStorage(window.localStorage);
+              handleConnect(walletConnect);
+            }}
             iconUrl='walletconnect.svg'
             disabled={connector === walletConnect || !!activatingConnector}
             isActive={connector === walletConnect}

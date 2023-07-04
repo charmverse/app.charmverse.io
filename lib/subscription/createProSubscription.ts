@@ -5,6 +5,7 @@ import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
+import { getCouponDetails } from './getCouponDetails';
 import { getCommunityPrice } from './getProductPrice';
 import type { CreateProSubscriptionRequest, ProSubscriptionResponse, StripeMetadataKeys } from './interfaces';
 import { stripeClient } from './stripe';
@@ -98,6 +99,11 @@ export async function createProSubscription({
     await stripeClient.subscriptions.del(existingStripeSubscription.id);
   }
 
+  let promoCodeData;
+  if (coupon) {
+    promoCodeData = await getCouponDetails(coupon);
+  }
+
   const subscription = await stripeClient.subscriptions.create({
     metadata: {
       productId,
@@ -113,7 +119,14 @@ export async function createProSubscription({
         quantity: blockQuota
       }
     ],
-    coupon,
+    ...(promoCodeData
+      ? {
+          [promoCodeData.type]: promoCodeData.id
+        }
+      : {
+          coupon: undefined,
+          promotion_code: undefined
+        }),
     payment_settings: {
       save_default_payment_method: 'on_subscription'
     },
@@ -131,7 +144,6 @@ export async function createProSubscription({
 
   const invoice = subscription.latest_invoice as Stripe.Invoice;
   const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent | null;
-  const discountCoupon = invoice.discount?.coupon?.id;
 
   return {
     subscriptionId: subscription.id,
@@ -149,7 +161,7 @@ export async function createProSubscription({
           clientSecret: paymentIntent.client_secret as string,
           subTotalPrice: ((subscription.latest_invoice as Stripe.Invoice).subtotal || 0) / 100,
           totalPrice: ((subscription.latest_invoice as Stripe.Invoice).total || 0) / 100,
-          coupon: discountCoupon
+          coupon
         }
       : undefined
   };

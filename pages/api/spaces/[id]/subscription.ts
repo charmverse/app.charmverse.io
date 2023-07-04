@@ -40,7 +40,9 @@ async function getSpaceSubscriptionController(
 
   const spaceSubscription = await getActiveSpaceSubscription({
     spaceId,
-    returnUrl
+    returnUrl,
+    // We only want to provide the customer portal link to admins, since it creates a fully trusted session on stripe portal
+    requestCustomerPortal: req.isAdmin
   });
 
   return res.status(200).json(spaceSubscription);
