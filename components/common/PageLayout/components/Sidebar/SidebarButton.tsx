@@ -70,11 +70,11 @@ export function SidebarLink({
 }) {
   return (
     <StyledSidebarLink {...props}>
-      <Box sx={{ justifyContent: 'space-between', display: 'flex', width: '100%' }}>
-        <div style={{ justifyContent: 'flex-start', display: 'flex' }}>
+      <Box justifyContent='space-between' display='flex' width='100%'>
+        <Box display='flex' alignItems='center'>
           {icon}
           {label}
-        </div>
+        </Box>
         {section && (premiumSettingSections as SpaceSettingsSection[]).includes(section) && (
           <span style={{ paddingLeft: 10 }}>
             <UpgradeChip
