@@ -16,7 +16,7 @@ export const communityProduct = {
   // For example, 30k blocks = 30 quantity * 1000 blockQuotaIncrement
   blockQuotaIncrement: 1000,
   monthlyActiveUserLimit: 25,
-  trial: 90,
+  trial: 30,
   pricing: {
     annual: 12,
     monthly: 1.2
