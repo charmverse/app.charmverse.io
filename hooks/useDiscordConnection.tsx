@@ -2,9 +2,11 @@ import { log } from '@charmverse/core/log';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
+import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
@@ -17,10 +19,12 @@ type IDiscordConnectionContext = {
   isLoading: boolean;
   connect: VoidFunction;
   error?: string;
+  popupLogin: (redirectUrl: string, type?: 'login' | 'connect') => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
   connect: () => {},
+  popupLogin: () => {},
   error: undefined,
   isConnected: false,
   isLoading: false
@@ -31,21 +35,24 @@ export function DiscordProvider({ children }: Props) {
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
   const authError = getCookie(AUTH_ERROR_COOKIE);
-
   const [discordError, setDiscordError] = useState('');
   const [isDisconnectingDiscord, setIsDisconnectingDiscord] = useState(false);
   const [isConnectDiscordLoading, setIsConnectDiscordLoading] = useState(false);
 
   const connectedWithDiscord = Boolean(user?.discordUser);
+  const { openPopupLogin } = usePopupLogin<{ code: string }>();
 
   async function connect() {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
         await disconnect();
       } else {
-        window.location.replace(
-          `/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`
-        );
+        const discordLoginPath = getDiscordLoginPath({
+          type: 'connect',
+          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
+        });
+
+        window.location.replace(discordLoginPath);
       }
     }
     setIsDisconnectingDiscord(false);
@@ -65,6 +72,40 @@ export function DiscordProvider({ children }: Props) {
       .finally(() => {
         setIsDisconnectingDiscord(false);
       });
+  }
+
+  function popupLogin(redirectUrl: string, type: 'login' | 'connect' = 'login') {
+    const discordLoginPath = getDiscordLoginPath({
+      type,
+      redirectUrl,
+      authFlowType: 'popup'
+    });
+
+    const loginCallback = async ({ code }: { code: string | null }) => {
+      if (!code) {
+        return;
+      }
+
+      try {
+        if (type === 'connect') {
+          const updatedUser = await charmClient.discord.connectDiscord(
+            {
+              code
+            },
+            'popup'
+          );
+
+          setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser }));
+        } else {
+          const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
+          setUser(loggedInUser);
+        }
+      } catch (e: any) {
+        showMessage(e.message || 'Failed to login with discord', 'error');
+      }
+    };
+
+    openPopupLogin(discordLoginPath, loginCallback);
   }
 
   useEffect(() => {
@@ -108,7 +149,8 @@ export function DiscordProvider({ children }: Props) {
       isLoading,
       isConnected,
       connect,
-      error
+      error,
+      popupLogin
     }),
     [isConnected, isLoading, error]
   );
