@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-const windowParams = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=650,left=50%,top=50%`;
+import type { OauthLoginState } from 'lib/oauth/interfaces';
 
-export type PopupLoginState = {
-  status: 'success' | 'error';
-};
+const windowParams = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=650,left=50%,top=50%`;
 
 export function usePopupLogin<T>() {
   const [popupWindow, setPopupWindow] = useState<Window | null>(null);
-  const loginCallbackRef = useRef<(data: PopupLoginState & T) => void>();
+  const loginCallbackRef = useRef<(data: OauthLoginState<T>) => void>();
 
   useEffect(() => {
     if (popupWindow) {
@@ -29,7 +27,7 @@ export function usePopupLogin<T>() {
   useEffect(() => {
     if (popupWindow) {
       // listen to message from popup window
-      const listener = (event: MessageEvent<PopupLoginState & T>) => {
+      const listener = (event: MessageEvent<OauthLoginState<T>>) => {
         const { data } = event;
 
         if (data.status) {
