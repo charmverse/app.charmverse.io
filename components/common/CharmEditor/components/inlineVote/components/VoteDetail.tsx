@@ -91,7 +91,7 @@ export function VoteDetail({
         gap: 1
       }}
     >
-      <span>Polls</span> <Chip size='small' label={totalVotes} />
+      <span>Votes</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 
@@ -129,30 +129,9 @@ export function VoteDetail({
         </Typography>
         <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
-      {contentText && content && (
+      {content && (
         <Box my={1} mb={2}>
-          {isDescriptionAbove && !detailed ? (
-            <span>
-              {contentText.slice(0, 200)}...
-              <Typography
-                component='span'
-                onClick={voteDetailsPopup.open}
-                sx={{
-                  ml: 0.5,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline'
-                  }
-                }}
-                variant='subtitle1'
-                fontWeight='bold'
-              >
-                (More)
-              </Typography>
-            </span>
-          ) : (
-            <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
-          )}
+          <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
       )}
       {!detailed && voteCountLabel}
