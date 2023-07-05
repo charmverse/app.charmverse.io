@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
@@ -76,10 +77,10 @@ export function generateSchema<T extends Extract<PropertyType, 'select' | 'multi
   type: T;
   options?: string[];
   propertyName?: string;
-}): PageProperty;
+}): PageProperty<T>;
 export function generateSchema<T extends Exclude<PropertyType, 'select' | 'multiSelect'>>(input: {
   type: T;
-}): PageProperty;
+}): PageProperty<T>;
 export function generateSchema<T extends PropertyType = PropertyType>({
   type,
   options,
@@ -122,6 +123,6 @@ export function generateSchema<T extends PropertyType = PropertyType>({
         options: options?.map((opt) => ({ id: uuid(), value: opt, color: 'propColorRed' })) || multiSelectSchema.options
       } as PageProperty<T>;
     default:
-      throw new Error(`Unknown property type: ${type}`);
+      throw new InvalidInputError(`Unknown property type: ${type}`);
   }
 }

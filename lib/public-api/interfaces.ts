@@ -52,13 +52,13 @@ export interface PagePropertyOption {
  *            type: object
  *            $ref: '#/components/schemas/PagePropertyOption'
  */
-
-export interface PageProperty<T extends PropertyType = PropertyType> {
+export type PageProperty<T extends PropertyType = PropertyType> = {
   id: string;
   name: string;
   type: T;
   options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
-}
+  // eslint-disable-next-line @typescript-eslint/ban-types
+} & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**
  * @swagger
