@@ -11,6 +11,7 @@ import type {
   UpdateMemberPropertyValuePayload
 } from 'lib/members/interfaces';
 
+import { useMemberCollections } from '../hooks/useMemberCollections';
 import { useMutateMemberPropertyValues } from '../hooks/useMutateMemberPropertyValues';
 
 import { NftsList } from './NftsList';
@@ -40,6 +41,19 @@ export function MemberPropertiesForm({
     getValues
   } = useForm({ mode: 'onChange' });
   const { user } = useUser();
+  const {
+    isFetchingNfts,
+    isFetchingOrgs,
+    isFetchingPoaps,
+    mutateNfts,
+    mutateOrgs,
+    nfts,
+    nftsError,
+    orgs,
+    orgsError,
+    poaps,
+    poapsError
+  } = useMemberCollections({ memberId: userId });
 
   function handleOnChange(propertyId: string, option: any) {
     const submitData = { ...getValues(), [propertyId]: option };
@@ -106,9 +120,21 @@ export function MemberPropertiesForm({
               mt: 3
             }}
           />
-          <NftsList userId={userId} />
-          <OrgsList userId={userId} />
-          <PoapsList userId={userId} />
+          <NftsList
+            isFetchingNfts={isFetchingNfts}
+            nfts={nfts}
+            nftsError={nftsError}
+            mutateNfts={mutateNfts}
+            userId={userId}
+          />
+          <OrgsList
+            isFetchingOrgs={isFetchingOrgs}
+            orgs={orgs}
+            orgsError={orgsError}
+            mutateOrgs={mutateOrgs}
+            userId={userId}
+          />
+          <PoapsList isFetchingPoaps={isFetchingPoaps} poaps={poaps} poapsError={poapsError} />
         </Stack>
       )}
     </Box>

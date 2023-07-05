@@ -56,6 +56,7 @@ import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { PublicProfileApi } from './apis/publicProfileApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
@@ -95,6 +96,8 @@ class CharmClient {
   pages = new PagesApi();
 
   profile = new ProfileApi();
+
+  publicProfile = new PublicProfileApi();
 
   proposals = new ProposalsApi();
 

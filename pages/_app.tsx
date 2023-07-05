@@ -30,6 +30,7 @@ import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
 import { PagesProvider } from 'hooks/usePages';
@@ -43,6 +44,7 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
+
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -208,9 +210,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                           <BountiesProvider>
                             <PaymentMethodsProvider>
                               <PagesProvider>
-                                <UserProfileProvider>
-                                  <PageTitleProvider>{children}</PageTitleProvider>
-                                </UserProfileProvider>
+                                <MemberPropertiesProvider>
+                                  <UserProfileProvider>
+                                    <PageTitleProvider>{children}</PageTitleProvider>
+                                  </UserProfileProvider>
+                                </MemberPropertiesProvider>
                               </PagesProvider>
                             </PaymentMethodsProvider>
                           </BountiesProvider>
