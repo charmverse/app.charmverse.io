@@ -16,8 +16,10 @@ handler.get(getDatabase);
  * @swagger
  * /databases/{databaseIdOrPath}:
  *   get:
- *     summary: Find database by ID
+ *     summary: Find database by ID or page path
  *     description: Use the ID of the Database Page, or its path ie. 'getting-started'. <br /> <br />  The board object contains the schema for the custom properties assigned to pages inside it.
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
  *         description: Summary of the database

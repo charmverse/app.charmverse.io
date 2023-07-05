@@ -17,6 +17,8 @@ handler.get(getCard).patch(updateCard);
  * /cards/{cardId}:
  *   get:
  *     summary: Find card page by ID
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
  *         description: Card page with content and properties
@@ -41,10 +43,12 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /pages/{cardId}:
+ * /cards/{cardId}:
  *   patch:
- *     summary: Update an existing page in the database
+ *     summary: Update a card in a database
  *     description: Update a page's title and / or its custom properties.
+ *     tags:
+ *      - 'Space API'
  *     requestBody:
  *       content:
  *          application/json:

@@ -24,7 +24,7 @@ export const getStaticProps: GetStaticProps = async () => {
       info: {
         title: 'Charmverse API',
         description: `The Charmverse public API requires an API key linked to your space, or a partner API key allowing access to multiple spaces. You can request this on our [Discord server](${charmverseDiscordInvite}).\r\n\r\nYour API key should be passed in the request headers as **Authorization: "Bearer <your-api-key>"**\r\n\r\n⚠️ If you are using a multi-space partner API key, any requests to API endpoints in the default group should also contain the spaceId you wish to make the request for as part of the query.\r\nExample:**"/api/v1/endpoint?spaceId=fc59c720-40de-bc1a-8b2b-00538f02953c"**`,
-        version: '1.0.0',
+        version: '1.1.0',
         contact: 'hello@charmverse.io',
         host: 'app.charmverse.io',
         baseUrl: 'v1'

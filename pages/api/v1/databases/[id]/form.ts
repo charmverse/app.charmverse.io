@@ -10,30 +10,31 @@ const handler = apiHandler();
 
 handler.post(createFormResponse);
 
-/**
- * @swagger
- * /databases/{databaseId}/form:
- *   post:
- *     summary: Create a new form response in the database.
- *     description: Create a new form response with array of questions and answers.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       all_responses:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Summary of the database
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Page'
- */
+// Unused endpoint, keeping it here for reference but removing from docs
+// /**
+//  * @swagger
+//  * /databases/{databaseId}/form:
+//  *   post:
+//  *     summary: Create a new form response in the database.
+//  *     description: Create a new form response with array of questions and answers.
+//  *     requestBody:
+//  *       content:
+//  *          application/json:
+//  *             schema:
+//  *               oneOf:
+//  *                  - type: object
+//  *                    properties:
+//  *                       all_responses:
+//  *                          type: string
+//  *                  - type: string
+//  *     responses:
+//  *       200:
+//  *         description: Summary of the database
+//  *         content:
+//  *            application/json:
+//  *              schema:
+//  *                $ref: '#/components/schemas/Page'
+//  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const spaceId = req.authorizedSpaceId;
