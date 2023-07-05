@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
+import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -13,25 +14,31 @@ import { createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
 import { getCardPageInDatabase } from '../getCardPageInDatabase';
 import type { CardPage } from '../interfaces';
-
-let user: User;
-let space: Space;
-let apiToken: SpaceApiToken;
-
-beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
-  user = generated.user;
-  space = generated.space;
-  apiToken = generated.apiToken;
-});
-
-const textSchema = generateSchema({ type: 'text' });
-const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
-const checkboxSchema = generateSchema({ type: 'checkbox' });
+import type { PageFromBlock } from '../pageFromBlock.class';
 
 describe('getCardPageInDatabase', () => {
-  it('should return the page along with its properties', async () => {
-    const databasePage = await createDatabase(
+  const textSchema = generateSchema({ type: 'text' });
+  const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
+  const checkboxSchema = generateSchema({ type: 'checkbox' });
+
+  const cardProperties = {
+    [textSchema.name]: 'Some text',
+    [selectSchema.id]: 'Green',
+    [checkboxSchema.id]: true
+  };
+
+  let user: User;
+  let space: Space;
+  let apiToken: SpaceApiToken;
+  let databasePage: Page;
+  let card: PageFromBlock;
+
+  beforeAll(async () => {
+    const generated = await generateUserAndSpaceWithApiToken();
+    user = generated.user;
+    space = generated.space;
+    apiToken = generated.apiToken;
+    databasePage = await createDatabase(
       {
         title: 'Some title',
         createdBy: user.id,
@@ -39,13 +46,7 @@ describe('getCardPageInDatabase', () => {
       },
       [textSchema, selectSchema, checkboxSchema]
     );
-    const cardProperties = {
-      [textSchema.name]: 'Some text',
-      [selectSchema.id]: 'Green',
-      [checkboxSchema.id]: true
-    };
-
-    const card = await createDatabaseCardPage({
+    card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       boardId: databasePage.boardId!,
       createdBy: user.id,
@@ -53,7 +54,9 @@ describe('getCardPageInDatabase', () => {
       spaceId: space.id,
       title: 'Example card'
     });
+  });
 
+  it('should return the page along with its properties', async () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const foundCard = await getCardPageInDatabase({ cardId: card.id, spaceId: space.id });
 
@@ -77,16 +80,51 @@ describe('getCardPageInDatabase', () => {
     );
   });
 
-  it('should throw a database not found error when the database for the page does not exist', async () => {
-    const databasePage = await createDatabase({
-      title: 'Some title',
-      createdBy: user.id,
-      spaceId: space.id
-    });
+  it('should accept a page path instead of a page ID', async () => {
+    const pagePath = (await prisma.page.findUnique({
+      where: {
+        id: card.id
+      },
+      select: {
+        path: true
+      }
+    })) as { path: string };
 
-    const card = await createDatabaseCardPage({
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const foundCard = await getCardPageInDatabase({ cardId: pagePath.path, spaceId: space.id });
+
+    // Add in actual assertions here
+    expect(foundCard).toEqual<CardPage>(
+      expect.objectContaining<CardPage>({
+        content: expect.any(Object),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        databaseId: expect.any(String),
+        id: expect.any(String),
+        isTemplate: expect.any(Boolean),
+        properties: expect.objectContaining({
+          [textSchema.name]: cardProperties[textSchema.name],
+          [selectSchema.name]: 'Green',
+          [checkboxSchema.name]: true
+        }),
+        spaceId: expect.any(String),
+        title: expect.any(String)
+      })
+    );
+  });
+
+  it('should throw a database not found error when the database for the page does not exist', async () => {
+    const deletedDatabase = await createDatabase(
+      {
+        title: 'Some title',
+        createdBy: user.id,
+        spaceId: space.id
+      },
+      [textSchema, selectSchema, checkboxSchema]
+    );
+    const deletedCard = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      boardId: databasePage.boardId!,
+      boardId: deletedDatabase.id!,
       createdBy: user.id,
       properties: {},
       spaceId: space.id,

@@ -50,7 +50,7 @@ export async function updateDatabaseCardPage({
   const card = await prisma.block.findFirst({
     where: {
       type: 'card',
-      id: cardId as string,
+      id: cardPage.id,
       spaceId
     }
   });
@@ -78,7 +78,7 @@ export async function updateDatabaseCardPage({
 
     const updatedPage = await tx.page.update({
       where: {
-        id: cardId as string
+        id: cardPage.id as string
       },
       data: {
         title: update.title,
