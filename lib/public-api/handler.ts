@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { count } from 'lib/metrics';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch } from 'lib/middleware';
 import { requireApiKey } from 'lib/middleware/requireApiKey';
 import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
@@ -28,6 +29,13 @@ async function logApiRequest(req: NextApiRequest, res: NextApiResponse, next: Vo
     spaceId: req.authorizedSpaceId,
     superApiTokenName: req.superApiToken?.name,
     path
+  });
+
+  trackUserAction(req.superApiToken ? 'partner_api_call' : 'space_api_call', {
+    method: req.method as string,
+    spaceId: req.authorizedSpaceId,
+    type: req.url as string,
+    userId: req.botUser?.id as string
   });
 
   count(`public-api.${path}.${req.method?.toLowerCase()}`, 1);
