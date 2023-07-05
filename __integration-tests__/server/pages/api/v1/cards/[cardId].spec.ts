@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type {
-  InvalidCustomPropertyValueError,
   CardPage as ApiPage,
+  InvalidCustomPropertyValueError,
   PageProperty,
   UnsupportedKeysError
 } from 'lib/public-api';

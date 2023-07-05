@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
 import type { PageProperty } from 'lib/public-api/interfaces';
+import type { UpdateableDatabaseFields } from 'lib/public-api/mapPropertiesFromApiToSystemFormat';
 
 const textSchema: PageProperty<'text'> = {
   id: uuid(),
@@ -73,23 +74,23 @@ const multiSelectSchema: PageProperty<'multiSelect'> = {
   ]
 };
 
-export function generateSchema<T extends Extract<PropertyType, 'select' | 'multiSelect'>>(input: {
+type SchemaGeneratorParams<T extends PropertyType = PropertyType> = {
   type: T;
-  options?: string[];
+  options?: T extends 'select' | 'multiSelect' ? string[] : undefined;
   propertyName?: string;
-}): PageProperty<T>;
-export function generateSchema<T extends Exclude<PropertyType, 'select' | 'multiSelect'>>(input: {
-  type: T;
-}): PageProperty<T>;
+};
+
+export function generateSchema<T extends Extract<PropertyType, 'select' | 'multiSelect'>>(
+  input: SchemaGeneratorParams<T>
+): PageProperty<T>;
+export function generateSchema<T extends Exclude<PropertyType, 'select' | 'multiSelect'>>(
+  input: Pick<SchemaGeneratorParams<T>, 'type' | 'propertyName'>
+): PageProperty<T>;
 export function generateSchema<T extends PropertyType = PropertyType>({
   type,
   options,
   propertyName
-}: {
-  type: T;
-  options?: T extends 'select' | 'multiSelect' ? string[] : undefined;
-  propertyName?: string;
-}): PageProperty<T> {
+}: SchemaGeneratorParams<T>): PageProperty<T> {
   const id = uuid();
   switch (type as T) {
     case 'text':
@@ -123,6 +124,40 @@ export function generateSchema<T extends PropertyType = PropertyType>({
         options: options?.map((opt) => ({ id: uuid(), value: opt, color: 'propColorRed' })) || multiSelectSchema.options
       } as PageProperty<T>;
     default:
-      throw new InvalidInputError(`Unknown property type: ${type}`);
+      throw new InvalidInputError(`Unsupported property type: ${type}`);
   }
+}
+
+type GeneratorParams = Partial<{
+  [key in UpdateableDatabaseFields]: SchemaGeneratorParams<key>;
+}>;
+
+type GeneratedFullSchema = {
+  [key in UpdateableDatabaseFields]: PageProperty<key>;
+};
+
+export function generateSchemasForAllSupportedFieldTypes({
+  checkbox,
+  date,
+  email,
+  multiSelect,
+  number,
+  person,
+  phone,
+  select,
+  text,
+  url
+}: GeneratorParams = {}): GeneratedFullSchema {
+  return {
+    checkbox: generateSchema({ type: 'checkbox', ...checkbox }),
+    date: generateSchema({ type: 'date', ...date }),
+    email: generateSchema({ type: 'email', ...email }),
+    multiSelect: generateSchema({ type: 'multiSelect', ...multiSelect }),
+    number: generateSchema({ type: 'number', ...number }),
+    person: generateSchema({ type: 'person', ...person }),
+    phone: generateSchema({ type: 'phone', ...phone }),
+    select: generateSchema({ type: 'select', ...select }),
+    text: generateSchema({ type: 'text', ...text }),
+    url: generateSchema({ type: 'url', ...url })
+  };
 }

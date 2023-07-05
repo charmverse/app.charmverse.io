@@ -1,5 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 
+import { InvalidCustomPropertyValueError } from '../errors';
+
 import type { ValueToValidate } from './interfaces';
 
 export function mapSelectFromApiToSystem({ value, schema }: ValueToValidate): string | null {
@@ -12,9 +14,11 @@ export function mapSelectFromApiToSystem({ value, schema }: ValueToValidate): st
     if (matchingOption) {
       return matchingOption.id;
     } else {
-      throw new InvalidInputError(
-        `Value was a UUID, but no option was found with this ID for "${schema.name}" field of type select.`
-      );
+      throw new InvalidCustomPropertyValueError({
+        key: schema.name,
+        value,
+        boardSchema: [schema]
+      });
     }
   }
 
@@ -24,9 +28,11 @@ export function mapSelectFromApiToSystem({ value, schema }: ValueToValidate): st
       if (matchingOption) {
         return matchingOption.id;
       } else {
-        throw new InvalidInputError(
-          `Value was a UUID, but no option was found with this ID for "${schema.name}" field of type select.`
-        );
+        throw new InvalidCustomPropertyValueError({
+          key: schema.name,
+          value: value[0],
+          boardSchema: [schema]
+        });
       }
     } else {
       throw new InvalidInputError(

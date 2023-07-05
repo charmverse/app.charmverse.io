@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { getDatabaseSchema } from 'lib/public-api/getDatabaseWithSchema';
+import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import { apiHandler } from 'lib/public-api/handler';
 
 const handler = apiHandler();
@@ -24,7 +24,7 @@ handler.get(getDatabase);
  *                $ref: '#/components/schemas/DatabasePage'
  */
 async function getDatabase(req: NextApiRequest, res: NextApiResponse) {
-  const result = await getDatabaseSchema({
+  const result = await getDatabaseWithSchema({
     databaseId: req.query.id as string,
     spaceId: req.authorizedSpaceId
   });

@@ -12,7 +12,7 @@ import type {
   PaginatedResponse,
   UnsupportedKeysError
 } from 'lib/public-api';
-import { createDatabase, createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { uniqueValues } from 'lib/utilities/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -22,6 +22,8 @@ let user: User;
 let space: Space;
 let apiToken: SpaceApiToken;
 let createdPageList: ApiPage[];
+
+const fullSchema = generateDatab;
 
 const exampleBoardSchema: PageProperty[] = [
   {

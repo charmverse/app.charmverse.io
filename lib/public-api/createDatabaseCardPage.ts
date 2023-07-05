@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { createPage } from 'lib/pages/server/createPage';
@@ -56,9 +56,11 @@ export async function createDatabaseCardPage({
   }
 
   const createdCard = await prisma.$transaction(async (tx) => {
+    const pageId = uuid();
+
     const cardBlock = await tx.block.create({
       data: {
-        id: v4(),
+        id: pageId,
         user: {
           connect: {
             id: createdBy

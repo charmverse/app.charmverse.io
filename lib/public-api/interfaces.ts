@@ -173,7 +173,7 @@ export type CardPage = {
   content: PageContentFormats;
   title: string;
   isTemplate: boolean;
-  properties: Record<string, string | number>;
+  properties: Record<string, BoardPropertyValue>;
 };
 
 /**
@@ -282,7 +282,7 @@ export interface PaginatedResponse<T> {
 export type PaginatedQuery<T> = {
   cursor?: string;
   limit?: number;
-  query: T;
+  query?: T;
 };
 
 /**

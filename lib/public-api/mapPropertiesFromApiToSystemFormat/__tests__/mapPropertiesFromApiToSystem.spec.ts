@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import { DatabasePageNotFoundError } from 'lib/public-api/errors';
+import { DatabasePageNotFoundError, InvalidCustomPropertyKeyError } from 'lib/public-api/errors';
 import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
@@ -101,6 +101,38 @@ describe('mapPropertiesFromApiToSystem', () => {
     });
   });
 
+  it('should skip undefined values during the mapping of properties', async () => {
+    const mapped = await mapPropertiesFromApiToSystem({
+      databaseIdOrSchema: database.id,
+      // Random mix of key values and names
+      properties: {
+        [textSchema.id]: inputValue.text,
+        [numberSchema.name]: inputValue.number,
+        [multiSelectSchema.id]: inputValue.multiSelect,
+        [personSchema.id]: inputValue.person,
+        [urlSchema.id]: inputValue.url,
+        [phoneSchema.id]: inputValue.phone,
+        [selectSchema.name]: undefined,
+        [dateSchema.name]: undefined,
+        [checkboxSchema.name]: undefined,
+        [emailSchema.name]: undefined
+      }
+    });
+
+    // We expect the mapped object to have the property ID as the key
+    expect(mapped).toEqual({
+      [textSchema.id]: inputValue.text,
+      [numberSchema.id]: String(inputValue.number),
+      [multiSelectSchema.id]: [multiSelectSchema.options[0].id, multiSelectSchema.options[1].id],
+      [personSchema.id]: [inputValue.person],
+      [urlSchema.id]: inputValue.url,
+      [phoneSchema.id]: inputValue.phone
+    });
+
+    // This is the number of keys which did not have undefined values
+    expect(Object.keys(mapped)).toHaveLength(6);
+  });
+
   it('should throw an error if the database does not exist', async () => {
     await expect(
       mapPropertiesFromApiToSystem({
@@ -118,6 +150,6 @@ describe('mapPropertiesFromApiToSystem', () => {
           'Inexistent property': 'value'
         }
       })
-    ).rejects.toBeInstanceOf(InvalidInputError);
+    ).rejects.toBeInstanceOf(InvalidCustomPropertyKeyError);
   });
 });

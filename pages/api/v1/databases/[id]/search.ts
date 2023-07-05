@@ -3,21 +3,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { CardPage, PageProperty, CardPageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
-import {
-  DatabasePageNotFoundError,
-  mapProperties,
-  PageFromBlock,
-  validatePageQuery,
-  validatePaginationQuery
-} from 'lib/public-api';
+import { DatabasePageNotFoundError, PageFromBlock, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
+import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import { apiHandler } from 'lib/public-api/handler';
+import { mapPropertiesFromApiToSystem } from 'lib/public-api/mapPropertiesFromApiToSystemFormat';
 
 const handler = apiHandler();
 
 handler.post(searchDatabase);
-
-// Limit the maximum size of a search query's results
-const maxRecordsPerQuery = 100;
 
 /**
  * @swagger
@@ -57,38 +50,31 @@ async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
 
   const spaceId = req.authorizedSpaceId;
 
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: id as string,
-      // This parameter is only added to ensure requests using the current API key only return data for that space
-      spaceId
-    }
+  const boardSchema = await getDatabaseWithSchema({
+    databaseId: id as string,
+    spaceId
   });
-
-  if (!board) {
-    throw new DatabasePageNotFoundError(id as string);
-  }
-
   const searchQuery = req.body as PaginatedQuery<CardPageQuery>;
 
   validatePaginationQuery(searchQuery);
 
   validatePageQuery(searchQuery.query);
-
-  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
-
   const cardProperties = searchQuery.query?.properties ?? {};
 
   const nestedJsonQuery: Prisma.NestedJsonFilter[] = [];
 
-  const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);
+  const queryProperties = await mapPropertiesFromApiToSystem({
+    properties: cardProperties,
+    databaseIdOrSchema: boardSchema.schema
+  });
 
   Object.entries(queryProperties).forEach((queryItem) => {
-    nestedJsonQuery.push({
-      path: ['properties', queryItem[0]],
-      equals: queryItem[1]
-    });
+    if (queryItem[1]) {
+      nestedJsonQuery.push({
+        path: ['properties', queryItem[0]],
+        equals: queryItem[1] as any
+      });
+    }
   });
 
   const prismaQueryContent: Prisma.BlockWhereInput = {
@@ -147,7 +133,7 @@ async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
     cardPagesRecord[cardPage.id] = cardPage;
   });
 
-  const cardsWithContent = cardBlocks.map((cardBlock) => new PageFromBlock(cardBlock, boardSchema));
+  const cardsWithContent = cardBlocks.map((cardBlock) => new PageFromBlock(cardBlock, boardSchema.schema));
 
   let hasNext = false;
   let cursor: string | undefined;

@@ -1,6 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 as uuid } from 'uuid';
 
+import { InvalidCustomPropertyValueError } from 'lib/public-api/errors';
 import { generateSchema } from 'testing/publicApi/schemas';
 
 import { mapSelectFromApiToSystem } from '../mapSelectFromApiToSystem';
@@ -15,12 +16,15 @@ describe('mapSelectFromApiToSystem', () => {
     expect(mapSelectFromApiToSystem({ value: schema.options?.[0]?.id, schema })).toBe(schema.options[0].id);
   });
 
-  it('should throw an error if value is a UUID, but no option was found with this ID', () => {
-    expect(() => mapSelectFromApiToSystem({ value: uuid(), schema })).toThrow(InvalidInputError);
-  });
-
   it('should return the corresponding UUID if the value exists in schema options', () => {
     expect(mapSelectFromApiToSystem({ value: schema.options[1].value, schema })).toBe(schema.options[1].id);
+  });
+  it('should throw an error if value is a UUID, but no option was found with this ID', () => {
+    expect(() => mapSelectFromApiToSystem({ value: uuid(), schema })).toThrow(InvalidCustomPropertyValueError);
+  });
+
+  it('should throw an error if value is non-uuid, but no option was found with this value', () => {
+    expect(() => mapSelectFromApiToSystem({ value: 'Bad value', schema })).toThrow(InvalidCustomPropertyValueError);
   });
 
   it('should throw an error if value is an array with more than one value', () => {

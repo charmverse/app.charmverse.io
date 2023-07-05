@@ -35,6 +35,11 @@ describe('mapDateFromApiToSystem', () => {
     expect(mapDateFromApiToSystem({ value, schema })).toEqual(JSON.stringify(value));
   });
 
+  it('should return correct object if value is a JSON object with only a "from" field', () => {
+    const value = { from: DateTime.now().toMillis() };
+    expect(mapDateFromApiToSystem({ value, schema })).toEqual(JSON.stringify(value));
+  });
+
   it('should throw an error if "to" date is before "from" date', () => {
     const value = { from: DateTime.now().toMillis(), to: DateTime.now().minus({ days: 1 }).toMillis() };
     expect(() => mapDateFromApiToSystem({ value, schema })).toThrow(InvalidInputError);

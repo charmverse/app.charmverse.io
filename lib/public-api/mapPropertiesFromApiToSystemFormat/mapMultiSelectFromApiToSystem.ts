@@ -1,5 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 
+import { InvalidCustomPropertyValueError } from '../errors';
+
 import type { ValueToValidate } from './interfaces';
 
 export function mapMultiSelectFromApiToSystem({ value, schema }: ValueToValidate): string[] {
@@ -12,9 +14,11 @@ export function mapMultiSelectFromApiToSystem({ value, schema }: ValueToValidate
     if (matchingOption) {
       return [matchingOption.id];
     } else {
-      throw new InvalidInputError(
-        `Value was a UUID, but no option was found with this ID for "${schema.name}" field of type multiSelect.`
-      );
+      throw new InvalidCustomPropertyValueError({
+        key: schema.name,
+        value,
+        boardSchema: [schema]
+      });
     }
   }
 
@@ -24,9 +28,11 @@ export function mapMultiSelectFromApiToSystem({ value, schema }: ValueToValidate
       if (matchingOption) {
         return matchingOption.id;
       } else {
-        throw new InvalidInputError(
-          `Value was a UUID, but no option was found with this ID for "${schema.name}" field of type multiSelect.`
-        );
+        throw new InvalidCustomPropertyValueError({
+          key: schema.name,
+          value: val,
+          boardSchema: [schema]
+        });
       }
     });
     return output;

@@ -4,6 +4,7 @@ import type { PropertyType } from 'lib/focalboard/board';
 import { InvalidStateError } from 'lib/middleware';
 import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
 
+import { InvalidCustomPropertyKeyError } from '../errors';
 import { getDatabaseWithSchema } from '../getDatabaseWithSchema';
 
 import type { MapperFunctionFromApiToSystem } from './interfaces';
@@ -76,10 +77,17 @@ export async function mapPropertiesFromApiToSystem({
   }
 
   const mappedProperties = Object.entries(properties).reduce((acc, [key, value]) => {
+    if (value === undefined) {
+      return acc;
+    }
+
     const propertySchema = schema.find((prop) => prop.name === key || prop.id === key);
 
     if (!propertySchema) {
-      throw new InvalidInputError(`Property "${key}" does not exist in this database`);
+      throw new InvalidCustomPropertyKeyError({
+        boardSchema: schema,
+        key
+      });
     } else if (!fieldMappers[propertySchema.type as UpdateableDatabaseFields]) {
       throw new InvalidInputError(`The property "${key}" cannot be created or updated via the public API`);
     }
