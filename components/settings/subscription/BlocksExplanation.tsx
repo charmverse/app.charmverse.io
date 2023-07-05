@@ -30,8 +30,12 @@ export function BlocksExplanation() {
     <Stack gap={2}>
       <Box>
         <Typography variant='body2'>
-          Community Edition is coming on July 1st. You have 3 months of complimentary access. There will be an option to
-          downgrade to FREE. <PricingLink label='Learn more' />
+          30 day Community Edition free trial. Upgrade anytime for
+          <ol>
+            <li>Private content with role-based access control.</li>
+            <li>Custom domain - bring your URL to this CharmVerse space.</li>
+            <li>API access.</li>
+          </ol>
         </Typography>
       </Box>
       <Box>
