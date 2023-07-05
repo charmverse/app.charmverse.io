@@ -53,7 +53,7 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
  *       content:
  *          application/json:
  *                schema:
- *                  $ref: '#/components/schemas/PageQuery'
+ *                  $ref: '#/components/schemas/CardPageUpdateData'
  *     responses:
  *       200:
  *         description: Returns the updated page

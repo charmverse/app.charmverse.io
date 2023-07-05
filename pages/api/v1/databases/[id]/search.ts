@@ -31,19 +31,8 @@ const maxRecordsPerQuery = 100;
  *       content:
  *          application/json:
  *             schema:
- *                type: object
- *                properties:
- *                  limit:
- *                    type: integer
- *                    required: false
- *                    example: 10
- *                  cursor:
- *                    type: string
- *                    required: false
- *                    example: e63758e2-de17-48b2-9c74-5a40ea5be761
- *                  query:
- *                    type: object
- *                    $ref: '#/components/schemas/PageQuery'
+ *                $ref: '#/components/schemas/PaginatedCardPageQuery'
+ *
  *     responses:
  *       200:
  *         description: Summary of the database

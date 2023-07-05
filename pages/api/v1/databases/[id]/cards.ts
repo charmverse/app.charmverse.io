@@ -23,7 +23,7 @@ handler.use(requireKeys<CardPage>(['title'], 'body')).post(createCard);
  *       content:
  *          application/json:
  *             schema:
- *                $ref: '#/components/schemas/CardPageQuery'
+ *                $ref: '#/components/schemas/CardPageCreationData'
  *     responses:
  *       200:
  *         description: Summary of the database

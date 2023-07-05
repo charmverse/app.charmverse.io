@@ -2,6 +2,9 @@ import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
 import type { PropertyType } from 'lib/focalboard/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
+
+export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
+
 /**
  * @swagger
  * components:
@@ -19,7 +22,6 @@ import type { APISpaceTemplateType } from 'lib/spaces/config';
  *        type: string
  *        example: Complete
  */
-
 export interface PagePropertyOption {
   id: string;
   color: string;
@@ -59,8 +61,6 @@ export interface PageProperty<T extends PropertyType = PropertyType> {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -208,6 +208,75 @@ export interface CardPage {
 export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
 
 /**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageCreationData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: grants
+ *          required: true
+ *        contentMarkdown:
+ *          type: string
+ *          example: ### Markdown title content
+ *          required: false
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageCreationData = {
+  title: string;
+  properties?: Record<string, BoardPropertyValue>;
+  contentMarkdown?: string;
+};
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageUpdateData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: grants
+ *          required: true
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageUpdateData = {
+  title: string;
+  properties?: Record<string, BoardPropertyValue>;
+};
+
+/**
  *
  * @property cursor undefined if hasNext is false
  */
@@ -223,6 +292,27 @@ export type PaginatedQuery<T> = {
   limit?: number;
   query: T;
 };
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    PaginatedCardPageQuery:
+ *      type: object
+ *      properties:
+ *         limit:
+ *           type: integer
+ *           required: false
+ *           example: 10
+ *         cursor:
+ *           type: string
+ *           required: false
+ *           example: e63758e2-de17-48b2-9c74-5a40ea5be761
+ *         query:
+ *           type: object
+ *           $ref: '#/components/schemas/CardPageQuery'
+ */
+export type PaginatedCardPageQuery = PaginatedQuery<CardPageQuery>;
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -409,5 +499,3 @@ export type UserProfile = {
   username: string;
   email: string;
 };
-
-export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;

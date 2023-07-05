@@ -13,11 +13,13 @@ import type { BoardPropertyValue, PageProperty } from './interfaces';
 import { mapPropertiesToSystemFormat } from './mapPropertiesToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
 
-export async function createDatabaseCardPage(
+type CreateDatabaseInput = {
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
     properties: Record<string, BoardPropertyValue>;
-  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>>
-): Promise<PageFromBlock> {
+  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>> & { contentMarkdown?: string };
+};
+
+export async function createDatabaseCardPage({ pageInfo }: CreateDatabaseInput): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);
 
   const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';

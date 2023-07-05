@@ -1,6 +1,6 @@
 import type { UnsupportedKeyDetails } from './errors';
 import { UnsupportedKeysError } from './errors';
-import type { CardPageQuery, PaginatedQuery, CardPage } from './interfaces';
+import type { CardPageCreationData, CardPageQuery, PaginatedQuery } from './interfaces';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -56,24 +56,45 @@ export function validatePageQuery(query: CardPageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateCreationData(creationData: CardPageQuery): true {
-  try {
-    validatePageQuery(creationData);
+export function validateCreationData(creationData: CardPageCreationData): true {
+  if (creationData === undefined || creationData === null) {
     return true;
-  } catch (error) {
-    const modifiedError = error as UnsupportedKeysError<Pick<CardPage, 'title' | 'properties'>>;
+  }
 
-    modifiedError.error.example = {
-      title: 'Page title',
-      properties: {
-        customProperty: 'initial value'
+  const supportedKeys: (keyof CardPageCreationData)[] = ['title', 'properties', 'contentMarkdown'];
+
+  const creationDataKeys = Object.keys(creationData);
+
+  const unsupportedKeys: string[] = [];
+
+  for (const key of creationDataKeys) {
+    if (!supportedKeys.includes(key as any)) {
+      unsupportedKeys.push(key);
+    }
+  }
+
+  if (unsupportedKeys.length > 0) {
+    const errorDetails: UnsupportedKeyDetails = {
+      unsupportedKeys,
+      allowedKeys: supportedKeys,
+      example: {
+        body: {
+          title: 'my page',
+          properties: {
+            customProperty: 'value'
+          },
+          contentMarkdown: '### Markdown title'
+        }
       }
     };
 
-    modifiedError.message = 'Invalid data inside your creation data';
-
-    throw modifiedError;
+    throw new UnsupportedKeysError({
+      message: 'Your creation data for this card contains unsupported keys',
+      error: errorDetails
+    });
   }
+
+  return true;
 }
 
 /**
@@ -83,24 +104,44 @@ export function validateCreationData(creationData: CardPageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateUpdateData(creationData: CardPageQuery): true {
-  try {
-    validatePageQuery(creationData);
+export function validateUpdateData(updateData: CardPageQuery): true {
+  if (updateData === undefined || updateData === null) {
     return true;
-  } catch (error) {
-    const modifiedError = error as UnsupportedKeysError;
+  }
 
-    modifiedError.error.example = {
-      title: 'New page title',
-      properties: {
-        customProperty: 'new value'
+  const supportedKeys: (keyof CardPageCreationData)[] = ['title', 'properties'];
+
+  const creationDataKeys = Object.keys(updateData);
+
+  const unsupportedKeys: string[] = [];
+
+  for (const key of creationDataKeys) {
+    if (!supportedKeys.includes(key as any)) {
+      unsupportedKeys.push(key);
+    }
+  }
+
+  if (unsupportedKeys.length > 0) {
+    const errorDetails: UnsupportedKeyDetails = {
+      unsupportedKeys,
+      allowedKeys: supportedKeys,
+      example: {
+        body: {
+          title: 'my page',
+          properties: {
+            customProperty: 'value'
+          }
+        }
       }
     };
 
-    modifiedError.message = 'Invalid data inside your update data';
-
-    throw modifiedError;
+    throw new UnsupportedKeysError({
+      message: 'Your update data for this card contains unsupported keys',
+      error: errorDetails
+    });
   }
+
+  return true;
 }
 
 export function validatePaginationQuery(query: PaginatedQuery<CardPageQuery>): true {
