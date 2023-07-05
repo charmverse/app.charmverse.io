@@ -7,7 +7,6 @@ inputs:
   commit_core_pkg_upgrade:
     description: 'Whether commit the update to core package back to branch'
     required: false
-    default: false
 
 runs:
   using: "composite"
