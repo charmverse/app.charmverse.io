@@ -1,8 +1,8 @@
 import type { ProfileFragment } from '@lens-protocol/client';
 
 import * as http from 'adapters/http';
+import type { Game7Inventory } from 'lib/game7/interface';
 import type { EnsProfile } from 'lib/profile/getEnsProfile';
-import type { Game7Inventory } from 'lib/profile/getGame7Profile';
 
 export class PublicProfileApi {
   getLensProfile(userId: string) {
