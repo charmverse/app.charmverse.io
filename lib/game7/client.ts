@@ -12,6 +12,7 @@ function _requestGET<T>(endpoint: string, { apiToken = GAME7_TOKEN }: { apiToken
     log.debug('Skip request: No API Key or URL for Game7');
     return Promise.resolve(null);
   }
+
   return GET<T>(`${GAME7_BASE_URL}/v1${endpoint}`, undefined, {
     headers: {
       Authorization: `Bearer ${apiToken}`

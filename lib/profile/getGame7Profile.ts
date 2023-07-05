@@ -51,9 +51,10 @@ export async function getGame7Profile({ userId }: { userId: string }): Promise<n
 
   if (!game7UserId && discordUserAccount) {
     const discordUsername = (discordUserAccount as any).username as undefined | string;
+    const discordDiscriminator = (discordUserAccount as any).discriminator as undefined | string;
     if (discordUsername) {
       game7UserId = await getGame7UserId({
-        discordHandle: discordUsername
+        discordHandle: `${discordUsername}#${discordDiscriminator}`
       });
     }
   }

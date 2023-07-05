@@ -36,11 +36,13 @@ describe('getGame7Profile', () => {
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const emailAddress = `test-${v4()}@gmail.com`;
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress, email: emailAddress });
-    const discordUsername = `test#${v4()}`;
+    const discordUsername = 'test';
+    const discordDiscriminator = v4();
     await prisma.discordUser.create({
       data: {
         account: {
-          username: discordUsername
+          username: discordUsername,
+          discriminator: discordDiscriminator
         },
         userId: user.id,
         discordId: v4()
@@ -50,7 +52,9 @@ describe('getGame7Profile', () => {
     mockSandbox
       .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(discordUsername)}`,
+        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+          `${discordUsername}#${discordDiscriminator}`
+        )}`,
         game7IdentityErrorResponse
       )
       .get(
@@ -94,13 +98,16 @@ describe('getGame7Profile', () => {
   });
 
   it(`Should return game7 profile attached with user's discord handle`, async () => {
-    const discordUsername = `test#${v4()}`;
+    const discordUsername = `test`;
+    const discordDiscriminator = v4();
     const walletAddress = Wallet.createRandom().address.toLowerCase();
+
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     await prisma.discordUser.create({
       data: {
         account: {
-          username: discordUsername
+          username: discordUsername,
+          discriminator: discordDiscriminator
         },
         userId: user.id,
         discordId: v4()
@@ -109,13 +116,18 @@ describe('getGame7Profile', () => {
 
     mockSandbox
       .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(discordUsername)}`, {
-        data: {
-          userId: user.id
-        },
-        message: '',
-        status: 0
-      })
+      .get(
+        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+          `${discordUsername}#${discordDiscriminator}`
+        )}`,
+        {
+          data: {
+            userId: user.id
+          },
+          message: '',
+          status: 0
+        }
+      )
       .get(`${GAME7_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
         data: {
           user: user.id
@@ -134,14 +146,17 @@ describe('getGame7Profile', () => {
   });
 
   it(`Should return game7 profile attached with user's email address`, async () => {
-    const discordUsername = `test#${v4()}`;
+    const discordUsername = `test`;
+    const discordDiscriminator = v4();
+
     const emailAddress = `test-${v4()}@gmail.com`;
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress, email: emailAddress });
     await prisma.discordUser.create({
       data: {
         account: {
-          username: discordUsername
+          username: discordUsername,
+          discriminator: discordDiscriminator
         },
         userId: user.id,
         discordId: v4()
@@ -151,7 +166,9 @@ describe('getGame7Profile', () => {
     mockSandbox
       .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(discordUsername)}`,
+        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+          `${discordUsername}#${discordDiscriminator}`
+        )}`,
         game7IdentityErrorResponse
       )
       .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
