@@ -109,7 +109,10 @@ export async function updateDatabaseCardPage({
       updatedBlock
     };
   });
-  const cardToReturn = new PageFromBlock(updatedData.updatedBlock, databaseSchema.schema);
+  const cardToReturn = new PageFromBlock(
+    { ...updatedData.updatedBlock, title: updatedData.updatedPage.title },
+    databaseSchema.schema
+  );
 
   if (cardPage) {
     cardToReturn.content.markdown = await getMarkdownText({

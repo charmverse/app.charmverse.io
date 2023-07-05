@@ -247,8 +247,8 @@ export type CardPageCreationData = {
  *      properties:
  *        title:
  *          type: string
- *          example: grants
- *          required: true
+ *          example: Grants - Summer
+ *          required: false
  *        properties:
  *          type: object
  *          required: false
@@ -264,7 +264,7 @@ export type CardPageCreationData = {
  *
  */
 export type CardPageUpdateData = {
-  title: string;
+  title?: string;
   properties?: Record<string, BoardPropertyValue>;
 };
 

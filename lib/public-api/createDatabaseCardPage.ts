@@ -18,7 +18,7 @@ import { mapPropertiesFromApiToSystem } from './mapPropertiesFromApiToSystemForm
 import { PageFromBlock } from './pageFromBlock.class';
 
 type CreateDatabaseInput = Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-  properties: Record<string, BoardPropertyValue>;
+  properties?: Record<string, BoardPropertyValue>;
 } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>> & { contentMarkdown?: string };
 
 export async function createDatabaseCardPage({
@@ -138,7 +138,10 @@ export async function createDatabaseCardPage({
     createdCard.page.spaceId
   );
 
-  const card = new PageFromBlock(createdCard.cardBlock, databaseWithSchema.schema);
+  const card = new PageFromBlock(
+    { ...createdCard.cardBlock, title: createdCard.page.title },
+    databaseWithSchema.schema
+  );
 
   if (contentMarkdown) {
     card.content.markdown = await getMarkdownText(createdCard.page.content);

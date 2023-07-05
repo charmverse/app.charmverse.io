@@ -23,7 +23,7 @@ const parseDate = (date: string | number, fieldName: string): number => {
 
   throw new InvalidInputError(`Invalid value for "${fieldName}" field of type date. Received value ${date}`);
 };
-type OutputDate = { from: number; to?: number };
+export type DatabaseDate = { from: number; to?: number };
 
 export function mapDateFromApiToSystem({ value, schema }: ValueToValidate): string | null {
   if (value === null) {
@@ -31,13 +31,13 @@ export function mapDateFromApiToSystem({ value, schema }: ValueToValidate): stri
   }
 
   if (typeof value === 'number' || typeof value === 'string') {
-    return JSON.stringify({ from: parseDate(value, schema.name) } as OutputDate);
+    return JSON.stringify({ from: parseDate(value, schema.name) } as DatabaseDate);
   }
 
   if (typeof value === 'object') {
     if ('from' in value) {
       const from = parseDate(value.from as string | number, schema.name);
-      const result: OutputDate = { from };
+      const result: DatabaseDate = { from };
 
       if ('to' in value) {
         const to = parseDate(value.to as string | number, schema.name);

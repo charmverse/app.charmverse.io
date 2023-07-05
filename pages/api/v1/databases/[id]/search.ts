@@ -1,16 +1,12 @@
-import type { Page as PrismaPage, Prisma } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { CardPage, PageProperty, CardPageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
-import { DatabasePageNotFoundError, PageFromBlock, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
-import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
+import type { CardPageQuery, PaginatedQuery } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
-import { mapPropertiesFromApiToSystem } from 'lib/public-api/mapPropertiesFromApiToSystemFormat';
+import { searchDatabase } from 'lib/public-api/searchDatabase';
 
 const handler = apiHandler();
 
-handler.post(searchDatabase);
+handler.post(searchDatabaseController);
 
 /**
  * @swagger
@@ -45,124 +41,17 @@ handler.post(searchDatabase);
  *                    items:
  *                      $ref: '#/components/schemas/Page'
  */
-async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
+async function searchDatabaseController(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
 
-  const boardSchema = await getDatabaseWithSchema({
+  const searchResults = await searchDatabase({
     databaseId: id as string,
-    spaceId
-  });
-  const searchQuery = req.body as PaginatedQuery<CardPageQuery>;
-
-  validatePaginationQuery(searchQuery);
-
-  validatePageQuery(searchQuery.query);
-  const cardProperties = searchQuery.query?.properties ?? {};
-
-  const nestedJsonQuery: Prisma.NestedJsonFilter[] = [];
-
-  const queryProperties = await mapPropertiesFromApiToSystem({
-    properties: cardProperties,
-    databaseIdOrSchema: boardSchema.schema
+    spaceId,
+    paginatedQuery: req.body as PaginatedQuery<CardPageQuery>
   });
 
-  Object.entries(queryProperties).forEach((queryItem) => {
-    if (queryItem[1]) {
-      nestedJsonQuery.push({
-        path: ['properties', queryItem[0]],
-        equals: queryItem[1] as any
-      });
-    }
-  });
-
-  const prismaQueryContent: Prisma.BlockWhereInput = {
-    rootId: id as string,
-    type: 'card',
-    AND: nestedJsonQuery.map((nestedJson) => {
-      return {
-        fields: nestedJson
-      };
-    })
-  };
-
-  if (searchQuery.query?.title) {
-    prismaQueryContent.page = {
-      title: {
-        contains: searchQuery.query.title,
-        mode: 'insensitive'
-      }
-    };
-  }
-
-  const prismaQueryWithCursor: Prisma.BlockFindManyArgs = {
-    where: prismaQueryContent,
-    orderBy: {
-      id: 'asc'
-    }
-  };
-
-  if (searchQuery.cursor) {
-    prismaQueryWithCursor.cursor = { id: searchQuery.cursor };
-    prismaQueryWithCursor.skip = 1;
-  }
-
-  if (searchQuery.limit) {
-    prismaQueryWithCursor.take = Math.min(maxRecordsPerQuery, searchQuery.limit);
-  } else {
-    prismaQueryWithCursor.take = maxRecordsPerQuery;
-  }
-
-  const cardBlocks = await prisma.block.findMany(prismaQueryWithCursor);
-
-  // Object that holds the page content for each card
-  const cardPagesRecord: Record<string, PrismaPage> = {};
-
-  const cardPages = await prisma.page.findMany({
-    where: {
-      OR: cardBlocks.map((cardBlock) => {
-        return {
-          id: cardBlock.id
-        };
-      })
-    }
-  });
-
-  cardPages.forEach((cardPage) => {
-    cardPagesRecord[cardPage.id] = cardPage;
-  });
-
-  const cardsWithContent = cardBlocks.map((cardBlock) => new PageFromBlock(cardBlock, boardSchema.schema));
-
-  let hasNext = false;
-  let cursor: string | undefined;
-
-  if (cardBlocks.length > 0) {
-    const lastPageId = cardBlocks[cardBlocks.length - 1].id;
-    const remainingRecords = await prisma.block.count({
-      cursor: {
-        id: lastPageId
-      },
-      skip: 1,
-      where: prismaQueryContent,
-      orderBy: {
-        id: 'asc'
-      }
-    });
-
-    if (remainingRecords > 0) {
-      hasNext = true;
-      cursor = lastPageId;
-    }
-  }
-
-  const paginatedResponse: PaginatedResponse<CardPage> = {
-    hasNext,
-    cursor,
-    data: cardsWithContent
-  };
-
-  return res.status(200).send(paginatedResponse);
+  return res.status(200).send(searchResults);
 }
 export default handler;

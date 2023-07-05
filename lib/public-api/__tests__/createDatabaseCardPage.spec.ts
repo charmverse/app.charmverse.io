@@ -1,29 +1,37 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import { ExpectedAnError } from 'testing/errors';
 import { generateSchema } from 'testing/publicApi/schemas';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createDatabase } from '../createDatabase';
 import { createDatabaseCardPage } from '../createDatabaseCardPage';
 import { PageFromBlock } from '../pageFromBlock.class';
 
-let user: User;
-let space: Space;
-
-beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
-  user = generated.user;
-  space = generated.space;
-});
-
-const textSchema = generateSchema({ type: 'text' });
-const numberSchema = generateSchema({ type: 'number' });
-const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
-
 describe('createDatabaseCardPage', () => {
+  const textSchema = generateSchema({ type: 'text' });
+  const numberSchema = generateSchema({ type: 'number' });
+  const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
+
+  let user: User;
+  let space: Space;
+
+  let database: Page;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace();
+    user = generated.user;
+    space = generated.space;
+    database = await createDatabase({ title: 'My database', createdBy: user.id, spaceId: space.id }, [
+      textSchema,
+      numberSchema,
+      selectSchema
+    ]);
+  });
+
   it('should throw an error when the linked database does not exist', async () => {
     try {
       await createDatabaseCardPage({
@@ -40,12 +48,6 @@ describe('createDatabaseCardPage', () => {
   });
 
   it('should return the newly created page', async () => {
-    const database = await createDatabase({
-      title: 'My database',
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const createdPage = await createDatabaseCardPage({
       title: 'Example title',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -59,12 +61,6 @@ describe('createDatabaseCardPage', () => {
   });
 
   it('should support a board page path as the target board ID', async () => {
-    const database = await createDatabase({
-      title: 'My database',
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const databasePage = await prisma.page.findUnique({
       where: {
         id: database.id
@@ -87,12 +83,6 @@ describe('createDatabaseCardPage', () => {
   });
 
   it('should not setup any page permissions', async () => {
-    const database = await createDatabase({
-      title: 'My database',
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const createdPage = await createDatabaseCardPage({
       title: 'Example title',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -112,12 +102,6 @@ describe('createDatabaseCardPage', () => {
   });
 
   it('should handle creation when properties are undefined', async () => {
-    const database = await createDatabase({
-      title: 'My database',
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const createdPage = await createDatabaseCardPage({
       title: 'Example title',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -131,15 +115,6 @@ describe('createDatabaseCardPage', () => {
   });
 
   it('should pass properties when creating the card', async () => {
-    const database = await createDatabase(
-      {
-        title: 'My database',
-        createdBy: user.id,
-        spaceId: space.id
-      },
-      [textSchema, numberSchema, selectSchema]
-    );
-
     const cardProps = {
       [textSchema.id]: 'Text',
       [selectSchema.name]: 'Green',
@@ -160,5 +135,39 @@ describe('createDatabaseCardPage', () => {
       [selectSchema.name]: cardProps[selectSchema.name],
       [numberSchema.name]: cardProps[numberSchema.name]
     });
+  });
+
+  it('should allow markdown to create the initial page content', async () => {
+    const matchPhrase = 'Lorem markdownum conducit illa iamque';
+
+    const card = await createDatabaseCardPage({
+      boardId: database.id,
+      createdBy: user.id,
+      contentMarkdown: `# Huius disertum
+
+      ## Et harenas Minyeias ignes
+      
+      ${matchPhrase}`,
+      spaceId: space.id,
+      title: 'Example title'
+    });
+
+    // We expect a set of human friendly keys and values
+
+    expect(card.content.markdown).toMatch(matchPhrase);
+
+    const rawPageContent = await prisma.page.findUnique({
+      where: {
+        id: card.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    expect(typeof rawPageContent?.content === 'object').toBe(true);
+    expect((rawPageContent?.content as any).type === 'doc').toBe(true);
+
+    expect(JSON.stringify(rawPageContent?.content)).toMatch(matchPhrase);
   });
 });

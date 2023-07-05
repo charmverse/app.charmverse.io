@@ -66,7 +66,7 @@ async function updateCard(req: NextApiRequest, res: NextApiResponse) {
 
   const updatedCard = await updateDatabaseCardPage({
     cardId: cardId as string,
-    updatedBy: req.botUser.id,
+    updatedBy: req.botUser?.id,
     update: req.body,
     spaceId
   });

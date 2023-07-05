@@ -1,6 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 
 import type { BoardPropertyValue, CardPage, PageContentFormats, PageProperty } from './interfaces';
+import type { DatabaseDate } from './mapPropertiesFromApiToSystemFormat/mapDateFromApiToSystem';
 
 /**
  * @content markdown - Should be generated externally and assigned to the key
@@ -70,6 +71,13 @@ export class PageFromBlock implements CardPage {
           } else if (matchedSchema.type === 'checkbox') {
             // Empty checkbox considered as false
             valueToAssign = valueToAssign === 'true' || valueToAssign === true;
+          } else if (matchedSchema.type === 'date') {
+            try {
+              const parsed = JSON.parse(valueToAssign as string) as DatabaseDate;
+              valueToAssign = parsed;
+            } catch (err) {
+              // Ignore
+            }
           }
         }
 
