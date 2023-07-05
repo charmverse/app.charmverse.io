@@ -9,7 +9,8 @@ import type {
   PageProperty,
   UnsupportedKeysError
 } from 'lib/public-api';
-import { createDatabase, createDatabaseCardPage } from 'lib/public-api';
+import { createDatabase } from 'lib/public-api/createDatabase';
+import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -300,7 +301,7 @@ describe('PATCH /api/v1/cards/{cardId}', () => {
         }
       });
 
-    exampleBoardSchema[0].options.forEach((option) => {
+    exampleBoardSchema[0].options?.forEach((option) => {
       expect((response.body as InvalidCustomPropertyValueError).error.validOptions).toContain(option.value);
     });
   });

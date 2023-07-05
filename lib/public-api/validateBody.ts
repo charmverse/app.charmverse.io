@@ -1,6 +1,6 @@
 import type { UnsupportedKeyDetails } from './errors';
 import { UnsupportedKeysError } from './errors';
-import type { CardPageCreationData, CardPageQuery, PaginatedQuery } from './interfaces';
+import type { CardPageCreationData, CardPageQuery, CardPageUpdateData, PaginatedQuery } from './interfaces';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -104,7 +104,7 @@ export function validateCreationData(creationData: CardPageCreationData): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateUpdateData(updateData: CardPageQuery): true {
+export function validateUpdateData(updateData: CardPageUpdateData): true {
   if (updateData === undefined || updateData === null) {
     return true;
   }

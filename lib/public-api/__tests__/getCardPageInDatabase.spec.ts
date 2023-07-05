@@ -4,14 +4,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { createPage } from 'lib/pages/server/createPage';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
+import { generateSchema } from 'testing/publicApi/schemas';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { createDatabase, createDatabaseCardPage } from '../createDatabaseCardPage';
+import { createDatabase } from '../createDatabase';
+import { createDatabaseCardPage } from '../createDatabaseCardPage';
 import { DatabasePageNotFoundError, PageNotFoundError } from '../errors';
-import { getDatabaseRoot, getPageInBoard } from '../getPageInBoard';
-import type { DatabasePage, CardPage } from '../interfaces';
+import { getCardPageInDatabase } from '../getCardPageInDatabase';
+import type { CardPage } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -24,25 +25,37 @@ beforeAll(async () => {
   apiToken = generated.apiToken;
 });
 
-describe('getPageInBoard', () => {
-  it('should return the page', async () => {
-    const databasePage = await createDatabase({
-      title: 'Some title',
-      createdBy: user.id,
-      spaceId: space.id
-    });
+const textSchema = generateSchema({ type: 'text' });
+const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
+const checkboxSchema = generateSchema({ type: 'checkbox' });
+
+describe('getCardPageInDatabase', () => {
+  it('should return the page along with its properties', async () => {
+    const databasePage = await createDatabase(
+      {
+        title: 'Some title',
+        createdBy: user.id,
+        spaceId: space.id
+      },
+      [textSchema, selectSchema, checkboxSchema]
+    );
+    const cardProperties = {
+      [textSchema.name]: 'Some text',
+      [selectSchema.id]: 'Green',
+      [checkboxSchema.id]: true
+    };
 
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       boardId: databasePage.boardId!,
       createdBy: user.id,
-      properties: {},
+      properties: cardProperties,
       spaceId: space.id,
       title: 'Example card'
     });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const foundCard = await getPageInBoard(card.id);
+    const foundCard = await getCardPageInDatabase({ cardId: card.id, spaceId: space.id });
 
     // Add in actual assertions here
     expect(foundCard).toEqual<CardPage>(
@@ -53,7 +66,11 @@ describe('getPageInBoard', () => {
         databaseId: expect.any(String),
         id: expect.any(String),
         isTemplate: expect.any(Boolean),
-        properties: expect.any(Object),
+        properties: expect.objectContaining({
+          [textSchema.name]: cardProperties[textSchema.name],
+          [selectSchema.name]: 'Green',
+          [checkboxSchema.name]: true
+        }),
         spaceId: expect.any(String),
         title: expect.any(String)
       })
@@ -85,7 +102,7 @@ describe('getPageInBoard', () => {
     });
 
     try {
-      const foundCard = await getPageInBoard(card.id);
+      const foundCard = await getCardPageInDatabase({ cardId: card.id, spaceId: space.id });
       throw new ExpectedAnError();
     } catch (error) {
       expect(error).toBeInstanceOf(DatabasePageNotFoundError);
@@ -95,7 +112,7 @@ describe('getPageInBoard', () => {
   it('should throw a page not found error when the page does not exist', async () => {
     try {
       const inexistentId = v4();
-      const foundCard = await getPageInBoard(inexistentId);
+      const foundCard = await getCardPageInDatabase({ cardId: inexistentId, spaceId: space.id });
       throw new ExpectedAnError();
     } catch (error) {
       expect(error).toBeInstanceOf(PageNotFoundError);
@@ -124,78 +141,10 @@ describe('getPageInBoard', () => {
     });
 
     try {
-      await getPageInBoard(page.id);
+      await getCardPageInDatabase({ cardId: page.id, spaceId: space.id });
       throw new ExpectedAnError();
     } catch (error) {
       expect(error).toBeInstanceOf(PageNotFoundError);
     }
   });
 });
-
-describe('getDatabaseRoot', () => {
-  it('should return a database by passing an ID', async () => {
-    const database = await createDatabase({
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Example'
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const found = await getDatabaseRoot(database.boardId!);
-
-    expect(found).toEqual<DatabasePage>(
-      expect.objectContaining<DatabasePage>({
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date),
-        id: expect.any(String),
-        spaceId: expect.any(String),
-        title: expect.any(String),
-        schema: expect.any(Array),
-        type: expect.stringMatching('board'),
-        url: expect.any(String)
-      })
-    );
-  });
-
-  it('should return a database by passing a page path and spaceId', async () => {
-    const database = await createDatabase({
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Example'
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const found = await getDatabaseRoot(database.path, space.id);
-
-    expect(found).toEqual<DatabasePage>(
-      expect.objectContaining<DatabasePage>({
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date),
-        id: expect.any(String),
-        spaceId: expect.any(String),
-        title: expect.any(String),
-        schema: expect.any(Array),
-        type: expect.stringMatching('board'),
-        url: expect.any(String)
-      })
-    );
-  });
-
-  it('should throw an error when passing a page path without a spaceId', async () => {
-    const database = await createDatabase({
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Example'
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-
-    try {
-      await getDatabaseRoot(database.path);
-    } catch (error) {
-      expect(error).toBeInstanceOf(InvalidInputError);
-    }
-  });
-});
-
-export default {};

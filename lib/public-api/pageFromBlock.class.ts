@@ -35,7 +35,7 @@ export class PageFromBlock implements CardPage {
     this.title = block.title;
     this.isTemplate = (block.fields as any).isTemplate === true;
     this.spaceId = block.spaceId;
-    this.properties = this.parseProperties((block.fields as any).properties, propertySchemas);
+    this.properties = this.parseProperties((block.fields as any).properties ?? {}, propertySchemas);
   }
 
   /**
@@ -51,14 +51,27 @@ export class PageFromBlock implements CardPage {
       const matchedSchema = propertySchemas.find((schema) => schema.id === propertyId);
 
       if (matchedSchema) {
-        const valueToAssign =
+        const currentValue = properties[propertyId];
+        let valueToAssign =
           matchedSchema.type === 'select'
-            ? matchedSchema.options.find((option) => option.id === properties[propertyId])?.value
+            ? matchedSchema.options?.find((option) => option.id === currentValue)?.value
             : matchedSchema.type === 'multiSelect'
-            ? (properties[propertyId] as string[])
-                .map((value) => matchedSchema.options.find((op) => op.id === value)?.value)
+            ? (currentValue as string[])
+                .map((value) => matchedSchema.options?.find((op) => op.id === value)?.value)
                 .filter((value) => !!value)
-            : properties[propertyId];
+            : currentValue;
+
+        // Provide some extra mappings for fields
+        if (valueToAssign) {
+          if (matchedSchema.type === 'number') {
+            if (typeof valueToAssign !== 'number') {
+              valueToAssign = parseFloat(valueToAssign as string);
+            }
+          } else if (matchedSchema.type === 'checkbox') {
+            // Empty checkbox considered as false
+            valueToAssign = valueToAssign === 'true' || valueToAssign === true;
+          }
+        }
 
         const humanFriendlyPropertyKey = matchedSchema.name;
 

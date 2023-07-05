@@ -1,10 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PropertyType } from 'lib/focalboard/board';
 import { InvalidStateError } from 'lib/middleware';
-import { DatabasePageNotFoundError } from 'lib/public-api/errors';
 import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
+
+import { getDatabaseWithSchema } from '../getDatabaseWithSchema';
 
 import type { MapperFunctionFromApiToSystem } from './interfaces';
 import { mapCheckboxFromApiToSystem } from './mapCheckboxFromApiToSystem';
@@ -37,41 +37,49 @@ export const fieldMappers: Record<UpdateableDatabaseFields, MapperFunctionFromAp
 };
 
 type PropertiesToMap = {
-  databaseId: string;
+  databaseIdOrSchema: string | PageProperty[];
   properties: Record<string, any>;
+  spaceId?: string;
 };
 
+type MappedProperties = Record<string, BoardPropertyValue>;
 /**
  * Return a map of properties from the API format to the system format
  *
  * These are the properties for a specific card
  */
+export async function mapPropertiesFromApiToSystem(input: {
+  databaseIdOrSchema: string;
+  spaceId?: string;
+  properties: Record<string, any>;
+}): Promise<MappedProperties>;
+export async function mapPropertiesFromApiToSystem(input: {
+  databaseIdOrSchema: PageProperty[];
+  properties: Record<string, any>;
+}): Promise<MappedProperties>;
 export async function mapPropertiesFromApiToSystem({
-  databaseId,
-  properties
-}: PropertiesToMap): Promise<Record<string, BoardPropertyValue>> {
-  const database = await prisma.block.findFirst({
-    where: {
-      id: databaseId,
-      type: 'board'
-    }
-  });
-
-  if (!database) {
-    throw new DatabasePageNotFoundError(databaseId);
+  databaseIdOrSchema,
+  properties,
+  spaceId
+}: PropertiesToMap): Promise<MappedProperties> {
+  if (!databaseIdOrSchema) {
+    throw new InvalidInputError(`The databaseIdOrSchema is required`);
   }
 
-  const schema = (database.fields as any).cardProperties as PageProperty[];
+  const schema =
+    typeof databaseIdOrSchema === 'string'
+      ? (await getDatabaseWithSchema({ databaseId: databaseIdOrSchema, spaceId }))?.schema
+      : databaseIdOrSchema;
 
   if (!schema) {
-    throw new InvalidStateError(`The database ${databaseId} does not have a schema`);
+    throw new InvalidStateError(`No schema found for the databaseIdOrSchema provided`);
   }
 
   const mappedProperties = Object.entries(properties).reduce((acc, [key, value]) => {
     const propertySchema = schema.find((prop) => prop.name === key || prop.id === key);
 
     if (!propertySchema) {
-      throw new InvalidInputError(`Property "${key}" does not exist in the database ${databaseId}`);
+      throw new InvalidInputError(`Property "${key}" does not exist in this database`);
     } else if (!fieldMappers[propertySchema.type as UpdateableDatabaseFields]) {
       throw new InvalidInputError(`The property "${key}" cannot be created or updated via the public API`);
     }

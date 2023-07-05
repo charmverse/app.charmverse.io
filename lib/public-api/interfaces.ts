@@ -122,8 +122,6 @@ export interface PageContentFormats {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -166,7 +164,7 @@ export interface PageContentFormats {
  *                example: Medium
  *
  */
-export interface CardPage {
+export type CardPage = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -176,11 +174,9 @@ export interface CardPage {
   title: string;
   isTemplate: boolean;
   properties: Record<string, string | number>;
-}
+};
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -208,8 +204,6 @@ export interface CardPage {
 export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -245,8 +239,6 @@ export type CardPageCreationData = {
 };
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -315,8 +307,6 @@ export type PaginatedQuery<T> = {
 export type PaginatedCardPageQuery = PaginatedQuery<CardPageQuery>;
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -378,8 +368,6 @@ export interface Workspace {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -430,8 +418,6 @@ export interface CreateWorkspaceRequestBody {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -469,8 +455,6 @@ export interface Space {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:

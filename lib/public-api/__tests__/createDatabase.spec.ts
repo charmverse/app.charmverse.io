@@ -4,7 +4,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createDatabase } from '../createDatabase';
-import { getDatabaseRoot } from '../getPageInBoard';
 import type { PageProperty } from '../interfaces';
 
 let user: User;
@@ -71,9 +70,18 @@ describe('createDatabase', () => {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const foundDb = await getDatabaseRoot(createdDb.boardId!);
+    const schema = (
+      (
+        await prisma.block.findUnique({
+          where: {
+            id: createdDb.id,
+            type: 'board'
+          }
+        })
+      )?.fields as any
+    ).cardProperties;
 
-    expect(foundDb.schema).toBeInstanceOf(Array);
-    expect(foundDb.schema).toEqual(exampleBoardSchema);
+    expect(schema).toBeInstanceOf(Array);
+    expect(schema).toEqual(exampleBoardSchema);
   });
 });

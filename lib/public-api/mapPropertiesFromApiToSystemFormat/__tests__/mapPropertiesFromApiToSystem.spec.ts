@@ -15,20 +15,11 @@ const textSchema = generateSchema({ type: 'text' });
 const numberSchema = generateSchema({ type: 'number' });
 const selectSchema = generateSchema({
   type: 'select',
-  options: [
-    { id: uuid(), value: 'Red' },
-    { id: uuid(), value: 'Green' },
-    { id: uuid(), value: 'Blue' }
-  ]
+  options: ['Red', 'Green', 'Blue']
 });
 const multiSelectSchema = generateSchema({
   type: 'multiSelect',
-  options: [
-    { id: uuid(), value: 'Marketing' },
-    { id: uuid(), value: 'Product' },
-    { id: uuid(), value: 'Engineering' },
-    { id: uuid(), value: 'Operations' }
-  ]
+  options: ['Marketing', 'Product', 'Engineering', 'Operations']
 });
 const dateSchema = generateSchema({ type: 'date' });
 const personSchema = generateSchema({ type: 'person' });
@@ -79,7 +70,7 @@ beforeAll(async () => {
 describe('mapPropertiesFromApiToSystem', () => {
   it('should map all properties to a record with the property id as the key, allowing the input value to be the property ID or its name', async () => {
     const mapped = await mapPropertiesFromApiToSystem({
-      databaseId: database.id,
+      databaseIdOrSchema: database.id,
       // Random mix of key values and names
       properties: {
         [textSchema.id]: inputValue.text,
@@ -113,7 +104,7 @@ describe('mapPropertiesFromApiToSystem', () => {
   it('should throw an error if the database does not exist', async () => {
     await expect(
       mapPropertiesFromApiToSystem({
-        databaseId: uuid(),
+        databaseIdOrSchema: uuid(),
         properties: {}
       })
     ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
@@ -122,7 +113,7 @@ describe('mapPropertiesFromApiToSystem', () => {
   it('should throw an error if some properties do not exist on the database schema', async () => {
     await expect(
       mapPropertiesFromApiToSystem({
-        databaseId: database.id,
+        databaseIdOrSchema: database.id,
         properties: {
           'Inexistent property': 'value'
         }

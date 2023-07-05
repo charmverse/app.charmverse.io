@@ -6,25 +6,14 @@ import { generateSchema } from 'testing/publicApi/schemas';
 
 import { mapSelectFromApiToSystem } from '../mapSelectFromApiToSystem';
 
-const option1: PagePropertyOption = {
-  color: 'propColorTeal',
-  id: uuid(),
-  value: 'Option 1'
-};
-const option2: PagePropertyOption = {
-  color: 'propColorTeal',
-  id: uuid(),
-  value: 'Option 2'
-};
-
 const schema = generateSchema({
   type: 'select',
-  options: [option1, option2]
+  options: ['Option 1', 'Option2']
 });
 
 describe('mapSelectFromApiToSystem', () => {
   it('should return the same UUID if it exists in schema options', () => {
-    expect(mapSelectFromApiToSystem({ value: option1.id, schema })).toBe(option1.id);
+    expect(mapSelectFromApiToSystem({ value: schema.options?.[0]?.id, schema })).toBe(option1.id);
   });
 
   it('should throw an error if value is a UUID, but no option was found with this ID', () => {

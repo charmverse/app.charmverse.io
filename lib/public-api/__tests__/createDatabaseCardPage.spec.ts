@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { ExpectedAnError } from 'testing/errors';
+import { generateSchema } from 'testing/publicApi/schemas';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createDatabase } from '../createDatabase';
@@ -17,6 +18,10 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 });
+
+const textSchema = generateSchema({ type: 'text' });
+const numberSchema = generateSchema({ type: 'number' });
+const selectSchema = generateSchema({ type: 'select', options: ['Green', 'Yellow', 'Red'] });
 
 describe('createDatabaseCardPage', () => {
   it('should throw an error when the linked database does not exist', async () => {
@@ -45,6 +50,34 @@ describe('createDatabaseCardPage', () => {
       title: 'Example title',
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       boardId: database.boardId!,
+      properties: {},
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    expect(createdPage).toBeInstanceOf(PageFromBlock);
+  });
+
+  it('should support a board page path as the target board ID', async () => {
+    const database = await createDatabase({
+      title: 'My database',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const databasePage = await prisma.page.findUnique({
+      where: {
+        id: database.id
+      },
+      select: {
+        path: true
+      }
+    });
+
+    const createdPage = await createDatabaseCardPage({
+      title: 'Example title',
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      boardId: databasePage?.path as string,
       properties: {},
       spaceId: space.id,
       createdBy: user.id
@@ -104,36 +137,13 @@ describe('createDatabaseCardPage', () => {
         createdBy: user.id,
         spaceId: space.id
       },
-      [
-        {
-          id: uuid(),
-          name: 'Priority',
-          type: 'select',
-          options: [{ id: uuid(), color: 'propColorTeal', value: 'High' }]
-        },
-        {
-          id: uuid(),
-          name: 'MultiSelect',
-          type: 'multiSelect',
-          options: [
-            { id: uuid(), color: 'propColorTeal', value: 'Alice' },
-            { id: uuid(), color: 'propColorTeal', value: 'Bob' },
-            { id: uuid(), color: 'propColorTeal', value: 'Carl' }
-          ]
-        },
-        {
-          id: uuid(),
-          name: 'Amount',
-          type: 'number',
-          options: []
-        }
-      ]
+      [textSchema, numberSchema, selectSchema]
     );
 
     const cardProps = {
-      Priority: 'High',
-      Amount: 5,
-      MultiSelect: ['Alice', 'Bob']
+      [textSchema.id]: 'Text',
+      [selectSchema.name]: 'Green',
+      [numberSchema.name]: 5
     };
 
     const card = await createDatabaseCardPage({
@@ -144,6 +154,11 @@ describe('createDatabaseCardPage', () => {
       title: 'Example title'
     });
 
-    expect(card.properties).toEqual(cardProps);
+    // We expect a set of human friendly keys and values
+    expect(card.properties).toEqual({
+      [textSchema.name]: cardProps[textSchema.id],
+      [selectSchema.name]: cardProps[selectSchema.name],
+      [numberSchema.name]: cardProps[numberSchema.name]
+    });
   });
 });
