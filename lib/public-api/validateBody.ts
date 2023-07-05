@@ -51,8 +51,6 @@ export function validatePageQuery(query: CardPageQuery): true {
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
- * For now, we use the same fields to update, create and query a page
- * This wrapper exists so we can seaparate this behaviour in future if needed
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
@@ -99,8 +97,6 @@ export function validateCreationData(creationData: CardPageCreationData): true {
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
- * For now, we use the same fields to update, create and query a page
- * This wrapper exists so we can seaparate this behaviour in future if needed
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */

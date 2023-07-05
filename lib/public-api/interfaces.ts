@@ -216,7 +216,7 @@ export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
  *          required: true
  *        contentMarkdown:
  *          type: string
- *          example: ### Markdown title content
+ *          example: Markdown title content
  *          required: false
  *        properties:
  *          type: object

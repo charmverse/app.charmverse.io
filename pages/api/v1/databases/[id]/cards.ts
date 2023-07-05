@@ -35,17 +35,6 @@ handler.use(requireKeys<CardPage>(['title'], 'body')).post(createCard);
 export async function createCard(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const spaceId = req.authorizedSpaceId;
-
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: id as string
-    }
-  });
-  if (!board || board.spaceId !== spaceId) {
-    throw new DatabasePageNotFoundError(id as string);
-  }
-
   validateCreationData(req.body);
 
   const card = await createDatabaseCardPage({
