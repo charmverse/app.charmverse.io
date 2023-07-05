@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { onError, onNoMatch } from 'lib/middleware';
+import type { AuthType, OauthFlowType } from 'lib/oauth/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
@@ -19,12 +20,14 @@ handler.get(oauth);
 async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
     redirect: string;
-    type: 'connect' | 'server' | 'login';
+    type: AuthType;
+    authFlowType?: OauthFlowType;
   };
 
+  const authFlowType = query.authFlowType ?? 'page';
   const host = req.headers.host;
   const redirect = getDiscordRedirectUrl(host, query.redirect);
-  const callbackUrl = getDiscordCallbackUrl(host);
+  const callbackUrl = getDiscordCallbackUrl(host, authFlowType);
 
   const state = encodeURIComponent(
     JSON.stringify({

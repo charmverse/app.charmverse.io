@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
@@ -7,8 +8,14 @@ import Button from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
-export function PaidAnnouncementBanner() {
-  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage('show-paid-banner', true);
+const UpgradeButton = styled(Button)`
+  font-weight: 600;
+  padding-bottom: 0;
+  padding-top: 0;
+`;
+
+export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
+  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
   const { onClick } = useSettingsDialog();
 
   return showPaidAnnouncementBar ? (
@@ -17,21 +24,15 @@ export function PaidAnnouncementBanner() {
         <Typography component='div'>
           Community Edition available. Upgrade NOW using code <b>"charmed"</b> for 40% off for the 1st year.{' '}
           <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-            <Button
-              color='inherit'
+            <UpgradeButton
+              endIcon={<EastIcon />}
+              sx={{ ml: 2 }}
+              color='primary'
               onClick={() => onClick('subscription')}
-              variant='text'
-              sx={{
-                fontSize: 15,
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: 'transparent'
-                }
-              }}
+              variant='outlined'
             >
               UPGRADE
-              <EastIcon sx={{ position: 'relative', top: 1.5, fontSize: 16, ml: 1 }} />
-            </Button>
+            </UpgradeButton>
           </Stack>
         </Typography>
       </Box>
