@@ -1,15 +1,14 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import type { CardPage } from 'lib/public-api';
-import { validateCreationData, DatabasePageNotFoundError, createDatabaseCardPage } from 'lib/public-api';
+import { createDatabaseCardPage, validateCreationData } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 
 const handler = apiHandler();
 
-handler.use(requireKeys<CardPage>(['title'], 'body')).post(createCard);
+handler.post(createCard);
 
 /**
  * @swagger
@@ -35,6 +34,7 @@ handler.use(requireKeys<CardPage>(['title'], 'body')).post(createCard);
 export async function createCard(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const spaceId = req.authorizedSpaceId;
+
   validateCreationData(req.body);
 
   const card = await createDatabaseCardPage({

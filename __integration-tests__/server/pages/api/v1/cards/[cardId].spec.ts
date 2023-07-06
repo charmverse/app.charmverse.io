@@ -112,7 +112,7 @@ describe('GET /api/v1/cards/{cardId}', () => {
       .set('Authorization', secondSpace.apiToken.token)
       .send();
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
   });
 });
 

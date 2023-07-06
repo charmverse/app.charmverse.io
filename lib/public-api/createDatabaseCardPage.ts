@@ -17,9 +17,11 @@ import type { BoardPropertyValue } from './interfaces';
 import { mapPropertiesFromApiToSystem } from './mapPropertiesFromApiToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
 
-type CreateDatabaseInput = Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
+type CreateDatabaseInput = Record<keyof Pick<Page, 'boardId' | 'createdBy' | 'spaceId'>, string> & {
   properties?: Record<string, BoardPropertyValue>;
-} & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>> & { contentMarkdown?: string };
+} & Partial<Pick<Page, 'title' | 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>> & {
+    contentMarkdown?: string;
+  };
 
 export async function createDatabaseCardPage({
   boardId,
@@ -58,6 +60,8 @@ export async function createDatabaseCardPage({
   const createdCard = await prisma.$transaction(async (tx) => {
     const pageId = uuid();
 
+    const pageTitle = title ?? 'Untitled';
+
     const cardBlock = await tx.block.create({
       data: {
         id: pageId,
@@ -70,7 +74,7 @@ export async function createDatabaseCardPage({
         type: 'card',
         rootId: databaseWithSchema.id,
         parentId: databaseWithSchema.id,
-        title,
+        title: pageTitle,
         space: {
           connect: {
             id: spaceId
@@ -107,7 +111,7 @@ export async function createDatabaseCardPage({
         contentText: contentText || '',
         path: getPagePath(),
         type: 'card',
-        title: title || '',
+        title: pageTitle,
         parentId: databaseWithSchema.id,
         id: cardBlock.id,
         space: {

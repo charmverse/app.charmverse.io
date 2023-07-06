@@ -32,6 +32,19 @@ describe('createDatabaseCardPage', () => {
     ]);
   });
 
+  it('should allow creating the page without any input properties or title', async () => {
+    const createdPage = await createDatabaseCardPage({
+      title: undefined,
+      properties: undefined,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      boardId: database.boardId!,
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    expect(createdPage).toBeInstanceOf(PageFromBlock);
+  });
+
   it('should throw an error when the linked database does not exist', async () => {
     try {
       await createDatabaseCardPage({

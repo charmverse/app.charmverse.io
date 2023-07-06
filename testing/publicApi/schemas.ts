@@ -80,6 +80,7 @@ type SchemaGeneratorParams<T extends PropertyType = PropertyType> = {
   propertyName?: string;
 };
 
+export function generateSchema<T extends PropertyType>(input: SchemaGeneratorParams<T>): PageProperty<T>;
 export function generateSchema<T extends Extract<PropertyType, 'select' | 'multiSelect'>>(
   input: SchemaGeneratorParams<T>
 ): PageProperty<T>;
