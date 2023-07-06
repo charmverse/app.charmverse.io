@@ -8,8 +8,8 @@ import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import Game7Icon from 'public/images/game7_logo.svg';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
+import Game7Icon from 'public/images/logos/game7_logo.svg';
 
 import { RoleForm } from './RoleForm';
 import { RolePermissions } from './RolePermissions/RolePermissions';
