@@ -259,7 +259,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             period={period}
             subscription={initialSubscriptionData}
             handleCoupon={handleCoupon}
-            onCancel={() => setShowCheckoutForm(false)}
+            onCloseCheckout={() => setShowCheckoutForm(false)}
             errors={errors}
             registerCoupon={{ ...register('coupon') }}
             validating={isValidationLoading}

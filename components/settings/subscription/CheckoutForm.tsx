@@ -22,7 +22,7 @@ import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
 export function CheckoutForm({
-  onCancel,
+  onCloseCheckout,
   handleCoupon,
   registerCoupon,
   errors,
@@ -46,7 +46,7 @@ export function CheckoutForm({
   }>;
   validating: boolean;
   registerCoupon: UseFormRegisterReturn<'coupon'>;
-  onCancel: VoidFunction;
+  onCloseCheckout: VoidFunction;
   handleCoupon: (coupon: string | undefined) => Promise<void>;
 }) {
   const stripe = useStripe();
@@ -113,7 +113,7 @@ export function CheckoutForm({
           'Payment successful! Please revisit this page in a few minutes to see your new account details.',
           'success'
         );
-        onCancel();
+        onCloseCheckout();
       }
     };
 
@@ -179,7 +179,7 @@ export function CheckoutForm({
       } else {
         showMessage('Payment successful! Community subscription active.', 'success');
       }
-      onCancel();
+      onCloseCheckout();
     } catch (error: any) {
       showMessage('Payment failed! Please try again', 'error');
       log.error(`[stripe]: Payment failed. ${error.message}`, {
@@ -187,7 +187,7 @@ export function CheckoutForm({
         errorType: error.type,
         errorCode: error.code
       });
-      onCancel();
+      onCloseCheckout();
     }
 
     setIsProcessing(false);
@@ -301,7 +301,7 @@ export function CheckoutForm({
               >
                 {isProcessing ? 'Processing ... ' : 'Upgrade'}
               </Button>
-              <Button disabled={isProcessing || validating} onClick={onCancel} color='secondary' variant='text'>
+              <Button disabled={isProcessing || validating} onClick={onCloseCheckout} color='secondary' variant='text'>
                 Cancel
               </Button>
             </Stack>
@@ -314,7 +314,7 @@ export function CheckoutForm({
               >
                 Upgrade
               </Button>
-              <Button disabled={isProcessing} onClick={onCancel} color='secondary' variant='text'>
+              <Button disabled={isProcessing} onClick={onCloseCheckout} color='secondary' variant='text'>
                 Cancel
               </Button>
             </Stack>
@@ -326,7 +326,7 @@ export function CheckoutForm({
         open={cryptoDrawerOpen}
         onClose={() => {
           setCryptoDrawerOpen(false);
-          onCancel();
+          onCloseCheckout();
         }}
         PaperProps={{
           sx: {
@@ -340,7 +340,7 @@ export function CheckoutForm({
         <IconButton
           onClick={() => {
             setCryptoDrawerOpen(false);
-            onCancel();
+            onCloseCheckout();
           }}
           size='small'
           sx={{ position: 'absolute', right: 5, top: 10, zIndex: 1 }}
