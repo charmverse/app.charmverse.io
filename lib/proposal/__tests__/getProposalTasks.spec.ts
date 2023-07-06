@@ -1,18 +1,19 @@
 import type { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';
-import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
+import { createVote, generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
-  it('Should only return non archived proposals', async () => {
+  it('Should only return non deleted proposals', async () => {
     const { user, space } = await generateUserAndSpace();
 
-    // This proposal page was archived, this shouldn't be fetched
-    await generateProposal({
+    // This proposal page was deleted, this shouldn't be fetched
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -21,7 +22,7 @@ describe('getProposalTasks', () => {
       deletedAt: new Date()
     });
 
-    const privateDraftProposal1 = await generateProposal({
+    const privateDraftProposal1 = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user.id],
@@ -31,11 +32,42 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    // sd d
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: privateDraftProposal1.proposal.status,
+          status: privateDraftProposal1.status,
+          action: 'start_review'
+        })
+      ])
+    );
+  });
+  it('Should ignore proposals marked as archived', async () => {
+    const { user, space } = await generateUserAndSpace();
+
+    // This proposal page was archived, this shouldn't be fetched
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id,
+      archived: true
+    });
+
+    const privateDraftProposal1 = await testUtilsProposals.generateProposal({
+      proposalStatus: 'discussion',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: privateDraftProposal1.status,
           action: 'start_review'
         })
       ])
@@ -46,7 +78,7 @@ describe('getProposalTasks', () => {
     const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -54,7 +86,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -63,7 +95,7 @@ describe('getProposalTasks', () => {
     });
 
     // This shouldn't be returned as the user is not an author
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user2.id],
@@ -80,7 +112,7 @@ describe('getProposalTasks', () => {
     const { user, space } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
-    const reviewedProposal1 = await generateProposal({
+    const reviewedProposal1 = await testUtilsProposals.generateProposal({
       proposalStatus: 'reviewed',
       spaceId: space.id,
       authors: [user.id],
@@ -88,7 +120,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'reviewed',
       spaceId: space.id,
       authors: [user2.id],
@@ -101,7 +133,7 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: reviewedProposal1.proposal.status,
+          status: reviewedProposal1.status,
           action: 'start_vote'
         })
       ])
@@ -123,7 +155,7 @@ describe('getProposalTasks', () => {
       spaceRoleId: (spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
     });
 
-    const proposalToReviewViaRole = await generateProposal({
+    const proposalToReviewViaRole = await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user2.id],
@@ -131,7 +163,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    const proposalToReviewViaUser = await generateProposal({
+    const proposalToReviewViaUser = await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user2.id],
@@ -139,7 +171,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user.id],
@@ -152,11 +184,11 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: proposalToReviewViaRole.proposal.status,
+          status: proposalToReviewViaRole.status,
           action: 'review'
         }),
         expect.objectContaining({
-          status: proposalToReviewViaUser.proposal.status,
+          status: proposalToReviewViaUser.status,
           action: 'review'
         })
       ])
@@ -178,7 +210,7 @@ describe('getProposalTasks', () => {
     });
 
     // This shouldn't be fetched as its private draft
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -186,7 +218,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const discussionProposal1 = await generateProposal({
+    const discussionProposal1 = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user.id],
@@ -194,7 +226,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const activeVoteProposal = await generateProposal({
+    const activeVoteProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'vote_active',
       spaceId: space.id,
       authors: [user.id],
@@ -209,7 +241,7 @@ describe('getProposalTasks', () => {
       context: 'proposal'
     });
 
-    const activeVoteWithUserVoteProposal = await generateProposal({
+    const activeVoteWithUserVoteProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'vote_active',
       spaceId: space.id,
       authors: [user.id],
@@ -228,7 +260,7 @@ describe('getProposalTasks', () => {
     });
 
     // The user isn't an author, but it should be returned as its in discussion
-    const discussionProposal2 = await generateProposal({
+    const discussionProposal2 = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user2.id],
@@ -237,7 +269,7 @@ describe('getProposalTasks', () => {
     });
 
     // This proposal is inaccessible as the user is not a member of the space
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: inaccessibleSpace.id,
       authors: [inaccessibleSpaceUser.id],
@@ -250,15 +282,15 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: discussionProposal1.proposal.status,
+          status: discussionProposal1.status,
           action: 'start_review'
         }),
         expect.objectContaining({
-          status: activeVoteProposal.proposal.status,
+          status: activeVoteProposal.status,
           action: 'vote'
         }),
         expect.objectContaining({
-          status: discussionProposal2.proposal.status,
+          status: discussionProposal2.status,
           action: 'discuss'
         })
       ])
@@ -279,7 +311,7 @@ describe('getProposalTasks', () => {
       notifyNewProposals: null
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [],
