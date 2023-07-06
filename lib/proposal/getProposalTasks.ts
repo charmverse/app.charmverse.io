@@ -1,5 +1,6 @@
 import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { RateLimit } from 'async-sema';
 
 import type {
   Discussion,
@@ -9,6 +10,7 @@ import type {
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -16,6 +18,11 @@ import { getProposalAction } from './getProposalAction';
 import type { ProposalWithCommentsAndUsers } from './interface';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
+
+// For a user with a large amount of space memberships, don't fire off hundreds of request simultaneously
+const spacesHandledPerSecond = 10;
+
+const spaceFetcherRateLimit = RateLimit(spacesHandledPerSecond);
 
 export interface ProposalTask {
   id: string; // the id of the workspace event
@@ -80,6 +87,11 @@ export async function getProposalTasks(userId: string): Promise<{
     },
     select: {
       spaceId: true,
+      space: {
+        select: {
+          paidTier: true
+        }
+      },
       spaceRoleToRole: {
         where: {
           spaceRole: {
@@ -100,9 +112,30 @@ export async function getProposalTasks(userId: string): Promise<{
   const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
   // Get all the roleId assigned to this user for each space
   const roleIds = spaceRoles
+    // We should not send role-based notifications for free spaces
+    .filter((spaceRole) => spaceRole.space.paidTier !== 'free')
     .map((spaceRole) => spaceRole.spaceRoleToRole)
     .flat()
     .map(({ role }) => role.id);
+
+  const visibleCategoryIds = (
+    await Promise.all(
+      spaceIds.map((id) =>
+        (async () => {
+          await spaceFetcherRateLimit();
+          const spacePermissionsClient = await getPermissionsClient({
+            resourceId: id,
+            resourceIdType: 'space'
+          });
+          const categories = await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
+            spaceId: id,
+            userId
+          });
+          return categories.map((c) => c.id);
+        })()
+      )
+    )
+  ).flat();
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
@@ -114,6 +147,9 @@ export async function getProposalTasks(userId: string): Promise<{
       proposal: {
         status: {
           not: 'draft'
+        },
+        categoryId: {
+          in: visibleCategoryIds
         }
       }
     },
