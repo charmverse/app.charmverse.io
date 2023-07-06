@@ -27,7 +27,7 @@ beforeAll(async () => {
   proposalCategory = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
 });
 describe('computeProposalPermissions', () => {
-  it('should allow the author to view, comment, delete, when the proposal is in review stage', async () => {
+  it('should allow the author to view, comment, delete, archive, unarchive when the proposal is in review stage', async () => {
     const testedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
@@ -55,7 +55,9 @@ describe('computeProposalPermissions', () => {
       edit: false,
       review: false,
       vote: false,
-      make_public: false
+      make_public: false,
+      archive: true,
+      unarchive: true
     });
   });
 
@@ -87,7 +89,9 @@ describe('computeProposalPermissions', () => {
       create_vote: false,
       edit: false,
       vote: false,
-      make_public: false
+      make_public: false,
+      archive: false,
+      unarchive: false
     });
   });
 
@@ -158,7 +162,9 @@ describe('computeProposalPermissions', () => {
       create_vote: false,
       edit: false,
       vote: false,
-      make_public: false
+      make_public: false,
+      archive: false,
+      unarchive: false
     });
 
     const nonDraftStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed', 'vote_active', 'vote_closed'];
@@ -178,7 +184,9 @@ describe('computeProposalPermissions', () => {
         create_vote: false,
         edit: false,
         vote: false,
-        make_public: false
+        make_public: false,
+        archive: false,
+        unarchive: false
       });
     }
   });

@@ -52,7 +52,7 @@ export async function baseComputeProposalPermissions({
 
   if (spaceRole) {
     if (isProposalAuthor({ proposal, userId })) {
-      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment']);
+      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'archive', 'unarchive']);
     }
 
     const isReviewer = isProposalReviewer({
