@@ -3,10 +3,10 @@ import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { GAME7_BASE_URL } from 'lib/game7/client';
+import { GAME7_BASE_URL } from 'lib/summon/api';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { getGame7Profile } from '../getGame7Profile';
+import { getSummonProfile } from '../getSummonProfile';
 
 const mockSandbox = fetchMock.sandbox();
 
@@ -26,9 +26,9 @@ const game7IdentityErrorResponse = {
   status: 0
 };
 
-describe('getGame7Profile', () => {
+describe('getSummonProfile', () => {
   it(`Should return null if not user exist`, async () => {
-    const game7Profile = await getGame7Profile({ userId: v4() });
+    const game7Profile = await getSummonProfile({ userId: v4() });
     expect(game7Profile).toBeNull();
   });
 
@@ -62,7 +62,7 @@ describe('getGame7Profile', () => {
         game7IdentityErrorResponse
       );
 
-    const game7Profile = await getGame7Profile({ userId: user.id });
+    const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toBeNull();
   });
@@ -86,7 +86,7 @@ describe('getGame7Profile', () => {
         status: 0
       });
 
-    const game7Profile = await getGame7Profile({ userId: user.id });
+    const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
       user: user.id
@@ -132,7 +132,7 @@ describe('getGame7Profile', () => {
         status: 0
       });
 
-    const game7Profile = await getGame7Profile({ userId: user.id });
+    const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
       user: user.id
@@ -180,7 +180,7 @@ describe('getGame7Profile', () => {
         status: 0
       });
 
-    const game7Profile = await getGame7Profile({ userId: user.id });
+    const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
       user: user.id

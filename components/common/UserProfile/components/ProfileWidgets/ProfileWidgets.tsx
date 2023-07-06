@@ -36,7 +36,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
   );
 
   const { data: game7Profile, isLoading: isLoadingGame7Profile } = useSWR(`public/profile/${userId}/game7`, () =>
-    charmClient.publicProfile.getGame7Profile(userId)
+    charmClient.publicProfile.getSummonProfile(userId)
   );
 
   const { memberPropertyValues, isLoading: isLoadingSpaceMemberPropertyValues } = useMemberPropertyValues(userId);

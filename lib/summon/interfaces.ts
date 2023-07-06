@@ -18,11 +18,12 @@ export type XPSUserInventory = {
   id: string;
   user: string;
   meta: {
-    achievements: number;
-    trophies: number;
+    achievements: any[];
+    trophies: any[];
     xp: number; // ex: 2761
     rank: number; // ex: 3.519999999999
     rankName: string; // ex: 'mighty mouse';
+    avatarUrl: string;
   };
   achievements: {
     taskId: string;
@@ -42,4 +43,12 @@ export type XPSUserInventory = {
   tasks: any[];
   materials: any[];
   gear: any[];
+};
+
+export type XPSUserProfile = {
+  id: string;
+  tenantId: string;
+  // avatar: string;
+  // username: string;
+  meta: XPSUserInventory['meta'];
 };
