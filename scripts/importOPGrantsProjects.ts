@@ -14,11 +14,11 @@ import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension
 
 const FILE_INPUT_PATH = './op-projects-input.csv';
 const FILE_OUTPUT_PATH = './op-projects.csv';
-const HOMEPAGE_TITLE = 'Information Hub';
 
 type ProjectData = {
   proposalTitle: string;
   twitter: string;
+  authorTwitter: string;
   space: Space;
   spaceImageUrl: string | null;
   owner: string;
@@ -29,14 +29,14 @@ async function importProjects() {
   const projectsData = getProjectsSeedData();
 
   for (const projectDetails of projectsData) {
-    const [projectName, spaceName, twitter, authorTwitter, spaceImageUrl] = projectDetails;
+    const [projectName, spaceName, twitter, authorTwitter, logo] = projectDetails;
     const proposalTitle = projectName.replace(/(^"|"$)/g, '');
+    const spaceImageUrl = logo?.replace(/[\n\r]/g, '');
 
     if (importedNames.includes(proposalTitle)) {
       console.log('🟡 Already imported, skipping', proposalTitle);
       continue;
     }
-
 
     if (projectDetails !== null) {
       const users = await createSpaceUsers(proposalTitle);
@@ -52,13 +52,13 @@ async function importProjects() {
             const { url } = await uploadUrlToS3({ pathInS3, url: spaceImageUrl });
             spaceImage = url;
           } catch (error) {
-            console.log('🔥', `error uploading space image ${proposalTitle}`, error);
+            console.log('🔥', `error uploading space image ${proposalTitle}`, spaceImageUrl, error);
           }
         }
 
         // Create workspace
         const spaceData: SpaceCreateInput = {
-          name: spaceName,
+          name: spaceName.replace(/(^"|"$)/g, ''),
           spaceImage,
           updatedBy: botUser.id,
           origin: 'optimism-grants'
@@ -68,7 +68,7 @@ async function importProjects() {
           spaceData,
           userId: adminUserId,
           extraAdmins: [botUser.id],
-          spaceTemplate: 'templateGitcoin'
+          spaceTemplate: 'templateOPGrant'
         });
 
         console.log('🟢 Created space for project', spaceName, space.id);
@@ -76,7 +76,7 @@ async function importProjects() {
         // mark space as created from gitcoin in mixpanel
         await updateTrackGroupProfile(space, 'optimism-grants');
 
-        const projectInfo = { proposalTitle, twitter, space, spaceImageUrl: spaceImage, owner: adminUserId };
+        const projectInfo = { proposalTitle, twitter, authorTwitter, space, spaceImageUrl: spaceImage, owner: adminUserId };
 
         exportDataToCSV([projectInfo]);
         console.log('🟢 Finished Importing project', spaceName);
@@ -155,6 +155,7 @@ function getCsvHeader() {
     'space_id',
     'space_name',
     'project_twitter',
+    'author_twitter',
     'owner',
     'space_url',
     'join_url',
@@ -169,7 +170,7 @@ function exportDataToCSV(data: ProjectData[]) {
     isEmpty = !readFileSync(FILE_OUTPUT_PATH).length;
   } catch (e) {}
 
-  const csvData = data.map(({ proposalTitle, space, spaceImageUrl, owner, twitter }) => {
+  const csvData = data.map(({ proposalTitle, space, spaceImageUrl, owner, twitter, authorTwitter }) => {
     const { name, domain, id, createdAt } = space;
 
     const spaceUrl = `https://app.charmverse.io/${domain}`;
@@ -181,6 +182,7 @@ function exportDataToCSV(data: ProjectData[]) {
       id,
       name,
       twitter,
+      authorTwitter,
       owner,
       spaceUrl,
       joinUrl,
@@ -199,16 +201,6 @@ function exportDataToCSV(data: ProjectData[]) {
     appendFileSync(FILE_OUTPUT_PATH, csvData.join('\n'));
   }
 }
-
-
-
-
-// getImportedProjcetIds()
-// getImportedProjcetSpaceIds()
-// getProjectCount();
-
-// updateSpaceOrigins();
-// updateCreatedAt();
 
 
 importProjects();
