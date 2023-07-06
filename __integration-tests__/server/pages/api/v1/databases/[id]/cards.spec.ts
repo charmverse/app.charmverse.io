@@ -4,7 +4,7 @@ import type { Response } from 'supertest';
 import request from 'supertest';
 
 import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
-import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

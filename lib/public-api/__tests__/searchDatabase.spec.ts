@@ -355,7 +355,7 @@ describe('searchDatabase', () => {
       paginatedQuery: {
         query: {
           properties: {
-            [boardSchema.date.name]: JSON.parse(pageWithMatchingDateValue.properties[boardSchema.date.name] as any)
+            [boardSchema.date.name]: pageWithMatchingDateValue.properties[boardSchema.date.name]
           }
         }
       }

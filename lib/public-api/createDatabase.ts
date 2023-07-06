@@ -6,6 +6,8 @@ import { createPage } from 'lib/pages/server/createPage';
 
 import type { PageProperty } from './interfaces';
 
+// This method is not used in production code, we should move it to testing utilities
+// Keeping here for now in case we want to offer this as an API endpoint
 export async function createDatabase(
   boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>,
   boardSchema: PageProperty[] = []
