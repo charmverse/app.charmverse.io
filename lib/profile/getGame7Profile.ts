@@ -1,4 +1,3 @@
-import * as http from '@charmverse/core/http';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getGame7Inventory, getGame7UserId } from 'lib/game7/client';

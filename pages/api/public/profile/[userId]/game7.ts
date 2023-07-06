@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { Game7Inventory } from 'lib/game7/interface';
 import { onError, onNoMatch } from 'lib/middleware';
-import type { Game7Inventory } from 'lib/profile/getGame7Profile';
 import { getGame7Profile } from 'lib/profile/getGame7Profile';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

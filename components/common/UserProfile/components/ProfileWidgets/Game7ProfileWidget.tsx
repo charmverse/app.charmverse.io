@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
-import type { Game7Inventory } from 'lib/profile/getGame7Profile';
+import type { Game7Inventory } from 'lib/game7/interface';
 
 import { ProfileWidget } from './ProfileWidget';
 

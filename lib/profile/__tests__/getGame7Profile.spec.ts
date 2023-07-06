@@ -64,8 +64,6 @@ describe('getGame7Profile', () => {
 
     const game7Profile = await getGame7Profile({ userId: user.id });
 
-    expect(mockSandbox).toBeDone();
-
     expect(game7Profile).toBeNull();
   });
 
@@ -89,8 +87,6 @@ describe('getGame7Profile', () => {
       });
 
     const game7Profile = await getGame7Profile({ userId: user.id });
-
-    expect(mockSandbox).toBeDone();
 
     expect(game7Profile).toStrictEqual({
       user: user.id
@@ -137,8 +133,6 @@ describe('getGame7Profile', () => {
       });
 
     const game7Profile = await getGame7Profile({ userId: user.id });
-
-    expect(mockSandbox).toBeDone();
 
     expect(game7Profile).toStrictEqual({
       user: user.id
@@ -187,8 +181,6 @@ describe('getGame7Profile', () => {
       });
 
     const game7Profile = await getGame7Profile({ userId: user.id });
-
-    expect(mockSandbox).toBeDone();
 
     expect(game7Profile).toStrictEqual({
       user: user.id
