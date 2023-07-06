@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { Box, Card, Typography } from '@mui/material';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
@@ -41,55 +42,64 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
     }
   }, [ref.current]);
 
-  // If there are no source for the node, return the image select component
-  if (!attrs.contract) {
-    if (readOnly) {
-      // hide the row completely
-      return <div />;
-    } else {
-      return (
-        <MediaSelectionPopup
-          node={node}
-          icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
-          buttonText='Embed an NFT'
-          isSelected={selected}
-          onDelete={deleteNode}
-        >
-          <Box py={3}>
-            <MediaUrlInput
-              helperText='Works with NFTs on Ethereum mainnet'
-              isValid={(url) => extractAttrsFromUrl(url) !== null}
-              onSubmit={(url) => {
-                const _attrs = extractAttrsFromUrl(url);
-                if (_attrs) {
-                  updateAttrs(_attrs);
-                }
-              }}
-              placeholder='https://opensea.io/assets/ethereum/0x...'
-            />
-          </Box>
-        </MediaSelectionPopup>
-      );
-    }
-  }
-
-  const forceMobile = width < 400; // default width of document is 700
-
   return (
-    <div>
-      <Script id='opensea-script' src={widgetJS} />
-      <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
-        <StyledContainer ref={ref}>
-          {/* @ts-ignore nft-card element is from OpenSea */}
-          <nft-card
-            contractAddress={attrs.contract}
-            orientationMode='manual' // it has to be manual since we set width
-            vertical={forceMobile === true ? true : undefined}
-            tokenId={attrs.token}
-            width='100%'
-          />
-        </StyledContainer>
-      </BlockAligner>
-    </div>
+    <Card variant='outlined'>
+      <Box p={3} textAlign='center'>
+        <CancelIcon fontSize='large' color='secondary' />
+        <Typography color='secondary'>Opensea has disabled NFT embeds. New NFT support coming soon.</Typography>
+      </Box>
+    </Card>
   );
+
+  // // If there are no source for the node, return the image select component
+  // if (!attrs.contract) {
+  //   if (readOnly) {
+  //     // hide the row completely
+  //     return <div />;
+  //   } else {
+  //     return (
+  //       <MediaSelectionPopup
+  //         node={node}
+  //         icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
+  //         buttonText='Embed an NFT'
+  //         isSelected={selected}
+  //         onDelete={deleteNode}
+  //       >
+  //         <Box py={3}>
+  //           <MediaUrlInput
+  //             helperText='Works with NFTs on Ethereum mainnet'
+  //             isValid={(url) => extractAttrsFromUrl(url) !== null}
+  //             onSubmit={(url) => {
+  //               const _attrs = extractAttrsFromUrl(url);
+  //               if (_attrs) {
+  //                 updateAttrs(_attrs);
+  //               }
+  //             }}
+  //             placeholder='https://opensea.io/assets/ethereum/0x...'
+  //           />
+  //         </Box>
+  //       </MediaSelectionPopup>
+  //     );
+  //   }
+  // }
+
+  // const forceMobile = width < 400; // default width of document is 700
+
+  // return (
+  //   <div>
+  //     <Script id='opensea-script' src={widgetJS} />
+  //     <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
+  //       <StyledContainer ref={ref}>
+  //         {/* @ts-ignore nft-card element is from OpenSea */}
+  //         <nft-card
+  //           contractAddress={attrs.contract}
+  //           orientationMode='manual' // it has to be manual since we set width
+  //           vertical={forceMobile === true ? true : undefined}
+  //           tokenId={attrs.token}
+  //           width='100%'
+  //         />
+  //       </StyledContainer>
+  //     </BlockAligner>
+  //   </div>
+  // );
 }
