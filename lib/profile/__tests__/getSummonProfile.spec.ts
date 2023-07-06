@@ -50,17 +50,14 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
+      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
           `${discordUsername}#${discordDiscriminator}`
         )}`,
         game7IdentityErrorResponse
       )
-      .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?email=${encodeURIComponent(emailAddress)}`,
-        game7IdentityErrorResponse
-      );
+      .get(`${GAME7_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, game7IdentityErrorResponse);
 
     const game7Profile = await getSummonProfile({ userId: user.id });
 
@@ -71,14 +68,14 @@ describe('getSummonProfile', () => {
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     mockSandbox
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, {
+      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
+      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -89,7 +86,9 @@ describe('getSummonProfile', () => {
     const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
-      user: user.id
+      id: user.id,
+      meta: undefined,
+      tenantId: undefined
     });
   });
 
@@ -111,9 +110,9 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
+      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
           `${discordUsername}#${discordDiscriminator}`
         )}`,
         {
@@ -124,7 +123,7 @@ describe('getSummonProfile', () => {
           status: 0
         }
       )
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
+      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -135,7 +134,9 @@ describe('getSummonProfile', () => {
     const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
-      user: user.id
+      id: user.id,
+      meta: undefined,
+      tenantId: undefined
     });
   });
 
@@ -158,21 +159,21 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
+      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
+        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
           `${discordUsername}#${discordDiscriminator}`
         )}`,
         game7IdentityErrorResponse
       )
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
+      .get(`${GAME7_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${GAME7_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
+      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -183,7 +184,9 @@ describe('getSummonProfile', () => {
     const game7Profile = await getSummonProfile({ userId: user.id });
 
     expect(game7Profile).toStrictEqual({
-      user: user.id
+      id: user.id,
+      meta: undefined,
+      tenantId: undefined
     });
   });
 });
