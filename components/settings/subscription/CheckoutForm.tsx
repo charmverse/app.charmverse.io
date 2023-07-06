@@ -1,7 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
-import { Divider, Drawer, Grid, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Divider, Drawer, Grid, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
@@ -13,7 +12,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { isProdEnv } from 'config/constants';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
@@ -66,7 +64,6 @@ export function CheckoutForm({
 
   const [isProcessing, setIsProcessing] = useState(false);
   const { showMessage } = useSnackbar();
-  const [pendingPayment, setPendingPayment] = useState(false);
 
   const {
     data: checkoutUrl,
@@ -112,7 +109,11 @@ export function CheckoutForm({
       }
 
       if (event?.type === 'message' && event?.data === 'CheckoutComplete') {
-        setPendingPayment(true);
+        showMessage(
+          'Payment successful! Please revisit this page in a few minutes to see your new account details.',
+          'success'
+        );
+        onCancel();
       }
     };
 
@@ -208,7 +209,8 @@ export function CheckoutForm({
       spaceId: space.id,
       payload: {
         subscriptionId: subscription.subscriptionId,
-        email: emailField
+        email: emailField,
+        coupon: couponField
       }
     });
   };
@@ -217,14 +219,9 @@ export function CheckoutForm({
 
   return (
     <>
-      {pendingPayment && (
-        <Stack gap={1}>
-          <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>
-        </Stack>
-      )}
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
-          {!isProdEnv && <PaymentTabs value={paymentType} onChange={changePaymentType} />}
+          <PaymentTabs value={paymentType} onChange={changePaymentType} />
           <PaymentTabPanel value={paymentType} index='card'>
             <PaymentElement options={{ paymentMethodOrder: ['card', 'us_bank_account'] }} />
           </PaymentTabPanel>

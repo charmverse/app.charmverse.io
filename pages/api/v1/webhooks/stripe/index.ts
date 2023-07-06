@@ -487,10 +487,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
       }
     }
 
-    res.status(200).end();
+    return res.status(200).json({});
   } catch (err: any) {
     log.warn('Stripe webhook failed to construct event', err);
-    res.status(400).json(`Webhook Error: ${err?.message}`);
+    return res.status(400).json(`Webhook Error: ${err?.message}`);
   }
 }
 

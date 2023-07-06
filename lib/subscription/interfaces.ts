@@ -42,6 +42,7 @@ export type CreateCryptoSubscriptionResponse = string;
 export type CreateCryptoSubscriptionRequest = {
   subscriptionId: string;
   email: string;
+  coupon?: string;
 };
 
 export type StripeMetadataKeys = {
