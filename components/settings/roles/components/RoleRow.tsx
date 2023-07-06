@@ -8,6 +8,7 @@ import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import Game7Icon from 'public/images/game7_logo.svg';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
 
 import { RoleForm } from './RoleForm';
@@ -30,6 +31,10 @@ const syncedRoleProps = {
   collabland: {
     descriptionIcon: <GuildXYZIcon />,
     description: <>This role is managed by Collab.land. Visit https://collab.land/ to modify this role</>
+  },
+  game7: {
+    descriptionIcon: <Game7Icon />,
+    description: <>This role is managed by Game7</>
   }
 };
 

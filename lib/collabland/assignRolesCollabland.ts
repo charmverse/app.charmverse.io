@@ -21,12 +21,12 @@ export async function assignRolesCollabland({
 
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>
-      createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
+      createAndAssignCollablandRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
     )
   );
 }
 
-async function createAndAssignCollablanRoles({
+async function createAndAssignCollablandRoles({
   userId,
   spaceId,
   roles
