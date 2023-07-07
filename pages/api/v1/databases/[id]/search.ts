@@ -10,7 +10,7 @@ handler.post(searchDatabaseController);
 
 /**
  * @swagger
- * /databases/{databaseId}/search:
+ * /databases/{databaseIdOrPath}/search:
  *   post:
  *     summary: Search cards in a database
  *     description: Get the available field names from the schema in the board. You can then query using its values.<br/><br/>The example properties below are only for illustrative purposes.<br/><br/>You can return up to 100 records per query

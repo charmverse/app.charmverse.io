@@ -10,7 +10,7 @@ handler.post(createCard);
 
 /**
  * @swagger
- * /databases/{databaseId}/cards:
+ * /databases/{databaseIdOrPath}/cards:
  *   post:
  *     summary: Create a new card in the database
  *     description: Create a new card with a title and any set of values from the custom properties in your database.

@@ -11,7 +11,7 @@ handler.get(getCard).patch(updateCard);
 
 /**
  * @swagger
- * /cards/{cardId}:
+ * /cards/{cardIdOrPath}:
  *   get:
  *     summary: Find card page by ID
  *     tags:
@@ -40,7 +40,7 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /cards/{cardId}:
+ * /cards/{cardIdOrPath}:
  *   patch:
  *     summary: Update a card in a database
  *     description: Update a page's title and / or its custom properties.
