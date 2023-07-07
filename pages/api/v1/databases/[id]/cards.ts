@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys } from 'lib/middleware';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import type { CardPage } from 'lib/public-api';
 import { createDatabaseCardPage, validateCreationData } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 

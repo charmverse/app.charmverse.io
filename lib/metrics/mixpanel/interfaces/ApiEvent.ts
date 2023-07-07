@@ -5,10 +5,16 @@ import type { BaseEvent } from './BaseEvent';
  * @method - the HTTP method
  */
 type ApiEvent = BaseEvent & {
-  type: string;
+  endpoint: string;
   method: string;
+  pageId?: string;
 };
+
+type PartnerApiEvent = ApiEvent & {
+  partnerKey: string;
+};
+
 export interface ApiEventMap {
   space_api_call: ApiEvent;
-  partner_api_call: ApiEvent;
+  partner_api_call: PartnerApiEvent;
 }
