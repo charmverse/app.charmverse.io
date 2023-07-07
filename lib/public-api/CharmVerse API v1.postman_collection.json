@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "72f1319f-4d09-4b1f-b680-faa9a5828204",
+		"_postman_id": "d8be7920-bf3b-4d86-a37b-c4348fcddf03",
 		"name": "CharmVerse API v1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3087129"
@@ -18,13 +18,13 @@
 					}
 				],
 				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID}}",
+					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}",
 					"host": [
 						"{{API_URL}}"
 					],
 					"path": [
 						"databases",
-						"{{DATABASE_ID}}"
+						"{{DATABASE_ID_OR_PATH}}"
 					],
 					"query": [
 						{
@@ -50,7 +50,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"properties\": {\n    \"Status\": \"In progress\"\n  }\n}",
+					"raw": "{\n  \"query\": {\n    \"properties\": {\n    }\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -58,13 +58,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID}}/search",
+					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/search",
 					"host": [
 						"{{API_URL}}"
 					],
 					"path": [
 						"databases",
-						"{{DATABASE_ID}}",
+						"{{DATABASE_ID_OR_PATH}}",
 						"search"
 					]
 				}
@@ -84,7 +84,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"title\": \"Markdown Import 2\",\n  \"contentMarkdown\": \"# Oechalidum tange meque sequentis nati ferus\\n\\n## Nec precanda torvo\\n\\nLorem markdownum positisque superi; tuque huic arbore arbore, diu funda: **illuc\\nesset**. Post [inlisit](http://www.si-venter.com/abprodesse.html) paludibus\\narboreis intravit: questus fessam meo aer [nec](http://musco.net/nulli.php)?\\nPotens sibi ortu, et vis sistite vulnere robigine parte.\\n\\n    if (filename_lock_pack(console_mp, drop_viral_snow)) {\\n        kbpsGps(3, zip_zip + wampHddRegular);\\n    }\\n    viralNetCard(cloneCamelcase);\\n    var analog = remote.function(soa_internic_ttl, 203562, fat_text) / 97 +\\n            file_igp;\\n\\nVirginis fauni; inprobe tamen mercibus quicquid territa. Hercule tune lanugine\\niuvenumque cum maturuit flavescere ventis.\\n\\n## Quae membraque sagittas tellus ponat\\n\\nPrunaque utilis remollescit manifesta ambae, intendunt valles ardua pinea mutua.\\nLeves ille auster vires.\\n\\nHabitata vocatum. Saxo decor, catenas figuras pennas quod inque quam Pagasaea,\\nviolentus herbas. Tela hoc redderet tantum demptos doleres plus, mei agros\\ncaptat dolebis vittas. Carmen inaequalis nec intrat, ureret anguis plangi fuit\\nademi amictu: caesique at! Tenet ubi oculis pennis senem in nati eruiturque\\ninane, in.\\n\\n> Mentiris pro, mons [terra](http://www.leves-nisi.net/illo-sacer.html) nacta\\n> calido desit, nec unus, Cephalus Phoce et datis: frequentant. Siculo\\n> constiterant vidit nunc forma fidemque resonare aspergine procul placabilis\\n> ungues opibus. Capillis pollice aderam Minyeidas, nate populisque monte\\n> caelatus Capitolia *carmen* utque quae situs curvavit, promisitque.\\n\\nMembra et exemplis dixit; est valles inferias, te operis. Iura iaculantem agros\\nsororis flumen: danda ad limite, duro me Parthenopeia me saltus Minervae iterum\\ncoeuntia *se*. Turaque **in ibant**. Exhalantes terra cecidisse fixum lacerto\\nnate.\",\n  \"properties\": {\n    \"Select\": \"Alpha\",\n    \"Multi Select\": [\"Product\", \"Development\"],\n    \"Toggle\": true,\n    \"Phone\": \"+1 394 2334 233\",\n    \"Email\": \"developer@charmverse.io\"\n  }\n}",
+					"raw": "{\n  \"title\": \"Markdown Import\",\n  \"contentMarkdown\": \"# Oechalidum tange meque sequentis nati ferus\\n\\n## Nec precanda torvo\\n\\nLorem markdownum positisque superi; tuque huic arbore arbore, diu funda: **illuc\\nesset**. Post [inlisit](http://www.si-venter.com/abprodesse.html) paludibus\\narboreis intravit: questus fessam meo aer [nec](http://musco.net/nulli.php)?\\nPotens sibi ortu, et vis sistite vulnere robigine parte.\\n\\n    if (filename_lock_pack(console_mp, drop_viral_snow)) {\\n        kbpsGps(3, zip_zip + wampHddRegular);\\n    }\\n    viralNetCard(cloneCamelcase);\\n    var analog = remote.function(soa_internic_ttl, 203562, fat_text) / 97 +\\n            file_igp;\\n\\nVirginis fauni; inprobe tamen mercibus quicquid territa. Hercule tune lanugine\\niuvenumque cum maturuit flavescere ventis.\\n\\n## Quae membraque sagittas tellus ponat\\n\\nPrunaque utilis remollescit manifesta ambae, intendunt valles ardua pinea mutua.\\nLeves ille auster vires.\\n\\nHabitata vocatum. Saxo decor, catenas figuras pennas quod inque quam Pagasaea,\\nviolentus herbas. Tela hoc redderet tantum demptos doleres plus, mei agros\\ncaptat dolebis vittas. Carmen inaequalis nec intrat, ureret anguis plangi fuit\\nademi amictu: caesique at! Tenet ubi oculis pennis senem in nati eruiturque\\ninane, in.\\n\\n> Mentiris pro, mons [terra](http://www.leves-nisi.net/illo-sacer.html) nacta\\n> calido desit, nec unus, Cephalus Phoce et datis: frequentant. Siculo\\n> constiterant vidit nunc forma fidemque resonare aspergine procul placabilis\\n> ungues opibus. Capillis pollice aderam Minyeidas, nate populisque monte\\n> caelatus Capitolia *carmen* utque quae situs curvavit, promisitque.\\n\\nMembra et exemplis dixit; est valles inferias, te operis. Iura iaculantem agros\\nsororis flumen: danda ad limite, duro me Parthenopeia me saltus Minervae iterum\\ncoeuntia *se*. Turaque **in ibant**. Exhalantes terra cecidisse fixum lacerto\\nnate.\",\n  \"properties\": {\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -92,13 +92,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID}}/cards",
+					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/cards",
 					"host": [
 						"{{API_URL}}"
 					],
 					"path": [
 						"databases",
-						"{{DATABASE_ID}}",
+						"{{DATABASE_ID_OR_PATH}}",
 						"cards"
 					]
 				}
@@ -118,7 +118,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"title\": \"New title\",\n  \"properties\": {\n    \"Status\": \"Complete\"\n  }\n}",
+					"raw": "{\n  \"title\": \"New title 2\",\n  \"properties\": {\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -126,13 +126,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{API_URL}}/cards/{{CARD_ID}}",
+					"raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
 					"host": [
 						"{{API_URL}}"
 					],
 					"path": [
 						"cards",
-						"{{CARD_ID}}"
+						"{{CARD_ID_OR_PATH}}"
 					]
 				}
 			},
@@ -173,13 +173,13 @@
 					}
 				],
 				"url": {
-					"raw": "{{API_URL}}/cards/{{CARD_ID}}",
+					"raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
 					"host": [
 						"{{API_URL}}"
 					],
 					"path": [
 						"cards",
-						"{{CARD_ID}}"
+						"{{CARD_ID_OR_PATH}}"
 					]
 				}
 			},
