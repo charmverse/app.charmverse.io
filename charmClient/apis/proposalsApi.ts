@@ -45,7 +45,7 @@ export class ProposalsApi {
   }
 
   archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
-    return http.POST<ProposalWithUsers[]>(`/api/proposals/${proposalId}/archive`, { archived });
+    return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }
 
   createProposalTemplate({
