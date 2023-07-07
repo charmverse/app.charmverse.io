@@ -24,11 +24,14 @@ export function useProposals() {
   let filteredProposals = proposals?.filter(
     (proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal'
   );
-
-  if (statusFilter !== 'all') {
-    filteredProposals = filteredProposals?.filter((proposal) => proposal.status === statusFilter);
+  if (statusFilter === 'archived') {
+    filteredProposals = filteredProposals?.filter((p) => !!p.archived);
+    // Never show archived proposals within the other statuses list
+  } else if (statusFilter === 'all') {
+    filteredProposals = filteredProposals?.filter((p) => !p.archived);
+  } else if (statusFilter) {
+    filteredProposals = filteredProposals?.filter((proposal) => proposal.status === statusFilter && !proposal.archived);
   }
-
   if (categoryIdFilter !== 'all') {
     filteredProposals = filteredProposals?.filter((proposal) => proposal.categoryId === categoryIdFilter);
   }
