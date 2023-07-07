@@ -91,4 +91,27 @@ describe('unassignRole', () => {
       expect(err).toBeInstanceOf(UndesirableOperationError);
     }
   });
+
+  it('should fail if trying to unassign a user from a role managed by summon', async () => {
+    const role = await generateRole({
+      spaceId: space.id,
+      createdBy: user.id,
+      source: 'summon'
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    try {
+      await unassignRole({
+        roleId: role.id,
+        userId: user.id
+      });
+      throw new ExpectedAnError();
+    } catch (err) {
+      expect(err).toBeInstanceOf(UndesirableOperationError);
+    }
+  });
 });

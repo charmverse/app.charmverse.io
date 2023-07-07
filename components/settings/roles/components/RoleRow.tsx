@@ -9,7 +9,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-import Game7Icon from 'public/images/logos/game7_logo.svg';
+import Game7Icon from 'public/images/logos/game7_monogram.svg';
 
 import { RoleForm } from './RoleForm';
 import { RolePermissions } from './RolePermissions/RolePermissions';
@@ -32,9 +32,9 @@ const syncedRoleProps = {
     descriptionIcon: <GuildXYZIcon />,
     description: <>This role is managed by Collab.land. Visit https://collab.land/ to modify this role</>
   },
-  game7: {
+  summon: {
     descriptionIcon: <Game7Icon />,
-    description: <>This role is managed by Game7</>
+    description: <>This role is managed by Summon</>
   }
 };
 
@@ -73,7 +73,8 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
       }
       roleActions={
         !readOnly &&
-        role.source !== 'guild_xyz' && (
+        role.source !== 'guild_xyz' &&
+        role.source !== 'summon' && (
           <>
             <IconButton size='small' {...bindTrigger(menuState)}>
               <MoreHorizIcon />
