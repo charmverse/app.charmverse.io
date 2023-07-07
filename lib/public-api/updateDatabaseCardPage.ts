@@ -6,6 +6,7 @@ import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 
 import { PageNotFoundError } from './errors';
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
+import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';
 import type { CardPageUpdateData } from './interfaces';
 import { mapPropertiesFromApiToSystem } from './mapPropertiesFromApiToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
@@ -65,13 +66,19 @@ export async function updateDatabaseCardPage({
     databaseId: card.rootId,
     spaceId
   });
-
   const mappedProperties = update.properties
     ? await mapPropertiesFromApiToSystem({
         properties: update.properties ?? {},
         databaseIdOrSchema: databaseSchema.schema
       })
     : {};
+
+  const newProperties = { ...((card.fields as any)?.properties ?? {}), ...mappedProperties };
+
+  const validatedProperties = handleMappedPropertyEdgeCases({
+    mapped: newProperties,
+    schema: databaseSchema.schema
+  });
 
   const updatedData = await prisma.$transaction(async (tx) => {
     const updatedAt = new Date();
@@ -96,10 +103,7 @@ export async function updateDatabaseCardPage({
         updatedBy,
         fields: {
           ...(card.fields ?? ({} as any)),
-          properties: {
-            ...((card.fields as any)?.properties ?? {}),
-            ...mappedProperties
-          }
+          properties: validatedProperties
         }
       }
     });

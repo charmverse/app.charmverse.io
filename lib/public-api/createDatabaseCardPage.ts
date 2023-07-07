@@ -13,6 +13,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
+import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';
 import type { BoardPropertyValue } from './interfaces';
 import { mapPropertiesFromApiToSystem } from './mapPropertiesFromApiToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
@@ -43,6 +44,11 @@ export async function createDatabaseCardPage({
   const mappedProperties = await mapPropertiesFromApiToSystem({
     properties: properties ?? {},
     databaseIdOrSchema: databaseWithSchema.schema
+  });
+
+  const validatedProperties = handleMappedPropertyEdgeCases({
+    mapped: mappedProperties,
+    schema: databaseWithSchema.schema
   });
 
   let contentToInsert: any = content;
@@ -86,7 +92,7 @@ export async function createDatabaseCardPage({
           headerImage: null,
           icon: '',
           isTemplate: false,
-          properties: mappedProperties as any
+          properties: validatedProperties as any
         }
       }
     });
