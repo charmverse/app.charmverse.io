@@ -18,11 +18,14 @@ async function createCryptoSubscriptionIntent(
   req: NextApiRequest,
   res: NextApiResponse<CreateCryptoSubscriptionResponse>
 ) {
-  const { email, subscriptionId } = req.body as CreateCryptoSubscriptionRequest;
+  const spaceId = req.query.id as string;
+  const { email, subscriptionId, coupon } = req.body as CreateCryptoSubscriptionRequest;
 
   const cryptoUrl = await createCryptoSubscription({
     subscriptionId,
-    email
+    email,
+    coupon,
+    spaceId
   });
 
   res.status(200).json(cryptoUrl);
