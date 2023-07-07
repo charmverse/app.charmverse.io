@@ -1,7 +1,8 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import InventoryIcon from '@mui/icons-material/Inventory';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
@@ -15,11 +16,15 @@ import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { ArchiveProposalMenuItem } from 'components/proposals/ArchiveProposalMenuItem';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useProposal } from 'hooks/useProposal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { fontClassName } from 'theme/fonts';
@@ -124,6 +129,7 @@ export function DocumentPageActionList({
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
   const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
@@ -313,8 +319,17 @@ export function DocumentPageActionList({
           <Divider />
         </>
       )}
+
       <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
-      {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
+      {pageType === 'proposal' && pageId && <ArchiveProposalMenuItem proposalId={pageId} refreshPageOnChange />}
+      {undoEditorChanges && (
+        <UndoAction
+          onClick={undoEditorChanges}
+          disabled={!pagePermissions?.edit_content}
+          // Ensure alignment of undo icon since internal structure is different
+          listItemStyle={{ mr: '-3px' }}
+        />
+      )}
       <Divider />
       <PublishToSnapshot
         pageId={pageId}
