@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { findUserByIdentity, getUserInventory } from './api';
 
-export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
+export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId

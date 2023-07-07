@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { AuthSig } from 'lit-js-sdk';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
+import { syncSummonSpaceRoles } from 'lib/summon/syncSpaceRole';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -50,7 +51,14 @@ export async function reevaluateRoles({
     const updatedSpaceMembership = await getSpaceMembershipWithRoles({ spaceId, userId });
     const updatedUserRoles = updatedSpaceMembership?.spaceRoleToRole.map((r) => r.roleId) ?? [];
     const newRoles = updatedUserRoles.filter((r) => !userRoles.includes(r)) || [];
-
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId });
+    if (totalSpaceRolesUpdated !== 0 || totalSpaceRolesAdded !== 0) {
+      log.debug(`Space roles sync result`, {
+        spaceId,
+        totalSpaceRolesAdded,
+        totalSpaceRolesUpdated
+      });
+    }
     return newRoles;
   } catch (error) {
     log.warn('Error reevaluating roles', { error, userId, spaceId });

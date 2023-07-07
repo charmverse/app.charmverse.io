@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import * as summonApi from '../api';
-import { syncSpaceRole } from '../syncSpaceRole';
+import { syncSummonSpaceRoles } from '../syncSpaceRole';
 
 jest.mock('../api', () => ({
   findUserByIdentity: jest.fn().mockResolvedValue(null),
@@ -14,7 +14,7 @@ jest.mock('../api', () => ({
 describe('syncSpaceRole', () => {
   it(`Should do nothing if the space does not have a tenant ID`, async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
-    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSpaceRole({ spaceId: space.id });
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
     expect(totalSpaceRolesAdded).toBe(0);
     expect(totalSpaceRolesUpdated).toBe(0);
   });
@@ -41,7 +41,7 @@ describe('syncSpaceRole', () => {
       }
     });
 
-    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSpaceRole({ spaceId: space.id });
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
     const newRole = await prisma.role.findFirstOrThrow({
       where: {
         spaceId: space.id,
@@ -114,7 +114,7 @@ describe('syncSpaceRole', () => {
       }
     });
 
-    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSpaceRole({ spaceId: space.id });
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
 
     expect(totalSpaceRolesAdded).toBe(0);
     expect(totalSpaceRolesUpdated).toBe(0);
@@ -165,7 +165,7 @@ describe('syncSpaceRole', () => {
       }
     });
 
-    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSpaceRole({ spaceId: space.id });
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
 
     const level2Role = await prisma.role.findFirstOrThrow({
       where: {
