@@ -196,7 +196,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
-        ) : pendingPayment && !spaceSubscription ? (
+        ) : pendingPayment && (!spaceSubscription || spaceSubscription.status === 'free_trial') ? (
           <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
