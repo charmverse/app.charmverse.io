@@ -51,6 +51,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
   });
 
+  const [pendingPayment, setPendingPayment] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const {
@@ -195,6 +196,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
+        ) : pendingPayment && !spaceSubscription ? (
+          <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             minimumBlockQuota={minimumBlockQuota}
@@ -259,6 +262,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             period={period}
             subscription={initialSubscriptionData}
             handleCoupon={handleCoupon}
+            handlePending={() => setPendingPayment(true)}
             onCloseCheckout={() => setShowCheckoutForm(false)}
             errors={errors}
             registerCoupon={{ ...register('coupon') }}

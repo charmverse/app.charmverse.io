@@ -9,11 +9,30 @@ import { stripeClient } from './stripe';
 export async function createCryptoSubscription({
   subscriptionId,
   email,
-  coupon
-}: CreateCryptoSubscriptionRequest): Promise<CreateCryptoSubscriptionResponse> {
+  coupon,
+  spaceId
+}: CreateCryptoSubscriptionRequest & { spaceId: string }): Promise<CreateCryptoSubscriptionResponse> {
   const encodedEmail = encodeURIComponent(email);
   const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
-  await stripeClient.subscriptions.del(subscriptionId);
+  const oldSubscriotions = await stripeClient.subscriptions.search({
+    query: `metadata['spaceId']:'${spaceId}' AND status:'past_due'`
+  });
+
+  // This is only for new customers to be sure that we delete all payment methods. This is how Loop works right now.
+  const customerId = subscription.customer as string;
+  const paymentMethods = await stripeClient.paymentMethods.list({
+    customer: customerId
+  });
+
+  for (const paymentMethod of paymentMethods.data) {
+    await stripeClient.paymentMethods.detach(paymentMethod.id);
+  }
+
+  const overdueSubscription = oldSubscriotions.data.find((sub) => sub.id !== subscriptionId);
+  if (overdueSubscription) {
+    await stripeClient.subscriptions.del(overdueSubscription.id);
+  }
+
   await stripeClient.customers.update(subscription.customer as string, {
     email
   });

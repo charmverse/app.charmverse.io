@@ -24,6 +24,7 @@ import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 export function CheckoutForm({
   onCloseCheckout,
   handleCoupon,
+  handlePending,
   registerCoupon,
   errors,
   space,
@@ -47,6 +48,7 @@ export function CheckoutForm({
   validating: boolean;
   registerCoupon: UseFormRegisterReturn<'coupon'>;
   onCloseCheckout: VoidFunction;
+  handlePending: VoidFunction;
   handleCoupon: (coupon: string | undefined) => Promise<void>;
 }) {
   const stripe = useStripe();
@@ -114,6 +116,7 @@ export function CheckoutForm({
           'success'
         );
         onCloseCheckout();
+        handlePending();
       }
     };
 
