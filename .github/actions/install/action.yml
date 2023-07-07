@@ -46,9 +46,9 @@ runs:
         file_pattern: "package*.json"
         commit_message: "Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}"
 
-    Include this step to deploy and test a different branch of core
-    1. Set the webapp branch
-    2. Set core branch
+    # Include this step to deploy and test a different branch of core
+    # 1. Set the webapp branch
+    # 2. Set core branch
     - name: Install special core library
       shell: bash
       if: github.head_ref == 'proposals/archived-status'
