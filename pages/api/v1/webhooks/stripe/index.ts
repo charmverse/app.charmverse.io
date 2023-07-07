@@ -36,31 +36,6 @@ const handler = defaultHandler();
 
 handler.post(stripePayment);
 
-/**
- * @swagger
- * /stripe:
- *   post:
- *     summary: Create/Update a Stripe subscription from an event.
- *     description: We will receive an event and depending on type we will update the db.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       [key: string]:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Update succeeded
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Subcsription'
- */
-
 export async function stripePayment(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers['stripe-signature'] as string | undefined;
