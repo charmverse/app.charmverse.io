@@ -8,6 +8,7 @@ import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { PageWithProposal } from 'lib/pages';
+import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
@@ -41,6 +42,10 @@ export class ProposalsApi {
 
   getProposalCategories(spaceId: string) {
     return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
+  }
+
+  archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
+    return http.POST<ProposalWithUsers[]>(`/api/proposals/${proposalId}/archive`, { archived });
   }
 
   createProposalTemplate({
