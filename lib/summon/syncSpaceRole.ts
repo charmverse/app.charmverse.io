@@ -10,15 +10,23 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
       id: spaceId
     }
   });
+  let totalSpaceRolesAdded = 0;
+  let totalSpaceRolesUpdated = 0;
 
   if (!space.xpsEngineId) {
     log.debug('Space does not have a Summon tenant ID', { spaceId });
-    return;
+    return {
+      totalSpaceRolesAdded,
+      totalSpaceRolesUpdated
+    };
   }
 
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      spaceId
+      spaceId,
+      user: {
+        isBot: false
+      }
     },
     select: {
       id: true,
@@ -45,7 +53,7 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
   const spaceRoleToRoles = await prisma.spaceRoleToRole.findMany({
     where: {
       role: {
-        source: 'game7',
+        source: 'summon',
         spaceId
       }
     },
@@ -85,14 +93,26 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
   });
 
   for (const spaceRole of spaceRoles) {
-    const xpsEngineId = await findUserXpsEngineId({
-      discordUserAccount: (spaceRole.user.discordUser?.account as { username: string; discriminator: string }) ?? null,
-      userEmail: spaceRole.user.email,
-      wallets: spaceRole.user.wallets,
-      xpsEngineId: spaceRole.user.xpsEngineId
-    });
+    const xpsEngineId =
+      spaceRole.user.xpsEngineId ??
+      (await findUserXpsEngineId({
+        discordUserAccount:
+          (spaceRole.user.discordUser?.account as { username: string; discriminator: string }) ?? null,
+        userEmail: spaceRole.user.email,
+        wallets: spaceRole.user.wallets
+      }));
 
     if (xpsEngineId) {
+      if (!spaceRole.user.xpsEngineId) {
+        await prisma.user.update({
+          where: {
+            id: spaceRole.user.id
+          },
+          data: {
+            xpsEngineId
+          }
+        });
+      }
       const userInventory = await getUserInventory(xpsEngineId);
       if (userInventory && userInventory.tenant === space.xpsEngineId) {
         const userRank = userInventory?.meta.rank ?? 0;
@@ -100,7 +120,7 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
           const role = await prisma.role.create({
             data: {
               name: `Level ${userRank}`,
-              source: 'game7',
+              source: 'summon',
               spaceId,
               createdBy: space.createdBy
             }
@@ -131,6 +151,7 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
             (memberId) => memberId !== spaceRole.user.id
           );
           rolesRecord[`Level ${userRank}`].memberIds.push(spaceRole.user.id);
+          totalSpaceRolesUpdated += 1;
         } else if (!currentRole) {
           await prisma.spaceRoleToRole.create({
             data: {
@@ -138,50 +159,51 @@ export async function syncSpaceRole({ spaceId }: { spaceId: string }) {
               spaceRoleId: spaceRole.id
             }
           });
+          totalSpaceRolesAdded += 1;
           rolesRecord[`Level ${userRank}`].memberIds.push(spaceRole.user.id);
         }
       }
     }
   }
+
+  return {
+    totalSpaceRolesAdded,
+    totalSpaceRolesUpdated
+  };
 }
 
 async function findUserXpsEngineId({
   wallets,
-  xpsEngineId: initialXpsEngineId,
   userEmail,
   discordUserAccount
 }: {
   discordUserAccount: { username: string; discriminator: string } | null;
   userEmail: string | null;
-  xpsEngineId: string | null;
   wallets: Pick<UserWallet, 'address'>[];
 }) {
-  let xpsEngineId = initialXpsEngineId ?? null;
+  let xpsEngineId: null | string = null;
 
-  if (!xpsEngineId) {
-    const walletAddresses = wallets.map(({ address }) => address);
+  const walletAddresses = wallets.map(({ address }) => address);
+  for (const walletAddress of walletAddresses) {
+    xpsEngineId = await findUserByIdentity({
+      walletAddress
+    });
 
-    for (const walletAddress of walletAddresses) {
-      xpsEngineId = await findUserByIdentity({
-        walletAddress
-      });
-
-      if (xpsEngineId) {
-        break;
-      }
+    if (xpsEngineId) {
+      break;
     }
+  }
 
-    if (!xpsEngineId && userEmail) {
-      xpsEngineId = await findUserByIdentity({
-        email: userEmail
-      });
-    }
+  if (!xpsEngineId && userEmail) {
+    xpsEngineId = await findUserByIdentity({
+      email: userEmail
+    });
+  }
 
-    if (discordUserAccount && !xpsEngineId) {
-      xpsEngineId = await findUserByIdentity({
-        discordHandle: `${discordUserAccount.username}#${discordUserAccount.discriminator}`
-      });
-    }
+  if (discordUserAccount && !xpsEngineId) {
+    xpsEngineId = await findUserByIdentity({
+      discordHandle: `${discordUserAccount.username}#${discordUserAccount.discriminator}`
+    });
   }
 
   return xpsEngineId;
