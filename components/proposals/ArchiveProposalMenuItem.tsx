@@ -9,6 +9,8 @@ import { useProposals } from 'components/proposals/hooks/useProposals';
 import { usePage } from 'hooks/usePage';
 import { useProposal } from 'hooks/useProposal';
 
+import { useProposalDetails } from './hooks/useProposalDetails';
+
 /**
  * We only want to refresh individual page data if user is currently on the page
  */
@@ -23,7 +25,7 @@ export function ArchiveProposalMenuItem({
 }) {
   const { archiveProposal, proposals } = useProposals();
 
-  const { refreshProposal } = useProposal({ proposalId: refreshPageOnChange ? proposalId : null });
+  const { refreshProposal } = useProposalDetails(refreshPageOnChange ? proposalId : null);
   const { refreshPage } = usePage({
     pageIdOrPath: refreshPageOnChange ? proposalId : null
   });
