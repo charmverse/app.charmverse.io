@@ -1,4 +1,4 @@
-export type XPSAchievement = {
+export type SummonAchievement = {
   name: string; // 'Onboarding Hero',
   description: string; // 'Complete the game7 onboarding process without error',
   rank: number; // 0.01,
@@ -14,7 +14,7 @@ export type XPSAchievement = {
   id: string; // '354662534299517012';
 };
 
-export type XPSUserInventory = {
+export type SummonUserInventory = {
   id: string;
   user: string;
   meta: {
@@ -45,10 +45,10 @@ export type XPSUserInventory = {
   gear: any[];
 };
 
-export type XPSUserProfile = {
+export type SummonUserProfile = {
   id: string;
   tenantId: string;
   // avatar: string;
   // username: string;
-  meta: XPSUserInventory['meta'];
+  meta: SummonUserInventory['meta'];
 };

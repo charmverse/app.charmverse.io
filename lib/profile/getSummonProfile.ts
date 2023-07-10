@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findUserXpsEngineId, getUserSummonProfile } from 'lib/summon/api';
-import type { XPSUserProfile } from 'lib/summon/interfaces';
+import type { SummonUserProfile } from 'lib/summon/interfaces';
 
-export async function getSummonProfile({ userId }: { userId: string }): Promise<null | XPSUserProfile> {
+export async function getSummonProfile({ userId }: { userId: string }): Promise<null | SummonUserProfile> {
   const user = await prisma.user.findUnique({
     where: {
       id: userId

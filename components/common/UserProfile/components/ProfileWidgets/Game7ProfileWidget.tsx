@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
-import type { XPSUserProfile } from 'lib/summon/interfaces';
+import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 import { ProfileWidget } from './ProfileWidget';
 
@@ -29,7 +29,7 @@ function Game7PlayerStatistics({ label, value }: { label: string; value: string 
   );
 }
 
-export function Game7ProfileWidget({ game7Profile }: { game7Profile: XPSUserProfile }) {
+export function Game7ProfileWidget({ game7Profile }: { game7Profile: SummonUserProfile }) {
   return (
     <ProfileWidget title='Game7 Profile' avatarVariant='square' avatarSrc='/images/logos/game7_logo.svg'>
       <Stack spacing={1} direction='row' alignItems='center'>

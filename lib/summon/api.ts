@@ -1,6 +1,6 @@
 import * as http from '@charmverse/core/http';
 
-import type { XPSAchievement, XPSUserInventory, XPSUserProfile } from './interfaces';
+import type { SummonAchievement, SummonUserInventory, SummonUserProfile } from './interfaces';
 
 const apiToken = process.env.XPS_API_TOKEN as string | undefined;
 
@@ -40,11 +40,11 @@ export async function findUserByIdentity(query: {
 // `/v1/xps/scan/inventory/{userId}`
 export function getUserInventory(userId: string) {
   return http
-    .GET<ApiResponse<XPSUserInventory | null>>(`${GAME7_BASE_URL}/scan/inventory/${userId}`, {}, { headers })
+    .GET<ApiResponse<SummonUserInventory | null>>(`${GAME7_BASE_URL}/scan/inventory/${userId}`, {}, { headers })
     .then(({ data }) => data);
 }
 
-export async function getUserSummonProfile(userId: string): Promise<XPSUserProfile | null> {
+export async function getUserSummonProfile(userId: string): Promise<SummonUserProfile | null> {
   const inventory = await getUserInventory(userId);
   if (inventory) {
     const { user, tenant, meta, achievements, ...profile } = inventory;
@@ -61,7 +61,7 @@ export async function getUserSummonProfile(userId: string): Promise<XPSUserProfi
 // `/v1/xps/achievement/{achievementId}`
 export function getAchievementById(achievementId: string) {
   return http
-    .GET<ApiResponse<XPSAchievement | null>>(`${GAME7_BASE_URL}/achievement/${achievementId}`, {}, { headers })
+    .GET<ApiResponse<SummonAchievement | null>>(`${GAME7_BASE_URL}/achievement/${achievementId}`, {}, { headers })
     .then(({ data }) => data)
     .catch((error) => {
       if (error.message === 'resource not found') {
