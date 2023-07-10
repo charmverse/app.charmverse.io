@@ -63,6 +63,7 @@ export async function addCertificateToListener(certificateArn: string) {
 
   const hasCertificate = await hasCertificateAdded({ certificateArn });
   if (hasCertificate) {
+    log.info('Certificate already added to listener', { certificateArn });
     return true;
   }
 
