@@ -549,3 +549,51 @@ ol li {
   position: relative;
   top: 3px;
 }
+
+
+/** Resizable columns **/
+
+
+.charm-column-row {
+}
+.charm-column-bar {
+  cursor: col-resize;
+  position: relative;
+  > div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px;
+    right: -10px;
+    > div {
+      height: 100%;
+      width: 4px;
+      margin-left: 10px;
+      margin-top: -4px;
+      padding: 4px 0;
+    }
+    &:hover > div {
+      background-color: var(--bg-gray);
+    }
+  }
+}
+.charm-column {
+  border-radius: 4px;
+  position: relative;
+  transition: background-color 250ms ease-in-out;
+
+  &:hover {
+    transition: background-color 250ms ease-in-out;
+    background-color: var(--bg-gray);
+  }
+
+  & .bangle-nv-content p {
+    overflow-wrap: anywhere;
+  }
+
+  margin: 0 -4px;
+
+  > div {
+    padding: 0 4px;
+  }
+}

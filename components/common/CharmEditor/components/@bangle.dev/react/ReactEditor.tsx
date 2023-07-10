@@ -8,7 +8,7 @@ import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { RefObject } from 'react';
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useMemo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 import useSWRImmutable from 'swr/immutable';
 
@@ -100,7 +100,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
-
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');
   }
@@ -213,6 +212,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
+  // console.log(nodeViews);
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}

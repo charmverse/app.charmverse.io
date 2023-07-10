@@ -40,8 +40,6 @@ import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
-import ColumnLayoutColumn from './components/columnLayout/Column';
-import ColumnLayoutRow from './components/columnLayout/ColumnLayoutRow';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -622,12 +620,6 @@ function CharmEditor({
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
-          case 'columnLayout': {
-            return <ColumnLayoutRow node={props.node}>{_children}</ColumnLayoutRow>;
-          }
-          case 'columnBlock': {
-            return <ColumnLayoutColumn node={props.node}>{_children}</ColumnLayoutColumn>;
-          }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
