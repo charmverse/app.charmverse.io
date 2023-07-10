@@ -36,31 +36,6 @@ const handler = defaultHandler();
 
 handler.post(stripePayment);
 
-/**
- * @swagger
- * /stripe:
- *   post:
- *     summary: Create/Update a Stripe subscription from an event.
- *     description: We will receive an event and depending on type we will update the db.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       [key: string]:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Update succeeded
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Subcsription'
- */
-
 export async function stripePayment(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers['stripe-signature'] as string | undefined;
@@ -326,6 +301,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const priceId = subscriptionData?.price?.id;
         const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
+        const encodedEmail = email ? `&email=${encodeURIComponent(email)}` : '';
 
         if (!stripeSubscription.metadata.loopCheckout && priceId) {
           const loopItems = await getLoopProducts();
@@ -340,8 +316,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           }
 
           const loopUrl = loopItem.url
-            ? `${loopItem.url}?cartEnabled=false&email=${email}&sub=${subscriptionId}`
-            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false&email=${email}&sub=${subscriptionId}`;
+            ? `${loopItem.url}?cartEnabled=false${encodedEmail}&sub=${subscriptionId}`
+            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false${encodedEmail}&sub=${subscriptionId}`;
 
           await stripeClient.subscriptions.update(subscriptionId, {
             metadata: {
@@ -486,10 +462,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
       }
     }
 
-    res.status(200).end();
+    return res.status(200).json({});
   } catch (err: any) {
     log.warn('Stripe webhook failed to construct event', err);
-    res.status(400).json(`Webhook Error: ${err?.message}`);
+    return res.status(400).json(`Webhook Error: ${err?.message}`);
   }
 }
 

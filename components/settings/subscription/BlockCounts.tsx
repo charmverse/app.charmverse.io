@@ -7,6 +7,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { getTimeDifference } from 'lib/utilities/dates';
 
 import { BlocksExplanationModal } from './BlocksExplanation';
 
@@ -64,7 +65,7 @@ export function BlockCounts() {
           whiteSpace: 'break-spaces'
         }}
       >
-        Complimentary Community Edition
+        Free trial: Community Edition - {getTimeDifference(new Date(2023, 6, 31), 'day')} days left
       </Typography>
 
       <BlocksExplanationModal open={isExplanationModalOpen} onClose={closeExplanationModal} />

@@ -12,6 +12,7 @@ import { DatabasePageActionList } from 'components/common/PageActions/components
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { ForumPostActionList } from 'components/common/PageActions/components/ForumPostActionList';
+import { useProposals } from 'components/proposals/hooks/useProposals';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';

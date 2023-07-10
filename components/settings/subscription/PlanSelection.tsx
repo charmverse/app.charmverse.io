@@ -56,7 +56,8 @@ export function PlanSelection({
             disabled={disabled}
             size='small'
             aria-label='Block quota slider'
-            valueLabelDisplay='off'
+            valueLabelDisplay='auto'
+            valueLabelFormat={(value) => `${value}K blocks`}
             value={blockQuotaInThousands}
             step={10}
             min={10}

@@ -1,28 +1,38 @@
+import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
-import Link from 'components/common/Link';
+import Button from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
-export function PaidAnnouncementBanner() {
-  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage('show-paid-banner', true);
+const UpgradeButton = styled(Button)`
+  font-weight: 600;
+  padding-bottom: 0;
+  padding-top: 0;
+`;
+
+export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
+  const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
+  const { onClick } = useSettingsDialog();
+
   return showPaidAnnouncementBar ? (
     <StyledBanner top={20} data-test='paid-announcement-banner'>
       <Box pr={3}>
         <Typography component='div'>
-          Community Edition coming on June 30th. Includes complex role-based access control, API, & custom domain.{' '}
+          Community Edition available. Upgrade NOW using code <b>"charmed"</b> for 40% off for the 1st year.{' '}
           <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-            <Link
-              color='inherit'
-              target='_blank'
-              href='https://app.charmverse.io/charmverse/page-5371612014886058'
-              sx={{ fontWeight: 600 }}
+            <UpgradeButton
+              endIcon={<EastIcon />}
+              sx={{ ml: 2 }}
+              color='primary'
+              onClick={() => onClick('subscription')}
+              variant='outlined'
             >
-              More Details
-            </Link>
-            <EastIcon sx={{ position: 'relative', top: 1.5, fontSize: 16 }} />
+              UPGRADE
+            </UpgradeButton>
           </Stack>
         </Typography>
       </Box>

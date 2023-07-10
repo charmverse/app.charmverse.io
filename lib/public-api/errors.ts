@@ -64,7 +64,7 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
       exampleObj[schema.name] = 'value';
 
       if (schema.type === 'multiSelect' || schema.type === 'select') {
-        exampleObj[schema.name] = schema.options[0]?.value;
+        exampleObj[schema.name] = schema.options?.[0].value;
       }
 
       return exampleObj;
@@ -96,7 +96,7 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 export class InvalidCustomPropertyValueError extends SystemError<{ validOptions: any[] }> {
   constructor(errorInfo: { key: string; value: any; boardSchema: PageProperty[] }) {
     const allowedValues =
-      errorInfo.boardSchema.find((schema) => schema.name === errorInfo.key)?.options.map((opt) => opt.value) ?? [];
+      errorInfo.boardSchema.find((schema) => schema.name === errorInfo.key)?.options?.map((opt) => opt.value) ?? [];
 
     super({
       message: `Value '${errorInfo.value}' is an invalid option for property ${errorInfo.key}`,

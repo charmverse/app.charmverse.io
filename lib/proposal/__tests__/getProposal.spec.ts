@@ -45,7 +45,8 @@ describe('getProposal', () => {
           reviewers: [],
           snapshotProposalExpiry: null,
           spaceId: space.id,
-          status: expect.any(String)
+          status: proposal.status,
+          archived: expect.any(Boolean)
         }
       })
     );

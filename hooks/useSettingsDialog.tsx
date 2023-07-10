@@ -55,7 +55,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
     if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
       onClick(router.query.settingTab as string);
-      router.push(router.asPath.split('?')[0]);
+      setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
     // If the user clicks a link inside the modal, close the modal only
     router.events.on('routeChangeStart', close);

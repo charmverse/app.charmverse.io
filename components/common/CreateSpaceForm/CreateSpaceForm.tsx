@@ -11,7 +11,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -27,6 +27,7 @@ import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImport
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
 import { getSpaceUrl } from 'lib/utilities/browser';
+import debounce from 'lib/utilities/debounce';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
@@ -39,7 +40,6 @@ const schema = yup.object({
   spaceImage: yup.string().nullable(true),
   spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
-
 type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
@@ -131,38 +131,41 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     }
   }
 
-  async function onSubmit(values: FormValues) {
-    try {
-      setSaveError(null);
-      const space = await createNewSpace({
-        spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
-        spaceData: {
-          name: values.name,
-          spaceImage: values.spaceImage
-        }
-      });
-
-      setNewSpace(space);
-
-      if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
-        const notionUrl = generateNotionImportRedirectUrl({
-          origin: window?.location.origin,
-          spaceDomain: space.domain
+  const onSubmit = useCallback(
+    debounce(async (values: FormValues) => {
+      try {
+        setSaveError(null);
+        const space = await createNewSpace({
+          spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
+          spaceData: {
+            name: values.name,
+            spaceImage: values.spaceImage
+          }
         });
 
-        router.push(notionUrl);
-        // We want to make the user import markdown after creating the space
-      } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
-        // Give time for spaces hook to update so user doesn't end up on Routeguard
-        setTimeout(() => {
-          router.push(getSpaceUrl({ domain: space.domain }));
-        }, 200);
+        setNewSpace(space);
+
+        if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
+          const notionUrl = generateNotionImportRedirectUrl({
+            origin: window?.location.origin,
+            spaceDomain: space.domain
+          });
+
+          router.push(notionUrl);
+          // We want to make the user import markdown after creating the space
+        } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
+          // Give time for spaces hook to update so user doesn't end up on Routeguard
+          setTimeout(() => {
+            router.push(getSpaceUrl({ domain: space.domain }));
+          }, 200);
+        }
+      } catch (err) {
+        log.error('Error creating space', err);
+        setSaveError((err as Error).message || err);
       }
-    } catch (err) {
-      log.error('Error creating space', err);
-      setSaveError((err as Error).message || err);
-    }
-  }
+    }, 2000),
+    []
+  );
 
   function randomizeName() {
     const name = randomName();
