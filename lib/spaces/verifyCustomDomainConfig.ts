@@ -10,7 +10,7 @@ export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomD
   if (!space || !space.customDomain) {
     return null;
   }
-  const domain = 'community.labdao.xysz';
+  const domain = space.customDomain;
   const certificateArn = await requestCertificateForDomain(domain);
   const certDetails = await getCertificateDetails({ certificateArn });
 
