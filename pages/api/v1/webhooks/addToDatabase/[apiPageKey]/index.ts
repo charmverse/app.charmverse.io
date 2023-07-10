@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -6,14 +5,14 @@ import { requireKeys } from 'lib/middleware';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { createDatabaseCardPage } from 'lib/public-api';
-import { defaultHandler } from 'lib/public-api/handler';
+import { apiPageKeyHandler } from 'lib/public-api/handler';
 import { updateDatabaseBlocks } from 'lib/public-api/updateDatabaseBlocks';
 import type { BodyFormResponse, TypeformResponse } from 'lib/typeform/interfaces';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
 import { transformWebhookBodyFormResponse } from 'lib/typeform/transformWebhookBodyFormResponse';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 
-const handler = defaultHandler();
+const handler = apiPageKeyHandler();
 
 handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 
@@ -43,36 +42,16 @@ handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 //  *                $ref: '#/components/schemas/Page'
 //  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
-  const key = req.query.key as string;
-
-  const apiPageKeyWithSpaceId = await prisma.apiPageKey.findUnique({
-    where: { apiKey: key },
-    select: {
-      createdAt: true,
-      updatedAt: true,
-      createdBy: true,
-      pageId: true,
-      apiKey: true,
-      type: true,
-      page: {
-        select: { spaceId: true }
-      }
-    }
-  });
-
-  if (!apiPageKeyWithSpaceId) {
-    throw new DataNotFoundError('Api key could not be found');
-  }
-
+  const apiPageKey = req.apiPageKey;
   let body: BodyFormResponse = [];
 
-  if (apiPageKeyWithSpaceId.type === 'typeform' && req.body.form_response) {
+  if (req.apiPageKey.type === 'typeform' && req.body.form_response) {
     const payload = req.body.form_response as TypeformResponse;
     body = simplifyTypeformResponse(payload);
   }
 
-  const spaceId = apiPageKeyWithSpaceId.page.spaceId;
-  const databaseIdorPath = apiPageKeyWithSpaceId.pageId;
+  const spaceId = apiPageKey.page.spaceId;
+  const databaseIdorPath = apiPageKey.pageId;
   const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
   if (!board) {
@@ -99,7 +78,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     properties: mappedCardProperties,
     boardId: board.id,
     spaceId,
-    createdBy: apiPageKeyWithSpaceId.createdBy
+    createdBy: apiPageKey.createdBy
   });
 
   await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
