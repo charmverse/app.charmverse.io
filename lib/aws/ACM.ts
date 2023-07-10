@@ -1,11 +1,13 @@
 import type { ACMClientConfig } from '@aws-sdk/client-acm';
 import { ACM } from '@aws-sdk/client-acm';
-import { log } from '@charmverse/core/log';
+import { getLogger } from '@charmverse/core/log';
 
 import type { DomainCertificateDetails } from 'lib/aws/interfaces';
 import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
 
 import { AWS_REGION } from './config';
+
+const log = getLogger('ACM');
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
@@ -21,10 +23,24 @@ const acm = new ACM(config);
 
 const MAX_RETRIES = 3;
 
+export async function getCertificateARNByDomain(domainName: string) {
+  const res = await acm.listCertificates({
+    CertificateStatuses: ['ISSUED', 'PENDING_VALIDATION']
+  });
+
+  return res.CertificateSummaryList?.find((cert) => cert.DomainName === domainName)?.CertificateArn;
+}
+
 export async function requestCertificateForDomain(domainName: string) {
   if (!isValidDomainName(domainName)) {
     log.warn(`Tried to reuiqest ACM certificate for invalid domain name: ${domainName}`);
     return;
+  }
+
+  const existingCertARN = await getCertificateARNByDomain(domainName);
+
+  if (existingCertARN) {
+    return existingCertARN;
   }
 
   const res = await acm.requestCertificate({
@@ -35,36 +51,49 @@ export async function requestCertificateForDomain(domainName: string) {
   return res.CertificateArn;
 }
 
-export async function getCertificateDetailsForDomain(domainName: string, retry = 0) {
-  const certARN = await requestCertificateForDomain(domainName);
+export async function getCertificateDetails({
+  domainName,
+  createCertificate,
+  certificateArn,
+  retry = 0
+}: {
+  domainName?: string;
+  certificateArn?: string;
+  retry?: number;
+  createCertificate?: boolean;
+}) {
+  let certArn = certificateArn || (await getCertificateARNByDomain(domainName || ''));
+  if (!certArn && createCertificate && domainName) {
+    certArn = await requestCertificateForDomain(domainName);
+  }
 
-  if (!certARN) {
+  if (!certArn) {
     log.warn(`Could not load certificate for domain: ${domainName}`);
     return;
   }
 
   const { Certificate: cert } = await acm.describeCertificate({
-    CertificateArn: certARN
+    CertificateArn: certArn
   });
 
   if (!cert) {
-    log.warn('Failed to load certificate', { certARN, domainName });
+    log.warn('Failed to load certificate', { certArn, domainName });
     return;
   }
 
   const validation = cert.DomainValidationOptions?.[0];
 
   if (!validation?.ResourceRecord?.Value && retry <= MAX_RETRIES) {
-    log.info('Waiting for certificate to be validated', { certARN, domainName });
+    log.info('Waiting for certificate to be validated', { certArn, domainName });
     await new Promise((resolve) => {
       setTimeout(resolve, 3000);
     });
 
-    return getCertificateDetailsForDomain(domainName, retry + 1);
+    return getCertificateDetails({ certificateArn: certArn, createCertificate, retry: retry + 1 });
   }
 
   const details: DomainCertificateDetails = {
-    domain: domainName,
+    domain: cert.DomainName || '',
     dnsValidation: {
       status: validation?.ValidationStatus || '',
       name: validation?.ResourceRecord?.Name || '',
