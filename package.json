@@ -86,7 +86,6 @@
     "@beam-australia/react-env": "^3.1.1",
     "@charmverse/core": "^0.0.2-rc-setting-right-v.0",
     "@column-resizer/core": "^1.0.1",
-    "@column-resizer/react": "^1.0.1",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@date-io/luxon": "^2.13.1",
