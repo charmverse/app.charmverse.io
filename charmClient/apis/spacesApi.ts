@@ -4,7 +4,7 @@ import type { Space, Prisma } from '@charmverse/core/prisma';
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
 import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
@@ -96,5 +96,9 @@ export class SpacesApi {
 
   updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {
     return http.PUT<UpdateCustomDomainResponse>(`/api/spaces/${spaceId}/custom-domain`, { customDomain });
+  }
+
+  verifyCustomDomain(spaceId: string) {
+    return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
   }
 }

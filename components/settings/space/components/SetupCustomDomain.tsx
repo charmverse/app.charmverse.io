@@ -1,5 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
-import { InputAdornment, TextField, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, InputAdornment, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,7 +9,9 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { useCustomDomainVerification } from 'hooks/useCustomDomainVerification';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -37,6 +40,8 @@ export function SetupCustomDomain({ space }: { space: Space }) {
     defaultValues: { customDomain: space.customDomain ?? '' }
   });
 
+  const { customDomainVerification, showCustomDomainVerification, setShowCustomDomainVerification, isLoading } =
+    useCustomDomainVerification();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(values: FormValues) {
@@ -76,7 +81,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
           <Stack direction='row' alignItems='start' spacing={1}>
             <TextField
               {...register('customDomain', {
-                validate: (value) => !!value || isValidDomainName(value) || 'Please provide valid domain name.'
+                validate: (value) => !value || isValidDomainName(value) || 'Please provide valid domain name.'
               })}
               InputProps={{
                 startAdornment: <InputAdornment position='start'>https://</InputAdornment>
@@ -100,14 +105,55 @@ export function SetupCustomDomain({ space }: { space: Space }) {
             </Button>
           </Stack>
         </form>
-      </UpgradeWrapper>
 
-      <Typography variant='caption' mt={0.5}>
-        You will need to point your domain to our app. You can find out on how to do that{' '}
-        <Link href={CNAME_INSTRUCTIONS_URL} external target='_blank'>
-          here
-        </Link>
-      </Typography>
+        {!!space.customDomain && (
+          <Accordion
+            expanded={showCustomDomainVerification}
+            onChange={() => {
+              setShowCustomDomainVerification((prev) => !prev);
+            }}
+            disableGutters
+            elevation={0}
+            sx={{
+              mt: 0.5,
+              boxShadow: 'none',
+              border: (theme) => ` 1px solid ${theme.palette.divider}`,
+              borderRadius: 1,
+              backgroundColor: 'transparent',
+              backgroundImage: 'none',
+              '&:before': { backgroundColor: 'transparent' }
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls='panel1a-content'
+              id='panel1a-header'
+              sx={{
+                px: 1.5,
+                minHeight: 0,
+                '.MuiAccordionSummary-content': { my: 1 }
+              }}
+            >
+              <Typography variant='subtitle1'>How to set up your domain provider</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: 1.5, pt: 0 }}>
+              {isLoading ? (
+                <LoadingComponent isLoading size={20} />
+              ) : (
+                <>
+                  <Typography>Verification content</Typography>
+                  <Typography variant='caption' mt={0.5}>
+                    You will need to point your domain to our app. You can find out on how to do that{' '}
+                    <Link href={CNAME_INSTRUCTIONS_URL} external target='_blank'>
+                      here
+                    </Link>
+                  </Typography>
+                </>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        )}
+      </UpgradeWrapper>
     </Stack>
   );
 }
