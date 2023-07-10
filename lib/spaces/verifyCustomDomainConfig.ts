@@ -4,12 +4,19 @@ import { getCertificateDetails, requestCertificateForDomain } from 'lib/aws/ACM'
 import { addCertificateToListener, hasCertificateAdded } from 'lib/aws/ELB';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 
-export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomDomainVerification | null> {
+export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomDomainVerification> {
   const space = await prisma.space.findUnique({ where: { id: spaceId } });
 
   if (!space || !space.customDomain) {
-    return null;
+    return {
+      isRedirectVerified: false,
+      isCertificateVerified: false,
+      isCertificateAttached: false,
+      isCustomDomainVerified: false,
+      certificateDetails: null
+    };
   }
+
   const domain = space.customDomain;
   const certificateArn = await requestCertificateForDomain(domain);
   const certDetails = await getCertificateDetails({ certificateArn });
