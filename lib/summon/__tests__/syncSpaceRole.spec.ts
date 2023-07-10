@@ -4,14 +4,14 @@ import { v4 } from 'uuid';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import * as summonApi from '../api';
-import { syncSummonSpaceRoles } from '../syncSpaceRole';
+import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 
 jest.mock('../api', () => ({
   findUserByIdentity: jest.fn().mockResolvedValue(null),
   getUserInventory: jest.fn().mockResolvedValue(null)
 }));
 
-describe('syncSpaceRole', () => {
+describe('syncSummonSpaceRoles', () => {
   it(`Should do nothing if the space does not have a tenant ID`, async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
     const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
