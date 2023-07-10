@@ -13,6 +13,7 @@ describe('isValidDomainName', () => {
     expect(isValidDomainName('app.chamrverse.io')).toBe(true);
     expect(isValidDomainName('qq.example.xyz')).toBe(true);
     expect(isValidDomainName('qwe.qq.example.xyz')).toBe(true);
+    expect(isValidDomainName('qwe.0xcharmverse.xyz')).toBe(true);
   });
 
   it('should not validate single-letter suffix / subdomain', () => {
