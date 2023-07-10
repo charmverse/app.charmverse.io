@@ -8,10 +8,11 @@ import { v4 } from 'uuid';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { InvalidApiKeyError } from '../errors';
-import { requireApiKey } from '../requireApiKey';
+import { provisionApiKey, requireApiKey } from '../requireApiKey';
 
 let user: User;
 let space: Space;
+let botUser: User;
 let normalApiKey: SpaceApiToken;
 let superApiKey: SuperApiToken;
 
@@ -20,16 +21,18 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  normalApiKey = await prisma.spaceApiToken.create({
-    data: {
-      token: v4(),
-      space: {
-        connect: {
-          id: space.id
+  normalApiKey = await provisionApiKey(space.id);
+
+  botUser = (await prisma.user.findFirst({
+    where: {
+      isBot: true,
+      spaceRoles: {
+        some: {
+          spaceId: space.id
         }
       }
     }
-  });
+  })) as User;
 
   superApiKey = await prisma.superApiToken.create({
     data: {
@@ -64,6 +67,22 @@ describe('requireApiKey', () => {
     expect(mockedNext).toBeCalledTimes(1);
   });
 
+  it('should set the bot user linked to the API key on the request object', async () => {
+    const testReq: NextApiRequest = {
+      headers: {
+        authorization: `Bearer ${normalApiKey.token}`
+      }
+    } as any;
+
+    const mockedNext = jest.fn();
+
+    await requireApiKey(testReq, {} as any, mockedNext);
+
+    expect(testReq.authorizedSpaceId).toBe(normalApiKey.spaceId);
+    expect(testReq.spaceIdRange).not.toBeDefined();
+    expect(testReq.botUser.id).toBeDefined();
+    expect(mockedNext).toBeCalledTimes(1);
+  });
   it('should identify the space linked to a normal API key when using query parameter auth', async () => {
     const testReq: NextApiRequest = {
       query: {

@@ -2,6 +2,7 @@ import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissio
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, MenuItem, Select, TextField } from '@mui/material';
+import Divider from '@mui/material/Divider';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -18,7 +19,7 @@ import { useProposalCategories } from '../hooks/useProposalCategories';
 import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
 import { ProposalCategoryChip } from './ProposalChip';
 
-export type ProposalStatusFilter = ProposalStatus | 'all';
+export type ProposalStatusFilter = ProposalStatus | 'all' | 'archived';
 
 type Props = {
   statusFilter: ProposalStatusFilter;
@@ -68,6 +69,8 @@ export function ProposalsViewOptions({
               {proposalStatusLabel}
             </MenuItem>
           ))}
+          <Divider />
+          <MenuItem value='archived'>Archived</MenuItem>
         </Select>
 
         <Select
@@ -76,6 +79,8 @@ export function ProposalsViewOptions({
           renderValue={(value) => {
             if (value === 'all') {
               return 'All categories';
+            } else if (value === 'archived') {
+              return 'Archived';
             }
 
             const category = categories.find((c) => c.id === value);

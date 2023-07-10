@@ -17,30 +17,31 @@ const handler = defaultHandler();
 
 handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 
-/**
- * @swagger
- * /databases/{databaseId}/{key}:
- *   post:
- *     summary: Create a new form response in the database from an external service.
- *     description: Create a new form response with array of questions and answers.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       all_responses:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Summary of the database
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Page'
- */
+// Unused endpoint, keeping it here for reference but removing from docs
+// /**
+//  * @swagger
+//  * /databases/{databaseId}/{key}:
+//  *   post:
+//  *     summary: Create a new form response in the database from an external service.
+//  *     description: Create a new form response with array of questions and answers.
+//  *     requestBody:
+//  *       content:
+//  *          application/json:
+//  *             schema:
+//  *               oneOf:
+//  *                  - type: object
+//  *                    properties:
+//  *                       all_responses:
+//  *                          type: string
+//  *                  - type: string
+//  *     responses:
+//  *       200:
+//  *         description: Summary of the database
+//  *         content:
+//  *            application/json:
+//  *              schema:
+//  *                $ref: '#/components/schemas/Page'
+//  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
   const key = req.query.key as string;
 

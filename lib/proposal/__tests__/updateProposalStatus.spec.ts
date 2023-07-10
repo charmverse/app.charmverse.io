@@ -1,38 +1,32 @@
 import type { ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 
 import { InvalidStateError } from 'lib/middleware';
-import {
-  createProposalWithUsers,
-  generateRole,
-  generateSpaceUser,
-  generateUserAndSpace,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
+import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 import { updateProposalStatus } from '../updateProposalStatus';
 
-let user: User;
-let reviewer: User;
-let reviewerRole: Role;
-let space: Space;
-let proposalCategory: ProposalCategory;
+describe('updateProposalStatus', () => {
+  let user: User;
+  let reviewer: User;
+  let reviewerRole: Role;
+  let space: Space;
+  let proposalCategory: ProposalCategory;
 
-beforeAll(async () => {
-  const generated = await generateUserAndSpace({
-    isAdmin: false
+  beforeAll(async () => {
+    const generated = await generateUserAndSpace({
+      isAdmin: false
+    });
+    user = generated.user;
+    space = generated.space;
+    reviewer = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    reviewerRole = await generateRole({ createdBy: user.id, spaceId: space.id });
+    proposalCategory = await generateProposalCategory({
+      spaceId: space.id
+    });
   });
-  user = generated.user;
-  space = generated.space;
-  reviewer = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-  reviewerRole = await generateRole({ createdBy: user.id, spaceId: space.id });
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
-});
-
-describe('Updates the proposal of a page', () => {
   it('Move a review proposal to reviewed status and assign proposal reviewer and reviewed at fields', async () => {
     const proposal = await generateProposal({
       spaceId: space.id,
@@ -109,6 +103,26 @@ describe('Updates the proposal of a page', () => {
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
+
+  it('should throw an error if trying to update an archived proposal', async () => {
+    const archivedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [{ group: 'role', id: reviewerRole.id }],
+      proposalStatus: 'discussion',
+      archived: true,
+      categoryId: proposalCategory.id
+    });
+    await expect(
+      updateProposalStatus({
+        proposalId: archivedProposal.id,
+        newStatus: 'review',
+        userId: user.id
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
   it('should save the snapshot expiry date when changing the status of the proposal to vote active if it was exported to snapshot', async () => {
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,

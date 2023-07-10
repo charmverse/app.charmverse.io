@@ -6,6 +6,8 @@ import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/m
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import { ArchiveProposalMenuItem } from 'components/proposals/ArchiveProposalMenuItem';
+import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -89,6 +91,12 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
+      {page.type === 'proposal' && (
+        <MenuItem>
+          <ArchiveProposalMenuItem proposalId={page.id} containerStyle={{ ml: -2 }} />
+        </MenuItem>
+      )}
+
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
@@ -98,6 +106,7 @@ export function PageActionsMenu({
         />
       )}
       <CopyPageLinkAction path={`/${page.path}`} />
+
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>

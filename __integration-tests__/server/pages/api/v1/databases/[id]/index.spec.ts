@@ -3,7 +3,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { DatabasePage } from 'lib/public-api';
-import { createDatabase } from 'lib/public-api';
+import { createDatabase } from 'lib/public-api/createDatabase';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
