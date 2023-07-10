@@ -83,7 +83,7 @@ export async function getCertificateDetails({
 
   const validation = cert.DomainValidationOptions?.[0];
 
-  if (!validation?.ResourceRecord?.Value && retry <= MAX_RETRIES) {
+  if (!validation?.ResourceRecord?.Value && cert.Status === 'PENDING_VALIDATION' && retry < MAX_RETRIES) {
     log.info('Waiting for certificate to be validated', { certArn, domainName });
     await new Promise((resolve) => {
       setTimeout(resolve, 3000);

@@ -51,6 +51,8 @@ export async function hasCertificateAdded({ certificateArn, domain }: { certific
   if (certificates) {
     return certificates.some((cert) => cert.CertificateArn === checkARN);
   }
+
+  return false;
 }
 
 export async function addCertificateToListener(certificateArn: string) {
@@ -58,7 +60,7 @@ export async function addCertificateToListener(certificateArn: string) {
 
   if (!listenerArn) {
     log.warn('No AWS listener ARN found. Cannot add certificate.');
-    return;
+    return false;
   }
 
   const hasCertificate = await hasCertificateAdded({ certificateArn });
