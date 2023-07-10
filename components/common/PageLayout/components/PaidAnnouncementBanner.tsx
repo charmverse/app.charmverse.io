@@ -20,21 +20,22 @@ export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
 
   return showPaidAnnouncementBar ? (
     <StyledBanner top={20} data-test='paid-announcement-banner'>
-      <Box pr={3}>
+      <Box pr={3} display='flex'>
         <Typography component='div'>
-          Community Edition available. Upgrade NOW using code <b>"charmed"</b> for 40% off for the 1st year.{' '}
-          <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-            <UpgradeButton
-              endIcon={<EastIcon />}
-              sx={{ ml: 2 }}
-              color='primary'
-              onClick={() => onClick('subscription')}
-              variant='outlined'
-            >
-              UPGRADE
-            </UpgradeButton>
-          </Stack>
+          Community Edition available. Upgrade NOW using code <b>"charmedcrypto"</b> for 40% off for the 1st year. Valid
+          until July 15th.{' '}
         </Typography>
+        <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
+          <UpgradeButton
+            endIcon={<EastIcon />}
+            sx={{ ml: 1 }}
+            color='primary'
+            onClick={() => onClick('subscription')}
+            variant='outlined'
+          >
+            UPGRADE
+          </UpgradeButton>
+        </Stack>
       </Box>
       <IconButton
         onClick={() => setShowPaidAnnouncementBar(false)}
