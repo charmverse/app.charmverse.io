@@ -10,6 +10,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getTimeDifference } from 'lib/utilities/dates';
 
 import { BlocksExplanationModal } from './BlocksExplanation';
+import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 
 /**
  * In future, we may bring back a version of block counts with a modal.
@@ -20,6 +21,7 @@ export function BlockCounts() {
   const { space: currentSpace } = useCurrentSpace();
   const theme = useTheme();
 
+  const { spaceSubscription } = useSpaceSubscription();
   const {
     isOpen: isExplanationModalOpen,
     close: closeExplanationModal,
@@ -56,17 +58,19 @@ export function BlockCounts() {
           }}
         />
       </Typography>
-      <Typography
-        variant='caption'
-        color='secondary'
-        sx={{
-          display: 'inline-flex',
-          width: '100%',
-          whiteSpace: 'break-spaces'
-        }}
-      >
-        Free trial: Community Edition - {getTimeDifference(new Date(2023, 6, 31), 'day')} days left
-      </Typography>
+      {spaceSubscription?.status === 'free_trial' && spaceSubscription.expiresOn && (
+        <Typography
+          variant='caption'
+          color='secondary'
+          sx={{
+            display: 'inline-flex',
+            width: '100%',
+            whiteSpace: 'break-spaces'
+          }}
+        >
+          Free trial: Community Edition - {getTimeDifference(new Date(spaceSubscription.expiresOn), 'day')} days left
+        </Typography>
+      )}
 
       <BlocksExplanationModal open={isExplanationModalOpen} onClose={closeExplanationModal} />
     </Box>
