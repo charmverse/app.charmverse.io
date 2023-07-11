@@ -1,6 +1,23 @@
 import type { Space } from '@charmverse/core/prisma';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, InputAdornment, TextField, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Chip,
+  InputAdornment,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { Stack } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,6 +27,7 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { LabelWithCopy } from 'components/settings/space/components/LabelWithCopy';
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCustomDomainVerification } from 'hooks/useCustomDomainVerification';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -40,8 +58,16 @@ export function SetupCustomDomain({ space }: { space: Space }) {
     defaultValues: { customDomain: space.customDomain ?? '' }
   });
 
-  const { customDomainVerification, showCustomDomainVerification, setShowCustomDomainVerification, isLoading } =
-    useCustomDomainVerification();
+  const {
+    isCustomDomainVerified,
+    customDomainVerification,
+    showCustomDomainVerification,
+    setShowCustomDomainVerification,
+    refreshVerification,
+    isLoading,
+    isRefreshing
+  } = useCustomDomainVerification();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(values: FormValues) {
@@ -130,24 +156,105 @@ export function SetupCustomDomain({ space }: { space: Space }) {
               id='panel1a-header'
               sx={{
                 px: 1.5,
-                minHeight: 0,
-                '.MuiAccordionSummary-content': { my: 1 }
+                '.MuiAccordionSummary-content': { my: 0 },
+                minHeight: 40
               }}
             >
-              <Typography variant='subtitle1'>How to set up your domain provider</Typography>
+              <Stack direction='row' alignItems='center' gap={1}>
+                <Typography variant='subtitle1'>How to set up your domain provider</Typography>
+
+                {isCustomDomainVerified ? (
+                  <Chip size='small' label='Setup verified' color='success' icon={<CheckCircleOutlineOutlinedIcon />} />
+                ) : customDomainVerification ? (
+                  <Chip size='small' label='Action required' color='warning' icon={<ErrorOutlineOutlinedIcon />} />
+                ) : null}
+              </Stack>
             </AccordionSummary>
             <AccordionDetails sx={{ px: 1.5, pt: 0 }}>
               {isLoading ? (
                 <LoadingComponent isLoading size={20} />
               ) : (
                 <>
-                  <Typography>Verification content</Typography>
-                  <Typography variant='caption' mt={0.5}>
-                    You will need to point your domain to our app. You can find out on how to do that{' '}
-                    <Link href={CNAME_INSTRUCTIONS_URL} external target='_blank'>
-                      here
-                    </Link>
+                  <Typography variant='body2'>
+                    In order to make custom app domain work, you will need to setup two CNAME records in your DNS
+                    Provider dashboard. One is to redirect your domain to CharmVerse, and the other is to verify your
+                    domain ownership.
                   </Typography>
+
+                  <Stack mt={1}>
+                    <Typography variant='caption'>
+                      You can find instructions on how to set DNS records{' '}
+                      <Link href={CNAME_INSTRUCTIONS_URL} external target='_blank'>
+                        here
+                      </Link>
+                    </Typography>
+                  </Stack>
+
+                  <TableContainer>
+                    <Table size='small' sx={{ '.MuiTableCell-root': { px: 0.5 } }}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Record Name</TableCell>
+                          <TableCell>Record Value</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <LabelWithCopy label={space.customDomain} />
+                          </TableCell>
+                          <TableCell>
+                            <Stack direction='row' alignContent='center' gap={1} justifyContent='space-between'>
+                              <LabelWithCopy label='app.charmverse.io' />
+
+                              {customDomainVerification?.isRedirectVerified ? (
+                                <Tooltip title='Redirect record verified'>
+                                  <CheckCircleOutlineOutlinedIcon color='success' />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip title='Redirect record does not exist'>
+                                  <ErrorOutlineOutlinedIcon color='warning' />
+                                </Tooltip>
+                              )}
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <LabelWithCopy
+                              label={customDomainVerification?.certificateDetails?.dnsValidation?.name || ''}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Stack direction='row' alignItems='center' gap={1} justifyContent='space-between'>
+                              <LabelWithCopy
+                                label={customDomainVerification?.certificateDetails?.dnsValidation?.value || ''}
+                              />
+
+                              {customDomainVerification?.isRedirectVerified ? (
+                                <Tooltip title='Domain verification passed'>
+                                  <CheckCircleOutlineOutlinedIcon color='success' />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip title='Domain verification record does not exist'>
+                                  <ErrorOutlineOutlinedIcon color='warning' />
+                                </Tooltip>
+                              )}
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Stack direction='row' justifyContent='flex-end' mt={1} gap={1}>
+                    <Link href={`https://${space.customDomain}`} external target='_blank'>
+                      <Button variant='text'>Go to your domain</Button>
+                    </Link>
+                    <Button loading={isRefreshing} disabled={isRefreshing} onClick={() => refreshVerification()}>
+                      Verify setup
+                    </Button>
+                  </Stack>
                 </>
               )}
             </AccordionDetails>

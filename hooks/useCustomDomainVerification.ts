@@ -4,10 +4,12 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { useSpaces } from 'hooks/useSpaces';
 
 export function useCustomDomainVerification() {
   const { isFreeSpace } = useIsFreeSpace();
   const { space } = useCurrentSpace();
+  const { setSpace } = useSpaces();
   const hasCustomDomain = !!space?.customDomain && !isFreeSpace;
 
   const [isCustomDomainVerified, setIsCustomDomainVerified] = useState(true);
@@ -15,8 +17,9 @@ export function useCustomDomainVerification() {
 
   const {
     data: customDomainVerification,
-    mutate: refresh,
-    isLoading
+    mutate: refreshVerification,
+    isLoading,
+    isValidating: isRefreshing
   } = useSWR(
     hasCustomDomain && (!isCustomDomainVerified || showCustomDomainVerification)
       ? `${space.customDomain}/custom-domain-verification`
@@ -31,11 +34,23 @@ export function useCustomDomainVerification() {
     }
   }, [space?.isCustomDomainVerified, hasCustomDomain]);
 
+  useEffect(() => {
+    if (customDomainVerification) {
+      setIsCustomDomainVerified(!!customDomainVerification.isCertificateVerified);
+      setShowCustomDomainVerification(!customDomainVerification.isCustomDomainVerified);
+
+      if (space && customDomainVerification.isCustomDomainVerified !== space.isCustomDomainVerified) {
+        setSpace({ ...space, isCustomDomainVerified: customDomainVerification.isCustomDomainVerified });
+      }
+    }
+  }, [customDomainVerification, setSpace, space]);
+
   return {
     isCustomDomainVerified,
     customDomainVerification,
-    refresh,
+    refreshVerification,
     isLoading: !isCustomDomainVerified && isLoading,
+    isRefreshing,
     showCustomDomainVerification,
     setShowCustomDomainVerification
   };
