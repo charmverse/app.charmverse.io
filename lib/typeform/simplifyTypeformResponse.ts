@@ -110,7 +110,6 @@ function simplifyTypeformAnswers(payload: Typeform.Response['answers']) {
 export function simplifyTypeformResponse(payload: TypeformResponse) {
   const questions = simplifyTypeformQuestions(payload.definition?.fields);
   const answers = simplifyTypeformAnswers(payload.answers);
-
   const qa = questions
     .map((q) => {
       const existingCardProperty = answers?.find((p) => p.id === q.id);

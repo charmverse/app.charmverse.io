@@ -1,18 +1,43 @@
-import type { Block } from '@charmverse/core/prisma';
+import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { relay } from 'lib/websockets/relay';
 
-export async function updateDatabaseBlocks(board: Block, properties: IPropertyTemplate[]) {
+import { DatabasePageNotFoundError } from './errors';
+import type { PageProperty } from './interfaces';
+
+/**
+ * @properties - Should be the full set of properties this board has going forward
+ */
+type DbSchemaUpdate = {
+  boardId: string;
+  properties: PageProperty[];
+};
+
+export async function updateDatabaseSchema({ boardId, properties }: DbSchemaUpdate) {
+  if (!boardId || !stringUtils.isUUID(boardId)) {
+    throw new InvalidInputError(`Invalid board ID: ${boardId}`);
+  }
+
+  const boardBlock = await prisma.block.findFirst({
+    where: {
+      type: 'board',
+      id: boardId
+    }
+  });
+
+  if (!boardBlock) {
+    throw new DatabasePageNotFoundError(boardId);
+  }
   const updatedBoard = await prisma.block.update({
     where: {
-      id: board.id
+      id: boardId
     },
     data: {
       fields: {
-        ...(board.fields as any),
+        ...(boardBlock.fields as any),
         cardProperties: properties
       }
     }

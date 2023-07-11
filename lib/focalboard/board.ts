@@ -31,11 +31,11 @@ interface IPropertyOption {
 }
 
 // A template for card properties attached to a board
-interface IPropertyTemplate {
+interface IPropertyTemplate<T extends PropertyType = PropertyType> {
   id: string;
   name: string;
-  type: PropertyType;
-  options: IPropertyOption[];
+  type: T;
+  options?: IPropertyOption[];
   description?: string;
 }
 
