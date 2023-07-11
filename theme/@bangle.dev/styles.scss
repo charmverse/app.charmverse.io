@@ -582,6 +582,7 @@ ol li {
   padding: 0 4px;
   position: relative;
   transition: background-color 250ms ease-in-out;
+  overflow: hidden; // this is also set by the column-resizer library
 
   &:hover {
     transition: background-color 250ms ease-in-out;

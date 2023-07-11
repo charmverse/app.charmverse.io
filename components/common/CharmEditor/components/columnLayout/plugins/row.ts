@@ -33,11 +33,14 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
             });
             const transaction = view.state.tr;
             columnUpdates.forEach((update) => {
-              transaction.setNodeMarkup(update.pos, undefined, { size: update.size });
+              if (update.pos > -1) {
+                transaction.setNodeMarkup(update.pos, undefined, { size: update.size });
+              }
             });
             view.dispatch(transaction);
           }, 100);
 
+          // trigger this after child nodes are rendered
           setTimeout(() => {
             columnResizer.init(element);
             element.addEventListener('column:after-resizing' as any, resizeCallback);
@@ -58,6 +61,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
               return true;
             },
             // prevents a recursive loop when the column resizer updates the DOM
+            // TODO: maybe we only need to ignore certain mutations?
             ignoreMutation(mutation) {
               return true;
               // ref bangle.dev: https://discuss.prosemirror.net/t/nodeviews-with-contentdom-stops-the-cursor-movement-for-a-node-with-text-content/3208/6
@@ -78,6 +82,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
               return true;
             },
             destroy() {
+              element.removeEventListener('column:after-resizing' as any, resizeCallback);
               columnResizer.dispose();
             }
           };
