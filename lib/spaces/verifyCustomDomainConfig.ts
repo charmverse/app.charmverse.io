@@ -1,4 +1,7 @@
+import dns from 'dns/promises';
+
 import { prisma } from '@charmverse/core/prisma-client';
+import { request, Agent } from 'undici';
 
 import { getCertificateDetails, requestCertificateForDomain } from 'lib/aws/ACM';
 import { addCertificateToListener, hasCertificateAdded } from 'lib/aws/ELB';
@@ -26,18 +29,18 @@ export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomD
     hasCertificateInELB = await addCertificateToListener(certificateArn);
   }
 
-  const isRedirectVerified = await isRedirectConfigured(domain);
+  const isRedirectVerified = await isRedirectConfigured(domain, space.domain);
   const isCertificateVerified = certDetails?.status === 'ISSUED';
   const isCertificateAttached = hasCertificateInELB;
 
   const isCustomDomainVerified = isRedirectVerified && isCertificateVerified && isCertificateAttached;
 
-  // if (isCustomDomainVerified && !space.isCustomDomainVerified) {
-  //   await prisma.space.update({
-  //     where: { id: spaceId },
-  //     data: { isCustomDomainVerified: true }
-  //   });
-  // }
+  if (isCustomDomainVerified !== space.isCustomDomainVerified) {
+    await prisma.space.update({
+      where: { id: spaceId },
+      data: { isCustomDomainVerified: true }
+    });
+  }
 
   return {
     isRedirectVerified,
@@ -49,10 +52,28 @@ export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomD
 }
 
 // Verify if domain DNS redirect has been configured by calling our health api
-async function isRedirectConfigured(domain: string) {
-  try {
-    await fetch(`https://${domain}/api/health`);
+async function isRedirectConfigured(domain: string, spaceDomain: string) {
+  const isDnsConfigured = await isDnsRedirectConfigured(domain, spaceDomain);
+  if (isDnsConfigured) {
     return true;
+  }
+
+  try {
+    await request(`https://${domain}/api/health`, {
+      dispatcher: new Agent({ connect: { rejectUnauthorized: false } })
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function isDnsRedirectConfigured(domain: string, spaceDomain: string) {
+  try {
+    const addresses = await dns.resolveCname(domain);
+    const appDomain = 'charmverse.io';
+
+    return addresses.includes(`${spaceDomain}.${appDomain}`);
   } catch (e) {
     return false;
   }

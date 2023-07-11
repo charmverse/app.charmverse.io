@@ -205,7 +205,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
                           </TableCell>
                           <TableCell>
                             <Stack direction='row' alignContent='center' gap={1} justifyContent='space-between'>
-                              <LabelWithCopy label='app.charmverse.io' />
+                              <LabelWithCopy label={`${space.domain}.charmverse.io`} />
 
                               {customDomainVerification?.isRedirectVerified ? (
                                 <Tooltip title='Redirect record verified'>
@@ -231,7 +231,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
                                 label={customDomainVerification?.certificateDetails?.dnsValidation?.value || ''}
                               />
 
-                              {customDomainVerification?.isRedirectVerified ? (
+                              {customDomainVerification?.isCertificateVerified ? (
                                 <Tooltip title='Domain verification passed'>
                                   <CheckCircleOutlineOutlinedIcon color='success' />
                                 </Tooltip>
@@ -247,10 +247,12 @@ export function SetupCustomDomain({ space }: { space: Space }) {
                     </Table>
                   </TableContainer>
 
-                  <Stack direction='row' justifyContent='flex-end' mt={1} gap={1}>
-                    <Link href={`https://${space.customDomain}`} external target='_blank'>
-                      <Button variant='text'>Go to your domain</Button>
-                    </Link>
+                  <Stack direction='row' justifyContent='flex-end' mt={2} gap={1}>
+                    {isCustomDomainVerified && (
+                      <Link href={`https://${space.customDomain}`} external target='_blank'>
+                        <Button variant='text'>Go to your domain</Button>
+                      </Link>
+                    )}
                     <Button loading={isRefreshing} disabled={isRefreshing} onClick={() => refreshVerification()}>
                       Verify setup
                     </Button>

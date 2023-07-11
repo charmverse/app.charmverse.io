@@ -25,11 +25,7 @@ export function LabelWithCopy({ label, copyText }: Props) {
           </Stack>
         </Tooltip>
 
-        <Tooltip placement='top' title={copied ? 'Copied' : copyText || 'Click to copy'} disableInteractive arrow>
-          <Typography variant='caption' sx={{ cursor: 'pointer' }}>
-            {label}
-          </Typography>
-        </Tooltip>
+        <Typography variant='caption'>{label}</Typography>
       </Stack>
     </CopyToClipboard>
   );

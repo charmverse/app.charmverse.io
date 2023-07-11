@@ -13,7 +13,7 @@ export function useCustomDomainVerification() {
   const hasCustomDomain = !!space?.customDomain && !isFreeSpace;
 
   const [isCustomDomainVerified, setIsCustomDomainVerified] = useState(true);
-  const [showCustomDomainVerification, setShowCustomDomainVerification] = useState(false);
+  const [showCustomDomainVerification, setShowCustomDomainVerification] = useState(!space?.isCustomDomainVerified);
 
   const {
     data: customDomainVerification,
@@ -30,14 +30,12 @@ export function useCustomDomainVerification() {
   useEffect(() => {
     if (hasCustomDomain) {
       setIsCustomDomainVerified(!!space.isCustomDomainVerified);
-      setShowCustomDomainVerification(!space.isCustomDomainVerified);
     }
   }, [space?.isCustomDomainVerified, hasCustomDomain]);
 
   useEffect(() => {
     if (customDomainVerification) {
-      setIsCustomDomainVerified(!!customDomainVerification.isCertificateVerified);
-      setShowCustomDomainVerification(!customDomainVerification.isCustomDomainVerified);
+      setIsCustomDomainVerified(!!customDomainVerification.isCustomDomainVerified);
 
       if (space && customDomainVerification.isCustomDomainVerified !== space.isCustomDomainVerified) {
         setSpace({ ...space, isCustomDomainVerified: customDomainVerification.isCustomDomainVerified });
@@ -49,7 +47,7 @@ export function useCustomDomainVerification() {
     isCustomDomainVerified,
     customDomainVerification,
     refreshVerification,
-    isLoading: !isCustomDomainVerified && isLoading,
+    isLoading,
     isRefreshing,
     showCustomDomainVerification,
     setShowCustomDomainVerification
