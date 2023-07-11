@@ -52,4 +52,4 @@ runs:
     - name: Install special core library
       shell: bash
       if: github.head_ref == 'feat/game7-role-sync'
-      run: npm install github:charmverse/core#feat/game7-role-sync && cd node_modules/@charmverse/core && npm run build && pwd
+      run: npm install github:charmverse/core#feat/game7-role-sync && cd node_modules/@charmverse/core && npm run build && pwd && ls -a
