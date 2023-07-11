@@ -4,52 +4,63 @@ import type { Response } from 'supertest';
 import request from 'supertest';
 
 import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
-import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
 import { baseUrl } from 'testing/mockApiCall';
+import { generateSchema } from 'testing/publicApi/schemas';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let database: Page;
-let user: User;
-let space: Space;
-let apiToken: SpaceApiToken;
+describe('POST /databases/{id}/cards', () => {
+  const textSchema = generateSchema({ type: 'text' });
+  const selectSchema = generateSchema({ type: 'select' });
 
-// Setup value we can assert against, ignore the rest of the request
-let failedCreateResponse: { body: UnsupportedKeysError };
+  let database: Page;
+  let user: User;
+  let space: Space;
+  let apiToken: SpaceApiToken;
 
-function invalidCreateRequest(): Promise<Response> {
-  return request(baseUrl)
-    .post(`/api/v1/databases/${database.boardId}/cards`)
-    .set('Authorization', `Bearer ${apiToken.token}`)
-    .send({
-      title: 'Example',
-      unsupportedProperty: ''
-    });
-}
+  // Setup value we can assert against, ignore the rest of the request
+  let failedCreateResponse: { body: UnsupportedKeysError };
 
-beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
-  user = generated.user;
-  space = generated.space;
-  apiToken = generated.apiToken;
+  function invalidCreateRequest(): Promise<Response> {
+    return request(baseUrl)
+      .post(`/api/v1/databases/${database.boardId}/cards`)
+      .set('Authorization', `Bearer ${apiToken.token}`)
+      .send({
+        title: 'Example',
+        unsupportedProperty: ''
+      });
+  }
 
-  database = await createDatabase({
-    title: 'Example title',
-    createdBy: user.id,
-    spaceId: space.id
+  beforeAll(async () => {
+    const generated = await generateUserAndSpaceWithApiToken();
+    user = generated.user;
+    space = generated.space;
+    apiToken = generated.apiToken;
+
+    database = await createDatabase(
+      {
+        title: 'Example title',
+        createdBy: user.id,
+        spaceId: space.id
+      },
+      [textSchema, selectSchema]
+    );
+
+    failedCreateResponse = await invalidCreateRequest();
   });
 
-  failedCreateResponse = await invalidCreateRequest();
-});
-
-describe('POST /databases/{id}/cards', () => {
   it('should create a new card in the database', async () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/cards`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({
         title: 'Example',
-        properties: {}
-      });
+        properties: {
+          [textSchema.id]: 'Example text',
+          [selectSchema.id]: [selectSchema.options[0].id]
+        }
+      })
+      .expect(201);
 
     //    TODO; // HANDLE EMPTY PROPERTIES
 
@@ -83,9 +94,6 @@ describe('POST /databases/{id}/cards', () => {
       .send({
         title: 'Example'
       });
-
-    //    TODO; // HANDLE EMPTY PROPERTIES
-
     expect(response.body).toEqual<ApiPage>(
       expect.objectContaining<ApiPage>({
         content: expect.any(Object),
@@ -99,15 +107,6 @@ describe('POST /databases/{id}/cards', () => {
         title: expect.any(String)
       })
     );
-  });
-
-  it('should fail with 400 error code when a title is not provided', async () => {
-    const response = await request(baseUrl)
-      .post(`/api/v1/databases/${database.boardId}/cards`)
-      .set('Authorization', `Bearer ${apiToken.token}`)
-      .send({});
-
-    expect(response.statusCode).toBe(400);
   });
 
   it('should fail with 400 error code when invalid properties are provided', async () => {

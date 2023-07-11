@@ -24,6 +24,9 @@ export async function createCardsFromProposals({
       spaceId,
       type: 'proposal',
       proposal: {
+        archived: {
+          not: true
+        },
         status: {
           not: 'draft'
         }

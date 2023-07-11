@@ -112,6 +112,9 @@ export async function getProposalTasks(userId: string): Promise<{
       },
       type: 'proposal',
       proposal: {
+        archived: {
+          not: true
+        },
         status: {
           not: 'draft'
         }

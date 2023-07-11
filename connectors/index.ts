@@ -265,7 +265,7 @@ const RPC = {
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.png',
-    shortName: 'era'
+    shortName: 'zksync'
   }
 } as const;
 

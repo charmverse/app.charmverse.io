@@ -17,11 +17,12 @@ import { OrgsList } from '../OrgsList';
 import { PoapsList } from '../PoapsList';
 
 import { EnsWidget } from './EnsWidget';
+import { Game7ProfileWidget } from './Game7ProfileWidget';
 import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { ProfileWidget } from './ProfileWidget';
 import { SocialWidget } from './SocialWidget';
 
-const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens'] as const;
+const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens', 'game7'] as const;
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
@@ -32,6 +33,10 @@ export function ProfileWidgets({ userId }: { userId: string }) {
 
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
     charmClient.publicProfile.getEnsProfile(userId)
+  );
+
+  const { data: game7Profile, isLoading: isLoadingGame7Profile } = useSWR(`public/profile/${userId}/game7`, () =>
+    charmClient.publicProfile.getSummonProfile(userId)
   );
 
   const { memberPropertyValues, isLoading: isLoadingSpaceMemberPropertyValues } = useMemberPropertyValues(userId);
@@ -93,6 +98,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     isFetchingOrgs ||
     isFetchingPoaps ||
     isLoadingLensProfile ||
+    isLoadingGame7Profile ||
     isLoadingUserDetails ||
     isLoadingSpaceMemberPropertyValues ||
     isLoadingEnsProfile;
@@ -166,6 +172,14 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                 </ProfileWidget>
               </Grid>
             ) : null;
+
+          case 'game7': {
+            return game7Profile ? (
+              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
+                <Game7ProfileWidget game7Profile={game7Profile} />
+              </Grid>
+            ) : null;
+          }
 
           case 'lens':
             return defaultLensProfile ? (

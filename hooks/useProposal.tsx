@@ -7,9 +7,9 @@ type Props = {
 };
 
 export function useProposal({ proposalId }: Props) {
-  const { data: proposal } = useSWR(!proposalId ? null : `proposal/${proposalId}`, () =>
+  const { data: proposal, mutate } = useSWR(!proposalId ? null : `proposal/${proposalId}`, () =>
     charmClient.proposals.getProposal(proposalId as string)
   );
 
-  return { proposal };
+  return { proposal, refreshProposal: mutate };
 }
