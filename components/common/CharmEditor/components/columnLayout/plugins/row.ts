@@ -57,25 +57,26 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
               });
               return true;
             },
-            // ignoreMutation(mutation) {
-            //   return true;
-            //   // ref bangle.dev: https://discuss.prosemirror.net/t/nodeviews-with-contentdom-stops-the-cursor-movement-for-a-node-with-text-content/3208/6
-            //   // if a child of this.dom (the one handled by PM)
-            //   // has any mutation, do not ignore it
-            //   if (this.dom.contains(mutation.target)) {
-            //     return false;
-            //   }
+            // prevents a recursive loop when the column resizer updates the DOM
+            ignoreMutation(mutation) {
+              return true;
+              // ref bangle.dev: https://discuss.prosemirror.net/t/nodeviews-with-contentdom-stops-the-cursor-movement-for-a-node-with-text-content/3208/6
+              // if a child of this.dom (the one handled by PM)
+              // has any mutation, do not ignore it
+              if (this.dom.contains(mutation.target)) {
+                return false;
+              }
 
-            //   // if the this.dom itself was the target
-            //   // do not ignore it. This is important for schema where
-            //   // content: 'inline*' and you end up deleting all the content with backspace
-            //   // PM needs to step in and create an empty node for us.
-            //   if (mutation.target === this.contentDOM) {
-            //     return false;
-            //   }
+              // if the this.dom itself was the target
+              // do not ignore it. This is important for schema where
+              // content: 'inline*' and you end up deleting all the content with backspace
+              // PM needs to step in and create an empty node for us.
+              if (mutation.target === this.contentDOM) {
+                return false;
+              }
 
-            //   return true;
-            // },
+              return true;
+            },
             destroy() {
               columnResizer.dispose();
             }
