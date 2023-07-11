@@ -6,6 +6,7 @@ import { count } from 'lib/metrics';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch } from 'lib/middleware';
 import { requireApiKey } from 'lib/middleware/requireApiKey';
+import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 
 export function defaultHandler() {
@@ -26,7 +27,7 @@ export function superApiHandler() {
 
 async function requireApiPageKey() {}
 
-export async function logApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
+export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: NextApiResponse, next: VoidFunction) {
   // Get a sanitised url to avoid leaking keys
   let path = req.url?.split('?')[0] ?? '';
 

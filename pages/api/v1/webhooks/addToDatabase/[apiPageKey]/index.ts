@@ -1,7 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { requireKeys } from 'lib/middleware';
+import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { createDatabaseCardPage } from 'lib/public-api';
@@ -41,7 +42,7 @@ handler.use(requireKeys(['key'], 'query')).post(createFormResponse);
 //  *              schema:
 //  *                $ref: '#/components/schemas/Page'
 //  */
-export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
+export async function createFormResponse(req: NextApiRequestWithApiPageKey, res: NextApiResponse) {
   const apiPageKey = req.apiPageKey;
   let body: BodyFormResponse = [];
 

@@ -1,16 +1,12 @@
-import { SubscriptionRequiredError, UnauthorisedActionError } from '@charmverse/core/errors';
-import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/prisma';
-import type { ApiPageKey, Page } from '@charmverse/core/prisma-client';
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtils, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';
 
-import { generateUserAndSpace } from 'testing/setupDatabase';
-
 import { InvalidApiKeyError } from '../errors';
-import { provisionApiKey, requireApiKey } from '../requireApiKey';
-import { requireApiPageKey } from '../requireApiPagekey';
+import type { NextApiRequestWithApiPageKey } from '../requireApiPageKey';
+import { requireApiPageKey } from '../requireApiPageKey';
 
 describe('requireApiPageKey', () => {
   it('should identify the apiPageKey from the query and set it on the request', async () => {
@@ -29,7 +25,7 @@ describe('requireApiPageKey', () => {
       }
     });
 
-    const testReq: Partial<NextApiRequest> = {
+    const testReq: Partial<NextApiRequestWithApiPageKey> = {
       query: {
         apiPageKey: apiPageKey.apiKey
       }

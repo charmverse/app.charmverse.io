@@ -1,4 +1,4 @@
-import { InvalidInputError, SubscriptionRequiredError, UnauthorisedActionError } from '@charmverse/core/errors';
+import { InvalidInputError, SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { ApiPageKey } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest } from 'next';
@@ -8,15 +8,9 @@ import { getPermissionsClient } from 'lib/permissions/api';
 
 import { InvalidApiKeyError } from './errors';
 
-declare module 'http' {
-  /**
-   * @authorizedSpaceid - Space ID that the API key is making a request for and authorized to use
-   * @spaceIdRange - Range of spaceIDs that a super API key can use
-   */
-  interface IncomingMessage {
-    apiPageKey: ApiPageKey & { page: { spaceId: string } };
-  }
-}
+export type InjectedPageApiKey = ApiPageKey & { page: { spaceId: string } };
+
+export type NextApiRequestWithApiPageKey = NextApiRequest & { apiPageKey: InjectedPageApiKey };
 
 /**
  * Used for databases receiving data from external services.
@@ -28,10 +22,10 @@ export async function requireApiPageKey(req: NextApiRequest, res: NextApiRequest
     throw new InvalidInputError('Api key is required');
   }
 
-  const apiPageKeyInDb = await prisma.apiPageKey.findUnique({
+  const apiPageKeyInDb = (await prisma.apiPageKey.findUnique({
     where: { apiKey: apiPageKey },
     include: { page: { select: { spaceId: true } } }
-  });
+  })) as InjectedPageApiKey | null;
 
   if (!apiPageKeyInDb) {
     throw new InvalidApiKeyError();
@@ -46,7 +40,7 @@ export async function requireApiPageKey(req: NextApiRequest, res: NextApiRequest
     throw new SubscriptionRequiredError();
   }
 
-  req.apiPageKey = apiPageKeyInDb;
+  (req as NextApiRequestWithApiPageKey).apiPageKey = apiPageKeyInDb;
 
   next();
 }
