@@ -113,6 +113,8 @@ handler.get(listProposals);
  *   get:
  *     summary: Get active proposals.
  *     description: Get a list of all proposals that are currently active in the space.
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
  *         description: List of proposals of casted vote
