@@ -554,11 +554,10 @@ ol li {
 /** Resizable columns **/
 
 
-.charm-column-row {
-}
-.charm-column-bar {
+.charm-column-resizer {
   cursor: col-resize;
   position: relative;
+  flex: 0 0 10px; //  this is also set by the column-resizer library
   > div {
     position: absolute;
     top: 0;
@@ -573,18 +572,20 @@ ol li {
       padding: 4px 0;
     }
     &:hover > div {
-      background-color: var(--bg-gray);
+      background-color: var(--input-border);
     }
   }
 }
+
 .charm-column {
   border-radius: 4px;
+  padding: 0 4px;
   position: relative;
   transition: background-color 250ms ease-in-out;
 
   &:hover {
     transition: background-color 250ms ease-in-out;
-    background-color: var(--bg-gray);
+    background-color: var(--background-light);
   }
 
   & .bangle-nv-content p {

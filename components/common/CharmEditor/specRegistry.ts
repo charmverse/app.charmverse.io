@@ -7,7 +7,7 @@ import * as codeBlock from './components/@bangle.dev/base-components/code-block'
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
 import * as callout from './components/callout';
-import * as columnLayout from './components/columnLayout';
+import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
@@ -76,8 +76,7 @@ export const specRegistry = new SpecRegistry([
   cryptoPriceSpec(), // NO
   pdfSpec(), // NO
   image.spec(), // OK
-  columnLayout.rowSpec(), // NO
-  columnLayout.columnSpec(), // NO
+  columnLayout.spec(), // NO
   nestedPageSpec(), // NO
   quote.spec(), // OK
   tabIndent.spec(),

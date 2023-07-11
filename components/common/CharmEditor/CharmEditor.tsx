@@ -39,7 +39,7 @@ import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugin
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import * as columnLayout from './components/columnLayout';
+import * as columnLayout from './components/columnLayout/columnLayout.plugins';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -106,6 +106,7 @@ const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
 const linksPluginKey = new PluginKey('links');
 const inlinePalettePluginKey = new PluginKey('inlinePalette');
+const columnsPluginKey = new PluginKey('columns');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -198,7 +199,9 @@ export function charmEditorPlugins({
       readOnly
     }),
     orderedList.plugins(),
-    columnLayout.plugins(),
+    columnLayout.plugins({
+      key: columnsPluginKey
+    }),
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins() as RawPlugins,
