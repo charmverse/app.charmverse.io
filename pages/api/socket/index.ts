@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import cors from 'cors';
 import { sealData } from 'iron-session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,7 +14,7 @@ import type { SealedUserId, SocketAuthResponse } from 'lib/websockets/interfaces
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
-
+handler.use(cors());
 handler.use(requireUser).get(socketHandler);
 
 // Initialise socket and bind user session to the socket
