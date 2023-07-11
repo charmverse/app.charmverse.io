@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { AuthSig } from 'lit-js-sdk';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
-import { syncSummonSpaceRoles } from 'lib/summon/syncSpaceRole';
+import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
 import { InvalidInputError } from 'lib/utilities/errors';
