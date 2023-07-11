@@ -2,7 +2,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
-import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: User;
@@ -14,7 +14,7 @@ beforeAll(async () => {
   space = generated.space;
 });
 
-describe('createFormResposnseCard', () => {
+describe('createFormResponseCard', () => {
   it('should create a card and add properties to board', async () => {
     const createdDb = await createDatabase({
       title: 'Example',

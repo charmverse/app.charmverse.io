@@ -1,7 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
 import { DatabasePageNotFoundError } from 'lib/public-api/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';

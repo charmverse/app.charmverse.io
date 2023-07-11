@@ -1,5 +1,5 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
-import { Box, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import {
@@ -14,7 +14,8 @@ export function MobileStepper({
   openVoteModal,
   proposalStatus,
   updateProposalStatus,
-  proposalFlowPermissions
+  proposalFlowPermissions,
+  archived
 }: StepperProps) {
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
@@ -38,44 +39,46 @@ export function MobileStepper({
           <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Status</Button>
           </div>
-          <Box display='flex' flex={1}>
-            <Select
-              fullWidth
-              value={proposalStatus ?? ''}
-              onChange={(e) => {
-                const status = e.target.value as ProposalStatus;
-                updateStatus(status);
-              }}
-              renderValue={(status) => {
-                return <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>;
-              }}
-            >
-              {PROPOSAL_STATUSES.map((status) => {
-                return (
-                  <MenuItem
-                    key={status}
-                    sx={{
-                      p: 1
-                    }}
-                    value={status}
-                    disabled={!proposalFlowPermissions?.[status]}
-                  >
-                    <Stack>
-                      <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>
-                      <Typography
-                        variant='subtitle2'
-                        sx={{
-                          whiteSpace: 'break-spaces'
-                        }}
-                      >
-                        {proposalStatusDetails[status]}
-                      </Typography>
-                    </Stack>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </Box>
+          <Tooltip title={archived ? 'Archived proposals cannot be updated' : ''}>
+            <Box display='flex' flex={1}>
+              <Select
+                fullWidth
+                value={proposalStatus ?? ''}
+                onChange={(e) => {
+                  const status = e.target.value as ProposalStatus;
+                  updateStatus(status);
+                }}
+                renderValue={(status) => {
+                  return <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>;
+                }}
+              >
+                {PROPOSAL_STATUSES.map((status) => {
+                  return (
+                    <MenuItem
+                      key={status}
+                      sx={{
+                        p: 1
+                      }}
+                      value={status}
+                      disabled={!proposalFlowPermissions?.[status] && !archived}
+                    >
+                      <Stack>
+                        <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>
+                        <Typography
+                          variant='subtitle2'
+                          sx={{
+                            whiteSpace: 'break-spaces'
+                          }}
+                        >
+                          {proposalStatusDetails[status]}
+                        </Typography>
+                      </Stack>
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </Box>
+          </Tooltip>
         </Box>
       </Box>
     </Box>

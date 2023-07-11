@@ -32,6 +32,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     webhookSigningSecret: null,
     publicProposals: null,
     hiddenFeatures: [],
+    isCustomDomainVerified: null,
     ...space
   };
 };
