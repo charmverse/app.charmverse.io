@@ -24,7 +24,7 @@ export const unsupportedChains: Record<string, LitChainConfig> = {
   },
 }
 
-const chainConfig = {
+export const chainConfig = {
   ethereum: {
     value: 'ethereum',
     label: 'Ethereum',
