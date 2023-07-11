@@ -1,0 +1,18 @@
+.lsm-checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 0.5em 0 0.5em;
+    cursor: pointer;
+}
+
+.lsm-checkbox-input {
+    height: 1.1em;
+    width: 1.1em;
+    margin-right: 1em;
+}
+
+.lsm-checkbox-label {
+    cursor: pointer;
+    color: var(--lsm-primary-color);
+    max-width: calc(100% - 2em);
+}

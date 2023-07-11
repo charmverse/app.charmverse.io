@@ -1,0 +1,63 @@
+.lsm-delete-modal-container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background-color: var(--lsm-modal-overlay-color);
+    border-radius: var(--lsm-border-radius);
+}
+
+.lsm-delete-modal {
+    width: 80%;
+    height: auto;
+    border-width: 10px;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+    z-index: 30;
+    padding: 1em 1.5em;
+    position: fixed;
+    background-color: var(--lsm-background-color);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.lsm-delete-modal-prompt {
+    font-family: var(--lsm-primary-font);
+    font-weight: var(--lsm-primary-font-weight);
+    color: var(--lsm-primary-color);
+    margin: 0 0 1em;
+    font-size: 1em;
+}
+
+.lsm-delete-modal-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 0.5em;
+}
+
+.lsm-delete-modal-button-no {
+    box-sizing: border-box;
+    width: 7em;
+    height: 3em;
+    background-color: var(--lsm-background-color);
+    color: var(--lsm-primary-color);
+    border: var(--lsm-secondary-color) 1px solid;
+    border-radius: var(--lsm-border-radius);
+    cursor: pointer;
+}
+
+.lsm-delete-modal-button-yes {
+    box-sizing: border-box;
+    width: 7em;
+    height: 3em;
+    color: #fff;
+    background-color: var(--lsm-accent-color);
+    border: var(--lsm-accent-color) 1px solid;
+    border-radius: var(--lsm-border-radius);
+    cursor: pointer;
+}

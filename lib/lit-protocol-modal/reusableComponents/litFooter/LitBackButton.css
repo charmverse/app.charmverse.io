@@ -1,0 +1,33 @@
+.lsm-back-button {
+    height: 3em;
+    padding: 0 1.5em;
+    border-radius: 0.25em;
+    display: flex;
+    align-items: center;
+    border: var(--lsm-secondary-color) 1px solid;
+    background-color: var(--lsm-background-color);
+    color: var(--lsm-primary-color);
+    cursor: pointer;
+    transition-duration: 0.3s;
+}
+
+.lsm-back-arrow {
+    margin-right: 0.5em;
+}
+
+/*.lsm-back-button {*/
+/*    height: 4em;*/
+/*    padding: 0 1.5em;*/
+/*    width: 50%;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    border-radius: 0;*/
+/*    border: none;*/
+/*    cursor: pointer;*/
+/*    transition-duration: 0.3s;*/
+/*}*/
+
+.lsm-back-button:hover {
+    background-color: #f4f4f4;
+}
