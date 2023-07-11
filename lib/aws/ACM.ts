@@ -61,7 +61,7 @@ export async function getCertificateDetails({
   certificateArn?: string;
   retry?: number;
   createCertificate?: boolean;
-}) {
+}): Promise<DomainCertificateDetails | undefined> {
   let certArn = certificateArn || (await getCertificateARNByDomain(domainName || ''));
   if (!certArn && createCertificate && domainName) {
     certArn = await requestCertificateForDomain(domainName);
