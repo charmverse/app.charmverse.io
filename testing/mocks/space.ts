@@ -33,5 +33,5 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     publicProposals: null,
     hiddenFeatures: [],
     ...space
-  };
+  } as any;
 };

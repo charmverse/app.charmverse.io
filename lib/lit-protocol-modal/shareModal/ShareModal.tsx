@@ -3,7 +3,7 @@ import LitJsSdk from 'lit-js-sdk';
 import type { SigningConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
-import { chainConfig } from '../chainConfig.js/index.js';
+import { chainConfig } from '../chainConfig';
 
 import { ShareModalContext } from './createShareContext';
 import DevModeContent from './devMode/DevModeContent';
