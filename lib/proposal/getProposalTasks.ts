@@ -1,4 +1,6 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/dist/cjs/permissions';
 import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
+import type { ProposalCategoryOperation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
@@ -118,7 +120,7 @@ export async function getProposalTasks(userId: string): Promise<{
     .flat()
     .map(({ role }) => role.id);
 
-  const visibleCategoryIds = (
+  const visibleCategories: ProposalCategoryWithPermissions[] = (
     await Promise.all(
       spaceIds.map((id) =>
         (async () => {
@@ -127,15 +129,19 @@ export async function getProposalTasks(userId: string): Promise<{
             resourceId: id,
             resourceIdType: 'space'
           });
-          const categories = await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
+          return spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
             spaceId: id,
             userId
           });
-          return categories.map((c) => c.id);
         })()
       )
     )
   ).flat();
+
+  const categoryMap = visibleCategories.reduce((acc, category) => {
+    acc[category.id] = category;
+    return acc;
+  }, {} as Record<string, ProposalCategoryWithPermissions>);
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
@@ -152,7 +158,7 @@ export async function getProposalTasks(userId: string): Promise<{
           not: 'draft'
         },
         categoryId: {
-          in: visibleCategoryIds
+          in: visibleCategories.map((c) => c.id)
         }
       }
     },
@@ -210,7 +216,16 @@ export async function getProposalTasks(userId: string): Promise<{
           taskId: workspaceEvent.id,
           createdAt: workspaceEvent.createdAt
         };
-        tasks.push(proposalTask);
+
+        if (
+          proposal.categoryId &&
+          ((action === 'discuss' && !categoryMap[proposal.categoryId]?.permissions.comment_proposals) ||
+            (action === 'vote' && !categoryMap[proposal.categoryId]?.permissions.vote_proposals))
+        ) {
+          // Do nothing
+        } else {
+          tasks.push(proposalTask);
+        }
       }
     }
   });
