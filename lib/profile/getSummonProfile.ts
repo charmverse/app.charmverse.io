@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { findUserXpsEngineId, getUserSummonProfile } from 'lib/summon/api';
+import * as api from 'lib/summon/api';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 export async function getSummonProfile({ userId }: { userId: string }): Promise<null | SummonUserProfile> {
@@ -34,7 +34,7 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
 
   const xpsEngineId =
     user.xpsEngineId ??
-    (await findUserXpsEngineId({
+    (await api.findUserXpsEngineId({
       discordUserAccount,
       userEmail,
       walletAddresses
@@ -44,5 +44,5 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
     return null;
   }
 
-  return getUserSummonProfile(xpsEngineId);
+  return api.getUserSummonProfile(xpsEngineId);
 }

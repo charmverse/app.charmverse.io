@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { findUserXpsEngineId, getUserInventory } from './api';
+import * as api from './api';
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 
 export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
@@ -95,7 +95,7 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   for (const spaceRole of spaceRoles) {
     const userXpsEngineId =
       spaceRole.user.xpsEngineId ??
-      (await findUserXpsEngineId({
+      (await api.findUserXpsEngineId({
         discordUserAccount: (spaceRole.user.discordUser?.account as { username: string }) ?? null,
         userEmail: spaceRole.user.email,
         walletAddresses: spaceRole.user.wallets.map((wallet) => wallet.address)
@@ -112,7 +112,7 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
           }
         });
       }
-      const userInventory = await getUserInventory(userXpsEngineId);
+      const userInventory = await api.getUserInventory(userXpsEngineId);
       if (userInventory && userInventory.tenant === space.xpsEngineId) {
         const userRank = userInventory?.meta.rank ?? 0;
         if (!rolesRecord[getSummonRoleLabel({ level: userRank })]) {
