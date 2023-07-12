@@ -17,7 +17,8 @@ export function DesktopStepper({
   openVoteModal,
   proposalStatus,
   updateProposalStatus,
-  proposalFlowPermissions
+  proposalFlowPermissions,
+  archived
 }: StepperProps) {
   const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
 
@@ -43,11 +44,11 @@ export function DesktopStepper({
           <Fragment key={status}>
             <Grid item xs display='flex' position='relative' alignItems='center' justifyContent='center'>
               <Stack alignItems='center' height='100%' gap={1}>
-                <Tooltip title={proposalStatusDetails[status]}>
+                <Tooltip title={archived ? 'Archived proposals cannot be updated' : proposalStatusDetails[status]}>
                   <StepperIcon
                     isComplete={currentStatusIndex > statusIndex}
                     isCurrent={currentStatusIndex === statusIndex}
-                    isEnabled={!!proposalFlowPermissions?.[status]}
+                    isEnabled={!!proposalFlowPermissions?.[status] && !archived}
                     onClick={() => updateStatus(status)}
                   >
                     {currentStatusIndex > statusIndex ? (

@@ -1,6 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
@@ -8,7 +9,7 @@ import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } fro
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
-describe('createCardsFromProposals()', () => {
+describe('createCardsFromProposals', () => {
   let user: User;
   let space: Space;
   let board: Page;
@@ -88,5 +89,38 @@ describe('createCardsFromProposals()', () => {
     const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(0);
+  });
+
+  // TODO ---- Cleanup tests above. They are mutating the same board, and only returning newly created cards.
+  it('should not create cards from archived proposals', async () => {
+    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
+
+    const testBoard = await generateBoard({
+      createdBy: testUser.id,
+      spaceId: testSpace.id
+    });
+
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    const ignoredProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      archived: true,
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    const cards = await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+
+    expect(cards.length).toBe(1);
+
+    expect(cards[0].syncWithPageId).toBe(visibleProposal.id);
   });
 });

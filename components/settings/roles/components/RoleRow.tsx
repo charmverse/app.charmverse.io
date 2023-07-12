@@ -56,7 +56,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
       readOnlyMembers={!!role.source}
       memberRoleId={role.id}
       title={role.name}
-      {...((role.source && syncedRoleProps[role.source]) || {})}
+      {...(role.source && ((syncedRoleProps as any)[role.source as any] || {}))}
       permissions={
         <RolePermissions
           targetGroup='role'
