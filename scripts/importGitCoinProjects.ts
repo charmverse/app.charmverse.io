@@ -310,11 +310,12 @@ async function updateSpaceOrigins() {
 }
 
 async function importApprovedRoundProjects() {
+ const filePath = './gitcoin-round-10.csv'
  const url = 'https://indexer-production.fly.dev/data/10/rounds/0x984e29dCB4286c2D9cbAA2c238AfDd8A191Eefbc/applications.json';
  const data: any[] = await GET(url, {});
 
   const importedOldRoundsProjects = getImportedProjectsData();
-  const importedProjects = getImportedProjectsData('./gitcoin-round-10.csv');
+  const importedProjects = getImportedProjectsData(filePath);
 
   const approvedProjects = data.filter((project) => project.status === 'APPROVED');
 
@@ -332,7 +333,7 @@ async function importApprovedRoundProjects() {
         console.log('🟡 Already imported in old round (verified by twitter), skipping', projectDetails.metadata.projectTwitter);
 
         const content = stringify([importedProjectData], { header: false });
-        appendFileSync('./gitcoin-round-10.csv', content);
+        appendFileSync(filePath, content);
 
         continue;
       }
