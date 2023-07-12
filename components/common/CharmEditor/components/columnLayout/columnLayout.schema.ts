@@ -44,9 +44,6 @@ function rowSpec(): RawSpecs {
   };
 }
 
-const resizerConfig = {
-  minSize: 50
-};
 function columnSpec(): RawSpecs {
   return {
     type: 'node',
@@ -85,7 +82,7 @@ function columnSpec(): RawSpecs {
 export function getColumnProperties({ size }: { size?: number }) {
   const config = JSON.stringify({
     defaultSize: size,
-    ...resizerConfig
+    minSize: 50
   });
   return { class: 'charm-column', 'data-item-type': 'SECTION', 'data-item-config': config };
 }
