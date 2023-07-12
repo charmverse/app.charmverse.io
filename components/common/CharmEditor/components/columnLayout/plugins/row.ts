@@ -102,8 +102,9 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
 
               return true;
             },
-            destroy() {
+            async destroy() {
               element.removeEventListener('column:after-resizing' as any, resizeCallback);
+              const columnResizer = await columnResizerPromise;
               columnResizer.dispose();
             }
           };
