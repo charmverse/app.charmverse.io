@@ -46,6 +46,8 @@ export const staticSpaceTemplates = [
   }
 ] as const;
 
+export const internalTemplates = ['templateGitcoin', 'templateOPGrant'] as const;
+
 const dynamicTemplateIds = ['default', 'importNotion', 'importMarkdown'] as const;
 
 export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), ...dynamicTemplateIds];
@@ -53,5 +55,8 @@ export const spaceTemplateApiNames = [...staticSpaceTemplates.map((tpl) => tpl.a
 
 export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
 export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
-// Include private templates, like gitcoin
-export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | 'templateGitcoin';
+
+type InternalTemplateType = (typeof internalTemplates)[number];
+
+// Include internal templates
+export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | InternalTemplateType;
