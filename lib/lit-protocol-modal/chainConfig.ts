@@ -12,7 +12,7 @@ type LitChainConfig = {
   addressValidator: (walletAddress: string) => boolean;
 }
 
-// We don't support solana for now. Keeping this here for documentation purposes
+// We don't these chains for now. Keeping this here for documentation purposes
 export const unsupportedChains: Record<string, LitChainConfig> = {
   solana: {
     value: 'solana',
@@ -20,6 +20,54 @@ export const unsupportedChains: Record<string, LitChainConfig> = {
     logo: '/images/cryptoLogos/solana-logo.svg',
     abbreviation: 'Sol',
     types: solanaTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  eluvio: {
+    value: 'eluvio',
+    label: 'Eluvio',
+    logo: '/images/cryptoLogos/eluvio-logo.png',
+    abbreviation: 'elv',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  fuji: {
+    value: 'fuji',
+    label: 'Avalanche FUJI Testnet',
+    logo: '/images/cryptoLogos/avalanche-avax-logo.svg',
+    abbreviation: 'fuji',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  kovan: {
+    value: 'kovan',
+    label: 'Kovan',
+    logo: '/images/cryptoLogos/kovan-logo.png',
+    abbreviation: 'kovan',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  ropstein: {
+    value: 'ropstein',
+    label: 'Ropstein',
+    logo: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    abbreviation: 'ropstein',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  cronos: {
+    value: 'cronos',
+    label: 'Cronos',
+    logo: '/images/cryptoLogos/cronos-logo.svg',
+    abbreviation: 'cro',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  aurora: {
+    value: 'aurora',
+    label: 'Aurora',
+    logo: '/images/cryptoLogos/aurora-logo.svg',
+    abbreviation: 'aoa',
+    types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
 }
@@ -104,35 +152,11 @@ export const chainConfig = {
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
-  eluvio: {
-    value: 'eluvio',
-    label: 'Eluvio',
-    logo: '/images/cryptoLogos/eluvio-logo.png',
-    abbreviation: 'elv',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
-  fuji: {
-    value: 'fuji',
-    label: 'Avalanche FUJI Testnet',
-    logo: '/images/cryptoLogos/avalanche-avax-logo.svg',
-    abbreviation: 'fuji',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
   harmony: {
     value: 'harmony',
     label: 'Harmony',
     logo: '/images/cryptoLogos/harmony-one-logo.svg',
     abbreviation: 'one',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
-  kovan: {
-    value: 'kovan',
-    label: 'Kovan',
-    logo: '/images/cryptoLogos/kovan-logo.png',
-    abbreviation: 'kovan',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
@@ -152,14 +176,6 @@ export const chainConfig = {
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
-  ropstein: {
-    value: 'ropstein',
-    label: 'Ropstein',
-    logo: '/images/cryptoLogos/ethereum-eth-logo.svg',
-    abbreviation: 'ropstein',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
   rinkeby: {
     value: 'rinkeby',
     label: 'Rinkeby',
@@ -167,21 +183,5 @@ export const chainConfig = {
     abbreviation: 'rinkeby',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
-  },
-  cronos: {
-    value: 'cronos',
-    label: 'Cronos',
-    logo: '/images/cryptoLogos/cronos-logo.svg',
-    abbreviation: 'cro',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
-  aurora: {
-    value: 'aurora',
-    label: 'Aurora',
-    logo: '/images/cryptoLogos/aurora-logo.svg',
-    abbreviation: 'aoa',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
-  },
+  }
 }
