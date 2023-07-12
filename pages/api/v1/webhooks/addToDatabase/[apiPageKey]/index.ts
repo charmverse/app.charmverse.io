@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 import type { NextApiResponse } from 'next';
 
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
@@ -46,8 +43,6 @@ handler.post(createFormResponse);
 export async function createFormResponse(req: NextApiRequestWithApiPageKey, res: NextApiResponse) {
   const apiPageKey = req.apiPageKey;
   let body: BodyFormResponse = [];
-
-  // await fs.writeFile(path.resolve(`jsonoutputs/createFormResponse.json`), JSON.stringify(req.body, null, 2), 'utf-8');
 
   if (req.apiPageKey.type === 'typeform' && req.body.form_response) {
     const payload = { ...req.body.form_response } as TypeformResponse;

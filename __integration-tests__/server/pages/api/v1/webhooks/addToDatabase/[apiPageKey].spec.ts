@@ -1,16 +1,14 @@
-import type { ApiPageKey, Page, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import type { CardPage, PageFromBlock } from 'lib/public-api';
+import type { CardPage } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
-import type { PublicApiPage } from 'lib/public-api/getPageApi';
 import type { TypeformResponse } from 'lib/typeform/interfaces';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
@@ -127,14 +125,25 @@ describe('POST /api/v1/webhooks/addToDatabase/{apiPageKey}', () => {
     // Expect the text data
     expect(schema).toHaveLength(2);
 
-    expect(schema.some((item) => item.id === sampleInput.answers?.[0].field?.id && item.type === 'text')).toBe(true);
+    expect(schema.some((item) => item.type === 'text')).toBe(true);
 
     expect(schema.some((item) => item.type === 'date')).toBe(true);
 
+    const numberFieldId = uuid();
+
     const secondSampleInput: TypeformResponse = {
+      definition: {
+        fields: [
+          {
+            type: 'number',
+            id: numberFieldId
+          }
+        ]
+      },
       answers: [
         {
-          field: { id: uuid(), type: 'number' },
+          field: { id: numberFieldId },
+          type: 'number',
           number: 5
         }
       ],
@@ -144,7 +153,7 @@ describe('POST /api/v1/webhooks/addToDatabase/{apiPageKey}', () => {
     await request(baseUrl)
       .post(`/api/v1/webhooks/addToDatabase/${apiPageKey.apiKey}`)
       .send({
-        form_response: sampleInput
+        form_response: secondSampleInput
       })
       .expect(201);
 
@@ -155,9 +164,11 @@ describe('POST /api/v1/webhooks/addToDatabase/{apiPageKey}', () => {
     // Expect the text data
     expect(schemaAfterUpdate).toHaveLength(3);
 
-    expect(
-      schemaAfterUpdate.some((item) => item.id === secondSampleInput.answers?.[0].field?.id && item.type === 'text')
-    ).toBe(true);
+    for (const property of schema) {
+      expect(schemaAfterUpdate.find((item) => item.id === property.id)).toBeDefined();
+    }
+
+    expect(schemaAfterUpdate.some((item) => item.type === 'text')).toBe(true);
 
     expect(schemaAfterUpdate.some((item) => item.type === 'number')).toBe(true);
 
