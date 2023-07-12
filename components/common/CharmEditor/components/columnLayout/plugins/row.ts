@@ -1,6 +1,5 @@
 import { createElement } from '@bangle.dev/core';
 import { log } from '@charmverse/core/log';
-import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { NodeView } from 'prosemirror-view';
@@ -13,9 +12,15 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
         [name]: function nodeViewFactory(node, view, getPos) {
           const element = createElement(['div', { class: 'charm-column-row' }]);
 
-          const columnResizer = new ColumnResizer({ vertical: false });
+          // load lib externally so it's not loaded on Server-side
+          const columnResizerPromise = import('@column-resizer/core').then(({ ColumnResizer }) => {
+            return new ColumnResizer({ vertical: false });
+          });
 
-          function resizeCallback() {
+          async function resizeCallback(event: any) {
+            event.preventDefault();
+            event.stopPropagation();
+            const columnResizer = await columnResizerPromise;
             const sizes = columnResizer
               .getResizer()
               .getResult()
@@ -51,8 +56,9 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
           }
 
           // trigger this after child nodes are rendered
-          setTimeout(() => {
+          setTimeout(async () => {
             log.info('init resizer on load', element);
+            const columnResizer = await columnResizerPromise;
             columnResizer.init(element);
             element.addEventListener('column:after-resizing' as any, resizeCallback);
           }, 0);
@@ -68,8 +74,9 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
 
               // if the node has been updated, we need to re-init the column resizer as Prosemirror has re-rendered the decorations
               // An alternative would be to create a unique key for each column resizer, but this is easier
-              setTimeout(() => {
+              setTimeout(async () => {
                 log.info('init resizer on view update', element);
+                const columnResizer = await columnResizerPromise;
                 columnResizer.init(element);
               });
               // always return true, or else prosemirror will re-create the entire node view
