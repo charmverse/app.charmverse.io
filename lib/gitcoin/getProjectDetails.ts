@@ -16,7 +16,7 @@ type ProjectOnchainDetails = {
   metadata: MetadataOnchainDetails;
 };
 
-type ProjectMetadata = {
+export type ProjectMetadata = {
   title: string;
   description: string;
   website: string;
@@ -28,7 +28,7 @@ type ProjectMetadata = {
 };
 
 export type GitcoinProjectDetails = {
-  projectId: number;
+  projectId: number | string;
   metadata: ProjectMetadata;
   owners: string[];
   metadataUrl: string;

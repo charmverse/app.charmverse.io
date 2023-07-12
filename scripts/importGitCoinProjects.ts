@@ -1,7 +1,7 @@
 import { AlchemyProvider } from '@ethersproject/providers';
 import { Space } from '@charmverse/core/prisma';
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
-import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
+import { getProjectDetails, GitcoinProjectDetails, ProjectMetadata } from 'lib/gitcoin/getProjectDetails';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from 'lib/utilities/strings';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -12,18 +12,21 @@ import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import {  parse, stringify } from 'csv/sync';
+import { GET } from '@charmverse/core/http';
+
 
 /*****
  * NOTE: This script creates new users and spaces for Gitcoin projects.
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 100;
+const START_ID = 950;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
 const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId: CHAIN_ID });
-const FILE_PATH = './gitcoin-projects.csv';
+const FILE_PATH = './gitcoin-projects-fixed.csv';
 const HOMEPAGE_TITLE = 'Information Hub';
 
 async function getProjectCount() {
@@ -57,66 +60,73 @@ async function importGitCoinProjects() {
     const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
 
     if (projectDetails !== null) {
-      const name = projectDetails.metadata.title;
-      const users = await createSpaceUsers([...projectDetails.owners]);
-
-      if (users !== null) {
-        const { botUser, adminUserId, extraAdmins } = users;
-
-        let spaceImage: string | null = null;
-        // upload space image from ipfs to s3
-        if (projectDetails.metadata.logoImg) {
-          const spaceImageUrl = getIpfsFileUrl(projectDetails.metadata.logoImg);
-          const pathInS3 = getUserS3FilePath({ userId: adminUserId, url: getFilenameWithExtension(spaceImageUrl) });
-          try {
-            const { url } = await uploadUrlToS3({ pathInS3, url: spaceImageUrl });
-            spaceImage = url;
-          } catch (error) {
-            console.log('🔥', `error uploading space image ${projectDetails.projectId}`, error);
-          }
-        }
-
-        // Create workspace
-        const spaceData: SpaceCreateInput = {
-          name,
-          spaceImage,
-          updatedBy: botUser.id,
-          origin: 'gitcoin'
-        };
-
-        const space = await createWorkspace({
-          spaceData,
-          userId: adminUserId,
-          extraAdmins: [...extraAdmins, botUser.id],
-          spaceTemplate: 'templateGitcoin'
-        });
-        console.log('🟢 Created space for project', i, space.id);
-
-        const bannerUrl = await updateHomepageBanner({
-          space,
-          bannerIpfsHash: projectDetails.metadata.bannerImg,
-          projectId: projectDetails.projectId
-        });
-
-        // mark space as created from gitcoin in mixpanel
-        await updateTrackGroupProfile(space, 'gitcoin');
-        // trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
-        // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
-
-        const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl };
+      const projectInfo = await importProjectFromDetails(projectDetails);
+      if (projectInfo) {
         projectsData.push(projectInfo);
-
         exportDataToCSV([projectInfo]);
-        console.log('🟢 Finished Importing project', i);
-      } else {
-        console.log('🟡 Failed to create users for project, skipping', i);
       }
+
     } else {
       console.log('🟡 Failed to load project details', i);
     }
   }
 
   console.log('🔥 imported projects count:', projectsData.length);
+}
+
+async function importProjectFromDetails(projectDetails: GitcoinProjectDetails) {
+  const name = projectDetails.metadata.title;
+  const users = await createSpaceUsers([...projectDetails.owners]);
+  const projectLogInfo = projectDetails.projectId || projectDetails.metadata.title;
+
+  if (users !== null) {
+    const { botUser, adminUserId, extraAdmins } = users;
+
+    let spaceImage: string | null = null;
+    // upload space image from ipfs to s3
+    if (projectDetails.metadata.logoImg) {
+      const spaceImageUrl = getIpfsFileUrl(projectDetails.metadata.logoImg);
+      const pathInS3 = getUserS3FilePath({ userId: adminUserId, url: getFilenameWithExtension(spaceImageUrl) });
+      try {
+        const { url } = await uploadUrlToS3({ pathInS3, url: spaceImageUrl });
+        spaceImage = url;
+      } catch (error) {
+        console.log('🔥', `error uploading space image ${projectDetails.projectId}`, error);
+      }
+    }
+
+    // Create workspace
+    const spaceData: SpaceCreateInput = {
+      name,
+      spaceImage,
+      updatedBy: botUser.id,
+      origin: 'gitcoin'
+    };
+
+    const space = await createWorkspace({
+      spaceData,
+      userId: adminUserId,
+      extraAdmins: [...extraAdmins, botUser.id],
+      spaceTemplate: 'templateGitcoin'
+    });
+    console.log('🟢 Created space for project', projectLogInfo, space.id);
+
+    const bannerUrl = await updateHomepageBanner({
+      space,
+      bannerIpfsHash: projectDetails.metadata.bannerImg,
+      projectId: Number(projectDetails.projectId)
+    });
+
+    // mark space as created from gitcoin in mixpanel
+    await updateTrackGroupProfile(space, 'gitcoin');
+
+    const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl };
+
+    console.log('🟢 Finished Importing project', projectLogInfo);
+    return projectInfo
+  } else {
+    console.log('🟡 Failed to create users for project, skipping', projectLogInfo);
+  }
 }
 
 async function updateHomepageBanner({
@@ -189,13 +199,14 @@ async function createSpaceUsers(owners: string[]) {
   return { adminUserId: author, extraAdmins: [...users], botUser };
 }
 
-function getImportedProjectsData() {
+function getImportedProjectsData(filePath = FILE_PATH) {
   try {
-    const content = readFileSync(FILE_PATH).toString();
-    const [_, ...rows] = content.split('\n');
-
-    return rows.map((row) => row?.split(';') || []);
-  } catch (e) {}
+    const content = readFileSync(filePath).toString();
+    const rows: string[][] = parse(content, { skip_empty_lines: true, from_line: 2 });
+    return rows
+  } catch (e) {
+    console.log('🔥', e);
+  }
 
   return [];
 }
@@ -227,8 +238,8 @@ function getImportedProjcetSpaceIds() {
     .filter((id): id is string => id !== null);
 }
 
-function getCsvHeader() {
-  return [
+function getCsvHeader(asString = false) {
+  const header =  [
     'gitcoin_project_id',
     'gitcoin_space_id',
     'space_name',
@@ -241,13 +252,15 @@ function getCsvHeader() {
     'banner_url',
     'metadata_url',
     'created_date'
-  ].join(';');
+  ];
+
+  return header;
 }
 
-function exportDataToCSV(data: ProjectData[]) {
+function exportDataToCSV(data: ProjectData[], filePath = FILE_PATH,) {
   let isEmpty = true;
   try {
-    isEmpty = !readFileSync(FILE_PATH).length;
+    isEmpty = !readFileSync(filePath).length;
   } catch (e) {}
 
   const csvData = data.map(({ projectDetails, space, bannerUrl, spaceImageUrl }) => {
@@ -272,17 +285,19 @@ function exportDataToCSV(data: ProjectData[]) {
       bannerUrl,
       metadataUrl,
       createdDate
-    ].join(';');
-    return '\n'.concat(infoRow);
+    ];
+
+    return infoRow;
   });
 
   // add header if file is empty
   if (isEmpty) {
-    csvData.unshift(getCsvHeader());
+    csvData.unshift(getCsvHeader(false));
   }
 
   if (csvData.length) {
-    appendFileSync(FILE_PATH, csvData.join('\n'));
+    const content = stringify(csvData, { header: false });
+    appendFileSync(filePath, content);
   }
 }
 
@@ -294,36 +309,69 @@ async function updateSpaceOrigins() {
   });
 }
 
-export async function updateCreatedAt() {
-  const data = getImportedProjectsData();
-  let updatedData = [...data];
+async function importApprovedRoundProjects() {
+ const url = 'https://indexer-production.fly.dev/data/10/rounds/0x984e29dCB4286c2D9cbAA2c238AfDd8A191Eefbc/applications.json';
+ const data: any[] = await GET(url, {});
 
-  for (const [i, row] of data.entries()) {
-    const projectId = Number(row[0]) || null;
-    const createdAt = row[11] || null;
-    if (projectId && !createdAt) {
-      const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
-      if (!projectDetails) {
+  const importedOldRoundsProjects = getImportedProjectsData();
+  const importedProjects = getImportedProjectsData('./gitcoin-round-10.csv');
+
+  const approvedProjects = data.filter((project) => project.status === 'APPROVED');
+
+  for (const project of approvedProjects) {
+    const projectDetails = getOffChainProjectDetails(project);
+
+    if (projectDetails !== null) {
+      if (importedProjects.some((projectData) => projectData[3] === projectDetails.metadata.projectTwitter)) {
+        console.log('🟡 Already imported, skipping', projectDetails.metadata.title, projectDetails.projectId);
         continue;
       }
 
-      const { metadata } = projectDetails;
-      const createdDate = new Date(metadata.createdAt).toLocaleDateString('en-US') || '??';
-      updatedData[i][11] = createdDate;
+      const importedProjectData = importedOldRoundsProjects.find((projectData) => projectData[3].toLowerCase() === projectDetails.metadata.projectTwitter.toLowerCase())
+      if (importedProjectData) {
+        console.log('🟡 Already imported in old round (verified by twitter), skipping', projectDetails.metadata.projectTwitter);
 
-      overrideCsv(updatedData);
+        const content = stringify([importedProjectData], { header: false });
+        appendFileSync('./gitcoin-round-10.csv', content);
+
+        continue;
+      }
+
+      const projectInfo = await importProjectFromDetails(projectDetails);
+
+      if (projectInfo) {
+        exportDataToCSV([projectInfo], './gitcoin-round-10.csv');
+      }
+
+    } else {
+      console.log('🟡 Failed to load project details', data);
     }
   }
 }
 
-function overrideCsv(data: string[][]) {
-  const csvData = [getCsvHeader()];
-  data.forEach((row) => {
-    csvData.push(row.join(';'));
-  });
+function getOffChainProjectDetails(data: {
+  projectId: string,
+  metadata: {
+    application: {
+      recipient: string,
+      project: ProjectMetadata & { metaPtr: { pointer: string } }
+    }
+} }): GitcoinProjectDetails | null {
+    try {
+    const { metadata, projectId } = data;
+    const { application } = metadata;
 
-  if (csvData.length) {
-    writeFileSync(FILE_PATH, csvData.join('\n'));
+    const projectDetails = {
+      projectId,
+      metadata: application.project,
+      owners: [application.recipient, '0x464fEcdb86cA7275c74bc65Fe95E72AA549Fa7ba'],
+      metadataUrl: getIpfsFileUrl(application.project.metaPtr.pointer)
+    };
+
+    return projectDetails;
+  } catch (e) {
+    console.log('🔥', 'Failed to get offchain project details', data);
+    return null
   }
 }
 
@@ -332,6 +380,7 @@ function overrideCsv(data: string[][]) {
 // getProjectCount();
 
 // updateSpaceOrigins();
-// updateCreatedAt();
 
-importGitCoinProjects();
+// importGitCoinProjects();
+// getImportedProjectsData();
+importApprovedRoundProjects();

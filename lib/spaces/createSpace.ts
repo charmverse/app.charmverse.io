@@ -24,7 +24,7 @@ import { gettingStartedPage } from 'seedData/gettingStartedPage';
 import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
-import { staticSpaceTemplates } from './config';
+import { internalTemplates, staticSpaceTemplates } from './config';
 import { countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
@@ -161,9 +161,10 @@ export async function createWorkspace({
     ]);
   } else {
     const staticTemplate = staticSpaceTemplates.find((template) => template.id === spaceTemplate);
+    const internalTemplate = internalTemplates.find((template) => template === spaceTemplate);
 
-    if (staticTemplate) {
-      const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${staticTemplate.id}.json`));
+    if (staticTemplate || internalTemplate) {
+      const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${spaceTemplate}.json`));
       const dataToImport: WorkspaceExport = JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
       await importWorkspacePages({
