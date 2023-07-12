@@ -1,4 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
@@ -95,8 +96,7 @@ describe('unassignRole', () => {
   it('should fail if trying to unassign a user from a role managed by summon', async () => {
     const role = await generateRole({
       spaceId: space.id,
-      createdBy: user.id,
-      source: 'summon'
+      createdBy: user.id
     });
 
     await assignRole({
@@ -104,14 +104,20 @@ describe('unassignRole', () => {
       userId: user.id
     });
 
-    try {
-      await unassignRole({
+    await prisma.role.update({
+      where: {
+        id: role.id
+      },
+      data: {
+        source: 'summon'
+      }
+    });
+
+    await expect(() =>
+      unassignRole({
         roleId: role.id,
         userId: user.id
-      });
-      throw new ExpectedAnError();
-    } catch (err) {
-      expect(err).toBeInstanceOf(UndesirableOperationError);
-    }
+      })
+    ).rejects.toThrow(UndesirableOperationError);
   });
 });

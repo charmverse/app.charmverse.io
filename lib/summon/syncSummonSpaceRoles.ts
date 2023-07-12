@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
-import type { UserWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { findUserByIdentity, getUserInventory } from './api';
+import { findUserXpsEngineId, getUserInventory } from './api';
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 
 export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
@@ -94,27 +93,26 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   });
 
   for (const spaceRole of spaceRoles) {
-    const xpsEngineId =
+    const userXpsEngineId =
       spaceRole.user.xpsEngineId ??
       (await findUserXpsEngineId({
-        discordUserAccount:
-          (spaceRole.user.discordUser?.account as { username: string; discriminator: string }) ?? null,
+        discordUserAccount: (spaceRole.user.discordUser?.account as { username: string }) ?? null,
         userEmail: spaceRole.user.email,
-        wallets: spaceRole.user.wallets
+        walletAddresses: spaceRole.user.wallets.map((wallet) => wallet.address)
       }));
 
-    if (xpsEngineId) {
+    if (userXpsEngineId) {
       if (!spaceRole.user.xpsEngineId) {
         await prisma.user.update({
           where: {
             id: spaceRole.user.id
           },
           data: {
-            xpsEngineId
+            xpsEngineId: userXpsEngineId
           }
         });
       }
-      const userInventory = await getUserInventory(xpsEngineId);
+      const userInventory = await getUserInventory(userXpsEngineId);
       if (userInventory && userInventory.tenant === space.xpsEngineId) {
         const userRank = userInventory?.meta.rank ?? 0;
         if (!rolesRecord[getSummonRoleLabel({ level: userRank })]) {
@@ -171,41 +169,4 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
     totalSpaceRolesAdded,
     totalSpaceRolesUpdated
   };
-}
-
-async function findUserXpsEngineId({
-  wallets,
-  userEmail,
-  discordUserAccount
-}: {
-  discordUserAccount: { username: string; discriminator: string } | null;
-  userEmail: string | null;
-  wallets: Pick<UserWallet, 'address'>[];
-}) {
-  let xpsEngineId: null | string = null;
-
-  const walletAddresses = wallets.map(({ address }) => address);
-  for (const walletAddress of walletAddresses) {
-    xpsEngineId = await findUserByIdentity({
-      walletAddress
-    });
-
-    if (xpsEngineId) {
-      break;
-    }
-  }
-
-  if (!xpsEngineId && userEmail) {
-    xpsEngineId = await findUserByIdentity({
-      email: userEmail
-    });
-  }
-
-  if (discordUserAccount && !xpsEngineId) {
-    xpsEngineId = await findUserByIdentity({
-      discordHandle: `${discordUserAccount.username}#${discordUserAccount.discriminator}`
-    });
-  }
-
-  return xpsEngineId;
 }

@@ -28,7 +28,7 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
     return null;
   }
 
-  const discordUserAccount = user.discordUser?.account as { username: string; discriminator: string } | null;
+  const discordUserAccount = user.discordUser?.account as { username: string } | null;
   const userEmail = user.email;
   const walletAddresses = user.wallets.map((wallet) => wallet.address);
 

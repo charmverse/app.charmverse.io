@@ -23,7 +23,7 @@ export async function syncSummonSpacesRoles() {
     try {
       await syncSummonSpaceRoles({ spaceId });
     } catch (err: any) {
-      log.error(`Error syncing space role for space ${spaceId}: ${err.stack || err.message || err}`, { err });
+      log.error(`Error syncing space role for space ${spaceId}: ${err.stack || err.message || err}`, { err, spaceId });
     }
   }
 }
