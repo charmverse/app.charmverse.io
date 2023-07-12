@@ -3,6 +3,7 @@ import type { UserWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findUserByIdentity, getUserInventory } from './api';
+import { getSummonRoleLabel } from './getSummonRoleLabel';
 
 export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   const space = await prisma.space.findUniqueOrThrow({
@@ -116,10 +117,10 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
       const userInventory = await getUserInventory(xpsEngineId);
       if (userInventory && userInventory.tenant === space.xpsEngineId) {
         const userRank = userInventory?.meta.rank ?? 0;
-        if (!rolesRecord[`Level ${userRank}`]) {
+        if (!rolesRecord[getSummonRoleLabel({ level: userRank })]) {
           const role = await prisma.role.create({
             data: {
-              name: `Level ${userRank}`,
+              name: getSummonRoleLabel({ level: userRank }),
               source: 'summon',
               spaceId,
               createdBy: space.createdBy
@@ -134,10 +135,10 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
         }
 
         const currentRole = Object.values(rolesRecord).find((role) => role.memberIds.includes(spaceRole.user.id));
-        const newRole = rolesRecord[`Level ${userRank}`];
+        const newRole = rolesRecord[getSummonRoleLabel({ level: userRank })];
 
         // If the user has a game7 role, but its different than the current one, replace it
-        if (currentRole && currentRole.name !== `Level ${userRank}`) {
+        if (currentRole && currentRole.name !== getSummonRoleLabel({ level: userRank })) {
           await prisma.spaceRoleToRole.updateMany({
             where: {
               roleId: currentRole.id,
@@ -150,7 +151,7 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
           rolesRecord[currentRole.name].memberIds = rolesRecord[currentRole.name].memberIds.filter(
             (memberId) => memberId !== spaceRole.user.id
           );
-          rolesRecord[`Level ${userRank}`].memberIds.push(spaceRole.user.id);
+          rolesRecord[getSummonRoleLabel({ level: userRank })].memberIds.push(spaceRole.user.id);
           totalSpaceRolesUpdated += 1;
         } else if (!currentRole) {
           await prisma.spaceRoleToRole.create({
@@ -160,7 +161,7 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
             }
           });
           totalSpaceRolesAdded += 1;
-          rolesRecord[`Level ${userRank}`].memberIds.push(spaceRole.user.id);
+          rolesRecord[getSummonRoleLabel({ level: userRank })].memberIds.push(spaceRole.user.id);
         }
       }
     }
