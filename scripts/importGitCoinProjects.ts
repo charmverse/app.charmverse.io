@@ -364,7 +364,7 @@ function getOffChainProjectDetails(data: {
     const projectDetails = {
       projectId,
       metadata: application.project,
-      owners: [application.recipient, '0x464fEcdb86cA7275c74bc65Fe95E72AA549Fa7ba'],
+      owners: [application.recipient],
       metadataUrl: getIpfsFileUrl(application.project.metaPtr.pointer)
     };
 
