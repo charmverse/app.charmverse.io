@@ -7,7 +7,7 @@ import * as summonApi from '../api';
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 
 jest.mock('../api', () => ({
-  findUserByIdentity: jest.fn().mockResolvedValue(null),
+  findUserXpsEngineId: jest.fn().mockResolvedValue(null),
   getUserInventory: jest.fn().mockResolvedValue(null)
 }));
 
@@ -24,7 +24,7 @@ describe('syncSummonSpaceRoles', () => {
     const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserByIdentity as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
+    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
     (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
       tenant: spaceXpsEngineId,
       meta: {
@@ -75,7 +75,7 @@ describe('syncSummonSpaceRoles', () => {
     const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserByIdentity as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
+    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
     (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
       tenant: spaceXpsEngineId,
       meta: {
@@ -126,7 +126,7 @@ describe('syncSummonSpaceRoles', () => {
     const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserByIdentity as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
+    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
     (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
       tenant: spaceXpsEngineId,
       meta: {
