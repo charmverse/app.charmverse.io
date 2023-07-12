@@ -13,7 +13,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
-import { webhookBaseUrl } from 'config/constants';
+import { webhookEndpoint } from 'config/constants';
 import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 
 import { SidebarHeader } from '../viewSidebar';
@@ -158,7 +158,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             <br />
             Paste the following URL:
             <br />
-            <i>{`${webhookBaseUrl}/${webhookApi?.apiKey}`}</i>
+            <i>{`${window.location.origin}/${webhookEndpoint}/${webhookApi?.apiKey}`}</i>
           </Typography>
         }
         title='Typeform webhook'

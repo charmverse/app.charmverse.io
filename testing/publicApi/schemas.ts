@@ -79,14 +79,13 @@ type SchemaGeneratorParams<T extends PropertyType = PropertyType> = {
   options?: T extends 'select' | 'multiSelect' ? string[] : undefined;
   propertyName?: string;
 };
-
-export function generateSchema<T extends PropertyType>(input: SchemaGeneratorParams<T>): PageProperty<T>;
 export function generateSchema<T extends Extract<PropertyType, 'select' | 'multiSelect'>>(
   input: SchemaGeneratorParams<T>
 ): PageProperty<T>;
 export function generateSchema<T extends Exclude<PropertyType, 'select' | 'multiSelect'>>(
   input: Pick<SchemaGeneratorParams<T>, 'type' | 'propertyName'>
 ): PageProperty<T>;
+export function generateSchema<T extends PropertyType>(input: SchemaGeneratorParams<T>): PageProperty<T>;
 export function generateSchema<T extends PropertyType = PropertyType>({
   type,
   options,
@@ -95,35 +94,35 @@ export function generateSchema<T extends PropertyType = PropertyType>({
   const id = uuid();
   switch (type as T) {
     case 'text':
-      return { ...textSchema, id, name: propertyName || textSchema.name } as PageProperty<T>;
+      return { ...textSchema, type: 'text' as T, id, name: propertyName || textSchema.name } as any as PageProperty<T>;
     case 'number':
-      return { ...numberSchema, id, name: propertyName || numberSchema.name } as PageProperty<T>;
+      return { ...numberSchema, id, name: propertyName || numberSchema.name } as any as PageProperty<T>;
     case 'email':
-      return { ...emailSchema, id, name: propertyName || emailSchema.name } as PageProperty<T>;
+      return { ...emailSchema, id, name: propertyName || emailSchema.name } as any as PageProperty<T>;
     case 'phone':
-      return { ...phoneSchema, id, name: propertyName || phoneSchema.name } as PageProperty<T>;
+      return { ...phoneSchema, id, name: propertyName || phoneSchema.name } as any as PageProperty<T>;
     case 'url':
-      return { ...urlSchema, id, name: propertyName || urlSchema.name } as PageProperty<T>;
+      return { ...urlSchema, id, name: propertyName || urlSchema.name } as any as PageProperty<T>;
     case 'checkbox':
-      return { ...checkboxSchema, id, name: propertyName || checkboxSchema.name } as PageProperty<T>;
+      return { ...checkboxSchema, id, name: propertyName || checkboxSchema.name } as any as PageProperty<T>;
     case 'date':
-      return { ...dateSchema, id, name: propertyName || dateSchema.name } as PageProperty<T>;
+      return { ...dateSchema, id, name: propertyName || dateSchema.name } as any as PageProperty<T>;
     case 'person':
-      return { ...personSchema, id, name: propertyName || personSchema.name } as PageProperty<T>;
+      return { ...personSchema, id, name: propertyName || personSchema.name } as any as PageProperty<T>;
     case 'select':
       return {
         ...selectSchema,
         id,
         name: propertyName || selectSchema.name,
         options: options?.map((opt) => ({ id: uuid(), value: opt, color: 'propColorRed' })) || selectSchema.options
-      } as PageProperty<T>;
+      } as any as PageProperty<T>;
     case 'multiSelect':
       return {
         ...multiSelectSchema,
         id,
         name: propertyName || multiSelectSchema.name,
         options: options?.map((opt) => ({ id: uuid(), value: opt, color: 'propColorRed' })) || multiSelectSchema.options
-      } as PageProperty<T>;
+      } as any as PageProperty<T>;
     default:
       throw new InvalidInputError(`Unsupported property type: ${type}`);
   }
