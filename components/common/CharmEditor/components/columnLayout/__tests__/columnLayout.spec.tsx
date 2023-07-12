@@ -1,5 +1,3 @@
-import type { ClientOptions } from '@uauth/js';
-
 import { CharmEditor } from 'components/common/CharmEditor';
 import { customRenderWithContext } from 'testing/customRender';
 import { jsonDoc, builders as _ } from 'testing/prosemirror';
@@ -10,10 +8,6 @@ jest.mock('hooks/useFirebaseAuth', () => ({
 
 jest.mock('lit-js-sdk', () => ({
   humanizeAccessControlConditions: () => {}
-}));
-
-jest.mock('@uauth/js', () => ({
-  UAuth: () => {}
 }));
 
 jest.mock('lib/snapshot/getProposal', () => ({
@@ -43,7 +37,7 @@ describe('Charm Plugin: columnLayout', () => {
     const content = jsonDoc(_.columnLayout(_.columnBlock(_.p('Hello')), _.columnBlock(_.p('World'))));
     const component = <CharmEditor isContentControlled content={content} readOnly={true} />;
     const { container } = customRenderWithContext(component, {});
-    const placeholder = container.querySelector('.charm-column-resizer');
-    expect(placeholder).toBeInTheDocument();
+    const resizer = container.querySelector('.charm-column-resizer');
+    expect(resizer).toBeInTheDocument();
   });
 });
