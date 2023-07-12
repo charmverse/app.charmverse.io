@@ -2,6 +2,7 @@ import type { NextApiResponse } from 'next';
 
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import type { PageProperty } from 'lib/public-api';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import { apiPageKeyHandler } from 'lib/public-api/handler';
@@ -59,7 +60,34 @@ export async function createFormResponse(req: NextApiRequestWithApiPageKey, res:
   // Transform body questions and answers into card properties
   const { updatedBody, allProperties } = transformWebhookBodyFormResponse(body, board.schema);
 
-  if (allProperties.length !== board.schema.length) {
+  // Eval if an existing property was changed
+  function evalPropertyChanged(prop: PageProperty): boolean {
+    if (prop.type !== 'select' && prop.type !== 'multiSelect') {
+      return false;
+    }
+
+    const matched = board.schema.find((s) => s.id === prop.id);
+
+    // This is a new property
+    if (!matched) {
+      return true;
+    } else if (prop.options?.length !== matched.options?.length) {
+      return true;
+    } else if (
+      prop.options?.some((o) => {
+        return !matched.options?.map((opt) => opt.value).includes(o.value);
+      })
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  const shouldUpdateProperties =
+    allProperties.length !== board.schema.length || allProperties.some(evalPropertyChanged);
+
+  if (shouldUpdateProperties) {
     await updateDatabaseSchema({ boardId: board.id, properties: allProperties });
   }
 
