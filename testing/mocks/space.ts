@@ -34,5 +34,5 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     hiddenFeatures: [],
     isCustomDomainVerified: null,
     ...space
-  };
+  } as any;
 };
