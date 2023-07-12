@@ -50,10 +50,6 @@ function columnSpec(): RawSpecs {
     name: 'columnBlock',
     schema: {
       attrs: {
-        // We need an id to identify the column when applying a resizer bar as decoration
-        id: {
-          default: null
-        },
         size: {
           default: undefined
         },

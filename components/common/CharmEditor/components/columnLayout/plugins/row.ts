@@ -1,4 +1,5 @@
 import { createElement } from '@bangle.dev/core';
+import { log } from '@charmverse/core/log';
 import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
@@ -40,6 +41,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
             });
             // console.log('save column sizes', getPos(), columnUpdates);
             const tr = view.state.tr;
+            log.info('dispatch updates to prosemirror', element);
             columnUpdates.forEach((update) => {
               if (update.pos > -1) {
                 tr.setNodeMarkup(update.pos, undefined, { size: update.size });
@@ -50,6 +52,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
 
           // trigger this after child nodes are rendered
           setTimeout(() => {
+            log.info('init resizer on load', element);
             columnResizer.init(element);
             element.addEventListener('column:after-resizing' as any, resizeCallback);
           }, 0);
@@ -66,7 +69,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
               // if the node has been updated, we need to re-init the column resizer as Prosemirror has re-rendered the decorations
               // An alternative would be to create a unique key for each column resizer, but this is easier
               setTimeout(() => {
-                columnResizer.dispose();
+                log.info('init resizer on view update', element);
                 columnResizer.init(element);
               });
               // always return true, or else prosemirror will re-create the entire node view
@@ -76,7 +79,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
             ignoreMutation(mutation) {
               // @ts-ignore donot ignore a selection type mutation
               // if (mutation.type === 'selection') {
-              //   console.log('selection mutation');
+              //   log.info('selection mutation');
               //   return false;
               // }
 
