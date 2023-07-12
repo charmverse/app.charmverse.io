@@ -8,18 +8,18 @@ export function ColumnNodeView({ name }: { name: string }) {
     key: new PluginKey(`${name}-NodeView`),
     props: {
       nodeViews: {
-        [name]: function nodeView(node, view, getPos) {
+        [name]: function nodeView(node) {
           const element = createElement(['div', getColumnProperties({ size: node.attrs.size })]);
 
           return {
             contentDOM: element,
             dom: element,
+            // we need to ignore mutations caused by column-resizer (the style attribute is changed by column-resizer)
             ignoreMutation(mutation) {
-              return true;
-              // ref bangle.dev: https://discuss.prosemirror.net/t/nodeviews-with-contentdom-stops-the-cursor-movement-for-a-node-with-text-content/3208/6
-              // if a child of this.dom (the one handled by PM)
-              // has any mutation, do not ignore it
               if (this.dom.contains(mutation.target)) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                  return true;
+                }
                 return false;
               }
 
@@ -27,27 +27,23 @@ export function ColumnNodeView({ name }: { name: string }) {
               // do not ignore it. This is important for schema where
               // content: 'inline*' and you end up deleting all the content with backspace
               // PM needs to step in and create an empty node for us.
-              if (mutation.target === this.contentDOM) {
-                return false;
-              }
+              // if (mutation.target === this.contentDOM) {
+              //   return false;
+              // }
 
               return true;
             },
             // tell prosemirror the node is updated when the attributes change, otherwise it will re-render the node
             update(newNode) {
-              if (newNode.type.name === name) {
-                if (node.sameMarkup(newNode)) {
-                  return false;
-                }
-                // keep html attributes up to date - might be useful in the future
-                const domAttrs = getColumnProperties({ size: newNode.attrs.size });
-                if (this.contentDOM) {
-                  this.contentDOM.setAttribute('data-item-config', domAttrs['data-item-config']);
-                }
-                return true;
+              // dont update if the update is from another node type
+              if (newNode.type.name !== name) {
+                return false;
               }
-              // console.log('view.update: confirm column node updated');
-              return false;
+              // keep html attributes up to date so that column resizer can be re-initialized
+              const domAttrs = getColumnProperties({ size: newNode.attrs.size });
+              this.contentDOM?.setAttribute('data-item-config', domAttrs['data-item-config']);
+
+              return true;
             }
           };
         }
