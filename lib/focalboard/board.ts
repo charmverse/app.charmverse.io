@@ -35,7 +35,7 @@ interface IPropertyTemplate<T extends PropertyType = PropertyType> {
   id: string;
   name: string;
   type: T;
-  options?: IPropertyOption[];
+  options: IPropertyOption[];
   description?: string;
 }
 

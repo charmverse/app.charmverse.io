@@ -1,10 +1,9 @@
-import type { IncomingMessage } from 'http';
-
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';
 
 import type { ApiEventMap } from 'lib/metrics/mixpanel/interfaces/ApiEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 
 import { logApiRequest } from '../handler';
 
@@ -51,7 +50,7 @@ describe('logApiRequest', () => {
     const mockApiPageKeyToken = uuid();
     const mockSpaceId = uuid();
 
-    const mockApiPageKey: IncomingMessage['apiPageKey'] = {
+    const mockApiPageKey: InjectedPageApiKey = {
       apiKey: mockApiPageKeyToken,
       createdAt: new Date(),
       createdBy: uuid(),
@@ -61,7 +60,7 @@ describe('logApiRequest', () => {
       updatedAt: new Date()
     };
 
-    const mockedReq: Partial<NextApiRequest> = {
+    const mockedReq: Partial<NextApiRequestWithApiPageKey> = {
       url: `${baseEndpoint}/${mockApiPageKeyToken}`,
       method: 'GET',
       apiPageKey: mockApiPageKey,

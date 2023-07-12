@@ -52,11 +52,12 @@ export interface PagePropertyOption {
  *            type: object
  *            $ref: '#/components/schemas/PagePropertyOption'
  */
-export type PageProperty<T extends PropertyType = PropertyType> = IPropertyTemplate & {
-  type: T;
-  options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-} & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
+export type PageProperty<T extends PropertyType = PropertyType> = Pick<IPropertyTemplate, 'id' | 'name'> &
+  Partial<Pick<IPropertyTemplate, 'description'>> & {
+    type: T;
+    options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+  } & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**
  * @swagger
