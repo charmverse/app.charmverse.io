@@ -37,12 +37,10 @@ describe('getSummonProfile', () => {
     const emailAddress = `test-${v4()}@gmail.com`;
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress, email: emailAddress });
     const discordUsername = 'test';
-    const discordDiscriminator = v4();
     await prisma.discordUser.create({
       data: {
         account: {
-          username: discordUsername,
-          discriminator: discordDiscriminator
+          username: discordUsername
         },
         userId: user.id,
         discordId: v4()
@@ -52,9 +50,7 @@ describe('getSummonProfile', () => {
     mockSandbox
       .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
-          `${discordUsername}#${discordDiscriminator}`
-        )}`,
+        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`,
         game7IdentityErrorResponse
       )
       .get(`${GAME7_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, game7IdentityErrorResponse);
@@ -93,16 +89,14 @@ describe('getSummonProfile', () => {
   });
 
   it(`Should return game7 profile attached with user's discord handle`, async () => {
-    const discordUsername = `test`;
-    const discordDiscriminator = v4();
+    const discordUsername = `test123`;
     const walletAddress = Wallet.createRandom().address.toLowerCase();
 
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     await prisma.discordUser.create({
       data: {
         account: {
-          username: discordUsername,
-          discriminator: discordDiscriminator
+          username: discordUsername
         },
         userId: user.id,
         discordId: v4()
@@ -111,18 +105,13 @@ describe('getSummonProfile', () => {
 
     mockSandbox
       .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
-      .get(
-        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
-          `${discordUsername}#${discordDiscriminator}`
-        )}`,
-        {
-          data: {
-            userId: user.id
-          },
-          message: '',
-          status: 0
-        }
-      )
+      .get(`${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`, {
+        data: {
+          userId: user.id
+        },
+        message: '',
+        status: 0
+      })
       .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
