@@ -65,7 +65,8 @@ export function useEditorItems({
       .flat();
 
     return itemList;
-  }, [addNestedPage, pageId, user, space]);
+    // include selection since we use cursor position as context, but we should find a way to only generate this when the popup appears
+  }, [addNestedPage, pageId, user, space, view.state.selection]);
 
   return paletteItems;
 }
