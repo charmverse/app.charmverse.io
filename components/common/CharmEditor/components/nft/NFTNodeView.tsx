@@ -69,23 +69,10 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
     }
   }
 
-  if (isLoading) {
-    return (
-      <Card variant='outlined'>
-        <Box p={3}>
-          <LoadingComponent />
-        </Box>
-      </Card>
-    );
-  }
-
   if (!nftData) {
     return (
       <Card variant='outlined'>
-        <Box p={3} textAlign='center'>
-          <Typography color='secondary'>NFT not found</Typography>
-        </Box>
-        <Alert severity='warning'>There was an error</Alert>
+        <Box p={6}>{isLoading ? <LoadingComponent /> : <Typography color='secondary'>NFT not found</Typography>}</Box>
       </Card>
     );
   }
