@@ -59,7 +59,7 @@ function EmptyImageContainer({
 const StyledImageContainer = styled.div<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
-  margin: 0 auto;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const StyledImage = styled.img`

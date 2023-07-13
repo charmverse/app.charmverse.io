@@ -551,41 +551,27 @@ ol li {
 }
 
 
-/** Resizable columns **/
-
-
-.charm-column-resizer {
-  cursor: col-resize;
-  position: relative;
-  flex: 0 0 10px; //  this is also set by the column-resizer library
-  > div {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -10px;
-    right: -10px;
-    > div {
-      height: 100%;
-      width: 4px;
-      margin-left: 10px;
-      padding: 4px 0;
-    }
-    &:hover > div {
-      background-color: var(--input-border);
-    }
-  }
-}
-
-/** Begin columns **/
+/** Begin Resizable columns **/
 
 .charm-column {
   border-radius: 4px;
-  padding: 0 4px;
+  padding: 8px 4px;
   position: relative;
-  transition: background-color 250ms ease-in-out;
   overflow: hidden; // this is also set by the column-resizer library
 
-  &:hover {
+  &::before {
+    content: '';
+    opacity: 0.4;
+    transition: background-color 250ms ease-in-out;
+    border-radius: 2px;
+    position:absolute;
+    top: 8px;
+    left: 4px;
+    right: 4px;
+    bottom: 8px;
+    z-index: -1; // make the background appear behind children
+  }
+  &:hover::before {
     background-color: var(--background-light);
   }
 
@@ -600,8 +586,30 @@ ol li {
   }
 }
 
+.charm-column-resizer {
+  cursor: col-resize;
+  position: relative;
+  flex: 0 0 20px; //  this is also set by the column-resizer library
+  > div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px; // extend outside boundary to give more space to detect the cursor
+    right: -10px;
+    > div {
+      height: 100%;
+      width: 4px;
+      margin: 0 auto;
+      padding: 4px 0;
+    }
+    &:hover > div {
+      background-color: var(--input-border);
+    }
+  }
+}
+
 .read-only {
-  .charm-column:hover {
+  .charm-column > .bangle-nv-container:hover {
     background-color: transparent;
   }
   .charm-column-resizer {

@@ -4,6 +4,9 @@ import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import { findChildrenByType } from 'prosemirror-utils';
 import { Decoration, DecorationSet } from 'prosemirror-view';
+
+const barWidth = 20;
+
 // Add a decoration next to each column block
 export function ResizeBarDecoration() {
   return new Plugin({
@@ -42,7 +45,11 @@ function buildResizeBars(state: EditorState) {
     state.doc,
     resizeBarConfig.map(({ pos }) =>
       Decoration.widget(pos + 1, () => {
-        return createElement(['div', { class: 'charm-column-resizer', 'data-item-type': 'BAR' }, ['div', ['div']]]);
+        return createElement([
+          'div',
+          { class: 'charm-column-resizer', 'data-item-type': 'BAR', 'data-item-config': `{"size": ${barWidth}}` },
+          ['div', ['div']]
+        ]);
       })
     )
   );

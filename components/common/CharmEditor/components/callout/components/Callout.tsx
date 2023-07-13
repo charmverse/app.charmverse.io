@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { IconButton, Menu } from '@mui/material';
+import { Box, IconButton, Menu } from '@mui/material';
 import type { BaseEmoji } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import type { MouseEvent, ReactNode } from 'react';
@@ -63,59 +63,61 @@ export default function Callout({
   const twemojiImage = getTwitterEmoji(node.attrs.emoji);
 
   return (
-    <StyledCallout>
-      <CalloutEmoji>
-        <IconButton
-          sx={{
-            width: 35,
-            height: 35,
-            fontSize: 20,
-            padding: 0.75,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
-            '&.Mui-disabled': {
-              color: '#FFFFFFFF'
-            }
-          }}
-          // use onMouseDown - for some reason, onClick gets intercepted by the editor
-          onMouseDown={handleClick}
-          disabled={readOnly}
-        >
-          {twemojiImage ? (
-            <img
-              style={{
-                cursor: 'pointer',
-                transition: 'background 100ms ease-in-out'
-              }}
-              src={twemojiImage}
-            />
-          ) : (
-            <div
-              style={{
-                cursor: 'pointer',
-                transition: 'background 100ms ease-in-out'
-              }}
-            >
-              {node.attrs.emoji}
-            </div>
-          )}
-        </IconButton>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <Picker
-            theme={theme.palette.mode}
-            onSelect={(emoji: BaseEmoji) => {
-              updateAttrs({
-                emoji: emoji.native
-              });
-              handleClose();
+    <Box py={0.5}>
+      <StyledCallout>
+        <CalloutEmoji>
+          <IconButton
+            sx={{
+              width: 35,
+              height: 35,
+              fontSize: 20,
+              padding: 0.75,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
+              '&.Mui-disabled': {
+                color: '#FFFFFFFF'
+              }
             }}
-          />
-        </Menu>
-      </CalloutEmoji>
-      {children}
-    </StyledCallout>
+            // use onMouseDown - for some reason, onClick gets intercepted by the editor
+            onMouseDown={handleClick}
+            disabled={readOnly}
+          >
+            {twemojiImage ? (
+              <img
+                style={{
+                  cursor: 'pointer',
+                  transition: 'background 100ms ease-in-out'
+                }}
+                src={twemojiImage}
+              />
+            ) : (
+              <div
+                style={{
+                  cursor: 'pointer',
+                  transition: 'background 100ms ease-in-out'
+                }}
+              >
+                {node.attrs.emoji}
+              </div>
+            )}
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <Picker
+              theme={theme.palette.mode}
+              onSelect={(emoji: BaseEmoji) => {
+                updateAttrs({
+                  emoji: emoji.native
+                });
+                handleClose();
+              }}
+            />
+          </Menu>
+        </CalloutEmoji>
+        {children}
+      </StyledCallout>
+    </Box>
   );
 }
