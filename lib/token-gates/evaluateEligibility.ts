@@ -13,7 +13,7 @@ const litClient = new LitNodeClient({
   debug: false
 } as any);
 
-export async function evalueTokenGateEligibility({
+export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain,
   userId

@@ -76,32 +76,32 @@ export async function findUserXpsEngineId({
   userEmail,
   discordUserAccount
 }: {
-  discordUserAccount: { username: string; discriminator: string } | null;
+  discordUserAccount: { username: string } | null;
   userEmail: string | null;
   walletAddresses: string[];
 }) {
-  let xpsEngineId: string | null = null;
+  let userXpsEngineId: string | null = null;
   for (const walletAddress of walletAddresses) {
-    xpsEngineId = await findUserByIdentity({
+    userXpsEngineId = await findUserByIdentity({
       walletAddress
     });
 
-    if (xpsEngineId) {
+    if (userXpsEngineId) {
       break;
     }
   }
 
-  if (!xpsEngineId && userEmail) {
-    xpsEngineId = await findUserByIdentity({
+  if (!userXpsEngineId && userEmail) {
+    userXpsEngineId = await findUserByIdentity({
       email: userEmail
     });
   }
 
-  if (discordUserAccount && !xpsEngineId) {
-    xpsEngineId = await findUserByIdentity({
-      discordHandle: `${discordUserAccount.username}#${discordUserAccount.discriminator}`
+  if (discordUserAccount && !userXpsEngineId) {
+    userXpsEngineId = await findUserByIdentity({
+      discordHandle: discordUserAccount.username
     });
   }
 
-  return xpsEngineId;
+  return userXpsEngineId;
 }
