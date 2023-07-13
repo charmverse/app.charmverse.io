@@ -576,6 +576,8 @@ ol li {
   }
 }
 
+/** Begin columns **/
+
 .charm-column {
   border-radius: 4px;
   padding: 0 4px;
@@ -584,7 +586,6 @@ ol li {
   overflow: hidden; // this is also set by the column-resizer library
 
   &:hover {
-    transition: background-color 250ms ease-in-out;
     background-color: var(--background-light);
   }
 
@@ -598,3 +599,15 @@ ol li {
     padding: 0 4px;
   }
 }
+
+.read-only {
+  .charm-column:hover {
+    background-color: transparent;
+  }
+  .charm-column-resizer {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/** End columns **/
