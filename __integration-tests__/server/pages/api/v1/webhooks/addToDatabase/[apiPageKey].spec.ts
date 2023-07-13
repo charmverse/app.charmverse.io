@@ -41,11 +41,53 @@ describe('POST /api/v1/webhooks/addToDatabase/{apiPageKey}', () => {
       }
     });
 
+    const textFieldId = uuid();
+    const selectId = uuid();
+
     const sampleInput: TypeformResponse = {
+      definition: {
+        fields: [
+          {
+            id: textFieldId,
+            ref: '01H531GWT0DN41H4C16PFP05NS',
+            type: 'short_text',
+            title: "Hello, what's your name?",
+            properties: {}
+          },
+          {
+            id: selectId,
+            ref: '01H531GWVKAT474T5MS32VKKS9',
+            type: 'multiple_choice',
+            title: 'Nice to meet you, {{field:01H531GWT0DN41H4C16PFP05NS}}, how is your day going?',
+            properties: {},
+            choices: [
+              {
+                id: 'hYorZ9YweWhP',
+                label: 'Terrific!'
+              },
+              {
+                id: 'rXSf6v3tVel8',
+                label: 'Not so well...'
+              }
+            ]
+          }
+        ]
+      },
       answers: [
         {
-          field: { id: uuid(), type: 'short_text', title: 'Example title' },
+          field: { id: textFieldId, type: 'short_text', title: 'Example title' },
           text: `Example text`
+        },
+        {
+          type: 'choice',
+          choice: {
+            label: 'Barcelona'
+          },
+          field: {
+            id: selectId,
+            type: 'multiple_choice',
+            ref: '01H531GWVKAT474T5MS32VKKS9'
+          }
         }
       ],
       submitted_at: new Date().toISOString()

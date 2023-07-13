@@ -27,6 +27,10 @@ export async function updateRole({ id, update }: { id: string; update: Updateabl
     throw new UndesirableOperationError('Cannot update role imported from guild.xyz');
   }
 
+  if (existingRole.source === 'summon') {
+    throw new UndesirableOperationError('Cannot update role imported from summon');
+  }
+
   const updatedRole = await prisma.role.update({
     where: {
       id
