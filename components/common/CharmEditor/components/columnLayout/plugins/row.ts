@@ -1,5 +1,4 @@
 import { createElement } from '@bangle.dev/core';
-import { log } from '@charmverse/core/log';
 import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
@@ -39,9 +38,7 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
               }
               return false;
             });
-            // console.log('save column sizes', getPos(), columnUpdates);
             const tr = view.state.tr;
-            log.info('dispatch updates to prosemirror', startPos, element);
             columnUpdates.forEach((update) => {
               if (update.pos > -1) {
                 tr.setNodeMarkup(update.pos, undefined, { size: update.size });
@@ -52,12 +49,8 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
 
           // trigger this after child nodes are rendered
           setTimeout(() => {
-            log.info('init resizer on load', getPos(), element);
             columnResizer.init(element);
             element.addEventListener('column:after-resizing' as any, resizeCallback);
-            element.addEventListener('column:activate' as any, function (e) {
-              log.debug('Activate event', 'column:activate', e.detail, element);
-            });
           }, 0);
 
           const nodeView: NodeView = {
@@ -72,7 +65,6 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
               // if the node has been updated, we need to re-init the column resizer as Prosemirror has re-rendered the decorations
               // An alternative would be to create a unique key for each column resizer, but this is easier
               setTimeout(() => {
-                log.info('init resizer on view update', element);
                 columnResizer.init(element);
               });
               // always return true, or else prosemirror will re-create the entire node view

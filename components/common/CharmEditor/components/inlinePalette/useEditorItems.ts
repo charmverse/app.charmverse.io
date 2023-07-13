@@ -1,3 +1,4 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
@@ -34,6 +35,7 @@ export function useEditorItems({
   const { user } = useUser();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+  const view = useEditorViewContext();
 
   const pageType = pageId ? pages[pageId]?.type : undefined;
 
@@ -48,7 +50,7 @@ export function useEditorItems({
       ],
       ['media', mediaItems()],
       ['embed', embedItems()],
-      ['advanced blocks', advancedBlocks({ enableVoting })]
+      ['advanced blocks', advancedBlocks({ view, enableVoting })]
     ];
 
     const itemList = itemGroups
