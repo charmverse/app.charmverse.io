@@ -14,6 +14,6 @@ export class PublicProfileApi {
   }
 
   getSummonProfile(userId: string) {
-    return http.GET<SummonUserProfile | null>(`/api/public/profile/${userId}/game7`);
+    return http.GET<SummonUserProfile | null>(`/api/public/profile/${userId}/summon`);
   }
 }
