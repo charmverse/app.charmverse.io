@@ -99,21 +99,21 @@ export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: strin
   });
 
   for (const spaceRole of spaceRoles) {
-    const summonProfile = await getSummonProfile({ userId: spaceRole.user.id });
+    try {
+      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id });
+      const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
 
-    if (summonProfile) {
-      if (!spaceRole.user.xpsEngineId) {
-        await prisma.user.update({
-          where: {
-            id: spaceRole.user.id
-          },
-          data: {
-            xpsEngineId: summonProfile.id
-          }
-        });
-      }
-      if (summonProfile.tenantId === space.xpsEngineId) {
-        const userRank = Math.floor(summonProfile.meta.rank ?? 0);
+      if (summonProfile && userRank) {
+        if (!spaceRole.user.xpsEngineId) {
+          await prisma.user.update({
+            where: {
+              id: spaceRole.user.id
+            },
+            data: {
+              xpsEngineId: summonProfile.id
+            }
+          });
+        }
         if (!rolesRecord[getSummonRoleLabel({ level: userRank })]) {
           const role = await prisma.role.create({
             data: {
@@ -161,6 +161,12 @@ export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: strin
           rolesRecord[getSummonRoleLabel({ level: userRank })].memberIds.push(spaceRole.user.id);
         }
       }
+    } catch (err: any) {
+      log.error(`Error syncing summon space role for user ${userId}: ${err.stack || err.message || err}`, {
+        err,
+        spaceId,
+        userId: spaceRole.user.id
+      });
     }
   }
 
