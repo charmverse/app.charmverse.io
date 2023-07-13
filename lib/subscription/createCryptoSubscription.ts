@@ -1,25 +1,65 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { getLoopProducts } from 'lib/loop/loop';
 import { NotFoundError } from 'lib/middleware';
 
-import { loopCheckoutUrl } from './constants';
+import { communityProduct, loopCheckoutUrl } from './constants';
 import { getCouponDetails } from './getCouponDetails';
-import type { CreateCryptoSubscriptionRequest, CreateCryptoSubscriptionResponse } from './interfaces';
+import { getCommunityPrice } from './getProductPrice';
+import type {
+  CreateCryptoSubscriptionRequest,
+  CreateCryptoSubscriptionResponse,
+  StripeMetadataKeys
+} from './interfaces';
 import { stripeClient } from './stripe';
 
 export async function createCryptoSubscription({
-  subscriptionId,
-  email,
+  billingEmail,
+  period,
+  blockQuota,
   coupon,
+  name,
+  address,
   spaceId
 }: CreateCryptoSubscriptionRequest & { spaceId: string }): Promise<CreateCryptoSubscriptionResponse> {
-  const encodedEmail = encodeURIComponent(email);
-  const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
-  const oldSubscriotions = await stripeClient.subscriptions.search({
+  const space = await prisma.space.findUnique({
+    where: { id: spaceId },
+    select: {
+      domain: true,
+      id: true,
+      name: true
+    }
+  });
+
+  if (!space) {
+    throw new NotFoundError('Space not found');
+  }
+
+  const productId = communityProduct.id;
+  const encodedEmail = encodeURIComponent(billingEmail || '');
+  const customerSearchResults = await stripeClient.customers.search({
+    query: `metadata['spaceId']:'${spaceId}'`
+  });
+
+  const existingStripeCustomer = customerSearchResults.data.find((_customer) => !_customer.deleted);
+  const customer =
+    existingStripeCustomer ||
+    (await stripeClient.customers.create({
+      metadata: {
+        spaceId,
+        domain: space.domain
+      } as StripeMetadataKeys,
+      address,
+      name: name || space.name,
+      email: billingEmail
+    }));
+
+  const oldSubscriptions = await stripeClient.subscriptions.search({
     query: `metadata['spaceId']:'${spaceId}' AND status:'past_due'`
   });
 
   // This is only for new customers to be sure that we delete all payment methods. This is how Loop works right now.
-  const customerId = subscription.customer as string;
+  const customerId = customer.id;
   const paymentMethods = await stripeClient.paymentMethods.list({
     customer: customerId
   });
@@ -28,32 +68,35 @@ export async function createCryptoSubscription({
     await stripeClient.paymentMethods.detach(paymentMethod.id);
   }
 
-  const overdueSubscription = oldSubscriotions.data.find((sub) => sub.id !== subscriptionId);
-  if (overdueSubscription) {
-    await stripeClient.subscriptions.del(overdueSubscription.id);
+  for (const oldSubscription of oldSubscriptions.data) {
+    await stripeClient.subscriptions.del(oldSubscription.id);
   }
 
-  await stripeClient.customers.update(subscription.customer as string, {
-    email
-  });
-
-  const priceId = subscription.items.data[0].price.id;
-  const quantity = subscription.items.data[0].quantity;
+  if (existingStripeCustomer && existingStripeCustomer?.email !== billingEmail) {
+    await stripeClient.customers.update(existingStripeCustomer.id as string, {
+      email: billingEmail
+    });
+  }
 
   let promoCodeData;
   if (coupon) {
     promoCodeData = await getCouponDetails(coupon);
   }
+  // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
+  const productPrice = await getCommunityPrice(productId, period);
 
   const newSubscription = await stripeClient.subscriptions.create({
     metadata: {
-      ...(subscription.metadata || {})
+      productId,
+      period,
+      tier: 'pro',
+      spaceId
     },
-    customer: subscription.customer as string,
+    customer: customer.id,
     items: [
       {
-        price: priceId,
-        quantity
+        price: productPrice.id,
+        quantity: blockQuota
       }
     ],
     ...(promoCodeData && {
@@ -68,7 +111,7 @@ export async function createCryptoSubscription({
   });
 
   const loopItems = await getLoopProducts();
-  const loopItem = loopItems.find((product) => product.externalId === priceId);
+  const loopItem = loopItems.find((product) => product.externalId === productPrice.id);
 
   if (!loopItem) {
     throw new NotFoundError('Loop item not found');

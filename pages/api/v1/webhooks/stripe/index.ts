@@ -101,16 +101,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         };
 
         await prisma.$transaction([
-          prisma.stripeSubscription.upsert({
-            where: {
-              subscriptionId: stripeSubscription.id,
-              spaceId
-            },
-            create: {
+          prisma.stripeSubscription.create({
+            data: {
               ...newData,
               spaceId
-            },
-            update: {}
+            }
           }),
           prisma.space.update({
             where: {
@@ -337,7 +332,9 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            subscriptionId: subscription.id
+            subscriptionId: subscription.id,
+            spaceId,
+            deletedAt: null
           },
           select: {
             id: true,
@@ -347,7 +344,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         if (!spaceSubscription) {
           log.warn(
-            `Can't update the user subscription. Space subscription not found for subscription ${subscription.id}`
+            `Can't delete the space subscription. Space subscription not found for subscription ${subscription.id}`
           );
           break;
         }
@@ -355,7 +352,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const afterUpdate = await prisma.stripeSubscription.update({
           where: {
             spaceId,
-            subscriptionId: subscription.id
+            subscriptionId: subscription.id,
+            deletedAt: null
           },
           data: {
             deletedAt: new Date()
@@ -376,6 +374,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: spaceId
             },
             data: {
+              updatedAt: new Date(),
               paidTier: 'cancelled'
             }
           });
@@ -386,18 +385,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             spaceId,
             userId: afterUpdate.space.createdBy
           });
-        }
 
-        relay.broadcast(
-          {
-            type: 'space_subscription',
-            payload: {
-              type: 'cancelled',
-              paidTier: 'cancelled'
-            }
-          },
-          spaceId
-        );
+          relay.broadcast(
+            {
+              type: 'space_subscription',
+              payload: {
+                type: 'cancelled',
+                paidTier: 'cancelled'
+              }
+            },
+            spaceId
+          );
+        }
 
         break;
       }
