@@ -23,7 +23,7 @@ export function useSpaceSubscription({ returnUrl }: Props = {}) {
     isLoading,
     mutate: refetchSpaceSubscription
   } = useSWR(
-    currentSpace ? `${currentSpace.id}-subscription` : null,
+    currentSpace ? `/spaces/${currentSpace.id}/subscription?returnUrl=${returnUrl}` : null,
     () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id, returnUrl }),
     {
       shouldRetryOnError: false,
