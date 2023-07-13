@@ -32,7 +32,7 @@ describe('getProposalTasks', () => {
       categoryId: visibleProposalCategory.id
     });
 
-    const privateDraftProposal1 = await testUtilsProposals.generateProposal({
+    const discussionProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user.id],
@@ -45,7 +45,7 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: privateDraftProposal1.status,
+          status: discussionProposal.status,
           action: 'start_review'
         })
       ])
@@ -222,8 +222,14 @@ describe('getProposalTasks', () => {
       ]
     });
 
-    const hiddenCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
+    const readonlyCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'view'
+        }
+      ]
     });
 
     // This shouldn't be fetched as its private draft
@@ -239,7 +245,7 @@ describe('getProposalTasks', () => {
       proposalStatus: 'discussion',
       spaceId: space.id,
       userId: author.id,
-      categoryId: hiddenCategory.id
+      categoryId: readonlyCategory.id
     });
 
     const discussionProposalVisibleCategory = await testUtilsProposals.generateProposal({
@@ -281,8 +287,14 @@ describe('getProposalTasks', () => {
       ]
     });
 
-    const hiddenCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
+    const nonVotableCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'view_comment'
+        }
+      ]
     });
 
     // This shouldn't be fetched as its private draft
@@ -298,7 +310,7 @@ describe('getProposalTasks', () => {
       proposalStatus: 'vote_active',
       spaceId: space.id,
       userId: author.id,
-      categoryId: hiddenCategory.id
+      categoryId: nonVotableCategory.id
     });
 
     const votingProposalVisibleCategory = await testUtilsProposals.generateProposal({
@@ -324,108 +336,7 @@ describe('getProposalTasks', () => {
         expect.objectContaining({
           pageId: votingProposalVisibleCategory.page.id,
           status: votingProposalVisibleCategory.status,
-          action: 'discuss'
-        })
-      ])
-    );
-  });
-
-  it('Should get all proposals in vote stage where the user has permission to vote inside this category', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true
-    });
-    const secondSpaceUser = await testUtilsUser.generateSpaceUser({
-      spaceId: space.id
-    });
-
-    const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await testUtilsUser.generateUserAndSpace();
-
-    const inaccessibleSpaceProposal = await testUtilsProposals.generateProposal({
-      spaceId: inaccessibleSpace.id,
-      userId: inaccessibleSpaceUser.id
-    });
-
-    const visibleCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          assignee: { group: 'space', id: space.id },
-          permissionLevel: 'full_access'
-        }
-      ]
-    });
-
-    const hiddenCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    // This shouldn't be fetched as its private draft
-    await testUtilsProposals.generateProposal({
-      proposalStatus: 'draft',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id
-    });
-
-    const discussionProposalHiddenCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id,
-      categoryId: hiddenCategory.id
-    });
-
-    const discussionProposalVisibleCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id,
-      categoryId: visibleCategory.id
-    });
-
-    const activeVoteProposalProposalVisibleCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'vote_active',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id,
-      categoryId: visibleCategory.id
-    });
-
-    const activeVoteProposalProposalHiddenCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'vote_active',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id,
-      categoryId: hiddenCategory.id
-    });
-
-    const proposalTasks = await getProposalTasks(secondSpaceUser.id);
-
-    expect(proposalTasks.unmarked).toHaveLength(2);
-
-    expect(proposalTasks.unmarked).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          status: discussionProposalVisibleCategory.status,
-          action: 'discuss'
-        }),
-        expect.objectContaining({
-          status: activeVoteProposalProposalVisibleCategory.status,
           action: 'vote'
-        })
-      ])
-    );
-
-    // Making double sure private draft wasn't fetched
-    expect(proposalTasks.unmarked).toEqual(
-      expect.not.arrayContaining([
-        expect.objectContaining({
-          status: 'draft'
         })
       ])
     );

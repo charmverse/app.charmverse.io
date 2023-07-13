@@ -155,11 +155,41 @@ export async function getProposalTasks(userId: string): Promise<{
           not: true
         },
         status: {
-          not: 'draft'
+          in: ['discussion', 'review', 'reviewed', 'vote_active']
         },
-        categoryId: {
-          in: visibleCategories.map((c) => c.id)
-        }
+        OR: [
+          {
+            categoryId: {
+              in: visibleCategories.map((c) => c.id)
+            }
+          },
+          {
+            createdBy: userId
+          },
+          {
+            authors: {
+              some: {
+                userId
+              }
+            }
+          },
+          {
+            reviewers: {
+              some: {
+                userId
+              }
+            }
+          },
+          {
+            reviewers: {
+              some: {
+                roleId: {
+                  in: roleIds
+                }
+              }
+            }
+          }
+        ]
       }
     },
     include: {
