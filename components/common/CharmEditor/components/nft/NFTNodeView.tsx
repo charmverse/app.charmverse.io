@@ -19,9 +19,9 @@ import type { NodeAttrs } from './nft.specs';
 import { extractAttrsFromUrl } from './utils';
 
 const StyledCard = styled(Card)`
-  img {
-    width: 100%;
-    height: auto;
+  a {
+    // override text decoration from charm editor
+    text-decoration: none !important;
   }
 `;
 
