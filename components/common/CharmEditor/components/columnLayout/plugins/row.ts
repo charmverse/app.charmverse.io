@@ -80,12 +80,6 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
             },
             // we need to ignore mutations caused by column-resizer (the style attribute is changed by column-resizer)
             ignoreMutation(mutation) {
-              // @ts-ignore donot ignore a selection type mutation
-              // if (mutation.type === 'selection') {
-              //   log.info('selection mutation');
-              //   return false;
-              // }
-
               // ref bangle.dev: https://discuss.prosemirror.net/t/nodeviews-with-contentdom-stops-the-cursor-movement-for-a-node-with-text-content/3208/6
               // if a child of this.dom (the one handled by PM)
               // has any mutation, do not ignore it

@@ -20,16 +20,7 @@ export function ColumnNodeView({ name }: { name: string }) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                   return true;
                 }
-                return false;
               }
-
-              // if the this.dom itself was the target
-              // do not ignore it. This is important for schema where
-              // content: 'inline*' and you end up deleting all the content with backspace
-              // PM needs to step in and create an empty node for us.
-              // if (mutation.target === this.contentDOM) {
-              //   return false;
-              // }
 
               return false;
             },
