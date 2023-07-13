@@ -31,7 +31,7 @@ export function ColumnNodeView({ name }: { name: string }) {
               //   return false;
               // }
 
-              return true;
+              return false;
             },
             // tell prosemirror the node is updated when the attributes change, otherwise it will re-render the node
             update(newNode) {

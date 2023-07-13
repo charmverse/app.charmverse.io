@@ -200,7 +200,8 @@ export function charmEditorPlugins({
     }),
     orderedList.plugins(),
     columnLayout.plugins({
-      key: columnsPluginKey
+      key: columnsPluginKey,
+      readOnly
     }),
     paragraph.plugins(),
     strike.plugins(),

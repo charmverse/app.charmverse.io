@@ -10,7 +10,7 @@ import { ColumnNodeView } from './plugins/column';
 import { ResizeBarDecoration } from './plugins/resizeBar';
 import { RowNodeView } from './plugins/row';
 
-export function plugins({ key }: { key: PluginKey }): RawPlugins {
+export function plugins({ key, readOnly }: { key: PluginKey; readOnly: boolean }): RawPlugins {
   return ({ schema }) => {
     const isColumnBlock = parentHasDirectParentOfType(schema.nodes.columnBlock, schema.nodes.columnLayout);
 
@@ -35,7 +35,8 @@ export function plugins({ key }: { key: PluginKey }): RawPlugins {
       ResizeBarDecoration(),
       RowNodeView({
         key,
-        name: 'columnLayout'
+        name: 'columnLayout',
+        readOnly
       }),
       ColumnNodeView({
         name: 'columnBlock'

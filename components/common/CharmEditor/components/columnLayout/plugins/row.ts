@@ -1,26 +1,21 @@
 import { createElement } from '@bangle.dev/core';
 import { log } from '@charmverse/core/log';
+import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { NodeView } from 'prosemirror-view';
 
-export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
+export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: string; readOnly: boolean }) {
   return new Plugin({
     key,
     props: {
       nodeViews: {
         [name]: function nodeViewFactory(node, view, getPos) {
-          const element = createElement(['div', { class: 'charm-column-row' }]);
+          const element = createElement(['div', { class: `charm-column-row ${readOnly ? 'read-only' : ''}` }]);
 
-          // load lib externally so it's not loaded on Server-side
-          const columnResizerPromise = import('@column-resizer/core').then(({ ColumnResizer }) => {
-            return new ColumnResizer({ vertical: false });
-          });
+          const columnResizer = new ColumnResizer({ vertical: false });
 
-          async function resizeCallback(event: any) {
-            event.preventDefault();
-            event.stopPropagation();
-            const columnResizer = await columnResizerPromise;
+          function resizeCallback() {
             const sizes = columnResizer
               .getResizer()
               .getResult()
@@ -46,7 +41,7 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
             });
             // console.log('save column sizes', getPos(), columnUpdates);
             const tr = view.state.tr;
-            log.info('dispatch updates to prosemirror', element);
+            log.info('dispatch updates to prosemirror', startPos, element);
             columnUpdates.forEach((update) => {
               if (update.pos > -1) {
                 tr.setNodeMarkup(update.pos, undefined, { size: update.size });
@@ -56,11 +51,13 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
           }
 
           // trigger this after child nodes are rendered
-          setTimeout(async () => {
-            log.info('init resizer on load', element);
-            const columnResizer = await columnResizerPromise;
+          setTimeout(() => {
+            log.info('init resizer on load', getPos(), element);
             columnResizer.init(element);
             element.addEventListener('column:after-resizing' as any, resizeCallback);
+            element.addEventListener('column:activate' as any, function (e) {
+              log.debug('Activate event', 'column:activate', e.detail, element);
+            });
           }, 0);
 
           const nodeView: NodeView = {
@@ -74,9 +71,8 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
 
               // if the node has been updated, we need to re-init the column resizer as Prosemirror has re-rendered the decorations
               // An alternative would be to create a unique key for each column resizer, but this is easier
-              setTimeout(async () => {
+              setTimeout(() => {
                 log.info('init resizer on view update', element);
-                const columnResizer = await columnResizerPromise;
                 columnResizer.init(element);
               });
               // always return true, or else prosemirror will re-create the entire node view
@@ -100,11 +96,10 @@ export function RowNodeView({ key, name }: { key: PluginKey; name: string }) {
                 return false;
               }
 
-              return true;
+              return false;
             },
-            async destroy() {
+            destroy() {
               element.removeEventListener('column:after-resizing' as any, resizeCallback);
-              const columnResizer = await columnResizerPromise;
               columnResizer.dispose();
             }
           };
