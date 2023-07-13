@@ -16,6 +16,7 @@ const StyledBlockAligner = styled.div`
   position: relative;
   max-width: 100%;
   text-align: center;
+  padding: ${({ theme }) => theme.spacing(0.5, 0)}; // add some vertical spacing around block elements
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
     &:hover .controls {
