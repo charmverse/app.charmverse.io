@@ -13,7 +13,6 @@ import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
   padding: ${({ theme }) => theme.spacing(1)};
-  margin-top: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
