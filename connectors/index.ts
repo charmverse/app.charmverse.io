@@ -271,7 +271,7 @@ const RPC = {
     chainId: 5001,
     chainName: 'Mantle - Testnet',
     nativeCurrency: {
-      name: 'Testnet Mantle',
+      name: 'Mantle',
       symbol: 'MNT',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
