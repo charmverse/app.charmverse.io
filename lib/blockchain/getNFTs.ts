@@ -62,13 +62,15 @@ function mapNftFromAlchemy(
   } else if (chainId === 137) {
     link = `https://opensea.io/assets/matic/${nft.contract.address}/${tokenId}`;
   }
+  // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
+  const image = nft.media[0].gateway?.startsWith('https://') ? nft.media[0].gateway : nft.media[0].raw;
   return {
     id: `${nft.contract.address}:${nft.id.tokenId}`,
     tokenId: nft.id.tokenId,
     tokenIdInt: parseInt(nft.id.tokenId, 16) || null,
     contract: nft.contract.address,
     imageRaw: nft.media[0].raw,
-    image: nft.media[0].raw?.startsWith('https://') ? nft.media[0].raw : nft.media[0].gateway,
+    image,
     imageThumb: nft.media[0].thumbnail,
     title: nft.title,
     description: nft.description,

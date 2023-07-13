@@ -81,7 +81,13 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
         <CardActionArea href={nftData.link} target='_blank'>
           <CardMedia component='img' image={nftData.image} />
           <CardContent>
-            <Box display='flex' justifyContent='space-between'>
+            <Box
+              display='flex'
+              gap={2}
+              flexDirection={{ xs: 'column', md: 'row' }}
+              alignItems={{ xs: 'center', md: 'flex-start' }}
+              justifyContent='space-between'
+            >
               <Typography component='span' variant='body2' color='text.secondary' align='left'>
                 {nftData.title}
               </Typography>
