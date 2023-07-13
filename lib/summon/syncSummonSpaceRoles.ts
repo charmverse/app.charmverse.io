@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import * as api from './api';
+import { getSummonProfile } from 'lib/profile/getSummonProfile';
+
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 
-export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
+export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: string; spaceId: string }) {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -24,9 +25,14 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId,
-      user: {
-        isBot: false
-      }
+      user: userId
+        ? {
+            isBot: false,
+            id: userId
+          }
+        : {
+            isBot: false
+          }
     },
     select: {
       id: true,
@@ -93,28 +99,21 @@ export async function syncSummonSpaceRoles({ spaceId }: { spaceId: string }) {
   });
 
   for (const spaceRole of spaceRoles) {
-    const userXpsEngineId =
-      spaceRole.user.xpsEngineId ??
-      (await api.findUserXpsEngineId({
-        discordUserAccount: (spaceRole.user.discordUser?.account as { username: string }) ?? null,
-        userEmail: spaceRole.user.email,
-        walletAddresses: spaceRole.user.wallets.map((wallet) => wallet.address)
-      }));
+    const summonProfile = await getSummonProfile({ userId: spaceRole.user.id });
 
-    if (userXpsEngineId) {
+    if (summonProfile) {
       if (!spaceRole.user.xpsEngineId) {
         await prisma.user.update({
           where: {
             id: spaceRole.user.id
           },
           data: {
-            xpsEngineId: userXpsEngineId
+            xpsEngineId: summonProfile.id
           }
         });
       }
-      const userInventory = await api.getUserInventory(userXpsEngineId);
-      if (userInventory && userInventory.tenant === space.xpsEngineId) {
-        const userRank = userInventory?.meta.rank ?? 0;
+      if (summonProfile.tenantId === space.xpsEngineId) {
+        const userRank = Math.floor(summonProfile.meta.rank ?? 0);
         if (!rolesRecord[getSummonRoleLabel({ level: userRank })]) {
           const role = await prisma.role.create({
             data: {

@@ -1,14 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import * as summonProfile from 'lib/profile/getSummonProfile';
+import { createUserFromWallet } from 'lib/users/createUser';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { addUserToSpace } from 'testing/utils/spaces';
 
-import * as summonApi from '../api';
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 
-jest.mock('../api', () => ({
-  findUserXpsEngineId: jest.fn().mockResolvedValue(null),
-  getUserInventory: jest.fn().mockResolvedValue(null)
+jest.mock('lib/profile/getSummonProfile', () => ({
+  getSummonProfile: jest.fn().mockResolvedValue(null)
 }));
 
 describe('syncSummonSpaceRoles', () => {
@@ -22,11 +23,111 @@ describe('syncSummonSpaceRoles', () => {
   it(`Should create new role if it doesn't exist and assign it to the user`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const userXpsEngineId = v4();
+    const user2XpsEngineId = v4();
+    const spaceXpsEngineId = v4();
+    const user2 = await createUserFromWallet();
+
+    await addUserToSpace({
+      isAdmin: false,
+      spaceId: space.id,
+      userId: user2.id
+    });
+
+    (summonProfile.getSummonProfile as jest.Mock<any, any>)
+      .mockResolvedValueOnce({
+        tenantId: spaceXpsEngineId,
+        user: userXpsEngineId,
+        meta: {
+          rank: 1.1
+        }
+      })
+      .mockResolvedValueOnce({
+        tenantId: spaceXpsEngineId,
+        user: user2XpsEngineId,
+        meta: {
+          rank: 3
+        }
+      });
+
+    await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        xpsEngineId: spaceXpsEngineId
+      }
+    });
+
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
+    const level1Role = await prisma.role.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        name: `Level 1`,
+        source: 'summon'
+      }
+    });
+
+    const level3Role = await prisma.role.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        name: `Level 3`,
+        source: 'summon'
+      }
+    });
+
+    const user1SpaceRole = await prisma.spaceRole.findFirstOrThrow({
+      where: {
+        userId: user.id,
+        spaceId: space.id
+      }
+    });
+
+    const user2SpaceRole = await prisma.spaceRole.findFirstOrThrow({
+      where: {
+        userId: user2.id,
+        spaceId: space.id
+      }
+    });
+
+    const user1SpaceRoleToRole = await prisma.spaceRoleToRole.findFirstOrThrow({
+      where: {
+        roleId: level1Role.id,
+        spaceRoleId: user1SpaceRole.id
+      }
+    });
+
+    const user2SpaceRoleToRole = await prisma.spaceRoleToRole.findFirstOrThrow({
+      where: {
+        roleId: level3Role.id,
+        spaceRoleId: user2SpaceRole.id
+      }
+    });
+
+    expect(level1Role).toBeTruthy();
+    expect(level3Role).toBeTruthy();
+    expect(user1SpaceRoleToRole).toBeTruthy();
+    expect(user2SpaceRoleToRole).toBeTruthy();
+    expect(totalSpaceRolesAdded).toBe(2);
+    expect(totalSpaceRolesUpdated).toBe(0);
+    jest.resetAllMocks();
+  });
+
+  it(`Should create new role for a single user if userId is also passed`, async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const user2 = await createUserFromWallet();
+
+    await addUserToSpace({
+      isAdmin: false,
+      spaceId: space.id,
+      userId: user2.id
+    });
+
+    const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
-    (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
-      tenant: spaceXpsEngineId,
+    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+      tenantId: spaceXpsEngineId,
+      user: userXpsEngineId,
       meta: {
         rank: 1
       }
@@ -41,7 +142,11 @@ describe('syncSummonSpaceRoles', () => {
       }
     });
 
-    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
+    const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({
+      spaceId: space.id,
+      userId: user.id
+    });
+
     const newRole = await prisma.role.findFirstOrThrow({
       where: {
         spaceId: space.id,
@@ -50,21 +155,37 @@ describe('syncSummonSpaceRoles', () => {
       }
     });
 
-    const spaceRole = await prisma.spaceRole.findFirstOrThrow({
+    const user1SpaceRole = await prisma.spaceRole.findFirstOrThrow({
       where: {
-        userId: user.id
+        userId: user.id,
+        spaceId: space.id
       }
     });
 
-    const spaceRoleToRole = await prisma.spaceRoleToRole.findFirstOrThrow({
+    const user2SpaceRole = await prisma.spaceRole.findFirstOrThrow({
+      where: {
+        userId: user2.id,
+        spaceId: space.id
+      }
+    });
+
+    const user1SpaceRoleToRole = await prisma.spaceRoleToRole.findFirstOrThrow({
       where: {
         roleId: newRole.id,
-        spaceRoleId: spaceRole.id
+        spaceRoleId: user1SpaceRole.id
+      }
+    });
+
+    const user2SpaceRoleToRole = await prisma.spaceRoleToRole.findFirst({
+      where: {
+        roleId: newRole.id,
+        spaceRoleId: user2SpaceRole.id
       }
     });
 
     expect(newRole).toBeTruthy();
-    expect(spaceRoleToRole).toBeTruthy();
+    expect(user1SpaceRoleToRole).toBeTruthy();
+    expect(user2SpaceRoleToRole).toBeFalsy();
     expect(totalSpaceRolesAdded).toBe(1);
     expect(totalSpaceRolesUpdated).toBe(0);
     jest.resetAllMocks();
@@ -75,9 +196,9 @@ describe('syncSummonSpaceRoles', () => {
     const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
-    (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
-      tenant: spaceXpsEngineId,
+    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+      tenantId: spaceXpsEngineId,
+      user: userXpsEngineId,
       meta: {
         rank: 1
       }
@@ -126,9 +247,9 @@ describe('syncSummonSpaceRoles', () => {
     const userXpsEngineId = v4();
     const spaceXpsEngineId = v4();
 
-    (summonApi.findUserXpsEngineId as jest.Mock<any, any>).mockResolvedValue(userXpsEngineId);
-    (summonApi.getUserInventory as jest.Mock<any, any>).mockResolvedValue({
-      tenant: spaceXpsEngineId,
+    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+      tenantId: spaceXpsEngineId,
+      user: userXpsEngineId,
       meta: {
         rank: 2
       }

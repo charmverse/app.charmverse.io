@@ -15,7 +15,7 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
           address: true
         }
       },
-      email: true,
+      googleAccounts: true,
       discordUser: {
         select: {
           account: true
@@ -29,7 +29,7 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
   }
 
   const discordUserAccount = user.discordUser?.account as { username: string } | null;
-  const userEmail = user.email;
+  const userEmail = user.googleAccounts[0]?.email;
   const walletAddresses = user.wallets.map((wallet) => wallet.address);
 
   const xpsEngineId =
