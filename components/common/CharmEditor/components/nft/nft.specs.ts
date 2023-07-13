@@ -47,7 +47,7 @@ export function spec(): RawSpecs {
       isolating: true, // dont allow backspace to delete
       parseDOM: [
         {
-          tag: 'nft-embed',
+          tag: 'div.nft-embed',
           getAttrs: (dom: any) => {
             return {
               chain: parseInt(dom.getAttribute('data-chain'), 10),
@@ -59,8 +59,13 @@ export function spec(): RawSpecs {
       ],
       toDOM: (node: Node) => {
         return [
-          'nft-embed',
-          { 'data-chain': node.attrs.chain, 'data-token': node.attrs.token, 'data-contract': node.attrs.contract }
+          'div',
+          {
+            class: 'nft-embed',
+            'data-chain': node.attrs.chain,
+            'data-token': node.attrs.token,
+            'data-contract': node.attrs.contract
+          }
         ];
       }
     }
