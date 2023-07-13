@@ -107,4 +107,29 @@ describe('getAccessiblePages - public space search', () => {
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(pageToFind.id);
   });
+
+  it('should handle special tsquery characters', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+
+    const tsQuerySpecialCharsList = [' ', '&', '|', '!', '<->', '<N>', '(', ')', ':', '*', "'"];
+
+    const pageToFind = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: `Special ${tsQuerySpecialCharsList.join('')} page`
+    });
+
+    const pageWithoutMatch = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      title: 'No match'
+    });
+
+    for (const char of tsQuerySpecialCharsList) {
+      // eslint-disable-next-line prettier/prettier, no-useless-escape
+    const pages = await getAccessiblePages({ userId: user.id, spaceId: space.id, search: `special ${ char } page` });
+      expect(pages).toHaveLength(1);
+      expect(pages[0].id).toBe(pageToFind.id);
+    }
+  });
 });
