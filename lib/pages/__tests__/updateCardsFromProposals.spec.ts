@@ -1,6 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -30,7 +31,7 @@ describe('updateCardsFromProposals()', () => {
   });
 
   it('should update cards from proposals', async () => {
-    const pageProposal = await generateProposal({
+    const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
       reviewers: [
@@ -76,11 +77,11 @@ describe('updateCardsFromProposals()', () => {
     expect(updatedCard?.title).toBe(updatedProposal.title);
     expect(updatedCard?.contentText).toBe(updatedProposal.contentText);
     expect(updatedCard?.hasContent).toBe(updatedProposal.hasContent);
-    expect(pageProposal.updatedAt.getTime()).toBeLessThan(updatedCard?.updatedAt.getTime() || 0);
+    expect(pageProposal.page.updatedAt.getTime()).toBeLessThan(updatedCard?.updatedAt.getTime() || 0);
   });
 
   it('should create cards from proposals if there are new proposals added', async () => {
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
       reviewers: [
@@ -95,7 +96,7 @@ describe('updateCardsFromProposals()', () => {
 
     await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
-    const pageProposal2 = await generateProposal({
+    const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
       reviewers: [
@@ -128,7 +129,7 @@ describe('updateCardsFromProposals()', () => {
     // populate board view
     await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
-    const pageProposal2 = await generateProposal({
+    const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
       proposalStatus: 'draft',
       reviewers: [],
@@ -151,9 +152,36 @@ describe('updateCardsFromProposals()', () => {
 
     expect(newCreatedCard).toBeNull();
   });
+  it('should not create cards from archived proposals', async () => {
+    // populate board view
+    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
+    const pageProposal2 = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id,
+      archived: true
+    });
+
+    await updateCardsFromProposals({
+      boardId: board.id,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const newCreatedCard = await prisma.page.findFirst({
+      where: {
+        type: 'card',
+        syncWithPageId: pageProposal2.id
+      }
+    });
+
+    expect(newCreatedCard).toBeNull();
+  });
   it('should delete cards from proposals', async () => {
-    const pageProposal = await generateProposal({
+    const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
       reviewers: [
@@ -195,7 +223,7 @@ describe('updateCardsFromProposals()', () => {
   });
 
   it('should permanently delete cards from proposals', async () => {
-    const pageProposal = await generateProposal({
+    const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
       reviewers: [
@@ -218,7 +246,7 @@ describe('updateCardsFromProposals()', () => {
       }),
       prisma.proposal.delete({
         where: {
-          id: pageProposal.proposalId || ''
+          id: pageProposal.id || ''
         }
       })
     ]);

@@ -1,3 +1,5 @@
+import { randomIntFromInterval } from 'lib/utilities/random';
+
 class Constants {
   static readonly menuColors: { [key: string]: string } = {
     propColorDefault: 'Default',
@@ -114,4 +116,10 @@ class Constants {
   ];
 }
 
-export { Constants };
+function randomBoardColor() {
+  const boardColors = Object.keys(Constants.menuColors);
+  const randomIndex = randomIntFromInterval(0, boardColors.length - 1);
+  return boardColors[randomIndex];
+}
+
+export { Constants, randomBoardColor };

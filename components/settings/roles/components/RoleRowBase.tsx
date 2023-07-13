@@ -11,8 +11,10 @@ import {
   Divider,
   Grid,
   Paper,
+  SvgIcon,
   Tab,
   Tabs,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -40,6 +42,7 @@ type RoleRowProps = {
   roleActions?: ReactNode;
   memberRoleId?: string;
   upgradeProps?: UpgradeProps;
+  descriptionIcon?: ReactNode;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -58,7 +61,8 @@ export function RoleRowBase({
   permissions,
   onAddMembers,
   members,
-  upgradeProps
+  upgradeProps,
+  descriptionIcon
 }: RoleRowProps) {
   const [openTab, setOpenTab] = useState(0);
 
@@ -75,6 +79,11 @@ export function RoleRowBase({
               <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {title}
                 <Chip size='small' label={members.length} />
+                {descriptionIcon && (
+                  <Tooltip title={description}>
+                    <SvgIcon sx={{ height: 20 }}>{descriptionIcon}</SvgIcon>
+                  </Tooltip>
+                )}
                 {upgradeProps?.upgradeContext && (
                   <UpgradeChip upgradeContext={upgradeProps.upgradeContext} onClick={upgradeProps.onClick} />
                 )}
