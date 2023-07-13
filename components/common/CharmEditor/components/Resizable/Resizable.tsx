@@ -1,6 +1,4 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import type { EditorView } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { ReactNode } from 'react';
 import { useCallback, useState, memo, useEffect, useRef } from 'react';
 

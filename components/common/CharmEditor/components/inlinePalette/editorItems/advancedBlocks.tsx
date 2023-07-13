@@ -1,10 +1,9 @@
 import type { EditorView, Node } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
-import { rafCommandExec } from '@bangle.dev/utils';
+import { rafCommandExec, findParentNodeOfType } from '@bangle.dev/utils';
 import { FormatListBulleted } from '@mui/icons-material';
 import CodeIcon from '@mui/icons-material/Code';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import type { EditorState } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
@@ -56,13 +55,17 @@ function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
   };
 }
 type AdvancedItemsProps = {
+  view: EditorView;
   enableVoting?: boolean;
 };
 
-export function items({ enableVoting }: AdvancedItemsProps = {}): PaletteItemTypeNoGroup[] {
+export function items({ view: currentView, enableVoting }: AdvancedItemsProps): PaletteItemTypeNoGroup[] {
+  const hasColumnParent = findParentNodeOfType(currentView.state.schema.nodes.columnLayout)(
+    currentView.state.selection
+  );
+
   const editorItems: PaletteItemTypeNoGroup[] = [
-    createColumnPaletteItem(2),
-    createColumnPaletteItem(3),
+    ...(hasColumnParent ? [] : [createColumnPaletteItem(2), createColumnPaletteItem(3)]),
     {
       uid: 'code',
       title: 'Code',

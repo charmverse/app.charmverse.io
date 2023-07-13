@@ -1,3 +1,4 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
@@ -34,6 +35,7 @@ export function useEditorItems({
   const { user } = useUser();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+  const view = useEditorViewContext();
 
   const pageType = pageId ? pages[pageId]?.type : undefined;
 
@@ -48,7 +50,7 @@ export function useEditorItems({
       ],
       ['media', mediaItems()],
       ['embed', embedItems()],
-      ['advanced blocks', advancedBlocks({ enableVoting })]
+      ['advanced blocks', advancedBlocks({ view, enableVoting })]
     ];
 
     const itemList = itemGroups
@@ -63,7 +65,8 @@ export function useEditorItems({
       .flat();
 
     return itemList;
-  }, [addNestedPage, pageId, user, space]);
+    // include selection since we use cursor position as context, but we should find a way to only generate this when the popup appears
+  }, [addNestedPage, pageId, user, space, view.state.selection]);
 
   return paletteItems;
 }
