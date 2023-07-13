@@ -555,7 +555,7 @@ ol li {
 
 .charm-column {
   border-radius: 4px;
-  padding: 8px 4px;
+  padding: 8px 0;
   position: relative;
   overflow: hidden; // this is also set by the column-resizer library
 
@@ -566,8 +566,8 @@ ol li {
     border-radius: 2px;
     position:absolute;
     top: 8px;
-    left: 4px;
-    right: 4px;
+    left: 0;
+    right: 0;
     bottom: 8px;
     z-index: -1; // make the background appear behind children
   }
@@ -579,11 +579,6 @@ ol li {
     overflow-wrap: anywhere;
   }
 
-  margin: 0 -4px;
-
-  > div {
-    padding: 0 4px;
-  }
 }
 
 .charm-column-resizer {
