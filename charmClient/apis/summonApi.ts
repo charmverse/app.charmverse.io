@@ -11,7 +11,7 @@ export class SummonApi {
     return http.GET<VerificationResponse>('/api/summon/verify-membership', input);
   }
 
-  async syncRoles(input: { spaceId: string }) {
-    return http.GET('/api/summon/sync-roles', input);
+  async syncSpaceRoles(input: { spaceId: string }) {
+    return http.GET<{ totalSpaceRolesAdded: number; totalSpaceRolesUpdated: number }>('/api/summon/sync-roles', input);
   }
 }

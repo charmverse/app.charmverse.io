@@ -35,7 +35,17 @@ describe('getSummonProfile', () => {
   it(`Should return null if user doesn't have any game7 account connected with wallet address, email or discord account`, async () => {
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const emailAddress = `test-${v4()}@gmail.com`;
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress, email: emailAddress });
+    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
+
+    await prisma.googleAccount.create({
+      data: {
+        avatarUrl: '',
+        email: emailAddress,
+        userId: user.id,
+        name: 'test'
+      }
+    });
+
     const discordUsername = 'test';
     await prisma.discordUser.create({
       data: {
@@ -132,10 +142,19 @@ describe('getSummonProfile', () => {
   it(`Should return game7 profile attached with user's email address`, async () => {
     const discordUsername = `test`;
     const discordDiscriminator = v4();
-
     const emailAddress = `test-${v4()}@gmail.com`;
     const walletAddress = Wallet.createRandom().address.toLowerCase();
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress, email: emailAddress });
+    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
+
+    await prisma.googleAccount.create({
+      data: {
+        avatarUrl: '',
+        email: emailAddress,
+        userId: user.id,
+        name: 'test'
+      }
+    });
+
     await prisma.discordUser.create({
       data: {
         account: {

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -25,12 +26,16 @@ async function syncSummonSpaceRolesController(req: NextApiRequest, res: NextApiR
     throw new InvalidInputError('You are not a member of this space');
   }
 
-  await syncSummonSpaceRoles({
-    spaceId,
-    userId
-  });
+  const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId });
+  if (totalSpaceRolesUpdated !== 0 || totalSpaceRolesAdded !== 0) {
+    log.debug(`Space roles sync result`, {
+      spaceId,
+      totalSpaceRolesAdded,
+      totalSpaceRolesUpdated
+    });
+  }
 
-  return res.status(200).end();
+  return res.status(200).send({ totalSpaceRolesAdded, totalSpaceRolesUpdated });
 }
 
 export default withSessionRoute(handler);
