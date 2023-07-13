@@ -25,6 +25,12 @@ describe('mapDateFromApiToSystem', () => {
     );
   });
 
+  it('should return correct object if value is an RFC 2822 DateTime timestamp', () => {
+    const value = 'Tue Jul 11 2023 16:10:37 GMT+0200 (Eastern European Standard Time)';
+    const valueAsMillis = DateTime.fromJSDate(new Date(value)).toMillis();
+    expect(mapDateFromApiToSystem({ value, schema })).toEqual(JSON.stringify({ from: valueAsMillis }));
+  });
+
   it('should return correct object if value is a stringified number timestamp', () => {
     const value = DateTime.now().toMillis().toString();
     expect(mapDateFromApiToSystem({ value, schema })).toEqual(JSON.stringify({ from: parseInt(value) }));

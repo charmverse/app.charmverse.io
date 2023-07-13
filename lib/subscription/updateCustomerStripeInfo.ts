@@ -51,8 +51,5 @@ export async function updateCustomerStripeInfo({ update, spaceId }: StripeCustom
   }
 
   const updatedCustomer = await stripeClient.customers.update(customer.id, sanitizedUpdateContent as any);
-
-  // await fs.writeFile(`${path.resolve(`jsonoutputs/${spaceId}-${Date.now()}`)}`, JSON.stringify(customer, null, 2));
-
   return updatedCustomer;
 }

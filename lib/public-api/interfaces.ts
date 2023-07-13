@@ -1,6 +1,6 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
@@ -52,13 +52,12 @@ export interface PagePropertyOption {
  *            type: object
  *            $ref: '#/components/schemas/PagePropertyOption'
  */
-export type PageProperty<T extends PropertyType = PropertyType> = {
-  id: string;
-  name: string;
-  type: T;
-  options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-} & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
+export type PageProperty<T extends PropertyType = PropertyType> = Pick<IPropertyTemplate, 'id' | 'name'> &
+  Partial<Pick<IPropertyTemplate, 'description'>> & {
+    type: T;
+    options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+  } & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**
  * @swagger

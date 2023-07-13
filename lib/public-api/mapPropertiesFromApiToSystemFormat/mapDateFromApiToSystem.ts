@@ -12,7 +12,13 @@ const parseDate = (date: string | number, fieldName: string): number => {
     }
 
     // Try parsing the string as an ISO date
-    const parsedDate = DateTime.fromISO(date);
+    let parsedDate = DateTime.fromISO(date);
+    if (parsedDate.isValid) {
+      return parsedDate.toMillis();
+    }
+
+    // Try parsing the string as an RFC2822
+    parsedDate = DateTime.fromJSDate(new Date(date));
     if (parsedDate.isValid) {
       return parsedDate.toMillis();
     }
