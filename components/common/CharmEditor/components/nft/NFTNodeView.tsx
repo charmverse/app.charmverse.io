@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
-import { Alert, Box, Card, CardMedia, CardContent, CardActionArea, Typography } from '@mui/material';
-import Script from 'next/script';
-import { useEffect, useRef, useState } from 'react';
+import { Box, Card, CardMedia, CardContent, CardActionArea, Typography } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
