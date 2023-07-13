@@ -80,7 +80,7 @@ describe('DELETE /api/spaces - Delete space', () => {
     expect(dbSpace).toBeNull();
   });
 
-  it('Should fail if user is not a part of the space and respond with 401', async () => {
+  it('Should fail if user is not an admin and respond with 401', async () => {
     const data = await generateUserAndSpace();
     const sessionCookie = await loginUser(data.user.id);
     await request(baseUrl).put(`/api/spaces/${data.space.id}`).set('Cookie', sessionCookie).expect(401);
