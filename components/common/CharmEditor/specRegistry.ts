@@ -25,7 +25,7 @@ import { spec as linkSpec } from './components/link/link.specs';
 import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
-import * as nft from './components/nft/nftSpec';
+import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as poll from './components/poll/pollSpec';

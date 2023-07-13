@@ -9,7 +9,7 @@ import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import { extractEmbedType, extractIframeProps } from '../iframe/utils';
-import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/nftUtils';
+import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/utils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
