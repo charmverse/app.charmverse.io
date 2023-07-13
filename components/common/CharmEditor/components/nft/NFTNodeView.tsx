@@ -83,7 +83,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
           <CardContent>
             <Box
               display='flex'
-              gap={2}
+              gap={1}
               flexDirection={{ xs: 'column', md: 'row' }}
               alignItems={{ xs: 'center', md: 'flex-start' }}
               justifyContent='space-between'
