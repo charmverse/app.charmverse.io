@@ -14,6 +14,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
 import Legend from 'components/settings/Legend';
+import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
@@ -147,39 +148,47 @@ export function SpaceSettings({ space }: { space: Space }) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <Avatar
-              name={watchName}
-              variant='rounded'
-              image={watchSpaceImage}
-              updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
-              editable={isAdmin}
-            />
-            <TextField {...register('spaceImage')} sx={{ visibility: 'hidden', width: '0px' }} />
+            <Stack direction={['column', 'row']} gap={3}>
+              <Stack pt={0.5}>
+                <Avatar
+                  name={watchName}
+                  variant='rounded'
+                  image={watchSpaceImage}
+                  updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
+                  editable={isAdmin}
+                />
+                <TextField {...register('spaceImage')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+              </Stack>
+
+              <Stack flex={1} gap={1.5}>
+                <Stack>
+                  <FieldLabel>Name</FieldLabel>
+                  <TextField
+                    {...register('name')}
+                    disabled={!isAdmin}
+                    fullWidth
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                    data-test='space-name-input'
+                  />
+                </Stack>
+                <Stack>
+                  <FieldLabel>Domain</FieldLabel>
+                  <TextField
+                    {...register('domain')}
+                    disabled={!isAdmin}
+                    fullWidth
+                    error={!!errors.domain}
+                    helperText={errors.domain?.message}
+                    sx={{ mb: 1 }}
+                    data-test='space-domain-input'
+                  />
+                  {error && <FormHelperText error>{error}</FormHelperText>}
+                </Stack>
+              </Stack>
+            </Stack>
           </Grid>
-          <Grid item>
-            <FieldLabel>Name</FieldLabel>
-            <TextField
-              {...register('name')}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              data-test='space-name-input'
-            />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Domain</FieldLabel>
-            <TextField
-              {...register('domain')}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.domain}
-              helperText={errors.domain?.message}
-              sx={{ mb: 1 }}
-              data-test='space-domain-input'
-            />
-            {error && <FormHelperText error>{error}</FormHelperText>}
-          </Grid>
+
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
             <Typography variant='caption'>Control space-wide notifications for your members.</Typography>
@@ -269,9 +278,10 @@ export function SpaceSettings({ space }: { space: Space }) {
           )}
         </Grid>
       </form>
-      <br />
-      <br />
-      <Legend mt={4}>Snapshot.org Integration</Legend>
+
+      <SetupCustomDomain space={space} />
+
+      <Legend mt={3}>Snapshot.org Integration</Legend>
       <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
       </Box>
