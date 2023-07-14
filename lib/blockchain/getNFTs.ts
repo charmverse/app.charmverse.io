@@ -1,5 +1,7 @@
 import type { UserWallet } from '@charmverse/core/prisma';
 
+import { isTruthy } from 'lib/utilities/types';
+
 import type { SupportedChainId } from './provider/alchemy';
 import * as alchemyApi from './provider/alchemy';
 
@@ -34,7 +36,7 @@ export async function getNFTs({
     const walletId = wallets.find((wallet) => wallet.address === nft.walletAddress)?.id ?? null;
     return mapNftFromAlchemy(nft, walletId, chainId);
   });
-  return mappedNfts;
+  return mappedNfts.filter(isTruthy);
 }
 
 export type NFTRequest = {
@@ -52,7 +54,11 @@ function mapNftFromAlchemy(
   nft: alchemyApi.AlchemyNft,
   walletId: string | null,
   chainId: alchemyApi.SupportedChainId
-): NFTData {
+): NFTData | null {
+  if (nft.error) {
+    // errors include "Contract does not have any code"
+    return null;
+  }
   let link = '';
   const tokenId = nft.id.tokenId.startsWith('0x') ? parseInt(nft.id.tokenId, 16) : nft.id.tokenId;
   if (chainId === 42161) {

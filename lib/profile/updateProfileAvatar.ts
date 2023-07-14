@@ -49,7 +49,7 @@ export async function updateProfileAvatar({
       chainId: avatarChain
     });
 
-    if (nft.image) {
+    if (nft?.image) {
       const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });
       try {
         const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });

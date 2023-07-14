@@ -10,6 +10,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
 import useSWRImmutable from 'swr/immutable';
@@ -20,7 +21,8 @@ import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockch
 import LoadingComponent from 'components/common/LoadingComponent';
 
 import BlockAligner from '../BlockAligner';
-import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { EmptyEmbed } from '../common/EmptyEmbed';
+import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
@@ -37,7 +39,8 @@ const blockchains = [1, 10, 137, 42161];
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
-
+  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
+  const [showEditPopup, setShowEditPopup] = useState(false);
   const { data: nftData, isLoading } = useSWRImmutable(`nft/${attrs.chain}/${attrs.contract}/${attrs.token}`, () => {
     if (!attrs.chain || !attrs.contract || !attrs.token) return null;
     return charmClient.blockchain.getNFT({
@@ -49,7 +52,39 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
 
   function submitForm(values: NodeAttrs) {
     updateAttrs(values);
+    setShowEditPopup(false);
   }
+
+  function openPopup() {
+    setShowEditPopup(true);
+  }
+
+  function closePopup() {
+    setShowEditPopup(false);
+  }
+
+  useEffect(() => {
+    if (autoOpen) {
+      openPopup();
+    }
+  }, [autoOpen]);
+
+  const popup = useMemo(
+    () => (
+      <MediaSelectionPopupNoButton
+        open={showEditPopup}
+        icon={<EmbedIcon icon={RiNftLine} size='large' />}
+        buttonText='Embed an NFT'
+        isSelected={selected}
+        onDelete={deleteNode}
+        onClose={closePopup}
+        width={{}}
+      >
+        <NFTForm defaultValues={node.attrs as NodeAttrs} onSubmit={submitForm} />
+      </MediaSelectionPopupNoButton>
+    ),
+    [node, showEditPopup, selected]
+  );
 
   // If there are no source for the node, return the image select component
   if (!attrs.contract) {
@@ -58,30 +93,36 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
       return <div />;
     } else {
       return (
-        <MediaSelectionPopup
-          node={node}
-          icon={<EmbedIcon icon={RiNftLine} size='large' />}
-          buttonText='Embed an NFT'
-          isSelected={selected}
-          onDelete={deleteNode}
-        >
-          <NFTForm onSubmit={submitForm} />
-        </MediaSelectionPopup>
+        <>
+          <div onClick={openPopup}>
+            <EmptyEmbed
+              isSelected={selected}
+              icon={<EmbedIcon icon={RiNftLine} size='large' />}
+              buttonText='Embed an NFT'
+              onDelete={deleteNode}
+            />
+          </div>
+          {popup}
+        </>
       );
     }
   }
 
   if (!nftData) {
     return (
-      <Card variant='outlined'>
-        <Box p={6}>{isLoading ? <LoadingComponent /> : <Typography color='secondary'>NFT not found</Typography>}</Box>
-      </Card>
+      <BlockAligner readOnly={readOnly} onEdit={openPopup} onDelete={deleteNode}>
+        <Card variant='outlined'>
+          <Box p={6}>{isLoading ? <LoadingComponent /> : <Typography color='secondary'>NFT not found</Typography>}</Box>
+        </Card>
+        {popup}
+      </BlockAligner>
     );
   }
 
   return (
-    <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
+    <BlockAligner readOnly={readOnly} onEdit={openPopup} onDelete={deleteNode}>
       <NFTView nft={nftData} />
+      {popup}
     </BlockAligner>
   );
 }
@@ -112,51 +153,86 @@ function NFTView({ nft }: { nft: { image: string; title: string; link: string } 
   );
 }
 
-function NFTForm({ onSubmit }: { onSubmit: (values: NodeAttrs) => void }) {
+function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSubmit: (values: NodeAttrs) => void }) {
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { isValid }
-  } = useForm<NodeAttrs>();
+  } = useForm<NodeAttrs>({
+    defaultValues
+  });
+
+  const input = watch();
+
+  const { data: nftData, isLoading } = useSWRImmutable(`nft/${input.chain}/${input.contract}/${input.token}`, () => {
+    if (!input.chain || !input.contract || !input.token) return null;
+    return charmClient.blockchain.getNFT({
+      chainId: input.chain as any,
+      address: input.contract,
+      tokenId: input.token
+    });
+  });
 
   function setChain(chain: number) {
     setValue('chain', chain as NodeAttrs['chain']);
   }
 
+  const defaultChain = defaultValues?.chain || 1;
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <Box py={2.5} mx='auto' maxWidth={400} display='flex' flexDirection='column' alignItems='center' gap={2}>
-          <Grid container spacing={2}>
-            <Grid item xs={9}>
-              <InputLabel>Contract address</InputLabel>
-              <TextField
-                fullWidth
-                {...register('contract', {
-                  required: true,
-                  validate: { matchPattern: (v) => /^0x[a-fA-F0-9]{40}$/gm.test(v) }
-                })}
-                placeholder='0x...'
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <InputLabel>Token id</InputLabel>
-              <TextField {...register('token', { required: true })} placeholder='1' />
-            </Grid>
-          </Grid>
-          <Box width='100%'>
-            <InputLabel>Blockchain</InputLabel>
-            <InputSearchBlockchain chains={blockchains} chainId={1} sx={{ width: '100%' }} onChange={setChain} />
+        <Box p={2.5} display='flex' flexDirection='column' alignItems='center' gap={2}>
+          <Box display='flex' gap={4} alignItems='center' flexDirection={{ xs: 'column', md: 'row' }}>
+            <Box maxWidth={400} flexDirection='column' alignItems='center' gap={2}>
+              <Grid container spacing={2}>
+                <Grid item xs={9}>
+                  <InputLabel>Contract address</InputLabel>
+                  <TextField
+                    fullWidth
+                    {...register('contract', {
+                      required: true,
+                      validate: { matchPattern: (v) => /^0x[a-fA-F0-9]{40}$/gm.test(v) }
+                    })}
+                    placeholder='0x...'
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <InputLabel>Token id</InputLabel>
+                  <TextField {...register('token', { required: true })} placeholder='1' />
+                </Grid>
+              </Grid>
+              <Box width='100%'>
+                <InputLabel>Blockchain</InputLabel>
+                <InputSearchBlockchain
+                  chains={blockchains}
+                  chainId={defaultChain}
+                  sx={{ width: '100%' }}
+                  onChange={setChain}
+                />
+              </Box>
+            </Box>
+            <Box
+              display='flex'
+              alignItems='center'
+              justifyContent='center'
+              height={124}
+              width={124}
+              bgcolor='sidebar.background'
+            >
+              {isLoading ? (
+                <LoadingComponent />
+              ) : !nftData ? (
+                <Typography color='secondary'>{isValid ? 'NFT not found' : 'Preview'}</Typography>
+              ) : (
+                <img src={nftData.image} width='100%' height='auto' />
+              )}
+            </Box>
           </Box>
-          <Button
-            disabled={!isValid}
-            sx={{
-              width: 250
-            }}
-            type='submit'
-          >
-            Submit
+          <Button disabled={!isValid || !nftData} fullWidth type='submit'>
+            Embed NFT
           </Button>
         </Box>
       </div>

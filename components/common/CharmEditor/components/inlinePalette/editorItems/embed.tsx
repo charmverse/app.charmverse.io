@@ -1,8 +1,7 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import TwitterIcon from '@mui/icons-material/Twitter';
-
-import OpenSeaIcon from 'public/images/opensea_logo.svg';
+import { RiNftLine } from 'react-icons/ri';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
@@ -91,10 +90,10 @@ export function items(): PaletteItemTypeNoGroup[] {
     },
     {
       uid: 'nft',
-      title: 'OpenSea NFT',
-      keywords: ['web3'],
-      icon: <EmbedIcon icon={OpenSeaIcon} size='large' />,
-      description: 'Embed an NFT on OpenSea',
+      title: 'Blockchain NFT',
+      keywords: ['web3', 'opensea'],
+      icon: <EmbedIcon icon={RiNftLine} size='large' />,
+      description: 'Embed an NFT',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
@@ -103,12 +102,11 @@ export function items(): PaletteItemTypeNoGroup[] {
               // let the node view know to show the tooltip by default
               const tooltipMark = _state.schema.mark('tooltip-marker');
               const node = _state.schema.nodes.nft.create(undefined, undefined, [tooltipMark]);
-
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
-              return insertNode(_state, _dispatch, node);
+              return insertNode(_state, _dispatch, node, false);
             });
           }
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
