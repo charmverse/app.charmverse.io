@@ -1,48 +1,39 @@
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { googleSignInScript, useGoogleLogin } from 'hooks/useGoogleLogin';
 import type { GooglePopupLoginState } from 'lib/oauth/interfaces';
 
 export default function Oauth() {
-  const { getGoogleTokenWithRedirect, getGoogleRedirectResult } = useFirebaseAuth();
+  const { onLoadScript, loginWithGoogleRedirect, isLoaded } = useGoogleLogin();
+
   const router = useRouter();
-  const [initLogin, setInitLogin] = useState(false);
-  const action = router.query.action;
+  const action: string | null =
+    (router.query.action as string) || (router.query.code || router.query.error ? 'callback' : null);
   const [loginState, setLoginState] = useState<GooglePopupLoginState | null>(null);
 
   async function getGoogleCredentials() {
-    try {
-      const googleToken = await getGoogleRedirectResult();
-      setLoginState({ status: 'success', googleToken });
-    } catch (e: any) {
-      setLoginState({ status: 'error', error: e.message || 'Failed to login with google' });
+    const { code } = router.query;
+
+    if (router.query.code && typeof code === 'string') {
+      setLoginState({ status: 'success', code });
+    } else {
+      setLoginState({ status: 'error', error: 'Failed to login with google' });
     }
   }
 
   useEffect(() => {
-    if (action === 'login') {
-      setInitLogin(true);
-      const query = router.query;
-      query.action = 'callback';
+    if (!action) return;
 
-      router.replace({
-        query
-      });
-    }
-  }, [router.query.action]);
-
-  useEffect(() => {
-    if (action !== 'callback') return;
-
-    if (initLogin) {
-      getGoogleTokenWithRedirect();
-    } else {
+    if (action === 'login' && isLoaded) {
+      loginWithGoogleRedirect();
+    } else if (action === 'callback') {
       getGoogleCredentials();
     }
-  }, [initLogin, action]);
+  }, [action, isLoaded]);
 
   useEffect(() => {
     if (!loginState) return;
@@ -61,6 +52,7 @@ export default function Oauth() {
 
   return (
     <Box height='100vh' width='100vw' display='flex' alignItems='center' justifyContent='center'>
+      <Script src={googleSignInScript} onReady={onLoadScript} />
       <LoadingComponent isLoading />
     </Box>
   );

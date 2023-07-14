@@ -19,6 +19,8 @@ export async function connectGoogleAccount({
   const verified = await verifyGoogleToken(accessToken);
 
   const email = verified.email;
+  const userDisplayName = displayName || verified.name || '';
+  const userAvatarUrl = avatarUrl || verified.picture || '';
 
   if (!email) {
     throw new InvalidInputError(`Email required to complete signup`);
@@ -43,8 +45,8 @@ export async function connectGoogleAccount({
       email
     },
     create: {
-      name: displayName,
-      avatarUrl,
+      name: userDisplayName,
+      avatarUrl: userAvatarUrl,
       email,
       user: {
         connect: {

@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import { googleOAuthClientIdSensitive as googleOAuthClientId } from 'config/constants';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { GooglePopupLoginState } from 'lib/oauth/interfaces';
 
@@ -16,6 +17,7 @@ export function useGoogleLogin() {
   const [loaded, setLoaded] = useState(false);
   const { showMessage } = useSnackbar();
   const { openPopupLogin } = usePopupLogin<GooglePopupLoginState>();
+  const { setUser } = useUser();
 
   function initClient({ hint, mode }: { hint?: string; mode?: 'redirect' | 'popup' } = {}) {
     if (!googleOAuthClientId) {
@@ -24,7 +26,7 @@ export function useGoogleLogin() {
     }
     const redirectUri = `${getCallbackDomain(
       typeof window === 'undefined' ? '' : window.location.hostname
-    )}/authenticate/google2`;
+    )}/authenticate/google`;
 
     // docs: https://developers.google.com/identity/oauth2/web/reference/js-reference
     const client = google.accounts.oauth2.initCodeClient({
@@ -58,9 +60,11 @@ export function useGoogleLogin() {
       if ('code' in state) {
         try {
           if (type === 'login') {
-            // const loggedInUser = await charmClient.google.login(state.googleToken);
-            // setUser(loggedInUser);
+            const loggedInUser = await charmClient.google.loginWithCode(state.code);
+            setUser(loggedInUser);
+            showMessage('Logged in successfully', 'success');
           } else {
+            // TODO - connect with code flow
             // const loggedInUser = await charmClient.google.connectAccount(state.googleToken);
             // setUser(loggedInUser);
           }
@@ -75,7 +79,7 @@ export function useGoogleLogin() {
       host = window.location.host;
     }
 
-    openPopupLogin(`${getCallbackDomain(host)}/authenticate/google2?action=login`, loginCallback);
+    openPopupLogin(`${getCallbackDomain(host)}/authenticate/google?action=login`, loginCallback);
   }
 
   return {

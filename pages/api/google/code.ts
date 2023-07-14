@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { googleOAuthClientId } from 'config/constants';
-import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import { loginWithGoogle } from 'lib/google/loginWithGoogle';
+import { loginWithGoogleCode } from 'lib/google/loginWithGoogleCode';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { saveSession } from 'lib/middleware/saveSession';
@@ -11,20 +9,15 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys(['accessToken'], 'body')).post(loginWithGoogleController);
+handler.use(requireKeys(['code'], 'body')).post(loginWithGoogleCodeHandler);
 
-async function loginWithGoogleController(req: NextApiRequest, res: NextApiResponse) {
-  const loginRequest = req.body as LoginWithGoogleRequest;
+async function loginWithGoogleCodeHandler(req: NextApiRequest, res: NextApiResponse) {
+  const { code } = req.body as { code: string };
   const signupAnalytics = extractSignupAnalytics(req.cookies as any);
 
-  const oauthParams = {
-    audience: googleOAuthClientId
-  };
-
-  const loggedInUser = await loginWithGoogle({
-    ...loginRequest,
-    signupAnalytics,
-    oauthParams
+  const loggedInUser = await loginWithGoogleCode({
+    code,
+    signupAnalytics
   });
 
   await saveSession({ req, userId: loggedInUser.id });

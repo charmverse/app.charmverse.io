@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
-import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { getAppUrl } from 'lib/utilities/browser';
@@ -122,7 +121,7 @@ export function useFirebaseAuth() {
     try {
       const googleToken = await getGoogleToken();
       const loggedInUser = await charmClient.google.login(googleToken);
-      return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName };
+      return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName || '' };
     } finally {
       setIsConnectingGoogle(false);
     }

@@ -19,6 +19,10 @@ export class GoogleApi {
     return http.POST<LoggedInUser>('/api/google/login', login);
   }
 
+  loginWithCode(code: string) {
+    return http.POST<LoggedInUser>('/api/google/code', { code });
+  }
+
   connectAccount(params: Omit<ConnectGoogleAccountRequest, 'userId'>) {
     return http.POST<LoggedInUser>('/api/google/connect-account', params);
   }
