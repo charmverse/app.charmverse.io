@@ -13,7 +13,6 @@ import { useMemberCollections } from '../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
 import { MemberProperties } from '../MemberProperties';
 import { NftsList } from '../NftsList';
-import { OrgsList } from '../OrgsList';
 import { PoapsList } from '../PoapsList';
 
 import { EnsWidget } from './EnsWidget';
@@ -45,8 +44,9 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     return charmClient.getUserDetails();
   });
 
-  const { isFetchingNfts, isFetchingOrgs, isFetchingPoaps, mutateNfts, nfts, nftsError, orgs, poaps, poapsError } =
-    useMemberCollections({ memberId: userId });
+  const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
+    memberId: userId
+  });
 
   const { getDisplayProperties } = useMemberProperties();
 
@@ -78,13 +78,11 @@ export function ProfileWidgets({ userId }: { userId: string }) {
       socialDetails?.twitterURL?.length === 0 &&
       socialDetails?.linkedinURL?.length === 0);
 
-  const pinnedOrgs = orgs.filter((org) => org.isPinned);
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
-  const hideCollections = pinnedNfts.length === 0 && pinnedOrgs.length === 0 && poaps.length === 0;
+  const hideCollections = pinnedNfts.length === 0 && poaps.length === 0;
 
   const isLoading =
     isFetchingNfts ||
-    isFetchingOrgs ||
     isFetchingPoaps ||
     isLoadingLensProfile ||
     isLoadingGame7Profile ||

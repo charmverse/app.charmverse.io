@@ -15,7 +15,6 @@ import { useMemberCollections } from '../hooks/useMemberCollections';
 import { useMutateMemberPropertyValues } from '../hooks/useMutateMemberPropertyValues';
 
 import { NftsList } from './NftsList';
-import { OrgsList } from './OrgsList';
 import { PoapsList } from './PoapsList';
 
 type Props = {
