@@ -34,7 +34,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
-import { webhookBaseUrl } from 'config/constants';
+import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -371,7 +371,7 @@ function CenterPanel(props: Props) {
   ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
-      unassignedOptionIds = groupByProperty.options
+      unassignedOptionIds = (groupByProperty.options ?? [])
         .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
         .map((o: IPropertyOption) => o.id);
     }
@@ -517,7 +517,7 @@ function CenterPanel(props: Props) {
           <PageWebhookBanner
             key={key.apiKey}
             type={key.type}
-            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            url={`${window.location.origin}/${webhookEndpoint}/${key?.apiKey}`}
             sx={{
               ...(isEmbedded && {
                 border: (theme) => `2px solid ${theme.palette.text.primary}`,
@@ -729,7 +729,7 @@ export function groupCardsByOptions(
 
   for (const optionId of optionIds) {
     if (optionId) {
-      const option = groupByProperty?.options.find((o) => o.id === optionId);
+      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
       if (groupByProperty && option) {
         const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
@@ -743,7 +743,7 @@ export function groupCardsByOptions(
       // Empty group
       const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },

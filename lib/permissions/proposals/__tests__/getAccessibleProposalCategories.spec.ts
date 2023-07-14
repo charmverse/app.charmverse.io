@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 describe('getAccessibleProposalCategories', () => {
-  it('should return all categories for a space member, with the ability to create a post', async () => {
+  it('should return all categories for a space member, with the ability to create a post, view a category, comment and vote on proposals', async () => {
     const categories = await getAccessibleProposalCategories({
       spaceId: space.id,
       userId: spaceMemberUser.id
@@ -34,19 +34,22 @@ describe('getAccessibleProposalCategories', () => {
 
     expect(categories.length).toBe(2);
 
-    const permissions = new AvailableProposalCategoryPermissions();
-
-    permissions.addPermissions(['create_proposal']);
+    const permissions = new AvailableProposalCategoryPermissions().addPermissions([
+      'create_proposal',
+      'view_category',
+      'comment_proposals',
+      'vote_proposals'
+    ]).operationFlags;
 
     expect(categories).toEqual(
       expect.arrayContaining<ProposalCategoryWithPermissions>([
         expect.objectContaining<ProposalCategoryWithPermissions>({
           ...proposalCategory,
-          permissions: permissions.operationFlags
+          permissions
         }),
         expect.objectContaining<ProposalCategoryWithPermissions>({
           ...secondProposalCategory,
-          permissions: permissions.operationFlags
+          permissions
         })
       ])
     );
@@ -81,7 +84,7 @@ describe('getAccessibleProposalCategories', () => {
     );
   });
 
-  it('should return all categories for a public user, with empty permissions', async () => {
+  it('should return all categories for a public user, with view permissions', async () => {
     const categories = await getAccessibleProposalCategories({
       spaceId: space.id,
       userId: undefined
@@ -89,17 +92,17 @@ describe('getAccessibleProposalCategories', () => {
 
     expect(categories.length).toBe(2);
 
-    const permissions = new AvailableProposalCategoryPermissions();
+    const permissions = new AvailableProposalCategoryPermissions().addPermissions(['view_category']).operationFlags;
 
     expect(categories).toEqual(
       expect.arrayContaining<ProposalCategoryWithPermissions>([
         expect.objectContaining<ProposalCategoryWithPermissions>({
           ...proposalCategory,
-          permissions: permissions.empty
+          permissions
         }),
         expect.objectContaining<ProposalCategoryWithPermissions>({
           ...secondProposalCategory,
-          permissions: permissions.empty
+          permissions
         })
       ])
     );

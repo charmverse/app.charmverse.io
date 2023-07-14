@@ -88,7 +88,11 @@ export function ProposalsViewOptions({
               return <ProposalCategoryChip color={category.color} title={category.title} />;
             }
           }}
-          onChange={(e) => setCategoryIdFilter(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value) {
+              setCategoryIdFilter(e.target.value);
+            }
+          }}
         >
           <MenuItem value='all'>All categories</MenuItem>
           {categories.map((category) => (

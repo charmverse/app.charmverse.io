@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { Box, Card, Typography } from '@mui/material';
-import Script from 'next/script';
-import { useEffect, useRef, useState } from 'react';
+import { Box, Card, CardMedia, CardContent, CardActionArea, Typography } from '@mui/material';
+import useSWRImmutable from 'swr/immutable';
 
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import OpenSeaIcon from 'public/images/opensea_logo.svg';
 
 import BlockAligner from '../BlockAligner';
@@ -12,94 +13,91 @@ import { MediaUrlInput } from '../common/MediaUrlInput';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-import type { NodeAttrs } from './nftSpec';
-import { extractAttrsFromUrl } from './nftUtils';
-import { setCSSOverrides } from './styles';
+import type { NodeAttrs } from './nft.specs';
+import { extractAttrsFromUrl } from './utils';
 
-// OpenSea embed plugin: https://github.com/ProjectOpenSea/embeddable-nfts
-export const widgetJS = 'https://unpkg.com/embeddable-nfts/dist/nft-card.min.js';
-
-const StyledContainer = styled.div`
-  nft-card > div,
-  nft-card-front > div {
-    background: transparent !important;
+const StyledCard = styled(Card)`
+  a {
+    // override text decoration from charm editor
+    text-decoration: none !important;
   }
 `;
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
-  const ref = useRef<HTMLDivElement>(null);
   const attrs = node.attrs as Partial<NodeAttrs>;
-  const [width, setWidth] = useState(0);
 
-  useEffect(() => {
-    const elm = ref.current;
-    if (elm) {
-      setCSSOverrides(elm);
-      // add a timeout so that the DOM has a chance to render. Otherwise clientWidth is 0
-      setTimeout(() => {
-        setWidth(elm.clientWidth);
-      }, 0);
+  const { data: nftData, isLoading } = useSWRImmutable(`nft/${attrs.chain}/${attrs.contract}/${attrs.token}`, () => {
+    if (!attrs.chain || !attrs.contract || !attrs.token) return null;
+    return charmClient.blockchain.getNFT({
+      chainId: attrs.chain as any,
+      address: attrs.contract,
+      tokenId: attrs.token
+    });
+  });
+
+  // If there are no source for the node, return the image select component
+  if (!attrs.contract) {
+    if (readOnly) {
+      // hide the row completely
+      return <div />;
+    } else {
+      return (
+        <MediaSelectionPopup
+          node={node}
+          icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
+          buttonText='Embed an NFT'
+          isSelected={selected}
+          onDelete={deleteNode}
+        >
+          <Box py={3}>
+            <MediaUrlInput
+              helperText='Works with NFTs on Ethereum mainnet'
+              isValid={(url) => extractAttrsFromUrl(url) !== null}
+              onSubmit={(url) => {
+                const _attrs = extractAttrsFromUrl(url);
+                if (_attrs) {
+                  updateAttrs(_attrs);
+                }
+              }}
+              placeholder='https://opensea.io/assets/ethereum/0x...'
+            />
+          </Box>
+        </MediaSelectionPopup>
+      );
     }
-  }, [ref.current]);
+  }
+
+  if (!nftData) {
+    return (
+      <Card variant='outlined'>
+        <Box p={6}>{isLoading ? <LoadingComponent /> : <Typography color='secondary'>NFT not found</Typography>}</Box>
+      </Card>
+    );
+  }
 
   return (
-    <Card variant='outlined'>
-      <Box p={3} textAlign='center'>
-        <CancelIcon fontSize='large' color='secondary' />
-        <Typography color='secondary'>Opensea has disabled NFT embeds. New NFT support coming soon.</Typography>
-      </Box>
-    </Card>
+    <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
+      <StyledCard variant='outlined'>
+        <CardActionArea href={nftData.link} target='_blank'>
+          <CardMedia component='img' image={nftData.image} />
+          <CardContent>
+            <Box
+              display='flex'
+              gap={1}
+              flexDirection={{ xs: 'column', md: 'row' }}
+              alignItems={{ xs: 'center', md: 'flex-start' }}
+              justifyContent='space-between'
+            >
+              <Typography component='span' variant='body2' color='text.secondary' align='left'>
+                {nftData.title}
+              </Typography>
+              <Button href={nftData.link} target='_blank' size='small' color='secondary' variant='outlined'>
+                View
+              </Button>
+            </Box>
+          </CardContent>
+        </CardActionArea>
+      </StyledCard>
+    </BlockAligner>
   );
-
-  // // If there are no source for the node, return the image select component
-  // if (!attrs.contract) {
-  //   if (readOnly) {
-  //     // hide the row completely
-  //     return <div />;
-  //   } else {
-  //     return (
-  //       <MediaSelectionPopup
-  //         node={node}
-  //         icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
-  //         buttonText='Embed an NFT'
-  //         isSelected={selected}
-  //         onDelete={deleteNode}
-  //       >
-  //         <Box py={3}>
-  //           <MediaUrlInput
-  //             helperText='Works with NFTs on Ethereum mainnet'
-  //             isValid={(url) => extractAttrsFromUrl(url) !== null}
-  //             onSubmit={(url) => {
-  //               const _attrs = extractAttrsFromUrl(url);
-  //               if (_attrs) {
-  //                 updateAttrs(_attrs);
-  //               }
-  //             }}
-  //             placeholder='https://opensea.io/assets/ethereum/0x...'
-  //           />
-  //         </Box>
-  //       </MediaSelectionPopup>
-  //     );
-  //   }
-  // }
-
-  // const forceMobile = width < 400; // default width of document is 700
-
-  // return (
-  //   <div>
-  //     <Script id='opensea-script' src={widgetJS} />
-  //     <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
-  //       <StyledContainer ref={ref}>
-  //         {/* @ts-ignore nft-card element is from OpenSea */}
-  //         <nft-card
-  //           contractAddress={attrs.contract}
-  //           orientationMode='manual' // it has to be manual since we set width
-  //           vertical={forceMobile === true ? true : undefined}
-  //           tokenId={attrs.token}
-  //           width='100%'
-  //         />
-  //       </StyledContainer>
-  //     </BlockAligner>
-  //   </div>
-  // );
 }

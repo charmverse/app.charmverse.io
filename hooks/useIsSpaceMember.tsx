@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useContext, createContext, useMemo } from 'react';
 
 import { useSpaceGatesReevaluate } from 'components/_app/hooks/useSpaceGatesReevaluate';
+import { useSyncSummonSpaceRoles } from 'components/_app/hooks/useSyncSummonSpaceRoles';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
@@ -30,6 +31,8 @@ export function IsSpaceMemberProvider({ children }: { children: ReactNode }) {
   }, [user, space]);
 
   useSpaceGatesReevaluate();
+
+  useSyncSummonSpaceRoles();
 
   return <IsSpaceMemberContext.Provider value={value}>{children}</IsSpaceMemberContext.Provider>;
 }
