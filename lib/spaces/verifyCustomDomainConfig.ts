@@ -1,11 +1,14 @@
 import dns from 'dns/promises';
 
+import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { request, Agent } from 'undici';
 
 import { getCertificateDetails, requestCertificateForDomain } from 'lib/aws/ACM';
 import { addCertificateToListener, hasCertificateAdded } from 'lib/aws/ELB';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
+
+const log = getLogger('ELB');
 
 export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomDomainVerification> {
   const space = await prisma.space.findUnique({ where: { id: spaceId } });
@@ -24,9 +27,16 @@ export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomD
   const certificateArn = await requestCertificateForDomain(domain);
   const certDetails = await getCertificateDetails({ certificateArn });
 
-  let hasCertificateInELB = await hasCertificateAdded({ certificateArn });
-  if (certDetails?.status === 'ISSUED' && !hasCertificateInELB && certificateArn) {
-    hasCertificateInELB = await addCertificateToListener(certificateArn);
+  let hasCertificateInELB = false;
+  try {
+    hasCertificateInELB = await hasCertificateAdded({ certificateArn });
+
+    if (certDetails?.status === 'ISSUED' && !hasCertificateInELB && certificateArn) {
+      hasCertificateInELB = await addCertificateToListener(certificateArn);
+    }
+  } catch (e) {
+    log.warn('Could not check if certificate is added to ELB', { certificateArn, domain, e });
+    hasCertificateInELB = true;
   }
 
   const isRedirectVerified = await isRedirectConfigured(domain, space.domain);
