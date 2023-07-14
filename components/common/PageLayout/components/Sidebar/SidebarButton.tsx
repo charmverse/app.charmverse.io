@@ -6,8 +6,8 @@ import Box from '@mui/material/Box';
 import Link from 'components/common/Link';
 import type { SpaceSettingsSection } from 'components/settings/config';
 import { premiumSettingSections } from 'components/settings/config';
-import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import type { UpgradeContext } from 'components/settings/subscription/components/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 
 export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   padding-left: ${theme.spacing(2)};

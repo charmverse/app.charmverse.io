@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 

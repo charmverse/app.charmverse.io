@@ -24,8 +24,8 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
-import type { Props as UpgradeProps } from 'components/settings/subscription/UpgradeWrapper';
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import type { Props as UpgradeProps } from 'components/settings/subscription/components/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Member } from 'lib/members/interfaces';
 

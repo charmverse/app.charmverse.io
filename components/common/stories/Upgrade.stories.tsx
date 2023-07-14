@@ -1,6 +1,6 @@
 import { Box, Paper } from '@mui/material';
 
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 
 export default {
   title: 'common/Upgrade',

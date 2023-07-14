@@ -3,7 +3,7 @@ import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 
 type Props = {
   isChecked: boolean;

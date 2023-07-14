@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 import { usePages } from 'hooks/usePages';
 
 import { AddPagePermissionsInput } from '../common/AddPagePermissionsInput';

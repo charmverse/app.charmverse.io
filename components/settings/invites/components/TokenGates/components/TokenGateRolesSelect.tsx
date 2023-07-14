@@ -5,7 +5,7 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import Tooltip from '@mui/material/Tooltip';
 import { useMemo } from 'react';
 
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useRoles } from 'hooks/useRoles';
 import { isTruthy } from 'lib/utilities/types';

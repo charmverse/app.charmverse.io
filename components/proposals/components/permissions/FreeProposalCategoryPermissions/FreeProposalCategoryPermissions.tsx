@@ -2,7 +2,7 @@ import type { ProposalCategory } from '@charmverse/core/prisma';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 
-import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { AddRolesButton } from '../components/AddRolesButton';

@@ -28,7 +28,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { LabelWithCopy } from 'components/settings/space/components/LabelWithCopy';
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCustomDomainVerification } from 'hooks/useCustomDomainVerification';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';

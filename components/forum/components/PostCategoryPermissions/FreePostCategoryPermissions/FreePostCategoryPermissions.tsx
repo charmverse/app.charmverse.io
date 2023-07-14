@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid';
 
-import { UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeWrapper, upgradeMessages } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { AddRolesRow } from '../components/AddRolesRow';

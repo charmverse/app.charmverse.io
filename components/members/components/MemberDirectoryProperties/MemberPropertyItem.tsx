@@ -19,7 +19,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 

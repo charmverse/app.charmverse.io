@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { CustomRolesInfoModal } from 'components/settings/roles/CustomRolesInfoModal';
-import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';

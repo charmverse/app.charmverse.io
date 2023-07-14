@@ -14,7 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 
 import Legend from '../Legend';
-import { UpgradeChip } from '../subscription/UpgradeWrapper';
+import { UpgradeChip } from '../subscription/components/UpgradeWrapper';
 
 export const schema = yup.object({
   webhookUrl: yup.string().nullable(true),

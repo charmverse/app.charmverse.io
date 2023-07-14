@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { getAbsolutePath } from 'lib/utilities/browser';

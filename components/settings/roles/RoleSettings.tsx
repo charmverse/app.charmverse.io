@@ -6,20 +6,20 @@ import { useRef, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Legend from 'components/settings/Legend';
-import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { scrollIntoView } from 'lib/utilities/browser';
 
-import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
+import { UpgradeChip, UpgradeWrapper } from '../subscription/components/UpgradeWrapper';
 
 import { AdminRoleRow } from './components/AdminRoleRow';
 import type { CreateRoleInput } from './components/CreateRoleForm';
 import { CreateRoleForm } from './components/CreateRoleForm';
 import { GuestRoleRow } from './components/GuestRoleRow';
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
+import ImportGuildRolesMenuItem from './components/ImportGuildRolesMenuItem';
 import { MemberRoleRow } from './components/MemberRoleRow';
 import { DefaultPagePermissions } from './components/RolePermissions/components/DefaultPagePermissions';
 import { RoleRow } from './components/RoleRow';

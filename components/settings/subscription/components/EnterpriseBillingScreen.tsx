@@ -5,12 +5,9 @@ import Image from 'next/image';
 
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
-import Legend from '../Legend';
-
-import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import Legend from '../../Legend';
 
 export function EnterpriseBillingScreen() {
-  const { spaceSubscription } = useSpaceSubscription();
   const isSmallScreen = useSmallScreen();
 
   const logoSize = isSmallScreen ? 50 : 100;

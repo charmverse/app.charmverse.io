@@ -13,7 +13,7 @@ import CommunityIcon from 'public/images/subscriptions/community.svg';
 import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
 
-import Legend from '../Legend';
+import Legend from '../../Legend';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (

@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 
 import PopperPopup from 'components/common/PopperPopup';
-import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/components/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
