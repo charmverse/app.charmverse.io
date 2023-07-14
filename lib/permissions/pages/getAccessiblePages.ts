@@ -8,6 +8,11 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
     throw new InvalidInputError(`Space id is required`);
   }
 
+  let pageLimit = input.limit ? parseInt(input.limit.toString(), 10) : undefined;
+  if (!pageLimit || Number.isNaN(pageLimit) || pageLimit < 1) {
+    pageLimit = undefined;
+  }
+
   // ref: https://www.postgresql.org/docs/12/functions-textsearch.html
   // ref: https://www.postgresql.org/docs/10/textsearch-controls.html
   // prisma refs: https://github.com/prisma/prisma/issues/8950
@@ -16,6 +21,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
     : undefined;
 
   const pages = await prisma.page.findMany({
+    take: pageLimit,
     where: {
       spaceId: input.spaceId,
       deletedAt: input.archived ? { not: null } : null,
