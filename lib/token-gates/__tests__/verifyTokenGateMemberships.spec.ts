@@ -9,7 +9,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('lit-js-sdk');
+jest.mock('@lit-protocol/lit-node-client');
 
 // @ts-ignore
 const mockedLitJsSdk: jest.Mocked<typeof LitJsSdk> = LitJsSdk;
@@ -43,7 +43,6 @@ describe('verifyTokenGateMemberships', () => {
 
   afterEach(async () => {
     mockedLitJsSdk.verifyJwt.mockClear();
-    // jest.unmock('lit-js-sdk');
     jest.resetModules();
   });
 

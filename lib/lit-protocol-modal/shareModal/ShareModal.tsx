@@ -1,6 +1,6 @@
 // @ts-nocheck
-import LitJsSdk from 'lit-js-sdk';
-import type { SigningConditions } from 'lit-js-sdk';
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
+import type { SigningConditions } from '@lit-protocol/types';
 import { useEffect, useState } from 'react';
 
 import { chainConfig } from '../chainConfig';
@@ -25,10 +25,10 @@ import { TOP_LIST } from './helpers/topList';
 import MultipleConditionSelect from './multipleConditionSelect/MultipleConditionSelect';
 import ReviewConditions from './reviewConditions/ReviewConditions';
 import SingleConditionSelect from './singleConditionSelect/SingleConditionSelect';
-import LitHeader from "../reusableComponents/litHeader/LitHeader"
+import LitHeader from '../reusableComponents/litHeader/LitHeader';
 export type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'>;
-import LitLoading from "../reusableComponents/litLoading/LitLoading"
-import LitConfirmationModal from "../reusableComponents/litConfirmationModal/LitConfirmationModal"
+import LitLoading from '../reusableComponents/litLoading/LitLoading';
+import LitConfirmationModal from '../reusableComponents/litConfirmationModal/LitConfirmationModal';
 
 interface Token {
   label: string;
@@ -81,7 +81,7 @@ function ShareModal(props: {
     conditionsAllowed = {},
     isModal = true,
     darkMode = false,
-    allowDevMode = false,
+    allowDevMode = false
   } = props;
 
   useEffect(() => {
