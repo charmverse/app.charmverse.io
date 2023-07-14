@@ -1,4 +1,4 @@
-import { extractAttrsFromUrl } from '../nftUtils';
+import { extractAttrsFromUrl } from '../utils';
 
 const extractionCases = [
   {

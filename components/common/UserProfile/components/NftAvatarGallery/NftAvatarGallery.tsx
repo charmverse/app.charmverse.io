@@ -4,7 +4,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
 import { useUser } from 'hooks/useUser';
-import type { NftData } from 'lib/blockchain/interfaces';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 
 import { EmptyAvatarGallery } from './EmptyAvatarGallery';
 import { NftGalleryItem } from './NftGalleryItem';
@@ -21,9 +21,9 @@ const ProgressContainer = styled.div`
 `;
 
 type Props = {
-  onSelect?: (avatar: NftData) => void;
+  onSelect?: (avatar: NFTData) => void;
   isSaving?: boolean;
-  nfts: NftData[] | undefined;
+  nfts: NFTData[] | undefined;
   isLoading?: boolean;
   emptyMessage?: string;
   disableAutoSelectAvatarNft?: boolean;
@@ -39,7 +39,7 @@ export default function NftAvatarGallery({
 }: Props) {
   const { user } = useUser();
 
-  const getIsSelected = (nft: NftData) => {
+  const getIsSelected = (nft: NFTData) => {
     if (!user || disableAutoSelectAvatarNft) {
       return false;
     }
