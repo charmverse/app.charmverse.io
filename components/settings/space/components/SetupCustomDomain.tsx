@@ -176,14 +176,14 @@ export function SetupCustomDomain({ space }: { space: Space }) {
               ) : (
                 <>
                   <Typography variant='body2'>
-                    In order to make custom app domain work, you will need to setup two CNAME records in your DNS
+                    In order to access space from you domain, you will need to setup two CNAME records in your DNS
                     Provider dashboard. One is to redirect your domain to CharmVerse, and the other is to verify your
                     domain ownership.
                   </Typography>
 
                   <Stack mt={1}>
                     <Typography variant='caption'>
-                      You can find instructions on how to set DNS records{' '}
+                      You can find instructions on how to set DNS CNAME records{' '}
                       <Link href={CNAME_INSTRUCTIONS_URL} external target='_blank'>
                         here
                       </Link>
