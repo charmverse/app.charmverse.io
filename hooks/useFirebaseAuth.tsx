@@ -20,8 +20,6 @@ import { googleWebClientConfig } from 'config/constants';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
-import type { GooglePopupLoginState } from 'lib/oauth/interfaces';
 import { getAppUrl } from 'lib/utilities/browser';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
@@ -37,8 +35,6 @@ export function useFirebaseAuth() {
   const { user, setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
   const router = useRouter();
-  const { openPopupLogin } = usePopupLogin<any>();
-
   const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
@@ -130,31 +126,6 @@ export function useFirebaseAuth() {
     } finally {
       setIsConnectingGoogle(false);
     }
-  }
-
-  async function loginWithGooglePopup(type: 'login' | 'connect' = 'login') {
-    const loginCallback = async (state: GooglePopupLoginState) => {
-      if ('googleToken' in state) {
-        try {
-          if (type === 'login') {
-            const loggedInUser = await charmClient.google.login(state.googleToken);
-            setUser(loggedInUser);
-          } else {
-            const loggedInUser = await charmClient.google.connectAccount(state.googleToken);
-            setUser(loggedInUser);
-          }
-        } catch (error: any) {
-          log.debug({ error });
-        }
-      }
-    };
-
-    let host = '';
-    if (typeof window !== 'undefined') {
-      host = window.location.host;
-    }
-
-    openPopupLogin(`${getCallbackDomain(host)}/authenticate/google?action=login`, loginCallback);
   }
 
   async function connectGoogleAccount(): Promise<void> {
@@ -272,7 +243,6 @@ export function useFirebaseAuth() {
     emailForSignIn,
     setEmailForSignIn,
     getGoogleRedirectResult,
-    getGoogleTokenWithRedirect,
-    loginWithGooglePopup
+    getGoogleTokenWithRedirect
   };
 }
