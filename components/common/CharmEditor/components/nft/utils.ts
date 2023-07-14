@@ -1,4 +1,13 @@
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+
 import type { NodeAttrs } from './nft.specs';
+
+const openseaChainsByPath: Record<string, SupportedChainId | undefined> = {
+  ethereum: 1,
+  arbitrum: 42161,
+  matic: 137,
+  optimism: 10
+};
 
 // a function to extract user screen name and tweet id from a tweet url
 export function extractAttrsFromUrl(url: string): NodeAttrs | null {
@@ -6,13 +15,17 @@ export function extractAttrsFromUrl(url: string): NodeAttrs | null {
     return null;
   }
 
-  const match = url.match(/opensea\.io\/([^/]+\/)?assets\/ethereum\/([^/]+)\/([^/]+)/);
+  const match = url.match(/opensea\.io\/([^/]+\/)?assets\/([^/]+)\/([^/]+)\/([^/]+)/);
   if (!match) {
     return null;
   }
+  const chainId = openseaChainsByPath[match[2]];
+  if (!chainId) {
+    return null;
+  }
   return {
-    chain: 1,
-    contract: match[2],
-    token: match[3]
+    chain: chainId,
+    contract: match[3],
+    token: match[4]
   };
 }

@@ -1,11 +1,12 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
-import type { supportedChainIds } from 'connectors';
+
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 import { name } from './config';
 
 export type NodeAttrs = {
-  chain: (typeof supportedChainIds)[number];
+  chain: SupportedChainId;
   contract: string;
   token: string;
 };

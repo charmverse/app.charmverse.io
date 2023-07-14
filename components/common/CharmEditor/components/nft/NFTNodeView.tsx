@@ -11,13 +11,13 @@ import {
   Typography
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
+import { RiNftLine } from 'react-icons/ri';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
-import OpenSeaIcon from 'public/images/opensea_logo.svg';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -32,6 +32,8 @@ const StyledCard = styled(Card)`
     text-decoration: none !important;
   }
 `;
+
+const blockchains = [1, 10, 137, 42161];
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
@@ -58,7 +60,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
       return (
         <MediaSelectionPopup
           node={node}
-          icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
+          icon={<EmbedIcon icon={RiNftLine} size='large' />}
           buttonText='Embed an NFT'
           isSelected={selected}
           onDelete={deleteNode}
@@ -145,7 +147,7 @@ function NFTForm({ onSubmit }: { onSubmit: (values: NodeAttrs) => void }) {
           </Grid>
           <Box width='100%'>
             <InputLabel>Blockchain</InputLabel>
-            <InputSearchBlockchain chainId={1} sx={{ width: '100%' }} onChange={setChain} />
+            <InputSearchBlockchain chains={blockchains} chainId={1} sx={{ width: '100%' }} onChange={setChain} />
           </Box>
           <Button
             disabled={!isValid}
