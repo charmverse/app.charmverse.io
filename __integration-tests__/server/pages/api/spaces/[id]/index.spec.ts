@@ -9,15 +9,13 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
-let adminUser: LoggedInUser;
 let memberUser: LoggedInUser;
 
 let adminCookie: string;
 let memberCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpace({ isAdmin: true });
-  adminUser = generatedUser;
+  const { space: generatedSpace, user: adminUser } = await generateUserAndSpace({ isAdmin: true });
   memberUser = await generateSpaceUser({ isAdmin: false, spaceId: generatedSpace.id });
   space = generatedSpace;
   adminCookie = await loginUser(adminUser.id);
