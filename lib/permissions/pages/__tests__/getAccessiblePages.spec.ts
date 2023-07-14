@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { createPage } from 'testing/setupDatabase';
 
@@ -111,7 +112,7 @@ describe('getAccessiblePages - public space search', () => {
   it('should handle special tsquery characters', async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
-    const tsQuerySpecialCharsList = [' ', '&', '|', '!', '<->', '<N>', '(', ')', ':', '*', "'"];
+    const tsQuerySpecialCharsList = stringUtils.tsQueryLanguageCharacters();
 
     const pageToFind = await testUtilsPages.generatePage({
       createdBy: user.id,
