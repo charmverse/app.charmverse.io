@@ -70,6 +70,8 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.2",
+    "@aws-sdk/client-acm": "^3.363.0",
+    "@aws-sdk/client-elastic-load-balancing-v2": "^3.363.0",
     "@aws-sdk/client-s3": "^3.347.1",
     "@aws-sdk/client-sqs": "^3.347.1",
     "@aws-sdk/client-sts": "^3.347.1",
@@ -84,7 +86,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.0.8",
+    "@charmverse/core": "^0.1.2",
     "@column-resizer/core": "^1.0.1",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
