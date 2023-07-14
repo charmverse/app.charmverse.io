@@ -52,11 +52,7 @@ export const getServerSideProps: GetServerSideProps<{ publicUser: PublicUser | n
 
       return {
         props: {
-          publicUser: {
-            ...user,
-            visibleNfts: [],
-            visiblePoaps: []
-          }
+          publicUser: user
         }
       };
     }

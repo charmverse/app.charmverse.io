@@ -1,6 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { useEffect } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
@@ -23,24 +22,24 @@ export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const {
-    data,
-    mutate: mutateProposals,
-    isLoading
-  } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
-    charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
-  );
 
-  const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
-    data ?? []
-  );
+  const {
+    filteredProposals,
+    statusFilter,
+    setStatusFilter,
+    categoryIdFilter,
+    setCategoryIdFilter,
+    proposals,
+    mutateProposals,
+    isLoading
+  } = useProposals();
   useEffect(() => {
     if (currentSpace?.id) {
       charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
     }
   }, [currentSpace?.id]);
 
-  const loadingData = !data;
+  const loadingData = !proposals;
 
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
 
@@ -106,15 +105,19 @@ export function ProposalsPage() {
             </Grid>
           ) : (
             <Grid item xs={12} sx={{ mt: 5 }}>
-              {data?.length === 0 && (
+              {proposals?.length === 0 && (
                 <EmptyStateVideo
                   description='Getting started with proposals'
                   videoTitle='Proposals | Getting started with Charmverse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}
-              {data?.length > 0 && (
-                <ProposalsTable isLoading={isLoading} proposals={filteredProposals} mutateProposals={mutateProposals} />
+              {proposals?.length > 0 && (
+                <ProposalsTable
+                  isLoading={isLoading}
+                  proposals={filteredProposals ?? []}
+                  mutateProposals={mutateProposals}
+                />
               )}
             </Grid>
           )}

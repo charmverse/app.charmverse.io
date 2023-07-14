@@ -3,7 +3,7 @@ import type { AuthSig } from '@lit-protocol/types';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
+import { evaluateTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function reevaluateRoles({
@@ -28,7 +28,7 @@ export async function reevaluateRoles({
 
     const userRoles = spaceMembership?.spaceRoleToRole.map((r) => r.roleId) ?? [];
 
-    const { gateTokens } = await evalueTokenGateEligibility({
+    const { gateTokens } = await evaluateTokenGateEligibility({
       spaceIdOrDomain: spaceId,
       authSig,
       userId
@@ -50,7 +50,6 @@ export async function reevaluateRoles({
     const updatedSpaceMembership = await getSpaceMembershipWithRoles({ spaceId, userId });
     const updatedUserRoles = updatedSpaceMembership?.spaceRoleToRole.map((r) => r.roleId) ?? [];
     const newRoles = updatedUserRoles.filter((r) => !userRoles.includes(r)) || [];
-
     return newRoles;
   } catch (error) {
     log.warn('Error reevaluating roles', { error, userId, spaceId });

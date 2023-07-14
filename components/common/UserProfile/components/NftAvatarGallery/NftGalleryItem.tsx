@@ -3,10 +3,10 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
-import type { NftData } from 'lib/blockchain/interfaces';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 
 type Props = {
-  nft: NftData;
+  nft: NFTData;
   isSelected: boolean;
   onClick: () => void;
 };

@@ -5,9 +5,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
+import { getLoopProducts } from 'lib/loop/loop';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
-import { communityProduct } from 'lib/subscription/constants';
+import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
@@ -34,31 +35,6 @@ function buffer(req: NextApiRequest) {
 const handler = defaultHandler();
 
 handler.post(stripePayment);
-
-/**
- * @swagger
- * /stripe:
- *   post:
- *     summary: Create/Update a Stripe subscription from an event.
- *     description: We will receive an event and depending on type we will update the db.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       [key: string]:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Update succeeded
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Subcsription'
- */
 
 export async function stripePayment(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -94,6 +70,13 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         const customerId = invoice.customer as string;
         const priceInterval = subscriptionData?.price?.recurring?.interval;
+
+        if (!spaceId) {
+          log.warn(
+            `Can't create the user subscription. SpaceId was not defined in the metadata for subscription ${stripeSubscription.id}`
+          );
+          break;
+        }
 
         const space = await prisma.space.findUnique({
           where: { id: spaceId, deletedAt: null }
@@ -300,6 +283,55 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         break;
       }
+
+      case 'invoice.finalized': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string | null;
+
+        if (!subscriptionId) {
+          log.warn(`The invoice ${invoice.id} does not have a subscription attached to it`);
+          break;
+        }
+
+        const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
+          expand: ['customer']
+        });
+
+        const spaceId = stripeSubscription.metadata.spaceId;
+        const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
+        const priceId = subscriptionData?.price?.id;
+        const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
+        const encodedEmail = email ? `&email=${encodeURIComponent(email)}` : '';
+
+        if (!stripeSubscription.metadata.loopCheckout && priceId) {
+          const loopItems = await getLoopProducts();
+          const loopItem = loopItems.find((product) => product.externalId === priceId);
+
+          if (!loopItem) {
+            log.warn(
+              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId}`,
+              { spaceId }
+            );
+            break;
+          }
+
+          const loopUrl = loopItem.url
+            ? `${loopItem.url}?cartEnabled=false${encodedEmail}&sub=${subscriptionId}`
+            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false${encodedEmail}&sub=${subscriptionId}`;
+
+          await stripeClient.subscriptions.update(subscriptionId, {
+            metadata: {
+              ...(stripeSubscription.metadata || {}),
+              loopCheckout: loopUrl
+            }
+          });
+
+          log.info(`Loop checkout url was succesfully added in stripe metadata`, { spaceId, priceId, subscriptionId });
+        }
+
+        break;
+      }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const spaceId = subscription.metadata.spaceId as string;
@@ -430,10 +462,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
       }
     }
 
-    res.status(200).end();
+    return res.status(200).json({});
   } catch (err: any) {
     log.warn('Stripe webhook failed to construct event', err);
-    res.status(400).json(`Webhook Error: ${err?.message}`);
+    return res.status(400).json(`Webhook Error: ${err?.message}`);
   }
 }
 

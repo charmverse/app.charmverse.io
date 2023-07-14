@@ -1,17 +1,10 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import {
-  onError,
-  onNoMatch,
-  requireUser,
-  requireSpaceMembership,
-  requireKeys,
-  InvalidStateError
-} from 'lib/middleware';
+import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { stripeClient } from 'lib/subscription/stripe';
+import { getCouponDetails } from 'lib/subscription/getCouponDetails';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,25 +26,15 @@ export type ValidatedCoupon = {
 
 async function validateDiscount(req: NextApiRequest, res: NextApiResponse<ValidatedCoupon>) {
   const couponCode = req.body.coupon;
+  const spaceId = req.query.id as string;
 
-  if (!couponCode) {
-    throw new InvalidInputError(`Please enter a coupon`);
+  const coupon = await getCouponDetails(couponCode);
+
+  if (!coupon) {
+    throw new InvalidInputError(`Invalid promotional code ${couponCode} for space ${spaceId}`);
   }
 
-  const matchedCoupon = await stripeClient.promotionCodes
-    .list()
-    .then((data) => data.data.find((coupon) => coupon.id === couponCode || coupon.code === couponCode));
-
-  if (!matchedCoupon) {
-    throw new DataNotFoundError(`Coupon not found ${matchedCoupon}`);
-  } else if (!matchedCoupon.coupon.valid) {
-    throw new InvalidStateError(`This coupon is not valid`);
-  }
-
-  res.status(200).send({
-    couponId: matchedCoupon.coupon.id,
-    valid: true
-  });
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);

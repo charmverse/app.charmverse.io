@@ -115,6 +115,8 @@ interface BountyVC {
  *   get:
  *     summary: Retrieve a list of bounties
  *     description: Retrieve bounties from your workspace.
+ *     tags:
+ *      - 'Space API'
  *     parameters:
  *      - in: query
  *        name: status

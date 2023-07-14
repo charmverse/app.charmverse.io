@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { ArchiveProposalMenuItem } from 'components/proposals/ArchiveProposalMenuItem';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
@@ -124,6 +125,7 @@ export function DocumentPageActionList({
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+
   const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
   const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
@@ -313,8 +315,17 @@ export function DocumentPageActionList({
           <Divider />
         </>
       )}
+
       <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
-      {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
+      {pageType === 'proposal' && pageId && <ArchiveProposalMenuItem proposalId={pageId} refreshPageOnChange />}
+      {undoEditorChanges && (
+        <UndoAction
+          onClick={undoEditorChanges}
+          disabled={!pagePermissions?.edit_content}
+          // Ensure alignment of undo icon since internal structure is different
+          listItemStyle={{ mr: '-3px' }}
+        />
+      )}
       <Divider />
       <PublishToSnapshot
         pageId={pageId}

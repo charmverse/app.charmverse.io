@@ -1,4 +1,4 @@
-import type { Page, ProposalCategory, Space, Vote } from '@charmverse/core/prisma';
+import type { Page, ProposalCategory, Space } from '@charmverse/core/prisma';
 import { SpaceOperation } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
@@ -9,13 +9,12 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { VoteDTO } from 'lib/votes/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
 let user: LoggedInUser;
-let vote: Vote;
 let proposalCategory: ProposalCategory;
 
 let userCookie: string;
@@ -34,12 +33,6 @@ beforeAll(async () => {
         userId: user.id
       }
     ]
-  });
-
-  vote = await createVote({
-    createdBy: user.id,
-    pageId: page.id,
-    spaceId: space.id
   });
 
   userCookie = await loginUser(user.id);
@@ -77,7 +70,8 @@ describe('POST /api/votes - Create a new poll', () => {
     });
     const newVote: VoteDTO = {
       deadline: new Date(),
-      description: '',
+      content: null,
+      contentText: '',
       context: 'inline',
       spaceId: pageForVote.spaceId,
       pageId: pageForVote.id,
@@ -103,7 +97,8 @@ describe('POST /api/votes - Create a new poll', () => {
       deadline: new Date(),
       pageId: pageForVote.id,
       spaceId: space.id,
-      description: '',
+      content: null,
+      contentText: '',
       context: 'inline',
       createdBy: nonAdminUser.id,
       title: 'new vote',
@@ -124,7 +119,8 @@ describe('POST /api/votes - Create a new poll', () => {
       deadline: new Date(),
       pageId: v4(),
       spaceId: space.id,
-      description: '',
+      content: null,
+      contentText: '',
       createdBy: user.id,
       context: 'inline',
       title: 'new vote',
@@ -146,7 +142,8 @@ describe('POST /api/votes - Create a new poll', () => {
       deadline: new Date(),
       pageId: page2.id,
       spaceId: space2.id,
-      description: '',
+      content: null,
+      contentText: '',
       createdBy: user2.id,
       context: 'inline',
       title: 'new vote',
@@ -175,7 +172,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
     const newVote: VoteDTO = {
       context: 'proposal',
       deadline: new Date(),
-      description: '',
+      content: null,
+      contentText: '',
       pageId: proposal.id,
       spaceId: proposal.spaceId,
       title: 'new vote',
@@ -203,7 +201,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
       context: 'proposal',
       deadline: new Date(),
       pageId: proposal.id,
-      description: '',
+      content: null,
+      contentText: '',
       spaceId: proposal.spaceId,
       title: 'new vote',
       type: 'Approval',
@@ -235,7 +234,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
       pageId: resultPage.id,
       spaceId: resultPage.spaceId,
       context: 'inline',
-      description: '',
+      content: null,
+      contentText: '',
       title: 'new vote',
       type: 'Approval',
       threshold: 50,

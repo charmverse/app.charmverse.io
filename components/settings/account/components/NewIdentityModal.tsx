@@ -38,7 +38,8 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { account, isConnectingIdentity, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { connectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { connectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase, loginWithGooglePopup } =
+    useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
@@ -80,7 +81,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     });
   }
 
-  const { connect, isConnected, isLoading: isDiscordLoading } = useDiscordConnection();
+  const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
@@ -149,12 +150,17 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {!isConnected && !isOnCustomDomain && (
+          {!isConnected && (
             <IdentityProviderItem type='Discord'>
               <PrimaryButton
                 size='small'
                 onClick={() => {
-                  connect();
+                  if (isOnCustomDomain) {
+                    popupLogin('/', 'connect');
+                  } else {
+                    connect();
+                  }
+
                   onClose();
                 }}
                 disabled={isDiscordLoading}
@@ -179,12 +185,17 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {(!user?.googleAccounts || user.googleAccounts.length === 0) && !isOnCustomDomain && (
+          {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
               <PrimaryButton
                 size='small'
                 onClick={async () => {
-                  await connectGoogleAccount();
+                  if (isOnCustomDomain) {
+                    loginWithGooglePopup('connect');
+                  } else {
+                    await connectGoogleAccount();
+                  }
+
                   onClose();
                 }}
                 disabled={isConnectingGoogle}

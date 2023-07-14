@@ -30,6 +30,7 @@ import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
 import { PagesProvider } from 'hooks/usePages';
@@ -43,6 +44,7 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
+
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -94,10 +96,32 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
+import 'lib/lit-protocol-modal/index.css';
+import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
+import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
+import 'lib/lit-protocol-modal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal';
+import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
+import 'lib/lit-protocol-modal/reusableComponents/litDeleteModal/LitDeleteModal.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitBackButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitFooter.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitNextButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litHeader/LitHeader.css';
+import 'lib/lit-protocol-modal/reusableComponents/litInput/LitInput.css';
+import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading';
+import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading.css';
+import 'lib/lit-protocol-modal/reusableComponents/litReusableSelect/LitReusableSelect.css';
+import 'lib/lit-protocol-modal/reusableComponents/litTokenSelect/LitTokenSelect.css';
+import 'lib/lit-protocol-modal/shareModal/devMode/DevModeContent.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
+import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css';
+import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
+import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 type NextPageWithLayout = NextPage & {
@@ -208,9 +232,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                           <BountiesProvider>
                             <PaymentMethodsProvider>
                               <PagesProvider>
-                                <UserProfileProvider>
-                                  <PageTitleProvider>{children}</PageTitleProvider>
-                                </UserProfileProvider>
+                                <MemberPropertiesProvider>
+                                  <UserProfileProvider>
+                                    <PageTitleProvider>{children}</PageTitleProvider>
+                                  </UserProfileProvider>
+                                </MemberPropertiesProvider>
                               </PagesProvider>
                             </PaymentMethodsProvider>
                           </BountiesProvider>

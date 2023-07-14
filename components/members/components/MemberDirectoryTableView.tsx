@@ -23,10 +23,8 @@ import { DiscordSocialIcon } from 'components/u/components/UserDetails/DiscordSo
 import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
-import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';

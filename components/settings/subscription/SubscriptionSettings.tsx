@@ -16,7 +16,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
-import { SETTINGS_TABS } from '../config';
 import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
@@ -32,8 +31,7 @@ const schema = () => {
   return yup
     .object({
       email: yup.string().email().required(),
-      coupon: yup.string().optional(),
-      validatedCouponId: yup.string().optional()
+      coupon: yup.string().optional()
     })
     .strict();
 };
@@ -50,11 +48,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     isLoading: isLoadingSpaceSubscription,
     refetchSpaceSubscription
   } = useSpaceSubscription({
-    returnUrl: `${window?.location.origin}/${router.asPath}?settingTab=${
-      SETTINGS_TABS.find((tab) => tab.path === 'subscription')?.path
-    }`
+    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
   });
 
+  const [pendingPayment, setPendingPayment] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const {
@@ -65,8 +62,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   } = useForm<FormValues>({
     defaultValues: {
       email: '',
-      coupon: '',
-      validatedCouponId: ''
+      coupon: ''
     },
     resolver: yupResolver(schema())
   });
@@ -85,7 +81,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       },
       async onSuccess(data) {
         setShowCheckoutForm(true);
-        setValue('validatedCouponId', data.coupon || '');
+        setValue('coupon', data.coupon || '');
         setValue('email', data.email || '');
       }
     }
@@ -93,20 +89,15 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const emailField = watch('email');
   const couponField = watch('coupon');
-  const validatedCoupon = watch('validatedCouponId');
 
   const { trigger: validateCoupon, isMutating: isValidationLoading } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: { coupon: string } } }>) =>
-      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload).then((coupon) => {
-        setValue('validatedCouponId', coupon.couponId);
-        return coupon;
-      }),
+      charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
     {
       onError() {
         showMessage('Your coupon is not valid', 'error');
         setValue('coupon', '');
-        setValue('validatedCouponId', '');
       }
     }
   );
@@ -146,7 +137,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         period,
         blockQuota: minimumBlockQuota > blockQuota ? minimumBlockQuota : blockQuota,
         billingEmail: emailField,
-        coupon: validatedCoupon
+        coupon: initialSubscriptionData?.coupon
       }
     });
   }
@@ -167,29 +158,28 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           blockQuota: minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota,
           period,
           billingEmail: emailField,
-          coupon: validatedCoupon
+          coupon: initialSubscriptionData?.coupon
         }
       });
     } else if (_period) {
       await createSubscription({
         spaceId: space.id,
-        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: validatedCoupon }
+        payload: { blockQuota, period: _period, billingEmail: emailField, coupon: initialSubscriptionData?.coupon }
       });
     }
   };
 
   const handleCoupon = async (coupon: string | undefined) => {
-    let applicableCouponId: string | undefined;
     if (coupon) {
-      applicableCouponId = await validateCoupon({
+      await validateCoupon({
         spaceId: space.id,
         payload: { coupon }
-      }).then((validated) => validated?.couponId);
+      });
     }
 
     await createSubscription({
       spaceId: space.id,
-      payload: { blockQuota, period, coupon: applicableCouponId, billingEmail: emailField }
+      payload: { blockQuota, period, coupon, billingEmail: emailField }
     });
   };
 
@@ -206,6 +196,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
+        ) : pendingPayment && (!spaceSubscription || spaceSubscription.status === 'free_trial') ? (
+          <Typography>Payment pending. Please revisit this page in a few minutes.</Typography>
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             minimumBlockQuota={minimumBlockQuota}
@@ -219,7 +211,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       </Stack>
     );
   }
-  const isLoading = isValidationLoading || isInitialSubscriptionLoading || isLoadingSpaceSubscription;
+
+  const isLoading = isInitialSubscriptionLoading || isLoadingSpaceSubscription;
 
   return (
     <Stack gap={1}>
@@ -269,9 +262,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             period={period}
             subscription={initialSubscriptionData}
             handleCoupon={handleCoupon}
-            onCancel={() => setShowCheckoutForm(false)}
+            handlePending={() => setPendingPayment(true)}
+            onCloseCheckout={() => setShowCheckoutForm(false)}
             errors={errors}
             registerCoupon={{ ...register('coupon') }}
+            validating={isValidationLoading}
           />
         </Elements>
       )}

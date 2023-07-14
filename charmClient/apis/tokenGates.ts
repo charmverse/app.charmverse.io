@@ -34,7 +34,7 @@ export class TokenGatesApi {
     return http.POST('/api/token-gates/verify', verification);
   }
 
-  evalueTokenGateEligibility(
+  evaluateTokenGateEligibility(
     verification: Omit<TokenGateEvaluationAttempt, 'userId'>
   ): Promise<TokenGateEvaluationResult> {
     return http.POST('/api/token-gates/evaluate', verification);

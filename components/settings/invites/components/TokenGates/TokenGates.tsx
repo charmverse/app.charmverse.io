@@ -2,6 +2,7 @@ import type { TokenGate } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
+import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
@@ -16,6 +17,7 @@ import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { LitShareModal } from 'lib/lit-protocol-modal';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
 import TokenGatesTable from './components/TokenGatesTable';
