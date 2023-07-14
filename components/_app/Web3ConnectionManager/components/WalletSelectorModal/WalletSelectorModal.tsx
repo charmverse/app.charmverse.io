@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
-import Alert from '@mui/material/Alert';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -16,7 +15,6 @@ import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/LoginButton';
-import { useUnstoppableDomains } from 'hooks/useUnstoppableDomains';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 
@@ -42,7 +40,6 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   } = useWeb3ConnectionManager();
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
-  const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
 
   const handleConnect = (_connector: AbstractConnector) => {
     setActivatingConnector(_connector);
@@ -78,10 +75,6 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
   log.info('Connect redirectUri', redirectUri);
-
-  async function handleUnstoppableDomainsLogin() {
-    unstoppableDomainsLogin({ loginSuccess, onError });
-  }
 
   return (
     <div>
@@ -122,27 +115,10 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
           />
         </Grid>
 
-        <Grid item xs={12}>
-          <ConnectorButton
-            name='Unstoppable Domains'
-            onClick={handleUnstoppableDomainsLogin}
-            iconUrl='unstoppable-domains.png'
-            disabled={false}
-            isActive={false}
-            isLoading={isConnectingIdentity}
-          />
-          {uAuthPopupError && (
-            <Alert severity='warning'>
-              Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
-              browser.
-            </Alert>
-          )}
-        </Grid>
-
         <Grid item>
           <Typography variant='caption' align='center'>
             New to Ethereum wallets?{' '}
-            <Link color='primay' href='https://ethereum.org/en/wallets/' external target='_blank'>
+            <Link color='primary' href='https://ethereum.org/en/wallets/' external target='_blank'>
               Learn more
               <IconButton size='small' sx={{ color: 'inherit' }}>
                 <ArrowSquareOut fontSize='small' />

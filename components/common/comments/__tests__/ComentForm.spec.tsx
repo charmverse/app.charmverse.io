@@ -1,5 +1,3 @@
-import type { ClientOptions } from '@uauth/js';
-
 import { customRenderWithContext } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
