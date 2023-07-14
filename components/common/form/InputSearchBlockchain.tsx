@@ -14,7 +14,7 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   sx?: SxProps<Theme>;
 }
 
-export default function InputSearchBlockchain({
+export function InputSearchBlockchain({
   defaultChainId,
   chainId,
   onChange = () => {},

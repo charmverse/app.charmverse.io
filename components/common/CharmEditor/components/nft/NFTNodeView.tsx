@@ -1,20 +1,30 @@
 import styled from '@emotion/styled';
-import { Box, Card, CardMedia, CardContent, CardActionArea, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActionArea,
+  Grid,
+  InputLabel,
+  TextField,
+  Typography
+} from '@mui/material';
+import { useForm } from 'react-hook-form';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
 import OpenSeaIcon from 'public/images/opensea_logo.svg';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
-import { MediaUrlInput } from '../common/MediaUrlInput';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { NodeAttrs } from './nft.specs';
-import { extractAttrsFromUrl } from './utils';
 
 const StyledCard = styled(Card)`
   a {
@@ -35,6 +45,10 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
     });
   });
 
+  function submitForm(values: NodeAttrs) {
+    updateAttrs(values);
+  }
+
   // If there are no source for the node, return the image select component
   if (!attrs.contract) {
     if (readOnly) {
@@ -49,19 +63,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
           isSelected={selected}
           onDelete={deleteNode}
         >
-          <Box py={3}>
-            <MediaUrlInput
-              helperText='Works with NFTs on Ethereum mainnet'
-              isValid={(url) => extractAttrsFromUrl(url) !== null}
-              onSubmit={(url) => {
-                const _attrs = extractAttrsFromUrl(url);
-                if (_attrs) {
-                  updateAttrs(_attrs);
-                }
-              }}
-              placeholder='https://opensea.io/assets/ethereum/0x...'
-            />
-          </Box>
+          <NFTForm onSubmit={submitForm} />
         </MediaSelectionPopup>
       );
     }
@@ -77,27 +79,85 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
 
   return (
     <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
-      <StyledCard variant='outlined'>
-        <CardActionArea href={nftData.link} target='_blank'>
-          <CardMedia component='img' image={nftData.image} />
-          <CardContent>
-            <Box
-              display='flex'
-              gap={1}
-              flexDirection={{ xs: 'column', md: 'row' }}
-              alignItems={{ xs: 'center', md: 'flex-start' }}
-              justifyContent='space-between'
-            >
-              <Typography component='span' variant='body2' color='text.secondary' align='left'>
-                {nftData.title}
-              </Typography>
-              <Button href={nftData.link} target='_blank' size='small' color='secondary' variant='outlined'>
-                View
-              </Button>
-            </Box>
-          </CardContent>
-        </CardActionArea>
-      </StyledCard>
+      <NFTView nft={nftData} />
     </BlockAligner>
+  );
+}
+
+function NFTView({ nft }: { nft: { image: string; title: string; link: string } }) {
+  return (
+    <StyledCard variant='outlined'>
+      <CardActionArea href={nft.link} target='_blank'>
+        <CardMedia component='img' image={nft.image} />
+        <CardContent>
+          <Box
+            display='flex'
+            gap={1}
+            flexDirection={{ xs: 'column', md: 'row' }}
+            alignItems={{ xs: 'center', md: 'flex-start' }}
+            justifyContent='space-between'
+          >
+            <Typography component='span' variant='body2' color='text.secondary' align='left'>
+              {nft.title}
+            </Typography>
+            <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
+              View
+            </Button>
+          </Box>
+        </CardContent>
+      </CardActionArea>
+    </StyledCard>
+  );
+}
+
+function NFTForm({ onSubmit }: { onSubmit: (values: NodeAttrs) => void }) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { isValid }
+  } = useForm<NodeAttrs>();
+
+  function setChain(chain: number) {
+    setValue('chain', chain as NodeAttrs['chain']);
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <Box py={2.5} mx='auto' maxWidth={400} display='flex' flexDirection='column' alignItems='center' gap={2}>
+          <Grid container spacing={2}>
+            <Grid item xs={9}>
+              <InputLabel>Contract address</InputLabel>
+              <TextField
+                fullWidth
+                {...register('contract', {
+                  required: true,
+                  validate: { matchPattern: (v) => /^0x[a-fA-F0-9]{40}$/gm.test(v) }
+                })}
+                placeholder='0x...'
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <InputLabel>Token id</InputLabel>
+              <TextField {...register('token', { required: true })} placeholder='1' />
+            </Grid>
+          </Grid>
+          <Box width='100%'>
+            <InputLabel>Blockchain</InputLabel>
+            <InputSearchBlockchain chainId={1} sx={{ width: '100%' }} onChange={setChain} />
+          </Box>
+          <Button
+            disabled={!isValid}
+            sx={{
+              width: 250
+            }}
+            type='submit'
+          >
+            Submit
+          </Button>
+        </Box>
+      </div>
+    </form>
   );
 }
