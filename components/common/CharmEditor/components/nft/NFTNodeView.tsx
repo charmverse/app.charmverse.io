@@ -19,12 +19,13 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
-import BlockAligner from '../BlockAligner';
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
+import Resizable from '../Resizable/Resizable';
 
 import type { NodeAttrs } from './nft.specs';
 
@@ -110,20 +111,35 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
 
   if (!nftData) {
     return (
-      <BlockAligner readOnly={readOnly} onEdit={openPopup} onDelete={deleteNode}>
+      <Resizable
+        readOnly={readOnly}
+        initialSize={node.attrs.size}
+        minWidth={MIN_IMAGE_WIDTH}
+        updateAttrs={updateAttrs}
+        defaultFullWidth
+        onEdit={openPopup}
+        onDelete={deleteNode}
+      >
         <Card variant='outlined'>
           <Box p={6}>{isLoading ? <LoadingComponent /> : <Typography color='secondary'>NFT not found</Typography>}</Box>
         </Card>
         {popup}
-      </BlockAligner>
+      </Resizable>
     );
   }
 
   return (
-    <BlockAligner readOnly={readOnly} onEdit={openPopup} onDelete={deleteNode}>
+    <Resizable
+      readOnly={readOnly}
+      initialSize={node.attrs.size}
+      minWidth={MIN_IMAGE_WIDTH}
+      updateAttrs={updateAttrs}
+      onEdit={openPopup}
+      onDelete={deleteNode}
+    >
       <NFTView nft={nftData} />
       {popup}
-    </BlockAligner>
+    </Resizable>
   );
 }
 

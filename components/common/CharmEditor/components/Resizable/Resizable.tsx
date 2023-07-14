@@ -1,4 +1,5 @@
 import type { NodeViewProps } from '@bangle.dev/core';
+import styled from '@emotion/styled';
 import type { ReactNode } from 'react';
 import { useCallback, useState, memo, useEffect, useRef } from 'react';
 
@@ -12,15 +13,33 @@ interface ResizableProps {
   aspectRatio?: number;
   minWidth: number;
   updateAttrs: NodeViewProps['updateAttrs'];
-  onDelete: () => void;
+  onDelete: VoidFunction;
+  onEdit?: VoidFunction;
   readOnly?: boolean;
+  defaultFullWidth?: boolean;
 }
 
+const StaticContainer = styled.div<{ size: number }>`
+  max-width: 100%;
+  width: ${({ size }) => size}px;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
+`;
+
 function Resizable(props: ResizableProps) {
-  const { readOnly = false, updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
-  const [size, setSize] = useState(initialSize || 100);
+  const {
+    readOnly = false,
+    defaultFullWidth,
+    updateAttrs,
+    onDelete,
+    onEdit,
+    initialSize = 100,
+    aspectRatio,
+    children,
+    minWidth
+  } = props;
+  const [size, setSize] = useState(initialSize || minWidth);
   const containerRef = useRef<HTMLDivElement>(null);
-  const maxWidth = containerRef.current?.clientWidth;
+  const [maxWidth, setMaxWidth] = useState<number>(0);
 
   const onResizeStopCallback = useCallback((_: any, data: any) => {
     updateAttrs({
@@ -35,12 +54,28 @@ function Resizable(props: ResizableProps) {
   }, []);
 
   useEffect(() => {
-    setSize(initialSize);
+    if (initialSize) {
+      setSize(initialSize);
+    }
   }, [initialSize]);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      setMaxWidth(containerWidth);
+      if (defaultFullWidth && !initialSize) {
+        setSize(containerWidth);
+      }
+    }
+  }, [containerRef.current, size]);
+
+  if (readOnly) {
+    return <StaticContainer size={size}>{children}</StaticContainer>;
+  }
 
   return (
     <div ref={containerRef}>
-      <BlockAligner readOnly={readOnly} onDelete={onDelete}>
+      <BlockAligner readOnly={readOnly} onEdit={onEdit} onDelete={onDelete}>
         <HorizontalResizer
           aspectRatio={aspectRatio}
           onResizeStop={onResizeStopCallback}

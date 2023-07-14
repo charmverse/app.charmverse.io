@@ -40,6 +40,10 @@ export function spec(): RawSpecs {
         },
         track: {
           default: []
+        },
+        size: {
+          // Making sure default size is middle of max and min range
+          default: null
         }
       },
       group: 'block',
