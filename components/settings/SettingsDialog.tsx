@@ -24,7 +24,7 @@ import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, getSettingsTabs } from './config';
 import { ImportSettings } from './import/ImportSettings';
-import { Invites } from './invites/Invites';
+import { Invites } from './invites/InviteSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 

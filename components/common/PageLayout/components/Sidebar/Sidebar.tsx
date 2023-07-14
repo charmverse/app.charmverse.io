@@ -15,7 +15,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
-import { BlockCounts } from 'components/settings/subscription/BlockCounts';
+import { BlockCounts } from 'components/settings/subscription/components/BlockCounts';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';

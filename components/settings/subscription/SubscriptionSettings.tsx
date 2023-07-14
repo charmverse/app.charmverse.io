@@ -18,14 +18,14 @@ import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
 import Legend from '../Legend';
 
-import { CheckoutForm } from './CheckoutForm';
-import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
-import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
+import { CheckoutForm } from './components/CheckoutForm';
+import { CreateSubscriptionInformation } from './components/CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './components/EnterpriseBillingScreen';
+import { LoadingSubscriptionSkeleton } from './components/LoadingSkeleton';
+import { PlanSelection } from './components/PlanSelection';
+import { SubscriptionInformation } from './components/SubscriptionInformation';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
-import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
-import { PlanSelection } from './PlanSelection';
-import { SubscriptionInformation } from './SubscriptionInformation';
 
 const schema = () => {
   return yup

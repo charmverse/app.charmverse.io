@@ -9,8 +9,9 @@ import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getTimeDifference } from 'lib/utilities/dates';
 
+import { useSpaceSubscription } from '../hooks/useSpaceSubscription';
+
 import { BlocksExplanationModal } from './BlocksExplanation';
-import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 
 /**
  * In future, we may bring back a version of block counts with a modal.
