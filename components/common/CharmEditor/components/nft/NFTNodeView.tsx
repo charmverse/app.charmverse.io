@@ -20,6 +20,7 @@ import Button from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { fancyTrimWords } from 'lib/utilities/strings';
 
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
@@ -156,7 +157,13 @@ function NFTView({ nft }: { nft: { image: string; title: string; link: string } 
             alignItems={{ xs: 'center', md: 'flex-start' }}
             justifyContent='space-between'
           >
-            <Typography component='span' variant='body2' color='text.secondary' align='left'>
+            <Typography
+              component='span'
+              variant='body2'
+              color='text.secondary'
+              align='left'
+              sx={{ height: '3em', overflow: 'hidden', webkitLineClamp: 2 }}
+            >
               {nft.title}
             </Typography>
             <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
