@@ -21,7 +21,7 @@ import { PoapsList } from './PoapsList';
 type Props = {
   properties?: PropertyValueWithDetails[];
   onChange: (values: UpdateMemberPropertyValuePayload[]) => void;
-  showBlockchainData?: boolean;
+  showCollectionOptions?: boolean;
   userId: string;
   refreshPropertyValues: VoidFunction;
 };
@@ -29,9 +29,9 @@ type Props = {
 export function MemberPropertiesForm({
   properties,
   onChange,
-  showBlockchainData = false,
   userId,
-  refreshPropertyValues
+  refreshPropertyValues,
+  showCollectionOptions
 }: Props) {
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const {
@@ -41,19 +41,9 @@ export function MemberPropertiesForm({
     getValues
   } = useForm({ mode: 'onChange' });
   const { user } = useUser();
-  const {
-    isFetchingNfts,
-    isFetchingOrgs,
-    isFetchingPoaps,
-    mutateNfts,
-    mutateOrgs,
-    nfts,
-    nftsError,
-    orgs,
-    orgsError,
-    poaps,
-    poapsError
-  } = useMemberCollections({ memberId: userId });
+  const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
+    memberId: userId
+  });
 
   function handleOnChange(propertyId: string, option: any) {
     const submitData = { ...getValues(), [propertyId]: option };
@@ -113,7 +103,7 @@ export function MemberPropertiesForm({
           />
         ))}
       </Box>
-      {showBlockchainData && (
+      {showCollectionOptions && (
         <Stack gap={3}>
           <Divider
             sx={{
@@ -125,13 +115,6 @@ export function MemberPropertiesForm({
             nfts={nfts}
             nftsError={nftsError}
             mutateNfts={mutateNfts}
-            userId={userId}
-          />
-          <OrgsList
-            isFetchingOrgs={isFetchingOrgs}
-            orgs={orgs}
-            orgsError={orgsError}
-            mutateOrgs={mutateOrgs}
             userId={userId}
           />
           <PoapsList isFetchingPoaps={isFetchingPoaps} poaps={poaps} poapsError={poapsError} />

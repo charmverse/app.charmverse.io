@@ -45,19 +45,8 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     return charmClient.getUserDetails();
   });
 
-  const {
-    isFetchingNfts,
-    isFetchingOrgs,
-    isFetchingPoaps,
-    mutateNfts,
-    mutateOrgs,
-    nfts,
-    nftsError,
-    orgs,
-    orgsError,
-    poaps,
-    poapsError
-  } = useMemberCollections({ memberId: userId });
+  const { isFetchingNfts, isFetchingOrgs, isFetchingPoaps, mutateNfts, nfts, nftsError, orgs, poaps, poapsError } =
+    useMemberCollections({ memberId: userId });
 
   const { getDisplayProperties } = useMemberProperties();
 
@@ -133,18 +122,6 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                         readOnly
                       />
                     )}
-
-                    {orgsError || pinnedOrgs.length === 0 ? null : (
-                      <OrgsList
-                        userId={userId}
-                        orgs={orgs}
-                        orgsError={orgsError}
-                        isFetchingOrgs={isFetchingOrgs}
-                        mutateOrgs={mutateOrgs}
-                        readOnly
-                      />
-                    )}
-
                     {poapsError || poaps.length === 0 ? null : (
                       <PoapsList poaps={poaps} poapsError={poapsError} isFetchingPoaps={isFetchingPoaps} />
                     )}
