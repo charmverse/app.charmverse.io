@@ -145,7 +145,20 @@ function ShareModal(props: {
     // get token list and cache it
     console.log('getting tokens');
     try {
-      const tokens = await LitJsSdk.getTokenList();
+      // Taken from https://github.com/LIT-Protocol/lit-js-sdk/blob/abf4189dcae3d5d6611ee0698ff69b18c5876d6c/src/utils/lit.js#L1458
+      // erc20
+      const erc20Url = "https://tokens.coingecko.com/uniswap/all.json";
+      const erc20Promise = fetch(erc20Url).then((r) => r.json());
+
+      // erc721
+      const erc721Url =
+        "https://raw.githubusercontent.com/0xsequence/token-directory/main/index/mainnet/erc721.json";
+      const erc721Promise = fetch(erc721Url).then((r) => r.json());
+
+      const [erc20s, erc721s] = await Promise.all([erc20Promise, erc721Promise]);
+      const tokens = [...erc20s.tokens, ...erc721s.tokens].sort((a, b) =>
+        a.name > b.name ? 1 : -1
+      );
       setTokenList(tokens);
     } catch (err) {
       setTokenList([]);
@@ -233,7 +246,8 @@ function ShareModal(props: {
       humanizedData = await humanizeNestedConditions([...cleanedAcc]);
       setHumanizedUnifiedAccessControlConditions([...humanizedData]);
     } catch (err) {
-      logDevError(err);
+      console.log(err)
+      logDevError(err)
     }
     setUnifiedAccessControlConditions([...cleanedAcc]);
   };

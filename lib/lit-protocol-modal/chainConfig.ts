@@ -89,11 +89,11 @@ export const chainConfig = {
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
-  mantle: {
-    value: 'mantle',
+  mantleTestnet: {
+    value: 'mantleTestnet',
     label: 'Mantle',
     logo: '/images/cryptoLogos/mantle-logo.svg',
-    abbreviation: 'mantle',
+    abbreviation: 'mantleTestnet',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },

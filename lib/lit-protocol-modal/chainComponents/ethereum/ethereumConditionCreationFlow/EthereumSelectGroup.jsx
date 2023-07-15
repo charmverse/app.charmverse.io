@@ -5,6 +5,7 @@ import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenS
 import LitInput from "../../../reusableComponents/litInput/LitInput";
 import { logDevError } from "../../../shareModal/helpers/helperFunctions";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
+import { decimalPlaces } from "@lit-protocol/misc"
 
 const EthereumSelectGroup = ({
                                updateUnifiedAccessControlConditions,
@@ -152,7 +153,7 @@ const EthereumSelectGroup = ({
     let decimals = 0;
     let unifiedAccessControlConditions;
     try {
-      decimals = await LitJsSdk.decimalPlaces({
+      decimals = await decimalPlaces({
         chain: chain['value'],
         contractAddress: contractAddress,
       });
