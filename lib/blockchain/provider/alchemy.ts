@@ -2,8 +2,9 @@ import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import orderBy from 'lodash/orderBy';
 
-export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
-export type SupportedChainId = (typeof SupportedChainIds)[number];
+// https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
+export const supportedChainIds = [1, 5, 10, 137, 80001, 42161] as const;
+export type SupportedChainId = (typeof supportedChainIds)[number];
 
 interface NftMedia {
   bytes: number;
@@ -49,8 +50,8 @@ interface AlchemyNftResponse {
 
 const alchemyApis: Record<SupportedChainId, string> = {
   1: 'eth-mainnet',
-  4: 'eth-rinkeby',
   5: 'eth-goerli',
+  10: 'opt-mainnet',
   137: 'polygon-mainnet',
   80001: 'polygon-mumbai',
   42161: 'arb-mainnet'
