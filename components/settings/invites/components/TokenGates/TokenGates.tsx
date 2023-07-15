@@ -141,7 +141,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
             injectCSS={false}
             permanentDefault={true}
             isModal={false}
-            onUnifiedAccessControlConditionsSelected={throttledOnSubmit}
+            onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any}
           />
         </ShareModalContainer>
       </Modal>
