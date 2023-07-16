@@ -62,17 +62,8 @@ describe('NFT Utils', () => {
 
   const toURLCases = [
     {
-      // basic example
+      // ethereum
       url: 'https://opensea.io/assets/ethereum/0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21/1273',
-      nft: {
-        chain: 1,
-        contract: '0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21',
-        token: '1273'
-      }
-    },
-    {
-      // supports foreign language urls
-      url: 'https://opensea.io/fr/assets/ethereum/0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21/1273',
       nft: {
         chain: 1,
         contract: '0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21',
