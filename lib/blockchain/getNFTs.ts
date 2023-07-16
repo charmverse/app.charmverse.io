@@ -1,5 +1,6 @@
 import type { UserWallet } from '@charmverse/core/prisma';
 
+import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { SupportedChainId } from './provider/alchemy';
@@ -59,15 +60,7 @@ function mapNftFromAlchemy(
     // errors include "Contract does not have any code"
     return null;
   }
-  let link = '';
-  const tokenId = nft.id.tokenId.startsWith('0x') ? parseInt(nft.id.tokenId, 16) : nft.id.tokenId;
-  if (chainId === 42161) {
-    link = `https://stratosnft.io/assets/${nft.contract.address}/${tokenId}`;
-  } else if (chainId === 1) {
-    link = `https://opensea.io/assets/ethereum/${nft.contract.address}/${tokenId}`;
-  } else if (chainId === 137) {
-    link = `https://opensea.io/assets/matic/${nft.contract.address}/${tokenId}`;
-  }
+  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: nft.id.tokenId }) ?? '';
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
   const image = nft.media[0].gateway?.startsWith('https://') ? nft.media[0].gateway : nft.media[0].raw;
   return {
