@@ -110,14 +110,12 @@ describe('NFT Utils', () => {
 
   toURLCases.forEach((testCase) => {
     test(`getNFTUrl() should generate a URL for test case`, () => {
-      if (testCase.result) {
-        const url = getNFTUrl({
-          chain: testCase.result.chain,
-          token: testCase.result.token,
-          contract: testCase.result.contract
-        });
-        expect(url).toEqual(testCase.url);
-      }
+      const url = getNFTUrl({
+        chain: testCase.nft.chain,
+        token: testCase.nft.token,
+        contract: testCase.nft.contract
+      });
+      expect(url).toEqual(testCase.url);
     });
   });
 });
