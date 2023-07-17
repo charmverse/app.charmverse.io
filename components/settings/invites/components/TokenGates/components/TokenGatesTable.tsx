@@ -204,11 +204,6 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                   >
                     {descriptions[tokenGateIndex]}
                   </Typography>
-                  {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='caption' sx={{ mt: 1 }}>
-                      -- OR --
-                    </Typography>
-                  )}
                 </TableCell>
                 <TableCell>
                   <TokenGateRolesSelect

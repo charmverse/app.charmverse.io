@@ -114,7 +114,7 @@ export const chainConfig = {
   mumbai: {
     value: 'mumbai',
     label: 'Mumbai',
-    logo: '/images/cryptoLogos/polygon-matic-logo.png',
+    logo: '/images/cryptoLogos/polygon-matic-logo.svg',
     abbreviation: 'mumbai',
     nativeToken: 'MATIC',
     types: ethereumTypesConfig,
