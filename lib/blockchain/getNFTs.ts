@@ -6,6 +6,9 @@ import { isTruthy } from 'lib/utilities/types';
 import type { SupportedChainId } from './provider/alchemy';
 import * as alchemyApi from './provider/alchemy';
 
+// eventually we will also include Mantle id
+export { supportedMainnets } from 'lib/blockchain/provider/alchemy';
+
 export type NFTData = {
   id: string;
   tokenId: string;

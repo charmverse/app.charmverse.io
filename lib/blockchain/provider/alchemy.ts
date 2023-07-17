@@ -4,6 +4,7 @@ import orderBy from 'lodash/orderBy';
 
 // https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
 export const supportedChainIds = [1, 5, 10, 137, 80001, 42161] as const;
+export const supportedMainnets = [1, 10, 137, 42161] as const;
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
 interface NftMedia {

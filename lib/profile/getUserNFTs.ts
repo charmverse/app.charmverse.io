@@ -1,8 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getNFTs } from 'lib/blockchain/getNFTs';
-
-export const supportedMainnets = [1, 137, 42161] as const;
+import { supportedMainnets, getNFTs } from 'lib/blockchain/getNFTs';
 
 export const getUserNFTs = async (userId: string) => {
   const profileItems = await prisma.profileItem.findMany({
