@@ -122,7 +122,7 @@ export function CurrentUserProfile({
             refreshPropertyValues={refreshPropertyValues}
             onChange={onMemberDetailsChange}
             userId={currentUser.id}
-            showBlockchainData
+            showCollectionOptions
           />
           <Box display='flex' justifyContent='flex-end' mt={2}>
             <Button disableElevation size='large' onClick={saveForm}>

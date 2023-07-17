@@ -132,7 +132,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
           </Stack>
         </form>
 
-        {!!space.customDomain && (
+        {!!space.customDomain && isAdmin && (
           <Accordion
             expanded={showCustomDomainVerification}
             onChange={() => {

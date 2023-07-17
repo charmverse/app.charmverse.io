@@ -6,7 +6,12 @@ import { TextSelection } from 'prosemirror-state';
 
 export const undoEventName = 'editor-undo';
 
-export function insertNode(state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, nodeToInsert: Node) {
+export function insertNode(
+  state: EditorState,
+  dispatch: ((tr: Transaction) => void) | undefined,
+  nodeToInsert: Node,
+  inheritMarks = true
+) {
   const insertPos = state.selection.$from.after();
 
   const tr = state.tr;

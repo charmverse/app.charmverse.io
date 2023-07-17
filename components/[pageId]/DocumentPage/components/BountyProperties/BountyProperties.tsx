@@ -14,7 +14,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import CharmButton from 'components/common/Button';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
@@ -293,7 +293,7 @@ export default function BountyProperties(props: {
               sx={{
                 width: '100%'
               }}
-              onChange={async (chainId) => {
+              onChange={(chainId) => {
                 const newNativeCurrency = refreshCryptoList(chainId);
                 applyBountyUpdates({
                   chainId,
