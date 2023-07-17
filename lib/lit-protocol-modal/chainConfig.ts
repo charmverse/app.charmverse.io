@@ -1,5 +1,5 @@
-import { ethereumTypesConfig } from "./chainComponents/ethereum/ethereumTypesConfig";
-import { solanaTypesConfig } from "./chainComponents/solana/solanaTypesConfig";
+import { ethereumTypesConfig } from './chainComponents/ethereum/ethereumTypesConfig';
+import { solanaTypesConfig } from './chainComponents/solana/solanaTypesConfig';
 
 import { utils, Wordlist, constants } from 'ethers';
 
@@ -10,7 +10,7 @@ type LitChainConfig = {
   abbreviation: string;
   types: any;
   addressValidator: (walletAddress: string) => boolean;
-}
+};
 
 // We don't these chains for now. Keeping this here for documentation purposes
 export const unsupportedChains: Record<string, LitChainConfig> = {
@@ -69,8 +69,8 @@ export const unsupportedChains: Record<string, LitChainConfig> = {
     abbreviation: 'aoa',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
-  },
-}
+  }
+};
 
 export const chainConfig = {
   ethereum: {
@@ -175,13 +175,5 @@ export const chainConfig = {
     abbreviation: 'goerli',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
-  },
-  rinkeby: {
-    value: 'rinkeby',
-    label: 'Rinkeby',
-    logo: '/images/cryptoLogos/ethereum-eth-logo.svg',
-    abbreviation: 'rinkeby',
-    types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => true
   }
-}
+};
