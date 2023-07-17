@@ -66,7 +66,7 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
-import * as nft from './components/nft/nft';
+import * as nft from './components/nft/nft.plugins';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';

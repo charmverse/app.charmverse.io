@@ -1,5 +1,8 @@
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/dist/cjs/permissions';
 import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
+import type { ProposalCategoryOperation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { RateLimit } from 'async-sema';
 
 import type {
   Discussion,
@@ -9,6 +12,7 @@ import type {
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -16,6 +20,11 @@ import { getProposalAction } from './getProposalAction';
 import type { ProposalWithCommentsAndUsers } from './interface';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
+
+// For a user with a large amount of space memberships, don't fire off hundreds of request simultaneously
+const spacesHandledPerSecond = 10;
+
+const spaceFetcherRateLimit = RateLimit(spacesHandledPerSecond);
 
 export interface ProposalTask {
   id: string; // the id of the workspace event
@@ -80,6 +89,11 @@ export async function getProposalTasks(userId: string): Promise<{
     },
     select: {
       spaceId: true,
+      space: {
+        select: {
+          paidTier: true
+        }
+      },
       spaceRoleToRole: {
         where: {
           spaceRole: {
@@ -100,9 +114,34 @@ export async function getProposalTasks(userId: string): Promise<{
   const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
   // Get all the roleId assigned to this user for each space
   const roleIds = spaceRoles
+    // We should not send role-based notifications for free spaces
+    .filter((spaceRole) => spaceRole.space.paidTier !== 'free')
     .map((spaceRole) => spaceRole.spaceRoleToRole)
     .flat()
     .map(({ role }) => role.id);
+
+  const visibleCategories: ProposalCategoryWithPermissions[] = (
+    await Promise.all(
+      spaceIds.map((id) =>
+        (async () => {
+          await spaceFetcherRateLimit();
+          const spacePermissionsClient = await getPermissionsClient({
+            resourceId: id,
+            resourceIdType: 'space'
+          });
+          return spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
+            spaceId: id,
+            userId
+          });
+        })()
+      )
+    )
+  ).flat();
+
+  const categoryMap = visibleCategories.reduce((acc, category) => {
+    acc[category.id] = category;
+    return acc;
+  }, {} as Record<string, ProposalCategoryWithPermissions>);
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
@@ -116,8 +155,41 @@ export async function getProposalTasks(userId: string): Promise<{
           not: true
         },
         status: {
-          not: 'draft'
-        }
+          in: ['discussion', 'review', 'reviewed', 'vote_active']
+        },
+        OR: [
+          {
+            categoryId: {
+              in: visibleCategories.map((c) => c.id)
+            }
+          },
+          {
+            createdBy: userId
+          },
+          {
+            authors: {
+              some: {
+                userId
+              }
+            }
+          },
+          {
+            reviewers: {
+              some: {
+                userId
+              }
+            }
+          },
+          {
+            reviewers: {
+              some: {
+                roleId: {
+                  in: roleIds
+                }
+              }
+            }
+          }
+        ]
       }
     },
     include: {
@@ -174,7 +246,16 @@ export async function getProposalTasks(userId: string): Promise<{
           taskId: workspaceEvent.id,
           createdAt: workspaceEvent.createdAt
         };
-        tasks.push(proposalTask);
+
+        if (
+          proposal.categoryId &&
+          ((action === 'discuss' && !categoryMap[proposal.categoryId]?.permissions.comment_proposals) ||
+            (action === 'vote' && !categoryMap[proposal.categoryId]?.permissions.vote_proposals))
+        ) {
+          // Do nothing
+        } else {
+          tasks.push(proposalTask);
+        }
       }
     }
   });

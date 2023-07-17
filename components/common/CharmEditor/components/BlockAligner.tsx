@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { ListItemButton } from '@mui/material';
 import type { ReactNode, MouseEvent } from 'react';
 import { memo, forwardRef } from 'react';
@@ -8,6 +9,7 @@ import { memo, forwardRef } from 'react';
 interface BlockAlignerProps {
   children: ReactNode;
   onDelete: () => void;
+  onEdit?: () => void;
   readOnly?: boolean;
 }
 
@@ -38,12 +40,17 @@ const Controls = styled.div`
 `;
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
-  const { children, onDelete, readOnly } = props;
+  const { children, onDelete, onEdit, readOnly } = props;
   const theme = useTheme();
 
-  function handleDelete(e: MouseEvent) {
-    onDelete();
+  function handleEdit(e: MouseEvent) {
     e.stopPropagation();
+    onEdit?.();
+  }
+
+  function handleDelete(e: MouseEvent) {
+    e.stopPropagation();
+    onDelete();
   }
 
   return (
@@ -51,12 +58,20 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
       {children}
       {!readOnly && (
         <Controls className='controls'>
+          {onEdit && (
+            <ListItemButton
+              onClick={handleEdit}
+              sx={{
+                padding: 1,
+                backgroundColor: 'inherit',
+                color: 'secondary'
+              }}
+            >
+              <EditOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.primary }} />
+            </ListItemButton>
+          )}
           <ListItemButton
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDelete(e);
-            }}
+            onClick={handleDelete}
             sx={{
               padding: 1,
               backgroundColor: 'inherit',

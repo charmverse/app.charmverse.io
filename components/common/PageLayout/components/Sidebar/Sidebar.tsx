@@ -130,7 +130,7 @@ interface SidebarProps {
   navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
+export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
   const { space } = useCurrentSpace();

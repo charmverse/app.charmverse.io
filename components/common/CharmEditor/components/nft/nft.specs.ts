@@ -1,11 +1,12 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
-import type { supportedChainIds } from 'connectors';
+
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 
 import { name } from './config';
 
 export type NodeAttrs = {
-  chain: (typeof supportedChainIds)[number];
+  chain: SupportedChainId;
   contract: string;
   token: string;
 };
@@ -39,6 +40,10 @@ export function spec(): RawSpecs {
         },
         track: {
           default: []
+        },
+        size: {
+          // Making sure default size is middle of max and min range
+          default: null
         }
       },
       group: 'block',
@@ -47,7 +52,7 @@ export function spec(): RawSpecs {
       isolating: true, // dont allow backspace to delete
       parseDOM: [
         {
-          tag: 'nft-embed',
+          tag: 'div.nft-embed',
           getAttrs: (dom: any) => {
             return {
               chain: parseInt(dom.getAttribute('data-chain'), 10),
@@ -59,8 +64,13 @@ export function spec(): RawSpecs {
       ],
       toDOM: (node: Node) => {
         return [
-          'nft-embed',
-          { 'data-chain': node.attrs.chain, 'data-token': node.attrs.token, 'data-contract': node.attrs.contract }
+          'div',
+          {
+            class: 'nft-embed',
+            'data-chain': node.attrs.chain,
+            'data-token': node.attrs.token,
+            'data-contract': node.attrs.contract
+          }
         ];
       }
     }
