@@ -165,8 +165,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           });
         }
 
-        if (invoice.charge) {
-          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+        if (invoice.paid) {
+          const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
           trackUserAction('subscription_payment', {
             spaceId,
             blockQuota,
@@ -175,7 +175,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             subscriptionId: stripeSubscription.id,
             paymentMethod: invoice.metadata?.transaction_hash
               ? 'crypto'
-              : charge.payment_method_details?.type?.startsWith('ach')
+              : charge?.payment_method_details?.type?.startsWith('ach')
               ? 'ach'
               : 'card',
             userId: space.createdBy
