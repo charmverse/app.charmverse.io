@@ -28,7 +28,7 @@ export function PoapsList({
         (isFetchingPoaps ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
             {sortedPoapData.length !== 0 ? (
               sortedPoapData.slice(0, 5).map((poap) => {
                 const poapData = transformPoap(poap);
