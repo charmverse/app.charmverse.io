@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState, Fragment } from 'react';
 import { ethers, utils } from "ethers";
-import LitJsSdk from "lit-js-sdk";
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenSelect";
 import LitInput from "../../../reusableComponents/litInput/LitInput";
 import { logDevError } from "../../../shareModal/helpers/helperFunctions";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
+import { decimalPlaces } from "@lit-protocol/misc"
 import { Radio, RadioGroup, FormControlLabel } from "@mui/material";
-
 
 const nativeTokenOption = {
   label: 'Ethereum',
@@ -15,11 +15,11 @@ const nativeTokenOption = {
 };
 
 const EthereumSelectGroup = ({
-                               updateUnifiedAccessControlConditions,
-                               submitDisabled,
-                               chain,
-                               initialState = null
-                             }) => {
+  updateUnifiedAccessControlConditions,
+  submitDisabled,
+  chain,
+  initialState = null
+}) => {
   const [ amount, setAmount ] = useState("");
   const [ selectedToken, setSelectedToken ] = useState(nativeTokenOption);
   const [ contractAddress, setContractAddress ] = useState("");
@@ -160,7 +160,7 @@ const EthereumSelectGroup = ({
     let decimals = 0;
     let unifiedAccessControlConditions;
     try {
-      decimals = await LitJsSdk.decimalPlaces({
+      decimals = await decimalPlaces({
         chain: chain['value'],
         contractAddress: contractAddress,
       });

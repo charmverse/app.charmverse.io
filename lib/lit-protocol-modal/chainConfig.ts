@@ -32,6 +32,15 @@ export const chainConfig = {
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
+  mantleTestnet: {
+    value: 'mantleTestnet',
+    label: 'Mantle Testnet',
+    logo: '/images/cryptoLogos/mantle-logo.svg',
+    abbreviation: 'mantleTestnet',
+    nativeToken: 'MNT',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
   mantle: {
     value: 'mantle',
     label: 'Mantle',
@@ -114,7 +123,7 @@ export const chainConfig = {
   mumbai: {
     value: 'mumbai',
     label: 'Mumbai',
-    logo: '/images/cryptoLogos/polygon-matic-logo.png',
+    logo: '/images/cryptoLogos/polygon-matic-logo.svg',
     abbreviation: 'mumbai',
     nativeToken: 'MATIC',
     types: ethereumTypesConfig,

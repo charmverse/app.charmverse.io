@@ -271,7 +271,7 @@ const RPC = {
     chainId: 5001,
     chainName: 'Mantle - Testnet',
     nativeCurrency: {
-      name: 'Mantle',
+      name: 'Testnet Mantle',
       symbol: 'MNT',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
@@ -281,6 +281,21 @@ const RPC = {
     blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
     shortName: 'mantle-testnet'
+  },
+  MANTLE: {
+    chainId: 5000,
+    chainName: 'Mantle',
+    nativeCurrency: {
+      name: 'Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.mantle.xyz'],
+    blockExplorerUrls: ['https://explorer.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    shortName: 'mantle'
   }
 } as const;
 
