@@ -5,6 +5,14 @@ import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenS
 import LitInput from "../../../reusableComponents/litInput/LitInput";
 import { logDevError } from "../../../shareModal/helpers/helperFunctions";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
+import { Radio, RadioGroup, FormControlLabel } from "@mui/material";
+
+
+const nativeTokenOption = {
+  label: 'Ethereum',
+  value: 'ethereum',
+  standard: 'ethereum',
+};
 
 const EthereumSelectGroup = ({
                                updateUnifiedAccessControlConditions,
@@ -13,7 +21,7 @@ const EthereumSelectGroup = ({
                                initialState = null
                              }) => {
   const [ amount, setAmount ] = useState("");
-  const [ selectedToken, setSelectedToken ] = useState({});
+  const [ selectedToken, setSelectedToken ] = useState(nativeTokenOption);
   const [ contractAddress, setContractAddress ] = useState("");
   const [ contractType, setContractType ] = useState("");
   const [ erc1155TokenId, setErc1155TokenId ] = useState("");
@@ -216,18 +224,28 @@ const EthereumSelectGroup = ({
     setContractType(value);
   };
 
+  const [value, setValue] = useState('native_token');
+  const handleChange = (event) => {
+    setValue(event.target.value);
+    if (event.target.value === 'native_token') {
+      setSelectedToken(nativeTokenOption);
+    }
+    else {
+      setSelectedToken({});
+    }
+  };
+
   return (
     <div className={'lsm-condition-container'}>
       <h3 className={'lsm-condition-prompt-text'}>Which group
         should be able to access this asset?</h3>
-      <h3 className={'lsm-condition-prompt-text'}>Select
-        token/NFT or enter contract address:</h3>
-      <LitTokenSelect option={selectedToken}
-                      label={(!selectedToken || !selectedToken['label']) ? 'Search for a token/NFT' : selectedToken.label}
-                      selectedToken={selectedToken}
-                      setSelectedToken={setSelectedToken}
-                      allowEthereum={true}
-      />
+      <RadioGroup
+        value={value}
+        onChange={handleChange}
+      >
+        <FormControlLabel value='native_token' control={<Radio />} label={`Check balance of ${chain.nativeToken || 'native token'}`} />
+        <FormControlLabel value='custom_token' control={<Radio />} label='Custom token' />
+      </RadioGroup>
       {selectedToken?.['value'] !== 'ethereum' && (
         <Fragment>
           <h3
