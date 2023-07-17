@@ -63,3 +63,9 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    - name: Checking if the custom branch is still there. 
+      shell: bash
+      run: |
+        cat node_modules/@charmverse/core/package.json | jq '.version'
+        cat node_modules/@charmverse/core/src/prisma/schema.prisma | egrep "^///" || true
+
