@@ -16,6 +16,7 @@ on:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
+  CORE_GITHUB_BRANCH: "gha-change-install-order"
 
 jobs:
   build-test-env:
@@ -36,6 +37,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build
@@ -60,6 +62,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -115,6 +118,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build

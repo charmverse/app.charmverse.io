@@ -7,6 +7,11 @@ inputs:
   commit_core_pkg_upgrade:
     description: "Whether commit the update to core package back to branch"
     required: false
+  use_github_core_branch:
+    description: |
+      Optional, core branch name to install from github. 
+      If set core_pkg_version and commit_core_pkg_upgrade will be ignored
+    required: false
 
 runs:
   using: "composite"
@@ -39,8 +44,12 @@ runs:
     # 2. Set core branch
     - name: Install special core library
       shell: bash
-      if: github.head_ref == 'ux/filter-proposal-notifications'
-      run: rm -rf ./node_modules/@charmverse && npm install github:charmverse/core#ux/filter-proposal-notifications && cd node_modules/@charmverse/core && npm run build 
+      if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
+      run: |
+        rm -rf ./node_modules/@charmverse && 
+        npm install github:charmverse/core#ux/filter-proposal-notifications &&
+        cd node_modules/@charmverse/core &&
+        npm run build 
 
     - name: Cache dependencies
       id: cache_node_modules
