@@ -406,17 +406,18 @@ export async function checkSpaceSpaceSubscriptionInfo({
 
   return engine;
 }
+export type SpacePermissionsClient = {
+  type: PermissionsEngine;
+  client: PermissionsClient | PremiumPermissionsClient;
+};
 
 /**
  * Get correct permissions client for a specific space, return premium client if space is paid subscriber
  * */
-export async function getPermissionsClient(
-  request: GetPermissionClient
-): Promise<{ type: 'free' | 'premium'; client: PermissionsClient | PremiumPermissionsClient }>;
 export async function getPermissionsClient({
   resourceId,
   resourceIdType = 'space'
-}: GetPermissionClient): Promise<{ type: PermissionsEngine; client: PermissionsClient | PremiumPermissionsClient }> {
+}: GetPermissionClient): Promise<SpacePermissionsClient> {
   const spaceInfo = await checkSpaceSpaceSubscriptionInfo({
     resourceId,
     resourceIdType

@@ -264,8 +264,38 @@ const RPC = {
     },
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
-    iconUrl: '/images/cryptoLogos/zksync-era-logo.png',
-    shortName: 'era'
+    iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
+    shortName: 'zksync'
+  },
+  MANTLE_TESTNET: {
+    chainId: 5001,
+    chainName: 'Mantle - Testnet',
+    nativeCurrency: {
+      name: 'Testnet Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.testnet.mantle.xyz'],
+    blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    shortName: 'mantle-testnet'
+  },
+  MANTLE: {
+    chainId: 5000,
+    chainName: 'Mantle',
+    nativeCurrency: {
+      name: 'Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.mantle.xyz'],
+    blockExplorerUrls: ['https://explorer.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    shortName: 'mantle'
   }
 } as const;
 
@@ -331,7 +361,8 @@ const supportedChains: Blockchain[] = [
   'OPTIMISM',
   'SEPOLIA',
   'MUMBAI',
-  'ZKSYNC'
+  'ZKSYNC',
+  'MANTLE_TESTNET'
 ];
 
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
@@ -417,6 +448,8 @@ export function getChainExplorerLink(
     case '324':
       return `https://explorer.zksync.io/${path}/${transactionOrContractId}`;
 
+    case '5001':
+      return `https://explorer.testnet.mantle.xyz/${path}/${transactionOrContractId}`;
     default:
       return '';
   }

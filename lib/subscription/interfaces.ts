@@ -39,10 +39,7 @@ export type ProSubscriptionResponse = {
 };
 export type CreateCryptoSubscriptionResponse = string;
 
-export type CreateCryptoSubscriptionRequest = {
-  subscriptionId: string;
-  email: string;
-};
+export type CreateCryptoSubscriptionRequest = CreateProSubscriptionRequest;
 
 export type StripeMetadataKeys = {
   domain: string;

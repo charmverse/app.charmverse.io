@@ -1,4 +1,4 @@
-import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
+import type { PageMeta, PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
@@ -25,7 +25,7 @@ import { isTruthy } from 'lib/utilities/types';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-function mapPageToMenuNode(page: PageWithPermissions): MenuNode {
+function mapPageToMenuNode(page: PageMeta): MenuNode {
   return {
     id: page.id,
     title: page.title,
@@ -43,7 +43,7 @@ function mapPageToMenuNode(page: PageWithPermissions): MenuNode {
 
 export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
   return Object.values(pageMap)
-    .filter((page): page is PageWithPermissions =>
+    .filter((page): page is PageMeta =>
       isTruthy(
         page &&
           (page.type === 'board' ||
@@ -80,7 +80,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const pagesArray: MenuNode[] = isFavorites
     ? Object.values(pages)
-        .filter((page): page is PageWithPermissions => isTruthy(page))
+        .filter((page): page is PageMeta => isTruthy(page))
         .map(mapPageToMenuNode)
     : filterVisiblePages(pages);
 

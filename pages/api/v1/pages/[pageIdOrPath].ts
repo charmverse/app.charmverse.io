@@ -13,6 +13,8 @@ handler.get(getPageHandler);
  * /pages/{pageIdOrPath}:
  *   get:
  *     summary: Find page by ID or path
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
  *         description: Page with content and markdown

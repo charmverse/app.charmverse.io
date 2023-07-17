@@ -92,7 +92,7 @@ export async function createProSubscription({
     }));
 
   // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
-  const productPrice = await getCommunityPrice(productId, period, spaceId);
+  const productPrice = await getCommunityPrice(productId, period);
 
   // Case when the user is updating his subscription in checkout
   if (existingStripeSubscription && existingStripeSubscription.status === 'incomplete') {
@@ -119,14 +119,9 @@ export async function createProSubscription({
         quantity: blockQuota
       }
     ],
-    ...(promoCodeData
-      ? {
-          [promoCodeData.type]: promoCodeData.id
-        }
-      : {
-          coupon: undefined,
-          promotion_code: undefined
-        }),
+    ...(promoCodeData && {
+      [promoCodeData.type]: promoCodeData.id
+    }),
     payment_settings: {
       save_default_payment_method: 'on_subscription'
     },

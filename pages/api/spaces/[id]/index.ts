@@ -74,7 +74,7 @@ async function deleteSpace(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  await deleteProSubscription({ spaceId, userId }).catch();
+  await deleteProSubscription({ spaceId, userId });
 
   await prisma.space.delete({
     where: {

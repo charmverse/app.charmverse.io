@@ -1,22 +1,21 @@
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
-let adminUser: LoggedInUser;
 let memberUser: LoggedInUser;
 
 let adminCookie: string;
 let memberCookie: string;
 
 beforeAll(async () => {
-  const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-  adminUser = generatedUser;
+  const { space: generatedSpace, user: adminUser } = await generateUserAndSpace({ isAdmin: true });
   memberUser = await generateSpaceUser({ isAdmin: false, spaceId: generatedSpace.id });
   space = generatedSpace;
   adminCookie = await loginUser(adminUser.id);
@@ -67,5 +66,23 @@ describe('PUT /api/spaces - Update space profile', () => {
       spaceImage: `https://new-space-logo-${v4()}.png`
     };
     await request(baseUrl).put(`/api/spaces/${space.id}`).set('Cookie', memberCookie).send(update).expect(401);
+  });
+});
+
+describe('DELETE /api/spaces - Delete space', () => {
+  it('Should allow an admin to delete a space, responding 200', async () => {
+    const data = await generateUserAndSpace({ isAdmin: true });
+    const sessionCookie = await loginUser(data.user.id);
+    await request(baseUrl).delete(`/api/spaces/${data.space.id}`).set('Cookie', sessionCookie).expect(200);
+    const dbSpace = await prisma.space.findUnique({ where: { id: data.space.id } });
+    expect(dbSpace).toBeNull();
+  });
+
+  it('Should fail if user is not an admin and respond with 401', async () => {
+    const data = await generateUserAndSpace();
+    const sessionCookie = await loginUser(data.user.id);
+    await request(baseUrl).put(`/api/spaces/${data.space.id}`).set('Cookie', sessionCookie).expect(401);
+    const dbSpace = await prisma.space.findUnique({ where: { id: data.space.id } });
+    expect(dbSpace).not.toBeNull();
   });
 });

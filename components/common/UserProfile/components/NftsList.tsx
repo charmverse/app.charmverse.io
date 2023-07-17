@@ -6,8 +6,7 @@ import type { KeyedMutator } from 'swr';
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import type { NftData } from 'lib/blockchain/interfaces';
-import { transformNft } from 'lib/blockchain/transformNft';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 
 import { NftAvatarGalleryPopup } from './NftAvatarGallery/NftAvatarGalleryPopup';
 import { NonPinnedItem, ProfileItemContainer } from './ProfileItemContainer';
@@ -19,9 +18,9 @@ type Props = {
   userId: string;
   readOnly?: boolean;
   isFetchingNfts: boolean;
-  mutateNfts: KeyedMutator<NftData[]>;
+  mutateNfts: KeyedMutator<NFTData[]>;
   nftsError: any;
-  nfts: NftData[];
+  nfts: NFTData[];
 };
 
 export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts, nfts, nftsError }: Props) {
@@ -31,8 +30,8 @@ export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts,
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
-  async function updateNft(nft: NftData) {
-    await updateProfileItem<NftData>(nft, 'nft', nft.walletId, mutateNfts);
+  async function updateNft(nft: NFTData) {
+    await updateProfileItem<NFTData>(nft, 'nft', nft.walletId, mutateNfts);
     setIsShowingNftGallery(false);
   }
 
@@ -55,15 +54,14 @@ export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts,
               pinnedNfts
                 .sort((nft1, nft2) => (nft1.title > nft2.title ? 1 : -1))
                 .map((nft) => {
-                  const nftData = transformNft(nft);
                   return (
                     <ProfileItemContainer key={nft.id}>
                       {!readOnly && (
                         <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
                       )}
-                      <Tooltip title={nftData.title}>
-                        <Link href={nftData.link} target='_blank' display='flex'>
-                          <Avatar size='large' isNft avatar={nftData.image} />
+                      <Tooltip title={nft.title}>
+                        <Link href={nft.link} target='_blank' display='flex'>
+                          <Avatar size='large' isNft avatar={nft.image ?? nft.imageThumb} />
                         </Link>
                       </Tooltip>
                     </ProfileItemContainer>

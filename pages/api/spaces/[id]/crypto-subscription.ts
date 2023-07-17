@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['subscriptionId', 'email'], 'body'))
+  .use(requireKeys(['billingEmail', 'blockQuota', 'period'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createCryptoSubscriptionIntent);
 
@@ -18,11 +18,17 @@ async function createCryptoSubscriptionIntent(
   req: NextApiRequest,
   res: NextApiResponse<CreateCryptoSubscriptionResponse>
 ) {
-  const { email, subscriptionId } = req.body as CreateCryptoSubscriptionRequest;
+  const spaceId = req.query.id as string;
+  const { billingEmail, coupon, blockQuota, period, address, name } = req.body as CreateCryptoSubscriptionRequest;
 
   const cryptoUrl = await createCryptoSubscription({
-    subscriptionId,
-    email
+    billingEmail,
+    blockQuota,
+    period,
+    address,
+    name,
+    coupon,
+    spaceId
   });
 
   res.status(200).json(cryptoUrl);

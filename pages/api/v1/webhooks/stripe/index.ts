@@ -36,31 +36,6 @@ const handler = defaultHandler();
 
 handler.post(stripePayment);
 
-/**
- * @swagger
- * /stripe:
- *   post:
- *     summary: Create/Update a Stripe subscription from an event.
- *     description: We will receive an event and depending on type we will update the db.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       [key: string]:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Update succeeded
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Subcsription'
- */
-
 export async function stripePayment(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers['stripe-signature'] as string | undefined;
@@ -126,16 +101,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         };
 
         await prisma.$transaction([
-          prisma.stripeSubscription.upsert({
-            where: {
-              subscriptionId: stripeSubscription.id,
-              spaceId
-            },
-            create: {
+          prisma.stripeSubscription.create({
+            data: {
               ...newData,
               spaceId
-            },
-            update: {}
+            }
           }),
           prisma.space.update({
             where: {
@@ -195,8 +165,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           });
         }
 
-        if (invoice.charge) {
-          const charge = await stripeClient.charges.retrieve(invoice.charge as string);
+        if (invoice.paid) {
+          const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
           trackUserAction('subscription_payment', {
             spaceId,
             blockQuota,
@@ -205,7 +175,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             subscriptionId: stripeSubscription.id,
             paymentMethod: invoice.metadata?.transaction_hash
               ? 'crypto'
-              : charge.payment_method_details?.type?.startsWith('ach')
+              : charge?.payment_method_details?.type?.startsWith('ach')
               ? 'ach'
               : 'card',
             userId: space.createdBy
@@ -362,7 +332,9 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const spaceId = subscription.metadata.spaceId as string;
         const spaceSubscription = await prisma.stripeSubscription.findUnique({
           where: {
-            subscriptionId: subscription.id
+            subscriptionId: subscription.id,
+            spaceId,
+            deletedAt: null
           },
           select: {
             id: true,
@@ -372,7 +344,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
 
         if (!spaceSubscription) {
           log.warn(
-            `Can't update the user subscription. Space subscription not found for subscription ${subscription.id}`
+            `Can't delete the space subscription. Space subscription not found for subscription ${subscription.id}`
           );
           break;
         }
@@ -380,7 +352,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const afterUpdate = await prisma.stripeSubscription.update({
           where: {
             spaceId,
-            subscriptionId: subscription.id
+            subscriptionId: subscription.id,
+            deletedAt: null
           },
           data: {
             deletedAt: new Date()
@@ -401,6 +374,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: spaceId
             },
             data: {
+              updatedAt: new Date(),
               paidTier: 'cancelled'
             }
           });
@@ -411,18 +385,18 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             spaceId,
             userId: afterUpdate.space.createdBy
           });
-        }
 
-        relay.broadcast(
-          {
-            type: 'space_subscription',
-            payload: {
-              type: 'cancelled',
-              paidTier: 'cancelled'
-            }
-          },
-          spaceId
-        );
+          relay.broadcast(
+            {
+              type: 'space_subscription',
+              payload: {
+                type: 'cancelled',
+                paidTier: 'cancelled'
+              }
+            },
+            spaceId
+          );
+        }
 
         break;
       }
@@ -487,10 +461,10 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
       }
     }
 
-    res.status(200).end();
+    return res.status(200).json({});
   } catch (err: any) {
     log.warn('Stripe webhook failed to construct event', err);
-    res.status(400).json(`Webhook Error: ${err?.message}`);
+    return res.status(400).json(`Webhook Error: ${err?.message}`);
   }
 }
 

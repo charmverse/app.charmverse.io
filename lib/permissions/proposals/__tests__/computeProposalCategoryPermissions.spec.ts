@@ -32,6 +32,9 @@ describe('computeProposalCategoryPermissions', () => {
 
     expect(permissions).toMatchObject<ProposalCategoryPermissionFlags>({
       create_proposal: true,
+      comment_proposals: true,
+      view_category: true,
+      vote_proposals: true,
       delete: false,
       edit: false,
       manage_permissions: false
@@ -47,18 +50,24 @@ describe('computeProposalCategoryPermissions', () => {
       create_proposal: true,
       delete: true,
       edit: true,
+      comment_proposals: true,
+      view_category: true,
+      vote_proposals: true,
       manage_permissions: false
     });
   });
 
-  it('should return empty permissions for none space members', async () => {
+  it('should return view permissions for non space members', async () => {
     const permissions = await computeProposalCategoryPermissions({
       resourceId: proposalCategory.id,
       userId: undefined
     });
 
     expect(permissions).toMatchObject<ProposalCategoryPermissionFlags>({
+      view_category: true,
       create_proposal: false,
+      comment_proposals: false,
+      vote_proposals: false,
       delete: false,
       edit: false,
       manage_permissions: false

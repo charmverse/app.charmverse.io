@@ -50,7 +50,7 @@ export async function getActiveSpaceSubscription({
     subscription: subscriptionInStripe as Stripe.Subscription & { customer: Stripe.Customer }
   });
 
-  if (stripeData.paymentMethod && requestCustomerPortal) {
+  if (stripeData.paymentMethod && requestCustomerPortal && returnUrl) {
     const portal = await stripeClient.billingPortal.sessions.create({
       customer: (subscriptionInStripe.customer as Stripe.Customer).id,
       return_url: returnUrl

@@ -29,7 +29,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .delete(deletePaymentSubscription)
   .put(updatePaymentSubscription)
-  .use(requireKeys(['period', 'blockQuota'], 'body'))
+  .use(requireKeys(['period', 'blockQuota', 'billingEmail'], 'body'))
   .post(createPaymentSubscription);
 
 async function getSpaceSubscriptionController(

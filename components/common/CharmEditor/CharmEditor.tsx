@@ -39,9 +39,7 @@ import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugin
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import * as columnLayout from './components/columnLayout';
-import ColumnLayoutColumn from './components/columnLayout/Column';
-import ColumnLayoutRow from './components/columnLayout/ColumnLayoutRow';
+import * as columnLayout from './components/columnLayout/columnLayout.plugins';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -68,7 +66,7 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
-import * as nft from './components/nft/nft';
+import * as nft from './components/nft/nft.plugins';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';
@@ -108,6 +106,7 @@ const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
 const linksPluginKey = new PluginKey('links');
 const inlinePalettePluginKey = new PluginKey('inlinePalette');
+const columnsPluginKey = new PluginKey('columns');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -200,7 +199,10 @@ export function charmEditorPlugins({
       readOnly
     }),
     orderedList.plugins(),
-    columnLayout.plugins(),
+    columnLayout.plugins({
+      key: columnsPluginKey,
+      readOnly
+    }),
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins() as RawPlugins,
@@ -622,12 +624,6 @@ function CharmEditor({
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
-          case 'columnLayout': {
-            return <ColumnLayoutRow node={props.node}>{_children}</ColumnLayoutRow>;
-          }
-          case 'columnBlock': {
-            return <ColumnLayoutColumn node={props.node}>{_children}</ColumnLayoutColumn>;
-          }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (

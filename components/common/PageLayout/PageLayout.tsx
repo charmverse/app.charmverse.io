@@ -25,7 +25,7 @@ import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import { PaidAnnouncementBanner } from './components/PaidAnnouncementBanner';
-import Sidebar from './components/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
 const MIN_SIDEBAR_WIDTH = 200;

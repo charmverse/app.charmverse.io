@@ -66,7 +66,16 @@ beforeAll(async () => {
 });
 
 // Defining these here so that the test is more resilient against future changes
-const authorPermissions: ProposalOperation[] = ['view', 'comment', 'vote', 'create_vote', 'edit', 'delete'];
+const authorPermissions: ProposalOperation[] = [
+  'view',
+  'comment',
+  'vote',
+  'create_vote',
+  'edit',
+  'delete',
+  'archive',
+  'unarchive'
+];
 const reviewerPermissions: ProposalOperation[] = ['view', 'comment', 'review'];
 
 const spaceMemberPermisions: Pick<ProposalPermissionFlags, 'view' | 'comment' | 'vote'> = {
@@ -76,7 +85,7 @@ const spaceMemberPermisions: Pick<ProposalPermissionFlags, 'view' | 'comment' | 
 };
 
 describe('computeProposalPermissions - base', () => {
-  it('should allow the author to view, edit, comment, vote, create_vote and delete the proposal', async () => {
+  it('should allow the author to view, edit, comment, vote, create_vote, delete, archive and unarchive the proposal', async () => {
     const permissions = await baseComputeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalAuthor.id
@@ -121,6 +130,8 @@ describe('computeProposalPermissions - base', () => {
       make_public: false,
       review: false,
       vote: false,
+      archive: false,
+      unarchive: false,
       // Proposal is always public
       view: true
     });
@@ -138,7 +149,9 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       delete: false,
-      create_vote: false
+      create_vote: false,
+      archive: false,
+      unarchive: false
     });
   });
 
@@ -165,7 +178,9 @@ describe('computeProposalPermissions - base', () => {
       delete: false,
       edit: false,
       make_public: false,
-      review: false
+      review: false,
+      archive: false,
+      unarchive: false
     });
   });
 
@@ -183,7 +198,9 @@ describe('computeProposalPermissions - base', () => {
       delete: true,
       edit: true,
       review: true,
-      make_public: false
+      make_public: false,
+      archive: true,
+      unarchive: true
     });
   });
 
@@ -202,6 +219,8 @@ describe('computeProposalPermissions - base', () => {
       make_public: false,
       review: false,
       vote: false,
+      archive: false,
+      unarchive: false,
       view: true
     });
   });

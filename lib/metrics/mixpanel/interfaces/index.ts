@@ -1,3 +1,4 @@
+import type { ApiEventMap } from './ApiEvent';
 import type { BountyEventMap } from './BountyEvent';
 import type { ForumEventMap } from './ForumEvent';
 import type { PageEventMap } from './PageEvent';
@@ -26,6 +27,7 @@ export type MixpanelEventMap = UserEventMap &
   BountyEventMap &
   SettingEventMap &
   ForumEventMap &
-  SubscriptionEventMap;
+  SubscriptionEventMap &
+  ApiEventMap;
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;

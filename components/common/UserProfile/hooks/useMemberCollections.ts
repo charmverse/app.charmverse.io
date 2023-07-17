@@ -12,15 +12,6 @@ export function useMemberCollections({ memberId }: { memberId: string }) {
   });
 
   const {
-    data: orgs = [],
-    mutate: mutateOrgs,
-    isLoading: isFetchingOrgs,
-    error: orgsError
-  } = useSWRImmutable(`/orgs/${memberId}`, () => {
-    return charmClient.profile.getOrgs(memberId);
-  });
-
-  const {
     data: nfts = [],
     mutate: mutateNfts,
     isLoading: isFetchingNfts,
@@ -33,10 +24,6 @@ export function useMemberCollections({ memberId }: { memberId: string }) {
     poaps,
     isFetchingPoaps,
     poapsError,
-    orgs,
-    mutateOrgs,
-    isFetchingOrgs,
-    orgsError,
     nfts,
     mutateNfts,
     isFetchingNfts,
