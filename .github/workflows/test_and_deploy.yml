@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  SELECTED_PERMISSION_API_TAG: ux-filter-proposal-notifications
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
