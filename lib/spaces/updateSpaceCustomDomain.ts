@@ -28,7 +28,7 @@ export async function updateSpaceCustomDomain(
         id: spaceId
       },
       data: {
-        customDomain: data.customDomain
+        customDomain: data.customDomain || null
       }
     });
   } catch (error) {
