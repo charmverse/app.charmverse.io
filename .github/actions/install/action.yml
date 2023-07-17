@@ -21,18 +21,6 @@ runs:
       shell: bash
       run: cp .env.test.local.example .env.test.local
 
-    - name: Cache dependencies
-      id: cache_node_modules
-      uses: actions/cache@v3
-      with:
-        path: ./node_modules
-        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
-
-    - name: Install npm dependencies
-      shell: bash
-      if: steps.cache_node_modules.outputs.cache-hit != 'true'
-      run: npm ci --no-audit --no-fund
-
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
       shell: bash
       if: inputs.core_pkg_version
@@ -53,3 +41,16 @@ runs:
       shell: bash
       if: github.head_ref == 'ux/filter-proposal-notifications'
       run: rm -rf ./node_modules/@charmverse && npm install github:charmverse/core#ux/filter-proposal-notifications && cd node_modules/@charmverse/core && npm run build 
+
+    - name: Cache dependencies
+      id: cache_node_modules
+      uses: actions/cache@v3
+      with:
+        path: ./node_modules
+        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+
+    - name: Install npm dependencies
+      shell: bash
+      if: steps.cache_node_modules.outputs.cache-hit != 'true'
+      run: npm ci --no-audit --no-fund
+

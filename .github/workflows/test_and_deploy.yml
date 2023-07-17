@@ -116,6 +116,11 @@ jobs:
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'test'
+
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
@@ -153,12 +158,7 @@ jobs:
             docker inspect permissions-api
             echo "permission api not up...sleeping"
             sleep 10
-          done 
-
-      - name: Restore app from cache
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
+          done
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
