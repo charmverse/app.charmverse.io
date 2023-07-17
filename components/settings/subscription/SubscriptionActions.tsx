@@ -2,7 +2,6 @@ import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import Button from 'components/common/Button';
-import { isProdEnv } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 
@@ -13,7 +12,6 @@ export function SubscriptionActions({
   spaceSubscription,
   loading,
   paidTier,
-  onDelete,
   onCancelAtEnd,
   onReactivation,
   onUpgrade,
@@ -22,7 +20,6 @@ export function SubscriptionActions({
   spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
   loading: boolean;
   paidTier: string;
-  onDelete: () => void;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
   onUpgrade: () => void;
@@ -67,16 +64,11 @@ export function SubscriptionActions({
             onClose={closeConfirmCancelPlanDialog}
             isOpen={isConfirmCancelPlanDialogOpen}
           />
-          {!isProdEnv && (
-            <Button disabled={loading} onClick={onDelete} color='error' variant='outlined'>
-              Delete Plan
-            </Button>
-          )}
         </>
       )}
       {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
         <>
-          <Button disabled={!isAdmin} onClick={openConfirmFreeTierDowngradeDialog} variant='outlined'>
+          <Button disabled={loading} onClick={openConfirmFreeTierDowngradeDialog} variant='outlined'>
             Use free plan
           </Button>
           <ConfirmFreeDowngradeModal

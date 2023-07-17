@@ -12,15 +12,13 @@ import Lock from 'public/images/subscriptions/lock.svg';
 import { StyledToggleButtonGroup } from './PaymentTabs';
 
 export function PlanSelection({
-  disabled,
   period,
   blockQuotaInThousands,
-  onSelect,
-  onSelectCommited
+  disabled = false,
+  onSelect
 }: {
-  disabled: boolean;
+  disabled?: boolean;
   onSelect: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
-  onSelectCommited: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
   period: SubscriptionPeriod;
   blockQuotaInThousands: number;
 }) {
@@ -36,7 +34,6 @@ export function PlanSelection({
           disabled={disabled}
           onChange={(_e, _period) => {
             onSelect(null, _period);
-            onSelectCommited(null, _period);
           }}
           aria-label='annual or monthly selection'
         >
@@ -63,7 +60,6 @@ export function PlanSelection({
             min={10}
             max={500}
             onChange={(_, value) => onSelect(value as number, null)}
-            onChangeCommitted={(_, value) => onSelectCommited(value as number, null)}
           />
           <Typography>${price * 500}/mo</Typography>
         </Stack>
@@ -75,7 +71,7 @@ export function PlanSelection({
         alignItems='center'
         maxWidth='400px'
         padding={2}
-        mt={2}
+        mb={1}
         sx={{ border: `1px solid ${theme.palette.secondary.main}` }}
       >
         <Stack>

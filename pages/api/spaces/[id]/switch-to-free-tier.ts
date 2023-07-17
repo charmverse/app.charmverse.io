@@ -22,13 +22,16 @@ handler
   .post(switchToFreeTier);
 
 async function switchToFreeTier(req: NextApiRequest, res: NextApiResponse<Space>) {
-  const { id: spaceId } = req.query as { id: string };
+  const spaceId = req.query.id as string;
+  const userId = req.session.user.id;
 
   const updatedSpace = await prisma.space.update({
     where: {
       id: spaceId
     },
     data: {
+      updatedAt: new Date(),
+      updatedBy: userId,
       paidTier: 'free'
     }
   });
