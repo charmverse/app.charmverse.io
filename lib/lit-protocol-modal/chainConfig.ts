@@ -34,9 +34,18 @@ export const chainConfig = {
   },
   mantleTestnet: {
     value: 'mantleTestnet',
-    label: 'Mantle',
+    label: 'Mantle Testnet',
     logo: '/images/cryptoLogos/mantle-logo.svg',
     abbreviation: 'mantleTestnet',
+    nativeToken: 'MNT',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
+  mantle: {
+    value: 'mantle',
+    label: 'Mantle',
+    logo: '/images/cryptoLogos/mantle-logo.svg',
+    abbreviation: 'mantle',
     nativeToken: 'MNT',
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
