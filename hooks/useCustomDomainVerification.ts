@@ -3,6 +3,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaces } from 'hooks/useSpaces';
 
@@ -11,6 +12,7 @@ export function useCustomDomainVerification() {
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
   const hasCustomDomain = !!space?.customDomain && !isFreeSpace;
+  const isAdmin = useIsAdmin();
 
   const [isCustomDomainVerified, setIsCustomDomainVerified] = useState(true);
   const [showCustomDomainVerification, setShowCustomDomainVerification] = useState(!space?.isCustomDomainVerified);
@@ -21,7 +23,7 @@ export function useCustomDomainVerification() {
     isLoading,
     isValidating: isRefreshing
   } = useSWR(
-    hasCustomDomain && (!isCustomDomainVerified || showCustomDomainVerification)
+    isAdmin && hasCustomDomain && (!isCustomDomainVerified || showCustomDomainVerification)
       ? `${space.customDomain}/custom-domain-verification`
       : null,
     () => charmClient.spaces.verifyCustomDomain(space!.id)
