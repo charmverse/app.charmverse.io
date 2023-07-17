@@ -28,16 +28,14 @@ import { OrderSummary } from './OrderSummary';
 import type { PaymentType } from './PaymentTabs';
 import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
-const schema = () => {
-  return yup
-    .object({
-      coupon: yup.string().optional(),
-      email: yup.string().email().required()
-    })
-    .strict();
-};
+const schema = yup
+  .object({
+    coupon: yup.string().optional(),
+    email: yup.string().required('Email is required').email('Invalid email address')
+  })
+  .strict();
 
-type FormValues = yup.InferType<ReturnType<typeof schema>>;
+type FormValues = yup.InferType<typeof schema>;
 
 export function CheckoutForm({
   onCloseCheckout,
@@ -72,7 +70,7 @@ export function CheckoutForm({
       coupon: '',
       email: ''
     },
-    resolver: yupResolver(schema())
+    resolver: yupResolver(schema)
   });
 
   const couponField = watch('coupon');
@@ -263,18 +261,23 @@ export function CheckoutForm({
 
   const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
+  const disableUpgradeButton =
+    !!errors.coupon ||
+    !emailField ||
+    !!errors.email ||
+    !stripe ||
+    !elements ||
+    isValidationLoading ||
+    isProcessing ||
+    (paymentType === 'card' ? cardDisabled : false);
+
   return (
     <>
       <Stack maxWidth='400px'>
         <Typography variant='h6'>Billing Information</Typography>
         <Stack gap={0.5} my={1}>
           <InputLabel>Email (required)</InputLabel>
-          <TextField
-            {...register('email')}
-            placeholder='johndoe@gmail.com'
-            error={!!errors.email}
-            disabled={isValidationLoading}
-          />
+          <TextField {...register('email')} placeholder='johndoe@gmail.com' disabled={isValidationLoading} />
         </Stack>
       </Stack>
       <Divider sx={{ mb: 1 }} />
@@ -302,24 +305,13 @@ export function CheckoutForm({
             price={price}
             period={period}
             isLoading={isProcessing}
-            disabledButton={
-              !emailField ||
-              !!errors.coupon ||
-              !!errors.email ||
-              !stripe ||
-              !elements ||
-              isValidationLoading ||
-              isProcessing ||
-              paymentType === 'card'
-                ? cardDisabled
-                : false
-            }
+            disabledButton={disableUpgradeButton}
             handleCheckout={paymentType === 'card' ? createSubscription : startCryptoPayment}
             handleCancelCheckout={onCloseCheckout}
           >
             <Typography>Coupon code</Typography>
             <Stack display='flex' flexDirection='row' gap={1}>
-              <TextField disabled={isProcessing || !!couponData || isValidationLoading} {...register('coupon')} />
+              <TextField {...register('coupon')} disabled={isProcessing || !!couponData || isValidationLoading} />
               <Button
                 onClick={() => (couponData ? handleCoupon('') : handleCoupon(couponField))}
                 disabled={isProcessing || !couponField || isValidationLoading}
