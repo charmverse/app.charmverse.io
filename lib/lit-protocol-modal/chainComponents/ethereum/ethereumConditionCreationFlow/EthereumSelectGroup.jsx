@@ -243,7 +243,7 @@ const EthereumSelectGroup = ({
         value={value}
         onChange={handleChange}
       >
-        <FormControlLabel value='native_token' control={<Radio />} label={`Check balance of native token`} />
+        <FormControlLabel value='native_token' control={<Radio />} label={`Check balance of ${chain.nativeToken || 'native token'}`} />
         <FormControlLabel value='custom_token' control={<Radio />} label='Custom token' />
       </RadioGroup>
       {selectedToken?.['value'] !== 'ethereum' && (
