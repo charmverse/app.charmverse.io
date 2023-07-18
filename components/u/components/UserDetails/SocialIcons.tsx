@@ -77,7 +77,9 @@ export function SocialIcons({
               <Typography variant='body2' fontWeight='bold'>
                 LinkedIn:
               </Typography>
-              <Typography variant='body2'>{social.linkedinURL.split('/').at(-1)}</Typography>
+              <Typography variant='body2'>
+                {social.linkedinURL.split('/').at(social.linkedinURL[social.linkedinURL.length - 1] !== '/' ? -1 : -2)}
+              </Typography>
             </Stack>
           ) : (
             <LinkedInIcon color='disabled' style={{ height: iconHeight }} />

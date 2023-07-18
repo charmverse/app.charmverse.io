@@ -11,9 +11,9 @@
     --lsm-disabled-color: #aaa;
     --lsm-menu-focused-color: #2684FF;
 
-    --lsm-title-font: Segoe UI, sans-serif;
+    --lsm-title-font: var(--font-family-default);
     --lsm-title-font-weight: 300;
-    --lsm-primary-font: Segoe UI, sans-serif;
+    --lsm-primary-font: var(--font-family-default);
     --lsm-primary-font-weight: 300;
     --lsm-border-radius: 0.25em;
     margin: 0;
@@ -35,7 +35,7 @@
 
     --lsm-title-font: Segoe UI, sans-serif;
     --lsm-title-font-weight: 300;
-    --lsm-primary-font: Segoe UI, sans-serif;
+    --lsm-primary-font: var(--font-family-default);
     --lsm-primary-font-weight: 300;
     --lsm-border-radius: 0.25em;
     margin: 0;

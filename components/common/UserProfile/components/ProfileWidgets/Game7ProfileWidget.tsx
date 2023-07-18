@@ -32,9 +32,22 @@ function Game7PlayerStatistics({ label, value }: { label: string; value: string 
 export function Game7ProfileWidget({ game7Profile }: { game7Profile: SummonUserProfile }) {
   return (
     <ProfileWidget title='Game7 Profile' avatarVariant='square' avatarSrc='/images/logos/game7_logo.svg'>
-      <Stack spacing={1} direction='row' alignItems='center'>
-        <Avatar size='2xLarge' variant='rounded' avatar={game7Profile.meta.avatarUrl} />
-        <Stack spacing={1} width='100%'>
+      <Stack
+        gap={1}
+        sx={{
+          flexDirection: {
+            xs: 'column',
+            sm: 'row'
+          }
+        }}
+        alignItems='center'
+      >
+        <Avatar
+          size='2xLarge'
+          variant='rounded'
+          avatar={game7Profile.meta.avatarUrl || `/images/logos/game7_logo.svg`}
+        />
+        <Stack gap={1} width='100%'>
           <Game7PlayerStatistics label='Rank' value={game7Profile.meta.rank} />
           <Game7PlayerStatistics label='XP' value={game7Profile.meta.xp} />
           <Game7PlayerStatistics label='Achievements' value={game7Profile.meta.achievements.length} />

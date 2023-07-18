@@ -105,37 +105,38 @@ export function SubscriptionInformation({
       onError() {
         showMessage('Updating failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
   const { trigger: upgradeSpaceSubscription, isMutating: isLoadingUpgrade } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription`,
+    `/api/spaces/${space.id}/upgrade-subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpgradeSubscriptionRequest } }>) =>
       charmClient.subscription.upgradeSpaceSubscription(arg.spaceId, arg.payload),
     {
       onError() {
         showMessage('Upgrading failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
         showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
-  const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
-      charmClient.subscription.deleteSpaceSubscription(arg.spaceId),
+  const { trigger: switchToFreePlan, isMutating: isLoadingSwitchToFreePlan } = useSWRMutation(
+    `/api/spaces/${space.id}/switch-to-free-tier`,
+    () => charmClient.subscription.switchToFreeTier(space.id),
     {
-      onError() {
-        showMessage('Deletion failed! Please try again', 'error');
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('You have successfully switch to free tier!', 'success');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to free tier could not be made. Please try again later.', 'error');
       }
     }
   );
@@ -184,16 +185,11 @@ export function SubscriptionInformation({
           <SubscriptionActions
             paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
-            loading={isLoadingUpdate || isLoadingDeletion || isLoadingUpgrade}
-            onDelete={() => deleteSubscription({ spaceId: space.id })}
+            loading={isLoadingUpdate || isLoadingUpgrade || isLoadingSwitchToFreePlan}
             onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
             onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
             onUpgrade={() => openUpgradeDialog()}
-            confirmFreeTierDowngrade={() => {
-              charmClient.subscription
-                .switchToFreeTier(space.id)
-                .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-            }}
+            confirmFreeTierDowngrade={switchToFreePlan}
           />
           <ConfirmUpgradeModal
             title='Upgrade Community Edition'
@@ -207,7 +203,6 @@ export function SubscriptionInformation({
                 period={period}
                 disabled={false}
                 onSelect={handlePlanSelect}
-                onSelectCommited={() => {}}
               />
             }
             onConfirm={openConfirmUpgradeDialog}

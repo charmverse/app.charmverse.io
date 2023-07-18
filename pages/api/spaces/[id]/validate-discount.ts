@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser, requireSpaceMembership, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { CouponDetails } from 'lib/subscription/getCouponDetails';
 import { getCouponDetails } from 'lib/subscription/getCouponDetails';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,22 +20,21 @@ handler
   .use(requireKeys(['coupon'], 'body'))
   .post(validateDiscount);
 
-export type ValidatedCoupon = {
-  valid: boolean;
-  couponId: string;
-};
-
-async function validateDiscount(req: NextApiRequest, res: NextApiResponse<ValidatedCoupon>) {
-  const couponCode = req.body.coupon;
+async function validateDiscount(req: NextApiRequest, res: NextApiResponse<CouponDetails | null>) {
+  const couponCode = req.body.coupon as string;
   const spaceId = req.query.id as string;
 
-  const coupon = await getCouponDetails(couponCode);
+  if (!couponCode) {
+    res.status(200).json(null);
+  }
 
-  if (!coupon) {
+  const couponDetails = await getCouponDetails(couponCode);
+
+  if (!couponDetails) {
     throw new InvalidInputError(`Invalid promotional code ${couponCode} for space ${spaceId}`);
   }
 
-  res.status(200).end();
+  res.status(200).json(couponDetails);
 }
 
 export default withSessionRoute(handler);

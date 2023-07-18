@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { AuthSig } from 'lit-js-sdk';
+import type { AuthSig } from '@lit-protocol/types';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';

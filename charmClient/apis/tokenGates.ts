@@ -1,5 +1,5 @@
 import type { TokenGate } from '@charmverse/core/prisma';
-import type { AuthSig } from 'lit-js-sdk';
+import type { AuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 
 import * as http from 'adapters/http';
 import type {
@@ -19,7 +19,9 @@ export class TokenGatesApi {
     return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
   }
 
-  saveTokenGate(tokenGate: Partial<TokenGate>): Promise<TokenGate> {
+  saveTokenGate(
+    tokenGate: Partial<Omit<TokenGate, 'resourceId'> & { resourceId: JsonSigningResourceId }>
+  ): Promise<TokenGate> {
     return http.POST<TokenGate>('/api/token-gates', tokenGate);
   }
 

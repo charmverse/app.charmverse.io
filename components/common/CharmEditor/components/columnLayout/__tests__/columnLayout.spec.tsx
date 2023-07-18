@@ -6,7 +6,7 @@ jest.mock('hooks/useFirebaseAuth', () => ({
   useFirebaseAuth: {}
 }));
 
-jest.mock('lit-js-sdk', () => ({
+jest.mock('@lit-protocol/lit-node-client', () => ({
   humanizeAccessControlConditions: () => {}
 }));
 
