@@ -100,27 +100,13 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { loginWithGooglePopup } = useGoogleLogin();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
-
-  async function handleGoogleLogin() {
-    if (isOnCustomDomain) {
-      return loginWithGooglePopup();
-    }
-
-    try {
-      const googleLoginResult = await loginWithGoogle();
-      handleLogin(googleLoginResult);
-    } catch (err) {
-      handleLoginError(err);
-    }
-  }
-
   async function handleMagicLinkRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
@@ -202,7 +188,7 @@ function LoginHandler(props: DialogProps) {
             {/* Google login method */}
             <ListItem>
               <ConnectorButton
-                onClick={handleGoogleLogin}
+                onClick={() => loginWithGooglePopup()}
                 name='Connect with Google'
                 iconUrl='Google_G.png'
                 disabled={false}
