@@ -66,7 +66,7 @@ describe('createProSubscription', () => {
       },
       metadata: {
         spaceId: space.id,
-        tier: 'pro',
+        tier: 'community',
         period: 'monthly',
         productId: communityProduct.id
       },
@@ -122,7 +122,7 @@ describe('createProSubscription', () => {
       coupon: undefined,
       promotion_code: undefined,
       metadata: {
-        tier: 'pro',
+        tier: 'community',
         period: 'monthly',
         spaceId: space.id,
         productId: communityProduct.id

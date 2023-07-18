@@ -220,7 +220,9 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    {isAdmin && space?.paidTier === 'pro' && <PaidAnnouncementBanner spaceId={space.id} />}
+                    {isAdmin && (space?.paidTier === 'community' || space?.paidTier === 'pro') && (
+                      <PaidAnnouncementBanner spaceId={space.id} />
+                    )}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

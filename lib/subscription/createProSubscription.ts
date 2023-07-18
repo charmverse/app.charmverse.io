@@ -108,7 +108,7 @@ export async function createProSubscription({
     metadata: {
       productId,
       period,
-      tier: 'pro',
+      tier: 'community',
       spaceId
     },
     trial_period_days: freeTrial ? communityProduct.trial : undefined,
