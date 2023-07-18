@@ -38,7 +38,7 @@ export async function getActiveSpaceSubscription({
     }
   });
 
-  const activeSpaceSubscription = space?.stripeSubscription[0];
+  const activeSpaceSubscription = space?.stripeSubscription?.[0];
 
   if (!activeSpaceSubscription) {
     return null;

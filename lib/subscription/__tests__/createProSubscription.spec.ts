@@ -47,6 +47,9 @@ describe('createProSubscription', () => {
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
     (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
     (stripeClient.customers.create as jest.Mock<any, any>) = stripeMock.stripeClient.customers.create;
+    (stripeClient.customers.update as jest.Mock<any, any>) = stripeMock.stripeClient.customers.update;
+    (stripeClient.coupons.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.coupons.retrieve;
+    (stripeClient.promotionCodes.list as jest.Mock<any, any>) = stripeMock.stripeClient.promotionCodes.list;
 
     const { paymentIntent, blockQuota, email, customerId, invoiceId, priceId, productId, subscriptionId } =
       await createProSubscription({
