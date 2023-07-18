@@ -43,7 +43,9 @@ export const stripeMock = {
       search: jest.fn().mockResolvedValue({
         data: []
       }),
-      create: jest.fn(),
+      create: jest.fn().mockResolvedValue({
+        id: stripeMockIds.subscriptionId
+      }),
       update: jest.fn(),
       del: jest.fn(),
       cancel: jest.fn()
@@ -104,25 +106,31 @@ export const stripeMock = {
       retrieve: jest.fn().mockResolvedValue({
         id: stripeMockIds.chargeId
       }),
-      list: jest.fn()
+      list: jest.fn().mockResolvedValue({
+        data: []
+      })
     },
     billingPortal: {
       sessions: {
         create: jest.fn()
       }
+    },
+    paymentMethods: {
+      list: jest.fn().mockResolvedValue({
+        data: []
+      }),
+      detach: jest.fn()
     }
   }
 };
 
-const itemId = v4();
-const entityId = v4();
 export const loopItemMock = {
-  itemId,
+  itemId: v4(),
   name: 'Community',
   amount: 1000,
   frequency: 'month',
   frequencyCount: 10,
-  entityId,
+  entityId: v4(),
   acceptedTokens: { 13: [] },
   externalId: stripeMockIds.priceId,
   createdAt: new Date().getTime(),

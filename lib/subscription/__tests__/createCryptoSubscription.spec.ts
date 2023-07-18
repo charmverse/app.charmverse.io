@@ -1,52 +1,71 @@
+import type { Space } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
-import { loopItemMock, stripeMock, stripeMockIds } from 'testing/stripeMock';
+import { loopItemMock, stripeMock } from 'testing/stripeMock';
+import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { createCryptoSubscription } from '../createCryptoSubscription';
 import { stripeClient } from '../stripe';
 
 jest.doMock('../stripe', () => ({ ...stripeMock }));
-
 jest.mock('lib/loop/loop', () => ({
-  getLoopProducts: jest.fn().mockResolvedValue([loopItemMock])
+  getLoopProducts: () => {
+    return [loopItemMock];
+  }
 }));
 
 describe('createCryptoSubscription', () => {
+  let space: Space;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace();
+    space = generated.space;
+  });
+
   it(`Should return a valid loop checkout url`, async () => {
-    (stripeClient.subscriptions.retrieve as jest.Mock) = stripeMock.stripeClient.subscriptions.retrieve;
-    (stripeClient.customers.update as jest.Mock) = stripeMock.stripeClient.customers.update;
+    const spaceId = space.id;
+    (stripeClient.subscriptions.create as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.create;
+    (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
+    (stripeClient.subscriptions.search as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.search;
+    (stripeClient.customers.search as jest.Mock<any, any>) = stripeMock.stripeClient.customers.search;
+    (stripeClient.customers.create as jest.Mock<any, any>) = stripeMock.stripeClient.customers.create;
+    (stripeClient.customers.update as jest.Mock<any, any>) = stripeMock.stripeClient.customers.update;
+    (stripeClient.coupons.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.coupons.retrieve;
+    (stripeClient.promotionCodes.list as jest.Mock<any, any>) = stripeMock.stripeClient.promotionCodes.list;
+    (stripeClient.paymentMethods.detach as jest.Mock<any, any>) = stripeMock.stripeClient.paymentMethods.detach;
+    (stripeClient.paymentMethods.list as jest.Mock<any, any>) = stripeMock.stripeClient.paymentMethods.list;
+
+    await addSpaceSubscription({
+      spaceId,
+      subscriptionId: v4()
+    });
 
     const url = await createCryptoSubscription({
-      subscriptionId: stripeMockIds.subscriptionId,
-      email: 'test@gmail.com'
+      billingEmail: 'test@gmail.com',
+      period: 'monthly',
+      blockQuota: 10,
+      coupon: 'test',
+      name: 'test',
+      spaceId
     });
 
-    expect(url).not.toBeNull();
+    expect(typeof url === 'string').toBeTruthy();
+    expect(!!url).toBeTruthy();
   });
-  it(`Should fail if no loop item`, async () => {
-    const subscriptionId = v4();
 
-    (stripeClient.subscriptions.retrieve as jest.Mock) = jest.fn().mockResolvedValue({
-      id: subscriptionId,
-      status: 'incomplete',
-      customer: stripeMockIds.customerId,
-      items: {
-        data: [
-          {
-            price: {
-              id: v4()
-            },
-            quantity: 10
-          }
-        ]
-      }
-    });
+  it(`Should fail if no space`, async () => {
+    const spaceId = v4();
 
     await expect(
       createCryptoSubscription({
-        subscriptionId,
-        email: 'test@gmail.com'
+        billingEmail: 'test@gmail.com',
+        period: 'monthly',
+        blockQuota: 10,
+        coupon: 'test',
+        name: 'test',
+        spaceId
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
