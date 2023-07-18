@@ -59,15 +59,10 @@ export function useGoogleLogin() {
     const loginCallback = async (state: GooglePopupLoginState) => {
       if ('code' in state) {
         try {
-          if (type === 'login') {
-            const loggedInUser = await charmClient.google.loginWithCode(state.code);
-            setUser(loggedInUser);
-            showMessage('Logged in successfully', 'success');
-          } else {
-            // TODO - connect with code flow
-            // const loggedInUser = await charmClient.google.connectAccount(state.googleToken);
-            // setUser(loggedInUser);
-          }
+          const loggedInUser = await charmClient.google.loginWithCode({ code: state.code, type });
+          setUser(loggedInUser);
+          const message = type === 'login' ? 'Logged in successfully' : 'Account connected successfully';
+          showMessage(message, 'success');
         } catch (error: any) {
           log.debug({ error });
         }

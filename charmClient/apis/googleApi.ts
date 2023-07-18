@@ -19,8 +19,8 @@ export class GoogleApi {
     return http.POST<LoggedInUser>('/api/google/login', login);
   }
 
-  loginWithCode(code: string) {
-    return http.POST<LoggedInUser>('/api/google/code', { code });
+  loginWithCode({ code, type, redirectUri }: { code: string; type?: 'login' | 'connect'; redirectUri?: string }) {
+    return http.POST<LoggedInUser>('/api/google/code', { code, type: type || 'login', redirectUri });
   }
 
   connectAccount(params: Omit<ConnectGoogleAccountRequest, 'userId'>) {
