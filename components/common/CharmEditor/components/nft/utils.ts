@@ -46,7 +46,7 @@ export function getNFTUrl({
 }: {
   chain: number;
   contract: string;
-  token: string;
+  token: string | number;
 }): string | null {
   let link: null | string = null;
   switch (chain) {

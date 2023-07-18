@@ -267,21 +267,6 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync'
   },
-  MANTLE_TESTNET: {
-    chainId: 5001,
-    chainName: 'Mantle - Testnet',
-    nativeCurrency: {
-      name: 'Testnet Mantle',
-      symbol: 'MNT',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
-    },
-    rpcUrls: ['https://rpc.testnet.mantle.xyz'],
-    blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
-    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
-    shortName: 'mantle-testnet'
-  },
   MANTLE: {
     chainId: 5000,
     chainName: 'Mantle',
@@ -296,6 +281,21 @@ const RPC = {
     blockExplorerUrls: ['https://explorer.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
     shortName: 'mantle'
+  },
+  MANTLE_TESTNET: {
+    chainId: 5001,
+    chainName: 'Mantle - Testnet',
+    nativeCurrency: {
+      name: 'Testnet Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.testnet.mantle.xyz'],
+    blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    shortName: 'mantle-testnet'
   }
 } as const;
 
@@ -362,7 +362,8 @@ const supportedChains: Blockchain[] = [
   'SEPOLIA',
   'MUMBAI',
   'ZKSYNC',
-  'MANTLE_TESTNET'
+  'MANTLE_TESTNET',
+  'MANTLE'
 ];
 
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);

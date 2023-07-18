@@ -9,12 +9,12 @@ export function getAppOriginURL({ protocol, port, host }: { protocol?: string; h
   const appProtocol = protocol || 'https://';
 
   if (isLocalhostAlias(host)) {
-    return host?.startsWith('http') ? new URL(host) : new URL(`${appProtocol}//${host}/`);
+    return host?.startsWith('http') ? new URL(host) : new URL(`${appProtocol}${host}/`);
   }
 
   if (isDevEnv && !host?.includes(getAppApexDomain())) {
     return new URL(`http://localhost${appPort}/`);
   }
 
-  return new URL(`${appProtocol}//${appSubdomain}.${appDomain}${appPort}/`);
+  return new URL(`${appProtocol}${appSubdomain}.${appDomain}${appPort}/`);
 }

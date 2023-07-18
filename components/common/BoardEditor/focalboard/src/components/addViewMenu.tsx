@@ -48,8 +48,8 @@ function AddViewMenu(props: AddViewProps) {
   const showView = props.showView;
 
   const views = props.views.filter((view) => !view.fields.inline);
-  const viewIds =
-    props.board.fields.viewIds.length === views.length ? props.board.fields.viewIds : views.map((view) => view.id);
+  const viewIdsFromFields = props.board.fields?.viewIds ?? [];
+  const viewIds = viewIdsFromFields.length === views.length ? viewIdsFromFields : views.map((view) => view.id);
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-view-menu' });
 
