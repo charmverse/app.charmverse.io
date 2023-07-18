@@ -79,9 +79,9 @@ async function deletePaymentSubscription(req: NextApiRequest, res: NextApiRespon
 async function updatePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
-  const { subscriptionId, billingEmail, status } = req.body as UpdateSubscriptionRequest;
+  const { billingEmail, status } = req.body as UpdateSubscriptionRequest;
 
-  await updateProSubscription({ spaceId, payload: { subscriptionId, billingEmail, status } });
+  await updateProSubscription({ spaceId, payload: { billingEmail, status } });
 
   log.info(`Subscription updated for space ${spaceId} by user ${userId}`);
 

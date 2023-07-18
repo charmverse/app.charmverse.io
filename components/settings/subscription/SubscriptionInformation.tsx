@@ -189,13 +189,13 @@ export function SubscriptionInformation({
             onCancelAtEnd={() =>
               updateSpaceSubscription({
                 spaceId: space.id,
-                payload: { subscriptionId: spaceSubscription.subscriptionId, status: 'cancel_at_end' }
+                payload: { status: 'cancel_at_end' }
               })
             }
             onReactivation={() =>
               updateSpaceSubscription({
                 spaceId: space.id,
-                payload: { subscriptionId: spaceSubscription.subscriptionId, status: 'active' }
+                payload: { status: 'active' }
               })
             }
             onUpgrade={() => openUpgradeDialog()}
@@ -261,7 +261,7 @@ export function SubscriptionInformation({
               onClick={() =>
                 updateSpaceSubscription({
                   spaceId: space.id,
-                  payload: { subscriptionId: spaceSubscription.subscriptionId, billingEmail: getValues().email }
+                  payload: { billingEmail: getValues().email }
                 })
               }
               sx={{ maxWidth: '100px', mt: 2 }}

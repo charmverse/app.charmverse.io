@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type Stripe from 'stripe';
 
 import { InvalidStateError } from 'lib/middleware';
@@ -7,7 +8,6 @@ import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscripti
 import { stripeClient } from './stripe';
 
 export type UpdateSubscriptionRequest = {
-  subscriptionId: string;
   status?: Extract<SubscriptionStatusType, 'active' | 'cancel_at_end'>;
   billingEmail?: SpaceSubscriptionWithStripeData['billingEmail'];
 };
@@ -19,7 +19,20 @@ export async function updateProSubscription({
   spaceId: string;
   payload: UpdateSubscriptionRequest;
 }) {
-  const { billingEmail, status, subscriptionId } = payload;
+  const { billingEmail, status } = payload;
+
+  const spaceSubscription = await prisma.stripeSubscription.findFirst({
+    where: {
+      spaceId,
+      deletedAt: null
+    }
+  });
+
+  if (!spaceSubscription) {
+    throw new InvalidStateError(`No subscription to update for space ${spaceId}`);
+  }
+
+  const subscriptionId = spaceSubscription.subscriptionId;
 
   const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
     expand: ['customer']
