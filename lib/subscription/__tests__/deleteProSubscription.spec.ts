@@ -7,6 +7,7 @@ import { stripeMock } from 'testing/stripeMock';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { deleteProSubscription } from '../deleteProSubscription';
+import { stripeClient } from '../stripe';
 
 jest.doMock('../stripe', () => ({ ...stripeMock }));
 
@@ -15,6 +16,8 @@ describe('deleteProSubscription', () => {
     const customerId = `cus_${v4()}`;
     const subscriptionId = `sub_${v4()}`;
     const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    (stripeClient.subscriptions.cancel as jest.Mock) = stripeMock.stripeClient.subscriptions.cancel;
 
     await addSpaceSubscription({
       spaceId: space.id,
