@@ -5,24 +5,32 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { IChainDetails } from 'connectors';
 import { RPCList, getChainById } from 'connectors';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent
   sx?: SxProps<Theme>;
+  chains?: number[];
 }
 
-export default function InputSearchBlockchain({
+export function InputSearchBlockchain({
   defaultChainId,
   chainId,
   onChange = () => {},
+  chains,
   sx = {},
   disabled,
   readOnly
 }: Props) {
   const [value, setValue] = useState<IChainDetails | null>(null);
+
+  const options = useMemo(() => {
+    return chains ? chains.map((chain) => getChainById(chain)).filter(isTruthy) : RPCList;
+  }, [chains]);
 
   useEffect(() => {
     if (defaultChainId && !value) {
@@ -57,7 +65,7 @@ export default function InputSearchBlockchain({
         }
       }}
       sx={{ minWidth: 150, ...sx }}
-      options={RPCList}
+      options={options}
       disableClearable
       autoHighlight
       size='small'

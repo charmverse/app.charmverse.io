@@ -15,7 +15,7 @@ type CustomPageViewEvent = BaseEventWithoutGroup & {
 };
 
 type PageTypeEvent = PageEvent & {
-  type: PageType;
+  type: PageType | 'billing/marketing' | 'billing/checkout' | 'billing/settings';
 };
 
 export interface PageEventMap {

@@ -30,7 +30,7 @@ export function ProposalsTable({
 }) {
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
-  const { showProposal } = useProposalDialog();
+  const { showProposal, hideProposal } = useProposalDialog();
   const router = useRouter();
   const { formatDateTime, formatDate } = useDateFormatter();
 
@@ -38,12 +38,14 @@ export function ProposalsTable({
     setUrlWithoutRerender(router.pathname, { id: null });
     mutateProposals();
     mutateTasks();
+    hideProposal();
   }
 
   function openPage(pageId: string) {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, id: pageId }
+    setUrlWithoutRerender(router.pathname, { id: pageId });
+    showProposal({
+      pageId,
+      onClose
     });
   }
 
@@ -54,13 +56,13 @@ export function ProposalsTable({
   }
 
   useEffect(() => {
-    if (typeof router.query.id === 'string') {
+    if (router.isReady && typeof router.query.id === 'string') {
       showProposal({
         pageId: router.query.id,
         onClose
       });
     }
-  }, [router.query.id]);
+  }, [router.isReady, router.query.id]);
 
   return (
     <>

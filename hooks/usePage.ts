@@ -12,7 +12,7 @@ import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
   spaceId?: string;
-  pageIdOrPath?: string;
+  pageIdOrPath?: string | null;
 };
 
 type PageResult = {

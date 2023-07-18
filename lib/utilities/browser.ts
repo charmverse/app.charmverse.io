@@ -2,6 +2,7 @@ import { baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
+import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
@@ -316,17 +317,63 @@ export function getDefaultSpaceUrl({
   useSubdomain?: boolean;
 }) {
   let protocol = isDevEnv ? 'http:' : 'https:';
+  let port = '';
   const appDomain = getAppApexDomain();
 
   if (typeof window !== 'undefined') {
     protocol = window.location.protocol;
+    port = window.location.port ? `:${window.location.port}` : '';
   }
 
   if (appDomain) {
     return useSubdomain
-      ? `${protocol}//${domain}.${appDomain}${path}`
-      : `${protocol}//app.${appDomain}/${domain}${path}`;
+      ? `${protocol}//${domain}.${appDomain}${port}${path}`
+      : `${protocol}//app.${appDomain}${port}/${domain}${path}`;
   }
 
   return `/${domain}${path}`;
+}
+
+export function shouldRedirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const isSubdomainUrl = !!getValidSubdomain();
+  const appDomain = getAppApexDomain();
+
+  return isSubdomainUrl && !!appDomain;
+}
+
+export function getAppUrl() {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  if (isLocalhostAlias()) {
+    return new URL(window.location.origin);
+  }
+
+  const port = window.location.port ? `:${window.location.port}` : '';
+
+  return getAppOriginURL({ port, protocol: window.location.protocol });
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appUrl = getAppUrl();
+
+  if (appUrl) {
+    const returnUrl = window.location.href;
+
+    appUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = appUrl.toString();
+
+    return true;
+  }
+
+  return false;
 }

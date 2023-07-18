@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
@@ -14,20 +14,24 @@ import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type LoginWithGoogleRequest = {
   accessToken: string;
-  displayName: string;
-  avatarUrl: string;
+  displayName?: string;
+  avatarUrl?: string;
   signupAnalytics?: Partial<SignupAnalytics>;
+  oauthParams?: GoogleLoginOauthParams;
 };
 export async function loginWithGoogle({
   accessToken,
   displayName,
   avatarUrl,
-  signupAnalytics = {}
+  signupAnalytics = {},
+  oauthParams
 }: LoginWithGoogleRequest): Promise<LoggedInUser> {
   try {
-    const verified = await verifyGoogleToken(accessToken);
+    const verified = await verifyGoogleToken(accessToken, oauthParams);
 
     const email = verified.email;
+    const userDisplayName = displayName || verified.name || '';
+    const userAvatarUrl = avatarUrl || verified.picture || '';
 
     if (!email) {
       throw new InvalidInputError(`Email required to complete signup`);
@@ -64,7 +68,7 @@ export async function loginWithGoogle({
         throw new DisabledAccountError(`This account has been disabled`);
       }
 
-      if (googleAccount.name !== displayName || googleAccount.avatarUrl !== avatarUrl) {
+      if (googleAccount.name !== userDisplayName || googleAccount.avatarUrl !== userAvatarUrl) {
         trackUserAction('sign_in', { userId: googleAccount.userId, identityType: 'Google' });
 
         await prisma.googleAccount.update({
@@ -105,13 +109,13 @@ export async function loginWithGoogle({
 
     const createdGoogleAccount = await prisma.googleAccount.create({
       data: {
-        name: displayName,
-        avatarUrl,
+        name: userDisplayName,
+        avatarUrl: userAvatarUrl,
         email,
         user: {
           create: {
             identityType: 'Google',
-            username: displayName,
+            username: userDisplayName,
             avatar: avatarUrl,
             path: uid()
           }

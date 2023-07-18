@@ -7,7 +7,11 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { generateFirstDiff } from './generateFirstDiff';
 
-export function createPage<T = Page>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<T> {
+export function createPage<T = Page>({
+  data,
+  include,
+  tx = prisma
+}: Prisma.PageCreateArgs & { tx?: Prisma.TransactionClient }): PrismaPromise<T> {
   const hasContent = data.content ? !checkIsContentEmpty(data.content as PageContent) : false;
   const createArgs: Prisma.PageCreateArgs = {
     data: {
@@ -28,5 +32,5 @@ export function createPage<T = Page>({ data, include }: Prisma.PageCreateArgs): 
     };
   }
 
-  return prisma.page.create(createArgs) as unknown as PrismaPromise<T>;
+  return tx.page.create(createArgs) as unknown as PrismaPromise<T>;
 }

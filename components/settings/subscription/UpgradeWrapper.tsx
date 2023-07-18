@@ -1,26 +1,64 @@
-import { useTheme } from '@emotion/react';
-import type { PaletteMode } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import type { TooltipProps } from '@mui/material/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
-import type { ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 export const upgradeMessages = {
-  pagePermissions: 'Upgrade to a paid plan to change page permissions'
+  page_permissions: 'Upgrade to a paid plan to change page permissions',
+  forum_permissions: 'Upgrade to a paid plan to change forum permissions',
+  proposal_permissions: 'Upgrade to a paid plan to change proposal permissions',
+  bounty_permissions: 'Upgrade to a paid plan to change bounty permissions',
+  custom_roles: 'Upgrade to a paid plan to use custom roles',
+  invite_guests: 'Upgrade to a paid plan to invite members with guest-level access',
+  customise_member_property: 'Upgrade to a paid plan to use this member property',
+  api_access: 'Upgrade to a paid plan to get access to the API',
+  custom_domain: 'Upgrade to a paid plan to use a custom app domain'
 };
 
-type Props = {
-  upgradeContext?: keyof typeof upgradeMessages;
+export type UpgradeContext = keyof typeof upgradeMessages;
+
+/**
+ * @onClick By default, this opens the settings dialog on the billing tab. Pass a custom handler to override this and provide your own selling flow.
+ * User needs to be an admin
+ */
+export type Props = {
+  upgradeContext?: UpgradeContext;
   forceDisplay?: boolean;
+  onClick?: () => void;
 };
 
-export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props & { children: ReactNode }) {
+export function UpgradeWrapper({
+  children,
+  upgradeContext,
+  onClick,
+  forceDisplay,
+  tooltipProps
+}: Props & { children: ReactNode; tooltipProps?: TooltipProps }) {
   const { openUpgradeSubscription } = useSettingsDialog();
 
   const { isFreeSpace } = useIsFreeSpace();
+  const isAdmin = useIsAdmin();
+
+  function handleClick(ev: SyntheticEvent) {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    // Don't perform any actions for non-admins
+    if (!isAdmin) {
+      return;
+    }
+
+    if (onClick) {
+      onClick();
+    } else {
+      openUpgradeSubscription();
+    }
+  }
 
   if (!isFreeSpace && !forceDisplay) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -28,13 +66,17 @@ export function UpgradeWrapper({ children, upgradeContext, forceDisplay }: Props
   }
 
   return (
-    <Tooltip title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
-      <Box onClick={openUpgradeSubscription}>{children}</Box>
+    <Tooltip {...tooltipProps} title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
+      <Box onClick={handleClick} position='relative' sx={{ cursor: 'pointer' }}>
+        {children}
+
+        <Box position='absolute' top={0} right={0} bottom={0} left={0} zIndex={1}></Box>
+      </Box>
     </Tooltip>
   );
 }
 
-export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
+export function UpgradeChip({ upgradeContext, forceDisplay, onClick }: Props) {
   const { isFreeSpace } = useIsFreeSpace();
 
   if (!isFreeSpace && !forceDisplay) {
@@ -42,7 +84,7 @@ export function UpgradeChip({ upgradeContext, forceDisplay }: Props) {
   }
 
   return (
-    <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay>
+    <UpgradeWrapper upgradeContext={upgradeContext} forceDisplay onClick={onClick}>
       <Chip
         color='warning'
         variant='outlined'

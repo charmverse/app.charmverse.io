@@ -38,7 +38,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
       .send({
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(401);
   });
@@ -48,8 +48,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
     const userCookie = await loginUser(user.id);
 
     await addSpaceSubscription({
-      spaceId: space.id,
-      createdBy: user.id
+      spaceId: space.id
     });
 
     await request(baseUrl)
@@ -58,7 +57,7 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
       .send({
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(400);
   });

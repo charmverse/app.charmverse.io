@@ -2,7 +2,7 @@ import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
-import type { Plugin, PluginKey } from '@bangle.dev/pm';
+import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
@@ -100,7 +100,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
-
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');
   }
@@ -124,6 +123,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       showMessage(error.message, 'warning');
     }
     log.error('[ws/ceditor]: Error message displayed to user', {
+      pageId,
       error
     });
     if (isLoadingRef.current) {
@@ -212,6 +212,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
+
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}

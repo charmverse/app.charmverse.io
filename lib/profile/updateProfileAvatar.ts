@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getNFT } from 'lib/blockchain/nfts';
+import { getNFT } from 'lib/blockchain/getNFTs';
 import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
@@ -44,13 +44,12 @@ export async function updateProfileAvatar({
     }
 
     const nft = await getNFT({
-      contractAddress: updatedContract,
+      address: updatedContract,
       tokenId: updatedTokenId,
-      chainId: avatarChain,
-      userId
+      chainId: avatarChain
     });
 
-    if (nft.image) {
+    if (nft?.image) {
       const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });
       try {
         const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });

@@ -3,7 +3,8 @@ import {
   AvailableProposalPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
   getDefaultProposalPermissionPolicies,
-  isProposalAuthor
+  isProposalAuthor,
+  proposalResolver
 } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -51,7 +52,7 @@ export async function baseComputeProposalPermissions({
 
   if (spaceRole) {
     if (isProposalAuthor({ proposal, userId })) {
-      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment']);
+      permissions.addPermissions(['edit', 'view', 'create_vote', 'delete', 'vote', 'comment', 'archive', 'unarchive']);
     }
 
     const isReviewer = isProposalReviewer({
@@ -70,21 +71,6 @@ export async function baseComputeProposalPermissions({
   permissions.addPermissions(['view']);
 
   return permissions.operationFlags;
-}
-
-function proposalResolver({ resourceId }: { resourceId: string }) {
-  return prisma.proposal.findUnique({
-    where: { id: resourceId },
-    select: {
-      id: true,
-      status: true,
-      categoryId: true,
-      spaceId: true,
-      createdBy: true,
-      authors: true,
-      reviewers: true
-    }
-  }) as Promise<ProposalResource>;
 }
 
 export const computeProposalPermissions = buildComputePermissionsWithPermissionFilteringPolicies<

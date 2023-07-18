@@ -9,7 +9,7 @@ import { getPagePath } from 'lib/pages/utils';
 export async function createCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
     properties: Record<string, string | string[]>;
-  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>>
+  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>>
 ): Promise<{ page: Page; block: Block }> {
   const board = await prisma.block.findFirst({
     where: {
@@ -31,6 +31,7 @@ export async function createCardPage(
           id: pageInfo.createdBy
         }
       },
+      createdAt: pageInfo.createdAt,
       updatedBy: pageInfo.createdBy,
       type: 'card',
       rootId: pageInfo.boardId,

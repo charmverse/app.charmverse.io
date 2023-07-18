@@ -1,56 +1,82 @@
 import Stack from '@mui/material/Stack';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import Button from 'components/common/Button';
-import { isProdEnv } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { SpaceSubscription } from 'lib/subscription/getSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
+
+import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
+import { ConfirmPlanCancellationModal } from './ConfirmPlanCancellation';
 
 export function SubscriptionActions({
   spaceSubscription,
   loading,
-  onCreate,
-  onDelete,
+  paidTier,
   onCancelAtEnd,
-  onReactivation
+  onReactivation,
+  onUpgrade,
+  confirmFreeTierDowngrade
 }: {
-  spaceSubscription: SpaceSubscription | null | undefined;
+  spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
   loading: boolean;
-  onCreate: () => void;
-  onDelete: () => void;
+  paidTier: string;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
+  onUpgrade: () => void;
+  confirmFreeTierDowngrade: () => void;
 }) {
   const isAdmin = useIsAdmin();
+
+  const {
+    isOpen: isConfirmDowngradeDialogOpen,
+    close: closeConfirmFreeTierDowngradeDialog,
+    open: openConfirmFreeTierDowngradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
+
+  const {
+    isOpen: isConfirmCancelPlanDialogOpen,
+    close: closeConfirmCancelPlanDialog,
+    open: openConfirmCancelPlanDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
   if (!isAdmin) {
     return null;
   }
 
   return (
-    <Stack flexDirection='row' gap={1} mb={1}>
-      {spaceSubscription === null && (
-        <Button disabled={loading} sx={{ width: 'fit-content' }} onClick={onCreate}>
-          Create a Plan
-        </Button>
-      )}
-      {spaceSubscription?.status === 'cancelAtEnd' && (
-        <Button disabled={loading} onClick={onReactivation} variant='outlined'>
+    <Stack flexDirection='column' gap={1} mb={1}>
+      {spaceSubscription?.status === 'cancel_at_end' && (
+        <Button disabled={loading} onClick={onReactivation}>
           Reactivate Plan
         </Button>
       )}
-      {spaceSubscription?.status === 'active' && (
+      {(spaceSubscription?.status === 'active' || spaceSubscription?.status === 'cancelled') && (
         <>
-          <Button disabled={loading} onClick={() => {}} variant='outlined'>
-            Upgrade/Downgrade Plan
+          <Button disabled={loading} onClick={onUpgrade}>
+            Update Plan
           </Button>
-          <Button disabled={loading} onClick={onCancelAtEnd} color='error' variant='outlined'>
+          <Button disabled={loading} onClick={openConfirmCancelPlanDialog} variant='text'>
             Cancel Plan
           </Button>
-          {!isProdEnv && (
-            <Button disabled={loading} onClick={onDelete} color='error' variant='outlined'>
-              Delete Plan
-            </Button>
-          )}
+          <ConfirmPlanCancellationModal
+            disabled={!isAdmin}
+            onConfirmCancellation={onCancelAtEnd}
+            onClose={closeConfirmCancelPlanDialog}
+            isOpen={isConfirmCancelPlanDialogOpen}
+          />
+        </>
+      )}
+      {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
+        <>
+          <Button disabled={loading} onClick={openConfirmFreeTierDowngradeDialog} variant='outlined'>
+            Use free plan
+          </Button>
+          <ConfirmFreeDowngradeModal
+            isOpen={isConfirmDowngradeDialogOpen}
+            onClose={closeConfirmFreeTierDowngradeDialog}
+            disabled={loading}
+            onConfirmDowngrade={confirmFreeTierDowngrade}
+          />
         </>
       )}
     </Stack>

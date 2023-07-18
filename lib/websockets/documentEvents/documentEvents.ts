@@ -40,6 +40,7 @@ type DocumentRoom = {
   participants: Map<string, DocumentEventHandler>;
   doc: {
     id: string;
+    spaceId: string;
     version: number;
     content: any;
     type: string;
@@ -82,6 +83,7 @@ export class DocumentEventHandler {
       socketId: this.id,
       userId: session.user?.id,
       pageId: session.documentId,
+      spaceId: docRoom?.doc.spaceId,
       pageVersion: docRoom?.doc.version,
       serverMessages: this.messages.server,
       clientMessages: this.messages.client
@@ -159,7 +161,10 @@ export class DocumentEventHandler {
         message
       });
       // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
-      this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      // check if there are at least a few updates and ask the user to refresh
+      if (message.type === 'diff' && message.ds.length > 30) {
+        this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      }
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
@@ -299,6 +304,7 @@ export class DocumentEventHandler {
         const room: DocumentRoom = {
           doc: {
             id: page.id,
+            spaceId: page.spaceId,
             content,
             type: page.type,
             galleryImage: page.galleryImage,
@@ -377,8 +383,13 @@ export class DocumentEventHandler {
   // We need to filter out marks from the suggested-tooltip plugin (supports mentions, slash command, etc). This way the tooltip doesn't show up for others.
   // (Not sure this is the best fix, but it's the only way I could think of for now)
   removeTooltipMarks(diff: ProsemirrorJSONStep) {
-    if (diff.slice?.content?.[0]?.marks?.length) {
-      diff.slice.content[0].marks = diff.slice.content[0].marks.filter((mark) => !mark.attrs?.trigger);
+    const content = diff.slice?.content;
+    if (content) {
+      for (const node of content) {
+        if (node.marks?.length) {
+          node.marks = node.marks.filter((mark) => !mark.attrs?.trigger);
+        }
+      }
     }
     return diff;
   }
@@ -391,6 +402,7 @@ export class DocumentEventHandler {
       socketId: this.id,
       userId: this.getSession().user.id,
       pageId: room.doc.id,
+      spaceId: room.doc.spaceId,
       v: clientV,
       c: message.c,
       s: message.s,
@@ -419,14 +431,19 @@ export class DocumentEventHandler {
         }
       }
       room.doc.diffs.push(message);
-      room.doc.diffs = room.doc.diffs.slice(this.historyLength);
+      room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
-      if (room.doc.version % this.docSaveInterval === 0) {
-        await this.saveDocument();
+      try {
+        await this.saveDiff(message);
+        if (room.doc.version % this.docSaveInterval === 0) {
+          await this.saveDocument();
+        }
+        this.confirmDiff(message.rid);
+        this.sendUpdatesToOthers(message);
+      } catch (error) {
+        log.error('Error when saving changes to the db', { error, ...logMeta });
+        this.sendError('There was an error saving your changes! Please refresh and try again.');
       }
-      await this.saveDiff(message);
-      this.confirmDiff(message.rid);
-      this.sendUpdatesToOthers(message);
     } else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
         // We have enough diffs stored to fix it.
@@ -434,12 +451,12 @@ export class DocumentEventHandler {
         log.debug('Client is behind. Resend document diffs', {
           ...logMeta,
           roomDiffs: room.doc.diffs.length,
-          diffsToSend
+          diffsToSend: diffsToSend * -1
         });
         const messages = room.doc.diffs.slice(diffsToSend);
         for (const m of messages) {
           const newMessage = { ...m, server_fix: true };
-          await this.sendMessage(newMessage);
+          this.sendMessage(newMessage);
         }
       } else {
         log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
@@ -457,7 +474,7 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room?.doc.version;
-    const logData = { clientV, serverV, pageId: room?.doc.id, userId: session.user.id };
+    const logData = { clientV, serverV, pageId: room?.doc.id, spaceId: room?.doc.spaceId, userId: session.user.id };
     log.debug('Check version of document', logData);
     if (clientV === serverV) {
       this.sendMessage({ type: 'confirm_version', v: clientV });
@@ -483,7 +500,11 @@ export class DocumentEventHandler {
     const toSend = this.messages.server - from;
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
+      log.warn('Unfixable: Too many messages to resend. Send full document', {
+        toSend,
+        from,
+        ...this.getSessionMeta()
+      });
       this.unfixable();
     } else {
       const lastTen = this.messages.lastTen.slice(-toSend);
@@ -538,7 +559,7 @@ export class DocumentEventHandler {
       s: this.messages.server
     };
     this.messages.lastTen.push(message);
-    this.messages.lastTen = this.messages.lastTen.slice(-10);
+    this.messages.lastTen = this.messages.lastTen.slice(-30); // changed from 10 to 30 to be safe
     try {
       this.socket.emit(this.socketEvent, wrappedMessage);
     } catch (err) {
@@ -616,7 +637,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
+    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id, spaceId: room.doc.spaceId });
 
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed

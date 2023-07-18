@@ -25,12 +25,14 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import { CharmEditor } from 'components/common/CharmEditor';
 import Modal from 'components/common/Modal';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
@@ -56,8 +58,6 @@ const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
-const MAX_DESCRIPTION_LENGTH = 200;
-
 export function VoteDetail({
   cancelVote,
   castVote,
@@ -68,7 +68,7 @@ export function VoteDetail({
   isProposal,
   disableVote
 }: VoteDetailProps) {
-  const { deadline, totalVotes, description, id, title, userChoice, voteOptions, aggregatedResult } = vote;
+  const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult } = vote;
   const { user } = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
@@ -89,7 +89,7 @@ export function VoteDetail({
         gap: 1
       }}
     >
-      <span>Polls</span> <Chip size='small' label={totalVotes} />
+      <span>Votes</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 
@@ -98,7 +98,6 @@ export function VoteDetail({
     userVotes && user ? userVotes.find((userVote) => userVote.userId === user.id)?.choice ?? userChoice : userChoice;
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
-  const isDescriptionAbove = description ? description.length > MAX_DESCRIPTION_LENGTH : false;
 
   function removeFromPage(voteId: string) {
     if (view) {
@@ -127,30 +126,9 @@ export function VoteDetail({
         </Typography>
         <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
-      {description && (
+      {content && (
         <Box my={1} mb={2}>
-          {isDescriptionAbove && !detailed ? (
-            <span>
-              {description.slice(0, 200)}...
-              <Typography
-                component='span'
-                onClick={voteDetailsPopup.open}
-                sx={{
-                  ml: 0.5,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline'
-                  }
-                }}
-                variant='subtitle1'
-                fontWeight='bold'
-              >
-                (More)
-              </Typography>
-            </span>
-          ) : (
-            description
-          )}
+          <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
       )}
       {!detailed && voteCountLabel}

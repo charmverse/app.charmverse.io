@@ -1,13 +1,16 @@
 import { log } from '@charmverse/core/log';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
+import type { UserCredential } from 'firebase/auth';
 import {
   getAuth,
+  getRedirectResult,
   GoogleAuthProvider,
   isSignInWithEmailLink,
   sendSignInLinkToEmail,
   signInWithEmailLink,
-  signInWithPopup
+  signInWithPopup,
+  signInWithRedirect
 } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -16,6 +19,7 @@ import charmClient from 'charmClient';
 import { googleWebClientConfig } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { getAppUrl } from 'lib/utilities/browser';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
 import type { AnyIdLogin } from '../components/login/LoginButton';
@@ -30,7 +34,6 @@ export function useFirebaseAuth() {
   const { user, setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
   const router = useRouter();
-
   const { showMessage } = useSnackbar();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
@@ -43,6 +46,33 @@ export function useFirebaseAuth() {
     });
   }, []);
 
+  async function getGoogleTokenWithRedirect(): Promise<void> {
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    signInWithRedirect(auth, provider);
+  }
+
+  async function getGoogleRedirectResult(): Promise<LoginWithGoogleRequest> {
+    const auth = getAuth(firebaseApp);
+    auth.languageCode = 'en';
+
+    const result = await getRedirectResult(auth);
+
+    if (!result) {
+      throw new ExternalServiceError(`Could not get credentials from Google`);
+    }
+
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+
+    if (!credential) {
+      throw new ExternalServiceError(`Could not authenticate with Google`);
+    }
+
+    return getGoogleCredentials(result);
+  }
+
   async function getGoogleToken(): Promise<LoginWithGoogleRequest> {
     try {
       const auth = getAuth(firebaseApp);
@@ -50,22 +80,7 @@ export function useFirebaseAuth() {
 
       const result = await signInWithPopup(auth, provider);
 
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-
-      if (!credential) {
-        throw new ExternalServiceError(`Could not authenticate with Google`);
-      }
-
-      const displayName = result.user.displayName ?? (result.user.email as string);
-
-      return {
-        accessToken: credential?.idToken as string,
-        displayName,
-        avatarUrl: result.user.photoURL as string
-      };
-
-      // ...
+      return getGoogleCredentials(result);
     } catch (error: any) {
       if (error instanceof SystemError) {
         throw error;
@@ -81,8 +96,24 @@ export function useFirebaseAuth() {
       log.debug({ errorCode, errorMessage, email, receivedCreds: credential });
 
       throw error;
-      // ...
     }
+  }
+
+  function getGoogleCredentials(googleResult: UserCredential): LoginWithGoogleRequest {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(googleResult);
+
+    if (!credential) {
+      throw new ExternalServiceError(`Could not authenticate with Google`);
+    }
+
+    const displayName = googleResult.user.displayName ?? (googleResult.user.email as string);
+
+    return {
+      accessToken: credential?.idToken as string,
+      displayName,
+      avatarUrl: googleResult.user.photoURL as string
+    };
   }
 
   async function loginWithGoogle(): Promise<AnyIdLogin> {
@@ -90,7 +121,7 @@ export function useFirebaseAuth() {
     try {
       const googleToken = await getGoogleToken();
       const loggedInUser = await charmClient.google.login(googleToken);
-      return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName };
+      return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName || '' };
     } finally {
       setIsConnectingGoogle(false);
     }
@@ -131,7 +162,8 @@ export function useFirebaseAuth() {
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
-    const url = new URL(`${window.location.origin}/authenticate`);
+    const url = new URL(`${getAppUrl()}authenticate`);
+
     if (connectToExistingAccount) {
       url.searchParams.set('connectToExistingAccount', 'true');
     }
@@ -208,6 +240,8 @@ export function useFirebaseAuth() {
     validateMagicLink,
     disconnectVerifiedEmailAccount,
     emailForSignIn,
-    setEmailForSignIn
+    setEmailForSignIn,
+    getGoogleRedirectResult,
+    getGoogleTokenWithRedirect
   };
 }

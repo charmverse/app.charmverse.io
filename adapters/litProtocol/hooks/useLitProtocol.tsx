@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import LitJsSdk from 'lit-js-sdk';
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import { useEffect, useMemo, useState } from 'react';
 
 function useLitProtocol() {
@@ -8,9 +8,8 @@ function useLitProtocol() {
     () =>
       new LitJsSdk.LitNodeClient({
         alertWhenUnauthorized: false,
-        // This option is documented in Lit docs, but not in their typescript definition
         debug: false
-      } as any),
+      }),
     []
   );
 

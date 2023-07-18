@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
@@ -54,18 +54,23 @@ export const useSharedPage = () => {
     }
 
     return !loadedSpace;
-  }, [spacesLoaded, isPublicPath, spaces, spaceDomain]);
+  }, [spacesLoaded, isPublicPath, loadedSpace]);
+
   const {
     data: publicPage,
     isLoading: isPublicPageLoading,
     error: publicPageError
-  } = useSWR(shouldLoadPublicPage ? `public/${pageKey}` : null, () => charmClient.getPublicPage(pageKey || ''));
+  } = useSWRImmutable(shouldLoadPublicPage ? `public/${pageKey}` : null, () =>
+    charmClient.getPublicPage(pageKey || '')
+  );
 
   const {
     data: space,
     isLoading: isSpaceLoading,
     error: spaceError
-  } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.spaces.searchByDomain(spaceDomain || ''));
+  } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
+    charmClient.spaces.searchByDomain(spaceDomain || '')
+  );
 
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';

@@ -5,12 +5,12 @@ import { useMemo, useState } from 'react';
 import { DialogTitle } from 'components/common/Modal';
 import { useMyNfts } from 'hooks/useMyNfts';
 import { useUser } from 'hooks/useUser';
-import type { NftData } from 'lib/blockchain/interfaces';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 
 import NftAvatarGallery from './NftAvatarGallery';
 
 type Props = {
-  onSelect?: (avatar: NftData) => void;
+  onSelect?: (avatar: NFTData) => void;
   isVisible: boolean;
   onClose: () => void;
   isSaving?: boolean;
