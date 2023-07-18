@@ -1,9 +1,11 @@
-import type { MediaSetFragment, ProfileFragment } from '@lens-protocol/client';
+import type { MediaSetFragment } from '@lens-protocol/client';
 import LanguageIcon from '@mui/icons-material/Language';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import useSWR from 'swr';
 
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 
 import { ProfileWidget } from './ProfileWidget';
@@ -27,79 +29,87 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
   );
 }
 
-export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
+export function LensDefaultProfileWidget({ userId }: { userId: string }) {
+  const { data: lensProfile, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
+    charmClient.publicProfile.getLensProfile(userId)
+  );
+
   return (
     <ProfileWidget
-      link={`https://www.lensfrens.xyz/${lensProfile.handle}`}
+      isLoading={isLoadingLensProfile}
+      emptyContent={!lensProfile ? 'User does not have a Lens profile' : null}
+      link={lensProfile ? `https://www.lensfrens.xyz/${lensProfile.handle}` : null}
       title='Lens Protocol'
       avatarSrc='/images/logos/lens_logo.svg'
     >
-      <Stack spacing={1}>
-        <Stack direction='row' spacing={1}>
-          <Avatar
-            size='large'
-            name={lensProfile.name ?? ''}
-            avatar={(lensProfile.picture as MediaSetFragment)?.original?.url}
-            variant='circular'
-          />
-          <Stack>
-            <Stack
-              gap={0.5}
-              sx={{
-                flexDirection: {
-                  xs: 'column',
-                  sm: 'row'
-                }
-              }}
-            >
-              <Typography variant='body1' fontWeight='bold'>
-                {lensProfile.name ?? lensProfile.handle}
-              </Typography>
-              <Typography
-                variant='subtitle2'
-                fontWeight='bold'
-                alignSelf={{
-                  xs: 'flex-start',
-                  sm: 'flex-end'
+      {lensProfile && (
+        <Stack spacing={1}>
+          <Stack direction='row' spacing={1}>
+            <Avatar
+              size='large'
+              name={lensProfile.name ?? ''}
+              avatar={(lensProfile.picture as MediaSetFragment)?.original?.url}
+              variant='circular'
+            />
+            <Stack>
+              <Stack
+                gap={0.5}
+                sx={{
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  }
                 }}
               >
-                #{lensProfile.id}
-              </Typography>
+                <Typography variant='body1' fontWeight='bold'>
+                  {lensProfile.name ?? lensProfile.handle}
+                </Typography>
+                <Typography
+                  variant='subtitle2'
+                  fontWeight='bold'
+                  alignSelf={{
+                    xs: 'flex-start',
+                    sm: 'flex-end'
+                  }}
+                >
+                  #{lensProfile.id}
+                </Typography>
+              </Stack>
+              <Typography variant='subtitle1'>{lensProfile.handle}</Typography>
             </Stack>
-            <Typography variant='subtitle1'>{lensProfile.handle}</Typography>
           </Stack>
-        </Stack>
-        <Stack direction='row'>
-          <Typography variant='body2'>
-            Followers: {lensProfile.stats?.totalFollowers ?? 0} | Following: {lensProfile.stats?.totalFollowing ?? 0}
-          </Typography>
-        </Stack>
-        <Divider />
-        <Typography variant='subtitle1'>{lensProfile.bio}</Typography>
+          <Stack direction='row'>
+            <Typography variant='body2'>
+              Followers: {lensProfile.stats?.totalFollowers ?? 0} | Following: {lensProfile.stats?.totalFollowing ?? 0}
+            </Typography>
+          </Stack>
+          <Divider />
+          <Typography variant='subtitle1'>{lensProfile.bio}</Typography>
 
-        {(lensProfile.attributes ?? []).map((attribute) => {
-          if (attribute.key === 'website') {
-            return (
-              <LensProfileAttributes
-                href={attribute.value}
-                key={attribute.key}
-                icon={<LanguageIcon fontSize='small' />}
-                label={`Website: ${attribute.value}`}
-              />
-            );
-          } else if (attribute.key === 'twitter') {
-            return (
-              <LensProfileAttributes
-                key={attribute.key}
-                href={`https://twitter.com/${attribute.value}`}
-                icon={<TwitterIcon style={{ color: '#00ACEE', height: 20 }} />}
-                label={`Twitter: ${attribute.value}`}
-              />
-            );
-          }
-          return null;
-        })}
-      </Stack>
+          {(lensProfile.attributes ?? []).map((attribute) => {
+            if (attribute.key === 'website') {
+              return (
+                <LensProfileAttributes
+                  href={attribute.value}
+                  key={attribute.key}
+                  icon={<LanguageIcon fontSize='small' />}
+                  label={`Website: ${attribute.value}`}
+                />
+              );
+            } else if (attribute.key === 'twitter') {
+              return (
+                <LensProfileAttributes
+                  key={attribute.key}
+                  href={`https://twitter.com/${attribute.value}`}
+                  icon={<TwitterIcon style={{ color: '#00ACEE', height: 20 }} />}
+                  label={`Twitter: ${attribute.value}`}
+                />
+              );
+            }
+            return null;
+          })}
+        </Stack>
+      )}
     </ProfileWidget>
   );
 }
