@@ -222,16 +222,16 @@ export async function getProposalTasks(userId: string): Promise<{
         isAuthor,
         isReviewer
       });
+      if (!action) {
+        return;
+      }
+      // Check notifications are enabled for space-wide proposal notifications
+      const notifyNewEvents = page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
+      if (!notifyNewEvents && (action === 'discuss' || action === 'vote')) {
+        return;
+      }
 
       if (workspaceEvent) {
-        // Check notifications are enabled for space-wide proposal notifications
-        const notifyNewEvents =
-          page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
-
-        if (!notifyNewEvents && (action === 'discuss' || action === 'vote')) {
-          return;
-        }
-
         const proposalTask = {
           id: workspaceEvent.id,
           eventDate: workspaceEvent.createdAt,
