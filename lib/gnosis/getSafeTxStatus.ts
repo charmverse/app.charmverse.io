@@ -20,14 +20,14 @@ export async function getSafeTxStatus({
   chainId: number;
 }): Promise<SafeTxStatusDetails | null> {
   const provider = new AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY);
-  const safeService = getGnosisService({ signer: provider, chainId });
+  const gnosisService = getGnosisService({ signer: provider, chainId });
 
-  if (!safeService) {
+  if (!gnosisService?.safeService) {
     return null;
   }
 
   try {
-    const safeTx = await safeService.getTransaction(safeTxHash);
+    const safeTx = await gnosisService.safeService.getTransaction(safeTxHash);
 
     const { isExecuted, isSuccessful, transactionHash: chainTxHash, nonce } = safeTx;
 
@@ -39,7 +39,7 @@ export async function getSafeTxStatus({
     }
 
     // check if tx was replaced with other tx with the same nonce
-    const executedTxs = await safeService.getAllTransactions(safeTx.safe, { executed: true });
+    const executedTxs = await gnosisService.safeService.getAllTransactions(safeTx.safe, { executed: true });
     const replacedTx = executedTxs.results.find((tx) => 'nonce' in tx && tx.nonce === nonce);
 
     // orginal tx was replaced with other tx

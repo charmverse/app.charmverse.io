@@ -13,7 +13,6 @@ interface ImportSafeProps {
 
 export async function importSafesFromWallet({ signer, addresses, getWalletDetails }: ImportSafeProps) {
   const safes = await getSafesForAddresses(signer, addresses);
-
   const safesData = safes.map((safe) => ({
     address: safe.address,
     owners: safe.owners,

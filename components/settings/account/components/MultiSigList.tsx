@@ -45,8 +45,8 @@ export function MultiSigList() {
 
   useEffect(() => {
     // We need this to run every time a user opens the account section in the settings modal
-    importSafes();
-  }, []);
+    importSafes(gnosisSigner);
+  }, [gnosisSigner]);
 
   if (!safeData) {
     return null;
