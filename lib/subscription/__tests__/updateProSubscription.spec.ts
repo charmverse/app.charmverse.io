@@ -55,7 +55,7 @@ describe('updateProSubscription', () => {
         spaceId,
         payload: { billingEmail: 'test@gmail.com', status: 'cancel_at_end' }
       })
-    ).not.rejects;
+    ).resolves.not.toThrow();
   });
 
   it(`Should fail if the space has no subscription`, async () => {
