@@ -32,6 +32,9 @@ const config = {
   },
   transpilePackages: esmModules,
   modularizeImports: {
+    '@mui/system': {
+      transform: '@mui/system/{{member}}'
+    },
     '@mui/material': {
       transform: '@mui/material/{{member}}'
     },
