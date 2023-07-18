@@ -107,7 +107,7 @@ function SafeRow({ safe, updateWallets }: { safe: UserGnosisSafe; updateWallets:
   const { trigger: updateSafeWallet, isMutating: isLoadingUpdateSafeWallet } = useSWRMutation(
     '/profile/add-wallets',
     (_url, { arg }: Readonly<{ arg: { id: string; name?: string; isHidden?: boolean } }>) =>
-      charmClient.updateMyGnosisSafe(arg),
+      charmClient.gnosisSafe.updateMyGnosisSafe(arg),
     {
       onSuccess() {
         updateWallets();

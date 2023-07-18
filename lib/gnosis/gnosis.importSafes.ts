@@ -23,7 +23,7 @@ export async function importSafesFromWallet({ signer, addresses, getWalletDetail
     isHidden: getWalletDetails?.(safe.address)?.isHidden ?? false
   }));
 
-  await charmClient.setMyGnosisSafes(safesData);
+  await charmClient.gnosisSafe.setMyGnosisSafes(safesData);
 
   return safes.length;
 }

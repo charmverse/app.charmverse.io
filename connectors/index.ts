@@ -280,6 +280,7 @@ const RPC = {
     rpcUrls: ['https://rpc.mantle.xyz'],
     blockExplorerUrls: ['https://explorer.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    gnosisUrl: 'https://multisig.mantle.xyz',
     shortName: 'mantle'
   },
   MANTLE_TESTNET: {
@@ -293,6 +294,7 @@ const RPC = {
       logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
     },
     rpcUrls: ['https://rpc.testnet.mantle.xyz'],
+    gnosisUrl: 'https://multisig.mantle.xyz',
     blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
     shortName: 'mantle-testnet'
@@ -448,6 +450,9 @@ export function getChainExplorerLink(
 
     case '324':
       return `https://explorer.zksync.io/${path}/${transactionOrContractId}`;
+
+    case '5000':
+      return `https://explorer.mantle.xyz/${path}/${transactionOrContractId}`;
 
     case '5001':
       return `https://explorer.testnet.mantle.xyz/${path}/${transactionOrContractId}`;
