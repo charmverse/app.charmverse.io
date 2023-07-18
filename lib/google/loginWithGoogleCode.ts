@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { googleOAuthClientIdSensitive } from 'config/constants';
 import { getClient } from 'lib/google/authorization/authClient';
 import { loginWithGoogle } from 'lib/google/loginWithGoogle';
@@ -21,12 +23,17 @@ export async function loginWithGoogleCode({
   };
 
   const client = getClient(redirectUri);
-  const { tokens } = await client.getToken(code);
-  const idToken = tokens.id_token;
+  try {
+    const { tokens } = await client.getToken(code);
+    const idToken = tokens.id_token;
 
-  if (!idToken) {
-    throw new InvalidInputError(`Invalid google authentication code`);
+    if (!idToken) {
+      throw new InvalidInputError(`Invalid google authentication code`);
+    }
+
+    return loginWithGoogle({ accessToken: idToken, signupAnalytics, oauthParams });
+  } catch (e) {
+    log.warn(`Could not verify authentication code`, { error: e, oauthParams });
+    throw new InvalidInputError(`Could not verify authentication code`);
   }
-
-  return loginWithGoogle({ accessToken: idToken, signupAnalytics, oauthParams });
 }
