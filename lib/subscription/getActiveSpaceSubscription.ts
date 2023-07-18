@@ -22,13 +22,17 @@ export async function getActiveSpaceSubscription({
 }: SpaceSubscriptionRequest & { requestCustomerPortal?: boolean }): Promise<SpaceSubscriptionWithStripeData | null> {
   const space = await prisma.space.findUnique({
     where: {
-      id: spaceId
+      id: spaceId,
+      deletedAt: null
     },
     select: {
       stripeSubscription: {
         take: 1,
         orderBy: {
           createdAt: 'desc'
+        },
+        where: {
+          deletedAt: null
         }
       }
     }
