@@ -4,10 +4,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { CollectionWidget } from './CollectionWidget';
 import { EnsWidget } from './EnsWidget';
-import { Game7ProfileWidget } from './Game7ProfileWidget';
 import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { MemberPropertiesWidget } from './MemberPropertiesWidget';
 import { SocialWidget } from './SocialWidget';
+import { SummonProfileWidget } from './SummonProfileWidget';
 
 const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens', 'game7'] as const;
 
@@ -48,7 +48,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
           case 'game7': {
             return (
               <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                <Game7ProfileWidget userId={userId} />
+                <SummonProfileWidget userId={userId} />
               </Grid>
             );
           }

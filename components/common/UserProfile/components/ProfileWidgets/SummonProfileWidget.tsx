@@ -30,20 +30,20 @@ function SummonPlayerStatistics({ label, value }: { label: string; value: string
   );
 }
 
-export function Game7ProfileWidget({ userId }: { userId: string }) {
-  const { data: game7Profile, isLoading: isLoadingGame7Profile } = useSWR(`public/profile/${userId}/game7`, () =>
+export function SummonProfileWidget({ userId }: { userId: string }) {
+  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(`public/profile/${userId}/summon`, () =>
     charmClient.publicProfile.getSummonProfile(userId)
   );
 
   return (
     <ProfileWidget
-      isLoading={isLoadingGame7Profile}
-      title='Game7 Profile'
+      isLoading={isLoadingSummonProfile}
+      title='Summon Profile'
       avatarVariant='square'
-      avatarSrc='/images/logos/game7_logo.svg'
-      emptyContent={!game7Profile ? 'User does not have a Game7 profile' : null}
+      avatarSrc='/images/logos/summon_logo.svg'
+      emptyContent={!summonProfile ? 'Profile Not Found' : null}
     >
-      {game7Profile && (
+      {summonProfile && (
         <Stack
           gap={1}
           sx={{
@@ -57,13 +57,13 @@ export function Game7ProfileWidget({ userId }: { userId: string }) {
           <Avatar
             size='2xLarge'
             variant='rounded'
-            avatar={game7Profile.meta.avatarUrl || `/images/logos/game7_logo.svg`}
+            avatar={summonProfile.meta.avatarUrl || `/images/logos/summon_logo.svg`}
           />
           <Stack gap={1} width='100%'>
-            <SummonPlayerStatistics label='Rank' value={game7Profile.meta.rank} />
-            <SummonPlayerStatistics label='XP' value={game7Profile.meta.xp} />
-            <SummonPlayerStatistics label='Achievements' value={game7Profile.meta.achievements.length} />
-            <SummonPlayerStatistics label='Skills' value={game7Profile.meta.trophies.length} />
+            <SummonPlayerStatistics label='Rank' value={summonProfile.meta.rank} />
+            <SummonPlayerStatistics label='XP' value={summonProfile.meta.xp} />
+            <SummonPlayerStatistics label='Achievements' value={summonProfile.meta.achievements.length} />
+            <SummonPlayerStatistics label='Skills' value={summonProfile.meta.trophies.length} />
           </Stack>
         </Stack>
       )}

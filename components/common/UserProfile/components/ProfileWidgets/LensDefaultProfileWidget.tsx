@@ -37,7 +37,7 @@ export function LensDefaultProfileWidget({ userId }: { userId: string }) {
   return (
     <ProfileWidget
       isLoading={isLoadingLensProfile}
-      emptyContent={!lensProfile ? 'User does not have a Lens profile' : null}
+      emptyContent={!lensProfile ? 'Profile Not Found' : null}
       link={lensProfile ? `https://www.lensfrens.xyz/${lensProfile.handle}` : null}
       title='Lens Protocol'
       avatarSrc='/images/logos/lens_logo.svg'

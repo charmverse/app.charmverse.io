@@ -59,7 +59,7 @@ export function EnsWidget({ userId }: { userId: string }) {
       title='Ethereum Naming Service'
       avatarSrc='/images/logos/ens_logo.svg'
       isLoading={isLoadingEnsProfile}
-      emptyContent={!ensProfile ? 'User does not have an ENS profile' : null}
+      emptyContent={!ensProfile ? 'Profile Not Found' : null}
     >
       {ensProfile && (
         <Stack spacing={2}>
