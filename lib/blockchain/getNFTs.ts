@@ -63,13 +63,15 @@ function mapNftFromAlchemy(
     // errors include "Contract does not have any code"
     return null;
   }
-  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: nft.id.tokenId }) ?? '';
+  const tokenIdInt = parseInt(nft.id.tokenId, 16);
+  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdInt }) ?? '';
+
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
   const image = nft.media[0].gateway?.startsWith('https://') ? nft.media[0].gateway : nft.media[0].raw;
   return {
     id: `${nft.contract.address}:${nft.id.tokenId}`,
     tokenId: nft.id.tokenId,
-    tokenIdInt: parseInt(nft.id.tokenId, 16) || null,
+    tokenIdInt,
     contract: nft.contract.address,
     imageRaw: nft.media[0].raw,
     image,
