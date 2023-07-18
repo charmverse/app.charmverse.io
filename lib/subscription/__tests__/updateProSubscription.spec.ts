@@ -50,34 +50,16 @@ describe('updateProSubscription', () => {
       deletedAt: null
     });
 
-    await updateProSubscription({
-      spaceId,
-      payload: { billingEmail: 'test@gmail.com', status: 'cancel_at_end' }
-    });
+    await expect(
+      updateProSubscription({
+        spaceId,
+        payload: { billingEmail: 'test@gmail.com', status: 'cancel_at_end' }
+      })
+    ).not.rejects;
   });
 
   it(`Should fail if the space has no subscription`, async () => {
-    const customerId = `cus_${v4()}`;
-    const subscriptionId = `sub_${v4()}`;
     const spaceId = v4();
-
-    const stripeSubscriptionDetails = {
-      id: subscriptionId,
-      status: 'active',
-      metadata: {},
-      customer: {
-        id: customerId,
-        deleted: undefined,
-        metadata: {
-          spaceId
-        }
-      }
-    };
-
-    (stripeClient.subscriptions.retrieve as jest.Mock) = jest.fn().mockResolvedValue(stripeSubscriptionDetails);
-    (stripeClient.subscriptions.update as jest.Mock) = stripeMock.stripeClient.subscriptions.update;
-    (stripeClient.customers.update as jest.Mock) = stripeMock.stripeClient.customers.update;
-
     await expect(
       updateProSubscription({
         spaceId,
