@@ -16,5 +16,5 @@ export function getAppOriginURL({ protocol, port, host }: { protocol?: string; h
     return new URL(`http://localhost${appPort}/`);
   }
 
-  return new URL(`${appProtocol}//${appSubdomain}.${appDomain}${appPort}/`);
+  return new URL(`${appProtocol}${appSubdomain}.${appDomain}${appPort}/`);
 }
