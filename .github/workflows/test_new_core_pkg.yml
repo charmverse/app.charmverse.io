@@ -15,10 +15,12 @@ jobs:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
-      - env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+      - name: Print out triggering event json
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
         run: |
-          echo $EVENT_CONTEXT
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
 
       - name: Install dependencies
