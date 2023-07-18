@@ -47,7 +47,7 @@ runs:
       if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
       run: |
         rm -rf ./node_modules/@charmverse && 
-        npm install github:charmverse/core#ux/filter-proposal-notifications &&
+        npm install github:charmverse/core#${{inputs.use_github_core_branch}} &&
         cd node_modules/@charmverse/core &&
         npm run build 
 
