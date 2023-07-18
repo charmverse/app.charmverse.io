@@ -1,4 +1,4 @@
-import { Stack } from '@mui/system';
+import { Stack } from '@mui/material';
 
 import { SocialIcons } from 'components/u/components/UserDetails/SocialIcons';
 import type { Social } from 'components/u/interfaces';
