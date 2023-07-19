@@ -6,10 +6,9 @@ import { CollectionWidget } from './CollectionWidget';
 import { EnsWidget } from './EnsWidget';
 import { LensDefaultProfileWidget } from './LensDefaultProfileWidget';
 import { MemberPropertiesWidget } from './MemberPropertiesWidget';
-import { SocialWidget } from './SocialWidget';
 import { SummonProfileWidget } from './SummonProfileWidget';
 
-const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens', 'summon'] as const;
+const profileWidgets = ['charmverse', 'collection', 'ens', 'lens', 'summon'] as const;
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
@@ -28,13 +27,6 @@ export function ProfileWidgets({ userId }: { userId: string }) {
             return (
               <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
                 <CollectionWidget userId={userId} />
-              </Grid>
-            );
-
-          case 'social':
-            return (
-              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                <SocialWidget userId={userId} />
               </Grid>
             );
 
