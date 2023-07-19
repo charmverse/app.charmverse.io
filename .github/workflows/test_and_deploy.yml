@@ -16,16 +16,19 @@ on:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
+  CORE_GITHUB_BRANCH: parameitizing-custom-branch-core-install
 
 jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
-      - env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+      - name: Print out triggering event json
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
         run: |
-          echo $EVENT_CONTEXT
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
 
       - name: Debug
@@ -36,6 +39,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build
@@ -60,6 +64,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -115,6 +120,7 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
