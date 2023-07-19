@@ -1,6 +1,5 @@
 import type { AuthSig } from '@lit-protocol/types';
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Typography, Stack } from '@mui/material';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';

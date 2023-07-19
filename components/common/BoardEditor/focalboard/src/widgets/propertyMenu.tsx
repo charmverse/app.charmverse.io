@@ -1,7 +1,6 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItemIcon, Menu, MenuItem, TextField, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { ListItemIcon, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
 import type { IntlShape } from 'react-intl';

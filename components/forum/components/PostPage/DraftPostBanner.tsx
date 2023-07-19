@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 
 const StyledPageTemplateBanner = styled(Box)`
   top: 55px;

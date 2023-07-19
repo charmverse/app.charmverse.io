@@ -21,8 +21,8 @@ export type LoginWithGoogleRequest = {
 };
 export async function loginWithGoogle({
   accessToken,
-  displayName,
-  avatarUrl,
+  displayName: providedDisplayName,
+  avatarUrl: providedAvatarUrl,
   signupAnalytics = {},
   oauthParams
 }: LoginWithGoogleRequest): Promise<LoggedInUser> {
@@ -30,8 +30,8 @@ export async function loginWithGoogle({
     const verified = await verifyGoogleToken(accessToken, oauthParams);
 
     const email = verified.email;
-    const userDisplayName = displayName || verified.name || '';
-    const userAvatarUrl = avatarUrl || verified.picture || '';
+    const displayName = providedDisplayName || verified.name || '';
+    const avatarUrl = providedAvatarUrl || verified.picture || '';
 
     if (!email) {
       throw new InvalidInputError(`Email required to complete signup`);
@@ -68,7 +68,7 @@ export async function loginWithGoogle({
         throw new DisabledAccountError(`This account has been disabled`);
       }
 
-      if (googleAccount.name !== userDisplayName || googleAccount.avatarUrl !== userAvatarUrl) {
+      if (googleAccount.name !== displayName || googleAccount.avatarUrl !== avatarUrl) {
         trackUserAction('sign_in', { userId: googleAccount.userId, identityType: 'Google' });
 
         await prisma.googleAccount.update({
@@ -109,13 +109,13 @@ export async function loginWithGoogle({
 
     const createdGoogleAccount = await prisma.googleAccount.create({
       data: {
-        name: userDisplayName,
-        avatarUrl: userAvatarUrl,
+        name: displayName,
+        avatarUrl,
         email,
         user: {
           create: {
             identityType: 'Google',
-            username: userDisplayName,
+            username: displayName,
             avatar: avatarUrl,
             path: uid()
           }
