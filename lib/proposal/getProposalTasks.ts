@@ -155,7 +155,7 @@ export async function getProposalTasks(userId: string): Promise<{
           not: true
         },
         status: {
-          in: ['discussion', 'review', 'reviewed', 'vote_active']
+          in: ['feedback', 'review', 'reviewed', 'vote_active']
         },
         OR: [
           {

@@ -11,7 +11,7 @@ export function getProposalAction({
   isAuthor: boolean;
   isReviewer: boolean;
 }): ProposalTask['action'] | null {
-  if (currentStatus === 'discussion') {
+  if (currentStatus === 'feedback') {
     if (isAuthor) {
       return 'start_review';
     }

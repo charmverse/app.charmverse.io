@@ -33,7 +33,7 @@ describe('updateCardsFromProposals()', () => {
   it('should update cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',
@@ -83,7 +83,7 @@ describe('updateCardsFromProposals()', () => {
   it('should create cards from proposals if there are new proposals added', async () => {
     await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',
@@ -98,7 +98,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',
@@ -158,7 +158,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [],
       spaceId: space.id,
       userId: user.id,
@@ -183,7 +183,7 @@ describe('updateCardsFromProposals()', () => {
   it('should delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',
@@ -225,7 +225,7 @@ describe('updateCardsFromProposals()', () => {
   it('should permanently delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',

@@ -21,7 +21,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     // User is the proposal author
-    // Moved a draft proposal from discussion back to draft
+    // Moved a draft proposal from feedback back to draft
     // Should create two separate workspace events
     // Should create only one proposal task with action start_discussion
     const authoredDraftProposal = await generateProposal({
@@ -39,7 +39,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
 
     const { proposal: updatedProposal } = await updateProposalStatus({
       proposalId: authoredDraftProposal.proposal.id,
-      newStatus: 'discussion',
+      newStatus: 'feedback',
       userId: user1.id
     });
 
@@ -50,7 +50,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     // User is not the proposal author but a reviewer
-    // Moved a discussion stage proposal to review
+    // Moved a feedback stage proposal to review
     // Should create a single proposal task where action is review
     const reviewProposal = await generateProposal({
       authors: [user2.id],
@@ -68,7 +68,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } =
       await updateProposalStatus({
         proposalId: reviewProposal.proposal.id,
-        newStatus: 'discussion',
+        newStatus: 'feedback',
         userId: user2.id
       });
 
@@ -79,7 +79,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     // User is a proposal author
-    // Moved a private draft proposal to discussion
+    // Moved a private draft proposal to feedback
     // Should create a single proposal task with action start_review
     const authoredStartReviewProposal = await generateProposal({
       authors: [user1.id],
@@ -96,12 +96,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
 
     await updateProposalStatus({
       proposalId: authoredStartReviewProposal.proposal.id,
-      newStatus: 'discussion',
+      newStatus: 'feedback',
       userId: user1.id
     });
 
     // User is not an author or reviewer of proposal, but have access to the space
-    // Move a draft proposal to discussion
+    // Move a draft proposal to feedback
     // Should create a single proposal task with action discuss (as a workspace member)
     const discussedProposal = await generateProposal({
       authors: [user2.id],
@@ -118,7 +118,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
 
     await updateProposalStatus({
       proposalId: discussedProposal.proposal.id,
-      newStatus: 'discussion',
+      newStatus: 'feedback',
       userId: user2.id
     });
 

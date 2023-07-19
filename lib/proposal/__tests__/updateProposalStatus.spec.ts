@@ -51,7 +51,7 @@ describe('updateProposalStatus', () => {
     expect(updatedProposal.reviewedAt).not.toBeNull();
   });
 
-  it('Move a reviewed proposal to discussion status and unassign proposal reviewer and reviewed at fields', async () => {
+  it('Move a reviewed proposal to feedback status and unassign proposal reviewer and reviewed at fields', async () => {
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
@@ -62,10 +62,10 @@ describe('updateProposalStatus', () => {
 
     const { proposal } = await updateProposalStatus({
       proposalId: pageWithProposal.proposal?.id as string,
-      newStatus: 'discussion',
+      newStatus: 'feedback',
       userId: user.id
     });
-    expect(proposal.status).toBe('discussion');
+    expect(proposal.status).toBe('feedback');
     expect(proposal.reviewedBy).toBeNull();
     expect(proposal.reviewedAt).toBeNull();
   });
@@ -87,13 +87,13 @@ describe('updateProposalStatus', () => {
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
-  it('Throw error when trying to move a discussion proposal to review without any reviewers attached', async () => {
+  it('Throw error when trying to move a feedback proposal to review without any reviewers attached', async () => {
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
       reviewers: [],
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
     await expect(
       updateProposalStatus({
@@ -110,7 +110,7 @@ describe('updateProposalStatus', () => {
       userId: user.id,
       authors: [],
       reviewers: [{ group: 'role', id: reviewerRole.id }],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       archived: true,
       categoryId: proposalCategory.id
     });

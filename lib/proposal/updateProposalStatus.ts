@@ -63,9 +63,9 @@ export async function updateProposalStatus({
     data: {
       status: newStatus,
       // Only record these if the new proposal status is reviewed
-      // If moving back to discussion, remove the reviewer and reviewedAt
-      reviewedBy: newStatus === 'reviewed' ? userId : newStatus === 'discussion' ? null : undefined,
-      reviewedAt: newStatus === 'reviewed' ? new Date() : newStatus === 'discussion' ? null : undefined
+      // If moving back to feedback, remove the reviewer and reviewedAt
+      reviewedBy: newStatus === 'reviewed' ? userId : newStatus === 'feedback' ? null : undefined,
+      reviewedAt: newStatus === 'reviewed' ? new Date() : newStatus === 'feedback' ? null : undefined
     }
   });
 

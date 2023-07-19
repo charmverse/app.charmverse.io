@@ -132,8 +132,8 @@ function getProposalContent(n: ProposalTask, currentUserId: string) {
 
 function getProposalNotificationStatus(status: ProposalStatus) {
   switch (status) {
-    case 'discussion':
-      return 'Discussion';
+    case 'feedback':
+      return 'Feedback';
     case 'review':
       return 'In Review';
     case 'reviewed':

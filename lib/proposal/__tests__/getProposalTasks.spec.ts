@@ -32,8 +32,8 @@ describe('getProposalTasks', () => {
       categoryId: visibleProposalCategory.id
     });
 
-    const discussionProposal = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
+    const feedbackProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'feedback',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -45,7 +45,7 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: discussionProposal.status,
+          status: feedbackProposal.status,
           action: 'start_review'
         })
       ])
@@ -65,7 +65,7 @@ describe('getProposalTasks', () => {
     });
 
     const privateDraftProposal1 = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -205,7 +205,7 @@ describe('getProposalTasks', () => {
     );
   });
 
-  it('Should get all proposals in discussion stage where the user has permission to comment inside this category', async () => {
+  it('Should get all proposals in feedback stage where the user has permission to comment inside this category', async () => {
     const { user: author, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -241,15 +241,15 @@ describe('getProposalTasks', () => {
       categoryId: visibleCategory.id
     });
 
-    const discussionProposalHiddenCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
+    const feedbackProposalHiddenCategory = await testUtilsProposals.generateProposal({
+      proposalStatus: 'feedback',
       spaceId: space.id,
       userId: author.id,
       categoryId: readonlyCategory.id
     });
 
-    const discussionProposalVisibleCategory = await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
+    const feedbackProposalVisibleCategory = await testUtilsProposals.generateProposal({
+      proposalStatus: 'feedback',
       spaceId: space.id,
       userId: author.id,
       categoryId: visibleCategory.id
@@ -262,8 +262,8 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          pageId: discussionProposalVisibleCategory.page.id,
-          status: discussionProposalVisibleCategory.status,
+          pageId: feedbackProposalVisibleCategory.page.id,
+          status: feedbackProposalVisibleCategory.status,
           action: 'discuss'
         })
       ])
@@ -348,7 +348,7 @@ describe('getProposalTasks', () => {
     });
 
     await testUtilsProposals.generateProposal({
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       spaceId: space.id,
       authors: [],
       reviewers: [],

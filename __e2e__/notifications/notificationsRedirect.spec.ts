@@ -14,7 +14,7 @@ test('Space notifications -  opens modal when coming from a notification email a
   const { user: spaceUser, space } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
 
   const prop = await generateProposal({
-    proposalStatus: 'discussion',
+    proposalStatus: 'feedback',
     spaceId: space.id,
     authors: [spaceUser.id],
     reviewers: [],

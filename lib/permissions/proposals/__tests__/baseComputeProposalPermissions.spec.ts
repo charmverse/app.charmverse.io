@@ -51,7 +51,7 @@ beforeAll(async () => {
     categoryId: proposalCategory.id,
     userId: proposalAuthor.id,
     authors: [proposalAuthor.id],
-    proposalStatus: 'discussion',
+    proposalStatus: 'feedback',
     reviewers: [
       {
         id: proposalReviewer.id,

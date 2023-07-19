@@ -37,7 +37,7 @@ describe('computePagePermissionsUsingProposalPermissions', () => {
       categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: authorUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const authorPermissions = await computePagePermissionsUsingProposalPermissions({

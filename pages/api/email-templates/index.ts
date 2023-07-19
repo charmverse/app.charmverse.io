@@ -179,7 +179,7 @@ const templates = {
           action: 'discuss',
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
-          status: 'discussion'
+          status: 'feedback'
         }),
         createProposalTasks({
           action: 'start_discussion',

@@ -68,7 +68,7 @@ test.describe.serial('View proposal', () => {
     discussionProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       categoryId: proposalCategory.id
     });
 

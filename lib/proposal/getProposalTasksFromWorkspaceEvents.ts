@@ -142,7 +142,7 @@ export async function getProposalTasksFromWorkspaceEvents(userId: string, worksp
           pageId: page.id
         };
 
-        if (newStatus === 'discussion') {
+        if (newStatus === 'feedback') {
           if (isAuthor) {
             proposalTasks.push({
               ...proposalTask,

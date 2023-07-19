@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 describe('computeProposalFlowPermissions', () => {
-  it('Proposal author should be able to change the proposal status from draft to discussion', async () => {
+  it('Proposal author should be able to change the proposal status from draft to feedback', async () => {
     // Create a test proposal first
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -84,7 +84,7 @@ describe('computeProposalFlowPermissions', () => {
     expect(flowFlags.reviewed).toBe(false);
   });
 
-  it("Proposal reviewer (userId) shouldn't be able to change the proposal status from draft to discussion", async () => {
+  it("Proposal reviewer (userId) shouldn't be able to change the proposal status from draft to feedback", async () => {
     // Create a test proposal first
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -98,7 +98,7 @@ describe('computeProposalFlowPermissions', () => {
       userId: reviewer1.id
     });
 
-    expect(flowFlags.discussion).toBe(false);
+    expect(flowFlags.feedback).toBe(false);
   });
 
   it('should return false for the review status if the proposal is in draft stage, but no reviewers exist', async () => {
@@ -106,7 +106,7 @@ describe('computeProposalFlowPermissions', () => {
       spaceId: space.id,
       userId: author.id,
       categoryId: proposalCategory.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const flowFlags = await computeProposalFlowPermissions({
@@ -114,6 +114,6 @@ describe('computeProposalFlowPermissions', () => {
       userId: author.id
     });
 
-    expect(flowFlags.discussion).toBe(false);
+    expect(flowFlags.feedback).toBe(false);
   });
 });

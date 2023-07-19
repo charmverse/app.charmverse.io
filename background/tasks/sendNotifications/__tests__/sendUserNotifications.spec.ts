@@ -13,7 +13,7 @@ describe('sendNotification()', () => {
     });
 
     await generateProposal({
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -62,7 +62,7 @@ describe('sendNotification()', () => {
     });
 
     await generateProposal({
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],

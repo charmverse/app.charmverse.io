@@ -341,7 +341,7 @@ describe('GET /api/v1/proposals', () => {
     const deletedProposal = await prisma.proposal.create({
       data: {
         createdBy: space2User.id,
-        status: 'discussion',
+        status: 'feedback',
         space: { connect: { id: space2.id } },
         page: {
           create: {

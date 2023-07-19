@@ -165,7 +165,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
-  it('should allow an admin to update any discussion stage proposal', async () => {
+  it('should allow an admin to update any feedback stage proposal', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
@@ -175,7 +175,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
       categoryId: proposalCategory.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -224,7 +224,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
       categoryId: proposalCategory.id,
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [{ group: 'user', id: userWithRole.id }]
     });
 

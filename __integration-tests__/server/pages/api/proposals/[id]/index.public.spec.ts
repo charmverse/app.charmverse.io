@@ -36,7 +36,7 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
       userId: author.id,
       authors: [author.id],
       reviewers: [{ group: 'user', id: reviewer.id }],
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
     // Unauthenticated request
     const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
@@ -47,7 +47,7 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'discussion',
+        status: 'feedback',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: generatedProposal.id,

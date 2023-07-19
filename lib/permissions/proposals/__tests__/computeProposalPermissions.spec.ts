@@ -95,7 +95,7 @@ describe('computeProposalPermissions', () => {
     });
   });
 
-  it('should allow the admin to always see proposals, but only edit the proposal during the draft, discussion, review and reviewed stages', async () => {
+  it('should allow the admin to always see proposals, but only edit the proposal during the draft, feedback, review and reviewed stages', async () => {
     const testedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       categoryId: proposalCategory.id,
@@ -112,7 +112,7 @@ describe('computeProposalPermissions', () => {
 
     expect(permissions.edit).toBe(true);
 
-    const editableStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed'];
+    const editableStatuses: ProposalStatus[] = ['feedback', 'review', 'reviewed'];
 
     for (const status of editableStatuses) {
       await prisma.proposal.update({ where: { id: testedProposal.id }, data: { status } });
@@ -167,7 +167,7 @@ describe('computeProposalPermissions', () => {
       unarchive: false
     });
 
-    const nonDraftStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed', 'vote_active', 'vote_closed'];
+    const nonDraftStatuses: ProposalStatus[] = ['feedback', 'review', 'reviewed', 'vote_active', 'vote_closed'];
 
     for (const status of nonDraftStatuses) {
       await prisma.proposal.update({ where: { id: proposal.id }, data: { status } });

@@ -1,10 +1,10 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
-  draft: ['discussion'],
-  discussion: ['draft', 'draft', 'review'],
-  review: ['discussion', 'reviewed'],
-  reviewed: ['vote_active', 'discussion'],
+  draft: ['feedback'],
+  feedback: ['draft', 'draft', 'review'],
+  review: ['feedback', 'reviewed'],
+  reviewed: ['vote_active', 'feedback'],
   vote_active: [],
   vote_closed: []
 };
@@ -13,7 +13,7 @@ export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as 
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   draft: 'Draft',
-  discussion: 'Discussion',
+  feedback: 'feedback',
   review: 'In Review',
   reviewed: 'Reviewed',
   vote_active: 'Vote Active',
@@ -26,25 +26,25 @@ export const proposalStatusTransitionPermission: Partial<
   Record<ProposalStatus, Partial<Record<ProposalUserGroup, ProposalStatus[]>>>
 > = {
   draft: {
-    // Author of the proposal can move draft proposal to both draft and discussion
+    // Author of the proposal can move draft proposal to both draft and feedback
     // Reviewer of the proposal can't update the status of the proposal
-    author: ['discussion']
+    author: ['feedback']
   },
-  discussion: {
+  feedback: {
     author: ['draft', 'review']
   },
   review: {
-    author: ['discussion'],
-    reviewer: ['reviewed', 'discussion']
+    author: ['feedback'],
+    reviewer: ['reviewed', 'feedback']
   },
   reviewed: {
-    author: ['discussion', 'vote_active']
+    author: ['feedback', 'vote_active']
   }
 };
 
 export const proposalStatusDetails: Record<ProposalStatus, string> = {
   draft: 'Only authors can view and edit this proposal',
-  discussion: 'Space members can comment on this proposal',
+  feedback: 'Space members can comment on this proposal',
   review: 'Reviewers can approve this proposal',
   reviewed: 'Authors can move this proposal to vote',
   vote_active: 'Space members are voting on this proposal',

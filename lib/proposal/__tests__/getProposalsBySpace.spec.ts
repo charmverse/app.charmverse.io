@@ -28,13 +28,13 @@ beforeAll(async () => {
     spaceId: space.id,
     userId: user.id,
     categoryId: proposalCategory.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'feedback'
   });
   secondProposal = await generateProposal({
     spaceId: space.id,
     userId: user.id,
     categoryId: secondProposalCategory.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'feedback'
   });
 });
 

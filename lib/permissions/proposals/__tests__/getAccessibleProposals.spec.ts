@@ -4,7 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { getAccessibleProposals } from '../getAccessibleProposals';
 
 describe('getAccessibleProposals', () => {
-  it('Should return all proposals at discussion stage and beyond, except templates and drafts', async () => {
+  it('Should return all proposals at feedback stage and beyond, except templates and drafts', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -21,7 +21,7 @@ describe('getAccessibleProposals', () => {
       categoryId: proposalCategory1.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const { page: page2, ...draftProposal1 } = await testUtilsProposals.generateProposal({
@@ -35,7 +35,7 @@ describe('getAccessibleProposals', () => {
       categoryId: proposalCategory1.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const proposals = await getAccessibleProposals({
@@ -66,7 +66,7 @@ describe('getAccessibleProposals', () => {
       categoryId: proposalCategory1.id,
       spaceId: space.id,
       userId: user.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
     const { page: page2, ...proposalCategory1DraftProposalAuthoredByAdmin } = await testUtilsProposals.generateProposal(
       {
@@ -112,7 +112,7 @@ describe('getAccessibleProposals', () => {
       categoryId: invisibleProposalCategory.id,
       spaceId: space.id,
       userId: user.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const { page: page2, ...invisibleCategoryDraftProposalAuthoredByUser } = await testUtilsProposals.generateProposal({
@@ -146,7 +146,7 @@ describe('getAccessibleProposals', () => {
       categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const pageComment = await prisma.pageComment.create({
@@ -194,7 +194,7 @@ describe('getAccessibleProposals', () => {
       categoryId: category1.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const category2 = await testUtilsProposals.generateProposalCategory({
@@ -206,7 +206,7 @@ describe('getAccessibleProposals', () => {
       categoryId: category2.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
     // Admin user test
     const proposalsRequestedByAdmin = await getAccessibleProposals({
@@ -249,14 +249,14 @@ describe('getAccessibleProposals', () => {
       categoryId: category1.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const { page: page2, ...proposalByUser } = await testUtilsProposals.generateProposal({
       categoryId: category1.id,
       spaceId: space.id,
       userId: user.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     const { page: page3, ...proposalByAdminReviewedByUser } = await testUtilsProposals.generateProposal({
@@ -269,7 +269,7 @@ describe('getAccessibleProposals', () => {
           id: user.id
         }
       ],
-      proposalStatus: 'discussion'
+      proposalStatus: 'feedback'
     });
 
     // Admin user test

@@ -32,7 +32,7 @@ describe('createCardsFromProposals', () => {
   it('should create cards from proposals', async () => {
     const newProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [
         {
           group: 'user',
@@ -102,7 +102,7 @@ describe('createCardsFromProposals', () => {
 
     const visibleProposal = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [],
       spaceId: testSpace.id,
       userId: testUser.id
@@ -111,7 +111,7 @@ describe('createCardsFromProposals', () => {
     const ignoredProposal = await testUtilsProposals.generateProposal({
       authors: [],
       archived: true,
-      proposalStatus: 'discussion',
+      proposalStatus: 'feedback',
       reviewers: [],
       spaceId: testSpace.id,
       userId: testUser.id

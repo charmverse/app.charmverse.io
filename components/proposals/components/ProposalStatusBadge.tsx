@@ -15,7 +15,7 @@ import type { BrandColor } from 'theme/colors';
 
 const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
   draft: <ModeEditOutlineOutlinedIcon />,
-  discussion: <ChatOutlinedIcon />,
+  feedback: <ChatOutlinedIcon />,
   review: <ReviewsOutlinedIcon />,
   reviewed: <CheckOutlinedIcon />,
   vote_active: <HowToVoteOutlinedIcon />,
@@ -24,7 +24,7 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
 
 export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
   draft: 'gray',
-  discussion: 'teal',
+  feedback: 'teal',
   review: 'yellow',
   reviewed: 'purple',
   vote_active: 'pink',
