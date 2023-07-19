@@ -5,10 +5,9 @@ import RedditIcon from '@mui/icons-material/Reddit';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { ProfileWidget } from './ProfileWidget';
@@ -38,37 +37,31 @@ function CustomChip({ label, value, icon }: { label: string; value: string; icon
   );
 }
 
-export function EnsWidget({ userId }: { userId: string }) {
-  const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
-    charmClient.publicProfile.getEnsProfile(userId)
-  );
-
-  const email = ensProfile?.emails ? ensProfile.emails[0] : undefined;
-  const discord = ensProfile?.discord ? ensProfile.discord : undefined;
-  const twitter = ensProfile?.twitter ? ensProfile.twitter : undefined;
-  const github = ensProfile?.github ? ensProfile.github : undefined;
-  const reddit = ensProfile?.reddit ? ensProfile.reddit : undefined;
-  const linkedin = ensProfile?.linkedin ? ensProfile.linkedin : undefined;
+export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
+  const email = ensProfile.emails?.[0];
+  const discord = ensProfile.discord;
+  const twitter = ensProfile.twitter;
+  const github = ensProfile.github;
+  const reddit = ensProfile.reddit;
+  const linkedin = ensProfile.linkedin;
 
   const showEmails = !!email;
   const showAccounts = !!discord || !!twitter || !!github || !!reddit || !!linkedin;
 
   return (
     <ProfileWidget
-      link={ensProfile ? `https://app.ens.domains/${ensProfile.ensname}` : null}
+      link={`https://app.ens.domains/${ensProfile.ensname}`}
       title='Ethereum Naming Service'
       avatarSrc='/images/logos/ens_logo.svg'
-      isLoading={isLoadingEnsProfile}
-      emptyContent={!ensProfile ? 'Profile Not Found' : null}
     >
       {ensProfile && (
         <Stack spacing={2}>
           <Stack spacing={1}>
             <Avatar size='large' name={ensProfile.ensname ?? ''} avatar={ensProfile.avatar} variant='circular' />
             <Typography variant='body1' fontWeight='bold'>
-              {ensProfile?.ensname}
+              {ensProfile.ensname}
             </Typography>
-            {ensProfile?.description && <Typography variant='subtitle1'>{ensProfile?.description}</Typography>}
+            {ensProfile.description && <Typography variant='subtitle1'>{ensProfile.description}</Typography>}
           </Stack>
           {showEmails || showAccounts ? (
             <Divider

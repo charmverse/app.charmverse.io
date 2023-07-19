@@ -3,14 +3,19 @@ import type { MemberPropertyType } from '@charmverse/core/prisma-client';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+import type { MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 
-import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
 import { MemberProperties } from '../MemberProperties';
 
 import { ProfileWidget } from './ProfileWidget';
 
-export function MemberPropertiesWidget({ userId }: { userId: string }) {
-  const { memberPropertyValues, isLoading } = useMemberPropertyValues(userId);
+export function MemberPropertiesWidget({
+  memberPropertyValues,
+  userId
+}: {
+  userId: string;
+  memberPropertyValues: MemberPropertyValuesBySpace[];
+}) {
   const { space } = useCurrentSpace();
   const { members } = useMembers();
   const { getDisplayProperties } = useMemberProperties();
@@ -50,19 +55,7 @@ export function MemberPropertiesWidget({ userId }: { userId: string }) {
     );
 
   return (
-    <ProfileWidget
-      isLoading={isLoading}
-      emptyContent={
-        !space ||
-        !memberPropertyValues ||
-        !currentSpacePropertyValues ||
-        currentSpacePropertyValues.properties.length === 0 ||
-        currentSpacePropertyNonEmptyValues.length === 0
-          ? 'User does not have any member properties added'
-          : null
-      }
-      title='CharmVerse Details'
-    >
+    <ProfileWidget title='CharmVerse Details'>
       <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
     </ProfileWidget>
   );

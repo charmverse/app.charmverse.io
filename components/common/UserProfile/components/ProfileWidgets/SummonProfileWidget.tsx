@@ -1,9 +1,8 @@
 import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 import { ProfileWidget } from './ProfileWidget';
 
@@ -30,22 +29,16 @@ function SummonPlayerStatistics({ label, value }: { label: string; value: string
   );
 }
 
-export function SummonProfileWidget({ userId }: { userId: string }) {
-  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(`public/profile/${userId}/summon`, () =>
-    charmClient.publicProfile.getSummonProfile(userId)
-  );
-
+export function SummonProfileWidget({ summonProfile }: { summonProfile: SummonUserProfile }) {
   const theme = useTheme();
 
   return (
     <ProfileWidget
-      isLoading={isLoadingSummonProfile}
       title='Summon Profile'
       avatarVariant='square'
       avatarSrc={
         theme.palette.mode === 'light' ? '/images/logos/summon_dark_mark.svg' : '/images/logos/summon_light_mark.svg'
       }
-      emptyContent={!summonProfile ? 'Profile Not Found' : null}
     >
       {summonProfile && (
         <Stack

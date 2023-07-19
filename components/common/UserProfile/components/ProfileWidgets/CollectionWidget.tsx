@@ -1,35 +1,35 @@
 import { Stack } from '@mui/material';
+import type { KeyedMutator } from 'swr';
 
 import { useUser } from 'hooks/useUser';
+import type { NFTData } from 'lib/blockchain/getNFTs';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 
-import { useMemberCollections } from '../../hooks/useMemberCollections';
 import { NftsList } from '../NftsList';
 import { PoapsList } from '../PoapsList';
 
 import { ProfileWidget } from './ProfileWidget';
 
-export function CollectionWidget({ userId }: { userId: string }) {
-  const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
-    memberId: userId
-  });
-
+export function CollectionWidget({
+  userId,
+  mutateNfts,
+  nfts,
+  poaps
+}: {
+  userId: string;
+  nfts: NFTData[];
+  poaps: ExtendedPoap[];
+  mutateNfts: KeyedMutator<NFTData[]>;
+}) {
   const { user } = useUser();
 
-  const pinnedNfts = nfts.filter((nft) => nft.isPinned);
-  const hideCollections = pinnedNfts.length === 0 && poaps.length === 0 && !isFetchingNfts && !isFetchingPoaps;
-
   return (
-    <ProfileWidget title='Collection' emptyContent={hideCollections ? 'User does not have any collections' : null}>
+    <ProfileWidget title='Collection'>
       <Stack spacing={2}>
-        <NftsList
-          userId={userId}
-          nfts={nfts}
-          nftsError={nftsError}
-          isFetchingNfts={isFetchingNfts}
-          mutateNfts={mutateNfts}
-          readOnly={user?.id !== userId}
-        />
-        <PoapsList poaps={poaps} poapsError={poapsError} isFetchingPoaps={isFetchingPoaps} />
+        {nfts.length !== 0 && (
+          <NftsList userId={userId} nfts={nfts} mutateNfts={mutateNfts} readOnly={user?.id !== userId} />
+        )}
+        {poaps.length !== 0 && <PoapsList poaps={poaps} />}
       </Stack>
     </ProfileWidget>
   );

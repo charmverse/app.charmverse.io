@@ -17,9 +17,9 @@ const totalShownNfts = 5;
 type Props = {
   userId: string;
   readOnly?: boolean;
-  isFetchingNfts: boolean;
+  isFetchingNfts?: boolean;
   mutateNfts: KeyedMutator<NFTData[]>;
-  nftsError: any;
+  nftsError?: any;
   nfts: NFTData[];
 };
 
