@@ -16,9 +16,9 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Stack
 } from '@mui/material';
-import { Stack } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 

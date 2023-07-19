@@ -1,9 +1,8 @@
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Divider, MenuItem, Select, Typography } from '@mui/material';
+import { Divider, MenuItem, Select, Typography, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { Stack } from '@mui/system';
 import { capitalize } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';

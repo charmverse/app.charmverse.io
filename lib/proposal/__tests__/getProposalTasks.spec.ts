@@ -359,4 +359,20 @@ describe('getProposalTasks', () => {
 
     expect(proposalTasks.unmarked).toEqual([]);
   });
+
+  it('Should not return notifications when there is no action', async () => {
+    const { user, space } = await generateUserAndSpace({});
+
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'reviewed',
+      spaceId: space.id,
+      authors: [],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual([]);
+  });
 });

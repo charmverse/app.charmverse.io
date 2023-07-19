@@ -8,7 +8,7 @@ const headers = {
   Authorization: apiToken ? `Bearer ${apiToken}` : null
 };
 
-export const GAME7_BASE_URL = 'https://g7p.io/v1/xps';
+export const SUMMON_BASE_URL = 'https://g7p.io/v1/xps';
 
 type ApiResponse<T> = {
   data: T;
@@ -27,7 +27,9 @@ export async function findUserByIdentity(query: {
   discordHandle?: string;
   githubUsername?: string;
 }): Promise<string | null> {
-  const result = await http.GET<ApiResponse<{ userId: string }>>(`${GAME7_BASE_URL}/scan/identity`, query, { headers });
+  const result = await http.GET<ApiResponse<{ userId: string }>>(`${SUMMON_BASE_URL}/scan/identity`, query, {
+    headers
+  });
   // Note that an empty Apiresponse looks very similar to positive result: {
   //  status: 1,
   //  message: 'resource not found',
@@ -40,7 +42,7 @@ export async function findUserByIdentity(query: {
 // `/v1/xps/scan/inventory/{userId}`
 export function getUserInventory(userId: string) {
   return http
-    .GET<ApiResponse<SummonUserInventory | null>>(`${GAME7_BASE_URL}/scan/inventory/${userId}`, {}, { headers })
+    .GET<ApiResponse<SummonUserInventory | null>>(`${SUMMON_BASE_URL}/scan/inventory/${userId}`, {}, { headers })
     .then(({ data }) => data);
 }
 
@@ -61,7 +63,7 @@ export async function getUserSummonProfile(userId: string): Promise<SummonUserPr
 // `/v1/xps/achievement/{achievementId}`
 export function getAchievementById(achievementId: string) {
   return http
-    .GET<ApiResponse<SummonAchievement | null>>(`${GAME7_BASE_URL}/achievement/${achievementId}`, {}, { headers })
+    .GET<ApiResponse<SummonAchievement | null>>(`${SUMMON_BASE_URL}/achievement/${achievementId}`, {}, { headers })
     .then(({ data }) => data)
     .catch((error) => {
       if (error.message === 'resource not found') {

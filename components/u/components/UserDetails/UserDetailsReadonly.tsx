@@ -24,10 +24,9 @@ type UserFields = {
 type UserDetailsMiniProps = {
   user: UserFields;
   sx?: SxProps<Theme>;
-  showSocials?: boolean;
 };
 
-export function UserDetailsReadonly({ showSocials = true, user, sx = {} }: UserDetailsMiniProps) {
+export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
   const { user: currentUser } = useUser();
 
   const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
@@ -36,11 +35,10 @@ export function UserDetailsReadonly({ showSocials = true, user, sx = {} }: UserD
   const socialDetails = (userDetails?.social as Social | undefined) ?? {};
 
   const hideSocials =
-    !showSocials ||
-    (socialDetails?.discordUsername?.length === 0 &&
-      socialDetails?.githubURL?.length === 0 &&
-      socialDetails?.twitterURL?.length === 0 &&
-      socialDetails?.linkedinURL?.length === 0);
+    socialDetails?.discordUsername?.length === 0 &&
+    socialDetails?.githubURL?.length === 0 &&
+    socialDetails?.twitterURL?.length === 0 &&
+    socialDetails?.linkedinURL?.length === 0;
 
   return (
     <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={sx}>
@@ -51,13 +49,7 @@ export function UserDetailsReadonly({ showSocials = true, user, sx = {} }: UserD
         </Grid>
         {!hideSocials && (
           <Grid item mt={1} height={40}>
-            <SocialIcons
-              showDiscord={socialDetails?.discordUsername?.length !== 0}
-              showGithub={socialDetails?.githubURL?.length !== 0}
-              showLinkedIn={socialDetails?.linkedinURL?.length !== 0}
-              showTwitter={socialDetails?.twitterURL?.length !== 0}
-              social={socialDetails}
-            />
+            <SocialIcons social={socialDetails} />
           </Grid>
         )}
         {userDetails && (
