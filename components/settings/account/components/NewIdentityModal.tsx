@@ -192,7 +192,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 size='small'
                 onClick={async () => {
                   if (isOnCustomDomain) {
-                    loginWithGooglePopup('connect');
+                    loginWithGooglePopup({ type: 'connect' });
                   } else {
                     await connectGoogleAccount();
                   }
