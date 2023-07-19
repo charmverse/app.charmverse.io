@@ -13,6 +13,7 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
+import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -296,7 +297,15 @@ export function SpaceSettings({ space }: { space: Space }) {
             if (isAdmin) {
               await charmClient.spaces.deleteSpace(space.id);
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
-              setSpaces(filteredSpaces);
+              // redirect user to the next space if they have one
+              if (filteredSpaces.length > 0) {
+                router.push(getDefaultWorkspaceUrl(filteredSpaces));
+              } else {
+                router.push('/createSpace');
+              }
+              setTimeout(() => {
+                setSpaces(filteredSpaces);
+              });
             }
           }}
         />
