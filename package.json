@@ -154,7 +154,7 @@
     "concurrently": "^7.1.0",
     "cookies": "^0.8.0",
     "cryptr": "^6.1.0",
-    "dd-trace": "^4.2.0",
+    "dd-trace": "^4.7.0",
     "diff": "^5.1.0",
     "dotenv": "^16.0.0",
     "dotenv-cli": "^5.1.0",
