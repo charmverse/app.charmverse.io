@@ -13,7 +13,7 @@ export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as 
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   draft: 'Draft',
-  feedback: 'feedback',
+  feedback: 'Feedback',
   review: 'In Review',
   reviewed: 'Reviewed',
   vote_active: 'Vote Active',
