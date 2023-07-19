@@ -3,7 +3,7 @@ import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { GAME7_BASE_URL } from 'lib/summon/api';
+import { SUMMON_BASE_URL } from 'lib/summon/api';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';
@@ -18,7 +18,7 @@ afterAll(() => {
   fetchMock.restore();
 });
 
-const game7IdentityErrorResponse = {
+const summonIdentityErrorResponse = {
   data: {
     userId: ''
   },
@@ -28,11 +28,11 @@ const game7IdentityErrorResponse = {
 
 describe('getSummonProfile', () => {
   it(`Should return null if not user exist`, async () => {
-    const game7Profile = await getSummonProfile({ userId: v4() });
-    expect(game7Profile).toBeNull();
+    const summonProfile = await getSummonProfile({ userId: v4() });
+    expect(summonProfile).toBeNull();
   });
 
-  it(`Should return null if user doesn't have any game7 account connected with wallet address, email or discord account`, async () => {
+  it(`Should return null if user doesn't have any summon account connected with wallet address, email or discord account`, async () => {
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const emailAddress = `test-${v4()}@gmail.com`;
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
@@ -58,30 +58,30 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`,
-        game7IdentityErrorResponse
+        `${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`,
+        summonIdentityErrorResponse
       )
-      .get(`${GAME7_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, game7IdentityErrorResponse);
+      .get(`${SUMMON_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, summonIdentityErrorResponse);
 
-    const game7Profile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id });
 
-    expect(game7Profile).toBeNull();
+    expect(summonProfile).toBeNull();
   });
 
-  it(`Should return game7 profile attached with user's wallet address`, async () => {
+  it(`Should return summon profile attached with user's wallet address`, async () => {
     const walletAddress = Wallet.createRandom().address.toLowerCase();
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     mockSandbox
-      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, {
+      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -89,16 +89,16 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const game7Profile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id });
 
-    expect(game7Profile).toStrictEqual({
+    expect(summonProfile).toStrictEqual({
       id: user.id,
       meta: undefined,
       tenantId: undefined
     });
   });
 
-  it(`Should return game7 profile attached with user's discord handle`, async () => {
+  it(`Should return summon profile attached with user's discord handle`, async () => {
     const discordUsername = `test123`;
     const walletAddress = Wallet.createRandom().address.toLowerCase();
 
@@ -114,15 +114,15 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
-      .get(`${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`, {
+      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -130,16 +130,16 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const game7Profile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id });
 
-    expect(game7Profile).toStrictEqual({
+    expect(summonProfile).toStrictEqual({
       id: user.id,
       meta: undefined,
       tenantId: undefined
     });
   });
 
-  it(`Should return game7 profile attached with user's email address`, async () => {
+  it(`Should return summon profile attached with user's email address`, async () => {
     const discordUsername = `test`;
     const discordDiscriminator = v4();
     const emailAddress = `test-${v4()}@gmail.com`;
@@ -167,21 +167,21 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${GAME7_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, game7IdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
       .get(
-        `${GAME7_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
+        `${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
           `${discordUsername}#${discordDiscriminator}`
         )}`,
-        game7IdentityErrorResponse
+        summonIdentityErrorResponse
       )
-      .get(`${GAME7_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
+      .get(`${SUMMON_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${GAME7_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -189,9 +189,9 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const game7Profile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id });
 
-    expect(game7Profile).toStrictEqual({
+    expect(summonProfile).toStrictEqual({
       id: user.id,
       meta: undefined,
       tenantId: undefined
