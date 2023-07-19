@@ -223,15 +223,17 @@ export async function getProposalTasks(userId: string): Promise<{
         isReviewer
       });
 
+      if (!action) {
+        return;
+      }
+
       if (workspaceEvent) {
         // Check notifications are enabled for space-wide proposal notifications
         const notifyNewEvents =
           page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
-
         if (!notifyNewEvents && (action === 'discuss' || action === 'vote')) {
           return;
         }
-
         const proposalTask = {
           id: workspaceEvent.id,
           eventDate: workspaceEvent.createdAt,
