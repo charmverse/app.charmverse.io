@@ -6,19 +6,24 @@ import {
   googleOAuthClientSecretSensitive as googleOAuthClientSecret
 } from 'config/constants';
 
+export type GoogleLoginOauthParams = {
+  redirectUri?: string;
+  audience?: string;
+};
+
 // The OAuth2Client is stateful when using user credentials, so as a best practice, we always create a new one each time
 // ref: https://github.com/googleapis/google-api-nodejs-client/issues/2080
-export function getClient() {
+export function getClient(redirectUri?: string) {
   return new OAuth2Client(
     googleOAuthClientId,
     googleOAuthClientSecret,
     // use 'postmessage' as redirect_uri because we use ux_mode: popup on the frontend
-    'postmessage'
+    redirectUri || 'postmessage'
   );
 }
 
-export async function getCredentialsFromGoogleCode(code: string) {
-  const client = getClient();
+export async function getCredentialsFromGoogleCode(code: string, redirectUri?: string) {
+  const client = getClient(redirectUri);
   const { tokens } = await client.getToken(code);
 
   if (tokens?.access_token) {

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { googleOAuthClientId } from 'config/constants';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { loginWithGoogle } from 'lib/google/loginWithGoogle';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -16,9 +17,14 @@ async function loginWithGoogleController(req: NextApiRequest, res: NextApiRespon
   const loginRequest = req.body as LoginWithGoogleRequest;
   const signupAnalytics = extractSignupAnalytics(req.cookies as any);
 
+  const oauthParams = {
+    audience: googleOAuthClientId
+  };
+
   const loggedInUser = await loginWithGoogle({
     ...loginRequest,
-    signupAnalytics
+    signupAnalytics,
+    oauthParams
   });
 
   await saveSession({ req, userId: loggedInUser.id });

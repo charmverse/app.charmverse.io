@@ -4,7 +4,7 @@ import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain
 import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
-export function getCallbackDomain(host: string | undefined) {
+export function getCallbackDomain(host?: string | undefined) {
   const protocol = isProdEnv || isStagingEnv ? `https://` : `http://`;
 
   if (isDevEnv) {
@@ -12,7 +12,7 @@ export function getCallbackDomain(host: string | undefined) {
   }
 
   if (!host) {
-    return `${protocol}//${appSubdomain}.${getAppApexDomain()}`;
+    return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
 
   if (getValidCustomDomain(host)) {
