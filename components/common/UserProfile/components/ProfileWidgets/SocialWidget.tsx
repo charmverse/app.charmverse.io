@@ -25,7 +25,7 @@ export function SocialWidget({ userId }: { userId: string }) {
     <ProfileWidget
       title='Social'
       isLoading={isLoadingUserDetails}
-      emptyContent={hideSocials ? "User doesn't have any social accounts linked" : null}
+      emptyContent={hideSocials ? 'User does not have any social accounts linked' : null}
     >
       {socialDetails && (
         <Stack spacing={1}>
