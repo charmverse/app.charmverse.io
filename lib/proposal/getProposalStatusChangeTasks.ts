@@ -252,6 +252,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           notifyNewEvents
         });
         if (!action) {
+          unmarkedWorkspaceEvents.push(workspaceEvent.id);
           // eslint-disable-next-line no-continue
           continue;
         }
@@ -264,6 +265,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
             (action === 'vote' && !category.permissions.vote_proposals))
         ) {
           // Do nothing
+          unmarkedWorkspaceEvents.push(workspaceEvent.id);
           // eslint-disable-next-line no-continue
           continue;
         }
