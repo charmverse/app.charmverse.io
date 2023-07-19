@@ -1,6 +1,5 @@
 import { Check, MoreHoriz } from '@mui/icons-material';
-import { IconButton, MenuItem, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { IconButton, MenuItem, Typography, Stack } from '@mui/material';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
