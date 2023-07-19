@@ -89,7 +89,9 @@ export default function ProposalCategoryInput({ disabled, options, value, onChan
       options={options}
       autoHighlight
       clearIcon={null}
-      renderOption={(_props, category) => <ProposalCategoryOption category={category} props={_props} />}
+      renderOption={(_props, category) => (
+        <ProposalCategoryOption category={category} props={_props} key={category.title} />
+      )}
       ChipProps={{
         // Avoids a bug where an error is thrown if the color is unsupported
         color: brandColorNames.includes(colorToDisplay as BrandColor) ? (colorToDisplay as BrandColor) : undefined,
