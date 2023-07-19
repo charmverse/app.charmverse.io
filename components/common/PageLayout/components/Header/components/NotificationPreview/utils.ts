@@ -149,7 +149,7 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalTask
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
-    createdBy: n.createdBy,
+    createdBy: n.createdBy || null,
     spaceName: n.spaceName,
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,
