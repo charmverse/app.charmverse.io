@@ -89,7 +89,7 @@ export async function createCryptoSubscription({
     metadata: {
       productId,
       period,
-      tier: 'pro',
+      tier: 'community',
       spaceId
     },
     customer: customer.id,

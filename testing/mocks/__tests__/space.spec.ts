@@ -7,7 +7,7 @@ describe('createMockSpace', () => {
     const mockSpace = createMockSpace();
 
     expect(mockSpace).toMatchObject<Partial<Space>>({
-      paidTier: 'pro',
+      paidTier: 'community',
       publicBountyBoard: null,
       publicProposals: null
     });

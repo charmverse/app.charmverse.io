@@ -112,7 +112,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'community'
             }
           })
         ]);
