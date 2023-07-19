@@ -35,12 +35,16 @@ export function SummonProfileWidget({ userId }: { userId: string }) {
     charmClient.publicProfile.getSummonProfile(userId)
   );
 
+  const theme = useTheme();
+
   return (
     <ProfileWidget
       isLoading={isLoadingSummonProfile}
       title='Summon Profile'
       avatarVariant='square'
-      avatarSrc='/images/logos/summon_logo.svg'
+      avatarSrc={
+        theme.palette.mode === 'light' ? '/images/logos/summon_dark_mark.svg' : '/images/logos/summon_light_mark.svg'
+      }
       emptyContent={!summonProfile ? 'Profile Not Found' : null}
     >
       {summonProfile && (

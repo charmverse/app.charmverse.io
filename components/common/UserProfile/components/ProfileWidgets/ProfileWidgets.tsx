@@ -9,7 +9,7 @@ import { MemberPropertiesWidget } from './MemberPropertiesWidget';
 import { SocialWidget } from './SocialWidget';
 import { SummonProfileWidget } from './SummonProfileWidget';
 
-const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens', 'game7'] as const;
+const profileWidgets = ['lens', 'charmverse', 'social', 'collection', 'ens', 'summon'] as const;
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
@@ -45,7 +45,7 @@ export function ProfileWidgets({ userId }: { userId: string }) {
               </Grid>
             ) : null;
 
-          case 'game7': {
+          case 'summon': {
             return (
               <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
                 <SummonProfileWidget userId={userId} />
