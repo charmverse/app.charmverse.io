@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import { v4 } from 'uuid';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
