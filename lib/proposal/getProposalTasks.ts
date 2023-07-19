@@ -1,6 +1,5 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/dist/cjs/permissions';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
-import type { ProposalCategoryOperation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
