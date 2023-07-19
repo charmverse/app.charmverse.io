@@ -191,7 +191,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               <PrimaryButton
                 size='small'
                 onClick={async () => {
-                  loginWithGooglePopup('connect');
+                  loginWithGooglePopup({ type: 'connect' });
                   onClose();
                 }}
                 disabled={isConnectingGoogle}

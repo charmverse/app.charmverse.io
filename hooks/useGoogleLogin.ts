@@ -56,14 +56,21 @@ export function useGoogleLogin() {
     client?.requestCode();
   }
 
-  async function loginWithGooglePopup(type: 'login' | 'connect' = 'login') {
+  async function loginWithGooglePopup(params: { type?: 'login' | 'connect'; onSuccess?: () => void }) {
+    const type = params?.type || 'login';
+    const onSuccess = params?.onSuccess;
+
     const loginCallback = async (state: GooglePopupLoginState) => {
       if ('code' in state) {
         try {
           const loggedInUser = await charmClient.google.loginWithCode({ code: state.code, type });
           setUser(loggedInUser);
           const message = type === 'login' ? 'Logged in successfully' : 'Account connected successfully';
-          showMessage(message, 'success');
+          if (onSuccess) {
+            onSuccess?.();
+          } else {
+            showMessage(message, 'success');
+          }
         } catch (error: any) {
           log.debug({ error });
         }
