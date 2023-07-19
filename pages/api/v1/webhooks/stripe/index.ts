@@ -154,6 +154,23 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
                 deletedAt: new Date()
               }
             });
+
+            if (invoice.paid) {
+              const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
+              trackUserAction('subscription_payment', {
+                spaceId,
+                blockQuota,
+                period,
+                status: 'success',
+                subscriptionId: stripeSubscription.id,
+                paymentMethod: invoice.metadata?.transaction_hash
+                  ? 'crypto'
+                  : charge?.payment_method_details?.type?.startsWith('ach')
+                  ? 'ach'
+                  : 'card',
+                userId: space.createdBy
+              });
+            }
           }
 
           trackUserAction('create_subscription', {
@@ -162,23 +179,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             spaceId,
             userId: space.createdBy,
             subscriptionId: stripeSubscription.id
-          });
-        }
-
-        if (invoice.paid) {
-          const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
-          trackUserAction('subscription_payment', {
-            spaceId,
-            blockQuota,
-            period,
-            status: 'success',
-            subscriptionId: stripeSubscription.id,
-            paymentMethod: invoice.metadata?.transaction_hash
-              ? 'crypto'
-              : charge?.payment_method_details?.type?.startsWith('ach')
-              ? 'ach'
-              : 'card',
-            userId: space.createdBy
           });
         }
 
