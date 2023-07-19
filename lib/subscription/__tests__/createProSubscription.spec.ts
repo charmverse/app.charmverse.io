@@ -45,10 +45,11 @@ describe('createProSubscription', () => {
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
     (stripeClient.subscriptions.list as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.list;
     (stripeClient.subscriptions.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.retrieve;
-    (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
+    (stripeClient.subscriptions.del as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.del;
     (stripeClient.customers.create as jest.Mock<any, any>) = stripeMock.stripeClient.customers.create;
     (stripeClient.customers.update as jest.Mock<any, any>) = stripeMock.stripeClient.customers.update;
     (stripeClient.customers.search as jest.Mock<any, any>) = stripeMock.stripeClient.customers.search;
+    (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
     (stripeClient.coupons.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.coupons.retrieve;
     (stripeClient.promotionCodes.list as jest.Mock<any, any>) = stripeMock.stripeClient.promotionCodes.list;
 
