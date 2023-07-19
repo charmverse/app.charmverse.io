@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
 import { brandColorNames } from 'theme/colors';
-import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 type TempOption = NewProposalCategory & {
   inputValue: string;
