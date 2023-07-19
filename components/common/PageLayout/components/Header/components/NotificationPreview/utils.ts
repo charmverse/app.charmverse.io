@@ -5,7 +5,7 @@ import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
-import type { ProposalTask } from 'lib/proposal/getProposalTasks';
+import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 function getForumContent(n: ForumTask) {

@@ -31,7 +31,7 @@ export type ProposalTask = {
   action: ProposalTaskAction | null;
   eventDate: Date;
   createdAt: Date;
-  createdBy: NotificationActor | null;
+  createdBy?: NotificationActor | null;
 };
 
 type PopulatedProposal = Proposal & {

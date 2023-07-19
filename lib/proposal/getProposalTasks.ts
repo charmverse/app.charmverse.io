@@ -7,11 +7,9 @@ import type {
   ProposalDiscussionNotificationsContext
 } from 'lib/discussion/getDiscussionTasks';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalTaskAction } from './getProposalAction';
 import type { ProposalTask } from './getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from './getProposalStatusChangeTasks';
 import type { ProposalWithCommentsAndUsers } from './interface';
