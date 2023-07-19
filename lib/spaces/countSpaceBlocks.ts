@@ -26,6 +26,7 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
         type: 'board'
       },
       select: {
+        id: true,
         fields: true
       }
     }),
@@ -49,6 +50,7 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
         spaceId
       },
       select: {
+        id: true,
         type: true,
         content: true
       }
@@ -59,6 +61,7 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
         spaceId
       },
       select: {
+        id: true,
         content: true
       }
     }),
@@ -127,13 +130,17 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
     }
   );
 
-  const documentBlocks = allPages.map((page) => countBlocks(page.content, spaceId)).reduce((a, b) => a + b, 0);
-
-  const boardDescriptionBlocks = boardBlocks
-    .map((board) => countBlocks((board.fields as any)?.description, spaceId))
+  const documentBlocks = allPages
+    .map((page) => countBlocks(page.content, { pageId: page.id, spaceId }))
     .reduce((a, b) => a + b, 0);
 
-  const forumPostBlocks = posts.map((post) => countBlocks(post.content, spaceId)).reduce((a, b) => a + b, 0);
+  const boardDescriptionBlocks = boardBlocks
+    .map((board) => countBlocks((board.fields as any)?.description, { blockId: board.id, spaceId }))
+    .reduce((a, b) => a + b, 0);
+
+  const forumPostBlocks = posts
+    .map((post) => countBlocks(post.content, { postId: post.id, spaceId }))
+    .reduce((a, b) => a + b, 0);
 
   const comments = blockComments + inlineComments + pageComments + postComments;
 
