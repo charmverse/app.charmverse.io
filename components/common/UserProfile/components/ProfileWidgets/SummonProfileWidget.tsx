@@ -42,7 +42,7 @@ export function SummonProfileWidget({ summonProfile }: { summonProfile: SummonUs
     >
       {summonProfile && (
         <Stack
-          gap={1}
+          gap={2}
           sx={{
             flexDirection: {
               xs: 'column',
@@ -54,7 +54,12 @@ export function SummonProfileWidget({ summonProfile }: { summonProfile: SummonUs
           <Avatar
             size='2xLarge'
             variant='rounded'
-            avatar={summonProfile.meta.avatarUrl || `/images/logos/summon_logo.svg`}
+            avatar={
+              summonProfile.meta.avatarUrl ||
+              (theme.palette.mode === 'light'
+                ? '/images/logos/summon_dark_mark.svg'
+                : '/images/logos/summon_light_mark.svg')
+            }
           />
           <Stack gap={1} width='100%'>
             <SummonPlayerStatistics label='Rank' value={summonProfile.meta.rank} />
