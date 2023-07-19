@@ -53,6 +53,7 @@ runs:
       shell: bash
       if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
       run: |
+        rm -fr node_modules/@charmverse/core 
         npm install github:charmverse/core#${{inputs.use_github_core_branch}}
         cd node_modules/@charmverse/core
         npm run build
