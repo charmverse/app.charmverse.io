@@ -10,8 +10,8 @@ export function PoapsList({
   isFetchingPoaps,
   poaps
 }: {
-  poapsError: any;
-  isFetchingPoaps: boolean;
+  poapsError?: any;
+  isFetchingPoaps?: boolean;
   poaps: ExtendedPoap[];
 }) {
   const sortedPoapData = poaps.sort((p1, p2) => (p1.created > p2.created ? -1 : 1));

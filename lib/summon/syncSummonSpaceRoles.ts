@@ -134,7 +134,7 @@ export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: strin
         const currentRole = Object.values(rolesRecord).find((role) => role.memberIds.includes(spaceRole.user.id));
         const newRole = rolesRecord[getSummonRoleLabel({ level: userRank })];
 
-        // If the user has a game7 role, but its different than the current one, replace it
+        // If the user has a summon role, but its different than the current one, replace it
         if (currentRole && currentRole.name !== getSummonRoleLabel({ level: userRank })) {
           await prisma.spaceRoleToRole.updateMany({
             where: {

@@ -14,6 +14,7 @@ const UpgradeButton = styled(Button)`
   padding-top: 0;
 `;
 
+// save this for a little while in case we need to show something to trialing accounts
 export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
   const [showPaidAnnouncementBar, setShowPaidAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
   const { onClick } = useSettingsDialog();
@@ -21,10 +22,7 @@ export function PaidAnnouncementBanner({ spaceId }: { spaceId: string }) {
   return showPaidAnnouncementBar ? (
     <StyledBanner top={20} data-test='paid-announcement-banner'>
       <Box pr={3} display='flex'>
-        <Typography component='div'>
-          Community Edition available. Upgrade NOW using code <b>"charmedcrypto"</b> for 40% off for the 1st year. Valid
-          until July 15th.{' '}
-        </Typography>
+        <Typography component='div'>Community Edition available. Upgrade now!</Typography>
         <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
           <UpgradeButton
             endIcon={<EastIcon />}
