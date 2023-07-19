@@ -7,7 +7,7 @@ import { ProposalStatusColors } from 'components/proposals/components/ProposalSt
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
 import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
-import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksBase';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
