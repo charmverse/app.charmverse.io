@@ -99,6 +99,9 @@ export async function getPages({
  *
  * @isOnboarded Default to true so all user / space pairs start as onboarded, and the tester can focus on the happy path they are targeting
  *
+ *
+ * By Default, the user created with this method will be a space admin
+ *
  * Returns a user and space along with this space's pages
  */
 export async function createUserAndSpace({
