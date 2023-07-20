@@ -24,12 +24,12 @@ beforeAll(async () => {
   const { user: u1, space } = await generateUserAndSpaceWithApiToken(undefined, true);
   user1 = u1;
   u1Space1 = space;
-  u1Space2 = await generateSpaceForUser(user1);
+  u1Space2 = await generateSpaceForUser({ user: user1 });
 
   // User with 2 spaces, 1 common with user 1
   const { user: u2 } = await generateUserAndSpaceWithApiToken(undefined, true);
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
-  await generateSpaceForUser(user2);
+  await generateSpaceForUser({ user: user2 });
 
   // User with no common spaces
   const { user: u3 } = await generateUserAndSpaceWithApiToken(undefined, true);

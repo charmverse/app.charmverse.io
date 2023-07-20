@@ -260,7 +260,7 @@ export function SpaceSettings({ space }: { space: Space }) {
               <Button disableElevation size='large' data-test='submit-space-update' disabled={!isDirty} type='submit'>
                 Save
               </Button>
-              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
+              <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
                 Delete Space
               </Button>
             </Grid>
