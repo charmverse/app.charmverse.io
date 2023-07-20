@@ -86,6 +86,7 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
   }
 
   res.setHeader('Cache-Control', 'no-store');
+  await removeOldCookieFromResponse(req, res, true);
 
   return res.status(200).json(profile);
 }
