@@ -20,6 +20,7 @@ export async function policyOnlyEditableByBountyCreator({
   return {
     ...flags,
     edit_content: !canEdit ? false : flags.edit_content,
-    delete: !canEdit ? false : flags.delete
+    delete: !canEdit ? false : flags.delete,
+    delete_attached_bounty: !canEdit ? false : flags.delete_attached_bounty
   };
 }
