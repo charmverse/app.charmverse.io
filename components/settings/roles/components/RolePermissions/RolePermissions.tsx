@@ -1,9 +1,8 @@
 import type { PostCategoryPermissionAssignment, TargetPermissionGroup } from '@charmverse/core/permissions';
 import { AvailableSpacePermissions } from '@charmverse/core/permissions/flags';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
-import { useReducer, useEffect, useState } from 'react';
+import { Box, Divider, Grid, Typography } from '@mui/material';
+import { useEffect, useReducer, useState } from 'react';
 import { mutate } from 'swr';
 import useSWR from 'swr/immutable';
 import { v4 as uuid } from 'uuid';
@@ -13,8 +12,7 @@ import Button from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
 import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/components/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -244,9 +242,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-createPage'
               label='Create new pages'
-              defaultChecked={assignedPermissions?.createPage || isFreeSpace}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.createPage}
               disabled={disableModifications}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createPage : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createPage : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createPage', nowHasAccess);
@@ -274,9 +272,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-createBounty'
               label='Create new bounties'
-              defaultChecked={assignedPermissions?.createBounty || isFreeSpace}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.createBounty}
               disabled={disableModifications}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createBounty', nowHasAccess);
@@ -304,8 +302,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-reviewProposals'
               label='Review proposals'
-              defaultChecked={isFreeSpace || assignedPermissions?.reviewProposals}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.reviewProposals : false}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.reviewProposals}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.reviewProposals : undefined}
               disabled={disableModifications}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -317,7 +315,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               <PermissionToggle
                 data-test='space-operation-deleteAnyProposal'
                 label='Delete and archive any proposal'
-                defaultChecked={!isFreeSpace && !!assignedPermissions?.deleteAnyPage}
+                defaultChecked={!!assignedPermissions?.deleteAnyProposal && !isFreeSpace}
                 disabled={disableModifications}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
