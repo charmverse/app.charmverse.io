@@ -3,11 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ProposalTask } from '../getProposalTasks';
-import { getProposalTasksFromWorkspaceEvents } from '../getProposalTasksFromWorkspaceEvents';
+import type { ProposalTask } from '../getProposalStatusChangeTasks';
+import { getProposalStatusChangeTasks } from '../getProposalStatusChangeTasks';
 import { updateProposalStatus } from '../updateProposalStatus';
 
-describe('getProposalTasksFromWorkspaceEvents', () => {
+describe('getProposalStatusChangeTasks()', () => {
   it('Return all the proposal tasks from current workspace events', async () => {
     const { user: user1, space } = await generateUserAndSpaceWithApiToken();
 
@@ -161,7 +161,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user2.id
     });
 
-    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalTasksFromWorkspaceEvents(
+    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(
       user1.id,
       await prisma.workspaceEvent.findMany({
         where: {

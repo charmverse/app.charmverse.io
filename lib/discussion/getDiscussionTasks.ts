@@ -636,7 +636,7 @@ export type ProposalDiscussionNotificationsContext = {
   proposals: ProposalWithCommentsAndUsers[];
 };
 
-export async function getProposalDiscussionTasks({
+async function getProposalDiscussionTasks({
   spaceIds,
   userId,
   spaceRecord,
