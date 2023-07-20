@@ -27,7 +27,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
-  const hasSpaceDomain = !!spaceDomain;
 
   useEffect(() => {
     const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
@@ -118,7 +117,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       }
     }
     // condition: trying to access a space without access
-    else if (!isAvailableToLoggedInUsers && hasSpaceDomain && !filterSpaceByDomain(spaces, _spaceDomain)) {
+    else if (!isAvailableToLoggedInUsers && !!_spaceDomain && !filterSpaceByDomain(spaces, _spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
       if (authorizedSpaceDomainRef.current === _spaceDomain) {
         authorizedSpaceDomainRef.current = '';

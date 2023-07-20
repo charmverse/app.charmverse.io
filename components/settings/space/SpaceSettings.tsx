@@ -299,13 +299,11 @@ export function SpaceSettings({ space }: { space: Space }) {
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
               // redirect user to the next space if they have one
               if (filteredSpaces.length > 0) {
-                router.push(getDefaultWorkspaceUrl(filteredSpaces));
+                await router.push(getDefaultWorkspaceUrl(filteredSpaces));
               } else {
-                router.push('/createSpace');
+                await router.push('/createSpace');
               }
-              setTimeout(() => {
-                setSpaces(filteredSpaces);
-              });
+              setSpaces(filteredSpaces);
             }
           }}
         />
