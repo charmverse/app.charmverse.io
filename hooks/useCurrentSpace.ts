@@ -25,7 +25,7 @@ export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshC
     }
   }, [space]);
 
-  if (!accessChecked && !isSpacesLoaded) {
+  if (!accessChecked || !isSpacesLoaded) {
     return { isLoading: true, refreshCurrentSpace };
   }
 
