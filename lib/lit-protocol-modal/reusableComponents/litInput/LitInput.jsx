@@ -15,7 +15,7 @@ const LitInput = ({
              value={value}
              type={type}
              disabled={disabled}
-             onChange={(e) => setValue(e.target.value)}
+             onChange={(e) => setValue(e.target.value.trim())}
              className={'lsm-input'}/>
       {!loading ? (
         <p className={'lsm-input-error'}>

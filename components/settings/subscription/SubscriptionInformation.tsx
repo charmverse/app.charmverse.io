@@ -105,37 +105,38 @@ export function SubscriptionInformation({
       onError() {
         showMessage('Updating failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
   const { trigger: upgradeSpaceSubscription, isMutating: isLoadingUpgrade } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription`,
+    `/api/spaces/${space.id}/upgrade-subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpgradeSubscriptionRequest } }>) =>
       charmClient.subscription.upgradeSpaceSubscription(arg.spaceId, arg.payload),
     {
       onError() {
         showMessage('Upgrading failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
         showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
-  const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
-      charmClient.subscription.deleteSpaceSubscription(arg.spaceId),
+  const { trigger: switchToFreePlan, isMutating: isLoadingSwitchToFreePlan } = useSWRMutation(
+    `/api/spaces/${space.id}/switch-to-free-tier`,
+    () => charmClient.subscription.switchToFreeTier(space.id),
     {
-      onError() {
-        showMessage('Deletion failed! Please try again', 'error');
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('You have successfully switch to free tier!', 'success');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to free tier could not be made. Please try again later.', 'error');
       }
     }
   );
@@ -184,16 +185,21 @@ export function SubscriptionInformation({
           <SubscriptionActions
             paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
-            loading={isLoadingUpdate || isLoadingDeletion || isLoadingUpgrade}
-            onDelete={() => deleteSubscription({ spaceId: space.id })}
-            onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
-            onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
+            loading={isLoadingUpdate || isLoadingUpgrade || isLoadingSwitchToFreePlan}
+            onCancelAtEnd={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'cancel_at_end' }
+              })
+            }
+            onReactivation={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'active' }
+              })
+            }
             onUpgrade={() => openUpgradeDialog()}
-            confirmFreeTierDowngrade={() => {
-              charmClient.subscription
-                .switchToFreeTier(space.id)
-                .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-            }}
+            confirmFreeTierDowngrade={switchToFreePlan}
           />
           <ConfirmUpgradeModal
             title='Upgrade Community Edition'
@@ -207,7 +213,6 @@ export function SubscriptionInformation({
                 period={period}
                 disabled={false}
                 onSelect={handlePlanSelect}
-                onSelectCommited={() => {}}
               />
             }
             onConfirm={openConfirmUpgradeDialog}
@@ -246,15 +251,18 @@ export function SubscriptionInformation({
           <Stack gap={0.5} my={2}>
             <InputLabel>Email</InputLabel>
             <TextField
-              error={!!errors.email}
-              disabled={isLoadingUpdate}
-              placeholder='johndoe@gmail.com'
               {...register('email')}
+              error={!!errors.email}
+              placeholder='johndoe@gmail.com'
+              disabled={isLoadingUpdate}
             />
             <Button
               disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
               onClick={() =>
-                updateSpaceSubscription({ spaceId: space.id, payload: { billingEmail: getValues().email } })
+                updateSpaceSubscription({
+                  spaceId: space.id,
+                  payload: { billingEmail: getValues().email }
+                })
               }
               sx={{ maxWidth: '100px', mt: 2 }}
               fullWidth={false}

@@ -56,7 +56,7 @@ export default function RedirectToMainPage() {
         router.push(redirectPath);
       }
     }
-  }, [space, loadingPages, pages]);
+  }, [space, loadingPages, pages, showLogin]);
 
   if (showLogin) {
     return <LoginPageView />;

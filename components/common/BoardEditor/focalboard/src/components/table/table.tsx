@@ -1,6 +1,5 @@
 import { Add } from '@mui/icons-material';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 

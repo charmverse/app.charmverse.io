@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AccessControlCondition } from 'lit-js-sdk';
+import type { AccsRegularParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -36,7 +36,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Flatten to get all nested conditions in the same flat array
-  const conditionsArr: AccessControlCondition[] = flatten(req.body.conditions?.unifiedAccessControlConditions);
+  const conditionsArr: AccsRegularParams[] = flatten(req.body.conditions?.unifiedAccessControlConditions);
   const conditions = conditionsArr.filter((c) => Boolean(c.chain));
   const chains: string[] = req.body.conditions?.chains || [];
   const numberOfConditions = conditions.length;

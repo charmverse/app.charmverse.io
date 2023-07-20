@@ -16,6 +16,7 @@ import Button from 'components/common/Button';
 import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
@@ -99,16 +100,18 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const { loginWithGoogle, requestMagicLinkViaFirebase, loginWithGooglePopup } = useFirebaseAuth();
+  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { loginWithGooglePopup } = useGoogleLogin();
   const { verifiableWalletDetected } = useWeb3AuthSig();
-  async function handleLogin(loggedInUser: AnyIdLogin) {
+  async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
 
   async function handleGoogleLogin() {
     if (isOnCustomDomain) {
-      return loginWithGooglePopup();
+      const onSuccess = () => handleLogin({ identityType: 'Google' });
+      return loginWithGooglePopup({ onSuccess });
     }
 
     try {

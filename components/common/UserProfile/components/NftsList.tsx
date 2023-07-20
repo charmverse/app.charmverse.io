@@ -17,9 +17,9 @@ const totalShownNfts = 5;
 type Props = {
   userId: string;
   readOnly?: boolean;
-  isFetchingNfts: boolean;
+  isFetchingNfts?: boolean;
   mutateNfts: KeyedMutator<NFTData[]>;
-  nftsError: any;
+  nftsError?: any;
   nfts: NFTData[];
 };
 
@@ -47,7 +47,7 @@ export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts,
         (isFetchingNfts ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
             {pinnedNfts.length === 0 && readOnly ? (
               <Typography color='secondary'>No pinned NFTs</Typography>
             ) : (

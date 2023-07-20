@@ -11,7 +11,7 @@ describe('getSpaceMembers', () => {
   it(`Should get space members based on custom member property value`, async () => {
     const user1 = await createUserFromWallet();
     const user2 = await createUserFromWallet();
-    const space = await generateSpaceForUser(user1);
+    const space = await generateSpaceForUser({ user: user1 });
     await addUserToSpace({ spaceId: space.id, userId: user2.id, isAdmin: false });
 
     const textMemberProperty = await createMemberProperty({

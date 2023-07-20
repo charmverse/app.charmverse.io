@@ -19,18 +19,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(
-    requireSpaceMembership({
-      adminOnly: false,
-      spaceIdKey: 'id'
-    })
-  )
-  .get(getSpaceSubscriptionController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
+  .get(getSpaceSubscriptionController)
   .delete(deletePaymentSubscription)
-  .put(updatePaymentSubscription)
-  .use(requireKeys(['period', 'blockQuota'], 'body'))
-  .post(createPaymentSubscription);
+  .put(requireKeys(['subscriptionId'], 'body'), updatePaymentSubscription)
+  .post(requireKeys(['period', 'blockQuota', 'billingEmail'], 'body'), createPaymentSubscription);
 
 async function getSpaceSubscriptionController(
   req: NextApiRequest,
@@ -86,9 +79,9 @@ async function deletePaymentSubscription(req: NextApiRequest, res: NextApiRespon
 async function updatePaymentSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
-  const payload = req.body as UpdateSubscriptionRequest;
+  const { billingEmail, status } = req.body as UpdateSubscriptionRequest;
 
-  await updateProSubscription({ spaceId, payload });
+  await updateProSubscription({ spaceId, payload: { billingEmail, status } });
 
   log.info(`Subscription updated for space ${spaceId} by user ${userId}`);
 

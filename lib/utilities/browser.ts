@@ -174,14 +174,10 @@ export function setCookie({
   expiresInDays: number;
 }) {
   const expires = new Date();
-  const domain = isLocalhostAlias() ? undefined : `Domain=${getAppApexDomain()};`;
   const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
 
   expires.setDate(expires.getDate() + expiresInDays);
-
-  document.cookie = `${name}=${encodeURIComponent(
-    value
-  )}; ${domain} expires=${expires.toUTCString()}; path=/; ${secure}}`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { LitNodeClient } from 'lit-js-sdk';
+import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import { validate } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';

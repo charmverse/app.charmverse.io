@@ -1,5 +1,4 @@
-import { Divider, ListItemIcon, MenuItem, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Divider, ListItemIcon, MenuItem, Typography, Stack } from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import type { PropertyType } from 'lib/focalboard/board';

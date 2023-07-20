@@ -1,7 +1,7 @@
 import { GET, PUT } from '@charmverse/core/http';
 import type { TokenGate } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AccessControlCondition } from 'lit-js-sdk';
+import type { AccsDefaultParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 
 import { baseUrl } from 'config/constants';
@@ -18,7 +18,7 @@ const SOURCE_PREFIX = 'charmverse-';
 
 type Operator = 'AND' | 'OR';
 type ConditionOperator = { operator: Operator };
-type Condition = AccessControlCondition | ConditionOperator;
+type Condition = AccsDefaultParams | ConditionOperator;
 type TokenGateAccessConditions = (Condition | Condition[])[];
 
 export async function addDaylightAbility(tokenGate: TokenGate) {
@@ -87,7 +87,7 @@ export async function getAllAbilities() {
   return GET<{ abilities: { sourceId: string; uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
 }
 
-function getRequirement(condition: AccessControlCondition) {
+function getRequirement(condition: AccsDefaultParams) {
   const accessType = getAccessType(condition);
 
   // Daylight currently supports only ethereum
@@ -151,7 +151,7 @@ export function getDaylightRequirements(conditionsData: TokenGateAccessCondition
 
   const conditions = conditionsFlatArr.filter((condition) => {
     return 'chain' in condition;
-  }) as AccessControlCondition[];
+  }) as AccsDefaultParams[];
 
   const conditionsOperator: Operator = (operators[0]?.operator.toLocaleUpperCase() as Operator) || 'OR';
 

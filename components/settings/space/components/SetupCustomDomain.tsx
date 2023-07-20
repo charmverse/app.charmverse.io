@@ -16,9 +16,9 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Stack
 } from '@mui/material';
-import { Stack } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -132,7 +132,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
           </Stack>
         </form>
 
-        {!!space.customDomain && (
+        {!!space.customDomain && isAdmin && (
           <Accordion
             expanded={showCustomDomainVerification}
             onChange={() => {

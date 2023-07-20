@@ -22,19 +22,23 @@ export async function getActiveSpaceSubscription({
 }: SpaceSubscriptionRequest & { requestCustomerPortal?: boolean }): Promise<SpaceSubscriptionWithStripeData | null> {
   const space = await prisma.space.findUnique({
     where: {
-      id: spaceId
+      id: spaceId,
+      deletedAt: null
     },
     select: {
       stripeSubscription: {
         take: 1,
         orderBy: {
           createdAt: 'desc'
+        },
+        where: {
+          deletedAt: null
         }
       }
     }
   });
 
-  const activeSpaceSubscription = space?.stripeSubscription[0];
+  const activeSpaceSubscription = space?.stripeSubscription?.[0];
 
   if (!activeSpaceSubscription) {
     return null;
@@ -50,7 +54,7 @@ export async function getActiveSpaceSubscription({
     subscription: subscriptionInStripe as Stripe.Subscription & { customer: Stripe.Customer }
   });
 
-  if (stripeData.paymentMethod && requestCustomerPortal) {
+  if (stripeData.paymentMethod && requestCustomerPortal && returnUrl) {
     const portal = await stripeClient.billingPortal.sessions.create({
       customer: (subscriptionInStripe.customer as Stripe.Customer).id,
       return_url: returnUrl

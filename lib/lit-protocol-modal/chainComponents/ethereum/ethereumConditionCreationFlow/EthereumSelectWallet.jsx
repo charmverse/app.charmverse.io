@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import LitJsSdk from "lit-js-sdk";
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import LitInput from "../../../reusableComponents/litInput/LitInput";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
 

@@ -22,7 +22,7 @@ export async function upgradeProSubscription({
 
   const productId = communityProduct.id;
   // Get all prices for the given product. Usually there will be two prices, one for monthly and one for yearly
-  const productPrice = await getCommunityPrice(productId, payload.period, spaceId);
+  const productPrice = await getCommunityPrice(productId, payload.period);
 
   const subscription = await stripeClient.subscriptions.retrieve(spaceSubscriptionWithDetails.subscriptionId);
 

@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/system';
+import type { SxProps } from '@mui/material';
 
 export const width = { xs: '90vw', md: 500, lg: 750 };
 

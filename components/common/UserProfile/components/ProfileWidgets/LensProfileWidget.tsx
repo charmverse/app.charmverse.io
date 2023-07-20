@@ -13,7 +13,13 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
     <Link href={href} target='_blank' display='flex'>
       <Stack direction='row' spacing={0.5}>
         {icon}
-        <Typography color='initial' variant='subtitle2'>
+        <Typography
+          color='initial'
+          variant='subtitle2'
+          sx={{
+            wordBreak: 'break-word'
+          }}
+        >
           {label}
         </Typography>
       </Stack>
@@ -21,7 +27,7 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
   );
 }
 
-export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
+export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
   return (
     <ProfileWidget
       link={`https://www.lensfrens.xyz/${lensProfile.handle}`}
@@ -37,11 +43,26 @@ export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: Profile
             variant='circular'
           />
           <Stack>
-            <Stack direction='row' gap={0.5} alignItems='flex-end'>
+            <Stack
+              gap={0.5}
+              sx={{
+                flexDirection: {
+                  xs: 'column',
+                  sm: 'row'
+                }
+              }}
+            >
               <Typography variant='body1' fontWeight='bold'>
                 {lensProfile.name ?? lensProfile.handle}
               </Typography>
-              <Typography variant='subtitle2' fontWeight='bold'>
+              <Typography
+                variant='subtitle2'
+                fontWeight='bold'
+                alignSelf={{
+                  xs: 'flex-start',
+                  sm: 'flex-end'
+                }}
+              >
                 #{lensProfile.id}
               </Typography>
             </Stack>

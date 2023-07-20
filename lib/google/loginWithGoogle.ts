@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
@@ -14,20 +14,24 @@ import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type LoginWithGoogleRequest = {
   accessToken: string;
-  displayName: string;
-  avatarUrl: string;
+  displayName?: string;
+  avatarUrl?: string;
   signupAnalytics?: Partial<SignupAnalytics>;
+  oauthParams?: GoogleLoginOauthParams;
 };
 export async function loginWithGoogle({
   accessToken,
-  displayName,
-  avatarUrl,
-  signupAnalytics = {}
+  displayName: providedDisplayName,
+  avatarUrl: providedAvatarUrl,
+  signupAnalytics = {},
+  oauthParams
 }: LoginWithGoogleRequest): Promise<LoggedInUser> {
   try {
-    const verified = await verifyGoogleToken(accessToken);
+    const verified = await verifyGoogleToken(accessToken, oauthParams);
 
     const email = verified.email;
+    const displayName = providedDisplayName || verified.name || '';
+    const avatarUrl = providedAvatarUrl || verified.picture || '';
 
     if (!email) {
       throw new InvalidInputError(`Email required to complete signup`);

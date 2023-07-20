@@ -166,9 +166,11 @@ function NFTView({ nft }: { nft: { image: string; title: string; link: string } 
             >
               {nft.title}
             </Typography>
-            <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
-              View
-            </Button>
+            {nft.link && (
+              <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
+                View
+              </Button>
+            )}
           </Box>
         </CardContent>
       </CardActionArea>

@@ -9,7 +9,7 @@ export const defaultFreeTrialBlockQuota = 30;
 
 export const communityProduct = {
   id: 'community',
-  tier: 'pro',
+  tier: 'community',
   name: 'CharmVerse Community',
   guestLimit: 100,
   // This is base number we use to calculate block limits. We multiply this by the quantity in Stripe.

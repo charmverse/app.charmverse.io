@@ -1,8 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Bounty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';

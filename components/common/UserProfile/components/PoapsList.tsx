@@ -10,8 +10,8 @@ export function PoapsList({
   isFetchingPoaps,
   poaps
 }: {
-  poapsError: any;
-  isFetchingPoaps: boolean;
+  poapsError?: any;
+  isFetchingPoaps?: boolean;
   poaps: ExtendedPoap[];
 }) {
   const sortedPoapData = poaps.sort((p1, p2) => (p1.created > p2.created ? -1 : 1));
@@ -28,7 +28,7 @@ export function PoapsList({
         (isFetchingPoaps ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
             {sortedPoapData.length !== 0 ? (
               sortedPoapData.slice(0, 5).map((poap) => {
                 const poapData = transformPoap(poap);
