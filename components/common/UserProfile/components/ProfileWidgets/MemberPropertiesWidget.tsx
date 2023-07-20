@@ -38,7 +38,7 @@ export function MemberPropertiesWidget({
           ...currentSpaceProperty,
           value: [
             ...(currentSpaceProperty.value as string[]),
-            member.isAdmin ? 'admin' : member.isGuest ? 'guest' : 'member'
+            member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
           ]
         };
       }

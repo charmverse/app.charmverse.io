@@ -97,11 +97,15 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               return (
                 <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0
-                      ? '-'
-                      : member.roles.map((role) => (
-                          <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                        ))}
+                    {[
+                      {
+                        id: 'role',
+                        name: member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
+                      },
+                      ...member.roles
+                    ].map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
                 </TableCell>
               );

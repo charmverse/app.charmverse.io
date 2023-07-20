@@ -127,18 +127,22 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
             }
             case 'role': {
               return (
-                member.roles.length !== 0 && (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>
-                      Role
-                    </Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {member.roles.map((role) => (
-                        <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                      ))}
-                    </Stack>
+                <Stack gap={0.5} key={property.id}>
+                  <Typography fontWeight='bold' variant='subtitle2'>
+                    Role
+                  </Typography>
+                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                    {[
+                      {
+                        id: 'role',
+                        name: member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
+                      },
+                      ...member.roles
+                    ].map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
-                )
+                </Stack>
               );
             }
             case 'timezone': {
