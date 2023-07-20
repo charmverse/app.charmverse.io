@@ -4,9 +4,6 @@ on:
   pull_request:
     types: [labeled, opened, synchronize]
 
-env:
-  CORE_GITHUB_BRANCH: parameitizing-custom-branch-core-install
-
 jobs:
   deploy:
     if: |
@@ -23,8 +20,6 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with: 
-          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build

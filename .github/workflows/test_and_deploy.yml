@@ -16,14 +16,13 @@ on:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
-  CORE_GITHUB_BRANCH:
 
 jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
-      - name: Print out triggering event json
+      - name: Print Triggering event context payload
         env:
           workflow_event_context: ${{ toJSON(github.event) }}
         run: |
@@ -39,7 +38,6 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
-          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Build app
         uses: ./.github/actions/build
@@ -64,7 +62,6 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
-          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -120,7 +117,6 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
-          use_github_core_branch: ${{ env.CORE_GITHUB_BRANCH }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
