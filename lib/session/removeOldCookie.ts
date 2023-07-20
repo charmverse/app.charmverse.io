@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { cookieName } from 'config/constants';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 export async function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiResponse, keepSession?: boolean) {
@@ -13,8 +14,8 @@ export async function removeOldCookieFromResponse(req: NextApiRequest, res: Next
 
   res.setHeader('Set-Cookie', [
     ...setCookiesArray,
-    // remove old non cross-domain cookie
-    `${cookieName}=; Max-Age=0; Path=/; HttpOnly;`
+    // remove old cross-domain cookie
+    `${cookieName}=; Domain=${getAppApexDomain()}; Max-Age=0; Path=/; HttpOnly;`
   ]);
 
   if (keepSession) {
