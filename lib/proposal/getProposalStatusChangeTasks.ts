@@ -37,7 +37,7 @@ export type ProposalTask = {
 type PopulatedProposal = Proposal & {
   authors: ProposalAuthor[];
   reviewers: ProposalReviewer[];
-  page: Pick<Page, 'id' | 'path' | 'title'>;
+  page: Pick<Page, 'id' | 'path' | 'title' | 'deletedAt'>;
 };
 
 type ProposalStatusChangeMetaData = {
@@ -158,8 +158,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
       page: {
         id: {
           in: [...workspaceEventsMap.keys()]
-        },
-        deletedAt: null
+        }
       },
       // filter by permissions
       OR: [
@@ -209,7 +208,8 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
         select: {
           id: true,
           path: true,
-          title: true
+          title: true,
+          deletedAt: true
         }
       }
     }
@@ -222,6 +222,12 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
     return record;
   }, new Map<string, PopulatedProposal>());
 
+  // A single proposal might trigger multiple workspace events
+  // We want to register them as a single event
+  // This set keeps track of the proposals encountered
+  // Since the events were already sorted in descending order, only the latest one will be processed
+  const visitedProposals: Set<string> = new Set();
+
   // These workspace events should be marked, as a relatively newer event was marked
   const unmarkedWorkspaceEvents: string[] = [];
 
@@ -232,11 +238,13 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
       const {
         meta: { newStatus }
       } = workspaceEvent as WorkspaceEventSpecialWithMeta;
+      const processedAlready = visitedProposals.has(proposal.id);
 
       // ignore draft events
-      if (newStatus.match(/draft/)) {
+      if (newStatus.match(/draft/) || proposal.page.deletedAt || processedAlready) {
         unmarkedWorkspaceEvents.push(workspaceEvent.id);
       } else {
+        visitedProposals.add(proposal.id);
         const isAuthor = proposal.authors.some((author) => author.userId === userId);
         const isReviewer = proposal.reviewers.some((reviewer) =>
           reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId
