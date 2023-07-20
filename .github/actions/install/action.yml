@@ -52,4 +52,4 @@ runs:
     - name: Install special core library
       shell: bash
       if: github.head_ref == 'permissions/space-operations'
-      run: rm -rf ./node_modules/@charmverse && npm install github:charmverse/core#ux/permissions/space-operations && cd node_modules/@charmverse/core && npm run build 
+      run: rm -rf ./node_modules/@charmverse && npm install github:charmverse/core#permissions/space-operations && cd node_modules/@charmverse/core && npm run build 
