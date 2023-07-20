@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  SELECTED_PERMISSION_API_TAG: permissions-space-operations
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
