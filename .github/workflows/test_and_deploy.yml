@@ -16,7 +16,7 @@ on:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
-  CORE_GITHUB_BRANCH: parameitizing-custom-branch-core-install
+  CORE_GITHUB_BRANCH:
 
 jobs:
   build-test-env:
