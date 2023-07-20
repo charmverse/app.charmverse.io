@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateProToCommunity() {
-  const result = await prisma.space.update({
+  const result = await prisma.space.updateMany({
     where: {
       paidTier: 'pro'
     },
