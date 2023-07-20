@@ -186,8 +186,18 @@ export function SubscriptionInformation({
             paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
             loading={isLoadingUpdate || isLoadingUpgrade || isLoadingSwitchToFreePlan}
-            onCancelAtEnd={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
-            onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
+            onCancelAtEnd={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'cancel_at_end' }
+              })
+            }
+            onReactivation={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'active' }
+              })
+            }
             onUpgrade={() => openUpgradeDialog()}
             confirmFreeTierDowngrade={switchToFreePlan}
           />
@@ -241,15 +251,18 @@ export function SubscriptionInformation({
           <Stack gap={0.5} my={2}>
             <InputLabel>Email</InputLabel>
             <TextField
-              error={!!errors.email}
-              disabled={isLoadingUpdate}
-              placeholder='johndoe@gmail.com'
               {...register('email')}
+              error={!!errors.email}
+              placeholder='johndoe@gmail.com'
+              disabled={isLoadingUpdate}
             />
             <Button
               disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
               onClick={() =>
-                updateSpaceSubscription({ spaceId: space.id, payload: { billingEmail: getValues().email } })
+                updateSpaceSubscription({
+                  spaceId: space.id,
+                  payload: { billingEmail: getValues().email }
+                })
               }
               sx={{ maxWidth: '100px', mt: 2 }}
               fullWidth={false}
