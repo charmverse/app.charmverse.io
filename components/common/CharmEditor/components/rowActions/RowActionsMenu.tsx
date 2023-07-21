@@ -11,7 +11,8 @@ import {
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { NodeSelection } from 'prosemirror-state';
+import { Fragment } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 
@@ -156,15 +157,21 @@ function Component({ menuState }: { menuState: PluginState }) {
       ? node.nodeEnd - 1
       : node.nodeEnd;
     const tr = view.state.tr;
-
+    // TODO: Trigger component select menu
+    // const emptyLine = view.state.schema.nodes.paragraph.create(
+    //   null,
+    //   Fragment.fromArray([
+    //     view.state.schema.text('', [view.state.schema.mark('inline-command-palette-paletteMark', { trigger: '/' })])
+    //   ])
+    // );
     const emptyLine = view.state.schema.nodes.paragraph.create();
-    const newTr = safeInsert(emptyLine, insertPos)(tr);
+    // const newTr = safeInsert(emptyLine, insertPos)(tr);
 
-    // if (node.nodeEnd) {
-    //   const resolvedPos = tr.doc.resolve(node.nodeEnd);
-    //   tr.setSelection(new NodeSelection(resolvedPos));
-    // }
-    view.dispatch(newTr.scrollIntoView());
+    tr.setSelection(TextSelection.create(tr.doc, insertPos));
+    tr.replaceSelectionWith(emptyLine, false);
+    tr.setSelection(TextSelection.create(tr.doc, insertPos + 1));
+    view.dispatch(tr.scrollIntoView());
+    view.focus();
   }
 
   const optionKey = isMac() ? 'Option' : 'Alt';
