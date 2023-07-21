@@ -12,6 +12,7 @@ import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { NodeSelection } from 'prosemirror-state';
+import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 
 import charmClient from 'charmClient';
@@ -64,7 +65,7 @@ function Component({ menuState }: { menuState: PluginState }) {
 
     const nodeStart = topPos.pos;
     const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
-    let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
+    let nodeEnd = nodeStart + (nodeSize - 1); // nodeSize includes the start and end tokens, so we need to subtract 1
 
     // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
     if (nodeEnd > view.state.doc.content.size) {
@@ -149,7 +150,7 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
     const insertPos = e.altKey
       ? // insert before
-        node.nodeStart
+        node.nodeStart - 1
       : // insert after
       node.node.type.name === 'columnLayout'
       ? node.nodeEnd - 1

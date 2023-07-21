@@ -7,6 +7,8 @@ import { NodeSelection } from 'prosemirror-state';
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
+// helpful links:
+// Indexing in PM: https://prosemirror.net/docs/guide/#doc.indexing
 
 export interface PluginState {
   tooltipDOM: HTMLElement;
@@ -16,18 +18,22 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
-const docLeftMargin = 50;
-
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
   function onMouseOver(view: EditorView, e: MouseEventInit) {
+    if (view.isDestroyed) {
+      return;
+    }
     // @ts-ignore
-    const containerXOffset = e.target.getBoundingClientRect().left;
-    const clientX = e.clientX!;
-    const left = clientX - containerXOffset < docLeftMargin ? clientX + docLeftMargin : clientX;
+    const startPos = view.posAtDOM(e.target, 0);
 
-    const startPos = posAtCoords(view, { left, top: e.clientY! });
+    // old way of determining pos using coords - maybe not needed?
+    // const docLeftMargin = 50;
+    // const containerXOffset = e.target.getBoundingClientRect().left;
+    // const clientX = e.clientX!;
+    // const left = clientX - containerXOffset < docLeftMargin ? clientX + docLeftMargin : clientX;
+    // const startPos = posAtCoords(view, { left, top: e.clientY! });
 
     if (startPos) {
       // Step 1. grab the top-most ancestor of the related DOM element
