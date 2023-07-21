@@ -8,6 +8,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import ConfirmModal from 'components/common/Modal/ConfirmModal';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { CreatePaymentMethodRequest } from 'lib/subscription/createPaymentMethod';
 import type { UpdatePaymentMethodRequest } from 'lib/subscription/updatePaymentMethod';
 
 import { CardSection } from './CardSection';
@@ -26,7 +27,7 @@ export function ChangeCardDetails({
   const [isDisabled, setIsDisabled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { trigger: changePaymentMethod } = useSWRMutation(
+  const { trigger: updatePaymentMethod } = useSWRMutation(
     `/spaces/${spaceId}/payment-method`,
     (_url, { arg }: Readonly<{ arg: UpdatePaymentMethodRequest }>) =>
       charmClient.subscription.updatePaymentMethod(spaceId, arg),
@@ -38,6 +39,18 @@ export function ChangeCardDetails({
       onSuccess() {
         showMessage('Changing payment details has been successful!', 'success');
         refetchSubscription();
+      }
+    }
+  );
+
+  const { trigger: createPaymentMethod } = useSWRMutation(
+    `/spaces/${spaceId}/payment-method`,
+    (_url, { arg }: Readonly<{ arg: CreatePaymentMethodRequest }>) =>
+      charmClient.subscription.createPaymentMethod(spaceId, arg),
+    {
+      onError() {
+        showMessage('Changing payment details failed!', 'error');
+        setIsProcessing(false);
       }
     }
   );
@@ -72,7 +85,26 @@ export function ChangeCardDetails({
       setIsProcessing(false);
       return;
     }
-    await changePaymentMethod({ paymentMethodId: paymentMethodDetails.id });
+
+    const setupIntent = await createPaymentMethod({ paymentMethodId: paymentMethodDetails.id });
+
+    if (setupIntent?.clientSecret) {
+      const { error: cardSetupError } = await stripe.confirmCardSetup(setupIntent.clientSecret, {
+        payment_method: paymentMethodDetails.id,
+        return_url: window.location.href
+      });
+      if (cardSetupError) {
+        showMessage('Payment failed! You did not confirm your new card setup.', 'error');
+        log.error(`[stripe]: Failed confirming card setup intent. ${cardSetupError.message}`, {
+          errorType: cardSetupError.type,
+          errorCode: cardSetupError.code
+        });
+        setIsProcessing(false);
+        return;
+      }
+    }
+
+    await updatePaymentMethod({ paymentMethodId: paymentMethodDetails.id });
 
     setIsProcessing(false);
   };

@@ -4,27 +4,45 @@ import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import type { CreatePaymentMethodRequest, CreatePaymentMethodResponse } from 'lib/subscription/createPaymentMethod';
+import { createPaymentMethod } from 'lib/subscription/createPaymentMethod';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
+import type { UpdatePaymentMethodRequest } from 'lib/subscription/updatePaymentMethod';
 import { updatePaymentMethod } from 'lib/subscription/updatePaymentMethod';
-
-export type UpgradeSubscriptionRequest = {
-  blockQuota: number;
-  period: SubscriptionPeriod;
-};
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .use(requireKeys(['paymentMethodId'], 'body'))
-  .put(upgradeSubscription);
+  .post(requireKeys(['paymentMethodId'], 'body'), createPaymentMethodController)
+  .put(requireKeys(['paymentMethodId'], 'body'), updatePaymentMethodController);
 
-async function upgradeSubscription(req: NextApiRequest, res: NextApiResponse<void>) {
+async function createPaymentMethodController(req: NextApiRequest, res: NextApiResponse<CreatePaymentMethodResponse>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
-  const paymentMethodId = req.body.paymentMethodId as string;
+  const { paymentMethodId } = req.body as CreatePaymentMethodRequest;
+
+  const subscriptionData = await getActiveSpaceSubscription({ spaceId });
+
+  if (!subscriptionData) {
+    throw new NotFoundError(`Subscription not found for space ${spaceId}`);
+  }
+
+  const result = await createPaymentMethod({
+    customerId: subscriptionData.customerId,
+    paymentMethodId
+  });
+
+  log.info(`Create payment method has been initialised for space ${spaceId} by the user ${userId}`);
+
+  res.status(200).json(result);
+}
+
+async function updatePaymentMethodController(req: NextApiRequest, res: NextApiResponse<void>) {
+  const { id: spaceId } = req.query as { id: string };
+  const userId = req.session.user.id;
+  const { paymentMethodId } = req.body as UpdatePaymentMethodRequest;
 
   const subscriptionData = await getActiveSpaceSubscription({ spaceId });
 
@@ -38,7 +56,7 @@ async function upgradeSubscription(req: NextApiRequest, res: NextApiResponse<voi
     paymentMethodId
   });
 
-  log.info(`Change payment method for subscription has been initialised for space ${spaceId} by the user ${userId}`);
+  log.info(`Payment method has been updated for space ${spaceId} by the user ${userId}`);
 
   res.status(200).end();
 }

@@ -1,6 +1,7 @@
 import type { Space } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
+import type { CreatePaymentMethodRequest, CreatePaymentMethodResponse } from 'lib/subscription/createPaymentMethod';
 import type {
   SpaceSubscriptionRequest,
   SpaceSubscriptionWithStripeData
@@ -43,6 +44,10 @@ export class SubscriptionApi {
 
   upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {
     return http.PUT<void>(`/api/spaces/${spaceId}/upgrade-subscription`, payload);
+  }
+
+  createPaymentMethod(spaceId: string, payload: CreatePaymentMethodRequest) {
+    return http.POST<CreatePaymentMethodResponse>(`/api/spaces/${spaceId}/payment-method`, payload);
   }
 
   updatePaymentMethod(spaceId: string, payload: UpdatePaymentMethodRequest) {
