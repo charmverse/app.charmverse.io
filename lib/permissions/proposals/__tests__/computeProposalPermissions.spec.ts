@@ -1,10 +1,10 @@
+import { ProposalNotFoundError } from '@charmverse/core/errors';
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalCategory, ProposalStatus, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { computeProposalPermissions } from '../computeProposalPermissions';

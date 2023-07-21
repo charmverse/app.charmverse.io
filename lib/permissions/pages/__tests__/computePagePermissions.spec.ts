@@ -86,6 +86,7 @@ describe('baseComputePagePermissions', () => {
       edit_path: false,
       edit_position: false,
       grant_permissions: false,
+      delete_attached_bounty: false,
       read: true
     });
 
@@ -103,6 +104,7 @@ describe('baseComputePagePermissions', () => {
       edit_path: false,
       edit_position: false,
       grant_permissions: false,
+      delete_attached_bounty: false,
       read: true
     });
   });
@@ -180,6 +182,7 @@ describe('computePagePermissions - with proposal policy', () => {
       edit_path: false,
       edit_position: false,
       grant_permissions: false,
+      delete_attached_bounty: false,
       read: true
     });
   });

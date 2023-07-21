@@ -23,8 +23,20 @@ export async function computeSpacePermissions({
   if (!spaceRole) {
     // Returns all permissions as false since user is not space member
     return allowedOperations.empty;
-  }
 
-  // Provide full permissions to all space members independent of admin status
-  return allowedOperations.full;
+    // Provide full permissions to all space members independent of admin status
+  } else if (spaceRole.isAdmin) {
+    return allowedOperations.full;
+  } else {
+    return {
+      createBounty: true,
+      createForumCategory: true,
+      createPage: true,
+      moderateForums: true,
+      reviewProposals: true,
+      deleteAnyBounty: false,
+      deleteAnyPage: false,
+      deleteAnyProposal: false
+    };
+  }
 }
