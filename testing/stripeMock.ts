@@ -12,7 +12,8 @@ export const stripeMockIds = {
   paymentId: v4(),
   priceId: v4(),
   paymentMethodId: v4(),
-  invoiceId: v4()
+  invoiceId: v4(),
+  setupIntentId: v4()
 };
 
 // For standard testing
@@ -20,6 +21,15 @@ export const stripeMock = {
   stripeClient: {
     webhooks: {
       constructEvent: jest.fn()
+    },
+    setupIntents: {
+      create: jest.fn().mockResolvedValue({
+        id: stripeMockIds.setupIntentId
+      }),
+      confirm: jest.fn().mockResolvedValue({
+        id: stripeMockIds.setupIntentId,
+        paymentMethodId: stripeMockIds.paymentMethodId
+      })
     },
     subscriptions: {
       retrieve: jest.fn().mockResolvedValue({
