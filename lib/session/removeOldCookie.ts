@@ -14,7 +14,7 @@ export async function removeOldCookieFromResponse(req: NextApiRequest, res: Next
 
   res.setHeader('Set-Cookie', [
     ...setCookiesArray,
-    // remove old cross-domain cookie
+    // remove old cross-domain cookies
     `${cookieName}=; Domain=${getAppApexDomain()}; Max-Age=0; Path=/; HttpOnly;`
   ]);
 
