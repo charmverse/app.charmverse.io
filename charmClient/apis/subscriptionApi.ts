@@ -12,6 +12,7 @@ import type {
   CreateProSubscriptionRequest,
   SubscriptionPaymentIntent
 } from 'lib/subscription/interfaces';
+import type { UpdatePaymentMethodRequest } from 'lib/subscription/updatePaymentMethod';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
 
@@ -20,10 +21,8 @@ export class SubscriptionApi {
     return http.POST<SubscriptionPaymentIntent & { email?: string }>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
-  getSpaceSubscription({ spaceId, returnUrl }: SpaceSubscriptionRequest) {
-    return http.GET<SpaceSubscriptionWithStripeData | null>(
-      `/api/spaces/${spaceId}/subscription?returnUrl=${returnUrl}`
-    );
+  getSpaceSubscription({ spaceId }: SpaceSubscriptionRequest) {
+    return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
   }
 
   createCryptoSubscription(spaceId: string, payload: CreateCryptoSubscriptionRequest) {
@@ -44,5 +43,9 @@ export class SubscriptionApi {
 
   upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {
     return http.PUT<void>(`/api/spaces/${spaceId}/upgrade-subscription`, payload);
+  }
+
+  updatePaymentMethod(spaceId: string, payload: UpdatePaymentMethodRequest) {
+    return http.PUT<void>(`/api/spaces/${spaceId}/payment-method`, payload);
   }
 }

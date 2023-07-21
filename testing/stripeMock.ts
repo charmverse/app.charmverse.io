@@ -110,11 +110,6 @@ export const stripeMock = {
         data: []
       })
     },
-    billingPortal: {
-      sessions: {
-        create: jest.fn()
-      }
-    },
     paymentMethods: {
       list: jest.fn().mockResolvedValue({
         data: []

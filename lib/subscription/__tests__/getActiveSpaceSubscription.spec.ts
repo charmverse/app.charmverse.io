@@ -24,11 +24,6 @@ jest.mock('../stripe', () => ({
       create: jest.fn(),
       search: jest.fn(),
       retrieve: jest.fn()
-    },
-    billingPortal: {
-      sessions: {
-        create: jest.fn()
-      }
     }
   }
 }));
@@ -126,49 +121,5 @@ describe('getActiveSpaceSubscription', () => {
     expect(stripeClient.subscriptions.retrieve).toHaveBeenCalledWith(subscriptionId, {
       expand: subscriptionExpandFields
     });
-  });
-
-  it('should only request a link to the billing portal if this is requested, and pass the return url to the payment method', async () => {
-    const { space } = await testUtilsUser.generateUserAndSpace();
-
-    const customerId = `cus_${v4()}`;
-    const subscriptionId = `sub_${v4()}`;
-
-    await addSpaceSubscription({
-      spaceId: space.id,
-      customerId,
-      subscriptionId
-    });
-
-    const subscriptionStub = stripeSubscriptionStub({ status: 'active', customerId, subscriptionId });
-    // Check the function is not called
-
-    (stripeClient.subscriptions.retrieve as jest.Mock).mockResolvedValueOnce(subscriptionStub);
-
-    const subscriptionWithoutReturnUrl = await getActiveSpaceSubscription({ spaceId: space.id });
-
-    expect(stripeClient.billingPortal.sessions.create).not.toHaveBeenCalled();
-
-    expect(subscriptionWithoutReturnUrl?.paymentMethod?.updateUrl).toBeUndefined();
-
-    // Check the function is called when parameter is passed
-    (stripeClient.subscriptions.retrieve as jest.Mock).mockResolvedValueOnce(subscriptionStub);
-
-    const billingPortalReturnUrl = 'www.example.com';
-
-    (stripeClient.billingPortal.sessions.create as jest.Mock).mockResolvedValueOnce({ url: billingPortalReturnUrl });
-
-    const subscriptionWithReturnUrl = await getActiveSpaceSubscription({
-      spaceId: space.id,
-      returnUrl: billingPortalReturnUrl,
-      requestCustomerPortal: true
-    });
-
-    expect(stripeClient.billingPortal.sessions.create).toHaveBeenCalledWith({
-      customer: customerId,
-      return_url: billingPortalReturnUrl
-    });
-
-    expect(subscriptionWithReturnUrl?.paymentMethod?.updateUrl).toEqual(billingPortalReturnUrl);
   });
 });

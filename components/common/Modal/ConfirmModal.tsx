@@ -10,25 +10,25 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   question: string | ReactNode;
   buttonText?: string;
   title?: string;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
   secondaryButtonText?: string;
   onClose: () => void;
   disabled?: boolean;
 };
 
-export default function ConfirmUpgradeModal({
+export default function ConfirmModal({
   onClose,
   open,
   question,
-  buttonText = 'Yes',
+  buttonText = 'Update',
   title,
   onConfirm,
   size,
   secondaryButtonText = 'Cancel',
   disabled
 }: Props) {
-  function _onConfirm() {
-    onConfirm();
+  async function _onConfirm() {
+    await onConfirm();
     onClose();
   }
 

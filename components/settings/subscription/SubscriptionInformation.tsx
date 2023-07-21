@@ -10,7 +10,7 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import ConfirmUpgradeModal from 'components/common/Modal/ConfirmUpgradeModal';
+import ConfirmUpdateModal from 'components/common/Modal/ConfirmModal';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -201,7 +201,7 @@ export function SubscriptionInformation({
             onUpgrade={() => openUpgradeDialog()}
             confirmFreeTierDowngrade={switchToFreePlan}
           />
-          <ConfirmUpgradeModal
+          <ConfirmUpdateModal
             title='Upgrade Community Edition'
             size='large'
             open={isUpgradeDialogOpen}
@@ -221,7 +221,7 @@ export function SubscriptionInformation({
               isLoadingUpgrade || (period === spaceSubscription.period && blockQuota === spaceSubscription.blockQuota)
             }
           />
-          <ConfirmUpgradeModal
+          <ConfirmUpdateModal
             title='Confirm plan changes'
             size='large'
             open={isConfirmUpgradeDialogOpen}
@@ -239,7 +239,11 @@ export function SubscriptionInformation({
       <Divider sx={{ my: 2 }} />
       {spaceSubscription?.paymentMethod && (
         <>
-          <PaymentMethod paymentMethod={spaceSubscription.paymentMethod} />
+          <PaymentMethod
+            paymentMethod={spaceSubscription.paymentMethod}
+            spaceId={space.id}
+            refetchSubscription={refetchSpaceSubscription}
+          />
           <Divider sx={{ my: 2 }} />
         </>
       )}
@@ -257,7 +261,9 @@ export function SubscriptionInformation({
               disabled={isLoadingUpdate}
             />
             <Button
-              disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
+              disabled={
+                isLoadingUpdate || email.length === 0 || !!errors.email || email === spaceSubscription.billingEmail
+              }
               onClick={() =>
                 updateSpaceSubscription({
                   spaceId: space.id,

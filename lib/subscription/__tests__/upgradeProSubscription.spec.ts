@@ -56,7 +56,6 @@ describe('upgradeProSubscription', () => {
     (stripeClient.subscriptions.retrieve as jest.Mock) = jest.fn().mockResolvedValue(stripeSubscriptionDetails);
     (stripeClient.subscriptions.update as jest.Mock) = stripeMock.stripeClient.subscriptions.update;
     (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
-    (stripeClient.billingPortal.sessions.create as jest.Mock) = stripeMock.stripeClient.billingPortal.sessions.create;
 
     await addSpaceSubscription({
       spaceId,

@@ -38,12 +38,11 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
   }
 }
 
-export type PaymentMethodWithUpdateUrl = {
+export type PaymentMethod = {
   id: string;
-  type: Stripe.PaymentMethod.Type;
-  digits?: string;
-  brand?: string;
-  updateUrl?: string;
+  type?: Stripe.PaymentMethod.Type;
+  digits?: string | null;
+  brand?: string | null;
 };
 
 /**
@@ -61,7 +60,7 @@ export type SubscriptionFieldsFromStripe = {
   billingEmail?: string | null;
   expiresOn?: Date | null;
   renewalDate?: Date | null;
-  paymentMethod?: PaymentMethodWithUpdateUrl | null;
+  paymentMethod?: PaymentMethod | null;
   coupon?: string;
 };
 export function mapStripeFields({
@@ -85,13 +84,13 @@ export function mapStripeFields({
   const paymentType = paymentDetails?.type;
   const paymentCard = paymentDetails?.card?.brand ?? paymentDetails?.us_bank_account?.bank_name;
   const last4 = paymentDetails?.card?.last4 ?? paymentDetails?.us_bank_account?.last4;
-  const paymentMethod = paymentDetails
-    ? ({
+  const paymentMethod: PaymentMethod | null = paymentDetails
+    ? {
         id: paymentDetails.id,
         brand: paymentCard,
         digits: last4,
         type: paymentType
-      } as PaymentMethodWithUpdateUrl)
+      }
     : null;
 
   const status = mapStripeStatus(subscription);

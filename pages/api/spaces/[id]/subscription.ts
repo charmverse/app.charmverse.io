@@ -6,10 +6,7 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } 
 import { withSessionRoute } from 'lib/session/withSession';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import type {
-  SpaceSubscriptionRequest,
-  SpaceSubscriptionWithStripeData
-} from 'lib/subscription/getActiveSpaceSubscription';
+import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from 'lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
@@ -22,21 +19,16 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .get(getSpaceSubscriptionController)
   .delete(deletePaymentSubscription)
-  .put(requireKeys(['subscriptionId'], 'body'), updatePaymentSubscription)
+  .put(updatePaymentSubscription)
   .post(requireKeys(['period', 'blockQuota', 'billingEmail'], 'body'), createPaymentSubscription);
 
 async function getSpaceSubscriptionController(
   req: NextApiRequest,
   res: NextApiResponse<SpaceSubscriptionWithStripeData | null>
 ) {
-  const { id: spaceId, returnUrl } = req.query as { id: string } & Pick<SpaceSubscriptionRequest, 'returnUrl'>;
+  const { id: spaceId } = req.query as { id: string };
 
-  const spaceSubscription = await getActiveSpaceSubscription({
-    spaceId,
-    returnUrl,
-    // We only want to provide the customer portal link to admins, since it creates a fully trusted session on stripe portal
-    requestCustomerPortal: req.isAdmin
-  });
+  const spaceSubscription = await getActiveSpaceSubscription({ spaceId });
 
   return res.status(200).json(spaceSubscription);
 }
