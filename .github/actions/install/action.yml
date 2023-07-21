@@ -64,4 +64,3 @@ runs:
         npm install github:charmverse/core#${{inputs.use_github_core_branch}}
         cd node_modules/@charmverse/core
         npm run build
-
