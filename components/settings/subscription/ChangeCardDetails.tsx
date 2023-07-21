@@ -91,7 +91,7 @@ export function ChangeCardDetails({
     if (setupIntent?.clientSecret) {
       const { error: cardSetupError } = await stripe.confirmCardSetup(setupIntent.clientSecret, {
         payment_method: paymentMethodDetails.id,
-        return_url: window.location.href
+        return_url: `${window?.location.origin}?settingTab=subscription`
       });
       if (cardSetupError) {
         showMessage('Payment failed! You did not confirm your new card setup.', 'error');
