@@ -25,6 +25,11 @@ export function plugins({ key }: { key: PluginKey }) {
     if (view.isDestroyed) {
       return;
     }
+    // mouse is hovering over the editor container (left side margin for example)
+    // @ts-ignore
+    if (e.target === view.dom) {
+      return;
+    }
     // @ts-ignore
     const startPos = view.posAtDOM(e.target, 0);
 
@@ -35,7 +40,7 @@ export function plugins({ key }: { key: PluginKey }) {
     // const left = clientX - containerXOffset < docLeftMargin ? clientX + docLeftMargin : clientX;
     // const startPos = posAtCoords(view, { left, top: e.clientY! });
 
-    if (startPos) {
+    if (startPos !== undefined) {
       // Step 1. grab the top-most ancestor of the related DOM element
       const dom = rowNodeAtPos(view, startPos);
       const rowNode = dom.rowNode;
@@ -145,6 +150,10 @@ export function posAtCoords(view: EditorView, coords: { left: number; top: numbe
 export function rowNodeAtPos(view: EditorView, startPos: number) {
   const dom = view.domAtPos(startPos);
   let rowNode = dom.node;
+  // if startPos = 0, domAtPos gives us the doc container
+  if (rowNode === view.dom) {
+    rowNode = view.dom.children[0] || view.dom;
+  }
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
   // ref: https://github.com/atlassian/prosemirror-utils/issues/8
   if (dom.offset && dom.node.childNodes[dom.offset]) {

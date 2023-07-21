@@ -44,7 +44,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
-    if (!menuState.rowPos || !menuState.rowDOM) {
+    if (menuState.rowPos === undefined || !menuState.rowDOM) {
       return null;
     }
 
@@ -65,15 +65,29 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
 
     const nodeStart = topPos.pos;
-    const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
-    let nodeEnd = nodeStart + (nodeSize - 1); // nodeSize includes the start and end tokens, so we need to subtract 1
+    const firstChild = pmNode.type.name === 'doc' ? pmNode.firstChild : null;
+    const nodeSize =
+      pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : firstChild?.content.size ?? pmNode.content.size;
+    // nodeSize includes the start and end tokens, so we need to subtract 1
+    // for images, nodeSize is 0
+    let nodeEnd = nodeStart + (nodeSize > 0 ? nodeSize - 1 : 0);
+    if (nodeEnd === nodeStart) {
+      nodeEnd = nodeStart + 1;
+    }
 
     // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
     if (nodeEnd > view.state.doc.content.size) {
       nodeEnd = view.state.doc.content.size;
     }
 
-    log.debug('Row meta', { nodeStart, topPos: topPos.pos, pmNode, nodeEnd, nodeSize });
+    log.debug('Row meta', {
+      child: firstChild?.content.size,
+      nodeStart,
+      topPos: topPos.pos,
+      pmNode,
+      nodeEnd,
+      nodeSize
+    });
 
     return {
       node: pmNode,
@@ -151,7 +165,9 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
     const insertPos = e.altKey
       ? // insert before
-        node.nodeStart - 1
+        node.nodeStart > 0
+        ? node.nodeStart - 1
+        : 0
       : // insert after
       node.node.type.name === 'columnLayout'
       ? node.nodeEnd - 1
