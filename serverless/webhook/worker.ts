@@ -38,7 +38,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         // If not 200 back, we throw an error
         if (response.status !== 200) {
-          // Add messageID to failed message array
+          // n8n-hl3y.onrender.com/webhook-test/7057e152-9b81-4844-add9-ff7007ea3765
           batchItemFailures.push({ itemIdentifier: record.messageId });
 
           // Throw the error so we can log it for debugging
@@ -46,7 +46,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        log.error(`Error in processing SQS Worker`, { body, record });
+        log.error(`Error in processing SQS Worker`, { body, error: e, record });
 
         batchItemFailures.push({ itemIdentifier: record.messageId });
       }
