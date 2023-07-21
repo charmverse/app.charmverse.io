@@ -1,7 +1,6 @@
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
-import { isMarkActiveInSelection } from '@bangle.dev/utils';
 import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
@@ -17,6 +16,8 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
+const docLeftMargin = 50;
+
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
@@ -24,7 +25,7 @@ export function plugins({ key }: { key: PluginKey }) {
     // @ts-ignore
     const containerXOffset = e.target.getBoundingClientRect().left;
     const clientX = e.clientX!;
-    const left = clientX - containerXOffset < 50 ? clientX + 50 : clientX;
+    const left = clientX - containerXOffset < docLeftMargin ? clientX + docLeftMargin : clientX;
 
     const startPos = posAtCoords(view, { left, top: e.clientY! });
 

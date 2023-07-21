@@ -2,10 +2,16 @@ import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
-import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  ContentCopy as DuplicateIcon,
+  DragIndicator as DragIndicatorIcon,
+  DeleteOutlined
+} from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
-import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { NodeSelection } from 'prosemirror-state';
 import reactDOM from 'react-dom';
 
 import charmClient from 'charmClient';
@@ -13,6 +19,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { isMac } from 'lib/utilities/browser';
 
 import type { PluginState } from './rowActions';
 
@@ -134,9 +141,51 @@ function Component({ menuState }: { menuState: PluginState }) {
     popupState.close();
   }
 
+  function addNewRow(e: MouseEvent) {
+    const node = _getNode();
+    if (!node) {
+      log.warn('no node identified to add new row');
+      return;
+    }
+    const insertPos = e.altKey
+      ? // insert before
+        node.nodeStart
+      : // insert after
+      node.node.type.name === 'columnLayout'
+      ? node.nodeEnd - 1
+      : node.nodeEnd;
+    const tr = view.state.tr;
+
+    const emptyLine = view.state.schema.nodes.paragraph.create();
+    const newTr = safeInsert(emptyLine, insertPos)(tr);
+
+    // if (node.nodeEnd) {
+    //   const resolvedPos = tr.doc.resolve(node.nodeEnd);
+    //   tr.setSelection(new NodeSelection(resolvedPos));
+    // }
+    view.dispatch(newTr.scrollIntoView());
+  }
+
+  const optionKey = isMac() ? 'Option' : 'Alt';
+
   return (
     <>
       <span className='charm-drag-handle' draggable='true'>
+        <Tooltip
+          title={
+            <>
+              <Typography fontWeight='bold' variant='caption'>
+                Click<span style={{ color: 'lightgray' }}> to add below</span>
+              </Typography>
+              <br />
+              <Typography fontWeight='bold' variant='caption'>
+                {optionKey}-click<span style={{ color: 'lightgray' }}> to add above</span>
+              </Typography>
+            </>
+          }
+        >
+          <AddIcon style={{ cursor: 'text' }} onClick={addNewRow} />
+        </Tooltip>
         <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
       </span>
 
