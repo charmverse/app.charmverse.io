@@ -39,13 +39,13 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { account, isConnectingIdentity, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { connectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
-  const { loginWithGooglePopup } = useGoogleLogin();
+  const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
 
   const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
     '/profile/add-wallets',
@@ -191,12 +191,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               <PrimaryButton
                 size='small'
                 onClick={async () => {
-                  if (isOnCustomDomain) {
-                    loginWithGooglePopup({ type: 'connect' });
-                  } else {
-                    await connectGoogleAccount();
-                  }
-
+                  loginWithGooglePopup({ type: 'connect' });
                   onClose();
                 }}
                 disabled={isConnectingGoogle}

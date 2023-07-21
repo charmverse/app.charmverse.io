@@ -1,5 +1,6 @@
 /// <reference types="google.accounts" />
 
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
@@ -16,8 +17,8 @@ export const googleSignInScript = 'https://accounts.google.com/gsi/client';
 export function useGoogleLogin() {
   const [loaded, setLoaded] = useState(false);
   const { showMessage } = useSnackbar();
-  const { openPopupLogin } = usePopupLogin<GooglePopupLoginState>();
-  const { setUser } = useUser();
+  const { openPopupLogin, isPopupLoginOpen } = usePopupLogin<GooglePopupLoginState>();
+  const { setUser, user } = useUser();
 
   function initClient({ hint, mode }: { hint?: string; mode?: 'redirect' | 'popup' } = {}) {
     if (!googleOAuthClientId) {
@@ -83,11 +84,22 @@ export function useGoogleLogin() {
 
     openPopupLogin(`${getCallbackDomain(host)}/authenticate/google?action=login`, loginCallback);
   }
+  async function disconnectGoogleAccount(): Promise<void> {
+    if (!user?.googleAccounts.length) {
+      throw new InvalidInputError('No Google account connected to user');
+    }
 
+    const loggedInUser = await charmClient.google.disconnectAccount({
+      googleAccountEmail: user?.googleAccounts[0].email as string
+    });
+    setUser(loggedInUser);
+  }
   return {
     loginWithGoogleRedirect,
     loginWithGooglePopup,
+    disconnectGoogleAccount,
     onLoadScript,
-    isLoaded: loaded
+    isLoaded: loaded,
+    isConnectingGoogle: isPopupLoginOpen
   };
 }
