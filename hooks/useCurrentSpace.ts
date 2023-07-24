@@ -32,18 +32,18 @@ export function useCurrentSpace(): {
     }
   }, [space]);
 
-  const returnSpaceValue = space ?? (publicSpace || undefined);
+  const spaceToReturn = space ?? (publicSpace || undefined);
 
   const spaceRole = useMemo(() => {
-    if (!user || !returnSpaceValue) {
+    if (!user || !spaceToReturn) {
       return undefined;
     }
-    return user.spaceRoles.find((sr) => sr.spaceId === returnSpaceValue.id);
-  }, [user, returnSpaceValue]);
+    return user.spaceRoles.find((sr) => sr.spaceId === spaceToReturn.id);
+  }, [user, spaceToReturn]);
 
   // if page is public and we are not loading space anymore OR if spaces are loaded
   if (isSpacesLoaded || isSharedPageLoaded) {
-    return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace, spaceRole };
+    return { space: spaceToReturn, isLoading: false, refreshCurrentSpace, spaceRole };
   }
   return { isLoading: true, refreshCurrentSpace };
 }
