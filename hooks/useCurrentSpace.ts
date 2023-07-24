@@ -1,16 +1,23 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, SpaceRole } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 import { useSpaces } from './useSpaces';
+import { useUser } from './useUser';
 
-export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshCurrentSpace: () => void } {
+export function useCurrentSpace(): {
+  space?: Space;
+  isLoading: boolean;
+  refreshCurrentSpace: () => void;
+  spaceRole?: SpaceRole;
+} {
   const router = useRouter();
   const { spaces, isLoaded: isSpacesLoaded, setSpace } = useSpaces();
+  const { user } = useUser();
   const { publicSpace, accessChecked: publicAccessChecked, isPublicPath } = useSharedPage();
   const isSharedPageLoaded = isPublicPath && publicAccessChecked;
   // Support for extracting domain from logged in view or shared bounties view
@@ -25,9 +32,18 @@ export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshC
     }
   }, [space]);
 
+  const returnSpaceValue = space ?? (publicSpace || undefined);
+
+  const spaceRole = useMemo(() => {
+    if (!user || !returnSpaceValue) {
+      return undefined;
+    }
+    return user.spaceRoles.find((sr) => sr.spaceId === returnSpaceValue.id);
+  }, [user, returnSpaceValue]);
+
   // if page is public and we are not loading space anymore OR if spaces are loaded
   if (isSpacesLoaded || isSharedPageLoaded) {
-    return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace };
+    return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace, spaceRole };
   }
   return { isLoading: true, refreshCurrentSpace };
 }
