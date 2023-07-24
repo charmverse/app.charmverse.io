@@ -82,6 +82,8 @@ export function ProposalsPage() {
                       categoryIdFilter={categoryIdFilter}
                       setCategoryIdFilter={setCategoryIdFilter}
                       categories={categories}
+                      // Playwright-specific
+                      testKey='desktop'
                     />
                   </Box>
                 </Box>

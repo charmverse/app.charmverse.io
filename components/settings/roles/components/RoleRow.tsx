@@ -46,7 +46,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
   } else if (role.source === 'guild_xyz') {
     descriptionIcon = <GuildXYZIcon />;
     description = <>This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role</>;
-  } else if (role.source !== 'summon') {
+  } else if (role.source === 'summon') {
     descriptionIcon = theme.palette.mode === 'dark' ? <SummonLightIcon /> : <SummonDarkIcon />;
     description = <>This role is managed by Summon</>;
   }

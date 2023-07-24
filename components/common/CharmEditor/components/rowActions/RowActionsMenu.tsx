@@ -2,10 +2,18 @@ import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
-import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  ContentCopy as DuplicateIcon,
+  DragIndicator as DragIndicatorIcon,
+  DeleteOutlined
+} from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
-import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { Fragment } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
+import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 
 import charmClient from 'charmClient';
@@ -13,6 +21,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { isMac } from 'lib/utilities/browser';
 
 import type { PluginState } from './rowActions';
 
@@ -35,7 +44,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
-    if (!menuState.rowPos || !menuState.rowDOM) {
+    if (menuState.rowPos === undefined || !menuState.rowDOM) {
       return null;
     }
 
@@ -56,15 +65,29 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
 
     const nodeStart = topPos.pos;
-    const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
-    let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
+    const firstChild = pmNode.type.name === 'doc' ? pmNode.firstChild : null;
+    const nodeSize =
+      pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : firstChild?.content.size ?? pmNode.content.size;
+    // nodeSize includes the start and end tokens, so we need to subtract 1
+    // for images, nodeSize is 0
+    let nodeEnd = nodeStart + (nodeSize > 0 ? nodeSize - 1 : 0);
+    if (nodeEnd === nodeStart) {
+      nodeEnd = nodeStart + 1;
+    }
 
     // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
     if (nodeEnd > view.state.doc.content.size) {
       nodeEnd = view.state.doc.content.size;
     }
 
-    log.debug('Row meta', { nodeStart, topPos: topPos.pos, pmNode, nodeEnd, nodeSize });
+    log.debug('Row meta', {
+      child: firstChild?.content.size,
+      nodeStart,
+      topPos: topPos.pos,
+      pmNode,
+      nodeEnd,
+      nodeSize
+    });
 
     return {
       node: pmNode,
@@ -134,9 +157,59 @@ function Component({ menuState }: { menuState: PluginState }) {
     popupState.close();
   }
 
+  function addNewRow(e: MouseEvent) {
+    const node = _getNode();
+    if (!node) {
+      log.warn('no node identified to add new row');
+      return;
+    }
+    const insertPos = e.altKey
+      ? // insert before
+        node.nodeStart > 0
+        ? node.nodeStart - 1
+        : 0
+      : // insert after
+      node.node.type.name === 'columnLayout'
+      ? node.nodeEnd - 1
+      : node.nodeEnd;
+    const tr = view.state.tr;
+    // TODO: Trigger component select menu
+    // const emptyLine = view.state.schema.nodes.paragraph.create(
+    //   null,
+    //   Fragment.fromArray([
+    //     view.state.schema.text('', [view.state.schema.mark('inline-command-palette-paletteMark', { trigger: '/' })])
+    //   ])
+    // );
+    const emptyLine = view.state.schema.nodes.paragraph.create();
+    // const newTr = safeInsert(emptyLine, insertPos)(tr);
+
+    tr.setSelection(TextSelection.create(tr.doc, insertPos));
+    tr.replaceSelectionWith(emptyLine, false);
+    tr.setSelection(TextSelection.create(tr.doc, insertPos + 1));
+    view.dispatch(tr.scrollIntoView());
+    view.focus();
+  }
+
+  const optionKey = isMac() ? 'Option' : 'Alt';
+
   return (
     <>
       <span className='charm-drag-handle' draggable='true'>
+        <Tooltip
+          title={
+            <>
+              <Typography fontWeight='bold' variant='caption'>
+                Click<span style={{ color: 'lightgray' }}> to add below</span>
+              </Typography>
+              <br />
+              <Typography fontWeight='bold' variant='caption'>
+                {optionKey}-click<span style={{ color: 'lightgray' }}> to add above</span>
+              </Typography>
+            </>
+          }
+        >
+          <AddIcon style={{ cursor: 'text' }} onClick={addNewRow} />
+        </Tooltip>
         <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
       </span>
 
