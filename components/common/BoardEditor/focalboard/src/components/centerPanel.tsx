@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -34,7 +34,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
-import { webhookBaseUrl } from 'config/constants';
+import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -107,7 +107,7 @@ function CenterPanel(props: Props) {
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
@@ -148,11 +148,15 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards
-    .map((card) => ({ card, page: pages[card.id]! }))
-    .filter(({ page }) => !!page && !page.deletedAt);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
@@ -329,7 +333,9 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      e.stopPropagation();
+      if (activeView?.fields.viewType !== 'table') {
+        e.stopPropagation();
+      }
     },
     [activeView]
   );
@@ -365,7 +371,7 @@ function CenterPanel(props: Props) {
   ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
-      unassignedOptionIds = groupByProperty.options
+      unassignedOptionIds = (groupByProperty.options ?? [])
         .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
         .map((o: IPropertyOption) => o.id);
     }
@@ -511,7 +517,7 @@ function CenterPanel(props: Props) {
           <PageWebhookBanner
             key={key.apiKey}
             type={key.type}
-            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            url={`${window.location.origin}/${webhookEndpoint}/${key?.apiKey}`}
             sx={{
               ...(isEmbedded && {
                 border: (theme) => `2px solid ${theme.palette.text.primary}`,
@@ -723,7 +729,7 @@ export function groupCardsByOptions(
 
   for (const optionId of optionIds) {
     if (optionId) {
-      const option = groupByProperty?.options.find((o) => o.id === optionId);
+      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
       if (groupByProperty && option) {
         const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
@@ -737,7 +743,7 @@ export function groupCardsByOptions(
       // Empty group
       const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },

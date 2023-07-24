@@ -179,6 +179,10 @@ export class WebSocketConnector {
             const clientDifference = this.messages.client - data.c;
             this.messages.client = data.c;
             if (clientDifference > this.messages.lastTen.length) {
+              log.debug(`[ws${namespace}] reset the document because we are too far ahead of the server`, {
+                messagesAvailableToResend: this.messages.lastTen.length,
+                clientDifference
+              });
               // We cannot fix the situation
               this.send(this.restartMessage);
               return;
@@ -359,18 +363,20 @@ export class WebSocketConnector {
   }
 
   resendMessages(from: number) {
-    const toSend = this.messages.client - from;
-    this.messages.client = from;
-    if (toSend > this.messages.lastTen.length) {
-      // Too many messages requested. Abort.
-      this.send(this.restartMessage);
-      return;
-    }
-    this.messages.lastTen.slice(0 - toSend).forEach((data) => {
-      this.messages.client += 1;
-      data.c = this.messages.client;
-      data.s = this.messages.server;
-      this.socket?.emit(socketEvent, data);
+    return this.waitForWS().then(() => {
+      const toSend = this.messages.client - from;
+      this.messages.client = from;
+      if (toSend > this.messages.lastTen.length) {
+        // Too many messages requested. Abort.
+        this.send(this.restartMessage);
+        return;
+      }
+      this.messages.lastTen.slice(0 - toSend).forEach((data) => {
+        this.messages.client += 1;
+        data.c = this.messages.client;
+        data.s = this.messages.server;
+        this.socket?.emit(socketEvent, data);
+      });
     });
   }
 

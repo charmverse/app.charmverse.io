@@ -39,7 +39,7 @@ import {
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';
 
-const maxIndentation = 4;
+const maxIndentation = 15;
 
 // Returns the number of nested lists that are ancestors of the given selection
 const numberNestedLists = (resolvedPos: ResolvedPos, nodes: Schema['nodes']) => {
@@ -390,7 +390,6 @@ export function indentList(type: NodeType) {
     if (!listItem) {
       ({ listItem } = state.schema.nodes);
     }
-
     if (isInsideListItem(listItem)(state)) {
       // Record initial list indentation
       const initialIndentationLevel = numberNestedLists(state.selection.$from, state.schema.nodes);
@@ -424,7 +423,14 @@ export function indentList(type: NodeType) {
             const range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild?.type === itemType);
             if (!range) return false;
             const startIndex = range.startIndex;
-            if (startIndex === 0) return false;
+            if (startIndex === 0) {
+              if (range.$from.pos === range.$to.pos) {
+                // Regular indentation
+                return false;
+              }
+              // Multi line selection, thus assume indentation
+              return true;
+            }
             const parent = range.parent;
             const nodeBefore = parent.child(startIndex - 1);
             if (nodeBefore.type !== itemType) return false;
@@ -454,7 +460,15 @@ export function indentList(type: NodeType) {
 
             return true;
           } else {
-            sinkListItem(listItem)(state, extendDispatch(dispatch, handleTodo(state.schema)));
+            const sinkedListItem = sinkListItem(listItem)(state, extendDispatch(dispatch, handleTodo(state.schema)));
+            if (!sinkedListItem) {
+              if ($from.pos === $to.pos) {
+                // Regular indentation
+                return false;
+              }
+              // Multi line selection, thus assume indentation
+              return true;
+            }
             return true;
           }
         }

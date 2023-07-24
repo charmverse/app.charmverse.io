@@ -1,8 +1,7 @@
 import type { TokenGate } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import LitShareModal from 'lit-share-modal-v3';
+import type { JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -16,6 +15,7 @@ import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { LitShareModal } from 'lib/lit-protocol-modal';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
 import TokenGatesTable from './components/TokenGatesTable';
@@ -49,18 +49,18 @@ const ShareModalContainer = styled.div`
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & {
+type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions' | 'permanant'> & {
   authSigTypes: string[];
   chains: string[];
 };
 
 interface TokenGatesProps {
+  popupState: PopupState;
   isAdmin: boolean;
   spaceId: string;
-  popupState: PopupState;
 }
 
-export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
@@ -97,7 +97,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
   async function saveTokenGate(conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
-    const resourceId: ResourceId = {
+    const resourceId: JsonSigningResourceId = {
       baseUrl: 'https://app.charmverse.io',
       path: `${Math.random()}`,
       orgId: spaceId,
@@ -111,7 +111,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
     const authSig: AuthSig = walletAuthSignature ?? (await sign());
 
-    await litClient!.saveSigningCondition({
+    await litClient?.saveSigningCondition({
       ...conditions,
       chain,
       authSig,
@@ -141,7 +141,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
             injectCSS={false}
             permanentDefault={true}
             isModal={false}
-            onUnifiedAccessControlConditionsSelected={throttledOnSubmit}
+            onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any}
           />
         </ShareModalContainer>
       </Modal>

@@ -4,6 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { InvalidStateError } from 'lib/middleware';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -30,10 +32,35 @@ export async function updateCardsFromProposals({
     throw new DataNotFoundError('Database was not found');
   }
 
+  const views = (
+    await prisma.block.findMany({
+      where: {
+        type: 'view',
+        parentId: boardId
+      }
+    })
+  ).map(prismaToBlock) as BoardView[];
+
+  // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
+  if (!views.find((view) => view.fields.sourceType === 'proposals')) {
+    throw new InvalidStateError('Board does not have a proposals view');
+  }
+
   const pageProposals = await prisma.page.findMany({
     where: {
       spaceId,
-      type: 'proposal'
+      type: 'proposal',
+      proposal: {
+        archived: {
+          not: true
+        },
+        status: {
+          not: 'draft'
+        }
+      }
+    },
+    include: {
+      workspaceEvents: true
     }
   });
 
@@ -123,10 +150,14 @@ export async function updateCardsFromProposals({
    */
   const newCards: { page: Page; block: Block }[] = [];
   for (const pageProposal of newPageProposals) {
+    const createdAt = pageProposal.workspaceEvents.find(
+      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
+    )?.createdAt;
     const _card = await createCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
+      createdAt,
       createdBy: userId,
       properties: { [boardCardProp?.id || '']: `${pageProposal.path}` },
       hasContent: pageProposal.hasContent,

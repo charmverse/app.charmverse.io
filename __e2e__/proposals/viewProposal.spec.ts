@@ -4,8 +4,12 @@ import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
+import { logout } from '__e2e__/utils/session';
+
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import {
+  createUser,
   createUserAndSpace,
   generateSpaceRole,
   generateUser,
@@ -26,10 +30,13 @@ const test = base.extend<Fixtures>({
 });
 
 let space: Space;
+let spaceAdmin: User;
 let proposalAuthor: User;
-let proposalCategory: ProposalCategory;
+let visibleProposalCategory: ProposalCategory;
+let hiddenProposalCategory: ProposalCategory;
 let draftProposal: Proposal;
 let discussionProposal: Proposal & { page: Page };
+let hiddenProposal: Proposal;
 
 let publicLink: string;
 
@@ -45,9 +52,14 @@ test.describe.serial('View proposal', () => {
     });
 
     space = generated.space;
-    proposalAuthor = generated.user;
+    spaceAdmin = generated.user;
 
-    proposalCategory = await testUtilsProposals.generateProposalCategory({
+    hiddenProposalCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      title: 'Invisible Proposals'
+    });
+
+    visibleProposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id,
       title: 'Proposals',
       proposalCategoryPermissions: [
@@ -58,18 +70,39 @@ test.describe.serial('View proposal', () => {
       ]
     });
 
+    await logout({ page });
+
+    proposalAuthor = await createUser({
+      address: randomETHWalletAddress(),
+      browserPage: page
+    });
+
+    await generateSpaceRole({
+      spaceId: space.id,
+      userId: proposalAuthor.id,
+      isAdmin: false,
+      isOnboarded: true
+    });
+
     draftProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
       proposalStatus: 'draft',
-      categoryId: proposalCategory.id
+      categoryId: visibleProposalCategory.id
     });
 
     discussionProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
       proposalStatus: 'discussion',
-      categoryId: proposalCategory.id
+      categoryId: visibleProposalCategory.id
+    });
+
+    hiddenProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: spaceAdmin.id,
+      proposalStatus: 'discussion',
+      categoryId: hiddenProposalCategory.id
     });
 
     // Finish setup start interacting with the app
@@ -81,9 +114,37 @@ test.describe.serial('View proposal', () => {
 
     const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
     const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
+    const hiddenRow = proposalListPage.getProposalRowLocator(hiddenProposal.id);
 
     await expect(draftRow).toBeVisible();
     await expect(discussionRow).toBeVisible();
+    await expect(hiddenRow).not.toBeVisible();
+  });
+
+  test('Space member can see visible proposal categories', async ({ proposalListPage, page }) => {
+    await loginBrowserUser({
+      browserPage: page,
+      userId: proposalAuthor.id
+    });
+
+    await proposalListPage.goToHomePage();
+
+    await proposalListPage.getSidebarLink('proposals').click();
+    await proposalListPage.waitForProposalsList(space.domain);
+
+    const categoriesDropDown = proposalListPage.getProposalCategoryListButtonLocator();
+
+    await page.pause();
+
+    await expect(categoriesDropDown).toBeVisible();
+
+    await categoriesDropDown.click();
+
+    const visibleCategoryButton = proposalListPage.getProposalCategoryLocator(visibleProposalCategory.id);
+    const hiddenCategoryButton = proposalListPage.getProposalCategoryLocator(hiddenProposalCategory.id);
+
+    await expect(visibleCategoryButton).toBeVisible();
+    await expect(hiddenCategoryButton).not.toBeVisible();
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
@@ -159,6 +220,7 @@ test.describe.serial('View proposal', () => {
     await expect(pagePermissions.publicShareToggle).toBeVisible();
 
     await pagePermissions.togglePageIsPublic();
+    await expect(pagePermissions.pageShareLink).toBeVisible();
 
     const shareLink = await pagePermissions.getPageShareLinkValue();
 

@@ -14,13 +14,13 @@ import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import CharmButton from 'components/common/Button';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -62,9 +62,9 @@ export default function BountyProperties(props: {
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>();
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { user } = useUser();
   const isRewardAmountInvalid = useMemo(
@@ -293,7 +293,7 @@ export default function BountyProperties(props: {
               sx={{
                 width: '100%'
               }}
-              onChange={async (chainId) => {
+              onChange={(chainId) => {
                 const newNativeCurrency = refreshCryptoList(chainId);
                 applyBountyUpdates({
                   chainId,
@@ -430,7 +430,7 @@ export default function BountyProperties(props: {
             readOnly={readOnly}
           />
         </div>
-        {!isPublicSpace && (
+        {!isFreeSpace && (
           <div
             className='octo-propertyrow'
             style={{

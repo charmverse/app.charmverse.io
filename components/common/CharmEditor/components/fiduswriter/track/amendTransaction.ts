@@ -191,7 +191,6 @@ function markWrapping(
 
 export function amendTransaction(tr: Transaction, state: EditorState, editor: FidusEditor, trackingEnabled: boolean) {
   if (
-    !tr.docChanged ||
     !tr.steps.length ||
     ((tr as any).meta &&
       (!Object.entries((tr as any).meta).every(

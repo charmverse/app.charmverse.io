@@ -2,9 +2,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
-  PagePermissionFlags,
-  PagePermissionWithSource,
-  PermissionCompute
+  PagePermissionWithSource
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -26,6 +24,9 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -34,11 +35,10 @@ import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -56,6 +56,7 @@ import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { PublicProfileApi } from './apis/publicProfileApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
@@ -96,6 +97,8 @@ class CharmClient {
 
   profile = new ProfileApi();
 
+  publicProfile = new PublicProfileApi();
+
   proposals = new ProposalsApi();
 
   roles = new RolesApi();
@@ -119,7 +122,7 @@ class CharmClient {
   subscription = new SubscriptionApi();
 
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
@@ -242,23 +245,27 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.PUT<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
@@ -416,7 +423,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {

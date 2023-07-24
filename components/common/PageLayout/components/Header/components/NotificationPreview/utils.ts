@@ -5,7 +5,7 @@ import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
-import type { ProposalTask } from 'lib/proposal/getProposalTasks';
+import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 function getForumContent(n: ForumTask) {
@@ -149,7 +149,7 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalTask
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
-    createdBy: n.createdBy,
+    createdBy: n.createdBy || null,
     spaceName: n.spaceName,
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,

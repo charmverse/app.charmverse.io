@@ -24,7 +24,7 @@ export function DuplicatePageAction({
   onComplete?: VoidFunction;
   pagePermissions: PagePermissionFlags | undefined;
 }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const router = useRouter();
   const { refreshBounty } = useBounties();

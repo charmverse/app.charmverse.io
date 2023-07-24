@@ -13,7 +13,7 @@ export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node
       if (res.doc) {
         return res.doc;
       } else {
-        log.warn('Could not apply step', { res });
+        log.warn('Could not apply step', { res, stepJson });
         throw new Error('Failed to apply step');
       }
     } catch (err) {

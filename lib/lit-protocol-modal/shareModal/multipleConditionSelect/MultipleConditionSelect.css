@@ -1,0 +1,17 @@
+.lsm-multiple-conditions-container {
+    height: 100%;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    /*padding-bottom: 4.5em;*/
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .lsm-multiple-conditions-container {
+        /*height: calc(100% - 1em);*/
+    }
+}

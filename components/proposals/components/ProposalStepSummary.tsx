@@ -3,6 +3,7 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
 
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import {
@@ -16,9 +17,16 @@ type Props = {
   proposalStatus?: ProposalWithUsers['status'];
   openVoteModal?: () => void;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
+  archived?: boolean | null;
 };
 
-export function ProposalStepSummary({ proposalStatus, proposalFlowFlags, openVoteModal, updateProposalStatus }: Props) {
+export function ProposalStepSummary({
+  proposalStatus,
+  proposalFlowFlags,
+  openVoteModal,
+  updateProposalStatus,
+  archived
+}: Props) {
   const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
   const nextStatus = PROPOSAL_STATUSES[currentStatusIndex + 1];
   const previousStatus = PROPOSAL_STATUSES[currentStatusIndex - 1];
@@ -37,6 +45,7 @@ export function ProposalStepSummary({ proposalStatus, proposalFlowFlags, openVot
         <Stack gap={0.5}>
           <Typography variant='h5' fontWeight='bold'>
             {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : '-'}
+            {archived ? <Chip sx={{ ml: 1 }} label='Archived' size='small' color='blue' /> : ''}
           </Typography>
           <Typography color='secondary' variant='body1'>
             {proposalStatus ? proposalStatusDetails[proposalStatus] : '-'}

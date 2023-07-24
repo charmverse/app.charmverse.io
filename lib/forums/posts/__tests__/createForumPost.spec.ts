@@ -2,11 +2,13 @@ import type { Post, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InsecureOperationError } from 'lib/utilities/errors';
-import { doc, poll } from 'testing/prosemirror';
+import { builders } from 'testing/prosemirror';
 import { generateUserAndSpace, createVote } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
+
+const { doc, poll } = builders;
 
 let space: Space;
 let user: User;

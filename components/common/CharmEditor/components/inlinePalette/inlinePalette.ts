@@ -107,7 +107,6 @@ function pluginsFactory({ key }: { key: PluginKey }) {
           }
           const marks = selection.$from.marks();
           const mark = _schema.mark(paletteMarkName, { trigger: _trigger });
-
           const textBefore = selection.$from.nodeBefore?.text;
           // Insert a space so we follow the convention of <space> trigger
           if (textBefore && !textBefore.endsWith(' ')) {

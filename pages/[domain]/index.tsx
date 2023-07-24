@@ -15,7 +15,7 @@ import { getSubdomainPath } from 'lib/utilities/browser';
 export default function RedirectToMainPage() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, loadingPages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? typeof window !== 'undefined' && localStorage.getItem(defaultPageKey) : null;
@@ -56,7 +56,7 @@ export default function RedirectToMainPage() {
         router.push(redirectPath);
       }
     }
-  }, [space, loadingPages, pages]);
+  }, [space, loadingPages, pages, showLogin]);
 
   if (showLogin) {
     return <LoginPageView />;

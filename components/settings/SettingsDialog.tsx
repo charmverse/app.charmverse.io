@@ -14,6 +14,7 @@ import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/Sid
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
@@ -23,7 +24,7 @@ import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, getSettingsTabs } from './config';
 import { ImportSettings } from './import/ImportSettings';
-import Invites from './invites/Invites';
+import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 
@@ -35,8 +36,9 @@ interface TabPanelProps extends BoxProps {
 
 function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
+  const isAdmin = useIsAdmin();
 
-  const settingsTab = getSettingsTabs(space).find((settingTab) => settingTab.path === tab.path);
+  const settingsTab = getSettingsTabs({ space, isAdmin }).find((settingTab) => settingTab.path === tab.path);
   const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
 
   if (!settingsTab && !accountsTab) {
@@ -95,11 +97,12 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export function SpaceSettingsDialog() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
+  const isAdmin = useIsAdmin();
 
   return (
     <Dialog
@@ -148,7 +151,7 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs(currentSpace).map((tab) => (
+            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
               <SidebarLink
                 data-test={`space-settings-tab-${tab.path}`}
                 key={tab.path}
@@ -156,6 +159,7 @@ export function SpaceSettingsDialog() {
                 icon={tab.icon}
                 onClick={() => onClick(tab.path)}
                 active={activePath === tab.path}
+                section={tab.path}
               />
             ))}
         </Box>
@@ -181,7 +185,7 @@ export function SpaceSettingsDialog() {
             </Box>
           )}
           {currentSpace &&
-            getSettingsTabs(currentSpace).map((tab) => (
+            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
               <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>

@@ -21,7 +21,7 @@ export function VideoUploadForm(props: Props) {
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   // poll endpoint until video is ready
   const { data: upload, error } = useSwr(

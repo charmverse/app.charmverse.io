@@ -61,7 +61,7 @@ export function UserSpacesList({ userId }: Props) {
   const isFormClean = memberDetails.length === 0;
 
   return (
-    <Box mt={4} mb={2}>
+    <Box mt={2} mb={2}>
       <Legend noBorder>My Charmverse Spaces</Legend>
       <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (

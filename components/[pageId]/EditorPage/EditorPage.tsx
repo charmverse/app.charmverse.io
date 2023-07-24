@@ -18,7 +18,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const {
     error: pageWithContentError,
@@ -39,6 +39,9 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       });
       setCurrentPageId(page.id);
     }
+    return () => {
+      resetPageProps();
+    };
   }, [page?.id]);
 
   // reset page id on unmount
@@ -64,10 +67,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // pass editMode thru to fix hot-reloading which resets the prop
       setPageProps({ permissions: page.permissionFlags, editMode });
     }
-    return () => {
-      resetPageProps();
-    };
-  }, [page?.permissionFlags]);
+  }, [page?.permissionFlags.edit_content]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {

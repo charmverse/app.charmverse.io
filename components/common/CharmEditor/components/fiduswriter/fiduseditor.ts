@@ -157,7 +157,7 @@ export class FidusEditor {
             try {
               this.mod.collab.doc.receiveDocument(data);
             } catch (error) {
-              log.error('Error loading document from sockets', { error, pageId: this.docInfo.id });
+              log.error('Error loading document from sockets', { data, error, pageId: this.docInfo.id });
               onError(error as Error);
             }
             // console.log('received doc');

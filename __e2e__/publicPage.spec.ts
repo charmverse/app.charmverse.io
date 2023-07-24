@@ -74,6 +74,10 @@ test.describe.serial('Make a page public and visit it', async () => {
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
 
+    await expect(shareLinkInput).toBeVisible();
+
+    await page.pause();
+
     const inputValue = await shareLinkInput.inputValue();
 
     expect(inputValue.match(shareUrl)).not.toBe(null);

@@ -42,10 +42,10 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { properties = [] } = useMemberProperties();
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
+  const { getDisplayProperties } = useMemberProperties();
+  const visibleProperties = getDisplayProperties('table');
   const { showUserProfile } = useUserProfile();
   const { formatDate } = useDateFormatter();
 
@@ -242,9 +242,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 }
 
 export function MemberDirectoryTableView({ members }: { members: Member[] }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
 
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
+  const visibleProperties = getDisplayProperties('table');
   return (
     <Table
       size='small'
