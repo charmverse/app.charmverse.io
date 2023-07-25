@@ -11,14 +11,15 @@ export function ImageUploadButton({
   isUploading,
   setIsUploading,
   uploadDisclaimer,
-  variant = 'outlined'
+  variant = 'outlined',
+  ...props
 }: {
   isUploading: boolean;
   setIsUploading: (isUploading: boolean) => void;
   setImage: (image: string) => void;
   uploadDisclaimer?: string;
   variant?: ButtonProps['variant'];
-}) {
+} & ButtonProps) {
   return (
     <Stack alignItems='center' gap={1}>
       <PimpedButton
@@ -27,9 +28,7 @@ export function ImageUploadButton({
         disabled={isUploading}
         component='label'
         variant={variant}
-        sx={{
-          width: 'fit-content'
-        }}
+        {...props}
       >
         Choose an image
         <input

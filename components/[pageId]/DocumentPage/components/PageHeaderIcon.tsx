@@ -43,7 +43,14 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
                 Submit
               </Button>
             </Stack>
-            <ImageUploadButton isUploading={isUploading} setIsUploading={setIsUploading} setImage={updatePageIcon} />
+            <ImageUploadButton
+              sx={{
+                width: '100%'
+              }}
+              isUploading={isUploading}
+              setIsUploading={setIsUploading}
+              setImage={updatePageIcon}
+            />
           </Stack>
         ]
       ]}
