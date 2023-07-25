@@ -80,18 +80,39 @@ async function getOrphans(domain: string) {
   let csv = 'Page Title, Page URL, Parent Page Title, Author, Created Date\n';
 
   const users = new Map<string, { username: string }>();
+  const parents = new Map<string, { title: string }>();
 
   for (let page of results) {
-    const parent = page.parentId ? await prisma.page.findUnique({ where: { id: page.parentId } }) : null;
+    const parent = page.parentId
+      ? parents.get(page.parentId) || (await prisma.page.findUnique({ where: { id: page.parentId } }))
+      : null;
     const author =
       users.get(page.createdBy) ||
       (await prisma.user.findUniqueOrThrow({ where: { id: page.createdBy }, select: { username: true } }));
+
+    if (parent && page.parentId) {
+      parents.set(page.parentId, parent);
+    }
     users.set(page.createdBy, author);
     // write to CSV file
-    const columns = [page.title, page.url, parent?.title || '', author.username, page.createdAt.toDateString()];
+    const columns = [
+      safeStr(page.title),
+      safeStr(page.url),
+      safeStr(parent?.title || ''),
+      safeStr(author.username),
+      page.createdAt.toDateString()
+    ];
     csv += columns.join(',') + '\n';
   }
   writeFileSync(`${process.cwd()}/${filename}`, csv);
+  process.exit();
 }
 
-getOrphans('brilliant-orange-tarantula');
+getOrphans('myosinxyz').catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+
+function safeStr(text: string) {
+  return '"' + text.replaceAll('"', '').replaceAll(',', '') + '"';
+}
