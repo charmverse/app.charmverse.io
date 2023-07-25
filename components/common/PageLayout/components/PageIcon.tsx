@@ -59,7 +59,7 @@ function LinkedIcon({ children }: { children: ReactNode }) {
 }
 
 type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
-  icon?: string | null;
+  icon?: ReactNode | null;
   pageType?: AllPagesProp['type'];
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;

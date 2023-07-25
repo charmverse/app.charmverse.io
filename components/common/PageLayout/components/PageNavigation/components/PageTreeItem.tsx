@@ -198,7 +198,7 @@ interface PageLinkProps {
   children?: ReactNode;
   href: string;
   label?: string;
-  labelIcon?: string;
+  labelIcon?: ReactNode;
   isEmptyContent?: boolean;
   pageType: Page['type'];
   pageId?: string;
