@@ -108,6 +108,7 @@ export function items({ view: currentView, enableVoting }: AdvancedItemsProps): 
           }}
         />
       ),
+      keywords: ['vote'],
       description: 'Insert an embedded poll',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {

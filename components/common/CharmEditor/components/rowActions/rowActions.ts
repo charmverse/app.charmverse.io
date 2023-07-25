@@ -6,6 +6,8 @@ import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
+const containerNodeTypes = ['columnBlock', 'bulletList', 'orderedList'];
+
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 // helpful links:
 // Indexing in PM: https://prosemirror.net/docs/guide/#doc.indexing
@@ -43,7 +45,7 @@ export function plugins({ key }: { key: PluginKey }) {
     if (startPos !== undefined) {
       // Step 1. grab the top-most ancestor of the related DOM element
       const dom = rowNodeAtPos(view, startPos);
-      const rowNode = dom.rowNode;
+      const rowNode = dom?.rowNode;
       // @ts-ignore pm types are wrong
       if (rowNode && view.dom.contains(rowNode.parentNode) && rowNode.getBoundingClientRect) {
         // @ts-ignore pm types are wrong
@@ -147,8 +149,15 @@ export function posAtCoords(view: EditorView, coords: { left: number; top: numbe
   return startPos;
 }
 
-export function rowNodeAtPos(view: EditorView, startPos: number) {
+export function rowNodeAtPos(
+  view: EditorView,
+  startPos: number
+): null | { node: HTMLElement; rowNode: HTMLElement; offset: number } {
   const dom = view.domAtPos(startPos);
+  if (startPos > 0 && dom.node === view.dom) {
+    // return null if pos is outside of document
+    return null;
+  }
   let rowNode = dom.node;
   // if startPos = 0, domAtPos gives us the doc container
   if (rowNode === view.dom) {
@@ -159,13 +168,24 @@ export function rowNodeAtPos(view: EditorView, startPos: number) {
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
   }
-  // let levels = 10; // pre-caution to prevent infinite loop
-  // while (rowNode && rowNode.parentNode !== view.dom && levels > 0) {
-  //   levels -= 1;
-  //   if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
-  //     rowNode = rowNode.parentNode;
-  //   }
-  // }
+  let levels = 20; // pre-caution to prevent infinite loop
+  while (rowNode && !isContainerNode(rowNode.parentNode) && levels > 0) {
+    levels -= 1;
+    if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
+      rowNode = rowNode.parentNode;
+    }
+  }
+
+  function isContainerNode(node: Node | null) {
+    if (node === view.dom) {
+      return true; // document container
+    }
+    const pmNodeType = node?.pmViewDesc?.node?.type.name;
+    if (pmNodeType && containerNodeTypes.includes(pmNodeType)) {
+      return true;
+    }
+    return false;
+  }
   // another approach, which may require checking the nodeType:
   // while (node && node.parentNode) {
   //   if ((node.parentNode as Element).classList?.contains('ProseMirror')) { // todo
@@ -175,7 +195,8 @@ export function rowNodeAtPos(view: EditorView, startPos: number) {
   // }
   return {
     ...dom,
-    rowNode
+    node: dom.node as HTMLElement,
+    rowNode: rowNode as HTMLElement
   };
 }
 
@@ -186,7 +207,7 @@ function blockPosAtCoords(view: EditorView, coords: { left: number; top: number 
   }
   const dom = rowNodeAtPos(view, startPos);
 
-  const node = dom.rowNode;
+  const node = dom?.rowNode;
 
   // nodeType === 1 is an element like <p> or <div>
   if (node && node.nodeType === 1) {
