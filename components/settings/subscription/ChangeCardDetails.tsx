@@ -6,7 +6,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import ConfirmModal from 'components/common/Modal/ConfirmModal';
+import UpdateCardModal from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { CreatePaymentMethodRequest } from 'lib/subscription/createPaymentMethod';
 import type { UpdatePaymentMethodRequest } from 'lib/subscription/updatePaymentMethod';
@@ -63,9 +63,9 @@ export function ChangeCardDetails({
     const cardNumber = elements.getElement(CardNumberElement);
     const cardExpiry = elements.getElement(CardExpiryElement);
     const cardCvc = elements.getElement(CardCvcElement);
-    const cardError = !cardNumber || !cardExpiry || !cardCvc;
+    const isMissingDetails = !cardNumber || !cardExpiry || !cardCvc;
 
-    if (cardError) {
+    if (isMissingDetails) {
       return;
     }
 
@@ -118,15 +118,16 @@ export function ChangeCardDetails({
       <Button {...bindTrigger(updatePaymentMethodPopup)} variant='text' sx={{ px: 0 }}>
         Update your payment details
       </Button>
-      <ConfirmModal
+      <UpdateCardModal
         open={updatePaymentMethodPopup.isOpen}
         onClose={updatePaymentMethodPopup.close}
         onConfirm={handlePaymentMethodChange}
         buttonText='Update card'
         disabled={isDisabled || isProcessing}
         title='Update your credit card details'
-        question={<CardSection disabled={isProcessing} handleCardDetails={handleCardDetails} />}
-      />
+      >
+        <CardSection disabled={isProcessing} handleCardDetails={handleCardDetails} />
+      </UpdateCardModal>
     </>
   );
 }

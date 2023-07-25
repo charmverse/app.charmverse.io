@@ -10,7 +10,7 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import ConfirmUpdateModal from 'components/common/Modal/ConfirmModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -201,39 +201,40 @@ export function SubscriptionInformation({
             onUpgrade={() => openUpgradeDialog()}
             confirmFreeTierDowngrade={switchToFreePlan}
           />
-          <ConfirmUpdateModal
+          <ModalWithButtons
             title='Upgrade Community Edition'
             size='large'
             open={isUpgradeDialogOpen}
             buttonText='Change subscription'
             secondaryButtonText='Cancel'
-            question={
-              <PlanSelection
-                blockQuotaInThousands={blockQuota}
-                period={period}
-                disabled={false}
-                onSelect={handlePlanSelect}
-              />
-            }
             onConfirm={openConfirmUpgradeDialog}
             onClose={closeUpgradeDialog}
             disabled={
               isLoadingUpgrade || (period === spaceSubscription.period && blockQuota === spaceSubscription.blockQuota)
             }
-          />
-          <ConfirmUpdateModal
+          >
+            <PlanSelection
+              blockQuotaInThousands={blockQuota}
+              period={period}
+              disabled={false}
+              onSelect={handlePlanSelect}
+            />
+          </ModalWithButtons>
+          <ModalWithButtons
             title='Confirm plan changes'
             size='large'
             open={isConfirmUpgradeDialogOpen}
             buttonText='Confirm'
             secondaryButtonText='Cancel'
-            question={`You are about to change your plan. ${
-              spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''
-            }`}
             onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
             onClose={closeConfirmUpgradeDialog}
             disabled={isLoadingUpgrade}
-          />
+          >
+            <Typography>
+              You are about to change your plan.{' '}
+              {spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''}
+            </Typography>
+          </ModalWithButtons>
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />

@@ -56,7 +56,7 @@ async function updatePaymentMethodController(req: NextApiRequest, res: NextApiRe
     paymentMethodId
   });
 
-  log.info(`Payment method has been updated for space ${spaceId} by the user ${userId}`);
+  log.info(`Payment method has been updated`, { spaceId, userId });
 
   res.status(200).end();
 }

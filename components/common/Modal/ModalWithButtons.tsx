@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
@@ -7,7 +6,7 @@ import type { ModalProps } from 'components/common/Modal';
 import { Modal } from 'components/common/Modal';
 
 type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
-  question: string | ReactNode;
+  children: ReactNode;
   buttonText?: string;
   title?: string;
   onConfirm: () => Promise<void> | void;
@@ -16,10 +15,10 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   disabled?: boolean;
 };
 
-export default function ConfirmModal({
+export default function ModalWithButtons({
   onClose,
   open,
-  question,
+  children,
   buttonText = 'Update',
   title,
   onConfirm,
@@ -34,8 +33,7 @@ export default function ConfirmModal({
 
   return (
     <Modal open={open} onClose={onClose} title={title} size={size}>
-      {typeof question === 'string' ? <Typography>{question}</Typography> : question}
-
+      {children}
       <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
         <Button
           color='primary'
