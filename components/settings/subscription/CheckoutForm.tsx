@@ -120,7 +120,7 @@ export function CheckoutForm({
       charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
     {
       onSuccess(data) {
-        setValue('coupon', data === null ? '' : data.id);
+        setValue('coupon', data === null ? '' : data.code);
       },
       onError() {
         showMessage('Your coupon is not valid', 'error');
@@ -194,7 +194,7 @@ export function CheckoutForm({
           blockQuota,
           period,
           name: space.name,
-          coupon: couponData?.id || undefined
+          coupon: couponData?.code || undefined
         }
       });
 
@@ -247,7 +247,7 @@ export function CheckoutForm({
       spaceId: space.id,
       payload: {
         billingEmail: emailField,
-        coupon: couponData?.id || undefined,
+        coupon: couponData?.code || undefined,
         blockQuota,
         period,
         name: space.name

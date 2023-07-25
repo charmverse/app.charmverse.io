@@ -2,7 +2,6 @@ import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -26,15 +25,7 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
-  const router = useRouter();
-
-  const {
-    spaceSubscription,
-    isLoading: isLoadingSpaceSubscription,
-    refetchSpaceSubscription
-  } = useSpaceSubscription({
-    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
-  });
+  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
   const [pendingPayment, setPendingPayment] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
