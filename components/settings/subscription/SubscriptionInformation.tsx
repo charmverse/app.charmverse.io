@@ -18,6 +18,7 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
+import { generatePriceDetails } from 'lib/subscription/generatePriceDetails';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { formatDate } from 'lib/utilities/dates';
@@ -155,8 +156,8 @@ export function SubscriptionInformation({
     }
   }, [spaceSubscription?.status]);
 
-  const price =
-    spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+  const pricePerMonth = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+  const priceDetails = generatePriceDetails(spaceSubscription.discount, pricePerMonth * blockQuota);
 
   const nextBillingDate = spaceSubscription?.renewalDate
     ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
@@ -172,7 +173,7 @@ export function SubscriptionInformation({
           </Typography>
           <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
           <Typography>
-            ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
+            ${priceDetails.total.toFixed(2)} per month billed {spaceSubscription.period}
           </Typography>
           {nextBillingDate && (
             <Typography>
