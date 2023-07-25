@@ -17,8 +17,29 @@ import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
  */
 
 async function search() {
-  const tasks = await getDiscussionTasks('cb9a5ede-6ff7-4eaa-9c23-91e684e23aed');
-  console.log('tasks', tasks);
+
+  await prisma.user.delete({
+    where: {
+      id: "7ee695e0-04e0-400c-b826-d3dc87d92e33"
+    }
+  })
+  const account = await prisma.googleAccount.findMany({
+    where: {
+      name: 'Mayeli Aguilar'
+    },
+    include: {
+      user: {
+        include: {
+          spacesCreated: true
+        }
+      },
+      
+    }
+  })
+
+  console.log(JSON.stringify({account}, null, 2))
+  // const tasks = await getDiscussionTasks('cb9a5ede-6ff7-4eaa-9c23-91e684e23aed');
+  // console.log('tasks', tasks);
   // await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2));
 }
 

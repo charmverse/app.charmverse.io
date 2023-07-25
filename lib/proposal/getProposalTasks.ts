@@ -1,4 +1,3 @@
-import type { ProposalStatus, User, WorkspaceEvent } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type {
@@ -7,38 +6,17 @@ import type {
   ProposalDiscussionNotificationsContext
 } from 'lib/discussion/getDiscussionTasks';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
-import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { getProposalAction } from './getProposalAction';
+import type { ProposalTask } from './getProposalStatusChangeTasks';
+import { getProposalStatusChangeTasks } from './getProposalStatusChangeTasks';
 import type { ProposalWithCommentsAndUsers } from './interface';
 
-export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
-
-export interface ProposalTask {
-  id: string; // the id of the workspace event
-  taskId: string;
-  action: ProposalTaskAction | null;
-  eventDate: Date;
-  createdAt: Date;
-  spaceDomain: string;
-  spaceName: string;
-  pageId: string;
-  pageTitle: string;
-  pagePath: string;
-  status: ProposalStatus;
-  createdBy: NotificationActor | null;
-}
-
-export interface ProposalTasksGroup {
+export type ProposalTasksGroup = {
   marked: ProposalTask[];
   unmarked: ProposalTask[];
-}
-
-type WorkspaceNotificationEvent = { actor: User | null } & Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'>;
-type WorkspaceEventRecord = Record<string, WorkspaceNotificationEvent | null>;
+};
 
 function sortProposals(proposals: ProposalTask[]) {
   proposals.sort((proposalA, proposalB) => {
@@ -46,10 +24,7 @@ function sortProposals(proposals: ProposalTask[]) {
   });
 }
 
-export async function getProposalTasks(userId: string): Promise<{
-  marked: ProposalTask[];
-  unmarked: ProposalTask[];
-}> {
+export async function getProposalTasks(userId: string): Promise<ProposalTasksGroup> {
   const workspaceEvents = await prisma.workspaceEvent.findMany({
     where: {
       type: 'proposal_status_change'
@@ -65,133 +40,30 @@ export async function getProposalTasks(userId: string): Promise<{
       createdAt: 'desc'
     }
   });
-
-  // Ensures we only track the latest status change for each proposal
-  const workspaceEventsRecord = workspaceEvents.reduce<WorkspaceEventRecord>((record, workspaceEvent) => {
-    if (!record[workspaceEvent.pageId]) {
-      record[workspaceEvent.pageId] = workspaceEvent;
-    }
-    return record;
-  }, {});
-
-  const spaceRoles = await prisma.spaceRole.findMany({
-    where: {
-      userId
-    },
-    select: {
-      spaceId: true,
-      spaceRoleToRole: {
-        where: {
-          spaceRole: {
-            userId
-          }
-        },
-        select: {
-          role: {
-            select: {
-              id: true
-            }
-          }
-        }
-      }
-    }
-  });
-
-  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
-  // Get all the roleId assigned to this user for each space
-  const roleIds = spaceRoles
-    .map((spaceRole) => spaceRole.spaceRoleToRole)
-    .flat()
-    .map(({ role }) => role.id);
-
-  const pagesWithProposals = await prisma.page.findMany({
-    where: {
-      deletedAt: null,
-      spaceId: {
-        in: spaceIds
-      },
-      type: 'proposal',
-      proposal: {
-        status: {
-          not: 'draft'
-        }
-      }
-    },
-    include: {
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true
-        }
-      },
-      space: true
-    }
-  });
-
-  const proposalsRecord: { marked: ProposalTask[]; unmarked: ProposalTask[] } = {
-    marked: [],
-    unmarked: []
-  };
-
-  const tasks: ProposalTask[] = [];
-
-  pagesWithProposals.forEach(({ proposal, ...page }) => {
-    if (proposal) {
-      const workspaceEvent = workspaceEventsRecord[page.id];
-      const isReviewer = proposal.reviewers.some((reviewer) =>
-        reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId
-      );
-      const isAuthor = proposal.authors.some((author) => author.userId === userId);
-      const action = getProposalAction({
-        currentStatus: proposal.status,
-        isAuthor,
-        isReviewer
-      });
-
-      if (workspaceEvent) {
-        // Check notifications are enabled for space-wide proposal notifications
-        const notifyNewEvents =
-          page.space.notifyNewProposals && page.space.notifyNewProposals < workspaceEvent.createdAt;
-
-        if (!notifyNewEvents && (action === 'discuss' || action === 'vote')) {
-          return;
-        }
-
-        const proposalTask = {
-          id: workspaceEvent.id,
-          eventDate: workspaceEvent.createdAt,
-          pageId: page.id,
-          pagePath: page.path,
-          pageTitle: page.title,
-          spaceDomain: page.space.domain,
-          spaceName: page.space.name,
-          status: proposal.status,
-          action,
-          createdBy: mapNotificationActor(workspaceEvent.actor),
-          taskId: workspaceEvent.id,
-          createdAt: workspaceEvent.createdAt
-        };
-        tasks.push(proposalTask);
-      }
-    }
-  });
-
+  const { proposalTasks } = await getProposalStatusChangeTasks(userId, workspaceEvents);
   const userNotifications = await prisma.userNotification.findMany({
     where: {
       taskId: {
-        in: tasks.map((task) => task.id)
+        in: proposalTasks.map((task) => task.id)
       },
       userId
     }
   });
 
-  tasks.forEach((task) => {
-    if (!userNotifications.some((t) => t.taskId === task.id)) {
-      proposalsRecord.unmarked.push(task);
-    } else {
-      proposalsRecord.marked.push(task);
+  const proposalsRecord = proposalTasks.reduce<{ marked: ProposalTask[]; unmarked: ProposalTask[] }>(
+    (acc, task) => {
+      if (!userNotifications.some((t) => t.taskId === task.id)) {
+        acc.unmarked.push(task);
+      } else {
+        acc.marked.push(task);
+      }
+      return acc;
+    },
+    {
+      marked: [],
+      unmarked: []
     }
-  });
+  );
 
   sortProposals(proposalsRecord.marked);
   sortProposals(proposalsRecord.unmarked);

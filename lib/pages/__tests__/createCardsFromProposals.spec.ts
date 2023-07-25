@@ -1,6 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
@@ -25,28 +26,13 @@ describe('createCardsFromProposals', () => {
   });
 
   beforeEach(async () => {
-    await prisma.$transaction([
-      prisma.page.deleteMany({
-        where: {
-          id: {
-            not: undefined
-          }
-        }
-      }),
-      prisma.proposal.deleteMany({
-        where: {
-          id: {
-            not: undefined
-          }
-        }
-      })
-    ]);
+    await prisma.$transaction([prisma.page.deleteMany(), prisma.proposal.deleteMany()]);
   });
 
   it('should create cards from proposals', async () => {
     const newProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'draft',
+      proposalStatus: 'discussion',
       reviewers: [
         {
           group: 'user',
@@ -73,6 +59,20 @@ describe('createCardsFromProposals', () => {
     ).toBeTruthy();
   });
 
+  it('should not create cards from draft proposals', async () => {
+    await generateProposal({
+      authors: [],
+      proposalStatus: 'draft',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+
+    expect(cards.length).toBe(0);
+  });
+
   it('should not create cards from proposals if board is not found', async () => {
     await expect(
       createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
@@ -89,5 +89,38 @@ describe('createCardsFromProposals', () => {
     const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
     expect(cards.length).toBe(0);
+  });
+
+  // TODO ---- Cleanup tests above. They are mutating the same board, and only returning newly created cards.
+  it('should not create cards from archived proposals', async () => {
+    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
+
+    const testBoard = await generateBoard({
+      createdBy: testUser.id,
+      spaceId: testSpace.id
+    });
+
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    const ignoredProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      archived: true,
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    const cards = await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+
+    expect(cards.length).toBe(1);
+
+    expect(cards[0].syncWithPageId).toBe(visibleProposal.id);
   });
 });

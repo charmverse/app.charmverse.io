@@ -1,4 +1,4 @@
-import { isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { isProdEnv, isStagingEnv } from 'config/constants';
 
 const cookieDomains = {
   dev: 'local.io',
@@ -7,10 +7,6 @@ const cookieDomains = {
 };
 
 export function getAppApexDomain() {
-  if (isDevEnv) {
-    return cookieDomains.dev;
-  }
-
   if (isStagingEnv) {
     return cookieDomains.staging;
   }
@@ -18,4 +14,6 @@ export function getAppApexDomain() {
   if (isProdEnv) {
     return cookieDomains.prod;
   }
+
+  return cookieDomains.dev;
 }

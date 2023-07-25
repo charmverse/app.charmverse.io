@@ -8,6 +8,7 @@ import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsers } from './interface';
 
 export async function updateProposalStatus({
@@ -26,6 +27,21 @@ export async function updateProposalStatus({
     throw new InvalidInputError('Please provide a valid status');
   } else if (!proposalId) {
     throw new InvalidInputError('Please provide a valid proposalId');
+  }
+
+  const proposal = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    select: {
+      archived: true
+    }
+  });
+
+  if (!proposal) {
+    throw new ProposalNotFoundError(proposalId);
+  } else if (proposal.archived) {
+    throw new InvalidStateError(`Archived proposals cannot be updated`);
   }
 
   const statusFlow = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(

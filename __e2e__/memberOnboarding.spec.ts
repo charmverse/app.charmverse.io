@@ -20,10 +20,8 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.waitForURL(targetPage);
 
     const memberProfileNftList = page.locator('data-test=member-profile-nft-list');
-    const memberProfileOrgList = page.locator('data-test=member-profile-org-list');
     const memberProfilePoapList = page.locator('data-test=member-profile-poap-list');
     await expect(memberProfileNftList).toBeVisible();
-    await expect(memberProfileOrgList).toBeVisible();
     await expect(memberProfilePoapList).toBeVisible();
 
     const closePropertiesModalBtn = page.locator('data-test=close-modal');

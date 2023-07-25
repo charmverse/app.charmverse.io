@@ -11,8 +11,8 @@ import { useSpaces } from './useSpaces';
 export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshCurrentSpace: () => void } {
   const router = useRouter();
   const { spaces, isLoaded: isSpacesLoaded, setSpace } = useSpaces();
-  const { publicSpace, accessChecked } = useSharedPage();
-
+  const { publicSpace, accessChecked: publicAccessChecked, isPublicPath } = useSharedPage();
+  const isSharedPageLoaded = isPublicPath && publicAccessChecked;
   // Support for extracting domain from logged in view or shared bounties view
   // domain in query can be either space domain or custom domain
   const domainOrCustomDomain = router.query.domain;
@@ -25,10 +25,9 @@ export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshC
     }
   }, [space]);
 
-  if (!accessChecked && !isSpacesLoaded) {
-    return { isLoading: true, refreshCurrentSpace };
+  // if page is public and we are not loading space anymore OR if spaces are loaded
+  if (isSpacesLoaded || isSharedPageLoaded) {
+    return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace };
   }
-
-  // We always want to return the space as priority since it's not just set by the URL
-  return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace };
+  return { isLoading: true, refreshCurrentSpace };
 }

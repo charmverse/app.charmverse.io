@@ -9,6 +9,7 @@ interface PopperPopupProps {
   popupContent: React.ReactNode;
   children?: React.ReactNode | null;
   autoOpen?: boolean;
+  open?: boolean; // use this prop to control popover from outside
   closeOnClick?: boolean;
   onClose?: () => void;
   onOpen?: () => void;
@@ -27,6 +28,7 @@ export default function PopperPopup(props: PopperPopupProps) {
     autoOpen = false,
     onClose,
     onOpen,
+    open,
     popoverProps: customPopoverProps = {}
   } = props;
 
@@ -82,6 +84,20 @@ export default function PopperPopup(props: PopperPopupProps) {
       });
     }
   }, [toggleRef, autoOpen]);
+
+  useEffect(() => {
+    if (!toggleRef.current || typeof open !== 'boolean') {
+      return;
+    }
+    if (open) {
+      popupState.setAnchorEl(toggleRef.current);
+      setTimeout(() => {
+        popupState.open();
+      });
+    } else {
+      popupState.close();
+    }
+  }, [toggleRef, open]);
 
   return (
     <div ref={toggleRef} style={style}>

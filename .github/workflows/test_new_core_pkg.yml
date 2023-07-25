@@ -6,27 +6,19 @@ name: Run test against new Core Pkg
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
       core_pkg_version:
         description: 'Core pkg version'
         required: true
-      permission_api_tag:
-        description: 'Permission api image tag'
-        required: false
 
 jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
     steps:
+      - env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
       - uses: actions/checkout@v3
 
       - name: Install dependencies
@@ -72,16 +64,14 @@ jobs:
             test_command: 'npm run test:ci -- --shard 2/3'
           - test_name: 'Basic tests #3'
             test_command: 'npm run test:ci -- --shard 3/3'
-          - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 1/2'
-          - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 2/2'
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset

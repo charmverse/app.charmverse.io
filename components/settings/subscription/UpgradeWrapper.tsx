@@ -16,7 +16,8 @@ export const upgradeMessages = {
   custom_roles: 'Upgrade to a paid plan to use custom roles',
   invite_guests: 'Upgrade to a paid plan to invite members with guest-level access',
   customise_member_property: 'Upgrade to a paid plan to use this member property',
-  api_access: 'Upgrade to a paid plan to get access to the API'
+  api_access: 'Upgrade to a paid plan to get access to the API',
+  custom_domain: 'Upgrade to a paid plan to use a custom app domain'
 };
 
 export type UpgradeContext = keyof typeof upgradeMessages;
@@ -66,7 +67,11 @@ export function UpgradeWrapper({
 
   return (
     <Tooltip {...tooltipProps} title={upgradeContext ? upgradeMessages[upgradeContext] : ''}>
-      <Box onClick={handleClick}>{children}</Box>
+      <Box onClick={handleClick} position='relative' sx={{ cursor: 'pointer' }}>
+        {children}
+
+        <Box position='absolute' top={0} right={0} bottom={0} left={0} zIndex={1}></Box>
+      </Box>
     </Tooltip>
   );
 }

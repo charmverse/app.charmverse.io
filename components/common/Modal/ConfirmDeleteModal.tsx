@@ -46,6 +46,7 @@ export default function ConfirmDeleteModal({
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}
+          data-test='confirm-delete-button'
           onClick={_onConfirm}
           disabled={disabled}
         >

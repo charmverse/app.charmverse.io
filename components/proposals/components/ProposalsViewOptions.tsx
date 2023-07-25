@@ -2,6 +2,7 @@ import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissio
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, MenuItem, Select, TextField } from '@mui/material';
+import Divider from '@mui/material/Divider';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -18,7 +19,7 @@ import { useProposalCategories } from '../hooks/useProposalCategories';
 import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
 import { ProposalCategoryChip } from './ProposalChip';
 
-export type ProposalStatusFilter = ProposalStatus | 'all';
+export type ProposalStatusFilter = ProposalStatus | 'all' | 'archived';
 
 type Props = {
   statusFilter: ProposalStatusFilter;
@@ -33,8 +34,10 @@ export function ProposalsViewOptions({
   setStatusFilter,
   categories,
   categoryIdFilter,
-  setCategoryIdFilter
-}: Props) {
+  setCategoryIdFilter,
+  // Needed for the playwright selector to get the correct item (since we use this component twice)
+  testKey = ''
+}: Props & { testKey?: string }) {
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
 
   const isAdmin = useIsAdmin();
@@ -56,7 +59,7 @@ export function ProposalsViewOptions({
 
   return (
     <ViewOptions label='Filter'>
-      <Box display='flex' gap={1}>
+      <Box data-test={`proposal-view-options-${testKey}`} display='flex' gap={1}>
         <Select
           variant='outlined'
           value={statusFilter}
@@ -68,14 +71,19 @@ export function ProposalsViewOptions({
               {proposalStatusLabel}
             </MenuItem>
           ))}
+          <Divider />
+          <MenuItem value='archived'>Archived</MenuItem>
         </Select>
 
         <Select
+          data-test='proposal-category-list'
           variant='outlined'
           value={categoryIdFilter || ''}
           renderValue={(value) => {
             if (value === 'all') {
               return 'All categories';
+            } else if (value === 'archived') {
+              return 'Archived';
             }
 
             const category = categories.find((c) => c.id === value);
@@ -83,13 +91,22 @@ export function ProposalsViewOptions({
               return <ProposalCategoryChip color={category.color} title={category.title} />;
             }
           }}
-          onChange={(e) => setCategoryIdFilter(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value) {
+              setCategoryIdFilter(e.target.value);
+            }
+          }}
         >
           <MenuItem value='all'>All categories</MenuItem>
           {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+            <MenuItem
+              data-test={`proposal-category-${category.id}`}
+              key={category.id}
+              value={category.id}
+              sx={{ justifyContent: 'space-between' }}
+            >
               <ProposalCategoryChip color={category.color} title={category.title} />
-              {isAdmin && <ProposalCategoryContextMenu category={category} key={category.id} />}
+              <ProposalCategoryContextMenu category={category} key={category.id} />
             </MenuItem>
           ))}
           <MenuItem

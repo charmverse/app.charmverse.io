@@ -6,7 +6,7 @@ import {
   MAX_EMBED_WIDTH,
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
-import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/nftUtils';
+import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/utils';
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';

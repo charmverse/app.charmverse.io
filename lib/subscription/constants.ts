@@ -9,14 +9,14 @@ export const defaultFreeTrialBlockQuota = 30;
 
 export const communityProduct = {
   id: 'community',
-  tier: 'pro',
+  tier: 'community',
   name: 'CharmVerse Community',
   guestLimit: 100,
   // This is base number we use to calculate block limits. We multiply this by the quantity in Stripe.
   // For example, 30k blocks = 30 quantity * 1000 blockQuotaIncrement
   blockQuotaIncrement: 1000,
   monthlyActiveUserLimit: 25,
-  trial: 90,
+  trial: 30,
   pricing: {
     annual: 12,
     monthly: 1.2
@@ -57,19 +57,6 @@ export const subscriptionDetails = {
     'Usage & engagement analytics',
     'Dedicated success manager'
   ]
-};
-
-export const subscriptionCancellationDetails = {
-  first:
-    'Cancelling CharmVerse Community Edition will revert this space to the Free Plan at the end of the current billing period. The following changes will be made: ',
-  list: [
-    'All content will be made public and shared on the web',
-    'All custom roles will be removed',
-    'All users will have the default member role',
-    'Custom domains will be removed',
-    'API access will be removed'
-  ],
-  last: 'You will still be able to use CharmVerse for your community but you will be working in public.'
 };
 
 export const SubscriptionStatus = {

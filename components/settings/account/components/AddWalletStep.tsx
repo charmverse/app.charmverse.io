@@ -1,12 +1,10 @@
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
-import type { AuthSig } from 'lit-js-sdk';
+import type { AuthSig } from '@lit-protocol/types';
+import { Typography, Stack } from '@mui/material';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { lowerCaseEqual, shortenHex } from 'lib/utilities/strings';
 
 type Props = {
   isConnectingWallet: boolean;

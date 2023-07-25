@@ -174,6 +174,7 @@ export function ProposalProperties({
               proposalStatus={proposal?.status}
               openVoteModal={openVoteModal}
               updateProposalStatus={updateProposalStatus}
+              archived={proposal?.archived}
             />
           </Grid>
 

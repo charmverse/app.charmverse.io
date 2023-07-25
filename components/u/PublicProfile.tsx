@@ -1,18 +1,17 @@
-import { Box, Chip, Stack } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import MultiTabs from 'components/common/MultiTabs';
+import { ProfileWidgets } from 'components/common/UserProfile/components/ProfileWidgets/ProfileWidgets';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import type { Collectable } from 'lib/blockchain/interfaces';
-import { transformNft } from 'lib/blockchain/transformNft';
-import { transformPoap } from 'lib/blockchain/transformPoap';
+import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import AggregatedData from './components/AggregatedData';
-import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import { UserDetailsFormWithSave } from './components/UserDetails/UserDetailsForm';
@@ -20,7 +19,11 @@ import { UserDetailsReadonly } from './components/UserDetails/UserDetailsReadonl
 import { isPublicUser } from './components/UserDetails/utils';
 import { UserSpacesList } from './components/UserSpacesList/UserSpacesList';
 
-export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly?: boolean }) {
+export function PublicProfile(props: {
+  user: Member | PublicUser | LoggedInUser;
+  readOnly?: boolean;
+  hideAggregateData?: boolean;
+}) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
@@ -33,36 +36,7 @@ export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly
   });
   const isPublic = isPublicUser(user, currentUser);
 
-  const {
-    data: poapData,
-    mutate: mutatePoaps,
-    isValidating: isPoapDataValidating
-  } = useSWRImmutable(`/poaps/${user.id}`, () => {
-    return charmClient.getUserPoaps(user.id);
-  });
-
-  const {
-    data: nftData,
-    mutate: mutateNfts,
-    isValidating: isNftDataValidating
-  } = useSWRImmutable(`/nfts/${user.id}`, () => {
-    return charmClient.blockchain.listNFTs(user.id);
-  });
-
-  const isLoading =
-    !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
-
-  const collectables: Collectable[] = [];
-
-  poapData?.forEach((poap) => {
-    collectables.push(transformPoap(poap));
-  });
-
-  nftData?.forEach((nft) => {
-    collectables.push(transformNft(nft));
-  });
-
-  collectables.sort((itemA, itemB) => (new Date(itemB.date) > new Date(itemA.date) ? 1 : -1));
+  const isLoading = !data || isAggregatedDataValidating;
 
   async function toggleCommunityVisibility(community: CommunityDetails) {
     if (currentUser) {
@@ -102,65 +76,14 @@ export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly
     }
   }
 
-  async function toggleCollectibleVisibility(item: Collectable) {
-    if (currentUser) {
-      await charmClient.profile.updateProfileItem({
-        profileItems: [
-          {
-            id: item.id,
-            isHidden: !item.isHidden,
-            type: item.type,
-            metadata: null,
-            isPinned: false,
-            walletId: item.walletId
-          }
-        ]
-      });
-      if (item.type === 'nft') {
-        mutateNfts(
-          (_nftData) => {
-            return _nftData?.map((nft) => {
-              if (nft.id === item.id) {
-                return {
-                  ...nft,
-                  isHidden: !item.isHidden
-                };
-              }
-              return nft;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-      } else {
-        mutatePoaps(
-          (_poapData) => {
-            return _poapData?.map((poap) => {
-              if (poap.id === item.id) {
-                return {
-                  ...poap,
-                  isHidden: !item.isHidden
-                };
-              }
-              return poap;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-      }
-    }
-  }
   const communities = (data?.communities ?? []).filter((community) => (isPublic ? !community.isHidden : true));
 
   const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
-    <Box>
+    <Stack spacing={2}>
       {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user as LoggedInUser} />}
-      <UserSpacesList userId={user.id} />
-      {readOnly && (
+
+      {readOnly && !props.hideAggregateData && (
         <AggregatedData
           totalBounties={data?.bounties}
           totalCommunities={data ? communities.length : undefined}
@@ -168,44 +91,37 @@ export function PublicProfile(props: { user: PublicUser | LoggedInUser; readOnly
           totalVotes={data?.totalVotes}
         />
       )}
-      <SectionHeader title='My Organizations' count={data ? allCommunities.length : undefined} />
-      <LoadingComponent isLoading={isLoading} minHeight={300}>
-        {allCommunities.length > 0 ? (
-          <Stack gap={2} mb={2}>
-            {allCommunities.map((community) => (
-              <CommunityRow
-                key={community.id}
-                onClick={() => {
-                  toggleCommunityVisibility(community);
-                }}
-                visible={!community.isHidden}
-                showVisibilityIcon={!readOnly}
-                community={community}
-              />
-            ))}
-          </Stack>
-        ) : null}
 
-        {collectables.length > 0 ? (
-          <>
-            <SectionHeader title='NFTs & POAPs' count={collectables.length} />
-            <Stack gap={2} mb={2}>
-              {collectables.map((collectable) => (
-                <CollectableRow
-                  key={collectable.id}
-                  showVisibilityIcon={!readOnly}
-                  visible={!collectable.isHidden}
-                  onClick={() => {
-                    toggleCollectibleVisibility(collectable);
-                  }}
-                  collectable={collectable}
-                />
-              ))}
+      <MultiTabs
+        tabs={[
+          ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />],
+          [
+            'Organizations',
+            <Stack key='organizations'>
+              <UserSpacesList userId={props.user.id} />
+              <SectionHeader title='My Organizations' count={data ? allCommunities.length : undefined} />
+              <LoadingComponent isLoading={isLoading} minHeight={300}>
+                {allCommunities.length > 0 ? (
+                  <Stack gap={2} mb={2}>
+                    {allCommunities.map((community) => (
+                      <CommunityRow
+                        key={community.id}
+                        onClick={() => {
+                          toggleCommunityVisibility(community);
+                        }}
+                        visible={!community.isHidden}
+                        showVisibilityIcon={!readOnly}
+                        community={community}
+                      />
+                    ))}
+                  </Stack>
+                ) : null}
+              </LoadingComponent>
             </Stack>
-          </>
-        ) : null}
-      </LoadingComponent>
-    </Box>
+          ]
+        ]}
+      />
+    </Stack>
   );
 }
 

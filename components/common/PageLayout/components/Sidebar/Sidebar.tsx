@@ -130,7 +130,7 @@ interface SidebarProps {
   navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
+export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
   const { space } = useCurrentSpace();
@@ -224,7 +224,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
 
           {
             // Don't show block counts for free or entreprise spaces
-            space?.paidTier === 'pro' && (
+            space?.paidTier === 'community' && (
               <Box ml={2}>
                 <BlockCounts />
               </Box>

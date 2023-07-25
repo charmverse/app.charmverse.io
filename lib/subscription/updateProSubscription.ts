@@ -1,17 +1,17 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type Stripe from 'stripe';
 
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
 
 import type { SubscriptionStatusType } from './constants';
 import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
-import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
 import { stripeClient } from './stripe';
 
-export type UpdateSubscriptionRequest = Partial<
-  Pick<SpaceSubscriptionWithStripeData, 'status' | 'billingEmail'> & {
-    status?: Extract<SubscriptionStatusType, 'active' | 'cancel_at_end'>;
-  }
->;
+export type UpdateSubscriptionRequest = {
+  status?: Extract<SubscriptionStatusType, 'active' | 'cancel_at_end'>;
+  billingEmail?: SpaceSubscriptionWithStripeData['billingEmail'];
+};
+
 export async function updateProSubscription({
   spaceId,
   payload
@@ -21,30 +21,50 @@ export async function updateProSubscription({
 }) {
   const { billingEmail, status } = payload;
 
-  const subscription = await getActiveSpaceSubscription({
-    spaceId
+  const spaceSubscription = await prisma.stripeSubscription.findFirst({
+    where: {
+      spaceId,
+      deletedAt: null
+    }
   });
 
-  if (!subscription) {
-    throw new NotFoundError(`Subscription not found for space ${spaceId}`);
-  }
-  if (subscription.status === 'cancelled') {
-    throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
+  if (!spaceSubscription) {
+    throw new InvalidStateError(`No subscription to update for space ${spaceId}`);
   }
 
-  if (status === 'cancel_at_end') {
-    await stripeClient.subscriptions.update(subscription.subscriptionId, {
-      cancel_at_period_end: true
-    });
-  } else if (status === 'active') {
-    await stripeClient.subscriptions.update(subscription.subscriptionId, {
-      cancel_at_period_end: false
-    });
+  const subscriptionId = spaceSubscription.subscriptionId;
+
+  const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
+    expand: ['customer']
+  });
+
+  if (stripeSubscription.metadata.spaceId !== spaceId) {
+    throw new InvalidStateError(`Subscription ${subscriptionId} is not related to space ${spaceId}`);
+  }
+
+  const stripeCustomer = stripeSubscription.customer as Stripe.Customer;
+
+  if (stripeCustomer.deleted) {
+    throw new InvalidStateError(`Can't update the subscription of a deleted customer ${stripeCustomer.id}`);
+  }
+
+  if (stripeSubscription?.status !== 'active') {
+    throw new InvalidStateError(`Subscription ${stripeSubscription.id} is not active`);
   }
 
   if (billingEmail) {
-    await stripeClient.customers.update(subscription.customerId, {
+    await stripeClient.customers.update(stripeCustomer.id, {
       email: billingEmail
+    });
+  }
+
+  if (status === 'cancel_at_end') {
+    await stripeClient.subscriptions.update(stripeSubscription.id, {
+      cancel_at_period_end: true
+    });
+  } else if (status === 'active') {
+    await stripeClient.subscriptions.update(stripeSubscription.id, {
+      cancel_at_period_end: false
     });
   }
 }

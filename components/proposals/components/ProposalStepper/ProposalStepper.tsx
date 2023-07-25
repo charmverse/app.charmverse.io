@@ -6,7 +6,8 @@ export function ProposalStepper({
   proposalStatus,
   openVoteModal,
   updateProposalStatus,
-  proposalFlowPermissions
+  proposalFlowPermissions,
+  archived
 }: StepperProps) {
   return (
     <>
@@ -15,12 +16,14 @@ export function ProposalStepper({
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         proposalFlowPermissions={proposalFlowPermissions}
+        archived={archived}
       />
       <MobileStepper
         proposalStatus={proposalStatus}
         openVoteModal={openVoteModal}
         updateProposalStatus={updateProposalStatus}
         proposalFlowPermissions={proposalFlowPermissions}
+        archived={archived}
       />
     </>
   );

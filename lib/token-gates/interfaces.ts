@@ -1,5 +1,5 @@
 import type { Role, Space, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
-import type { AuthSig } from 'lit-js-sdk';
+import type { AuthSig } from '@lit-protocol/types';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 

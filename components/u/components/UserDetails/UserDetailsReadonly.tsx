@@ -49,13 +49,7 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
         </Grid>
         {!hideSocials && (
           <Grid item mt={1} height={40}>
-            <SocialIcons
-              showDiscord={socialDetails?.discordUsername?.length !== 0}
-              showGithub={socialDetails?.githubURL?.length !== 0}
-              showLinkedIn={socialDetails?.linkedinURL?.length !== 0}
-              showTwitter={socialDetails?.twitterURL?.length !== 0}
-              social={socialDetails}
-            />
+            <SocialIcons social={socialDetails} />
           </Grid>
         )}
         {userDetails && (

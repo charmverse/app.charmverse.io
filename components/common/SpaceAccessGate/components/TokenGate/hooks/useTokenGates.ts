@@ -64,7 +64,7 @@ export function useTokenGates({
     setIsVerifying(true);
 
     charmClient.tokenGates
-      .evalueTokenGateEligibility({
+      .evaluateTokenGateEligibility({
         authSig,
         spaceIdOrDomain: space.id
       })

@@ -2,11 +2,12 @@ import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
@@ -15,6 +16,7 @@ import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
@@ -24,58 +26,68 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
-  const { spaceSubscription, isLoading, refetchSpaceSubscription } = useSpaceSubscription();
-
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const router = useRouter();
 
   const {
-    data: initialSubscriptionData,
-    trigger: createSubscription,
-    isMutating: isInitialSubscriptionLoading
-  } = useSWRMutation(
+    spaceSubscription,
+    isLoading: isLoadingSpaceSubscription,
+    refetchSpaceSubscription
+  } = useSpaceSubscription({
+    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
+  });
+
+  const [pendingPayment, setPendingPayment] = useState(false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+
+  const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
     `/api/spaces/${space?.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateProSubscriptionRequest } }>) =>
       charmClient.subscription.createSubscription(arg.spaceId, arg.payload),
     {
       onError() {
         showMessage('Checkout failed! Please try again', 'error');
-      },
-      async onSuccess() {
-        setShowCheckoutForm(true);
       }
     }
   );
 
+  const { data: blockCountData } = useSWR(space.id ? `space-block-count-${space.id}` : null, () =>
+    charmClient.spaces.getBlockCount({ spaceId: space.id })
+  );
+
+  const blockCount = blockCountData?.count || 0;
+
+  const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
+
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
-  const [blockQuota, setblockQuota] = useState(10);
+  const [blockQuota, setBlockQuota] = useState(10);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 
+  useEffect(() => {
+    // Ensure that we remove the pending screen after the subscription is created
+    if (pendingPayment && spaceSubscription) {
+      setPendingPayment(false);
+    }
+  }, [spaceSubscription, pendingPayment]);
+
   async function handleShowCheckoutForm() {
+    if (minimumBlockQuota > blockQuota) {
+      setBlockQuota(minimumBlockQuota);
+    }
+
     setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
-    await createSubscription({ spaceId: space.id, payload: { period, blockQuota } });
   }
 
   const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
     if (_blockQuota) {
-      setblockQuota(_blockQuota);
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
     } else if (_period) {
       setPeriod(_period);
-    }
-  };
-
-  const handlePlanSelectCommited = async (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
-    if (_blockQuota) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota: _blockQuota, period } });
-    } else if (_period) {
-      await createSubscription({ spaceId: space.id, payload: { blockQuota, period: _period } });
     }
   };
 
@@ -83,19 +95,33 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const stripePromise = loadStripe();
 
+  const handleCreateSubscription = async (args: { spaceId: string; payload: CreateProSubscriptionRequest }) => {
+    return createSubscription(args);
+  };
+
+  if (space.paidTier === 'enterprise') {
+    return <EnterpriseBillingScreen />;
+  }
+
   if (!showCheckoutForm) {
     return (
       <Stack gap={1}>
-        {isLoading ? (
-          <LoadingSubscriptionSkeleton isLoading={isLoading} />
-        ) : spaceSubscription ? (
+        {isLoadingSpaceSubscription ? (
+          <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
+        ) : pendingPayment && (!spaceSubscription || spaceSubscription.status === 'free_trial') ? (
+          <Typography>
+            Your payment is being processed. This screen will be automatically updated as soon as the process is
+            complete.
+          </Typography>
+        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
+            minimumBlockQuota={minimumBlockQuota}
             space={space}
             spaceSubscription={spaceSubscription}
             refetchSpaceSubscription={refetchSpaceSubscription}
           />
         ) : (
-          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} />
+          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} spaceSubscription={spaceSubscription} />
         )}
       </Stack>
     );
@@ -106,37 +132,31 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Legend>Upgrade to Community</Legend>
       <Typography variant='h6'>Onboard & Engage Community Members</Typography>
       <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
-      <PlanSelection
-        disabled={isInitialSubscriptionLoading}
-        onSelect={handlePlanSelect}
-        onSelectCommited={handlePlanSelectCommited}
-        blockQuotaInThousands={blockQuota}
-        period={period}
-      />
-      <LoadingComponent isLoading={isInitialSubscriptionLoading} />
-      {!isLoading &&
-        !isInitialSubscriptionLoading &&
-        spaceSubscription !== undefined &&
-        initialSubscriptionData?.clientSecret && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret: initialSubscriptionData.clientSecret,
-              appearance: {
-                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-              }
-            }}
-          >
-            <CheckoutForm
-              show={showCheckoutForm}
-              blockQuota={blockQuota}
-              period={period}
-              subscriptionId={initialSubscriptionData.subscriptionId}
-              refetch={refetchSpaceSubscription}
-              onCancel={() => setShowCheckoutForm(false)}
-            />
-          </Elements>
-        )}
+      {!!blockCountData && (
+        <PlanSelection
+          disabled={isSubscriptionCreationLoading}
+          onSelect={handlePlanSelect}
+          blockQuotaInThousands={blockQuota}
+          period={period}
+        />
+      )}
+      <Elements
+        stripe={stripePromise}
+        options={{
+          appearance: {
+            theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+          }
+        }}
+      >
+        <CheckoutForm
+          space={space}
+          blockQuota={blockQuota}
+          period={period}
+          handlePending={() => setPendingPayment(true)}
+          onCloseCheckout={() => setShowCheckoutForm(false)}
+          handleCreateSubscription={handleCreateSubscription}
+        />
+      </Elements>
     </Stack>
   );
 }

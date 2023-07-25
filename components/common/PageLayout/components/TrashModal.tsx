@@ -27,6 +27,7 @@ import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
@@ -86,6 +87,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { mutatePagesRemove, pages, getPageByPath } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { showMessage } = useSnackbar();
 
   const { data: archivedPages, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
@@ -152,20 +154,30 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
   const onRestorePage = useCallback(
     async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
-      e.preventDefault();
-      setIsMutating(true);
-      await restorePage(pageId);
-      setIsMutating(false);
+      try {
+        e.preventDefault();
+        setIsMutating(true);
+        await restorePage(pageId);
+      } catch (err: any) {
+        showMessage(err.message ?? 'Failed to restore page', 'error');
+      } finally {
+        setIsMutating(false);
+      }
     },
     [isMutating]
   );
 
   const onDeletePage = useCallback(
     async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
-      e.preventDefault();
-      setIsMutating(true);
-      await deletePage(pageId);
-      setIsMutating(false);
+      try {
+        e.preventDefault();
+        setIsMutating(true);
+        await deletePage(pageId);
+      } catch (err: any) {
+        showMessage(err.message ?? 'Failed to delete page', 'error');
+      } finally {
+        setIsMutating(false);
+      }
     },
     [isMutating]
   );

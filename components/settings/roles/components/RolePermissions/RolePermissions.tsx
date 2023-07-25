@@ -1,9 +1,8 @@
 import type { PostCategoryPermissionAssignment, TargetPermissionGroup } from '@charmverse/core/permissions';
 import { AvailableSpacePermissions } from '@charmverse/core/permissions/flags';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import { Box, Divider, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
-import { useReducer, useEffect, useState } from 'react';
+import { Box, Divider, Grid, Typography } from '@mui/material';
+import { useEffect, useReducer, useState } from 'react';
 import { mutate } from 'swr';
 import useSWR from 'swr/immutable';
 import { v4 as uuid } from 'uuid';
@@ -11,10 +10,9 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
-import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/ProposalCategoryPermissionRow';
+import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/components/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import type { UpgradeContext } from 'components/settings/subscription/UpgradeWrapper';
-import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -24,6 +22,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
+
+import { PermissionToggle } from './components/PermissionToggle';
 
 /**
  * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
@@ -242,15 +242,28 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-createPage'
               label='Create new pages'
-              defaultChecked={assignedPermissions?.createPage || isFreeSpace}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.createPage}
               disabled={disableModifications}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createPage : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createPage : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createPage', nowHasAccess);
               }}
               upgradeContext='page_permissions'
             />
+            {targetGroup !== 'space' && (
+              <PermissionToggle
+                data-test='space-operation-deleteAnyPage'
+                label='Delete any page'
+                defaultChecked={!isFreeSpace && !!assignedPermissions?.deleteAnyPage}
+                disabled={disableModifications}
+                onChange={(ev) => {
+                  const { checked: nowHasAccess } = ev.target;
+                  setSpacePermission('deleteAnyPage', nowHasAccess);
+                }}
+                upgradeContext='page_permissions'
+              />
+            )}
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Bounties
@@ -259,15 +272,28 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-createBounty'
               label='Create new bounties'
-              defaultChecked={assignedPermissions?.createBounty || isFreeSpace}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.createBounty}
               disabled={disableModifications}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : false}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
                 setSpacePermission('createBounty', nowHasAccess);
               }}
               upgradeContext='bounty_permissions'
             />
+            {targetGroup !== 'space' && (
+              <PermissionToggle
+                data-test='space-operation-deleteAnyBounty'
+                label='Delete any bounty'
+                defaultChecked={!isFreeSpace && !!assignedPermissions?.deleteAnyBounty}
+                disabled={disableModifications}
+                onChange={(ev) => {
+                  const { checked: nowHasAccess } = ev.target;
+                  setSpacePermission('deleteAnyBounty', nowHasAccess);
+                }}
+                upgradeContext='bounty_permissions'
+              />
+            )}
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Proposals
@@ -276,8 +302,8 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             <PermissionToggle
               data-test='space-operation-reviewProposals'
               label='Review proposals'
-              defaultChecked={isFreeSpace || assignedPermissions?.reviewProposals}
-              memberChecked={targetGroup !== 'space' ? defaultPermissions?.reviewProposals : false}
+              defaultChecked={isFreeSpace ? true : assignedPermissions?.reviewProposals}
+              memberChecked={targetGroup !== 'space' ? defaultPermissions?.reviewProposals : undefined}
               disabled={disableModifications}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -285,6 +311,19 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               }}
               upgradeContext='proposal_permissions'
             />
+            {targetGroup !== 'space' && (
+              <PermissionToggle
+                data-test='space-operation-deleteAnyProposal'
+                label='Delete and archive any proposal'
+                defaultChecked={!!assignedPermissions?.deleteAnyProposal && !isFreeSpace}
+                disabled={disableModifications}
+                onChange={(ev) => {
+                  const { checked: nowHasAccess } = ev.target;
+                  setSpacePermission('deleteAnyProposal', nowHasAccess);
+                }}
+                upgradeContext='proposal_permissions'
+              />
+            )}
             <Typography sx={{ my: 1 }}>Access to categories</Typography>
             <Box display='flex' gap={3} mb={2}>
               <Divider orientation='vertical' flexItem />
@@ -393,57 +432,5 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         </Grid>
       </form>
     </div>
-  );
-}
-
-function PermissionToggle(props: {
-  label: string;
-  defaultChecked?: boolean;
-  disabled: boolean;
-  memberChecked?: boolean; // if this permission is inherited from the Member role
-  ['data-test']?: string;
-  onChange: (ev: ChangeEvent<HTMLInputElement>) => void;
-  upgradeContext?: UpgradeContext;
-}) {
-  const { isFreeSpace } = useIsFreeSpace();
-  // const disabled = props.disabled;
-  // const defaultChecked = props.memberChecked || props.defaultChecked;
-  const useDefault = typeof props.defaultChecked !== 'boolean';
-  return (
-    <FormControlLabel
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        margin: 0
-      }}
-      control={
-        typeof props.defaultChecked === 'boolean' || typeof props.memberChecked === 'boolean' ? (
-          <Tooltip title={useDefault && !isFreeSpace ? 'Default setting' : ''}>
-            <span
-              style={{
-                opacity: useDefault && !isFreeSpace ? 0.5 : 1,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <UpgradeWrapper upgradeContext={props.upgradeContext}>
-                <Switch
-                  // key={`${props.label}-${defaultChecked}`}
-                  data-test={props['data-test']}
-                  disabled={props.disabled}
-                  checked={useDefault ? props.memberChecked : props.defaultChecked}
-                  onChange={props.onChange}
-                />
-              </UpgradeWrapper>
-            </span>
-          </Tooltip>
-        ) : (
-          // placeholder element while loading
-          <Switch sx={{ visibility: 'hidden' }} disabled={true} />
-        )
-      }
-      label={props.label}
-      labelPlacement='start'
-    />
   );
 }

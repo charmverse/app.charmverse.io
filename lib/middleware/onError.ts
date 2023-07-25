@@ -4,6 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { UnknownError } from 'lib/middleware';
 import { SystemError } from 'lib/utilities/errors';
 
+import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
+
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
 export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
@@ -21,12 +23,12 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
       userId: req.session?.user?.id,
       pageId: req.query?.pageId || req.body?.pageId,
       spaceId: req.query?.spaceId || req.body?.spaceId,
-      url: req.url,
+      url: removeApiKeyFromQuery(req.url ?? ''),
       body: req.body
     });
   } else {
     log.warn(`Client Error: ${errorAsSystemError.message}`, {
-      url: req.url,
+      url: removeApiKeyFromQuery(req.url ?? ''),
       body: req.body,
       userId: req.session?.user?.id,
       pageId: req.query?.pageId || req.body?.pageId,

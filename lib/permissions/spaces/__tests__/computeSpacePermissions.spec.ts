@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 describe('computeSpacePermissions', () => {
-  it('should return true to all permissions for all space members and admins', async () => {
+  it('should return all permissions except deleteAnyPage/Bounty/Proposal for space members', async () => {
     const normalSpaceMember = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -28,6 +28,19 @@ describe('computeSpacePermissions', () => {
       userId: normalSpaceMember.id
     });
 
+    expect(normalMemberPermissions).toMatchObject<SpacePermissionFlags>({
+      createBounty: true,
+      createForumCategory: true,
+      createPage: true,
+      moderateForums: true,
+      reviewProposals: true,
+      deleteAnyBounty: false,
+      deleteAnyPage: false,
+      deleteAnyProposal: false
+    });
+  });
+
+  it('should return true to all permissions for admins', async () => {
     const adminPermissions = await computeSpacePermissions({
       resourceId: space.id,
       userId: adminUser.id
@@ -38,11 +51,11 @@ describe('computeSpacePermissions', () => {
       createPage: true,
       reviewProposals: true,
       createForumCategory: true,
-      moderateForums: true
+      moderateForums: true,
+      deleteAnyBounty: true,
+      deleteAnyPage: true,
+      deleteAnyProposal: true
     };
-
-    expect(normalMemberPermissions).toMatchObject<SpacePermissionFlags>(fullPermissions);
-
     expect(adminPermissions).toMatchObject<SpacePermissionFlags>(fullPermissions);
   });
 
@@ -60,7 +73,10 @@ describe('computeSpacePermissions', () => {
       createForumCategory: false,
       createPage: false,
       reviewProposals: false,
-      moderateForums: false
+      moderateForums: false,
+      deleteAnyBounty: false,
+      deleteAnyPage: false,
+      deleteAnyProposal: false
     });
   });
 });

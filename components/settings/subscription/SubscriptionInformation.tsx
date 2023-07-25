@@ -1,8 +1,8 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Divider, Grid, List, ListItem, ListItemText, Stack, TextField, Typography } from '@mui/material';
-import Chip from '@mui/material/Chip';
+import { Divider, Grid, Stack, TextField, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
@@ -10,19 +10,21 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ConfirmUpgradeModal from 'components/common/Modal/ConfirmUpgradeModal';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaces } from 'hooks/useSpaces';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { communityProduct, subscriptionCancellationDetails } from 'lib/subscription/constants';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import { communityProduct } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
-import { formatDate, getTimeDifference } from 'lib/utilities/dates';
+import { formatDate } from 'lib/utilities/dates';
+import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
 
+import { PaymentMethod } from './PaymentMethod';
+import { PlanSelection } from './PlanSelection';
 import { SubscriptionActions } from './SubscriptionActions';
 
 const schema = () => {
@@ -36,17 +38,28 @@ const schema = () => {
 export function SubscriptionInformation({
   space,
   spaceSubscription,
+  minimumBlockQuota,
   refetchSpaceSubscription
 }: {
   space: Space;
   spaceSubscription: SpaceSubscriptionWithStripeData;
+  minimumBlockQuota: number;
   refetchSpaceSubscription: () => Promise<SpaceSubscriptionWithStripeData | null | undefined>;
 }) {
   const { showMessage } = useSnackbar();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { userPreferences } = useUserPreferences();
-  const isAdmin = useIsAdmin();
+  const {
+    isOpen: isUpgradeDialogOpen,
+    close: closeUpgradeDialog,
+    open: openUpgradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'upgrade-susbcription' });
+
+  const {
+    isOpen: isConfirmUpgradeDialogOpen,
+    close: closeConfirmUpgradeDialog,
+    open: openConfirmUpgradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'confirm-upgrade-susbcription' });
 
   const {
     register,
@@ -55,12 +68,23 @@ export function SubscriptionInformation({
     formState: { errors }
   } = useForm<{ email: string }>({
     mode: 'onChange',
-    defaultValues: { email: '' },
+    defaultValues: { email: spaceSubscription.billingEmail ?? '' },
     resolver: yupResolver(schema())
   });
   const email = watch('email');
 
   const { subscribe } = useWebSocketClient();
+
+  const [period, setPeriod] = useState<SubscriptionPeriod>(spaceSubscription.period);
+  const [blockQuota, setBlockQuota] = useState(spaceSubscription.blockQuota);
+
+  const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
+    if (_blockQuota) {
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
+    } else if (_period) {
+      setPeriod(_period);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = subscribe('space_subscription', async () => {
@@ -81,29 +105,41 @@ export function SubscriptionInformation({
       onError() {
         showMessage('Updating failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
-  const { trigger: deleteSubscription, isMutating: isLoadingDeletion } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription-intent`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string } }>) =>
-      charmClient.subscription.deleteSpaceSubscription(arg.spaceId),
+  const { trigger: upgradeSpaceSubscription, isMutating: isLoadingUpgrade } = useSWRMutation(
+    `/api/spaces/${space.id}/upgrade-subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: UpgradeSubscriptionRequest } }>) =>
+      charmClient.subscription.upgradeSpaceSubscription(arg.spaceId, arg.payload),
     {
       onError() {
-        showMessage('Deletion failed! Please try again', 'error');
+        showMessage('Upgrading failed! Please try again', 'error');
       },
-      async onSuccess() {
-        await refetchSpaceSubscription();
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('Subscription change succeeded!', 'success');
       }
     }
   );
 
-  async function handleDeleteSubs() {
-    await deleteSubscription({ spaceId: space.id });
-  }
+  const { trigger: switchToFreePlan, isMutating: isLoadingSwitchToFreePlan } = useSWRMutation(
+    `/api/spaces/${space.id}/switch-to-free-tier`,
+    () => charmClient.subscription.switchToFreeTier(space.id),
+    {
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('You have successfully switch to free tier!', 'success');
+      },
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to free tier could not be made. Please try again later.', 'error');
+      }
+    }
+  );
 
   const status = useMemo(() => {
     switch (spaceSubscription?.status) {
@@ -112,7 +148,7 @@ export function SubscriptionInformation({
       case 'pending':
         return 'Pending';
       case 'cancel_at_end':
-        return 'Your subscription was cancelled and will end on the next billing date. You can reactivate it by clicking the button below.';
+        return 'Your subscription was cancelled and will end on the next billing date';
       case 'cancelled':
       default:
         return null;
@@ -122,20 +158,10 @@ export function SubscriptionInformation({
   const price =
     spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
 
-  const freeTrialEnds =
-    spaceSubscription.status === 'free_trial'
-      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
-      : undefined;
-  const freeTrialLabel =
-    spaceSubscription.status === 'free_trial'
-      ? (freeTrialEnds as number) > 0
-        ? `Free trial - ${freeTrialEnds} days left`
-        : `Free trial finished`
-      : '';
-
   const nextBillingDate = spaceSubscription?.renewalDate
     ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
     : null;
+
   return (
     <>
       <Legend whiteSpace='normal'>Plan & Billing</Legend>
@@ -143,89 +169,80 @@ export function SubscriptionInformation({
         <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
           <Typography variant='h6' mb={1}>
             Current plan
-            {spaceSubscription.status === 'free_trial' && (
-              <Chip
-                sx={{ ml: 2 }}
-                size='small'
-                color={(freeTrialEnds as number) > 0 ? 'green' : 'orange'}
-                label={freeTrialLabel}
-              />
-            )}
           </Typography>
           <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
-
           <Typography>
             ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
           </Typography>
           {nextBillingDate && (
             <Typography>
-              {spaceSubscription.status === 'free_trial' ? 'First payment' : 'Renews'} on {nextBillingDate}
+              {spaceSubscription.status === 'cancel_at_end' ? 'Ends' : 'Renews'} on {nextBillingDate}
             </Typography>
           )}
           {status && <Typography>Status: {status}</Typography>}
-
-          {space.paidTier !== 'free' && (
-            <Button
-              disabled={!isAdmin}
-              onClick={() => {
-                charmClient.subscription
-                  .switchToFreeTier(space.id)
-                  .catch((err) => showMessage(err.message ?? 'Something went wrong', 'error'));
-              }}
-            >
-              Use free plan
-            </Button>
-          )}
         </Grid>
         <Grid item xs={12} sm={4}>
           <SubscriptionActions
+            paidTier={space.paidTier}
             spaceSubscription={spaceSubscription}
-            loading={isLoadingUpdate || isLoadingDeletion}
-            onDelete={handleDeleteSubs}
-            onCancelAtEnd={() => setShowConfirmDialog(true)}
-            onReactivation={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'active' } })}
-          />
-          <ConfirmDeleteModal
-            title='Cancelling Community Edition'
-            size='large'
-            open={showConfirmDialog}
-            buttonText='Yes'
-            secondaryButtonText='No'
-            question={
-              <>
-                <Typography>{subscriptionCancellationDetails.first}</Typography>
-                <List dense sx={{ listStyle: 'disc' }}>
-                  {subscriptionCancellationDetails.list.map((item) => (
-                    <ListItem key={item} sx={{ display: 'list-item', ml: '15px' }}>
-                      <ListItemText>{item}</ListItemText>
-                    </ListItem>
-                  ))}
-                </List>
-                <Typography>{subscriptionCancellationDetails.last}</Typography>
-                <br />
-                <Typography>Do you still want to Cancel?</Typography>
-              </>
+            loading={isLoadingUpdate || isLoadingUpgrade || isLoadingSwitchToFreePlan}
+            onCancelAtEnd={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'cancel_at_end' }
+              })
             }
-            onConfirm={() => updateSpaceSubscription({ spaceId: space.id, payload: { status: 'cancel_at_end' } })}
-            onClose={() => setShowConfirmDialog(false)}
-            disabled={isLoadingUpdate || isLoadingDeletion}
+            onReactivation={() =>
+              updateSpaceSubscription({
+                spaceId: space.id,
+                payload: { status: 'active' }
+              })
+            }
+            onUpgrade={() => openUpgradeDialog()}
+            confirmFreeTierDowngrade={switchToFreePlan}
+          />
+          <ConfirmUpgradeModal
+            title='Upgrade Community Edition'
+            size='large'
+            open={isUpgradeDialogOpen}
+            buttonText='Change subscription'
+            secondaryButtonText='Cancel'
+            question={
+              <PlanSelection
+                blockQuotaInThousands={blockQuota}
+                period={period}
+                disabled={false}
+                onSelect={handlePlanSelect}
+              />
+            }
+            onConfirm={openConfirmUpgradeDialog}
+            onClose={closeUpgradeDialog}
+            disabled={
+              isLoadingUpgrade || (period === spaceSubscription.period && blockQuota === spaceSubscription.blockQuota)
+            }
+          />
+          <ConfirmUpgradeModal
+            title='Confirm plan changes'
+            size='large'
+            open={isConfirmUpgradeDialogOpen}
+            buttonText='Confirm'
+            secondaryButtonText='Cancel'
+            question={`You are about to change your plan. ${
+              spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''
+            }`}
+            onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
+            onClose={closeConfirmUpgradeDialog}
+            disabled={isLoadingUpgrade}
           />
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
-      <Grid container alignItems='center'>
-        <Grid item xs={12} sm={8} display='flex' flexDirection='column' alignItems='flex-start' gap={1}>
-          <Typography variant='h6' mb={1}>
-            Payment Method
-          </Typography>
-          <Typography>Visa **** 4641</Typography>
-          <Typography>
-            <u>change payment method</u>
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={4} />
-      </Grid>
-      <Divider sx={{ my: 2 }} />
+      {spaceSubscription?.paymentMethod && (
+        <>
+          <PaymentMethod paymentMethod={spaceSubscription.paymentMethod} />
+          <Divider sx={{ my: 2 }} />
+        </>
+      )}
       <Grid container alignItems='center'>
         <Grid item xs={12} sm={6}>
           <Typography variant='h6' mb={1}>
@@ -234,15 +251,18 @@ export function SubscriptionInformation({
           <Stack gap={0.5} my={2}>
             <InputLabel>Email</InputLabel>
             <TextField
-              error={!!errors.email}
-              disabled={isLoadingUpdate}
-              placeholder='johndoe@gmail.com'
               {...register('email')}
+              error={!!errors.email}
+              placeholder='johndoe@gmail.com'
+              disabled={isLoadingUpdate}
             />
             <Button
               disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
               onClick={() =>
-                updateSpaceSubscription({ spaceId: space.id, payload: { billingEmail: getValues().email } })
+                updateSpaceSubscription({
+                  spaceId: space.id,
+                  payload: { billingEmail: getValues().email }
+                })
               }
               sx={{ maxWidth: '100px', mt: 2 }}
               fullWidth={false}

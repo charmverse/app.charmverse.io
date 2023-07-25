@@ -11,6 +11,7 @@ import { AddWalletStep } from 'components/settings/account/components/AddWalletS
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -38,12 +39,13 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { account, isConnectingIdentity, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { connectGoogleAccount, isConnectingGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
+  const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
 
   const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
     '/profile/add-wallets',
@@ -80,7 +82,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     });
   }
 
-  const { connect, isConnected, isLoading: isDiscordLoading } = useDiscordConnection();
+  const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
@@ -149,12 +151,17 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {!isConnected && !isOnCustomDomain && (
+          {!isConnected && (
             <IdentityProviderItem type='Discord'>
               <PrimaryButton
                 size='small'
                 onClick={() => {
-                  connect();
+                  if (isOnCustomDomain) {
+                    popupLogin('/', 'connect');
+                  } else {
+                    connect();
+                  }
+
                   onClose();
                 }}
                 disabled={isDiscordLoading}
@@ -179,12 +186,12 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               </PrimaryButton>
             </IdentityProviderItem>
           )}
-          {(!user?.googleAccounts || user.googleAccounts.length === 0) && !isOnCustomDomain && (
+          {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
               <PrimaryButton
                 size='small'
                 onClick={async () => {
-                  await connectGoogleAccount();
+                  loginWithGooglePopup({ type: 'connect' });
                   onClose();
                 }}
                 disabled={isConnectingGoogle}
