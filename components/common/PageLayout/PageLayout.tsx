@@ -230,7 +230,7 @@ function PageLayout({ children }: PageLayoutProps) {
                     {spaceSubscription && passedBlockQuota && (
                       <AnnouncementBanner spaceId={space.id} showClose={false} errorBackground>
                         <Typography>
-                          This space has passed its block limit of{' '}
+                          This space has passed the block limit of{' '}
                           <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
                         </Typography>
                       </AnnouncementBanner>
