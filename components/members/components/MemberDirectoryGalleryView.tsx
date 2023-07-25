@@ -31,6 +31,7 @@ const StyledBox = styled(Box)`
   position: relative;
   cursor: pointer;
 `;
+
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
@@ -132,13 +133,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                     Role
                   </Typography>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {[
-                      {
-                        id: 'role',
-                        name: member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
-                      },
-                      ...member.roles
-                    ].map((role) => (
+                    {member.roles.map((role) => (
                       <Chip label={role.name} key={role.id} size='small' variant='outlined' />
                     ))}
                   </Stack>

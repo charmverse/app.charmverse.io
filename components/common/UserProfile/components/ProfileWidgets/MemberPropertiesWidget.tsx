@@ -36,10 +36,7 @@ export function MemberPropertiesWidget({
       if (currentSpaceProperty.type === 'role' && member) {
         return {
           ...currentSpaceProperty,
-          value: [
-            ...(currentSpaceProperty.value as string[]),
-            member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
-          ]
+          value: member.roles.map((role) => role.name) as string[]
         };
       }
 
