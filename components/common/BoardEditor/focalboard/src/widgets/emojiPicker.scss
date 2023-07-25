@@ -18,7 +18,21 @@
   }
 }
 
+div[role="tabpanel"] .EmojiPicker .emoji-mart {
+
+  .emoji-mart-category-label span {
+    background: var(--background-paper);
+  }
+
+  background: none;
+  border: none;
+}
+
 // Remove emoji mark footer with watermark
 .emoji-mart-scroll + .emoji-mart-bar {
   display: none;
+}
+
+.emoji-mart-bar {
+  border: none;
 }
