@@ -60,24 +60,6 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
   }
 }
 
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy',
-  'proposalUrl'
-];
-
 const PropertyMenu = React.memo((props: Props) => {
   const nameTextbox = useRef<HTMLInputElement>(null);
   const propertyType = props.property.type;

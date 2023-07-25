@@ -2,10 +2,11 @@ import { Divider, ListItemIcon, MenuItem, Typography, Stack } from '@mui/materia
 import { useIntl } from 'react-intl';
 
 import type { PropertyType } from 'lib/focalboard/board';
+import { propertyTypesList } from 'lib/focalboard/board';
 
 import { iconForPropertyType } from '../components/viewHeader/viewHeaderPropertiesMenu';
 
-import { propertyTypesList, typeDisplayName } from './propertyMenu';
+import { typeDisplayName } from './propertyMenu';
 
 export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyType) => void; isMobile?: boolean }) {
   const intl = useIntl();

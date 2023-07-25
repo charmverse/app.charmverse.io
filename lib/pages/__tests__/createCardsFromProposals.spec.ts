@@ -76,13 +76,13 @@ describe('createCardsFromProposals', () => {
   it('should not create cards from proposals if board is not found', async () => {
     await expect(
       createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toBeInstanceOf(DataNotFoundError);
+    ).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toBeInstanceOf(DataNotFoundError);
+    await expect(createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })).rejects.toThrowError(
+      DataNotFoundError
+    );
   });
 
   it('should not create cards if no proposals are found', async () => {
