@@ -47,9 +47,7 @@ jobs:
           NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
           NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID_STG }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID_STG }}
-          NEXT_PUBLIC_BUILD_ID: 
-#          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
-#          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -67,7 +65,6 @@ jobs:
             sed -i 's/prd/stg/g' $conf_file
             sed -i 's/production/staging/g' $conf_file
           done
-          echo "build id is:$(cat .next/BUILD_ID)"
           
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master

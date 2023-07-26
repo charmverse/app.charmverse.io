@@ -21,6 +21,8 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -45,8 +47,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: 
-#          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
@@ -71,6 +72,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -165,6 +167,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}

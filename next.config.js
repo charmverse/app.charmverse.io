@@ -181,11 +181,7 @@ const config = {
         });
       };
     }
-    // _config.plugins.push(
-    //   new webpack.DefinePlugin({
-    //     'process.env.NEXT_PUBLIC_BUILD_ID': `"${buildId}"`
-    //   })
-    // );
+
     return _config;
   }
 };
