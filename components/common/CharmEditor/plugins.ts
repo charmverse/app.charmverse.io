@@ -3,7 +3,6 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
-import * as table from '@skiff-org/prosemirror-tables';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -37,6 +36,7 @@ import { placeholderPlugin } from './components/placeholder/index';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
+import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
@@ -193,17 +193,7 @@ export function charmEditorPlugins({
     }),
     bookmarkPlugins(),
     tabIndent.plugins(),
-    table.tableEditing({ allowTableNodeSelection: true }),
-    table.columnHandles(),
-    table.columnResizing({}),
-    // @ts-ignore missing type
-    table.tablePopUpMenu(),
-    // @ts-ignore missing type
-    table.tableHeadersMenu(),
-    // @ts-ignore missing type
-    table.selectionShadowPlugin(),
-    // @ts-ignore missing type
-    table.TableFiltersMenu(),
+    tablePlugins,
     disclosure.plugins(),
     nft.plugins(),
     tweet.plugins(),

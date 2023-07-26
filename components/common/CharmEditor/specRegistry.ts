@@ -33,7 +33,7 @@ import * as quote from './components/quote/quote';
 import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
-import { spec as tableSpec } from './components/table/table';
+import { spec as tableSpec } from './components/table/table.schema';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';

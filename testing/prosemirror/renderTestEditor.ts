@@ -1,11 +1,9 @@
-/**
- * @jest-environment jsdom
- */
-
 import type { SpecRegistry } from '@bangle.dev/core';
 import { BangleEditor, BangleEditorState } from '@bangle.dev/core';
-import type { EditorState, EditorView, Selection, Node } from '@bangle.dev/pm';
-import { TextSelection } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
+import type { EditorState, Selection } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 const mountedEditors = new Set<BangleEditor>();
 if (typeof afterEach === 'function') {
@@ -40,7 +38,7 @@ export function renderTestEditor(
       // include bangle-editor-core to support prosemirror-tables fork
       attributes: { class: 'bangle-editor content bangle-editor-core' }
     };
-    let editor: BangleEditor = new BangleEditor(container, {
+    const editor: BangleEditor = new BangleEditor(container, {
       state: new BangleEditorState({ specRegistry, plugins, editorProps })
     });
 
@@ -74,8 +72,6 @@ export function renderTestEditor(
       container,
       editorState: view.state as EditorState,
       schema: view.state.schema,
-      // TODO deprecate editorView
-      editorView: view,
       selection: view.state.selection as Selection,
       posLabels,
       updateDoc,
