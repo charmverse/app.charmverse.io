@@ -189,10 +189,6 @@ export function rowNodeAtPos(
   startPos: number
 ): null | { node: HTMLElement; rowNode: HTMLElement; offset: number } {
   const dom = view.domAtPos(startPos);
-  if (startPos > 0 && dom.node === view.dom) {
-    // return null if pos is outside of document
-    return null;
-  }
   let rowNode = dom.node;
   // if startPos = 0, domAtPos gives us the doc container
   if (rowNode === view.dom) {
@@ -202,6 +198,10 @@ export function rowNodeAtPos(
   // ref: https://github.com/atlassian/prosemirror-utils/issues/8
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
+  }
+  if (startPos > 0 && rowNode === view.dom) {
+    // return null if pos is outside of document
+    return null;
   }
   // if (isContainerNode(rowNode)) {
   //   return null;

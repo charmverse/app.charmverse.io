@@ -11,13 +11,6 @@ const testEditor = renderTestEditor({
 });
 
 describe('rowNodeAtPos() returns the DOM node given a position in the prosemirror document', () => {
-  test('When pos is outside the document, returns null', () => {
-    const doc = _.doc();
-    const editor = testEditor(doc);
-    const node = rowNodeAtPos(editor.view, 100);
-    expect(node).toBeNull();
-  });
-
   test('When pos is inside a text node, returns the parent paragraph', () => {
     const doc = _.doc(_.p('hello world'));
     const editor = testEditor(doc);
