@@ -20,6 +20,7 @@ import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
+import type { DisabledAddCardProp } from '../shared';
 
 type Props = {
   board: Board;
@@ -31,7 +32,7 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
-};
+} & DisabledAddCardProp;
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, groupByProperty } = props;
@@ -142,7 +143,9 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               )}
             </Menu>
           </MenuWrapper>
-          <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
+          {!props.disableAddingCards && (
+            <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
+          )}
         </>
       )}
     </div>

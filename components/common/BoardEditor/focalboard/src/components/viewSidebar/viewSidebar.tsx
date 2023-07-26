@@ -42,6 +42,7 @@ interface Props {
   board?: Board;
   parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
+  views: BoardView[];
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
@@ -112,7 +113,7 @@ function ViewSidebar(props: Props) {
       // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
       fields: sourceBoard?.fields || props.parentBoard.fields
     };
-    const newView = createTableView(board, props.view);
+    const newView = createTableView({ board, activeView: props.view, views: props.views });
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;

@@ -18,7 +18,7 @@ import { publishIncrementalUpdate } from 'components/common/BoardEditor/publishe
 import Button from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
 import { Constants } from '../constants';
@@ -48,6 +48,7 @@ function AddViewMenu(props: AddViewProps) {
   const showView = props.showView;
 
   const views = props.views.filter((view) => !view.fields.inline);
+
   const viewIdsFromFields = props.board.fields?.viewIds ?? [];
   const viewIds = viewIdsFromFields.length === views.length ? viewIdsFromFields : views.map((view) => view.id);
 
@@ -107,7 +108,7 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView(board, activeView, intl);
+    const view = createTableView({ board, activeView, intl, views });
     view.id = uuid();
 
     const oldViewId = activeView?.id;
@@ -285,7 +286,15 @@ function AddViewMenu(props: AddViewProps) {
   );
 }
 
-export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
+type CreateViewProps = {
+  board: Board;
+  views: BoardView[];
+  activeView?: BoardView;
+  intl?: IntlShape;
+  dataSourceType?: ViewSourceType;
+};
+
+export function createTableView({ board, activeView, intl, dataSourceType, views }: CreateViewProps) {
   const view = createBoardView(activeView);
   view.title = '';
   view.fields.viewType = 'table';
@@ -295,6 +304,8 @@ export function createTableView(board: Board, activeView?: BoardView, intl?: Int
   view.fields.columnWidths = {};
   view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
   view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+  view.fields.sourceType = views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : dataSourceType;
+
   return view;
 }
 
