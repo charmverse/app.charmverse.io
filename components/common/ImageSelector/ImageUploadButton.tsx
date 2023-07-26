@@ -32,7 +32,11 @@ export function ImageUploadButton({
         disabled={isUploading}
         component='label'
         variant={variant}
-        onClick={openFilePicker}
+        onClick={(e: any) => {
+          // This is necessary to prevent the file picker to open multiple times (this happens in the sidebar)
+          e.preventDefault();
+          openFilePicker();
+        }}
         {...props}
       >
         Choose an image
@@ -43,6 +47,7 @@ export function ImageUploadButton({
           hidden
           accept='image/*'
           onClick={(e) => {
+            // Without this the file picker doesn't open
             e.stopPropagation();
           }}
           onChange={onFileChange}
