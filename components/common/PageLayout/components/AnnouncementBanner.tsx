@@ -1,51 +1,45 @@
-import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack } from '@mui/material';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { Button } from 'components/common/Button';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
-const UpgradeButton = styled(Button)`
-  font-weight: 600;
-  padding-bottom: 0;
-  padding-top: 0;
-`;
-
 export function AnnouncementBanner({
-  spaceId,
   children,
-  showClose = true,
-  errorBackground = false
+  hideClose,
+  errorBackground
 }: {
-  spaceId: string;
   children: ReactNode;
-  showClose?: boolean;
+  hideClose?: boolean;
   errorBackground?: boolean;
 }) {
-  const [showAnnouncementBar, setShowAnnouncementBar] = useLocalStorage(`show-paid-banner/${spaceId}`, true);
+  const [showAnnouncementBar, setShowAnnouncementBar] = useState(true);
   const { onClick } = useSettingsDialog();
 
-  return showAnnouncementBar ? (
+  if (!showAnnouncementBar) {
+    return null;
+  }
+
+  return (
     <StyledBanner errorBackground={errorBackground} top={20} data-test='subscription-banner'>
       <Box pr={3} display='flex' alignItems='center'>
         {children}
         <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-          <UpgradeButton
+          <Button
             endIcon={<EastIcon />}
-            sx={{ ml: 1 }}
+            sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
             color={errorBackground ? 'white' : 'primary'}
             onClick={() => onClick('subscription')}
             variant='outlined'
           >
             UPGRADE
-          </UpgradeButton>
+          </Button>
         </Stack>
       </Box>
-      {showClose && (
+      {!hideClose && (
         <IconButton
           onClick={() => setShowAnnouncementBar(false)}
           size='small'
@@ -59,5 +53,5 @@ export function AnnouncementBanner({
         </IconButton>
       )}
     </StyledBanner>
-  ) : null;
+  );
 }
