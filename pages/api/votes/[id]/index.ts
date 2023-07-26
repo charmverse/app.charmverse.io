@@ -65,12 +65,12 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
 
   if (vote.pageId && vote.page) {
     if (vote.page.proposalId) {
-      const proposalPermissiong = await req.basePermissionsClient.proposals.computeProposalPermissions({
+      const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
         userId,
         resourceId: vote.pageId
       });
 
-      if (!proposalPermissiong.create_vote) {
+      if (!proposalPermissions.create_vote) {
         throw new UnauthorisedActionError('You do not have permissions to update the vote.');
       }
     } else {
