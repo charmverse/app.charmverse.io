@@ -16,9 +16,11 @@ import Modal from 'components/common/Modal';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
+import type { NotionImportCompleted } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useSnackbar } from './useSnackbar';
+import { useWebSocketClient } from './useWebSocketClient';
 
 interface Props {
   children: JSX.Element;
@@ -48,6 +50,7 @@ export function NotionProvider({ children }: Props) {
   const dispatch = useAppDispatch();
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);
+  const { subscribe } = useWebSocketClient();
 
   const { trigger } = useSWRMutation(
     '/notion/import',
@@ -86,6 +89,13 @@ export function NotionProvider({ children }: Props) {
     setModalOpen(false);
   }
 
+  function handleNotionImportCompleted({ totalImportedPages, totalPages }: NotionImportCompleted['payload']) {
+    // Only show this message if the import was not triggered by the user
+    if (totalImportedPages === totalPages && !notionCode) {
+      showMessage('Notion workspace successfully imported');
+    }
+  }
+
   useEffect(() => {
     if (space?.id && notionCode) {
       deleteCookie(AUTH_CODE_COOKIE);
@@ -95,6 +105,12 @@ export function NotionProvider({ children }: Props) {
     }
   }, [space?.id, notionCode]);
 
+  useEffect(() => {
+    const unsubscribeFromBlockUpdates = subscribe('notion_import_completed', handleNotionImportCompleted);
+    return () => {
+      unsubscribeFromBlockUpdates?.();
+    };
+  }, []);
   const value = useMemo<INotionImportContext>(() => ({ loading: notionState.loading }), [notionState.loading]);
 
   return (

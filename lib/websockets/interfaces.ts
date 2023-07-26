@@ -109,6 +109,14 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+  };
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -125,7 +133,8 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
-  | SpaceSubscriptionUpdated;
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

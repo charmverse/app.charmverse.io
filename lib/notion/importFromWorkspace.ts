@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
 
+import { relay } from 'lib/websockets/relay';
+
 import { NotionImporter } from './NotionImporter/NotionImporter';
 
 export async function importFromWorkspace({
@@ -27,10 +29,22 @@ export async function importFromWorkspace({
   });
 
   const pagesRecordValues = Array.from(notionImporter.cache.pagesRecord.values());
+  const totalNotionPages = pagesRecordValues.filter((value) => value.notionPage).length;
+  const totalImportedPages = pagesRecordValues.filter((value) => value.charmversePage).length;
+  relay.broadcast(
+    {
+      type: 'notion_import_completed',
+      payload: {
+        totalImportedPages,
+        totalPages: totalNotionPages
+      }
+    },
+    spaceId
+  );
 
   log.info('[notion] Completed import of Notion pages', {
-    'Notion pages': pagesRecordValues.filter((value) => value.notionPage).length,
-    'Created CharmVerse pages (incl. cards)': pagesRecordValues.filter((value) => value.charmversePage).length,
+    'Notion pages': totalNotionPages,
+    'Created CharmVerse pages (incl. cards)': totalImportedPages,
     'Failed import pages': Object.values(notionImporter.cache.failedImportsRecord).slice(0, 25),
     'Pages without integration access': notionImporter.cache.pagesWithoutIntegrationAccess
   });

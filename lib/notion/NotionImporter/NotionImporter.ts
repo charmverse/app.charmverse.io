@@ -92,6 +92,7 @@ export class NotionImporter {
 
     const workspacePageId = v4();
 
+    // Create a root level page for the notion workspace
     await createPrismaPage({
       createdBy: this.userId,
       spaceId: this.spaceId,
