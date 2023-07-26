@@ -1,13 +1,12 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createCard } from 'lib/focalboard/card';
-import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
+import { generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
@@ -120,9 +119,19 @@ describe('createCardsFromProposals', () => {
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })).rejects.toThrowError(
-      DataNotFoundError
-    );
+    await expect(
+      createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
+    ).rejects.toThrowError();
+  });
+
+  it('should throw an error if boardId or spaceId is invalid', async () => {
+    await expect(
+      createCardsFromProposals({ boardId: board.id, spaceId: 'Bad space id', userId: user.id })
+    ).rejects.toThrowError(InvalidInputError);
+
+    await expect(
+      createCardsFromProposals({ boardId: 'bad board id', spaceId: space.id, userId: user.id })
+    ).rejects.toThrowError(InvalidInputError);
   });
 
   it('should not create cards if no proposals are found', async () => {

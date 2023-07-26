@@ -27,6 +27,7 @@ import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { ViewSourceType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -1056,13 +1057,15 @@ export async function generateBoard({
   parentId,
   cardCount,
   views,
-  addPageContent
+  addPageContent,
+  viewDataSource
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
   views?: number;
+  viewDataSource?: ViewSourceType;
   addPageContent?: boolean;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
@@ -1071,7 +1074,8 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
-    addPageContent
+    addPageContent,
+    viewDataSource
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

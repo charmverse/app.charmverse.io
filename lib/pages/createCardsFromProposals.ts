@@ -1,6 +1,8 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -20,6 +22,20 @@ export async function createCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
+  if (!stringUtils.isUUID(spaceId)) {
+    throw new InvalidInputError('Invalid spaceId');
+  } else if (!stringUtils.isUUID(boardId)) {
+    throw new InvalidInputError('Invalid boardId');
+  }
+  await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      id: true
+    }
+  });
+
   const pageProposals = await prisma.page.findMany({
     where: {
       spaceId,
@@ -79,9 +95,6 @@ export async function createCardsFromProposals({
       });
     })
   );
-
-  // eslint-disable-next-line no-console
-  console.log({ updatedViewBlocks: JSON.stringify(updatedViewBlocks, null, 2) });
 
   relay.broadcast(
     {

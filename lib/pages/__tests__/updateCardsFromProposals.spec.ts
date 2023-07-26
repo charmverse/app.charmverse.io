@@ -9,6 +9,7 @@ import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDa
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
+import { extractCardProposalProperties, extractDatabaseProposalProperties } from '../utils';
 
 describe('updateCardsFromProposals()', () => {
   let user: User;
@@ -180,23 +181,38 @@ describe('updateCardsFromProposals()', () => {
     expect(newCreatedCard).toBeNull();
   });
 
-  it('should update the card proposalStatusProperty if the proposal status was changed', async () => {
+  it('should update the card proposalStatus and proposalCategory property if the proposal status or category was changed', async () => {
     const database = await generateBoard({
       createdBy: user.id,
       spaceId: space.id,
-      views: 1
+      views: 1,
+      viewDataSource: 'proposals'
     });
-
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [],
       proposalStatus: 'discussion',
       reviewers: [],
       spaceId: space.id,
-      userId: user.id,
-      archived: true
+      userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id });
+
+    const databaseAfterUpdate = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: database.id
+      }
+    });
+
+    const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
+      database: databaseAfterUpdate as any
+    });
+
+    const discussionValueId = proposalStatus?.options.find((opt) => opt.value === 'discussion')?.id;
+    const reviewValueId = proposalStatus?.options.find((opt) => opt.value === 'review')?.id;
+
+    expect(discussionValueId).toBeDefined();
+    expect(reviewValueId).toBeDefined();
 
     const syncedPage = await prisma.page.findFirstOrThrow({
       where: {
@@ -211,38 +227,72 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    await prisma.proposal.update({
+    const cardBlockProposalProps = extractCardProposalProperties({
+      card: cardBlock as any,
+      databaseProperties: {
+        proposalCategory,
+        proposalStatus,
+        proposalUrl
+      }
+    });
+
+    expect(cardBlockProposalProps.cardProposalStatus).toBeDefined();
+    expect(cardBlockProposalProps.cardProposalStatus?.value).toBe('discussion');
+    expect(cardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
+    expect(cardBlockProposalProps.cardProposalCategory).toBeDefined();
+    expect(cardBlockProposalProps.cardProposalCategory?.optionId).toBe(pageProposal.categoryId);
+    expect(cardBlockProposalProps.cardProposalCategory?.value).toBe(pageProposal.category?.title);
+    expect(cardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
+
+    const updatedProposal = await prisma.proposal.update({
       where: {
         id: pageProposal.id
       },
       data: {
-        status: 'review'
+        status: 'review',
+        category: {
+          create: {
+            color: '',
+            title: 'New category',
+            space: { connect: { id: space.id } }
+          }
+        }
+      },
+      include: {
+        category: true
       }
     });
 
-    const pageProposal2 = await testUtilsProposals.generateProposal({
-      authors: [],
-      proposalStatus: 'discussion',
-      reviewers: [],
-      spaceId: space.id,
-      userId: user.id,
-      archived: true
-    });
-
     await updateCardsFromProposals({
-      boardId: board.id,
+      boardId: database.id,
       spaceId: space.id,
       userId: user.id
     });
 
-    const newCreatedCard = await prisma.page.findFirst({
+    const databaseAfterSecondUpdate = await prisma.block.findUniqueOrThrow({
       where: {
-        type: 'card',
-        syncWithPageId: pageProposal2.id
+        id: database.id
       }
     });
 
-    expect(newCreatedCard).toBeNull();
+    const updatedCard = await prisma.block.findUnique({
+      where: {
+        id: cardBlock.id
+      }
+    });
+
+    const updatedCardBlockProposalProps = extractCardProposalProperties({
+      card: updatedCard as any,
+      databaseProperties: extractDatabaseProposalProperties({ database: databaseAfterSecondUpdate })
+    });
+
+    expect(updatedCardBlockProposalProps.cardProposalStatus).toBeDefined();
+    expect(updatedCardBlockProposalProps.cardProposalStatus?.value).toBe('review');
+    expect(updatedCardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
+    expect(updatedCardBlockProposalProps.cardProposalCategory).toBeDefined();
+    expect(updatedCardBlockProposalProps.cardProposalCategory?.optionId).toBe(updatedProposal.categoryId);
+    expect(updatedCardBlockProposalProps.cardProposalCategory?.value).toBe(updatedProposal.category?.title);
+    expect(updatedCardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
   });
 
   it('should delete cards from proposals', async () => {

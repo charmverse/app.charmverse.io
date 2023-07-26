@@ -1,6 +1,7 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
+import type { ViewSourceType } from 'lib/focalboard/boardView';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -22,7 +23,8 @@ export function boardWithCardsArgs({
   parentId,
   cardCount = 2,
   addPageContent,
-  views = 1
+  views = 1,
+  viewDataSource
 }: {
   createdBy: string;
   spaceId: string;
@@ -30,6 +32,7 @@ export function boardWithCardsArgs({
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
+  viewDataSource?: ViewSourceType;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -290,6 +293,7 @@ export function boardWithCardsArgs({
           operation: 'and'
         },
         viewType: 'gallery',
+        viewDataSource,
         cardOrder: [cardIds[1], cardIds[0]],
         sortOptions: [],
         columnWidths: {},
