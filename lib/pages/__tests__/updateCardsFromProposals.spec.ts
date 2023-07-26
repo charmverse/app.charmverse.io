@@ -1,12 +1,11 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { BoardView } from 'lib/focalboard/boardView';
 import { InvalidStateError } from 'lib/middleware';
-import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
+import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
@@ -180,6 +179,72 @@ describe('updateCardsFromProposals()', () => {
 
     expect(newCreatedCard).toBeNull();
   });
+
+  it('should update the card proposalStatusProperty if the proposal status was changed', async () => {
+    const database = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      views: 1
+    });
+
+    const pageProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id,
+      archived: true
+    });
+
+    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+
+    const syncedPage = await prisma.page.findFirstOrThrow({
+      where: {
+        parentId: database.id,
+        syncWithPageId: pageProposal.id
+      }
+    });
+
+    const cardBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: syncedPage.id
+      }
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: pageProposal.id
+      },
+      data: {
+        status: 'review'
+      }
+    });
+
+    const pageProposal2 = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'discussion',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id,
+      archived: true
+    });
+
+    await updateCardsFromProposals({
+      boardId: board.id,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const newCreatedCard = await prisma.page.findFirst({
+      where: {
+        type: 'card',
+        syncWithPageId: pageProposal2.id
+      }
+    });
+
+    expect(newCreatedCard).toBeNull();
+  });
+
   it('should delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],

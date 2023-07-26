@@ -190,22 +190,3 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
     }
   });
 }
-
-/**
- * Returns all proposal properties
- */
-export function extractDatabaseProposalProperties({
-  database
-}: {
-  database: Block;
-}): Partial<Record<DatabaseProposalPropertyType, IPropertyTemplate>> {
-  return {
-    proposalCategory: (database.fields as any).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalCategory'
-    ),
-    proposalUrl: (database.fields as any).cardProperties.find((prop: IPropertyTemplate) => prop.type === 'proposalUrl'),
-    proposalStatus: (database.fields as any).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalStatus'
-    )
-  };
-}

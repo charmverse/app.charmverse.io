@@ -1,16 +1,15 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from './createCardPage';
-import { extractDatabaseProposalProperties, setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { extractDatabaseProposalProperties } from './utils';
 
 export async function createCardsFromProposals({
   boardId,
