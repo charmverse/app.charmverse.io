@@ -1,6 +1,6 @@
 import { Typography, Box } from '@mui/material';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CircularProgressWithLabel } from 'components/common/CircularProgressWithLabel/CircularProgressWithLabel';
 import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';

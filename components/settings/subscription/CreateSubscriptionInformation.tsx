@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { subscriptionDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';

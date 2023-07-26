@@ -1,6 +1,7 @@
 import { Box, Grid, Paper } from '@mui/material';
 import { useState } from 'react';
 
+import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
@@ -9,7 +10,6 @@ import { TimezoneAutocomplete } from 'components/u/components/TimezoneAutocomple
 import UserDescription from 'components/u/components/UserDescription';
 import type { Social } from 'components/u/interfaces';
 
-import Button from '../Button';
 import type { SelectOptionType } from '../form/fields/Select/interfaces';
 
 export default {

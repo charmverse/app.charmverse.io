@@ -1,7 +1,7 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import type { FormEvent, ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { generatePriceDetails } from 'lib/subscription/generatePriceDetails';
 import type { CouponDetails } from 'lib/subscription/getCouponDetails';

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { SiDiscourse } from 'react-icons/si';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { ImportZippedMarkdown } from 'components/common/ImportZippedMarkdown';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
 import { useRefreshApplicationStatus } from 'components/bounties/hooks/useRefreshApplicationStatus';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';

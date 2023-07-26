@@ -5,7 +5,7 @@ import { Box, IconButton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 

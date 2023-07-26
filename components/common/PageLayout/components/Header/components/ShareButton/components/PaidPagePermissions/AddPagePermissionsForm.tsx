@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';

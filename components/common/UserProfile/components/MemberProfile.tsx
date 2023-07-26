@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { PublicProfile } from 'components/u/PublicProfile';
 import type { Member } from 'lib/members/interfaces';
 

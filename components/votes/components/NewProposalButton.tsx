@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useProposalDialog } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';

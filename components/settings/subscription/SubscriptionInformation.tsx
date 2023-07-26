@@ -9,7 +9,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

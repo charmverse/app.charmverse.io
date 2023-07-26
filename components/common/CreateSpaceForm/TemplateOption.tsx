@@ -3,7 +3,7 @@ import { KeyboardArrowRight } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 type TemplateOptionProps = {
   icon?: ReactNode;

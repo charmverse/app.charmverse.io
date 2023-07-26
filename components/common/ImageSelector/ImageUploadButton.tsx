@@ -4,7 +4,7 @@ import { Stack, Typography } from '@mui/material';
 import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 
-import { PimpedButton } from '../Button';
+import { Button } from '../Button';
 
 export function ImageUploadButton({
   setImage,
@@ -26,7 +26,7 @@ export function ImageUploadButton({
 
   return (
     <Stack alignItems='center' gap={1}>
-      <PimpedButton
+      <Button
         loading={isUploading}
         loadingMessage='Uploading image'
         disabled={isUploading}
@@ -52,7 +52,7 @@ export function ImageUploadButton({
           }}
           onChange={onFileChange}
         />
-      </PimpedButton>
+      </Button>
       {uploadDisclaimer && (
         <Typography variant='caption' color='secondary'>
           {uploadDisclaimer}

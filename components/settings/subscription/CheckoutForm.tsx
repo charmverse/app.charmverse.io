@@ -12,7 +12,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
