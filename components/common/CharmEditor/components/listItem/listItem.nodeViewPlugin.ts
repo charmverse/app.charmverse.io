@@ -93,6 +93,15 @@ export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
 
         // Connect the two contentDOM and containerDOM for pm to write to
         instance.containerDOM?.appendChild(instance.contentDOM!);
+
+        // Disable mutation observer for all attributes except checked
+        instance.ignoreMutation = (mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName !== 'checked') {
+            return true;
+          }
+
+          return false;
+        };
       },
 
       // We need to achieve a two way binding of the todoChecked state.
