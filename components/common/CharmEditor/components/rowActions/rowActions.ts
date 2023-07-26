@@ -189,6 +189,7 @@ export function rowNodeAtPos(
   startPos: number
 ): null | { node: HTMLElement; rowNode: HTMLElement; offset: number } {
   const dom = view.domAtPos(startPos);
+
   let rowNode = dom.node;
   // if startPos = 0, domAtPos gives us the doc container
   if (rowNode === view.dom) {
@@ -196,8 +197,12 @@ export function rowNodeAtPos(
   }
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
   // ref: https://github.com/atlassian/prosemirror-utils/issues/8
-  if (dom.offset && dom.node.childNodes[dom.offset]) {
+  if (dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
+  }
+
+  if (isContainerNode(rowNode)) {
+    return null;
   }
 
   // if we are over a container, select the first child
@@ -248,7 +253,6 @@ function blockPosAtCoords(view: EditorView, coords: { left: number; top: number 
   const dom = rowNodeAtPos(view, startPos);
 
   const node = dom?.rowNode;
-
   // nodeType === 1 is an element like <p> or <div>
   if (node && node.nodeType === 1) {
     // @ts-ignore
