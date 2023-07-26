@@ -44,13 +44,20 @@ function buildResizeBars(state: EditorState) {
   return DecorationSet.create(
     state.doc,
     resizeBarConfig.map(({ pos }) =>
-      Decoration.widget(pos + 1, () => {
-        return createElement([
-          'div',
-          { class: 'charm-column-resizer', 'data-item-type': 'BAR', 'data-item-config': `{"size": ${barWidth}}` },
-          ['div', ['div']]
-        ]);
-      })
+      Decoration.widget(
+        pos + 1,
+        () => {
+          return createElement([
+            'div',
+            { class: 'charm-column-resizer', 'data-item-type': 'BAR', 'data-item-config': `{"size": ${barWidth}}` },
+            ['div', ['div']]
+          ]);
+        },
+        {
+          // helps rowAction plugin ignore widgets when using posAtDom
+          side: -1
+        }
+      )
     )
   );
 }

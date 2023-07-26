@@ -44,7 +44,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
-    if (menuState.rowPos === undefined || !menuState.rowDOM) {
+    if (menuState.rowPos === undefined) {
       return null;
     }
 

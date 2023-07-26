@@ -6,11 +6,24 @@ import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
-const containerNodeTypes = ['columnBlock', 'bulletList', 'orderedList'];
+// TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
+const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList'];
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 // helpful links:
 // Indexing in PM: https://prosemirror.net/docs/guide/#doc.indexing
+/**
+ *
+ * How it works:
+ *  A Prosemirror plugin is created to listen to mouse events on the editor.
+ * 1. On clicking a handle (dragStart), create a node selection a snapshot of the current row. Serialize the content that is stored in the event
+ * 2. On mouse move, keep track of the document pos
+ *
+ *
+ *
+ *
+ *
+ */
 
 export interface PluginState {
   tooltipDOM: HTMLElement;
@@ -20,9 +33,12 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
+// A Prosemirror plugin is needed to listen to mouse events on the editor.
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
+  // Track the pos of the row to be moved, as the cursor moves around the editor.
+  // This is used to position the handlebar which appears in the margin.
   function onMouseOver(view: EditorView, e: MouseEventInit) {
     if (view.isDestroyed) {
       return;
@@ -68,6 +84,7 @@ export function plugins({ key }: { key: PluginKey }) {
 
   const brokenClipboardAPI = false;
 
+  // Listen to drag start events on the .charm-drag-handle elements and set the dragged content based on prosemiror content.
   function dragStart(view: EditorView, e: DragEvent) {
     if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
 
@@ -149,6 +166,14 @@ export function posAtCoords(view: EditorView, coords: { left: number; top: numbe
   return startPos;
 }
 
+function getFirstChildBlock(children: HTMLCollection) {
+  for (const child of children) {
+    if (child.pmViewDesc?.node?.isBlock) {
+      return child;
+    }
+  }
+}
+
 export function rowNodeAtPos(
   view: EditorView,
   startPos: number
@@ -161,12 +186,20 @@ export function rowNodeAtPos(
   let rowNode = dom.node;
   // if startPos = 0, domAtPos gives us the doc container
   if (rowNode === view.dom) {
-    rowNode = view.dom.children[0] || view.dom;
+    rowNode = getFirstChildBlock(view.dom.children) || view.dom;
   }
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
   // ref: https://github.com/atlassian/prosemirror-utils/issues/8
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
+  }
+  // if we are over a container, select the first child
+  while (isContainerNode(rowNode)) {
+    const firstChild = getFirstChildBlock(rowNode.childNodes as any);
+    if (!firstChild) {
+      return null;
+    }
+    rowNode = firstChild;
   }
   let levels = 20; // pre-caution to prevent infinite loop
   while (rowNode && !isContainerNode(rowNode.parentNode) && levels > 0) {
