@@ -50,7 +50,8 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       spaceId: true,
       createdBy: true,
       pageId: true,
-      postId: true
+      postId: true,
+      page: true
     }
   });
 
@@ -58,14 +59,25 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
     throw new DataNotFoundError(`Cannot update vote as vote with id ${voteId} was not found.`);
   }
 
-  if (vote.pageId) {
-    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
-      userId,
-      resourceId: vote.pageId
-    });
+  if (vote.pageId && vote.page) {
+    if (vote.page.proposalId) {
+      const proposalPermissiong = await req.basePermissionsClient.proposals.computeProposalPermissions({
+        userId,
+        resourceId: vote.pageId
+      });
 
-    if (!pagePermissions.create_poll) {
-      throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      if (!proposalPermissiong.create_vote) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
+    } else {
+      const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+        userId,
+        resourceId: vote.pageId
+      });
+
+      if (!pagePermissions.create_poll) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
     }
   } else if (vote.postId) {
     const postPermissions = await req.basePermissionsClient.forum.computePostPermissions({
