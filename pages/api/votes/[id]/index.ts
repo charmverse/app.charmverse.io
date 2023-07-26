@@ -63,8 +63,8 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
     throw new DataNotFoundError(`Cannot update vote as vote with id ${voteId} was not found.`);
   }
 
-  if (vote.pageId && vote.page) {
-    if (vote.page.proposalId) {
+  if (vote.pageId) {
+    if (vote.page?.proposalId) {
       const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
         userId,
         resourceId: vote.pageId
