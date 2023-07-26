@@ -12,7 +12,7 @@ import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';

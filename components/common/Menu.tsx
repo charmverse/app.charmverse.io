@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { v4 } from 'uuid';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 
 export interface MenuOption<T = any> {

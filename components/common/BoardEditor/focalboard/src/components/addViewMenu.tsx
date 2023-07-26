@@ -15,7 +15,7 @@ import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';

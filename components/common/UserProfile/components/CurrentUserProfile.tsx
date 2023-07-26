@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/u/components/UserDetails/UserDetailsForm';
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';

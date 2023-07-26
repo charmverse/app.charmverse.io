@@ -1,7 +1,7 @@
 import { Check } from '@mui/icons-material';
 import { Box, Paper } from '@mui/material';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 export default {
   title: 'common/Buttons',

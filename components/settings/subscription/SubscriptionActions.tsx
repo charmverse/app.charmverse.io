@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 

@@ -4,7 +4,7 @@ import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material'
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useIsAdmin } from 'hooks/useIsAdmin';

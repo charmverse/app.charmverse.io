@@ -9,8 +9,8 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import ConfirmUpgradeModal from 'components/common/Modal/ConfirmUpgradeModal';
+import { Button } from 'components/common/Button';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import Legend from 'components/settings/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -18,6 +18,7 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import { communityProduct } from 'lib/subscription/constants';
+import { generatePriceDetails } from 'lib/subscription/generatePriceDetails';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
 import { formatDate } from 'lib/utilities/dates';
@@ -155,8 +156,8 @@ export function SubscriptionInformation({
     }
   }, [spaceSubscription?.status]);
 
-  const price =
-    spaceSubscription.period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+  const pricePerMonth = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
+  const priceDetails = generatePriceDetails(spaceSubscription.discount, pricePerMonth * blockQuota);
 
   const nextBillingDate = spaceSubscription?.renewalDate
     ? formatDate(spaceSubscription.renewalDate, { withYear: true, month: 'long' }, userPreferences.locale)
@@ -172,7 +173,7 @@ export function SubscriptionInformation({
           </Typography>
           <Typography>Community Edition - {String(spaceSubscription.blockQuota)}K blocks</Typography>
           <Typography>
-            ${price * spaceSubscription.blockQuota} per month billed {spaceSubscription.period}
+            ${priceDetails.total.toFixed(2)} per month billed {spaceSubscription.period}
           </Typography>
           {nextBillingDate && (
             <Typography>
@@ -201,45 +202,50 @@ export function SubscriptionInformation({
             onUpgrade={() => openUpgradeDialog()}
             confirmFreeTierDowngrade={switchToFreePlan}
           />
-          <ConfirmUpgradeModal
+          <ModalWithButtons
             title='Upgrade Community Edition'
             size='large'
             open={isUpgradeDialogOpen}
             buttonText='Change subscription'
             secondaryButtonText='Cancel'
-            question={
-              <PlanSelection
-                blockQuotaInThousands={blockQuota}
-                period={period}
-                disabled={false}
-                onSelect={handlePlanSelect}
-              />
-            }
             onConfirm={openConfirmUpgradeDialog}
             onClose={closeUpgradeDialog}
             disabled={
               isLoadingUpgrade || (period === spaceSubscription.period && blockQuota === spaceSubscription.blockQuota)
             }
-          />
-          <ConfirmUpgradeModal
+          >
+            <PlanSelection
+              blockQuotaInThousands={blockQuota}
+              period={period}
+              disabled={false}
+              onSelect={handlePlanSelect}
+            />
+          </ModalWithButtons>
+          <ModalWithButtons
             title='Confirm plan changes'
             size='large'
             open={isConfirmUpgradeDialogOpen}
             buttonText='Confirm'
             secondaryButtonText='Cancel'
-            question={`You are about to change your plan. ${
-              spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''
-            }`}
             onConfirm={() => upgradeSpaceSubscription({ spaceId: space.id, payload: { period, blockQuota } })}
             onClose={closeConfirmUpgradeDialog}
             disabled={isLoadingUpgrade}
-          />
+          >
+            <Typography>
+              You are about to change your plan.{' '}
+              {spaceSubscription.blockQuota < blockQuota ? 'This will automatically charge your payment method.' : ''}
+            </Typography>
+          </ModalWithButtons>
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
       {spaceSubscription?.paymentMethod && (
         <>
-          <PaymentMethod paymentMethod={spaceSubscription.paymentMethod} />
+          <PaymentMethod
+            paymentMethod={spaceSubscription.paymentMethod}
+            spaceId={space.id}
+            refetchSubscription={refetchSpaceSubscription}
+          />
           <Divider sx={{ my: 2 }} />
         </>
       )}
@@ -257,7 +263,9 @@ export function SubscriptionInformation({
               disabled={isLoadingUpdate}
             />
             <Button
-              disabled={isLoadingUpdate || email.length === 0 || !!errors.email}
+              disabled={
+                isLoadingUpdate || email.length === 0 || !!errors.email || email === spaceSubscription.billingEmail
+              }
               onClick={() =>
                 updateSpaceSubscription({
                   spaceId: space.id,

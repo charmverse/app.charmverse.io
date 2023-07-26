@@ -7,10 +7,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import Legend from '../Legend';
 
-import { useSpaceSubscription } from './hooks/useSpaceSubscription';
-
 export function EnterpriseBillingScreen() {
-  const { spaceSubscription } = useSpaceSubscription();
   const isSmallScreen = useSmallScreen();
 
   const logoSize = isSmallScreen ? 50 : 100;

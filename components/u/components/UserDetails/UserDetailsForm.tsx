@@ -15,7 +15,7 @@ import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/settings/account/components/useIdentityTypes';

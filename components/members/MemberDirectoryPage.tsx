@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';

@@ -19,7 +19,7 @@ import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';

@@ -3,7 +3,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';
-import { stripeMock } from 'testing/stripeMock';
+import { stripeMock, stripeMockIds } from 'testing/stripeMock';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { stripeClient } from '../stripe';
@@ -36,6 +36,14 @@ describe('updateProSubscription', () => {
         metadata: {
           spaceId
         }
+      },
+      items: {
+        data: [
+          {
+            price: stripeMockIds.priceId,
+            quantity: 10
+          }
+        ]
       }
     };
 
@@ -104,6 +112,14 @@ describe('updateProSubscription', () => {
         metadata: {
           spaceId
         }
+      },
+      items: {
+        data: [
+          {
+            price: stripeMockIds.priceId,
+            quantity: 10
+          }
+        ]
       }
     };
 
@@ -141,6 +157,14 @@ describe('updateProSubscription', () => {
         metadata: {
           spaceId
         }
+      },
+      items: {
+        data: [
+          {
+            price: stripeMockIds.priceId,
+            quantity: 10
+          }
+        ]
       }
     };
 
@@ -172,6 +196,14 @@ describe('updateProSubscription', () => {
         metadata: {
           spaceId
         }
+      },
+      items: {
+        data: [
+          {
+            price: stripeMockIds.priceId,
+            quantity: 10
+          }
+        ]
       }
     };
 
