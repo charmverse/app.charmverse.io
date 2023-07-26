@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { ButtonProps } from '@mui/material';
 import { Stack, Typography } from '@mui/material';
 
+import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 import { PimpedButton } from '../Button';
@@ -12,6 +13,7 @@ export function ImageUploadButton({
   setIsUploading,
   uploadDisclaimer,
   variant = 'outlined',
+  fileSizeLimit,
   ...props
 }: {
   isUploading: boolean;
@@ -19,7 +21,10 @@ export function ImageUploadButton({
   setImage: (image: string) => void;
   uploadDisclaimer?: string;
   variant?: ButtonProps['variant'];
+  // file size limit in megabytes
+  fileSizeLimit?: number;
 } & ButtonProps) {
+  const { showMessage } = useSnackbar();
   return (
     <Stack alignItems='center' gap={1}>
       <PimpedButton
@@ -51,6 +56,11 @@ export function ImageUploadButton({
             setIsUploading(true);
             const firstFile = e.target.files?.[0];
             if (firstFile) {
+              if (firstFile.size > (fileSizeLimit ?? 10) * 1024 * 1024) {
+                showMessage(`File size limit is ${fileSizeLimit ?? 10}MB`, 'error');
+                setIsUploading(false);
+                return;
+              }
               try {
                 const { url } = await uploadToS3(firstFile);
                 setImage(url);

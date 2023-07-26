@@ -47,6 +47,7 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
               sx={{
                 width: '100%'
               }}
+              uploadDisclaimer='Recommended size is 280 × 280 pixels'
               isUploading={isUploading}
               setIsUploading={setIsUploading}
               setImage={updatePageIcon}
