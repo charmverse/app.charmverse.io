@@ -50,7 +50,12 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       spaceId: true,
       createdBy: true,
       pageId: true,
-      postId: true
+      postId: true,
+      page: {
+        select: {
+          proposalId: true
+        }
+      }
     }
   });
 
@@ -59,13 +64,24 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
   }
 
   if (vote.pageId) {
-    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
-      userId,
-      resourceId: vote.pageId
-    });
+    if (vote.page?.proposalId) {
+      const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+        userId,
+        resourceId: vote.pageId
+      });
 
-    if (!pagePermissions.create_poll) {
-      throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      if (!proposalPermissions.create_vote) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
+    } else {
+      const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+        userId,
+        resourceId: vote.pageId
+      });
+
+      if (!pagePermissions.create_poll) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
     }
   } else if (vote.postId) {
     const postPermissions = await req.basePermissionsClient.forum.computePostPermissions({
