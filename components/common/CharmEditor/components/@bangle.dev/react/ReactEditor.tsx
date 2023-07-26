@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -183,6 +184,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
             isLoadingRef.current = false;
+          },
+          onCommentUpdate: () => {
+            mutate(`pages/${pageId}/threads`);
           },
           onParticipantUpdate
         });
