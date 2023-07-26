@@ -165,6 +165,13 @@ export function NotionProvider({ children }: Props) {
         autoHideDuration={null}
         isOpen={!!notionState.error || !!notionState.warning || notionState.failedImports.length !== 0}
         message={notionState.error ?? notionState.warning}
+        handleClose={() => {
+          setNotionState({
+            error: undefined,
+            warning: undefined,
+            failedImports: []
+          });
+        }}
         actions={
           notionState.failedImports.length !== 0 && !notionState.loading
             ? [
