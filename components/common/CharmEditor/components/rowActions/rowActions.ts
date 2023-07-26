@@ -48,6 +48,12 @@ export function plugins({ key }: { key: PluginKey }) {
     if (e.target === view.dom) {
       return;
     }
+
+    // ignore UL and OL tags, using native browser list icons means we need to use padding on these container elements
+    // @ts-ignore
+    if (e.target.nodeName === 'OL' || e.target.nodeName === 'UL') {
+      return;
+    }
     // @ts-ignore
     const startPos = view.posAtDOM(e.target, 0);
 
@@ -162,7 +168,28 @@ export function plugins({ key }: { key: PluginKey }) {
           }
         };
       }
-    })
+    }),
+    (() => {
+      let focusing = false;
+      return new Plugin({
+        props: {
+          handleDOMEvents: {
+            focus: (view) => {
+              if (focusing) {
+                focusing = false;
+              } else {
+                focusing = true;
+                setTimeout(() => {
+                  view.dom.blur();
+                  view.dom.focus();
+                }, 0);
+              }
+              return false;
+            }
+          }
+        }
+      });
+    })()
   ];
 }
 
