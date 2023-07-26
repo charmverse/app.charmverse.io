@@ -51,7 +51,11 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       createdBy: true,
       pageId: true,
       postId: true,
-      page: true
+      page: {
+        select: {
+          proposalId: true
+        }
+      }
     }
   });
 
