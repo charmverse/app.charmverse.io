@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG:
+  SELECTED_PERMISSION_API_TAG: run-custom-branch-of-permission-in-staging
 
 jobs:
   deploy:
@@ -69,7 +69,7 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}"
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
             yq -I 4 -i '
