@@ -30,9 +30,11 @@ jobs:
           echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
 
-      - name: Debug
-        shell: bash
-        run: echo -e "Debug" && pwd && ls -a
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -43,6 +45,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
