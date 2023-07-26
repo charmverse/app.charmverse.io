@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -11,6 +12,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -41,6 +43,11 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
 
   const [isDragging, isOver, groupHeaderRef] = useSortable('groupHeader', group.option, !props.readOnly, props.onDrop);
   const intl = useIntl();
+
+  const formattedGroupTitle =
+    groupByProperty?.type === 'proposalStatus'
+      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      : groupTitle;
 
   const preventPropertyDeletion =
     props.groupByProperty && proposalPropertyTypesList.includes(props.groupByProperty.type as any);
@@ -73,22 +80,21 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
           className='hello-world'
         />
-
         {!group.option.id && (
           <Label
-            title={intl.formatMessage(
+            title={`${intl.formatMessage(
               {
                 id: 'BoardComponent.no-property-title',
                 defaultMessage: 'Items with an empty {property} property will go here. This column cannot be removed.'
               },
               { property: groupByProperty?.name }
-            )}
+            )}`}
           >
             <FormattedMessage
               id='BoardComponent.no-property'
               defaultMessage='No {property}'
               values={{
-                property: groupByProperty?.name
+                property: `${groupByProperty?.name}`
               }}
             />
           </Label>
@@ -96,7 +102,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
         {group.option.id && (
           <Label color={group.option.color}>
             <Editable
-              value={groupTitle}
+              value={formattedGroupTitle}
               placeholderText='New Select'
               onChange={setGroupTitle}
               onSave={() => {

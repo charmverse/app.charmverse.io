@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -11,6 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
@@ -87,6 +89,11 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
       defaultProperty
     : defaultProperty;
 
+  const formattedGroupTitle =
+    groupByProperty?.type === 'proposalStatus'
+      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      : groupTitle;
+
   return (
     <div
       key={group.option.id || 'empty'}
@@ -117,7 +124,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
       {group.option.id && (
         <Label color={group.option.color}>
           <Editable
-            value={groupTitle}
+            value={formattedGroupTitle}
             placeholderText='New Select'
             onChange={setGroupTitle}
             onSave={() => {

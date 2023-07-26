@@ -163,7 +163,7 @@ function ViewSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {props.view.fields.sourceType && (
+              {props.view.fields.sourceType !== 'proposals' && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
                   icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}

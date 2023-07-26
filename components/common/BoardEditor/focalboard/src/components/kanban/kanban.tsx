@@ -124,6 +124,11 @@ function Kanban(props: Props) {
 
   const onDropToColumn = useCallback(
     async (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => {
+      // Proposal data should be readonly
+      if (groupByProperty?.type === 'proposalCategory' || groupByProperty?.type === 'proposalStatus') {
+        return;
+      }
+
       const { selectedCardIds } = props;
       const optionId = option ? option.id : undefined;
 
