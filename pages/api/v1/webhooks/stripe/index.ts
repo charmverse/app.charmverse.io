@@ -13,7 +13,7 @@ import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubsc
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
 
-// Stripe requires the raw body to construct the event. https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
+// Stripe requires the raw body to construct the event.https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
 export const config = { api: { bodyParser: false } };
 
 function buffer(req: NextApiRequest) {
