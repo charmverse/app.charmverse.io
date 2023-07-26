@@ -14,6 +14,7 @@ import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
 import { Utils } from '../../utils';
+import type { CustomReadonlyViewProps } from '../shared';
 
 import CalculationRow from './calculation/calculationRow';
 import TableGroup from './tableGroup';
@@ -34,7 +35,7 @@ type Props = {
   showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-};
+} & CustomReadonlyViewProps;
 
 function Table(props: Props): JSX.Element {
   const { board, cardPages, activeView, visibleGroups, groupByProperty, views } = props;
@@ -251,6 +252,7 @@ function Table(props: Props): JSX.Element {
                   onDropToGroupHeader={onDropToGroupHeader}
                   onDropToCard={onDropToCard}
                   onDropToGroup={onDropToGroup}
+                  readonlyTitle={props.readonlyTitle}
                 />
               );
             })}
@@ -271,27 +273,31 @@ function Table(props: Props): JSX.Element {
               addCard={props.addCard}
               onCardClicked={props.onCardClicked}
               onDrop={onDropToCard}
+              readonlyTitle={props.readonlyTitle}
             />
           )}
         </div>
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readOnly && !props.readOnlySourceData && !activeView.fields.groupById && (
-            <div
-              className='octo-table-cell'
-              onClick={() => {
-                props.addCard('');
-              }}
-            >
-              <Box display='flex' gap={1} alignItems='center'>
-                <Add fontSize='small' />
-                <Typography fontSize='small' id='TableComponent.plus-new'>
-                  New
-                </Typography>
-              </Box>
-            </div>
-          )}
+          {!props.readOnly &&
+            !props.readOnlySourceData &&
+            !activeView.fields.groupById &&
+            !props.disableAddingCards && (
+              <div
+                className='octo-table-cell'
+                onClick={() => {
+                  props.addCard('');
+                }}
+              >
+                <Box display='flex' gap={1} alignItems='center'>
+                  <Add fontSize='small' />
+                  <Typography fontSize='small' id='TableComponent.plus-new'>
+                    New
+                  </Typography>
+                </Box>
+              </div>
+            )}
         </div>
 
         <CalculationRow

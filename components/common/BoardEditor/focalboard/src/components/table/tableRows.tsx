@@ -9,6 +9,8 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
+import type { CustomReadonlyViewProps, ReadonlyTitleProp } from '../shared';
+
 import TableRow from './tableRow';
 
 type Props = {
@@ -25,9 +27,9 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-};
+} & ReadonlyTitleProp;
 
-function TableRows(props: Props): JSX.Element {
+function TableRows(props: Props & Pick<CustomReadonlyViewProps, 'readonlyTitle'>): JSX.Element {
   const { board, cardPages: allCardPages, activeView } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
@@ -73,6 +75,7 @@ function TableRows(props: Props): JSX.Element {
           resizingColumn={props.resizingColumn}
           columnRefs={props.columnRefs}
           cardPage={page}
+          readonlyTitle={props.readonlyTitle}
         />
       ))}
 

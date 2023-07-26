@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import { memo } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
+import type { ReadonlyTitleProp } from 'components/common/BoardEditor/focalboard/src/components/shared';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
@@ -54,16 +55,16 @@ const EditorHeader = styled.div`
   }
 `;
 
-interface PageHeaderProps {
+type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
   setPage: (p: Partial<Page>) => void;
   updatedAt: string;
-}
+} & ReadonlyTitleProp;
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
+function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readonlyTitle }: PageHeaderProps) {
   function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
@@ -136,7 +137,7 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
           )}
         </Controls>
       </EditorHeader>
-      <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageTitleInput readOnly={readOnly || readonlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>
   );
 }

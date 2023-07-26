@@ -1,3 +1,4 @@
+import type { ProposalStatus } from '@charmverse/core/dist/cjs/prisma-client';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -29,6 +30,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { Constants } from '../../constants';
@@ -261,6 +264,49 @@ function FilterPropertyValue({
         </Select>
       );
     }
+  } else if (propertyDataType === 'proposal_status') {
+    return (
+      <Select<string>
+        displayEmpty
+        value={filter.values[0]}
+        renderValue={(selected) => {
+          const foundOption = property.options?.find((o) => o.id === selected);
+          return foundOption ? (
+            <Chip
+              size='small'
+              label={
+                PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[foundOption.value as Exclude<ProposalStatus, 'draft'> | 'archived']
+              }
+              color={focalboardColorsMap[foundOption.color]}
+            />
+          ) : (
+            <Typography fontSize='small' color='secondary'>
+              Select an option
+            </Typography>
+          );
+        }}
+      >
+        {property.options.length === 0 ? (
+          <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
+            No options available
+          </Typography>
+        ) : (
+          property.options?.map((option) => {
+            return (
+              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
+                <Chip
+                  size='small'
+                  label={
+                    PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[option.value as Exclude<ProposalStatus, 'draft'> | 'archived']
+                  }
+                  color={focalboardColorsMap[option.color]}
+                />
+              </MenuItem>
+            );
+          })
+        )}
+      </Select>
+    );
   } else if (propertyDataType === 'select') {
     return (
       <Select<string>
@@ -282,7 +328,7 @@ function FilterPropertyValue({
             No options available
           </Typography>
         ) : (
-          property.options?.map((option) => {
+          property.options.map((option) => {
             return (
               <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
                 <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />

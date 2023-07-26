@@ -509,6 +509,9 @@ function CenterPanel(props: Props) {
   const isLoadingSourceData =
     !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
+  const readonlyTitle = activeView?.fields.sourceType === 'proposals';
+  const disableAddingNewCards = activeView?.fields.sourceType === 'proposals';
+
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -674,6 +677,8 @@ function CenterPanel(props: Props) {
                   showCard={showCard}
                   addCard={addCard}
                   onCardClicked={cardClicked}
+                  disableAddingCards={disableAddingNewCards}
+                  readonlyTitle={readonlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'calendar' && (
