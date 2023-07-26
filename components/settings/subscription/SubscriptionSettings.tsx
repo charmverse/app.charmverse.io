@@ -2,9 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
 import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
@@ -17,6 +15,7 @@ import Legend from '../Legend';
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
 import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
+import { useBlockCount } from './hooks/useBlockCount';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
@@ -26,15 +25,7 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
 
-  const router = useRouter();
-
-  const {
-    spaceSubscription,
-    isLoading: isLoadingSpaceSubscription,
-    refetchSpaceSubscription
-  } = useSpaceSubscription({
-    returnUrl: `${window?.location.origin}${router.asPath}?settingTab=subscription`
-  });
+  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
   const [pendingPayment, setPendingPayment] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
@@ -50,9 +41,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   );
 
-  const { data: blockCountData } = useSWR(space.id ? `space-block-count-${space.id}` : null, () =>
-    charmClient.spaces.getBlockCount({ spaceId: space.id })
-  );
+  const { blockCount: blockCountData } = useBlockCount();
 
   const blockCount = blockCountData?.count || 0;
 

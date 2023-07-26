@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Tooltip, Box } from '@mui/material';
+import { Tooltip, Box, Typography } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
@@ -11,6 +11,8 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
+import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
+import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -21,10 +23,10 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
+import { AnnouncementBanner } from './components/AnnouncementBanner';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
-import { PaidAnnouncementBanner } from './components/PaidAnnouncementBanner';
 import { Sidebar } from './components/Sidebar/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
@@ -154,7 +156,8 @@ function PageLayout({ children }: PageLayoutProps) {
   });
   const { user } = useUser();
   const { space } = useCurrentSpace();
-
+  const { spaceSubscription } = useSpaceSubscription();
+  const { blockCount } = useBlockCount();
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
   const { accessChecked, publicPage } = useSharedPage();
@@ -191,6 +194,9 @@ function PageLayout({ children }: PageLayoutProps) {
     [handleDrawerClose, !!user, isMobile]
   );
 
+  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
+  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
+
   if (!accessChecked) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
@@ -220,7 +226,15 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    {/* {isAdmin && space?.paidTier === 'community' && <PaidAnnouncementBanner spaceId={space.id} />} */}
+                    {/* {isAdmin && space?.paidTier === 'community' && <AnnouncementBanner spaceId={space.id}><Typography component='div'>Community Edition available. Upgrade now!</Typography></AnnouncementBanner>} */}
+                    {spaceSubscription && passedBlockQuota && (
+                      <AnnouncementBanner spaceId={space.id} showClose={false} errorBackground>
+                        <Typography>
+                          This space has passed the block limit of{' '}
+                          <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
+                        </Typography>
+                      </AnnouncementBanner>
+                    )}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

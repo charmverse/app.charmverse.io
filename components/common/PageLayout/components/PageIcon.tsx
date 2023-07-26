@@ -59,7 +59,7 @@ function LinkedIcon({ children }: { children: ReactNode }) {
 }
 
 type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
-  icon?: ReactNode;
+  icon?: ReactNode | null;
   pageType?: AllPagesProp['type'];
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
@@ -78,6 +78,7 @@ export function NoAccessPageIcon() {
 }
 
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
+  let iconComponent: ReactNode = icon;
   if (!icon) {
     if (pageType === 'linked_board') {
       return (
@@ -91,25 +92,34 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
         />
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
-      icon = <StyledDatabaseIcon />;
+      iconComponent = <StyledDatabaseIcon />;
     } else if (pageType === 'proposal' || pageType === 'proposals') {
-      icon = <ProposalIcon />;
+      iconComponent = <ProposalIcon />;
     } else if (pageType === 'bounty' || pageType === 'bounties') {
-      icon = <BountyIcon />;
+      iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
-      icon = <AccountCircleIcon />;
+      iconComponent = <AccountCircleIcon />;
     } else if (pageType === 'forum' || pageType === 'forum_category') {
-      icon = <MessageOutlinedIcon />;
+      iconComponent = <MessageOutlinedIcon />;
     } else if (isEditorEmpty) {
-      icon = <EmptyPageIcon />;
+      iconComponent = <EmptyPageIcon />;
     } else {
-      icon = <FilledPageIcon />;
+      iconComponent = <FilledPageIcon />;
     }
+  } else if (typeof icon === 'string' && icon.startsWith('http')) {
+    iconComponent = (
+      <img
+        src={icon}
+        style={{
+          objectFit: 'cover'
+        }}
+      />
+    );
   }
 
   return isLinkedPage ? (
-    <StyledPageIcon icon={<LinkedIcon>{icon}</LinkedIcon>} {...props} />
+    <StyledPageIcon icon={<LinkedIcon>{iconComponent}</LinkedIcon>} {...props} />
   ) : (
-    <StyledPageIcon icon={icon} {...props} />
+    <StyledPageIcon icon={iconComponent} {...props} />
   );
 }

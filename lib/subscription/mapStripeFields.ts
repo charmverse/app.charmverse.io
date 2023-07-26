@@ -6,6 +6,7 @@ import type Stripe from 'stripe';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 
 import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';
+import type { CouponDetails } from './getCouponDetails';
 
 function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusType {
   const { status, trial_end } = subscription;
@@ -38,12 +39,11 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
   }
 }
 
-export type PaymentMethodWithUpdateUrl = {
+export type PaymentMethod = {
   id: string;
-  type: Stripe.PaymentMethod.Type;
-  digits?: string;
-  brand?: string;
-  updateUrl?: string;
+  type?: Stripe.PaymentMethod.Type;
+  digits?: string | null;
+  brand?: string | null;
 };
 
 /**
@@ -61,8 +61,9 @@ export type SubscriptionFieldsFromStripe = {
   billingEmail?: string | null;
   expiresOn?: Date | null;
   renewalDate?: Date | null;
-  paymentMethod?: PaymentMethodWithUpdateUrl | null;
+  paymentMethod?: PaymentMethod | null;
   coupon?: string;
+  discount?: CouponDetails;
 };
 export function mapStripeFields({
   subscription,
@@ -85,13 +86,13 @@ export function mapStripeFields({
   const paymentType = paymentDetails?.type;
   const paymentCard = paymentDetails?.card?.brand ?? paymentDetails?.us_bank_account?.bank_name;
   const last4 = paymentDetails?.card?.last4 ?? paymentDetails?.us_bank_account?.last4;
-  const paymentMethod = paymentDetails
-    ? ({
+  const paymentMethod: PaymentMethod | null = paymentDetails
+    ? {
         id: paymentDetails.id,
         brand: paymentCard,
         digits: last4,
         type: paymentType
-      } as PaymentMethodWithUpdateUrl)
+      }
     : null;
 
   const status = mapStripeStatus(subscription);
@@ -102,6 +103,7 @@ export function mapStripeFields({
       ? subscription.trial_end
       : null;
 
+  const discount = subscription.discount;
   const fields: SubscriptionFieldsFromStripe = {
     period: subscription.items.data[0].price.recurring?.interval === 'month' ? 'monthly' : 'annual',
     priceInCents: subscription.items.data[0].price.unit_amount ?? 0,
@@ -110,6 +112,15 @@ export function mapStripeFields({
     paymentMethod,
     billingEmail: subscription.customer.email,
     expiresOn: typeof expiryDate === 'number' ? new Date(coerceToMilliseconds(expiryDate)) : null,
+    discount: discount
+      ? {
+          id: discount.id,
+          code: typeof discount.promotion_code === 'string' ? discount.promotion_code : discount.coupon?.id || '',
+          type: discount.promotion_code ? 'promotion_code' : 'coupon',
+          discountType: discount.coupon?.percent_off ? 'percent' : 'fixed',
+          discount: discount.coupon?.percent_off ?? subscription.discount?.coupon?.amount_off ?? 0
+        }
+      : undefined,
     renewalDate: subscription.current_period_end
       ? new Date(coerceToMilliseconds(subscription.current_period_end))
       : undefined
