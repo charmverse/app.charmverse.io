@@ -45,6 +45,9 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
+  async generateBuildId() {
+    return process.env.NEXT_PUBLIC_BUILD_ID
+  },
   async redirects() {
     return [
       {
