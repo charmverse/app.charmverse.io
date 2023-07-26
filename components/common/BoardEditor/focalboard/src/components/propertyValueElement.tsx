@@ -8,6 +8,7 @@ import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/com
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
@@ -95,7 +96,12 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
+  if (
+    propertyTemplate.type === 'select' ||
+    propertyTemplate.type === 'multiSelect' ||
+    propertyTemplate.type === 'proposalCategory' ||
+    propertyTemplate.type === 'proposalStatus'
+  ) {
     propertyValueElement = (
       <SelectProperty
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
@@ -173,7 +179,7 @@ function PropertyValueElement(props: Props) {
   const commonProps = {
     className: 'octo-propertyvalue',
     placeholderText: emptyDisplayValue,
-    readOnly,
+    readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,

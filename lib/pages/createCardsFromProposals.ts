@@ -69,7 +69,7 @@ export async function createCardsFromProposals({
             visiblePropertyIds: [
               ...new Set([
                 ...(block.fields as any).visiblePropertyIds,
-                (database.fields as any).cardProperties.map((p: IPropertyTemplate) => p.id)
+                ...(database.fields as any).cardProperties.map((p: IPropertyTemplate) => p.id)
               ])
             ],
             sourceType: 'proposals'
@@ -80,6 +80,9 @@ export async function createCardsFromProposals({
       });
     })
   );
+
+  // eslint-disable-next-line no-console
+  console.log({ updatedViewBlocks: JSON.stringify(updatedViewBlocks, null, 2) });
 
   relay.broadcast(
     {

@@ -2,7 +2,7 @@ import { Divider, ListItemIcon, MenuItem, Typography, Stack } from '@mui/materia
 import { useIntl } from 'react-intl';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { propertyTypesList } from 'lib/focalboard/board';
+import { proposalPropertyTypesList, propertyTypesList } from 'lib/focalboard/board';
 
 import { iconForPropertyType } from '../components/viewHeader/viewHeaderPropertiesMenu';
 
@@ -21,7 +21,7 @@ export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyT
         </>
       )}
       {propertyTypesList
-        .filter((type) => type !== 'proposalUrl')
+        .filter((type) => !proposalPropertyTypesList.includes(type as any))
         .map((type) => (
           <MenuItem onClick={() => onClick(type)} key={type}>
             <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
