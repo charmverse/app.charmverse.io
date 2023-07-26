@@ -100,6 +100,7 @@ jobs:
 
       - name: Set STAGE and DDENABLED variable in environment for build and deploy steps
         run: |
+          cat  .ebextensions/00_env_vars.config
           echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
