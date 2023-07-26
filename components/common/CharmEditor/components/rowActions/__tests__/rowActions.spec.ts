@@ -10,7 +10,7 @@ const testEditor = renderTestEditor({
   plugins: charmEditorPlugins()
 });
 
-describe('rowNodeAtPos()', () => {
+describe('rowNodeAtPos() returns the DOM node given a position in the prosemirror document', () => {
   test('When pos is outside the document, returns null', () => {
     const doc = _.doc();
     const editor = testEditor(doc);
