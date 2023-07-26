@@ -17,6 +17,7 @@ import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { PageHeaderIcon } from 'components/[pageId]/DocumentPage/components/PageHeaderIcon';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
@@ -280,7 +281,7 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
         e.stopPropagation();
       }}
     >
-      <EmojiPicker onSelect={onSelectEmoji} />
+      <PageHeaderIcon updatePageIcon={onSelectEmoji} />
     </Menu>
   );
 }

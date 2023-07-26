@@ -57,7 +57,7 @@ export function ImageUploadButton({
             const firstFile = e.target.files?.[0];
             if (firstFile) {
               if (firstFile.size > (fileSizeLimit ?? 10) * 1024 * 1024) {
-                showMessage(`File size limit is ${fileSizeLimit ?? 10}MB`, 'error');
+                showMessage(`File size limit is ${fileSizeLimit ?? 10}MB`, 'warning');
                 setIsUploading(false);
                 return;
               }
