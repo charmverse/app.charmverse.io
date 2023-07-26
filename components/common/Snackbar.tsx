@@ -16,7 +16,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 });
 
 interface CustomizedSnackbarProps {
-  autoHideDuration?: number;
+  autoHideDuration?: number | null;
   severity?: AlertColor;
   message?: string;
   actions?: ReactNode[];

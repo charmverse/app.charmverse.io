@@ -4,6 +4,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -114,6 +115,7 @@ export type NotionImportCompleted = {
   payload: {
     totalImportedPages: number;
     totalPages: number;
+    failedImports: FailedImportsError[];
   };
 };
 
