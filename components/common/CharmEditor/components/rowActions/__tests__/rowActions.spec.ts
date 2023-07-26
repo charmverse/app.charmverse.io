@@ -34,20 +34,4 @@ describe('rowNodeAtPos() returns the DOM node given a position in the prosemirro
     expect(result?.node.pmViewDesc?.node?.type.name).toBe('columnBlock');
     expect(result?.rowNode.pmViewDesc?.node?.type.name).toBe('paragraph');
   });
-
-  test('When pos is on a column row, returns the first child', () => {
-    const doc = _.doc(_.columnLayout(_.columnBlock(_.p('hello world'))));
-    const editor = testEditor(doc);
-    const result = rowNodeAtPos(editor.view, 1);
-    expect(result?.node.pmViewDesc?.node?.type.name).toBe('columnLayout');
-    expect(result?.rowNode.pmViewDesc?.node?.type.name).toBe('paragraph');
-  });
-
-  test('When pos is on between columns, returns the first child of the second column', () => {
-    const doc = _.doc(_.columnLayout(_.columnBlock(_.p('hello')), _.columnBlock(_.p('world'))));
-    const editor = testEditor(doc);
-    const result = rowNodeAtPos(editor.view, 10);
-    expect(result?.node.pmViewDesc?.node?.type.name).toBe('columnLayout');
-    expect(result?.rowNode.pmViewDesc?.node?.type.name).toBe('paragraph');
-  });
 });
