@@ -209,7 +209,9 @@ export function CheckoutForm({
             name: space.name,
             email: emailField
           }
-        }
+        },
+        receipt_email: emailField,
+        return_url: `${window?.location.origin}?settingTab=subscription`
       });
 
       if (confirmCardError) {
