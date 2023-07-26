@@ -306,25 +306,26 @@ function Kanban(props: Props) {
           />
         ))}
 
-        {!props.readOnly && (
-          <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
-            <Button size='small' variant='text' color='secondary'>
-              <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
-            </Button>
-          </div>
+        {!props.readOnly && !props.disableAddingCards ? (
+          <>
+            <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
+              <Button size='small' variant='text' color='secondary'>
+                <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
+              </Button>
+            </div>
+            <Menu {...bindMenu(popupState)}>
+              <NewGroupTextField
+                onClick={(groupName) => {
+                  addGroupClicked(groupName);
+                  popupState.close();
+                }}
+              />
+            </Menu>
+          </>
+        ) : (
+          // Empty column to ensure hidden columns are aligned to the right
+          <div className='octo-board-header-cell narrow'></div>
         )}
-
-        {!props.readOnly && !props.disableAddingCards && (
-          <Menu {...bindMenu(popupState)}>
-            <NewGroupTextField
-              onClick={(groupName) => {
-                addGroupClicked(groupName);
-                popupState.close();
-              }}
-            />
-          </Menu>
-        )}
-
         {/* Hidden column header */}
 
         {hiddenGroups.length > 0 && (
