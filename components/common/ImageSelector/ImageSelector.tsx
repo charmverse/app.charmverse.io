@@ -27,7 +27,6 @@ export default function ImageSelector({
 }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
-  const [isUploading, setIsUploading] = useState(false);
 
   if (galleryImages) {
     tabs.push(['Gallery', <ImageSelectorGallery key='gallery' onImageClick={onImageSelect} items={galleryImages} />]);
@@ -40,7 +39,6 @@ export default function ImageSelector({
       popupContent={
         <Box>
           <MultiTabs
-            disabled={isUploading}
             tabs={[
               ...tabs,
               [
@@ -56,13 +54,7 @@ export default function ImageSelector({
                     width: '100%'
                   }}
                 >
-                  <ImageUploadButton
-                    isUploading={isUploading}
-                    setIsUploading={setIsUploading}
-                    setImage={onImageSelect}
-                    uploadDisclaimer={uploadDisclaimer}
-                    variant='contained'
-                  />
+                  <ImageUploadButton setImage={onImageSelect} uploadDisclaimer={uploadDisclaimer} />
                 </Box>
               ],
               [

@@ -7,11 +7,9 @@ import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadBu
 import MultiTabs from 'components/common/MultiTabs';
 
 export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: string) => void }) {
-  const [isUploading, setIsUploading] = useState(false);
   const [imageLink, setImageLink] = useState('');
   return (
     <MultiTabs
-      disabled={isUploading}
       tabs={[
         [
           'Emojis',
@@ -31,25 +29,23 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
                 onChange={(e) => {
                   setImageLink(e.target.value);
                 }}
-                disabled={isUploading}
                 placeholder='Paste link to an image ...'
               />
               <Button
                 onClick={() => {
                   updatePageIcon(imageLink);
                 }}
-                disabled={isUploading || imageLink.length === 0}
+                disabled={imageLink.length === 0}
               >
                 Submit
               </Button>
             </Stack>
             <ImageUploadButton
+              variant='outlined'
               sx={{
                 width: '100%'
               }}
               uploadDisclaimer='Recommended size is 280 × 280 pixels'
-              isUploading={isUploading}
-              setIsUploading={setIsUploading}
               setImage={updatePageIcon}
             />
           </Stack>

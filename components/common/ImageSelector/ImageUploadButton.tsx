@@ -1,30 +1,29 @@
-import { log } from '@charmverse/core/log';
 import type { ButtonProps } from '@mui/material';
 import { Stack, Typography } from '@mui/material';
 
-import { useSnackbar } from 'hooks/useSnackbar';
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
+import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
 
 import { PimpedButton } from '../Button';
 
 export function ImageUploadButton({
   setImage,
-  isUploading,
-  setIsUploading,
   uploadDisclaimer,
   variant = 'outlined',
-  fileSizeLimit,
+  fileSizeLimitMB,
   ...props
 }: {
-  isUploading: boolean;
-  setIsUploading: (isUploading: boolean) => void;
   setImage: (image: string) => void;
   uploadDisclaimer?: string;
   variant?: ButtonProps['variant'];
-  // file size limit in megabytes
-  fileSizeLimit?: number;
+  fileSizeLimitMB?: number;
 } & ButtonProps) {
-  const { showMessage } = useSnackbar();
+  const onFileUpload: UploadedFileCallback = ({ url }) => {
+    setImage(url);
+  };
+
+  const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput(onFileUpload, fileSizeLimitMB);
+
   return (
     <Stack alignItems='center' gap={1}>
       <PimpedButton
@@ -33,43 +32,20 @@ export function ImageUploadButton({
         disabled={isUploading}
         component='label'
         variant={variant}
+        onClick={openFilePicker}
         {...props}
       >
         Choose an image
         <input
+          ref={inputRef}
           disabled={isUploading}
           type='file'
-          style={{
-            opacity: 0,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            cursor: 'pointer'
-          }}
+          hidden
           accept='image/*'
           onClick={(e) => {
             e.stopPropagation();
           }}
-          onChange={async (e) => {
-            setIsUploading(true);
-            const firstFile = e.target.files?.[0];
-            if (firstFile) {
-              if (firstFile.size > (fileSizeLimit ?? 10) * 1024 * 1024) {
-                showMessage(`File size limit is ${fileSizeLimit ?? 10}MB`, 'warning');
-                setIsUploading(false);
-                return;
-              }
-              try {
-                const { url } = await uploadToS3(firstFile);
-                setImage(url);
-              } catch (error) {
-                log.error('Error uploading image to s3', { error });
-              }
-            }
-            setIsUploading(false);
-          }}
+          onChange={onFileChange}
         />
       </PimpedButton>
       {uploadDisclaimer && (
