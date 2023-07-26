@@ -199,13 +199,7 @@ export function rowNodeAtPos(
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
   }
-  if (startPos > 0 && rowNode === view.dom) {
-    // return null if pos is outside of document
-    return null;
-  }
-  // if (isContainerNode(rowNode)) {
-  //   return null;
-  // }
+
   // if we are over a container, select the first child
   while (isContainerNode(rowNode)) {
     const firstChild = getFirstChildBlock(rowNode.childNodes as any);
