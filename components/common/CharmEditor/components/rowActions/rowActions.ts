@@ -69,7 +69,17 @@ export function plugins({ key }: { key: PluginKey }) {
         const viewBox = view.dom.getBoundingClientRect();
         // align to the top of the row
         const top = box.top - viewBox.top;
+        let left = box.left - viewBox.left - 50; // 50: some default padding
+        // handle when nodes have negative margin
+        if (left < 0) {
+          left = 0;
+        }
+        // Hack: subtract the left padding from UL/OL tags - TODO: find a better way to add list padding without putting it on OL/UL tags
+        if (rowNode.nodeName === 'LI') {
+          left -= 24;
+        }
         tooltipDOM.style.top = `${top}px`;
+        tooltipDOM.style.left = `${left}px`;
         const newState = {
           rowPos: startPos,
           rowDOM: dom.rowNode,
@@ -193,6 +203,9 @@ export function rowNodeAtPos(
   if (dom.offset && dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
   }
+  // if (isContainerNode(rowNode)) {
+  //   return null;
+  // }
   // if we are over a container, select the first child
   while (isContainerNode(rowNode)) {
     const firstChild = getFirstChildBlock(rowNode.childNodes as any);

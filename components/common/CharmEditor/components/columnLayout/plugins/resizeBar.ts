@@ -5,7 +5,7 @@ import { Plugin } from 'prosemirror-state';
 import { findChildrenByType } from 'prosemirror-utils';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
-const barWidth = 20;
+const barWidth = 50;
 
 // Add a decoration next to each column block
 export function ResizeBarDecoration() {
