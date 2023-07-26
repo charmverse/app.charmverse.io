@@ -46,7 +46,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     });
     return res.status(201).json(pageComment);
   } else {
-    throw new ActionNotPermittedError();
+    throw new ActionNotPermittedError(`User is not the application creator.`);
   }
 }
 
