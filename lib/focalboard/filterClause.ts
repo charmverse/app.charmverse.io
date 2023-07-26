@@ -44,7 +44,7 @@ export const SelectDataTypeConditions = ['is', 'is_not', 'is_empty', 'is_not_emp
 
 export const MiscDataTypeConditions = ['is_empty', 'is_not_empty'] as const;
 
-export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi_select' | 'select' | 'misc' | 'proposal_status';
+export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi_select' | 'select' | 'misc';
 
 export type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
   datatype: DT;
@@ -58,7 +58,6 @@ export type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeCond
 export type MultiSelectDataTypeConfig = DataTypeFactory<'multi_select', typeof MultiSelectDataTypeConditions>;
 export type SelectDataTypeConfig = DataTypeFactory<'select', typeof SelectDataTypeConditions>;
 export type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>;
-export type ProposalStatusDataTypeConfig = DataTypeFactory<'proposal_status', typeof SelectDataTypeConditions>;
 
 export type DataTypeConfigs =
   | BooleanDataTypeConfig
@@ -67,8 +66,7 @@ export type DataTypeConfigs =
   | DateDataTypeConfig
   | MultiSelectDataTypeConfig
   | SelectDataTypeConfig
-  | MiscDataTypeConfig
-  | ProposalStatusDataTypeConfig;
+  | MiscDataTypeConfig;
 
 export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   updatedBy: {
@@ -140,7 +138,7 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: SelectDataTypeConditions
   },
   proposalStatus: {
-    datatype: 'proposal_status',
+    datatype: 'select',
     conditions: SelectDataTypeConditions
   }
 };

@@ -21,6 +21,7 @@ import type {
   WorkspaceEvent
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
@@ -1058,7 +1059,8 @@ export async function generateBoard({
   cardCount,
   views,
   addPageContent,
-  viewDataSource
+  viewDataSource,
+  boardPageType
 }: {
   createdBy: string;
   spaceId: string;
@@ -1067,6 +1069,7 @@ export async function generateBoard({
   views?: number;
   viewDataSource?: ViewSourceType;
   addPageContent?: boolean;
+  boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1075,7 +1078,8 @@ export async function generateBoard({
     cardCount,
     views,
     addPageContent,
-    viewDataSource
+    viewDataSource,
+    boardPageType
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

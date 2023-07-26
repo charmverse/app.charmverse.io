@@ -264,7 +264,7 @@ function FilterPropertyValue({
         </Select>
       );
     }
-  } else if (propertyDataType === 'proposal_status') {
+  } else if (propertyDataType === 'select') {
     return (
       <Select<string>
         displayEmpty
@@ -275,7 +275,11 @@ function FilterPropertyValue({
             <Chip
               size='small'
               label={
-                PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[foundOption.value as Exclude<ProposalStatus, 'draft'> | 'archived']
+                property.type === 'proposalStatus'
+                  ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
+                      foundOption.value as Exclude<ProposalStatus, 'draft'> | 'archived'
+                    ]
+                  : foundOption.value
               }
               color={focalboardColorsMap[foundOption.color]}
             />
@@ -291,47 +295,20 @@ function FilterPropertyValue({
             No options available
           </Typography>
         ) : (
-          property.options?.map((option) => {
+          property.options.map((option) => {
             return (
               <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
                 <Chip
                   size='small'
                   label={
-                    PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[option.value as Exclude<ProposalStatus, 'draft'> | 'archived']
+                    property.type === 'proposalStatus'
+                      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
+                          option.value as Exclude<ProposalStatus, 'draft'> | 'archived'
+                        ]
+                      : option.value
                   }
                   color={focalboardColorsMap[option.color]}
                 />
-              </MenuItem>
-            );
-          })
-        )}
-      </Select>
-    );
-  } else if (propertyDataType === 'select') {
-    return (
-      <Select<string>
-        displayEmpty
-        value={filter.values[0]}
-        renderValue={(selected) => {
-          const foundOption = property.options?.find((o) => o.id === selected);
-          return foundOption ? (
-            <Chip size='small' label={foundOption.value} color={focalboardColorsMap[foundOption.color]} />
-          ) : (
-            <Typography fontSize='small' color='secondary'>
-              Select an option
-            </Typography>
-          );
-        }}
-      >
-        {property.options.length === 0 ? (
-          <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
-            No options available
-          </Typography>
-        ) : (
-          property.options.map((option) => {
-            return (
-              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
-                <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
               </MenuItem>
             );
           })

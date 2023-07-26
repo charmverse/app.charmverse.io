@@ -61,7 +61,6 @@ export function KanbanGroupColumn({
           isManualSort={isManualSort}
         />
       ))}
-
       {hasNextPage && (
         <Button
           size='small'
@@ -77,7 +76,6 @@ export function KanbanGroupColumn({
           </Box>
         </Button>
       )}
-
       {!readOnly && !disableAddingCards && (
         <Button
           size='small'

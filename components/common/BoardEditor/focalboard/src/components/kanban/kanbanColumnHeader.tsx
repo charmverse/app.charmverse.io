@@ -10,6 +10,7 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
@@ -185,12 +186,15 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               />
               {group.option.id && (
                 <>
-                  <Menu.Text
-                    id='delete'
-                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-                    name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                    onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
-                  />
+                  {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+                    <Menu.Text
+                      id='delete'
+                      icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
+                      name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
+                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                    />
+                  )}
+
                   <Menu.Separator />
                   {Object.entries(Constants.menuColors).map(([key, color]) => (
                     <Menu.Color
@@ -204,12 +208,14 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               )}
             </Menu>
           </MenuWrapper>
-          <IconButton
-            icon={<AddIcon fontSize='small' />}
-            onClick={() => {
-              props.addCard(group.option.id, true);
-            }}
-          />
+          {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+            <IconButton
+              icon={<AddIcon fontSize='small' />}
+              onClick={() => {
+                props.addCard(group.option.id, true);
+              }}
+            />
+          )}
         </>
       )}
     </div>

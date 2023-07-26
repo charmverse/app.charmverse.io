@@ -124,11 +124,6 @@ function Kanban(props: Props) {
 
   const onDropToColumn = useCallback(
     async (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => {
-      // Proposal data should be readonly
-      if (groupByProperty?.type === 'proposalCategory' || groupByProperty?.type === 'proposalStatus') {
-        return;
-      }
-
       const { selectedCardIds } = props;
       const optionId = option ? option.id : undefined;
 
@@ -193,7 +188,11 @@ function Kanban(props: Props) {
 
   const onDropToCard = useCallback(
     async (srcCard: Card, dstCard: Card) => {
-      if (srcCard.id === dstCard.id || !groupByProperty) {
+      if (
+        srcCard.id === dstCard.id ||
+        !groupByProperty ||
+        proposalPropertyTypesList.includes(groupByProperty.type as any)
+      ) {
         return;
       }
       Utils.log(`onDropToCard: ${dstCard.title}`);
@@ -277,6 +276,11 @@ function Kanban(props: Props) {
   };
   const menuTriggerProps = !props.readOnly ? { ...restBindings, onClick: addNewGroupHandler } : {};
 
+  // eslint-disable-next-line no-console
+  console.log({
+    groupedBy: props.groupByProperty
+  });
+
   return (
     <Box className='Kanban'>
       <div className='octo-board-header' id='mainBoardHeader'>
@@ -310,7 +314,7 @@ function Kanban(props: Props) {
           </div>
         )}
 
-        {!proposalPropertyTypesList.includes(props.groupByProperty?.type as any) && (
+        {!props.readOnly && !props.disableAddingCards && (
           <Menu {...bindMenu(popupState)}>
             <NewGroupTextField
               onClick={(groupName) => {
