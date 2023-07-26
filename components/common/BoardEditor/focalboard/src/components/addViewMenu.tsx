@@ -31,6 +31,10 @@ import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
 import { typeDisplayName } from '../widgets/propertyMenu';
 
+function getViewSource({ source, views }: { source?: ViewSourceType; views: BoardView[] }): ViewSourceType | undefined {
+  return views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : source;
+}
+
 type AddViewProps = {
   board: Board;
   activeView?: BoardView;
@@ -77,6 +81,7 @@ function AddViewMenu(props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -108,8 +113,9 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView({ board, activeView, intl, views });
+    const view = createTableView({ board, activeView, intl, views: props.views });
     view.id = uuid();
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -149,6 +155,7 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -185,6 +192,7 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 

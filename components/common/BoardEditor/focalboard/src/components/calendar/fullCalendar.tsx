@@ -18,6 +18,7 @@ import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import PropertyValueElement from '../propertyValueElement';
+import type { DisabledAddCardProp } from '../shared';
 
 const oneDay = 60 * 60 * 24 * 1000;
 
@@ -30,7 +31,7 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate;
   showCard: (cardId: string) => void;
   addCard: (properties: Record<string, string>) => void;
-};
+} & DisabledAddCardProp;
 
 const timeZoneOffset = (date: number): number => {
   return new Date(date).getTimezoneOffset() * 60 * 1000;
@@ -238,9 +239,13 @@ function CalendarFullView(props: Props): JSX.Element | null {
     (args: DayCellContentArg): JSX.Element | null => {
       return (
         <div className='dateContainer'>
-          <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
-            +
-          </div>
+          {props.readOnly || props.disableAddingCards ? (
+            <div></div>
+          ) : (
+            <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
+              +
+            </div>
+          )}
           <div className='dateDisplay'>{args.dayNumberText}</div>
         </div>
       );

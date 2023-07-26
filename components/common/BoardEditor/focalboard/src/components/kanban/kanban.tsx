@@ -8,6 +8,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
@@ -16,6 +17,7 @@ import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
+import type { CustomReadonlyViewProps } from '../shared';
 
 import KanbanColumnHeader from './kanbanColumnHeader';
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
@@ -66,7 +68,7 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
   showCard: (cardId: string | null) => void;
-};
+} & CustomReadonlyViewProps;
 
 function Kanban(props: Props) {
   const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
@@ -291,6 +293,7 @@ function Kanban(props: Props) {
             onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
             onCalculationMenuClose={() => toggleOptions(group.option.id)}
             anchorEl={anchorEl}
+            readonlyTitle={props.readonlyTitle}
           />
         ))}
 
@@ -302,14 +305,16 @@ function Kanban(props: Props) {
           </div>
         )}
 
-        <Menu {...bindMenu(popupState)}>
-          <NewGroupTextField
-            onClick={(groupName) => {
-              addGroupClicked(groupName);
-              popupState.close();
-            }}
-          />
-        </Menu>
+        {!proposalPropertyTypesList.includes(props.groupByProperty?.type as any) && (
+          <Menu {...bindMenu(popupState)}>
+            <NewGroupTextField
+              onClick={(groupName) => {
+                addGroupClicked(groupName);
+                popupState.close();
+              }}
+            />
+          </Menu>
+        )}
 
         {/* Hidden column header */}
 
@@ -339,6 +344,7 @@ function Kanban(props: Props) {
               onDropToColumn={onDropToColumn}
               onCardClicked={props.onCardClicked}
               showCard={props.showCard}
+              disableAddingCards={props.disableAddingCards}
             />
           ))}
 
