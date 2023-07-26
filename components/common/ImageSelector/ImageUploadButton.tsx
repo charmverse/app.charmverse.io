@@ -9,7 +9,7 @@ import { PimpedButton } from '../Button';
 export function ImageUploadButton({
   setImage,
   uploadDisclaimer,
-  variant = 'outlined',
+  variant = 'contained',
   fileSizeLimitMB,
   ...props
 }: {

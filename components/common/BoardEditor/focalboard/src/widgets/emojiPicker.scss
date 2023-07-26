@@ -36,3 +36,16 @@ div[role="tabpanel"] .EmojiPicker .emoji-mart {
 .emoji-mart-bar {
   border: none;
 }
+
+.emoji-mart-anchor-icon {
+  cursor: pointer;
+}
+
+.emoji-mart-anchor-selected {
+  // This is an inline style so we need to use !important to override it
+  color: var(--primary-color) !important;
+
+  .emoji-mart-anchor-bar {
+    background: var(--primary-color) !important;
+  }
+}
