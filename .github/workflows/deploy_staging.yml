@@ -128,7 +128,14 @@ jobs:
           aws-region: us-east-1
 
       - name: Package
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          mkdir deploy
+          cp deploy.zip deploy
+          cd deploy
+          unzip deploy.zip
+          pwd
+          cat .ebextensions/00_env_vars.config
 
       - name: Deploy to staging
         id: cdk_deploy
