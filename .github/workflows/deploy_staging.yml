@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: run-custom-branch-of-permission-in-staging
+  SELECTED_PERMISSION_API_TAG: feat-proposals-datasource-privacy
 
 jobs:
   deploy:
