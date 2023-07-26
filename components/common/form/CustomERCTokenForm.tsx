@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { FormError } from 'components/common/form/FormError.class';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

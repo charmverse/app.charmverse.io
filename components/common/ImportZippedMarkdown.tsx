@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import type { InputProps } from 'components/common/Button';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useIsAdmin } from 'hooks/useIsAdmin';

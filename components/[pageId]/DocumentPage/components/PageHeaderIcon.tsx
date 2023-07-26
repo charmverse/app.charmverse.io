@@ -2,7 +2,7 @@ import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadButton';
 import MultiTabs from 'components/common/MultiTabs';
 

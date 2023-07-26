@@ -4,7 +4,7 @@ import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 import { PagePermissionsContainer } from './components/PagePermissionsContainer';
 

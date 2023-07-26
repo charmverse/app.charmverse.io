@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useRoles } from 'hooks/useRoles';
 import type { ISystemError } from 'lib/utilities/errors';
 

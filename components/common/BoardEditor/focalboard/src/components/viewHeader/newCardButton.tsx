@@ -4,7 +4,7 @@ import { ButtonGroup, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';

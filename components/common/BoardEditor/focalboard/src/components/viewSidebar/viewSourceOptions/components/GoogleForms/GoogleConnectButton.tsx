@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 

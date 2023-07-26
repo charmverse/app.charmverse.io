@@ -9,7 +9,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';

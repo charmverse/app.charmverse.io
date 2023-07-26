@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 type Props = {

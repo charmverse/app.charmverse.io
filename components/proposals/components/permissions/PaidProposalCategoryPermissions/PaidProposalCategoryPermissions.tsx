@@ -9,7 +9,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';

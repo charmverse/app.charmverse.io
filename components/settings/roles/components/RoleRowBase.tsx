@@ -21,7 +21,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
 import type { Props as UpgradeProps } from 'components/settings/subscription/UpgradeWrapper';

@@ -8,7 +8,7 @@ import useSWR from 'swr/immutable';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
 import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/components/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';

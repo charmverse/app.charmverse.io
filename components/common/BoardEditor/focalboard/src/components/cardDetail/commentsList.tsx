@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';

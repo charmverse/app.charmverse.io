@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { ModalProps } from 'components/common/Modal';
 import { Modal } from 'components/common/Modal';
 

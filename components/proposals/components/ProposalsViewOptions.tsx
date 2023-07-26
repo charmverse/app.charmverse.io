@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useIsAdmin } from 'hooks/useIsAdmin';

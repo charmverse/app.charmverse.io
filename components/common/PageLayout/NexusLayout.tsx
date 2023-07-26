@@ -4,7 +4,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';

@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';

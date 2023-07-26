@@ -31,7 +31,7 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
 import { webhookEndpoint } from 'config/constants';

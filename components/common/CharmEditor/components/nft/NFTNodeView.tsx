@@ -16,7 +16,7 @@ import { RiNftLine } from 'react-icons/ri';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
