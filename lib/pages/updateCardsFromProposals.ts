@@ -238,6 +238,14 @@ export async function updateCardsFromProposals({
     );
   }
 
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: [prismaToBlock(database)]
+    },
+    spaceId
+  );
+
   if (updatedBlocks.length > 0) {
     relay.broadcast(
       {

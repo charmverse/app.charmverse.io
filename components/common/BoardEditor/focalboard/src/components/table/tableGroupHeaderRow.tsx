@@ -5,10 +5,11 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 import { Constants } from '../../constants';
@@ -20,7 +21,7 @@ import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import type { DisabledAddCardProp } from '../shared';
+import type { CustomReadonlyViewProps } from '../shared';
 
 type Props = {
   board: Board;
@@ -32,7 +33,7 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
-} & DisabledAddCardProp;
+} & CustomReadonlyViewProps;
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, groupByProperty } = props;
@@ -40,6 +41,9 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
 
   const [isDragging, isOver, groupHeaderRef] = useSortable('groupHeader', group.option, !props.readOnly, props.onDrop);
   const intl = useIntl();
+
+  const preventPropertyDeletion =
+    props.groupByProperty && proposalPropertyTypesList.includes(props.groupByProperty.type as any);
 
   useEffect(() => {
     setGroupTitle(group.option.value);
@@ -104,7 +108,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               onCancel={() => {
                 setGroupTitle(group.option.value);
               }}
-              readOnly={props.readOnly || !group.option.id}
+              readOnly={props.readOnly || !group.option.id || props.readonlyTitle}
               spellCheck={true}
             />
           </Label>
@@ -124,12 +128,15 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               />
               {group.option.id && (
                 <>
-                  <Menu.Text
-                    id='delete'
-                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-                    name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                    onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
-                  />
+                  {!preventPropertyDeletion && (
+                    <Menu.Text
+                      id='delete'
+                      icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
+                      disabled={preventPropertyDeletion}
+                      name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
+                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                    />
+                  )}
                   <Menu.Separator />
                   {Object.entries(Constants.menuColors).map(([key, color]) => (
                     <Menu.Color

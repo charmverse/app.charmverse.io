@@ -6,7 +6,7 @@ import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import type { ReadonlyTitleProp } from '../shared';
+import type { CustomReadonlyViewProps, ReadonlyTitleProp } from '../shared';
 
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';
@@ -28,7 +28,7 @@ type Props = {
   onDropToGroupHeader: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
   onDropToCard: (srcCard: Card, dstCard: Card) => void;
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
-} & ReadonlyTitleProp;
+} & CustomReadonlyViewProps;
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, onDropToGroup, groupByProperty } = props;
@@ -66,6 +66,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
         readOnly={props.readOnly}
         propertyNameChanged={props.propertyNameChanged}
         onDrop={props.onDropToGroupHeader}
+        disableAddingCards={props.disableAddingCards}
+        readonlyTitle={props.readonlyTitle}
       />
 
       {group.cards.length > 0 && (

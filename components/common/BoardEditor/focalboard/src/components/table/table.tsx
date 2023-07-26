@@ -253,6 +253,7 @@ function Table(props: Props): JSX.Element {
                   onDropToCard={onDropToCard}
                   onDropToGroup={onDropToGroup}
                   readonlyTitle={props.readonlyTitle}
+                  disableAddingCards={props.disableAddingCards}
                 />
               );
             })}
