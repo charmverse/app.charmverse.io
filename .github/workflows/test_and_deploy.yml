@@ -45,7 +45,8 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          NEXT_PUBLIC_BUILD_ID: 
+#          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
