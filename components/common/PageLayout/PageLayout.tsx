@@ -15,7 +15,6 @@ import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCo
 import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useResize } from 'hooks/useResize';
@@ -142,7 +141,6 @@ function PageLayout({ children }: PageLayoutProps) {
   const [storageOpen, setStorageOpen] = useLocalStorage('leftSidebar', !isMobile);
   const [sidebarStorageWidth, setSidebarStorageWidth] = useLocalStorage('leftSidebarWidth', 300);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const isAdmin = useIsAdmin();
 
   const {
     width: resizableSidebarWidth,
@@ -196,6 +194,7 @@ function PageLayout({ children }: PageLayoutProps) {
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
+  const showUpgradeBanner = spaceSubscription && !!user && passedBlockQuota && space?.paidTier !== 'enterprise';
 
   if (!accessChecked) {
     return (
@@ -226,9 +225,8 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    {/* {isAdmin && space?.paidTier === 'community' && <AnnouncementBanner spaceId={space.id}><Typography component='div'>Community Edition available. Upgrade now!</Typography></AnnouncementBanner>} */}
-                    {spaceSubscription && passedBlockQuota && (
-                      <AnnouncementBanner spaceId={space.id} showClose={false} errorBackground>
+                    {showUpgradeBanner && (
+                      <AnnouncementBanner hideClose={true} errorBackground>
                         <Typography>
                           This space has passed the block limit of{' '}
                           <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
