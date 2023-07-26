@@ -46,7 +46,7 @@ const config = {
     }
   },
   async generateBuildId() {
-    return process.env.NEXT_PUBLIC_BUILD_ID || `"${buildId}"`
+    return process.env.NEXT_PUBLIC_BUILD_ID
   },
   async redirects() {
     return [
