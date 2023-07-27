@@ -254,14 +254,16 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
             </Grid>
             <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
               {watchSpaceTemplate !== 'importMarkdown' && (
-                <PrimaryButton
+                <Button
+                  size='large'
                   disabled={!watchName || !!newSpace}
                   type='submit'
                   data-test='create-workspace'
                   loading={isCreatingSpace}
+                  sx={{ px: 4 }}
                 >
                   {submitLabel}
-                </PrimaryButton>
+                </Button>
               )}
               {watchSpaceTemplate === 'importMarkdown' && (
                 <ImportZippedMarkdown
