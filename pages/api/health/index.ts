@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { gauge, count } from 'lib/metrics';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json({ health: 'ok' });
+  res.status(200).json({ health: 'ok ok' });
 }
 
 // need to add a router to this.

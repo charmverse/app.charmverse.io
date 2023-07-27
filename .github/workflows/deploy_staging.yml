@@ -58,6 +58,7 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
+          cat .next/BUILD_ID
           ebextension_files=$(ls .ebextensions*/00_env_vars.config)
           ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
 
