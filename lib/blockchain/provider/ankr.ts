@@ -24,13 +24,17 @@ const ankrAdvancedApis = {
   43114: 'avalanche'
 } as const;
 
+// We can still support chains that dont have an advanced api
+const rpcApis = [5000] as const;
+
 // https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
-export const supportedChainIds = typedKeys(ankrAdvancedApis);
+export const supportedChainIds = [...typedKeys(ankrAdvancedApis), ...rpcApis];
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
 export const supportedMainnets: SupportedChainId[] = [56, 250, 43114];
 
 const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
+const mantleRPCEndpoint = `https://rpc.ankr.com/mantle/${process.env.ANKR_API_ID}`;
 
 // Docs: https://api-docs.ankr.com/reference/post_ankr-getnftholders
 export async function getNFTs({
@@ -43,6 +47,10 @@ export async function getNFTs({
   walletId: string;
 }): Promise<NFTData[]> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
+  if (chainId === 5000) {
+    // TODO: find a provider that indexes the Mantle blockchain for NFTs
+    return [];
+  }
   const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   const results = await paginatedCall(
@@ -70,6 +78,11 @@ type GetNFTInput = {
 };
 
 export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
+  // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
+  if (chainId === 5000) {
+    const provider = new AnkrProvider(mantleRPCEndpoint);
+    return null;
+  }
   const provider = new AnkrProvider(advancedAPIEndpoint);
   const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
@@ -91,7 +104,14 @@ type GetNFTOwnerInput = {
   chainId: SupportedChainId;
 };
 
+// https://github.com/charmverse/api.charmverse.io/blob/main/lib/blockchain/index.ts
+
 export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Promise<string[]> {
+  // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
+  if (chainId === 5000) {
+    const provider = new AnkrProvider(mantleRPCEndpoint);
+    return [];
+  }
   const provider = new AnkrProvider(advancedAPIEndpoint);
   const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
