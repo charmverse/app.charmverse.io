@@ -7,6 +7,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -46,6 +47,14 @@ async function updateCommentController(req: NextApiRequest, res: NextApiResponse
     id: commentId
   });
 
+  relay.broadcast(
+    {
+      type: 'inline_comment_updated',
+      payload: commentAfterUpdate
+    },
+    commentAfterUpdate.spaceId
+  );
+
   return res.status(200).json(commentAfterUpdate);
 }
 
@@ -59,7 +68,9 @@ async function deleteCommentController(req: NextApiRequest, res: NextApiResponse
       id: commentId as string
     },
     select: {
-      userId: true
+      threadId: true,
+      userId: true,
+      spaceId: true
     }
   });
 
@@ -72,6 +83,17 @@ async function deleteCommentController(req: NextApiRequest, res: NextApiResponse
   }
 
   await deleteComment(commentId as string);
+
+  relay.broadcast(
+    {
+      type: 'inline_comment_deleted',
+      payload: {
+        commentId: commentId as string,
+        threadId: comment.threadId
+      }
+    },
+    comment.spaceId
+  );
 
   return res.status(200).json({ ok: true });
 }

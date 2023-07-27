@@ -1,3 +1,4 @@
+import type { Comment } from '@charmverse/core/prisma-client';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -8,6 +9,10 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useMembers } from 'hooks/useMembers';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithCommentsAndAuthors, ThreadWithComments } from 'lib/threads/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
+
+import { useCurrentSpace } from './useCurrentSpace';
+import { useWebSocketClient } from './useWebSocketClient';
 
 type IContext = {
   isValidating: boolean;
@@ -39,6 +44,8 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
   const [threads, setThreads] = useState<CommentThreadsMap>({});
   const { members } = useMembers();
+  const { subscribe } = useWebSocketClient();
+  const { spaceRole } = useCurrentSpace();
 
   const { data, isValidating, mutate } = useSWR(
     () => (currentPageId ? `pages/${currentPageId}/threads` : null),
@@ -47,7 +54,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   );
 
   function populateThreads(_threads: ThreadWithComments[]): CommentThreadsMap {
-    const threadsandAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
+    const threadsAndAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
       const newThread: ThreadWithCommentsAndAuthors = {
         ...thread,
         comments: thread.comments.map((comment) => ({
@@ -58,8 +65,109 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       acc[thread.id] = newThread;
       return acc;
     }, {});
-    return threadsandAuthors;
+    return threadsAndAuthors;
   }
+
+  function inlineCommentCreatedHandler(comment: Comment) {
+    setThreads((_threads) => {
+      const thread = _threads[comment.threadId];
+      if (thread) {
+        return {
+          ..._threads,
+          [thread.id]: {
+            ...thread,
+            comments: [
+              ...thread.comments,
+              {
+                ...comment,
+                user: members.find((m) => m.id === comment.userId) || ({} as any)
+              }
+            ]
+          }
+        };
+      }
+
+      return _threads;
+    });
+  }
+
+  function inlineCommentDeletedHandler(payload: WebSocketPayload<'inline_comment_deleted'>) {
+    setThreads((_threads) => {
+      const thread = _threads[payload.threadId];
+      if (thread) {
+        return {
+          ..._threads,
+          [thread.id]: {
+            ...thread,
+            comments: thread.comments.filter((_comment) => _comment.id !== payload.commentId)
+          }
+        };
+      }
+
+      return _threads;
+    });
+  }
+
+  function inlineCommentUpdatedHandler(payload: WebSocketPayload<'inline_comment_updated'>) {
+    setThreads((_threads) => {
+      const thread = _threads[payload.threadId];
+      if (thread) {
+        return {
+          ..._threads,
+          [thread.id]: {
+            ...thread,
+            comments: thread.comments.map((_comment) => {
+              if (_comment.id === payload.id) {
+                return {
+                  ..._comment,
+                  ...payload
+                };
+              }
+              return _comment;
+            })
+          }
+        };
+      }
+
+      return _threads;
+    });
+  }
+
+  function inlineCommentThreadUpdatedHandler(payload: WebSocketPayload<'inline_comment_thread_updated'>) {
+    setThreads((_threads) => {
+      const thread = _threads[payload.id];
+      if (thread) {
+        return {
+          ..._threads,
+          [thread.id]: {
+            ...thread,
+            ...payload
+          }
+        };
+      }
+
+      return _threads;
+    });
+  }
+
+  useEffect(() => {
+    if (spaceRole && !spaceRole.isGuest) {
+      const unsubscribeFromInlineCommentCreatedEvent = subscribe('inline_comment_created', inlineCommentCreatedHandler);
+      const unsubscribeFromInlineCommentUpdatedEvent = subscribe('inline_comment_updated', inlineCommentUpdatedHandler);
+      const unsubscribeFromInlineCommentDeletedEvent = subscribe('inline_comment_deleted', inlineCommentDeletedHandler);
+      const unsubscribeFromInlineCommentThreadUpdatedEvent = subscribe(
+        'inline_comment_thread_updated',
+        inlineCommentThreadUpdatedHandler
+      );
+
+      return () => {
+        unsubscribeFromInlineCommentCreatedEvent();
+        unsubscribeFromInlineCommentDeletedEvent();
+        unsubscribeFromInlineCommentUpdatedEvent();
+        unsubscribeFromInlineCommentThreadUpdatedEvent();
+      };
+    }
+  }, [spaceRole]);
 
   useEffect(() => {
     if (data) {

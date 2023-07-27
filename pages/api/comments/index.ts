@@ -9,6 +9,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -57,6 +58,14 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     userId,
     spaceId: thread.spaceId
   });
+
+  relay.broadcast(
+    {
+      type: 'inline_comment_created',
+      payload: createdComment
+    },
+    thread.spaceId
+  );
 
   return res.status(201).json(createdComment);
 }

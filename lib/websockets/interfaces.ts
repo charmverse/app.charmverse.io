@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Comment, Page, SubscriptionTier, Thread } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
@@ -109,6 +109,29 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
+type InlineCommentCreated = {
+  type: 'inline_comment_created';
+  payload: Comment;
+};
+
+type InlineCommentDeleted = {
+  type: 'inline_comment_deleted';
+  payload: {
+    commentId: string;
+    threadId: string;
+  };
+};
+
+type InlineCommentUpdated = {
+  type: 'inline_comment_updated';
+  payload: Comment;
+};
+
+type InlineCommentThreadUpdated = {
+  type: 'inline_comment_thread_updated';
+  payload: Thread;
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -125,6 +148,10 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
+  | InlineCommentCreated
+  | InlineCommentUpdated
+  | InlineCommentDeleted
+  | InlineCommentThreadUpdated
   | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
