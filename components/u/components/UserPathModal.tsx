@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import debouncePromise from 'lib/utilities/debouncePromise';
 

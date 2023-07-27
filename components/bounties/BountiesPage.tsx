@@ -8,7 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import Link from 'components/common/Link';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';

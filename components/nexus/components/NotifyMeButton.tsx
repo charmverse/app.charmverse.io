@@ -3,7 +3,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 
 import NotifyMeModal from './NotifyMeModal';

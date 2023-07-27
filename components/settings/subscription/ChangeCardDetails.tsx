@@ -5,7 +5,7 @@ import { useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import UpdateCardModal from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { CreatePaymentMethodRequest } from 'lib/subscription/createPaymentMethod';

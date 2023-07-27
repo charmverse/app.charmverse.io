@@ -4,7 +4,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 

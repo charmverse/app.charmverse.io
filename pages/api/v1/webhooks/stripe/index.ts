@@ -343,9 +343,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         if (!spaceSubscription) {
-          log.warn(
-            `Can't delete the space subscription. Space subscription not found for subscription ${subscription.id}`
-          );
+          // Continue only of the subscription deletion was triggered from the stripe dashboard and there is an active space subscription.
           break;
         }
 

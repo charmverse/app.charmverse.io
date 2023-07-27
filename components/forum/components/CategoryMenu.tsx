@@ -9,7 +9,7 @@ import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';

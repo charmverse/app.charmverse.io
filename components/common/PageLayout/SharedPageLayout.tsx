@@ -8,7 +8,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';

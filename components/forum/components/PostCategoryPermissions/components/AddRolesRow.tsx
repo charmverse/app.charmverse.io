@@ -1,6 +1,6 @@
 import Tooltip from '@mui/material/Tooltip';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 type Props = {
   onClick?: () => void;

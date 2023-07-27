@@ -8,7 +8,7 @@ import { CryptoCurrencies, getChainById } from 'connectors';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
