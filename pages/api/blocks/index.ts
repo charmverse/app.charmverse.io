@@ -74,7 +74,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     }
 
     if (!spaceId) {
-      throw new NotFoundError('space not found');
+      throw new NotFoundError(`space ${spaceId} not found`);
     }
 
     const blocks = await prisma.block.findMany({
