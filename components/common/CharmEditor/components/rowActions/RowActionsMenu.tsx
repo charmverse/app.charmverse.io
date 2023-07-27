@@ -23,6 +23,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utilities/browser';
 
+import { nodeViewUpdateStore } from '../@bangle.dev/react/node-view-helpers';
+
 import type { PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
@@ -44,7 +46,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   const boards = useAppSelector(getSortedBoards);
 
   function _getNode() {
-    if (menuState.rowPos === undefined || !menuState.rowDOM) {
+    if (menuState.rowPos === undefined) {
       return null;
     }
 
@@ -163,15 +165,15 @@ function Component({ menuState }: { menuState: PluginState }) {
       log.warn('no node identified to add new row');
       return;
     }
-    const insertPos = e.altKey
-      ? // insert before
-        node.nodeStart > 0
-        ? node.nodeStart - 1
-        : 0
-      : // insert after
-      node.node.type.name === 'columnLayout'
-      ? node.nodeEnd - 1
-      : node.nodeEnd;
+    let insertPos = -1;
+    // insert before
+    if (e.altKey) {
+      insertPos = node.nodeStart > 0 ? node.nodeStart - 1 : 0;
+    }
+    // insert after
+    else {
+      insertPos = node.node.type.name === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd;
+    }
     const tr = view.state.tr;
     // TODO: Trigger component select menu
     // const emptyLine = view.state.schema.nodes.paragraph.create(
