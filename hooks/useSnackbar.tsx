@@ -16,11 +16,9 @@ type IContext = {
   handleClose: SnackbarProps['onClose'];
   autoHideDuration?: number | null;
   setAutoHideDuration?: Dispatch<SetStateAction<number | null>>;
-  resetState: () => void;
 };
 
 export const SnackbarContext = createContext<Readonly<IContext>>({
-  resetState: () => {},
   handleClose: () => {},
   isOpen: false,
   actions: [],
@@ -69,7 +67,6 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       autoHideDuration,
       setAutoHideDuration,
       isOpen,
-      resetState,
       handleClose,
       showMessage: (msg: string, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
         newSeverity = newSeverity ?? 'info';
