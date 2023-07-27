@@ -8,7 +8,11 @@ import {
   getNFT as getNFTFromAlchemy
 } from './provider/alchemy';
 import type { SupportedChainId as SupportedChainIdByAlchemy } from './provider/alchemy';
-import { supportedMainnets as supportedMainnetsByAnkr, getNFTs as getNFTsFromAnkr } from './provider/ankr';
+import {
+  supportedMainnets as supportedMainnetsByAnkr,
+  getNFTs as getNFTsFromAnkr,
+  getNFT as getNFTFromAnkr
+} from './provider/ankr';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr';
 
 export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr;
@@ -77,8 +81,10 @@ export type NFTRequest = {
 
 export async function getNFT({ address, tokenId, chainId = 1 }: NFTRequest) {
   if (supportedMainnetsByAlchemy.includes(chainId as SupportedChainIdByAlchemy)) {
-    return getNFTFromAlchemy(address, tokenId, chainId as SupportedChainIdByAlchemy);
+    return getNFTFromAlchemy({ address, tokenId, chainId: chainId as SupportedChainIdByAlchemy });
+  } else if (supportedMainnetsByAnkr.includes(chainId as SupportedChainIdByAnkr)) {
+    return getNFTFromAnkr({ address, tokenId, chainId: chainId as SupportedChainIdByAnkr });
   }
-  // TODO: add support to ankr
+  log.warn('NFT requested from unsupported chainId', { chainId });
   return null;
 }

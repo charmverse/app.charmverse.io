@@ -31,8 +31,8 @@ export const supportedMainnets: SupportedChainId[] = [1, 10, 56, 137, 250, 42161
 
 const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
 
-// Docs: https://docs.alchemy.com/reference/getnfts
-export const getNFTs = async ({
+// Docs: https://api-docs.ankr.com/reference/post_ankr-getnftholders
+export async function getNFTs({
   chainId,
   address,
   walletId
@@ -40,9 +40,10 @@ export const getNFTs = async ({
   chainId: SupportedChainId;
   address: string;
   walletId: string;
-}): Promise<NFTData[]> => {
+}): Promise<NFTData[]> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
   const blockchain = ankrApis[chainId];
+  if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   const results = await paginatedCall(
     async (params) => {
       await rateLimiter();
@@ -59,9 +60,35 @@ export const getNFTs = async ({
     .flat()
     .map((nft) => mapNFTData(nft, walletId, chainId));
   return nfts;
-};
+}
 
-function mapNFTData(nft: Nft, walletId: string | null, chainId: SupportedChainId): NFTData {
+export async function getNFT({
+  address,
+  tokenId,
+  chainId
+}: {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+}): Promise<NFTData | null> {
+  const provider = new AnkrProvider(advancedAPIEndpoint);
+  const blockchain = ankrApis[chainId];
+  if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
+  const nft = await provider.getNFTMetadata({
+    blockchain,
+    tokenId,
+    contractAddress: address,
+    forceFetch: false
+  });
+  if (!nft.attributes || !nft.metadata) {
+    return null;
+  }
+  return mapNFTData({ ...nft.attributes, ...nft.metadata }, null, chainId);
+}
+
+type NFTFields = Pick<Nft, 'contractAddress' | 'tokenId' | 'imageUrl' | 'name'>;
+
+function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedChainId): NFTData {
   const tokenIdInt = parseInt(nft.tokenId, 16);
   const link = getNFTUrl({ chain: chainId, contract: nft.contractAddress, token: tokenIdInt }) ?? '';
   return {

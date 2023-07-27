@@ -142,11 +142,19 @@ export async function getNFTs({
   return mappedNfts;
 }
 
-export const getNFT = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
+export async function getNFT({
+  address,
+  tokenId,
+  chainId = 1
+}: {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+}) {
   const url = `${getAlchemyBaseUrl(chainId)}/getNFTMetadata`;
-  const res = await GET<AlchemyNft>(url, { contractAddress, tokenId });
+  const res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId });
   return mapNFTData(res, null, chainId);
-};
+}
 
 export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
