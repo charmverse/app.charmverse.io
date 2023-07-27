@@ -12,22 +12,23 @@ import type { NFTData } from '../getNFTs';
 const rateLimiter = RateLimit(0.8);
 
 // Find supported chains:  https://www.npmjs.com/package/@ankr.com/ankr.js
-const ankrApis = {
-  1: 'eth',
-  5: 'eth_goerli',
-  10: 'optimism',
+// Note: we commented out chains already supported by alchemy
+const ankrAdvancedApis = {
+  // 1: 'eth',
+  // 5: 'eth_goerli',
+  // 10: 'optimism',
   56: 'bsc',
-  137: 'polygon',
+  // 137: 'polygon',
   250: 'fantom',
-  42161: 'arbitrum',
+  // 42161: 'arbitrum',
   43114: 'avalanche'
 } as const;
 
 // https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
-export const supportedChainIds = typedKeys(ankrApis);
+export const supportedChainIds = typedKeys(ankrAdvancedApis);
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
-export const supportedMainnets: SupportedChainId[] = [1, 10, 56, 137, 250, 42161, 43114];
+export const supportedMainnets: SupportedChainId[] = [56, 250, 43114];
 
 const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
 
@@ -42,7 +43,7 @@ export async function getNFTs({
   walletId: string;
 }): Promise<NFTData[]> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
-  const blockchain = ankrApis[chainId];
+  const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   const results = await paginatedCall(
     async (params) => {
@@ -70,7 +71,7 @@ type GetNFTInput = {
 
 export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
-  const blockchain = ankrApis[chainId];
+  const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   await rateLimiter();
   const nft = await provider.getNFTMetadata({
@@ -92,7 +93,7 @@ type GetNFTOwnerInput = {
 
 export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Promise<string[]> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
-  const blockchain = ankrApis[chainId];
+  const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   const results = await paginatedCall(
     async (params) => {
