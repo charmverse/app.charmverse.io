@@ -104,7 +104,7 @@ function LoginHandler(props: DialogProps) {
   const { loginWithGooglePopup } = useGoogleLogin();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
-    showMessage(`Logged in with ${loggedInUser?.identityType}.`, 'success');
+    showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
   async function handleGoogleLogin() {
