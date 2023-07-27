@@ -65,7 +65,7 @@ jobs:
             sed -i 's/prd/stg/g' $conf_file
             sed -i 's/production/staging/g' $conf_file
           done
-          
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
