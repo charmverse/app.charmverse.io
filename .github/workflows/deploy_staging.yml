@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: feat-proposals-datasource-privacy
+  SELECTED_PERMISSION_API_TAG:
 
 jobs:
   deploy:
@@ -23,8 +23,6 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with:
-          use_github_core_branch: feat/proposals-datasource-privacy
 
       - name: Build app
         uses: ./.github/actions/build

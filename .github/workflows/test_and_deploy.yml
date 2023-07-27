@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  SELECTED_PERMISSION_API_TAG: feat-proposals-datasource-privacy
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
@@ -38,7 +38,6 @@ jobs:
         uses: ./.github/actions/install
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
-          use_github_core_branch: feat/proposals-datasource-privacy
 
       - name: Build app
         uses: ./.github/actions/build
