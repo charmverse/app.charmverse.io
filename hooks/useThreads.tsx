@@ -133,7 +133,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  function inlineCommentThreadUpdatedHandler(payload: WebSocketPayload<'inline_comment_thread_updated'>) {
+  function threadUpdatedHandler(payload: WebSocketPayload<'thread_updated'>) {
     setThreads((_threads) => {
       const thread = _threads[payload.id];
       if (thread) {
@@ -150,21 +150,30 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  function threadDeletedHandler(threadId: WebSocketPayload<'thread_deleted'>) {
+    setThreads((_threads) => {
+      if (_threads) {
+        delete _threads[threadId];
+      }
+
+      return _threads;
+    });
+  }
+
   useEffect(() => {
     if (spaceRole && !spaceRole.isGuest) {
       const unsubscribeFromInlineCommentCreatedEvent = subscribe('inline_comment_created', inlineCommentCreatedHandler);
       const unsubscribeFromInlineCommentUpdatedEvent = subscribe('inline_comment_updated', inlineCommentUpdatedHandler);
       const unsubscribeFromInlineCommentDeletedEvent = subscribe('inline_comment_deleted', inlineCommentDeletedHandler);
-      const unsubscribeFromInlineCommentThreadUpdatedEvent = subscribe(
-        'inline_comment_thread_updated',
-        inlineCommentThreadUpdatedHandler
-      );
+      const unsubscribeFromThreadUpdatedEvent = subscribe('thread_updated', threadUpdatedHandler);
+      const unsubscribeFromThreadDeletedEvent = subscribe('thread_deleted', threadDeletedHandler);
 
       return () => {
         unsubscribeFromInlineCommentCreatedEvent();
         unsubscribeFromInlineCommentDeletedEvent();
         unsubscribeFromInlineCommentUpdatedEvent();
-        unsubscribeFromInlineCommentThreadUpdatedEvent();
+        unsubscribeFromThreadUpdatedEvent();
+        unsubscribeFromThreadDeletedEvent();
       };
     }
   }, [spaceRole]);

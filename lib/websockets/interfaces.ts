@@ -127,9 +127,14 @@ type InlineCommentUpdated = {
   payload: Comment;
 };
 
-type InlineCommentThreadUpdated = {
-  type: 'inline_comment_thread_updated';
+type ThreadUpdated = {
+  type: 'thread_updated';
   payload: Thread;
+};
+
+type ThreadDeleted = {
+  type: 'thread_deleted';
+  payload: string;
 };
 
 export type ClientMessage = SubscribeToWorkspace;
@@ -151,7 +156,8 @@ export type ServerMessage =
   | InlineCommentCreated
   | InlineCommentUpdated
   | InlineCommentDeleted
-  | InlineCommentThreadUpdated
+  | ThreadUpdated
+  | ThreadDeleted
   | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
