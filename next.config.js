@@ -7,6 +7,7 @@ const next = require('next/dist/lib/is-serializable-props');
 const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
+const uuid = require('uuid');
 
 // we can save time and skip code checks, which are handle in a special step by the CI
 const skipCodeChecks = process.env.CI === 'true';
@@ -46,7 +47,7 @@ const config = {
     }
   },
   async generateBuildId() {
-    return process.env.NEXT_PUBLIC_BUILD_ID
+    return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
   },
   async redirects() {
     return [
