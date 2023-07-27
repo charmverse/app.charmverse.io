@@ -194,7 +194,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>
   ): Promise<ExtendedVote> {
     if (!user || !currentSpace) {
-      throw new Error('Missing user or space, cannot create vote');
+      throw new Error('Missing user or space');
     }
 
     const extendedVote = await charmClient.votes.createVote({
