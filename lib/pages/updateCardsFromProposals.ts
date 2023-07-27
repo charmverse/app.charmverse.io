@@ -118,8 +118,8 @@ export async function updateCardsFromProposals({
       });
 
       const archivedStatusValueId = databaseProposalProps.proposalStatus?.options.find(
-        (opt) => opt.value !== 'archived'
-      )?.value;
+        (opt) => opt.value === 'archived'
+      )?.id;
       if (
         card.title !== pageWithProposal.title ||
         card.hasContent !== pageWithProposal.hasContent ||
@@ -128,8 +128,8 @@ export async function updateCardsFromProposals({
         card.deletedAt !== pageWithProposal.deletedAt ||
         cardProposalCategory?.optionId !== pageWithProposal.proposal?.categoryId ||
         cardProposalUrl?.value !== pageWithProposal.path ||
-        (pageWithProposal.proposal?.archived && cardProposalStatus?.optionId !== archivedStatusValueId) ||
-        (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === archivedStatusValueId) ||
+        (pageWithProposal.proposal?.archived && cardProposalStatus?.value !== 'archived') ||
+        (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === 'archived') ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStatus?.optionId !==
             databaseProposalProps.proposalStatus?.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
