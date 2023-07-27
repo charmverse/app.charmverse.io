@@ -62,18 +62,17 @@ export async function getNFTs({
   return nfts;
 }
 
-export async function getNFT({
-  address,
-  tokenId,
-  chainId
-}: {
+type GetNFTInput = {
   address: string;
   tokenId: string;
   chainId: SupportedChainId;
-}): Promise<NFTData | null> {
+};
+
+export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
   const provider = new AnkrProvider(advancedAPIEndpoint);
   const blockchain = ankrApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
+  await rateLimiter();
   const nft = await provider.getNFTMetadata({
     blockchain,
     tokenId,
@@ -84,6 +83,29 @@ export async function getNFT({
     return null;
   }
   return mapNFTData({ ...nft.attributes, ...nft.metadata }, null, chainId);
+}
+
+type GetNFTOwnerInput = {
+  address: string;
+  chainId: SupportedChainId;
+};
+
+export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Promise<string[]> {
+  const provider = new AnkrProvider(advancedAPIEndpoint);
+  const blockchain = ankrApis[chainId];
+  if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
+  const results = await paginatedCall(
+    async (params) => {
+      await rateLimiter();
+      return provider.getNFTHolders({
+        ...params,
+        contractAddress: address,
+        blockchain
+      });
+    },
+    (response) => (response.nextPageToken ? { pageToken: response.nextPageToken } : null)
+  );
+  return results.map((res) => res.holders).flat();
 }
 
 type NFTFields = Pick<Nft, 'contractAddress' | 'tokenId' | 'imageUrl' | 'name'>;

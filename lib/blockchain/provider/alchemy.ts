@@ -156,12 +156,20 @@ export async function getNFT({
   return mapNFTData(res, null, chainId);
 }
 
-export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
+export async function getNFTOwners({
+  address,
+  tokenId,
+  chainId = 1
+}: {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+}) {
   const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
-  const res = await GET<{ owners: string[] }>(url, { contractAddress, tokenId });
+  const res = await GET<{ owners: string[] }>(url, { contractAddress: address, tokenId });
 
   return res.owners;
-};
+}
 
 function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: SupportedChainId): NFTData | null {
   if (nft.error) {

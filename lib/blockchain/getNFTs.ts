@@ -5,13 +5,15 @@ import orderBy from 'lodash/orderBy';
 import {
   supportedMainnets as supportedMainnetsByAlchemy,
   getNFTs as getNFTsFromAlchemy,
-  getNFT as getNFTFromAlchemy
+  getNFT as getNFTFromAlchemy,
+  getNFTOwners as getNFTOwnersFromAlchemy
 } from './provider/alchemy';
 import type { SupportedChainId as SupportedChainIdByAlchemy } from './provider/alchemy';
 import {
   supportedMainnets as supportedMainnetsByAnkr,
   getNFTs as getNFTsFromAnkr,
-  getNFT as getNFTFromAnkr
+  getNFT as getNFTFromAnkr,
+  getNFTOwners as getNFTOwnersFromAnkr
 } from './provider/ankr';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr';
 
@@ -87,4 +89,29 @@ export async function getNFT({ address, tokenId, chainId = 1 }: NFTRequest) {
   }
   log.warn('NFT requested from unsupported chainId', { chainId });
   return null;
+}
+
+export type NFTOwnerRequest = {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+  userAddresses: string[];
+};
+
+export async function verifyNFTOwner({
+  address,
+  tokenId,
+  chainId = 1,
+  userAddresses
+}: NFTOwnerRequest): Promise<boolean> {
+  if (supportedMainnetsByAlchemy.includes(chainId as SupportedChainIdByAlchemy)) {
+    const owners = await getNFTOwnersFromAlchemy({ address, tokenId, chainId: chainId as SupportedChainIdByAlchemy });
+    return userAddresses.some((a) => owners.some((o) => o.toLowerCase() === a.toLowerCase()));
+  } else if (supportedMainnetsByAnkr.includes(chainId as SupportedChainIdByAnkr)) {
+    // Note: Ankr does not require a tokenId, which means the list could be very long. Maybe we should request NFTs by owner instead?
+    const owners = await getNFTOwnersFromAnkr({ address, chainId: chainId as SupportedChainIdByAnkr });
+    return userAddresses.some((a) => owners.some((o) => o.toLowerCase() === a.toLowerCase()));
+  }
+  log.warn('NFT verification requested from unsupported chainId', { chainId });
+  return false;
 }
