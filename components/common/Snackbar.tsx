@@ -26,7 +26,16 @@ interface CustomizedSnackbarProps {
 }
 
 export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
-  const { setIsOpen, severity, message, actions, origin, handleClose, isOpen } = useSnackbar();
+  const {
+    setIsOpen,
+    severity,
+    message,
+    actions,
+    origin,
+    handleClose,
+    isOpen,
+    autoHideDuration = props.autoHideDuration ?? 5000
+  } = useSnackbar();
   const router = useRouter();
 
   // Close the snackbar if we change url
@@ -40,8 +49,7 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     isOpen: isOpenProp,
     message: messageProp,
     origin: originProp,
-    severity: severityProp,
-    autoHideDuration = 5000
+    severity: severityProp
   } = props;
 
   return (

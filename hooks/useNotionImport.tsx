@@ -7,7 +7,6 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
-import Snackbar from 'components/common/Snackbar';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
@@ -22,9 +21,7 @@ interface Props {
 }
 
 type NotionImportState = {
-  error?: string;
   loading: boolean;
-  warning?: string;
   failedImports: FailedImportsError[];
 };
 
@@ -98,21 +95,19 @@ export function NotionProvider({ children }: Props) {
     (_, { arg }: Readonly<{ arg: { code: string; spaceId: string } }>) => charmClient.importFromNotion(arg),
     {
       onError(err) {
+        setNotionState({
+          loading: false
+        });
         if (err.status === 504) {
-          setNotionState({
-            loading: false,
-            warning:
-              'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.'
-          });
+          showMessage(
+            'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.',
+            'warning'
+          );
         } else {
-          setNotionState({
-            loading: false,
-            error:
-              notionError ||
-              err.message ||
-              err.error ||
-              'Something went wrong with your notion import. Please try again'
-          });
+          showMessage(
+            notionError || err.message || err.error || 'Something went wrong with your notion import. Please try again',
+            'error'
+          );
         }
       }
     }
@@ -131,10 +126,22 @@ export function NotionProvider({ children }: Props) {
         failedImports: []
       });
     } else {
+      showMessage(
+        'Notion import completed! Click the view button to see which pages failed to be imported.',
+        'warning'
+      );
+      setActions([
+        <IconButton key='view'>
+          <VisibilityOutlinedIcon
+            onClick={() => {
+              setIsFailedImportsModalOpen(true);
+            }}
+          />
+        </IconButton>
+      ]);
       setNotionState({
         loading: false,
-        failedImports,
-        warning: `Notion import completed! Click the view button to see which pages failed to be imported.`
+        failedImports
       });
     }
   }
@@ -154,38 +161,12 @@ export function NotionProvider({ children }: Props) {
       unsubscribeFromBlockUpdates();
     };
   }, []);
+
   const value = useMemo<INotionImportContext>(() => ({ loading: notionState.loading }), [notionState.loading]);
 
   return (
     <NotionImportContext.Provider value={value}>
       {children}
-      <Snackbar
-        severity={notionState.error ? 'error' : 'warning'}
-        // For error and warning messages, we don't want the snackbar to auto hide
-        autoHideDuration={null}
-        isOpen={!!notionState.error || !!notionState.warning || notionState.failedImports.length !== 0}
-        message={notionState.error ?? notionState.warning}
-        handleClose={() => {
-          setNotionState({
-            error: undefined,
-            warning: undefined,
-            failedImports: []
-          });
-        }}
-        actions={
-          notionState.failedImports.length !== 0 && !notionState.loading
-            ? [
-                <IconButton key='view'>
-                  <VisibilityOutlinedIcon
-                    onClick={() => {
-                      setIsFailedImportsModalOpen(true);
-                    }}
-                  />
-                </IconButton>
-              ]
-            : []
-        }
-      />
       <Modal
         title='Failed Notion Imports'
         open={isFailedImportsModalOpen}
