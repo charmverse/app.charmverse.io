@@ -6,16 +6,16 @@ type IContext = {
   isOpen: boolean;
   actions?: ReactNode[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  message: string | null;
+  message: ReactNode;
   origin: SnackbarOrigin;
-  setMessage: Dispatch<SetStateAction<string | null>>;
+  setMessage: Dispatch<SetStateAction<ReactNode>>;
   severity: AlertColor;
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
   setActions: Dispatch<SetStateAction<ReactNode[]>>;
-  showMessage: (msg: string, newSeverity?: AlertColor) => void;
+  showMessage: (msg: ReactNode, newSeverity?: AlertColor) => void;
   handleClose: SnackbarProps['onClose'];
-  autoHideDuration?: number | null;
-  setAutoHideDuration?: Dispatch<SetStateAction<number | null>>;
+  autoHideDuration: number | null;
+  setAutoHideDuration: Dispatch<SetStateAction<number | null>>;
 };
 
 export const SnackbarContext = createContext<Readonly<IContext>>({
@@ -39,20 +39,16 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   const [actions, setActions] = useState<ReactNode[]>([]);
   const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });
   const [severity, setSeverity] = useState<AlertColor>('info');
-  const [message, setMessage] = useState<null | string>(null);
+  const [message, setMessage] = useState<null | ReactNode>(null);
   const [autoHideDuration, setAutoHideDuration] = useState<null | number>(5000);
-
-  const handleClick = () => {
-    setIsOpen(true);
-  };
 
   const resetState = () => {
     setIsOpen(false);
     setActions([]);
     setOrigin({ vertical: 'bottom', horizontal: 'left' });
-    setSeverity('info');
     setMessage(null);
     setAutoHideDuration(5000);
+    setSeverity('info');
   };
 
   const handleClose: SnackbarProps['onClose'] = (_, reason) => {
@@ -68,9 +64,9 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       setAutoHideDuration,
       isOpen,
       handleClose,
-      showMessage: (msg: string, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
+      showMessage: (msg: ReactNode, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
         newSeverity = newSeverity ?? 'info';
-        handleClick();
+        setIsOpen(true);
         if (anchorOrigin) {
           setOrigin(anchorOrigin);
         }

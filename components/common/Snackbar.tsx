@@ -40,8 +40,11 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
 
   // Close the snackbar if we change url
   useEffect(() => {
-    setIsOpen(false);
-  }, [router.asPath]);
+    // When autoHideDuration is null, we don't want to close the snackbar automatically and instead wait for close action
+    if (autoHideDuration !== null) {
+      setIsOpen(false);
+    }
+  }, [router.asPath, autoHideDuration]);
 
   const {
     actions: actionsProp,

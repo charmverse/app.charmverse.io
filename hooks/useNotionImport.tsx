@@ -1,11 +1,13 @@
+import { useTheme } from '@emotion/react';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { IconButton } from '@mui/material';
+import { IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { LoadingIcon } from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -76,12 +78,14 @@ function NotionFailedImportsModal({ failedImports }: { failedImports: FailedImpo
 
 export function NotionProvider({ children }: Props) {
   const [notionState, _setNotionState] = useState<NotionImportState>({ loading: false, failedImports: [] });
-  const { showMessage, setActions } = useSnackbar();
+  const { showMessage, setActions, setAutoHideDuration } = useSnackbar();
   const { space } = useCurrentSpace();
   const notionCode = getCookie(AUTH_CODE_COOKIE);
   const notionError = getCookie(AUTH_ERROR_COOKIE);
   const { subscribe } = useWebSocketClient();
   const [isFailedImportsModalOpen, setIsFailedImportsModalOpen] = useState(false);
+
+  const theme = useTheme();
 
   function setNotionState(partialNotionState: Partial<NotionImportState>) {
     _setNotionState({
@@ -118,6 +122,7 @@ export function NotionProvider({ children }: Props) {
     totalPages,
     failedImports
   }: NotionImportCompleted['payload']) {
+    setAutoHideDuration(null);
     // Only show this message if the import was not triggered by the user
     if (totalImportedPages === totalPages && failedImports.length === 0) {
       showMessage('Notion workspace successfully imported', 'success');
@@ -150,7 +155,19 @@ export function NotionProvider({ children }: Props) {
     if (space?.id && notionCode) {
       deleteCookie(AUTH_CODE_COOKIE);
       setNotionState({ loading: true, failedImports: [] });
-      showMessage('Importing your files from Notion.', 'info');
+      showMessage(
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <LoadingIcon
+            size={16}
+            style={{
+              color: theme.palette.mode === 'dark' ? 'black' : 'white'
+            }}
+          />
+          Importing your files from Notion
+        </Stack>,
+        'info'
+      );
+      setAutoHideDuration(null);
       trigger({ code: notionCode, spaceId: space.id });
     }
   }, [space?.id, notionCode]);
