@@ -126,6 +126,7 @@ export function VideoNodeView({
       return (
         <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
           <MuxVideo
+            playsInline
             style={{ height: '100%', maxWidth: '100%', width: '100%' }}
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
             // for analytics
