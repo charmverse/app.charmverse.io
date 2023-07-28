@@ -288,6 +288,7 @@ export function CheckoutForm({
               disabled={isValidationLoading}
               InputProps={{
                 sx: {
+                  boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02)',
                   backgroundColor: 'transparent'
                 }
               }}
