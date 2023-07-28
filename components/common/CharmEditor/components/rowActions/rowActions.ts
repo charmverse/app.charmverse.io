@@ -6,9 +6,24 @@ import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
+// TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
+const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList'];
+
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 // helpful links:
 // Indexing in PM: https://prosemirror.net/docs/guide/#doc.indexing
+/**
+ *
+ * How it works:
+ *  A Prosemirror plugin is created to listen to mouse events on the editor.
+ * 1. On clicking a handle (dragStart), create a node selection a snapshot of the current row. Serialize the content that is stored in the event
+ * 2. On mouse move, keep track of the document pos
+ *
+ *
+ *
+ *
+ *
+ */
 
 export interface PluginState {
   tooltipDOM: HTMLElement;
@@ -18,9 +33,12 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
+// A Prosemirror plugin is needed to listen to mouse events on the editor.
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
+  // Track the pos of the row to be moved, as the cursor moves around the editor.
+  // This is used to position the handlebar which appears in the margin.
   function onMouseOver(view: EditorView, e: MouseEventInit) {
     if (view.isDestroyed) {
       return;
@@ -28,6 +46,12 @@ export function plugins({ key }: { key: PluginKey }) {
     // mouse is hovering over the editor container (left side margin for example)
     // @ts-ignore
     if (e.target === view.dom) {
+      return;
+    }
+
+    // ignore UL and OL tags, using native browser list icons means we need to use padding on these container elements
+    // @ts-ignore
+    if (e.target.nodeName === 'OL' || e.target.nodeName === 'UL') {
       return;
     }
     // @ts-ignore
@@ -43,7 +67,7 @@ export function plugins({ key }: { key: PluginKey }) {
     if (startPos !== undefined) {
       // Step 1. grab the top-most ancestor of the related DOM element
       const dom = rowNodeAtPos(view, startPos);
-      const rowNode = dom.rowNode;
+      const rowNode = dom?.rowNode;
       // @ts-ignore pm types are wrong
       if (rowNode && view.dom.contains(rowNode.parentNode) && rowNode.getBoundingClientRect) {
         // @ts-ignore pm types are wrong
@@ -51,7 +75,17 @@ export function plugins({ key }: { key: PluginKey }) {
         const viewBox = view.dom.getBoundingClientRect();
         // align to the top of the row
         const top = box.top - viewBox.top;
+        let left = box.left - viewBox.left - 50; // 50: some default padding
+        // handle when nodes have negative margin
+        if (left < 0) {
+          left = 0;
+        }
+        // Hack: subtract the left padding from UL/OL tags - TODO: find a better way to add list padding without putting it on OL/UL tags
+        if (rowNode.nodeName === 'LI') {
+          left -= 24;
+        }
         tooltipDOM.style.top = `${top}px`;
+        tooltipDOM.style.left = `${left}px`;
         const newState = {
           rowPos: startPos,
           rowDOM: dom.rowNode,
@@ -66,6 +100,7 @@ export function plugins({ key }: { key: PluginKey }) {
 
   const brokenClipboardAPI = false;
 
+  // Listen to drag start events on the .charm-drag-handle elements and set the dragged content based on prosemiror content.
   function dragStart(view: EditorView, e: DragEvent) {
     if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
 
@@ -147,24 +182,60 @@ export function posAtCoords(view: EditorView, coords: { left: number; top: numbe
   return startPos;
 }
 
-export function rowNodeAtPos(view: EditorView, startPos: number) {
+function getFirstChildBlock(children: HTMLCollection) {
+  for (const child of children) {
+    if (child.pmViewDesc?.node?.isBlock) {
+      return child;
+    }
+  }
+}
+
+export function rowNodeAtPos(
+  view: EditorView,
+  startPos: number
+): null | { node: HTMLElement; rowNode: HTMLElement; offset: number } {
   const dom = view.domAtPos(startPos);
+
   let rowNode = dom.node;
   // if startPos = 0, domAtPos gives us the doc container
   if (rowNode === view.dom) {
-    rowNode = view.dom.children[0] || view.dom;
+    rowNode = getFirstChildBlock(view.dom.children) || view.dom;
   }
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
   // ref: https://github.com/atlassian/prosemirror-utils/issues/8
-  if (dom.offset && dom.node.childNodes[dom.offset]) {
+  if (dom.node.childNodes[dom.offset]) {
     rowNode = dom.node.childNodes[dom.offset];
   }
-  let levels = 10; // pre-caution to prevent infinite loop
-  while (rowNode && rowNode.parentNode !== view.dom && levels > 0) {
+
+  if (isContainerNode(rowNode)) {
+    return null;
+  }
+
+  // if we are over a container, select the first child
+  while (isContainerNode(rowNode)) {
+    const firstChild = getFirstChildBlock(rowNode.childNodes as any);
+    if (!firstChild) {
+      return null;
+    }
+    rowNode = firstChild;
+  }
+  let levels = 20; // pre-caution to prevent infinite loop
+  while (rowNode && !isContainerNode(rowNode.parentNode) && levels > 0) {
     levels -= 1;
     if (rowNode.parentNode && view.dom.contains(rowNode.parentNode)) {
       rowNode = rowNode.parentNode;
     }
+  }
+
+  function isContainerNode(node: Node | null) {
+    if (node === view.dom) {
+      return true; // document container
+    }
+    const pmNodeType = node?.pmViewDesc?.node?.type.name;
+    if (pmNodeType && containerNodeTypes.includes(pmNodeType)) {
+      return true;
+    }
+    return false;
   }
   // another approach, which may require checking the nodeType:
   // while (node && node.parentNode) {
@@ -175,7 +246,8 @@ export function rowNodeAtPos(view: EditorView, startPos: number) {
   // }
   return {
     ...dom,
-    rowNode
+    node: dom.node as HTMLElement,
+    rowNode: rowNode as HTMLElement
   };
 }
 
@@ -186,8 +258,7 @@ function blockPosAtCoords(view: EditorView, coords: { left: number; top: number 
   }
   const dom = rowNodeAtPos(view, startPos);
 
-  const node = dom.rowNode;
-
+  const node = dom?.rowNode;
   // nodeType === 1 is an element like <p> or <div>
   if (node && node.nodeType === 1) {
     // @ts-ignore

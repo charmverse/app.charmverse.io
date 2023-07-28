@@ -101,11 +101,16 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         };
 
         await prisma.$transaction([
-          prisma.stripeSubscription.create({
-            data: {
+          prisma.stripeSubscription.upsert({
+            where: {
+              subscriptionId: stripeSubscription.id,
+              spaceId
+            },
+            create: {
               ...newData,
               spaceId
-            }
+            },
+            update: {}
           }),
           prisma.space.update({
             where: {

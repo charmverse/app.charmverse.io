@@ -16,8 +16,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .get(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }), getSpaceSubscriptionController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .get(getSpaceSubscriptionController)
   .delete(deletePaymentSubscription)
   .put(updatePaymentSubscription)
   .post(requireKeys(['period', 'blockQuota', 'billingEmail'], 'body'), createPaymentSubscription);
