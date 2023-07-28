@@ -1,11 +1,14 @@
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import { getTimeDifference } from 'lib/utilities/dates';
@@ -14,6 +17,9 @@ import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
 
 import Legend from '../Legend';
+
+import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
+import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -32,12 +38,39 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 }
 
 export function CreateSubscriptionInformation({
-  onClick,
-  spaceSubscription
+  onUpgrade,
+  spaceSubscription,
+  pendingPayment,
+  spaceId
 }: {
-  onClick: () => void;
+  onUpgrade: () => void;
   spaceSubscription?: SpaceSubscriptionWithStripeData | null;
+  pendingPayment?: boolean;
+  spaceId: string;
 }) {
+  const { refetchSpaceSubscription } = useSpaceSubscription();
+  const { showMessage } = useSnackbar();
+
+  const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
+    `spaces/${spaceId}/switch-to-free-tier`,
+    () => charmClient.subscription.switchToFreeTier(spaceId),
+    {
+      onSuccess() {
+        refetchSpaceSubscription();
+        showMessage('You have successfully switch to free tier!', 'success');
+      },
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to free tier could not be made. Please try again later.', 'error');
+      }
+    }
+  );
+
+  const {
+    isOpen: isConfirmDowngradeDialogOpen,
+    close: closeConfirmFreeTierDowngradeDialog,
+    open: openConfirmFreeTierDowngradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
+
   const freeTrialEnds =
     spaceSubscription?.status === 'free_trial'
       ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
@@ -80,8 +113,27 @@ export function CreateSubscriptionInformation({
           <MobileIconContainer>
             <FreeIcon width='140px' height='140px' />
           </MobileIconContainer>
+          {spaceSubscription?.status === 'free_trial' && (
+            <>
+              <Button
+                fullWidth
+                variant='outlined'
+                onClick={openConfirmFreeTierDowngradeDialog}
+                disabled={pendingPayment || isSwitchToFreeLoading}
+              >
+                Switch to free
+              </Button>
+              <ConfirmFreeDowngradeModal
+                isOpen={isConfirmDowngradeDialogOpen}
+                onClose={closeConfirmFreeTierDowngradeDialog}
+                disabled={isSwitchToFreeLoading}
+                onConfirmDowngrade={switchToFreePlan}
+              />
+            </>
+          )}
         </Grid>
         <Grid item xs={12} sm={7.5}>
+          <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.free.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
@@ -113,9 +165,12 @@ export function CreateSubscriptionInformation({
           <MobileIconContainer>
             <CommunityIcon width='150px' height='150px' />
           </MobileIconContainer>
-          <Button onClick={onClick}>Upgrade $10/month</Button>
+          <Button onClick={onUpgrade} disabled={pendingPayment}>
+            {pendingPayment ? 'Payment pending' : 'Upgrade $10/month'}
+          </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
+          <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.community.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
@@ -143,10 +198,11 @@ export function CreateSubscriptionInformation({
             </MobileIconContainer>
           </div>
           <Button fullWidth variant='outlined' href='mailto:hello@charmverse.io'>
-            Contact us
+            Contact us for pricing
           </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
+          <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.enterprise.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
