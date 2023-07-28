@@ -4,13 +4,20 @@ import type { TypographyProps } from '@mui/material/Typography';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
+type LegendProps = TypographyProps & {
+  children: string | ReactNode;
+  helperText?: string | ReactNode;
+  noBorder?: boolean;
+  mb?: number;
+  pb?: number;
+  wrap?: boolean;
+};
+
 const StyledBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'noBorder'
-})<{ noBorder?: boolean }>`
-  white-space: nowrap;
+  shouldForwardProp: (prop) => prop !== 'noBorder' && prop !== 'wrap'
+})<{ noBorder?: boolean; wrap?: boolean }>`
+  white-space: ${({ wrap }) => (wrap ? 'normal' : 'nowrap')};
   border-bottom: ${({ noBorder, theme }) => (noBorder ? '0' : `1px solid ${theme.palette.divider}`)};
-  padding-bottom: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledTypography = styled(Typography)`
@@ -18,20 +25,14 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
-interface LegendProps extends TypographyProps {
-  children: string | ReactNode;
-  helperText?: string | ReactNode;
-  noBorder?: boolean;
-}
-
-function Legend({ children, helperText, noBorder, ...props }: LegendProps) {
+function Legend({ children, helperText, noBorder, mb = 2, pb = 2, wrap, ...props }: LegendProps) {
   return (
-    <StyledBox noBorder={noBorder}>
-      <StyledTypography noWrap {...props}>
+    <StyledBox noBorder={noBorder} mb={mb} pb={pb} wrap={wrap}>
+      <StyledTypography noWrap={!wrap} {...props}>
         {children}
       </StyledTypography>
       {helperText && (
-        <Typography color='secondary' mt={0.5} variant='caption' component='p'>
+        <Typography color='secondary' mt={0.5} variant='caption' component='p' sx={{ hyphens: 'auto' }}>
           {helperText}
         </Typography>
       )}

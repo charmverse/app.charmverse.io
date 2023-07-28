@@ -1,7 +1,7 @@
+import { log } from '@charmverse/core/log';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import log from 'lib/log';
 import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';

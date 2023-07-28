@@ -1,8 +1,8 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -39,6 +39,7 @@ async function getCurrentSpace(req: NextApiRequest, res: NextApiResponse<Space |
       domain: spaceDomain
     }
   });
+
   if (space) {
     return res.status(200).json(space);
   }

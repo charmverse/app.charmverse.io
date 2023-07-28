@@ -4,54 +4,44 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
-import Button from 'components/common/Button';
-import { usePages } from 'hooks/usePages';
-import useRoles from 'hooks/useRoles';
+import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
+import { Button } from 'components/common/Button';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
-import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
-import type { BountyPagePermissionIntersection, PagePermissionMeta } from 'lib/permissions/interfaces';
+import type { BountyWithDetails } from 'lib/bounties';
 
 /**
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
   bounty: BountyWithDetails;
-  bountyPermissions?: Partial<BountyPermissions>;
-  pagePermissions?: PagePermissionMeta[];
   pageId: string;
+  readOnly?: boolean;
+  refreshPermissions: () => void;
 }
 
-export default function BountyPropertiesHeader({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {
-  const { roleups } = useRoles();
-  const { mutatePage } = usePages();
+export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refreshPermissions }: Props) {
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
-  const intersection: BountyPagePermissionIntersection =
-    !bountyPermissions || !pagePermissions || !roleups
-      ? { hasPermissions: [], missingPermissions: [] }
-      : compareBountyPagePermissions({
-          bountyPermissions,
-          pagePermissions,
-          bountyOperations: ['work'],
-          pageOperations: ['edit_content'],
-          roleups
-        });
+  const { isFreeSpace } = useIsFreeSpace();
 
+  const { data: editableCheck } = useSWR(!isFreeSpace ? `bounty-editable-${bounty.id}` : null, () =>
+    charmClient.bounties.isBountyEditable(bounty.id)
+  );
   function restrictPermissions() {
     setUpdatingPermissions(true);
     charmClient
       .restrictPagePermissions({
         pageId
       })
-      .then((page) => {
-        mutatePage(page);
-        showMessage('Page permissions updated', 'success');
+      .then(() => {
+        refreshPermissions();
+        showMessage('Page permissions updated. Only the bounty creator can edit this page.', 'success');
       })
       .finally(() => setUpdatingPermissions(false));
   }
@@ -60,10 +50,10 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
     <>
       {/* Bounty price and status  */}
       <Grid container mb={2}>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Typography fontWeight='bold'>Bounty information</Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <Box
             sx={{
               justifyContent: 'flex-end',
@@ -73,7 +63,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
             }}
           >
             {/* Provide the bounty menu options */}
-            <Box display='flex'>
+            <Box data-test='bounty-header-amount' display='flex'>
               <BountyStatusBadge bounty={bounty} truncate />
             </Box>
           </Box>
@@ -81,7 +71,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
       </Grid>
 
       {/* Warning for applicants */}
-      {intersection.hasPermissions.length > 0 && (
+      {!!editableCheck?.editable && !isFreeSpace && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}
@@ -93,7 +83,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
             </Tooltip>
           }
         >
-          The current permissions allow applicants to edit the details of this bounty.
+          The current permissions allow some applicants to edit the details of this bounty.
         </Alert>
       )}
     </>

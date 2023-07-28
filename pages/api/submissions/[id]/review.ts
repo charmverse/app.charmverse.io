@@ -1,8 +1,8 @@
-import type { Application } from '@prisma/client';
+import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/actions';
 import { reviewSubmission } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
@@ -11,8 +11,8 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishBountyEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -63,7 +63,7 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
 
   await rollupBountyStatus(updatedSubmission.bountyId);
 
-  const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
+  const { spaceId, rewardAmount, rewardToken, id, page, customReward } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     await publishBountyEvent({
@@ -80,7 +80,8 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
         pageId: page?.id || '',
         rewardToken,
         rewardAmount,
-        resourceId: id
+        resourceId: id,
+        customReward
       });
     }
 

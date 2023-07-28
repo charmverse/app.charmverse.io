@@ -1,36 +1,41 @@
-import type { Role, Space } from '@prisma/client';
-import { useMemo } from 'react';
+import type { Role } from '@charmverse/core/prisma';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import type { CreateRoleInput } from 'components/settings/roles/components/CreateRoleForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 
-import type { RoleupWithMembers } from '../lib/roles';
-
-export default function useRoles() {
-  const space = useCurrentSpace();
+export function useRoles() {
+  const { space } = useCurrentSpace();
+  const { mutateMembers } = useMembers();
 
   const { data: roles } = useSWR(
     () => (space ? `roles/${space.id}` : null),
-    () => space && charmClient.listRoles(space.id)
+    () => (space ? charmClient.roles.listRoles(space.id) : null)
   );
 
-  async function createRole(role: Partial<Role>): Promise<Role> {
-    role.spaceId = space?.id;
-    const createdRole = await charmClient.createRole(role);
+  async function createRole(role: CreateRoleInput): Promise<Role> {
+    if (!space) {
+      throw new Error('Cannot create role without a space');
+    }
+    const createdRole = await charmClient.roles.createRole({
+      spaceId: space.id,
+      ...role
+    });
     refreshRoles();
     return createdRole;
   }
 
   async function updateRole(role: Partial<Role>): Promise<Role> {
     role.spaceId = space?.id;
-    const updatedRole = await charmClient.updateRole(role);
+    const updatedRole = await charmClient.roles.updateRole(role);
     refreshRoles();
     return updatedRole;
   }
 
   async function deleteRole(roleId: string) {
-    await charmClient.deleteRole(roleId);
+    await charmClient.roles.deleteRole(roleId);
     refreshRoles();
   }
 
@@ -38,7 +43,7 @@ export default function useRoles() {
     if (space) {
       await Promise.all(
         userIds.map((userId) =>
-          charmClient.assignRole({
+          charmClient.roles.assignRole({
             roleId,
             userId,
             spaceId: space.id
@@ -46,39 +51,27 @@ export default function useRoles() {
         )
       );
       refreshRoles();
+      mutateMembers();
     }
   }
 
   async function unassignRole(roleId: string, userId: string) {
     if (space) {
-      await charmClient.unassignRole({
+      await charmClient.roles.unassignRole({
         roleId,
         userId,
         spaceId: space.id
       });
       refreshRoles();
+      mutateMembers();
     }
   }
 
-  function refreshRoles() {
+  async function refreshRoles() {
     if (space) {
-      mutate(`roles/${space.id}`);
+      return mutate(`roles/${space.id}`);
     }
   }
-
-  const roleups: RoleupWithMembers[] = useMemo(() => {
-    return (roles ?? []).map((r) => {
-      const rollup: RoleupWithMembers = {
-        id: r.id,
-        name: r.name,
-        members: r.spaceRolesToRole.length,
-        users: r.spaceRolesToRole.map((sr) => {
-          return sr.spaceRole.user;
-        })
-      };
-      return rollup;
-    });
-  }, [roles]);
 
   return {
     createRole,
@@ -87,7 +80,6 @@ export default function useRoles() {
     assignRoles,
     unassignRole,
     refreshRoles,
-    roles,
-    roleups
+    roles
   };
 }

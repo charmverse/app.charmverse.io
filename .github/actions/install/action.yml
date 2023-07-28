@@ -1,13 +1,32 @@
-name: 'Install dependencies'
+name: "Install dependencies"
+
+inputs:
+  core_pkg_version:
+    description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
+    required: false
+  commit_core_pkg_upgrade:
+    description: "Whether commit the update to core package back to branch"
+    required: false
+  use_github_core_branch:
+    description: |
+      Optional, core branch name to install from github. 
+      If set core_pkg_version and commit_core_pkg_upgrade will be ignored. 
+      Add your branch to this variable below to install your custom branch.
+    required: false
+    default:
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
       with:
         node-version: 18
+
+    - name: Create .env.test.local file
+      shell: bash
+      run: cp .env.test.local.example .env.test.local
 
     - name: Cache dependencies
       id: cache_node_modules
@@ -21,8 +40,27 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    # Build prisma types which are cached inside of node_modules
-    - name: Build Prisma types
+    # If installing specific version of core via npmjs 
+    - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
       shell: bash
-      if: steps.cache_node_modules.outputs.cache-hit != 'true'
-      run: npm run build:prisma
+      if: inputs.core_pkg_version
+      run: |
+        npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
+    # Commits pkg upgrade back to main. Only done on push event with main branch.
+    - name: Commit package and lock file back into repo
+      if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        file_pattern: "package*.json"
+        commit_message: "Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}"
+
+    # If installing core via github branch
+    - name: Install custom core branch
+      shell: bash
+      if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
+      run: |
+        rm -fr node_modules/@charmverse/core 
+        npm install github:charmverse/core#${{inputs.use_github_core_branch}}
+        cd node_modules/@charmverse/core
+        npm run build

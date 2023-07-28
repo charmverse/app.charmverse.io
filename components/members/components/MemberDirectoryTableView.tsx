@@ -18,9 +18,9 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import type { Social } from 'components/profile/interfaces';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { DiscordSocialIcon } from 'components/u/components/UserDetails/DiscordSocialIcon';
+import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -42,11 +42,11 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { properties = [] } = useMemberProperties();
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
-  const { showMemberProfile } = useMemberProfile();
+  const { getDisplayProperties } = useMemberProperties();
+  const visibleProperties = getDisplayProperties('table');
+  const { showUserProfile } = useUserProfile();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -67,7 +67,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              showMemberProfile(member.id);
+              showUserProfile(member.id);
             }}
             style={{
               opacity: 1
@@ -97,11 +97,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               return (
                 <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0
-                      ? '-'
-                      : member.roles.map((role) => (
-                          <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                        ))}
+                    {member.roles.map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
                 </TableCell>
               );
@@ -171,7 +169,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                       {content}
                     </Link>
                   ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => showMemberProfile(member.id)}>
+                    <Box sx={{ cursor: 'pointer' }} onClick={() => showUserProfile(member.id)}>
                       {content}
                     </Box>
                   )}
@@ -215,6 +213,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                 >
                   {memberProperty.value ? (
                     <SelectPreview
+                      wrapColumn
                       size='small'
                       options={property.options as SelectOptionType[]}
                       value={memberProperty.value as string | string[]}
@@ -241,9 +240,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 }
 
 export function MemberDirectoryTableView({ members }: { members: Member[] }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
 
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
+  const visibleProperties = getDisplayProperties('table');
   return (
     <Table
       size='small'

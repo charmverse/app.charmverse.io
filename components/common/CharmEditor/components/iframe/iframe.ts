@@ -1,8 +1,10 @@
 import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
+import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
+import type { PdfNodeAttrs } from '../ResizablePDF';
 import { extractYoutubeLinkType } from '../video/utils';
 import type { VideoNodeAttrs } from '../video/videoSpec';
 import { name as videoName } from '../video/videoSpec';
@@ -26,18 +28,15 @@ export function plugins() {
             return false;
           }
           const text = event.clipboardData.getData('text/plain');
-          const html = event.clipboardData.getData('text/html');
-          const isPlainText = text && !html;
-
-          if (!isPlainText) {
-            return false;
-          }
           const props = extractIframeProps(text);
           if (props) {
             const { src, height, width } = props;
             if (extractYoutubeLinkType(src)) {
               const attrs: Partial<VideoNodeAttrs> = { src };
               insertNode(videoName, view.state, view.dispatch, view, attrs);
+            } else if (isPdfEmbedLink(src)) {
+              const attrs: Partial<PdfNodeAttrs> = { src };
+              insertNode('pdf', view.state, view.dispatch, view, attrs);
             } else {
               const embedType = extractEmbedType(src);
               const attrs: Partial<IframeNodeAttrs> = {

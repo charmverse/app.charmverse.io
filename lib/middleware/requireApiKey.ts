@@ -1,12 +1,16 @@
 import crypto from 'node:crypto';
 
-import type { Space, SpaceApiToken, User } from '@prisma/client';
+import { SubscriptionRequiredError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
+import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { prisma } from 'db';
-import log from 'lib/log';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
+import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
+import { getPermissionsClient } from 'lib/permissions/api';
+import { uid } from 'lib/utilities/strings';
 
 declare module 'http' {
   /**
@@ -67,7 +71,8 @@ export async function getBotUser(spaceId: string): Promise<User> {
       data: {
         username: 'Bot',
         isBot: true,
-        identityType: 'RandomName'
+        identityType: 'RandomName',
+        path: uid()
       }
     });
 
@@ -83,56 +88,57 @@ export async function getBotUser(spaceId: string): Promise<User> {
   return botUser;
 }
 
+type APIKeyType = 'space' | 'partner';
+
+type SpaceWithKey = {
+  space: Space;
+  apiKey: { type: APIKeyType; key: string };
+};
+
 /**
  * @returns Space linked to API key in the request
  * Throws if the API key or space do not exist
  */
-export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Space> {
+export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<SpaceWithKey> {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
 
   // Protect against api keys or nullish API Keys
   if (!apiKey || apiKey.length < 1) {
     throw new InvalidApiKeyError();
   }
+  const superApiKeyData = await getVerifiedSuperApiToken(apiKey, req.query?.spaceId as string);
 
-  if (req.query?.spaceId && typeof req.query?.spaceId === 'string') {
-    const superApiKey = await prisma.superApiToken.findFirst({
-      where: {
-        token: apiKey,
-        spaces: {
-          some: {
-            id: req.query.spaceId as string
-          }
-        }
-      },
-      include: {
-        spaces: true
-      }
-    });
-
-    if (!superApiKey) {
+  if (superApiKeyData) {
+    // super api key without spaceId param
+    if (!superApiKeyData.authorizedSpace) {
       throw new InvalidApiKeyError();
     }
 
-    req.authorizedSpaceId = req.query?.spaceId as string;
-    req.spaceIdRange = superApiKey.spaces.map((space) => space.id);
-    return superApiKey.spaces.find((s) => s.id === (req.query.spaceId as string)) as Space;
-  } else {
-    const spaceToken = await prisma.spaceApiToken.findFirst({
-      where: {
-        token: apiKey
-      },
-      include: {
-        space: true
-      }
-    });
+    req.authorizedSpaceId = superApiKeyData.authorizedSpace.id;
+    req.spaceIdRange = superApiKeyData.spaceIdRange;
+    req.superApiToken = superApiKeyData.superApiKey;
 
-    if (!spaceToken) {
-      throw new InvalidApiKeyError();
-    }
-    req.authorizedSpaceId = spaceToken.spaceId;
-    return spaceToken.space;
+    return {
+      space: superApiKeyData.authorizedSpace,
+      apiKey: { key: superApiKeyData.superApiKey.token, type: 'partner' }
+    } as SpaceWithKey;
   }
+
+  const spaceToken = await prisma.spaceApiToken.findFirst({
+    where: {
+      token: apiKey
+    },
+    include: {
+      space: true
+    }
+  });
+
+  if (!spaceToken) {
+    throw new InvalidApiKeyError();
+  }
+
+  req.authorizedSpaceId = spaceToken.spaceId;
+  return { space: spaceToken.space, apiKey: { key: spaceToken.token, type: 'space' } } as SpaceWithKey;
 }
 
 /**
@@ -142,7 +148,15 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
  */
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
-    await setRequestSpaceFromApiKey(req);
+    const apiKeyCheck = await setRequestSpaceFromApiKey(req);
+
+    if (apiKeyCheck.apiKey.type === 'space') {
+      const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
+
+      if (client.type === 'free') {
+        throw new SubscriptionRequiredError();
+      }
+    }
 
     const querySpaceId = req.query?.spaceId;
 
@@ -166,6 +180,10 @@ export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, n
 
     req.botUser = botUser;
   } catch (error) {
+    if (error instanceof SubscriptionRequiredError) {
+      throw error;
+    }
+
     log.warn('Found error', error);
     throw new InvalidApiKeyError();
   }

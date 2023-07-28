@@ -1,18 +1,21 @@
-import type { GoogleAccount, Page, Proposal, Role, Space, SuperApiToken, User, UserWallet } from '@prisma/client';
+import type {
+  GoogleAccount,
+  Page,
+  Proposal,
+  Role,
+  Space,
+  SuperApiToken,
+  User,
+  UserWallet
+} from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';
-import {
-  generateBountyWithSingleApplication,
-  generateSpaceUser,
-  generateUserAndSpaceWithApiToken,
-  generateUserAndSpace,
-  generateRole
-} from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;
@@ -192,7 +195,7 @@ beforeAll(async () => {
   privateDraftProposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'private_draft',
+      status: 'draft',
       space: { connect: { id: space.id } },
       page: {
         create: {

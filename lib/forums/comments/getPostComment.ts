@@ -1,6 +1,5 @@
-import type { PostComment } from '@prisma/client';
-
-import { prisma } from 'db';
+import type { PostComment } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { PostCommentNotFoundError } from './errors';
 

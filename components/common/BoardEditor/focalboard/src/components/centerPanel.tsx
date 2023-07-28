@@ -1,25 +1,29 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 
+import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Typography, Link } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import Papa from 'papaparse';
+import type { ChangeEvent } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -27,19 +31,25 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
+import { webhookEndpoint } from 'config/constants';
+import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -75,6 +85,7 @@ type Props = WrappedComponentProps &
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
+    page?: PageMeta;
   };
 
 type State = {
@@ -84,7 +95,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, pageIcon, showView, views } = props;
+  const { activeView, board, pageIcon, showView, views, page: boardPage } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -96,32 +107,26 @@ function CenterPanel(props: Props) {
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
-  const { pages, updatePage } = usePages();
+  const { space } = useCurrentSpace();
+  const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
-
-  useEffect(() => {
-    if (views.length === 0 && !activeView) {
-      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
-    } else if (activeView) {
-      setState((s) => ({ ...s, showSettings: null }));
-    }
-  }, [activeView?.id, views.length]);
+  const { showMessage } = useSnackbar();
+  const { user } = useUser();
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPage = pages[board.id];
   const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
-  let activeBoardId: string | undefined = props.board.id;
+  let activeBoardId: string | undefined = board.id;
   if (activeView?.fields.linkedSourceId) {
     activeBoardId = activeView?.fields.linkedSourceId;
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+  const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
 
+  const { keys } = useApiPageKeys(props.page?.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
-  const activePage = pages[activeBoardId ?? ''];
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
@@ -129,13 +134,29 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      pages
     })
   );
+
+  useEffect(() => {
+    if (views.length === 0 && !activeView) {
+      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
+    } else if (activeView) {
+      setState((s) => ({ ...s, showSettings: null }));
+    }
+  }, [activeView?.id, views.length, activePage]);
+
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
@@ -208,7 +229,7 @@ function CenterPanel(props: Props) {
     isTemplate = false
   ) => {
     if (!activeBoard) {
-      throw new Error('No active view');
+      throw new Error('No active board');
     }
     if (!activeView) {
       throw new Error('No active view');
@@ -224,6 +245,7 @@ function CenterPanel(props: Props) {
       activeView.fields.filter,
       activeBoard.fields.cardProperties
     );
+
     if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
       if (groupByOptionId) {
         propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
@@ -248,17 +270,7 @@ function CenterPanel(props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(
-              `pages/${space.id}`,
-              async (_pages: Record<string, Page> | undefined): Promise<Record<string, Page>> => {
-                const newPage = await charmClient.pages.getPage(block.id);
-
-                return { ..._pages, [newPage.id]: newPage };
-              },
-              {
-                revalidate: false
-              }
-            );
+            await refreshPage(block.id);
           }
 
           if (isTemplate) {
@@ -321,7 +333,9 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      e.stopPropagation();
+      if (activeView?.fields.viewType !== 'table') {
+        e.stopPropagation();
+      }
     },
     [activeView]
   );
@@ -357,7 +371,7 @@ function CenterPanel(props: Props) {
   ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
-      unassignedOptionIds = groupByProperty.options
+      unassignedOptionIds = (groupByProperty.options ?? [])
         .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
         .map((o: IPropertyOption) => o.id);
     }
@@ -373,8 +387,17 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const view = createTableView(board);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const _board = {
+      // use parentBoard props like id and rootId by default
+      ...board,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || board.fields
+    };
+    const view = createTableView(_board);
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -389,6 +412,7 @@ function CenterPanel(props: Props) {
     }
     const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
     showView(view.id);
+    return view;
   }
 
   function openSelectSource() {
@@ -431,11 +455,78 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const isLoadingSourceData = !activeBoard && state.showSettings !== 'create-linked-view';
+  const onCsvImport = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (board && event.target.files && event.target.files[0]) {
+      Papa.parse(event.target.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        worker: event.target.files[0].size > 100000, // 100kb
+        delimiter: '\n', // fallback for a csv with 1 column
+        complete: async (results) => {
+          if (results.errors && results.errors[0]) {
+            log.warn('CSV import failed', { spaceId: space?.id, pageId: board.id, error: results.errors[0] });
+            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
+            return;
+          }
+
+          if (isValidCsvResult(results)) {
+            if (!user || !space) {
+              throw new Error(
+                'An error occured while importing. Please verify you have a valid user, space and board.'
+              );
+            }
+
+            const spaceId = space?.id;
+            const pageId = board.id;
+
+            showMessage('Importing your csv file...', 'info');
+
+            try {
+              const view = await createDatabase();
+              await addNewCards({
+                board,
+                members,
+                results,
+                spaceId: space?.id,
+                userId: user.id,
+                views: [view]
+              });
+
+              if (spaceId) {
+                charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
+              }
+              showMessage('Your csv file was imported successfully', 'success');
+            } catch (error) {
+              log.error('CSV import failed', { spaceId, pageId, error });
+              showMessage((error as Error).message || 'Import failed', 'error');
+            }
+          }
+        }
+      });
+    }
+  };
+
+  const isLoadingSourceData =
+    !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {keys?.map((key) =>
+        activeBoardId === key.pageId ? (
+          <PageWebhookBanner
+            key={key.apiKey}
+            type={key.type}
+            url={`${window.location.origin}/${webhookEndpoint}/${key?.apiKey}`}
+            sx={{
+              ...(isEmbedded && {
+                border: (theme) => `2px solid ${theme.palette.text.primary}`,
+                backgroundColor: 'transparent !important'
+              })
+            }}
+          />
+        ) : null
+      )}
       <div
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
@@ -456,39 +547,44 @@ function CenterPanel(props: Props) {
           </Box>
         )}
         <div className='top-head'>
-          {board && (boardPageType === 'board' || !isEmbedded) && (
+          {board && boardPage && (boardPageType === 'board' || !isEmbedded) && (
             <ViewTitle
-              key={board.id + board.title}
+              key={boardPage.id + boardPage.title}
               board={board}
+              pageTitle={boardPage.title}
               pageIcon={pageIcon}
               readOnly={props.readOnly}
               setPage={props.setPage}
             />
           )}
-          <ViewHeader
-            onDeleteView={props.onDeleteView}
-            maxTabsShown={props.maxTabsShown}
-            disableUpdatingUrl={props.disableUpdatingUrl}
-            showView={props.showView}
-            onClickNewView={
-              boardPageType === 'inline_linked_board' || boardPageType === 'linked_board' ? openSelectSource : undefined
-            }
-            activeBoard={activeBoard}
-            viewsBoard={board}
-            activeView={props.activeView}
-            toggleViewOptions={toggleViewOptions}
-            cards={cards}
-            views={props.views}
-            dateDisplayProperty={dateDisplayProperty}
-            addCard={() => addCard('', true)}
-            showCard={showCard}
-            // addCardFromTemplate={addCardFromTemplate}
-            addCardTemplate={() => addCard('', true, {}, false, true)}
-            editCardTemplate={editCardTemplate}
-            readOnly={props.readOnly}
-            readOnlySourceData={props.readOnlySourceData}
-            embeddedBoardPath={props.embeddedBoardPath}
-          />
+          {(activePage || activeBoard) && (
+            <ViewHeader
+              onDeleteView={props.onDeleteView}
+              maxTabsShown={props.maxTabsShown}
+              disableUpdatingUrl={props.disableUpdatingUrl}
+              showView={props.showView}
+              onClickNewView={
+                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                  ? openSelectSource
+                  : undefined
+              }
+              activeBoard={activeBoard}
+              viewsBoard={board}
+              activeView={props.activeView}
+              toggleViewOptions={toggleViewOptions}
+              cards={cards}
+              views={views}
+              dateDisplayProperty={dateDisplayProperty}
+              addCard={() => addCard('', true)}
+              showCard={showCard}
+              // addCardFromTemplate={addCardFromTemplate}
+              addCardTemplate={() => addCard('', true, {}, false, true)}
+              editCardTemplate={editCardTemplate}
+              readOnly={props.readOnly}
+              readOnlySourceData={props.readOnlySourceData}
+              embeddedBoardPath={props.embeddedBoardPath}
+            />
+          )}
         </div>
 
         <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
@@ -498,7 +594,7 @@ function CenterPanel(props: Props) {
               {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
                 <InlineViewTitle
                   key={activePage.id + activePage.title}
-                  board={activeBoard}
+                  pageTitle={activePage.title}
                   readOnly={props.readOnly}
                   setPage={props.setPage}
                 />
@@ -535,14 +631,17 @@ function CenterPanel(props: Props) {
                     }`}
                     sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
                   >
-                    {activePage.title || 'Untitled'}
+                    {activePage?.title || 'Untitled'}
                   </Button>
                 )}
               {!activeView && state.showSettings === 'create-linked-view' && (
                 <CreateLinkedView
                   readOnly={props.readOnly}
                   onSelect={selectViewSource}
+                  // if it links to deleted db page then the board can't be inline_board type
                   onCreate={views.length === 0 ? createDatabase : undefined}
+                  onCsvImport={onCsvImport}
+                  pageId={props.page?.id}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -566,7 +665,7 @@ function CenterPanel(props: Props) {
                   activeView={activeView}
                   cardPages={cardPages}
                   groupByProperty={groupByProperty}
-                  views={props.views}
+                  views={views}
                   visibleGroups={visibleGroups}
                   selectedCardIds={state.selectedCardIds}
                   readOnly={props.readOnly}
@@ -606,6 +705,7 @@ function CenterPanel(props: Props) {
             {activeView && (
               <ViewSidebar
                 board={activeBoard}
+                pageId={activePage?.id}
                 parentBoard={board}
                 view={activeView}
                 isOpen={state.showSettings === 'view-options'}
@@ -629,9 +729,9 @@ export function groupCardsByOptions(
 
   for (const optionId of optionIds) {
     if (optionId) {
-      const option = groupByProperty?.options.find((o) => o.id === optionId);
-      if (option) {
-        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty!.id]);
+      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
+      if (groupByProperty && option) {
+        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
           option,
           cardPages: c,
@@ -643,7 +743,7 @@ export function groupCardsByOptions(
       // Empty group
       const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },

@@ -1,6 +1,8 @@
+import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import { IconButton, InputAdornment, Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -8,40 +10,40 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import Avatar from 'components/settings/workspace/LargeAvatar';
+import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
-import log from 'lib/log';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import { spaceCreateTemplates } from 'lib/spaces/config';
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import { spaceTemplateIds } from 'lib/spaces/config';
+import type { SpaceTemplateType } from 'lib/spaces/config';
+import { getSpaceUrl } from 'lib/utilities/browser';
+import debounce from 'lib/utilities/debounce';
 import randomName from 'lib/utilities/randomName';
 
-import { ImportZippedMarkdown } from '../CharmEditor/components/markdownParser/ImportZippedMarkdown';
-import { JoinDynamicSpaceForm } from '../TokenGateForm/JoinDynamicSpaceForm';
+import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
+import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';
 
 import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  spaceTemplateOption: yup.mixed<SpaceCreateTemplate>().oneOf(spaceCreateTemplates).default('default')
+  spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
-
 type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
+  className?: string;
   defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
   submitText?: string;
@@ -50,7 +52,7 @@ interface Props {
 
 type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 
-export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) {
+export function CreateSpaceForm({ className, defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
 
@@ -78,7 +80,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   // This use effect should only be relevant when a user uploads markdown, has an error, and then changes the space name or image. In other cases, the space is created and the user is redirected to the space.
   useEffect(() => {
     if (newSpace) {
-      charmClient.updateSpace({
+      charmClient.spaces.updateSpace({
         name: watchName,
         spaceImage: watchSpaceImage
       });
@@ -101,7 +103,7 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
           name: watchName,
           spaceImage: watchSpaceImage
         },
-        createSpaceOption: watchSpaceTemplate
+        spaceTemplate: watchSpaceTemplate
       })
         .then((_space) => {
           setNewSpace(_space);
@@ -129,45 +131,48 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
     }
   }
 
-  async function onSubmit(values: FormValues) {
-    try {
-      setSaveError(null);
-      const space = await createNewSpace({
-        createSpaceOption: values.spaceTemplateOption as SpaceCreateTemplate,
-        spaceData: {
-          name: values.name,
-          spaceImage: values.spaceImage
-        }
-      });
-
-      setNewSpace(space);
-
-      if ((values.spaceTemplateOption as SpaceCreateTemplate) === 'importNotion') {
-        const notionUrl = generateNotionImportRedirectUrl({
-          origin: window?.location.origin,
-          spaceDomain: space.domain
+  const onSubmit = useCallback(
+    debounce(async (values: FormValues) => {
+      try {
+        setSaveError(null);
+        const space = await createNewSpace({
+          spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
+          spaceData: {
+            name: values.name,
+            spaceImage: values.spaceImage
+          }
         });
 
-        router.push(notionUrl);
-        // We want to make the user import markdown after creating the space
-      } else if ((values.spaceTemplateOption as SpaceCreateTemplate) !== 'importMarkdown') {
-        // Give time for spaces hook to update so user doesn't end up on Routeguard
-        setTimeout(() => {
-          router.push(`/${space.domain}`);
-        }, 200);
+        setNewSpace(space);
+
+        if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
+          const notionUrl = generateNotionImportRedirectUrl({
+            origin: window?.location.origin,
+            spaceDomain: space.domain
+          });
+
+          router.push(notionUrl);
+          // We want to make the user import markdown after creating the space
+        } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
+          // Give time for spaces hook to update so user doesn't end up on Routeguard
+          setTimeout(() => {
+            router.push(getSpaceUrl({ domain: space.domain }));
+          }, 200);
+        }
+      } catch (err) {
+        log.error('Error creating space', err);
+        setSaveError((err as Error).message || err);
       }
-    } catch (err) {
-      log.error('Error creating space', err);
-      setSaveError((err as Error).message || err);
-    }
-  }
+    }, 2000),
+    []
+  );
 
   function randomizeName() {
     const name = randomName();
     setValue('name', name);
   }
 
-  function handleNewSpaceTemplate(value: SpaceCreateTemplate) {
+  function handleNewSpaceTemplate(value: SpaceTemplateType) {
     setValue('spaceTemplateOption', value);
     setStep('create_space');
   }
@@ -179,12 +184,12 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
   if (step === 'join_space') {
     return (
       <Box>
-        <JoinDynamicSpaceForm goBack={goToSelectTemplate} />
+        <SpaceAccessGateWithSearch goBack={goToSelectTemplate} />
       </Box>
     );
   }
   return (
-    <div>
+    <div className={className}>
       <DialogTitle onClose={onCancel ? onClose : undefined} sx={{ textAlign: 'center' }}>
         <Box display='flex' alignItems='center' gap={1}>
           {step !== 'select_template' && (
@@ -195,20 +200,16 @@ export function CreateSpaceForm({ defaultValues, onCancel, submitText }: Props) 
           Create a space{' '}
         </Box>
       </DialogTitle>
-      <Box mb={2}>
-        <Typography textAlign='center' variant='body2' whiteSpace='nowrap'>
-          A space is where your organization collaborates
-        </Typography>
-      </Box>
 
       {step === 'select_template' && (
         <>
           <SelectNewSpaceTemplate onSelect={handleNewSpaceTemplate} />
+
           <Divider sx={{ my: 2 }} />
           <Typography sx={{ mb: 2 }} textAlign='center' fontWeight='bold'>
             Join an existing space
           </Typography>
-          <Button size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
+          <Button color='secondary' size='large' disableElevation fullWidth onClick={() => setStep('join_space')}>
             Search for space
           </Button>
         </>

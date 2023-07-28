@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { ModalProps } from 'components/common/Modal';
 import { Modal } from 'components/common/Modal';
 
@@ -12,6 +12,8 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   title?: string;
   onConfirm: () => void;
   secondaryButtonText?: string;
+  onClose: () => void;
+  disabled?: boolean;
 };
 
 export default function ConfirmDeleteModal({
@@ -22,7 +24,8 @@ export default function ConfirmDeleteModal({
   title,
   onConfirm,
   size,
-  secondaryButtonText = 'Cancel'
+  secondaryButtonText = 'Cancel',
+  disabled
 }: Props) {
   function _onConfirm() {
     onConfirm();
@@ -43,7 +46,9 @@ export default function ConfirmDeleteModal({
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}
+          data-test='confirm-delete-button'
           onClick={_onConfirm}
+          disabled={disabled}
         >
           {buttonText}
         </Button>

@@ -1,19 +1,19 @@
-import React from 'react';
-
-import UserProperty from '../user/user';
+import UserDisplay from 'components/common/UserDisplay';
+import { useMembers } from 'hooks/useMembers';
 
 type Props = {
-  userID: string;
+  userId: string;
 };
 
-function CreatedBy(props: Props): JSX.Element {
-  return (
-    <UserProperty
-      value={props.userID}
-      readOnly={true} // created by is an immutable property, so will always be readonly
-      onChange={() => {}}
-    />
-  );
+function CreatedBy(props: Props) {
+  const { getMemberById } = useMembers();
+  const member = getMemberById(props.userId);
+
+  return member ? (
+    <div style={{ width: 'fit-content' }} className=' readonly octo-propertyvalue'>
+      <UserDisplay user={member} avatarSize='xSmall' fontSize='small' />
+    </div>
+  ) : null;
 }
 
 export default CreatedBy;

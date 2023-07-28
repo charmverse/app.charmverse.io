@@ -1,8 +1,8 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
 import { baseUrl } from 'testing/mockApiCall';
 import {
@@ -71,7 +71,8 @@ describe('GET /api/v1/bounties', () => {
         reward: {
           amount: bountyWithPaidApplication.rewardAmount,
           chain: bountyWithPaidApplication.chainId,
-          token: bountyWithPaidApplication.rewardToken
+          token: bountyWithPaidApplication.rewardToken,
+          custom: null
         },
         title: bountyWithPaidApplication.page.title,
         status: bountyWithPaidApplication.status,
@@ -97,7 +98,8 @@ describe('GET /api/v1/bounties', () => {
         reward: {
           amount: bountyWithInProgressWork.rewardAmount,
           chain: bountyWithInProgressWork.chainId,
-          token: bountyWithInProgressWork.rewardToken
+          token: bountyWithInProgressWork.rewardToken,
+          custom: null
         },
         title: bountyWithInProgressWork.page.title,
         status: bountyWithInProgressWork.status,

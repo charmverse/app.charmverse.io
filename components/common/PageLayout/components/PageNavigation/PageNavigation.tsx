@@ -1,6 +1,8 @@
+import type { PageMeta, PageNodeWithChildren } from '@charmverse/core/pages';
+import { pageTree } from '@charmverse/core/pages/utilities';
+import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -9,29 +11,53 @@ import charmClient from 'charmClient';
 import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
 import { TreeRoot } from 'components/common/PageLayout/components/PageNavigation/components/TreeRoot';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput, PageMeta } from 'lib/pages';
+import type { NewPageInput, PagesMap } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import { isParentNode, mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
+import { findParentOfType } from 'lib/pages/findParentOfType';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-export function filterVisiblePages(pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
-  return pages.filter((page): page is IPageWithPermissions =>
-    isTruthy(
-      page &&
-        (page.type === 'board' ||
-          page.type === 'page' ||
-          page.type === 'linked_board' ||
-          rootPageIds?.includes(page.id))
+function mapPageToMenuNode(page: PageMeta): MenuNode {
+  return {
+    id: page.id,
+    title: page.title,
+    icon: page.icon,
+    index: page.index,
+    isEmptyContent: !page.hasContent,
+    parentId: page.parentId,
+    path: page.path,
+    type: page.type,
+    createdAt: page.createdAt,
+    deletedAt: page.deletedAt,
+    spaceId: page.spaceId
+  };
+}
+
+export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
+  return Object.values(pageMap)
+    .filter((page): page is PageMeta =>
+      isTruthy(
+        page &&
+          (page.type === 'board' ||
+            page.type === 'page' ||
+            page.type === 'linked_board' ||
+            rootPageIds?.includes(page.id)) &&
+          !findParentOfType({
+            pageId: page.id,
+            pageType: 'card',
+            pageMap
+          })
+      )
     )
-  );
+    .map(mapPageToMenuNode);
 }
 
 type PageNavigationProps = {
@@ -44,39 +70,42 @@ type PageNavigationProps = {
 function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
   const router = useRouter();
   const { pages, setPages, mutatePage } = usePages();
+
   const currentPage = usePageFromPath();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
-  const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
-    (page): MenuNode => ({
-      id: page.id,
-      title: page.title,
-      icon: page.icon,
-      index: page.index,
-      isEmptyContent: !page.hasContent,
-      parentId: page.parentId,
-      path: page.path,
-      type: page.type,
-      createdAt: page.createdAt,
-      deletedAt: page.deletedAt,
-      spaceId: page.spaceId
-    })
-  );
+  const { reorderFavorites } = useFavoritePages();
+
+  const pagesArray: MenuNode[] = isFavorites
+    ? Object.values(pages)
+        .filter((page): page is PageMeta => isTruthy(page))
+        .map(mapPageToMenuNode)
+    : filterVisiblePages(pages);
 
   const currentPageId = currentPage?.id ?? '';
 
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    return mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const mappedPages = pageTree.mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    if (isFavorites) {
+      return rootPageIds
+        ?.map((id) => mappedPages.find((page) => page.id === id))
+        .filter(Boolean) as PageNodeWithChildren<MenuNode>[];
+    }
+
+    return mappedPages;
   }, [pageHash, rootPageIds]);
 
   const isValidDropTarget = useCallback(
     ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => {
       // do not allow to drop parent onto children
-      return droppedItem.id !== targetItem?.id && !isParentNode({ node: droppedItem, child: targetItem, items: pages });
+      return (
+        droppedItem.id !== targetItem?.id &&
+        !pageTree.isParentNode({ node: droppedItem, child: targetItem, items: pages })
+      );
     },
     [pagesArray]
   );
@@ -87,27 +116,33 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         return;
       }
 
+      if (isFavorites) {
+        reorderFavorites({ reorderId: droppedItem.id, nextSiblingId: containerItem.id });
+        return;
+      }
+
       const parentId = containerItem.parentId;
 
       setPages((_pages) => {
         const unsortedSiblings = Object.values(_pages)
           .filter(isTruthy)
           .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-        const siblings = sortNodes(unsortedSiblings);
-
+        const siblings = pageTree.sortNodes(unsortedSiblings);
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {
           throw new Error('cannot find dropped page');
         }
+
         const originIndex: number = siblings.findIndex((sibling) => sibling.id === containerItem.id);
         siblings.splice(originIndex, 0, droppedPage);
         siblings.forEach((page, _index) => {
           page.index = _index;
-          page.parentId = parentId;
+          page.parentId = parentId ?? null;
           charmClient.pages.updatePage({
             id: page.id,
             index: _index,
-            parentId
+            // If there is no parentId, the page was dropped at the root level
+            parentId: parentId ?? null
           });
         });
         siblings.forEach((page) => {
@@ -120,10 +155,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             };
           }
         });
+
         return { ..._pages };
       });
     },
-    [isValidDropTarget]
+    [isValidDropTarget, rootPageIds]
   );
 
   const onDropChild = useCallback(
@@ -211,8 +247,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       aria-label='items navigator'
       defaultCollapseIcon={
         <NavIconHover
-          width={{ xs: 30, md: 24 }}
-          height={{ xs: 30, md: 24 }}
+          width={{ xs: 30, md: 20 }}
+          height={{ xs: 30, md: 20 }}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -222,8 +258,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       }
       defaultExpandIcon={
         <NavIconHover
-          width={{ xs: 30, md: 24 }}
-          height={{ xs: 30, md: 24 }}
+          width={{ xs: 30, md: 20 }}
+          height={{ xs: 30, md: 20 }}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -238,7 +274,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           key={item.id}
           item={item}
           onDropChild={isFavorites ? null : onDropChild}
-          onDropAdjacent={isFavorites ? null : onDropAdjacent}
+          onDropAdjacent={onDropAdjacent}
           pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
@@ -246,6 +282,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           deletePage={deletePage}
           onClick={onClick}
           validateTarget={isValidDropTarget}
+          isFavorites={isFavorites}
         />
       ))}
     </TreeRoot>

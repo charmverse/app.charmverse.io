@@ -1,9 +1,24 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 import type { ProposalCategory } from './interface';
 
-export function createProposalCategory(data: Omit<ProposalCategory, 'id'>) {
-  return prisma.proposalCategory.create({
-    data
+export type CreateProposalCategoryInput = Pick<ProposalCategory, 'title' | 'spaceId'> &
+  Partial<Pick<ProposalCategory, 'color'>>;
+
+export async function createProposalCategory({
+  data
+}: {
+  data: CreateProposalCategoryInput;
+}): Promise<ProposalCategory> {
+  const category = await prisma.proposalCategory.create({
+    data: {
+      color: data.color ?? getRandomThemeColor(),
+      title: data.title,
+      space: { connect: { id: data.spaceId } }
+    }
   });
+
+  return category;
 }

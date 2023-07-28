@@ -9,7 +9,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   flex-direction: column;
-  background-color: rgb(var(--center-channel-bg-rgb));
+  background-color: var(--background-paper);
   color: rgb(var(--center-channel-color-rgb));
   border-radius: var(--default-rad);
   box-shadow: var(--elevation-4);

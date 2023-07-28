@@ -3,13 +3,12 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Utils } from '../../../utils';
-import Editable from '../../../widgets/editable';
 import { TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
   readOnly?: boolean;
-  placeholder?: string;
+  placeholderText?: string;
   multiline?: boolean;
   onChange: (value: string) => void;
   onSave: () => void;
@@ -33,22 +32,23 @@ function URLProperty(props: Props): JSX.Element {
       </a>
     );
   }
+
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: props.placeholderText,
+    readOnly: props.readOnly,
+    value: props.value,
+    autoExpand: false,
+    onChange: props.onChange,
+    multiline: props.multiline,
+    onSave: props.onSave,
+    onCancel: props.onCancel,
+    validator: props.validator
+  };
+
   return (
     <div className='URLProperty property-link url'>
-      {(hasValue || props.placeholder) && (
-        <TextInput
-          className='octo-propertyvalue'
-          placeholderText={props.placeholder}
-          value={props.value}
-          autoExpand={false}
-          multiline={props.multiline}
-          readOnly={props.readOnly}
-          onChange={props.onChange}
-          onSave={props.onSave}
-          onCancel={props.onCancel}
-          validator={props.validator}
-        />
-      )}
+      <TextInput {...commonProps} />
       {link}
     </div>
   );

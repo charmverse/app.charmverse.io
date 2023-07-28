@@ -1,10 +1,10 @@
-import type { TokenGate } from '@prisma/client';
-import type { AccessControlCondition } from 'lit-js-sdk';
+import { GET, PUT } from '@charmverse/core/http';
+import type { TokenGate } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import type { AccsDefaultParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 
-import fetch from 'adapters/http/fetch.server';
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 
 import { getAccessType } from './utils';
 
@@ -18,7 +18,7 @@ const SOURCE_PREFIX = 'charmverse-';
 
 type Operator = 'AND' | 'OR';
 type ConditionOperator = { operator: Operator };
-type Condition = AccessControlCondition | ConditionOperator;
+type Condition = AccsDefaultParams | ConditionOperator;
 type TokenGateAccessConditions = (Condition | Condition[])[];
 
 export async function addDaylightAbility(tokenGate: TokenGate) {
@@ -36,24 +36,22 @@ export async function addDaylightAbility(tokenGate: TokenGate) {
     return;
   }
 
-  const params = {
-    method: 'POST',
-    headers: HEADERS,
-    body: JSON.stringify({
-      requirements: requirementsData.requirements,
-      requirementsLogic: requirementsData.operator,
-      action: { linkUrl: getActionUrl(space.domain) },
-      title: ` Join the ${space.name} Space on CharmVerse`,
-      description:
-        'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
-      type: 'access',
-      isActive: true,
-      sourceId: getAbilitySourceId(tokenGate.id)
-    })
+  const body = {
+    requirements: requirementsData.requirements,
+    requirementsLogic: requirementsData.operator,
+    action: { linkUrl: getActionUrl(space.domain) },
+    title: ` Join the ${space.name} Space on CharmVerse`,
+    description:
+      'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
+    type: 'access',
+    isActive: true,
+    sourceId: getAbilitySourceId(tokenGate.id)
   };
 
   try {
-    return await fetch('https://api.daylight.xyz/v1/abilities', params);
+    return await PUT('https://api.daylight.xyz/v1/abilities', body, {
+      headers: HEADERS
+    });
   } catch (e) {
     // eslint-disable-next-line no-empty
   }
@@ -86,13 +84,10 @@ export async function getAllAbilities() {
     headers: HEADERS
   };
 
-  return fetch<{ abilities: { sourceId: string; uid: string }[] }>(
-    'https://api.daylight.xyz/v1/abilities/mine',
-    params
-  );
+  return GET<{ abilities: { sourceId: string; uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
 }
 
-function getRequirement(condition: AccessControlCondition) {
+function getRequirement(condition: AccsDefaultParams) {
   const accessType = getAccessType(condition);
 
   // Daylight currently supports only ethereum
@@ -156,7 +151,7 @@ export function getDaylightRequirements(conditionsData: TokenGateAccessCondition
 
   const conditions = conditionsFlatArr.filter((condition) => {
     return 'chain' in condition;
-  }) as AccessControlCondition[];
+  }) as AccsDefaultParams[];
 
   const conditionsOperator: Operator = (operators[0]?.operator.toLocaleUpperCase() as Operator) || 'OR';
 

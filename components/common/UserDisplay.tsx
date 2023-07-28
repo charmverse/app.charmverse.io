@@ -1,22 +1,25 @@
-import { log } from 'console';
-
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import type { User } from '@prisma/client';
+import type { ReactNode } from 'react';
 import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
+/**
+ * @avatarIcon Pass this to override the user avatar with a custom icon
+ */
 interface StyleProps extends BoxProps {
   fontSize?: string | number;
   fontWeight?: number | string;
   avatarSize?: InitialAvatarProps['size'];
   hideName?: boolean;
+  avatarIcon?: ReactNode;
+  wrapName?: boolean;
 }
 
 interface BaseComponentProps extends StyleProps {
@@ -33,6 +36,7 @@ function BaseComponent({
   fontWeight,
   isNft,
   hideName,
+  wrapName,
   ...props
 }: BaseComponentProps) {
   return (
@@ -46,9 +50,13 @@ function BaseComponent({
         cursor: props.onClick ? 'pointer' : 'initial'
       }}
     >
-      <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
+      {props.avatarIcon ? (
+        <Box sx={{ ml: 0.5, mt: 1 }}>{props.avatarIcon}</Box>
+      ) : (
+        <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
+      )}
       {!hideName && (
-        <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
+        <Typography whiteSpace={wrapName ? 'break-spaces' : 'nowrap'} fontSize={fontSize} fontWeight={fontWeight}>
           {username}
         </Typography>
       )}
@@ -72,13 +80,18 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: Omit<User, 'addresses'> | null;
+  user?: {
+    avatar?: string | null;
+    username: string;
+    path?: string | null;
+    id: string;
+  } | null;
   linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }
 
 function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...props }: UserDisplayProps) {
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   if (!user) {
     // strip out invalid names
@@ -93,7 +106,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
 
   // Copied from User Details component
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path || user.id;
+  const userPath = user.path;
   const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
 
@@ -107,11 +120,15 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
 
   return (
     <BaseComponent
-      onClick={() => {
-        if (showMiniProfile) {
-          showMemberProfile(user.id);
-        }
-      }}
+      onClick={
+        showMiniProfile
+          ? () => {
+              if (showMiniProfile) {
+                showUserProfile(user.id);
+              }
+            }
+          : undefined
+      }
       username={user.username}
       avatar={user.avatar}
       isNft={isNft}

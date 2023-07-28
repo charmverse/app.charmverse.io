@@ -1,6 +1,6 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DisabledAccountError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -91,5 +91,32 @@ describe('loginWithGoogle', () => {
         displayName: googleUserName
       })
     ).rejects.toBeInstanceOf(DisabledAccountError);
+  });
+
+  it('should pass login if the user has an existing verified email', async () => {
+    const { user } = await generateUserAndSpaceWithApiToken();
+
+    const testEmail = `test-${v4()}@example.com`;
+
+    await prisma.verifiedEmail.create({
+      data: {
+        email: testEmail,
+        name: googleUserName,
+        avatarUrl: googleAvatarUrl,
+        user: {
+          connect: {
+            id: user.id
+          }
+        }
+      }
+    });
+
+    const existingUser = await loginWithGoogle({
+      accessToken: testEmail,
+      avatarUrl: googleAvatarUrl,
+      displayName: googleUserName
+    });
+
+    expect(existingUser.id).toEqual(user.id);
   });
 });

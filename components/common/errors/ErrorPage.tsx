@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { ReactNode } from 'react';
 
 import Bolt from 'public/images/lightning_bolt.svg';
 
@@ -22,12 +23,19 @@ const Text = styled(Typography)`
   font-weight: 700;
 `;
 
-export default function ErrorPage({ message = 'Sorry! there was an error' }: { message?: string }) {
+export default function ErrorPage({
+  message = 'Sorry! there was an error',
+  children
+}: {
+  message?: string;
+  children?: ReactNode;
+}) {
   return (
     <Container>
       <Box sx={{ textAlign: 'center' }} data-test='error-title'>
         <StyledBolt />
         <Text sx={{ mt: 3 }}>{message}</Text>
+        {children}
       </Box>
     </Container>
   );

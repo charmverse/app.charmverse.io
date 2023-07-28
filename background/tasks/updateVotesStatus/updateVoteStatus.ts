@@ -1,8 +1,10 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishProposalEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
   const votesPassedDeadline = await prisma.vote.findMany({
@@ -20,7 +22,10 @@ const updateVoteStatus = async () => {
 
   const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
 
-  const proposalPageIds = votesPassedDeadline.filter((v) => v.context === 'proposal').map((v) => v.pageId);
+  const proposalPageIds = votesPassedDeadline
+    .filter((v) => v.context === 'proposal')
+    .map((v) => v.pageId)
+    .filter(isTruthy);
 
   await prisma.$transaction([
     // update passed votes
@@ -59,20 +64,26 @@ const updateVoteStatus = async () => {
   ]);
 
   await Promise.all([
-    ...rejectedVotes.map((vote) =>
-      publishProposalEvent({
-        scope: WebhookEventNames.ProposalFailed,
-        spaceId: vote.spaceId,
-        proposalId: vote.pageId
-      })
-    ),
-    ...passedVotes.map((vote) =>
-      publishProposalEvent({
-        scope: WebhookEventNames.ProposalPassed,
-        spaceId: vote.spaceId,
-        proposalId: vote.pageId
-      })
-    )
+    ...rejectedVotes.map((vote) => {
+      if (vote.pageId) {
+        return publishProposalEvent({
+          scope: WebhookEventNames.ProposalFailed,
+          spaceId: vote.spaceId,
+          proposalId: vote.pageId
+        });
+      }
+      return Promise.resolve();
+    }),
+    ...passedVotes.map((vote) => {
+      if (vote.pageId) {
+        return publishProposalEvent({
+          scope: WebhookEventNames.ProposalPassed,
+          spaceId: vote.spaceId,
+          proposalId: vote.pageId
+        });
+      }
+      return Promise.resolve();
+    })
   ]);
 
   return votesPassedDeadline.length;

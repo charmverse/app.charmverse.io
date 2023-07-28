@@ -1,7 +1,6 @@
+import * as http from '@charmverse/core/http';
+import { log } from '@charmverse/core/log';
 import { RateLimit } from 'async-sema';
-
-import * as http from 'adapters/http';
-import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
@@ -29,7 +28,7 @@ export async function handleDiscordResponse<T>(
       data: response
     };
   } catch (err: any) {
-    log.warn('Error from Discord', err);
+    log.warn('Error from Discord', { error: err, endpoint });
     // The bot token is invalid
     if (err.code === 0) {
       return {

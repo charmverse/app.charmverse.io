@@ -8,7 +8,7 @@ import { InputRule, TextSelection } from '@bangle.dev/pm';
 const leafNodeReplacementCharacter = '\ufffc';
 
 export function triggerInputRule(schema: Schema, markName: string, trigger: string) {
-  const regexStart = new RegExp(`(^|[.!?\\s${leafNodeReplacementCharacter}])(${escapeRegExp(trigger)})$`);
+  const regexStart = new RegExp(`(^|[.!?\\s([${leafNodeReplacementCharacter}])(${escapeRegExp(`${trigger}`)})$`);
 
   const startRule = new InputRule(regexStart, (editorState: EditorState, match: string[]) => {
     /**

@@ -1,11 +1,13 @@
-import { Box, Button, Tooltip } from '@mui/material';
-import type { Application, Bounty } from '@prisma/client';
+import type { Application, Bounty } from '@charmverse/core/prisma';
+import { Box, Button, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { AssignedBountyPermissions } from 'lib/bounties';
+
+import { ApplicationComments } from '../BountyApplicantsTable/ApplicationComments';
 
 import ApplicationInput from './components/ApplicationInput';
 import SubmissionInput from './components/SubmissionInput';
@@ -14,7 +16,7 @@ interface BountyApplicationFormProps {
   permissions: AssignedBountyPermissions;
   bounty: Bounty;
   submissions: Application[];
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantForm(props: BountyApplicationFormProps) {
@@ -65,6 +67,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
       </Box>
     ) : (
       <ApplicationInput
+        permissions={permissions}
+        refreshSubmissions={refreshSubmissions}
         bountyId={bounty.id}
         mode='create'
         onSubmit={submitApplication}
@@ -78,8 +82,10 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
     return (
       <>
         <ApplicationInput
+          permissions={permissions}
+          refreshSubmissions={refreshSubmissions}
           bountyId={bounty.id}
-          proposal={userApplication}
+          application={userApplication}
           mode='update'
           readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
@@ -88,6 +94,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         />
         {userApplication?.status !== 'applied' && (
           <SubmissionInput
+            hasCustomReward={bounty.customReward !== null}
             bountyId={bounty.id}
             onSubmit={submitApplication}
             submission={userApplication}
@@ -96,9 +103,14 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
             onCancel={() => {
               setShowApplication(false);
             }}
-            readOnly={userApplication?.status !== 'inProgress'}
-            alwaysExpanded={true}
+            readOnly={userApplication?.status !== 'inProgress' && userApplication?.status !== 'review'}
+            alwaysExpanded
           />
+        )}
+        {userApplication && userApplication.createdBy === user?.id && (
+          <Stack gap={1} mt={2}>
+            <ApplicationComments status={userApplication.status} applicationId={userApplication.id} />
+          </Stack>
         )}
       </>
     );
@@ -126,10 +138,11 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         onCancel={() => {
           setShowApplication(false);
         }}
+        hasCustomReward={bounty.customReward !== null}
         readOnly={userApplication?.status === 'rejected'}
         submission={userApplication}
         permissions={permissions}
-        alwaysExpanded={true}
+        alwaysExpanded
       />
     );
   } else {

@@ -1,7 +1,6 @@
 import { link } from '@bangle.dev/base-components';
-import type { PluginKey } from '@bangle.dev/pm';
+import type { Mark, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
-import { getMarkAttrs } from '@bangle.dev/utils';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import {
@@ -9,6 +8,8 @@ import {
   referenceElement,
   renderSuggestionsTooltip
 } from '../@bangle.dev/tooltip/suggest-tooltip';
+
+import { getLinkElement } from './getLinkElement';
 
 export type LinkPluginState = {
   show: boolean;
@@ -19,7 +20,6 @@ export type LinkPluginState = {
 
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
-
   let tooltipTimer: null | NodeJS.Timer = null;
 
   return [
@@ -61,25 +61,31 @@ export function plugins({ key }: { key: PluginKey }) {
         }
       },
       props: {
-        handleClick: (view, _pos, event) => {
+        handleClickOn: (view, _pos, _node, _nodePos, event) => {
           const { schema } = view.state;
           const markType = schema.marks.link;
-          const attrs = getMarkAttrs(view.state, markType);
+          let marks: Mark[] = [];
+          view.state.doc.nodesBetween(_pos, _pos, (node) => {
+            marks = [...marks, ...node.marks];
+          });
+          const attrs = marks.find((markItem) => markItem.type.name === markType.name)?.attrs ?? {};
           if (attrs.href) {
             event.stopPropagation();
             window.open(attrs.href, '_blank');
+            return true;
           }
           return false;
         },
         handleDOMEvents: {
           mouseover: (view, event) => {
-            const target = event.target as HTMLAnchorElement; // span for link
-            const parentElement = target?.parentElement; // anchor for link
-            const hrefElement = parentElement?.classList.contains('charm-link')
-              ? parentElement
-              : target?.classList.contains('charm-link')
-              ? target
-              : null;
+            function hideWithTimeout() {
+              if (tooltipTimer) clearTimeout(tooltipTimer);
+              tooltipTimer = setTimeout(() => {
+                hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
+              }, 750);
+            }
+
+            const hrefElement = getLinkElement({ htmlElement: event.target as HTMLElement });
 
             if (hrefElement) {
               const href = hrefElement.getAttribute('href');
@@ -99,12 +105,18 @@ export function plugins({ key }: { key: PluginKey }) {
                       ev.clientY < boundingRect.bottom + BUFFER &&
                       ev.clientX > boundingRect.left &&
                       ev.clientX < boundingRect.right;
+
                     if (!isWithinBufferRegion) {
-                      if (tooltipTimer) clearTimeout(tooltipTimer);
-                      tooltipTimer = setTimeout(() => {
-                        hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-                      }, 750);
+                      hideWithTimeout();
                     }
+                  };
+
+                  // do not hide when hovering over tooltip
+                  tooltipDOMSpec.contentDOM.onmouseenter = () => {
+                    if (tooltipTimer) clearTimeout(tooltipTimer);
+                  };
+                  tooltipDOMSpec.contentDOM.onmouseleave = () => {
+                    hideWithTimeout();
                   };
                 }, 400);
               }

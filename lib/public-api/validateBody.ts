@@ -1,6 +1,6 @@
 import type { UnsupportedKeyDetails } from './errors';
 import { UnsupportedKeysError } from './errors';
-import type { PageQuery, PaginatedQuery, Page } from './interfaces';
+import type { CardPageCreationData, CardPageQuery, CardPageUpdateData, PaginatedQuery } from './interfaces';
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
@@ -8,13 +8,13 @@ import type { PageQuery, PaginatedQuery, Page } from './interfaces';
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validatePageQuery(query: PageQuery): true {
+export function validatePageQuery(query: CardPageQuery): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
   }
 
-  const supportedKeys: (keyof PageQuery)[] = ['properties', 'title'];
+  const supportedKeys: (keyof CardPageQuery)[] = ['properties', 'title'];
 
   const queryKeys = Object.keys(query);
 
@@ -51,65 +51,102 @@ export function validatePageQuery(query: PageQuery): true {
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
- * For now, we use the same fields to update, create and query a page
- * This wrapper exists so we can seaparate this behaviour in future if needed
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateCreationData(creationData: PageQuery): true {
-  try {
-    validatePageQuery(creationData);
+export function validateCreationData(creationData: CardPageCreationData): true {
+  if (creationData === undefined || creationData === null) {
     return true;
-  } catch (error) {
-    const modifiedError = error as UnsupportedKeysError<Pick<Page, 'title' | 'properties'>>;
+  }
 
-    modifiedError.error.example = {
-      title: 'Page title',
-      properties: {
-        customProperty: 'initial value'
+  const supportedKeys: (keyof CardPageCreationData)[] = ['title', 'properties', 'contentMarkdown'];
+
+  const creationDataKeys = Object.keys(creationData);
+
+  const unsupportedKeys: string[] = [];
+
+  for (const key of creationDataKeys) {
+    if (!supportedKeys.includes(key as any)) {
+      unsupportedKeys.push(key);
+    }
+  }
+
+  if (unsupportedKeys.length > 0) {
+    const errorDetails: UnsupportedKeyDetails = {
+      unsupportedKeys,
+      allowedKeys: supportedKeys,
+      example: {
+        body: {
+          title: 'my page',
+          properties: {
+            customProperty: 'value'
+          },
+          contentMarkdown: '### Markdown title'
+        }
       }
     };
 
-    modifiedError.message = 'Invalid data inside your creation data';
-
-    throw modifiedError;
+    throw new UnsupportedKeysError({
+      message: 'Your creation data for this card contains unsupported keys',
+      error: errorDetails
+    });
   }
+
+  return true;
 }
 
 /**
  * Use this in the api to throw an error when an unsupported field is provided
- * For now, we use the same fields to update, create and query a page
- * This wrapper exists so we can seaparate this behaviour in future if needed
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateUpdateData(creationData: PageQuery): true {
-  try {
-    validatePageQuery(creationData);
+export function validateUpdateData(updateData: CardPageUpdateData): true {
+  if (updateData === undefined || updateData === null) {
     return true;
-  } catch (error) {
-    const modifiedError = error as UnsupportedKeysError;
+  }
 
-    modifiedError.error.example = {
-      title: 'New page title',
-      properties: {
-        customProperty: 'new value'
+  const supportedKeys: (keyof CardPageCreationData)[] = ['title', 'properties'];
+
+  const creationDataKeys = Object.keys(updateData);
+
+  const unsupportedKeys: string[] = [];
+
+  for (const key of creationDataKeys) {
+    if (!supportedKeys.includes(key as any)) {
+      unsupportedKeys.push(key);
+    }
+  }
+
+  if (unsupportedKeys.length > 0) {
+    const errorDetails: UnsupportedKeyDetails = {
+      unsupportedKeys,
+      allowedKeys: supportedKeys,
+      example: {
+        body: {
+          title: 'my page',
+          properties: {
+            customProperty: 'value'
+          }
+        }
       }
     };
 
-    modifiedError.message = 'Invalid data inside your update data';
-
-    throw modifiedError;
+    throw new UnsupportedKeysError({
+      message: 'Your update data for this card contains unsupported keys',
+      error: errorDetails
+    });
   }
+
+  return true;
 }
 
-export function validatePaginationQuery(query: PaginatedQuery<PageQuery>): true {
+export function validatePaginationQuery(query: PaginatedQuery<CardPageQuery>): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
   }
 
-  const supportedKeys: (keyof PaginatedQuery<PageQuery>)[] = ['cursor', 'limit', 'query'];
+  const supportedKeys: (keyof PaginatedQuery<CardPageQuery>)[] = ['cursor', 'limit', 'query'];
 
   const queryKeys = Object.keys(query);
 

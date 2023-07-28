@@ -1,6 +1,8 @@
-import { prisma } from 'db';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { GetOrganizationsResponse } from 'lib/deepdao/client';
 import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
-import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -15,19 +17,32 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
 
   const profiles = (
     await Promise.all(
-      wallets.map(({ address }) =>
-        getProfile(address, apiToken).catch((error) => {
-          log.error('Error calling DEEP DAO API', error);
+      wallets.map(async ({ address }) => {
+        try {
+          const profile = await getProfile(address, apiToken);
+          if (!profile) return null;
+          return {
+            ...profile,
+            address
+          };
+        } catch (error) {
+          log.error('Error retrieving profiles from DEEP DAO API', error);
           return null;
-        })
-      )
+        }
+      })
     )
   ).filter(isTruthy);
 
-  const [allOrganizations, userWorkspaces] = await Promise.all([
-    getAllOrganizations(apiToken),
-    getSpacesOfUser(userId)
-  ]);
+  async function getOrgsSafe() {
+    try {
+      return await getAllOrganizations(apiToken);
+    } catch (error) {
+      log.error('Error retrieving orgs from DEEP DAO API', error);
+      return { data: { resources: [], totalResources: 0 } } as GetOrganizationsResponse;
+    }
+  }
+
+  const [allOrganizations, userWorkspaces] = await Promise.all([getOrgsSafe(), getSpacesOfUser(userId)]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
     logos[org.organizationId] = org.logo;
@@ -67,7 +82,8 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
         isPinned: pinnedItems.includes(org.organizationId),
         name: org.name,
         // sometimes the logo is just a filename, do some basic validation
-        logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
+        logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null,
+        walletId: wallets.find((wallet) => wallet.address === profile.address)?.id ?? null
       }))
     )
     .flat();
@@ -85,7 +101,8 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
     isPinned: pinnedItems.includes(userWorkspace.id),
     joinDate: userWorkspace.spaceRoles.find((spaceRole) => spaceRole.userId === userId)?.createdAt.toISOString(),
     name: userWorkspace.name,
-    logo: userWorkspace.spaceImage
+    logo: userWorkspace.spaceImage,
+    walletId: null
   }));
 
   return {

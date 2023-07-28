@@ -1,10 +1,8 @@
-import type { Prisma } from '@prisma/client';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
-
-import type { TransactionClient } from 'db';
-import { prisma } from 'db';
-
-import type { PageMeta } from '../interfaces';
 
 export function pageMetaSelect() {
   return {
@@ -16,6 +14,7 @@ export function pageMetaSelect() {
     createdAt: true,
     createdBy: true,
     deletedAt: true,
+    deletedBy: true,
     fullWidth: true,
     galleryImage: true,
     hasContent: true,
@@ -26,12 +25,12 @@ export function pageMetaSelect() {
     parentId: true,
     path: true,
     proposalId: true,
-    snapshotProposalId: true,
     title: true,
     spaceId: true,
     updatedAt: true,
     updatedBy: true,
     type: true,
+    convertedProposalId: true,
     permissions: {
       select: {
         id: true,
@@ -50,7 +49,7 @@ export function pageMetaSelect() {
 export async function getPageMeta(
   pageIdOrPath: string,
   spaceId?: string,
-  tx: TransactionClient = prisma
+  tx: PrismaTransactionClient = prisma
 ): Promise<PageMeta | null> {
   const isValidUUid = validate(pageIdOrPath);
 

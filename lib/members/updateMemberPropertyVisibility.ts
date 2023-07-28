@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { NotFoundError } from 'lib/middleware';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 

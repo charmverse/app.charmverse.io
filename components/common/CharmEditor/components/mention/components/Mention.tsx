@@ -4,8 +4,8 @@ import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
+import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -31,20 +31,27 @@ const StyledTypography = styled(Typography)`
 `;
 
 export default function Mention({ node }: NodeViewProps) {
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { pages } = usePages();
-  const member = members.find((_member) => _member.id === attrs.value);
-  const space = useCurrentSpace();
+  const member = getMemberById(attrs.value);
+  const { space } = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
-    value = page && (
+    value = page ? (
       <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
         <Box display='flex' alignItems='center'>
           <PageIcon isLinkedPage icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           <StyledTypography>{page.title || 'Untitled'}</StyledTypography>
+        </Box>
+      </MentionContainer>
+    ) : (
+      <MentionContainer color='inherit'>
+        <Box display='flex' alignItems='center'>
+          <NoAccessPageIcon />
+          <StyledTypography>No access</StyledTypography>
         </Box>
       </MentionContainer>
     );
@@ -52,7 +59,7 @@ export default function Mention({ node }: NodeViewProps) {
     value = (
       <MentionContainer color='secondary'>
         <Typography
-          onClick={() => member?.id && showMemberProfile(member.id)}
+          onClick={() => member?.id && showUserProfile(member.id)}
           component='span'
           color='secondary'
           sx={{ cursor: 'pointer' }}

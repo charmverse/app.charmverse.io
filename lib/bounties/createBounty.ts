@@ -1,7 +1,7 @@
-import type { BountyStatus, Prisma } from '@prisma/client';
+import type { BountyStatus, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
 import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
@@ -20,11 +20,12 @@ export async function createBounty({
   status = 'suggestion',
   chainId = 1,
   linkedPageId,
-  approveSubmitters = true,
+  approveSubmitters = false,
   maxSubmissions,
   rewardAmount = 0,
   rewardToken = 'ETH',
-  permissions
+  permissions,
+  customReward
 }: BountyCreationData) {
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
@@ -36,12 +37,14 @@ export async function createBounty({
     );
   }
 
-  if (rewardAmount === 0 && status === 'open') {
-    throw new InvalidInputError('An open bounty must have a reward amount assigned');
-  }
+  if (rewardAmount !== null) {
+    if (rewardAmount === 0 && status === 'open') {
+      throw new InvalidInputError('An open bounty must have a reward amount assigned');
+    }
 
-  if (rewardAmount < 0) {
-    throw new PositiveNumbersOnlyError();
+    if (rewardAmount < 0) {
+      throw new PositiveNumbersOnlyError();
+    }
   }
 
   const space = await prisma.space.findUnique({
@@ -77,7 +80,8 @@ export async function createBounty({
     approveSubmitters,
     maxSubmissions,
     rewardAmount,
-    rewardToken
+    rewardToken,
+    customReward
   };
 
   const isSuggestion = status === 'suggestion';

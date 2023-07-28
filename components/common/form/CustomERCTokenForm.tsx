@@ -1,18 +1,18 @@
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import type { PaymentMethod } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { FormError } from 'components/common/form/FormError.class';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
@@ -63,7 +63,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
   });
 
   const [, , refreshPaymentMethods] = usePaymentMethods();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
   const [formError, setFormError] = useState<ISystemError | null>(null);

@@ -1,11 +1,13 @@
+/* deprecated  use import { Button } from 'components/common/Button'; */
+
 import styled from '@emotion/styled';
 import { darken } from '@mui/material/styles';
 import type { ElementType } from 'react';
 
+import { Button, StyledSpinner } from 'components/common/Button';
 import { blueColor } from 'theme/colors';
 
 import type { InputProps } from './Button';
-import Button, { StyledSpinner } from './Button';
 
 const StyledButton = styled(Button)`
   background: ${blueColor};
@@ -34,8 +36,9 @@ const StyledButton = styled(Button)`
   }
 `;
 
-function PimpedButton<C extends ElementType>(props: InputProps<C>) {
+function DeprecatedButton<C extends ElementType>(props: InputProps<C>) {
   const { children, loading, loadingMessage, ...rest } = props;
+
   return (
     <StyledButton disabled={loading} {...rest}>
       {loading && loadingMessage ? loadingMessage : children}
@@ -44,4 +47,5 @@ function PimpedButton<C extends ElementType>(props: InputProps<C>) {
   );
 }
 
-export default PimpedButton;
+/* deprecated  use import { Button } from 'components/common/Button'; */
+export default DeprecatedButton;

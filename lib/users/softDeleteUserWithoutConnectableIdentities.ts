@@ -1,5 +1,5 @@
-import { prisma } from 'db';
-import log from 'lib/log';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { countConnectableIdentities } from './countConnectableIdentities';
 import { getUserProfile } from './getUser';

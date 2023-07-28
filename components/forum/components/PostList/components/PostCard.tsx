@@ -1,3 +1,4 @@
+import type { PostCategory } from '@charmverse/core/prisma';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Stack } from '@mui/material';
@@ -6,22 +7,20 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { CommentVote } from 'components/common/comments/CommentVote';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
-import { usePostPermissions } from 'components/forum/hooks/usePostPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
-
-import { ForumVote } from '../../ForumVote';
 
 import { PostSummary } from './PostSummary';
 
@@ -41,7 +40,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   const { id: postId } = pagePost;
   const router = useRouter();
   const { showPost } = usePostDialog();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
 
   const permissions = usePostPermissions({ postIdOrPath: post.id });
 
@@ -129,7 +128,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />
+            {!post.isDraft && <CommentVote permissions={permissions} onVote={voteOnPost} votes={pagePost.votes} />}
           </Box>
         </CardContent>
       </CardActionArea>

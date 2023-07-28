@@ -1,93 +1,161 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Page, Prisma } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4, validate } from 'uuid';
 
-import { prisma } from 'db';
-import log from 'lib/log';
+import type { BountyWithDetails } from 'lib/bounties';
+import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
+import type { WorkspaceExport, ExportedPage } from './exportWorkspacePages';
 
-interface UpdateRefs {
-  oldNewHashMap: Record<string, string>;
+type WorkspaceImportOptions = {
+  exportData?: WorkspaceExport;
+  exportName?: string;
+  targetSpaceIdOrDomain: string;
+  // Parent id of root pages, could be another page or null if space is parent
+  parentId?: string | null;
+  updateTitle?: boolean;
+  includePermissions?: boolean;
+};
+
+type UpdateRefs = {
+  oldNewPageIdHashMap: Record<string, string>;
   pages: Page[];
+};
+
+function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
+  if (node?.content) {
+    node?.content.forEach((childNode) => {
+      recurse(childNode, cb);
+    });
+  }
+  if (node) {
+    cb(node);
+  }
 }
 
 /**
  * Mutates the provided content to replace nested page refs
  */
-function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
-  let foundPageRefs = 0;
+function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
+  const extractedPolls: Map<string, { pageId: string; newPollId: string; originalId: string }> = new Map();
 
-  pages.forEach((p) => {
-    const prosemirrorNodes = (p.content as PageContent)?.content;
-    if (prosemirrorNodes) {
-      let prosemirrorNodesAsText = JSON.stringify(prosemirrorNodes);
+  for (const page of pages) {
+    recurse(page.content as PageContent, (node) => {
+      if (node.type === 'poll') {
+        const attrs = node.attrs as { pollId: string };
+        if (attrs.pollId) {
+          const newPollId = v4();
+          extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
+          attrs.pollId = newPollId;
+        }
+      } else if (node.type === 'page') {
+        const attrs = node.attrs as { id: string };
+        const oldPageId = attrs.id;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
 
-      // Step 1 - Update all nested page links
-      const nestedPageRefs = prosemirrorNodesAsText.match(
-        /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"/g
-      );
-
-      nestedPageRefs?.forEach((pageLinkNode) => {
-        foundPageRefs += 1;
-
-        const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
-        const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
+        if (oldPageId && !newPageId) {
+          newPageId = v4();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
 
         if (oldPageId && newPageId) {
-          prosemirrorNodesAsText = prosemirrorNodesAsText.replace(oldPageId, newPageId);
+          attrs.id = newPageId;
         }
-      });
+      } else if (node.type === 'inlineDatabase') {
+        const attrs = node.attrs as { pageId: string };
+        const oldPageId = attrs.pageId;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
 
-      (p.content as PageContent).content = JSON.parse(prosemirrorNodesAsText);
-    }
-  });
+        if (oldPageId && !newPageId) {
+          newPageId = v4();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
+
+        if (oldPageId && newPageId) {
+          attrs.pageId = newPageId;
+        }
+      }
+
+      const marks: TextMark[] = node.marks;
+
+      if (marks) {
+        node.marks = marks.filter((mark) => mark.type !== 'inline-comment');
+      }
+    });
+  }
+
+  return {
+    extractedPolls
+  };
 }
 
-interface WorkspaceImportResult {
-  pages: number;
-  blocks: number;
-}
+type WorkspaceImportResult = {
+  pages: PageMeta[];
+  totalBlocks: number;
+  totalPages: number;
+  rootPageIds: string[];
+  bounties: BountyWithDetails[];
+  blockIds: string[];
+};
 
 export async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
   exportData,
-  exportName
-}: WorkspaceImport): Promise<{ pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs }> {
+  exportName,
+  parentId: rootParentId,
+  updateTitle,
+  includePermissions
+}: WorkspaceImportOptions): Promise<{
+  pageArgs: Prisma.PageCreateArgs[];
+  blockArgs: Prisma.BlockCreateManyArgs;
+  voteArgs: Prisma.VoteCreateManyArgs;
+  voteOptionsArgs: Prisma.VoteOptionsCreateManyArgs;
+  bountyArgs: Prisma.BountyCreateManyArgs;
+  bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
+  proposalArgs: Prisma.ProposalCreateManyArgs;
+  proposalCategoryArgs: Prisma.ProposalCategoryCreateManyArgs;
+  proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyArgs;
+}> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
-  const space = await prisma.space.findUnique({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
+  const space = await prisma.space.findUniqueOrThrow({
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
+    include: {
+      proposalCategories: true
+    }
   });
-
-  if (!space) {
-    throw new DataNotFoundError(`Space not found: ${targetSpaceIdOrDomain}`);
-  }
-
   const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
   const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
   if (!dataToImport) {
     throw new InvalidInputError('Please provide the source export data, or export path');
   }
-
-  // List of page object references which we will mutate
-  const flatPages: Page[] = [];
-
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
+  const voteArgs: Prisma.VoteCreateManyInput[] = [];
+  const voteOptionsArgs: Prisma.VoteOptionsCreateManyInput[] = [];
   const blockArgs: Prisma.BlockCreateManyInput[] = [];
+  const bountyArgs: Prisma.BountyCreateManyInput[] = [];
+  const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
+  const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
+  const proposalCategoryArgs: Prisma.ProposalCategoryCreateManyInput[] = [];
+  const proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
-  const oldNewHashmap: Record<string, string> = {};
+  const oldNewPageIdHashMap: Record<string, string> = {};
 
   /**
    * Mutates the pages, updating their ids
@@ -95,32 +163,40 @@ export async function generateImportWorkspacePages({
   function recursivePagePrep({
     node,
     newParentId,
-    rootSpacePermissionId
+    rootSpacePermissionId,
+    rootPageId,
+    oldNewPermissionMap
   }: {
+    // This is required for inline databases
+    rootPageId?: string;
     node: ExportedPage;
     newParentId: string | null;
     rootSpacePermissionId?: string;
+    oldNewPermissionMap: Record<string, string>;
   }) {
-    const newId = v4();
+    const existingNewPageId =
+      node.type === 'page' || isBoardPageType(node.type) ? oldNewPageIdHashMap[node.id] : undefined;
 
-    oldNewHashmap[newId] = node.id;
-    oldNewHashmap[node.id] = newId;
+    const newId = rootPageId ?? existingNewPageId ?? v4();
 
-    flatPages.push(node);
-
+    oldNewPageIdHashMap[newId] = node.id;
+    oldNewPageIdHashMap[node.id] = newId;
     const {
       children,
-      permissions,
       createdBy,
       updatedBy,
       spaceId,
       cardId,
       proposalId,
+      version,
       parentId,
       bountyId,
       blocks,
+      votes: pageVotes,
+      inlineDatabases: ignored,
       ...pageWithoutJoins
-    } = node;
+      // This typecasting is for retro-compatibility. We dropped inline databases from exports, but old versions may still contain this content
+    } = node as ExportedPage & { inlineDatabases: any };
 
     typedKeys(pageWithoutJoins).forEach((key) => {
       if (pageWithoutJoins[key] === null) {
@@ -128,44 +204,90 @@ export async function generateImportWorkspacePages({
       }
     });
 
+    const currentParentId = newParentId ?? rootParentId ?? undefined;
+
     const newPermissionId = v4();
 
     // Reassigned when creating the root permission
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
+    const pagePermissions = includePermissions
+      ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
+          const newPagePermissionId = v4();
+
+          oldNewPermissionMap[permission.id] = newPagePermissionId;
+
+          const newSourcePermissionId = inheritedFromPermission
+            ? oldNewPermissionMap[inheritedFromPermission]
+            : undefined;
+
+          return {
+            ...permission,
+            inheritedFromPermission: newSourcePermissionId,
+            id: newPagePermissionId
+          };
+        })
+      : [
+          {
+            id: newPermissionId,
+            permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
+            spaceId: space.id,
+            inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
+          }
+        ];
+
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
+        title:
+          parentId === rootParentId && updateTitle
+            ? `${pageWithoutJoins.title || 'Untitled'} (Copy)`
+            : pageWithoutJoins.title,
         id: newId,
         autoGenerated: true,
-        boardId: node.type.match('board') ? newId : undefined,
-        parentId: newParentId ?? undefined,
+        boardId: isBoardPageType(node.type) ? newId : undefined,
+        parentId: currentParentId,
+        proposal: {
+          connect:
+            node.type === 'proposal' || node.type === 'proposal_template'
+              ? {
+                  id: newId
+                }
+              : undefined
+        },
+        card: {
+          connect:
+            node.type === 'card'
+              ? {
+                  id: newId
+                }
+              : undefined
+        },
+        bounty: {
+          connect:
+            node.type === 'bounty' || node.type === 'bounty_template'
+              ? {
+                  id: newId
+                }
+              : undefined
+        },
         content: (node.content as Prisma.InputJsonValue) ?? undefined,
         path: getPagePath(),
+        convertedProposalId: undefined,
         space: {
           connect: {
-            // eslint-disable @typescript-eslint/no-non-null-assertion
-            id: space!.id
+            id: space.id
           }
         },
         permissions: {
           createMany: {
-            data: [
-              {
-                id: newPermissionId,
-                permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                spaceId: space!.id,
-                inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
-              }
-            ]
+            data: pagePermissions
           }
         },
-        updatedBy: space!.createdBy,
+        updatedBy: space.createdBy,
         author: {
           connect: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            id: space!.createdBy
+            id: space.createdBy
           }
         }
       }
@@ -176,27 +298,27 @@ export async function generateImportWorkspacePages({
 
       if (cardBlock) {
         cardBlock.id = newId;
-        cardBlock.rootId = newParentId as string;
-        cardBlock.parentId = newParentId as string;
-        // eslint-disable @typescript-eslint/no-non-null-assertion
+        cardBlock.rootId = currentParentId as string;
+        cardBlock.parentId = currentParentId as string;
         cardBlock.updatedAt = undefined as any;
         cardBlock.createdAt = undefined as any;
-        cardBlock.updatedBy = space!.createdBy;
-        cardBlock.createdBy = space!.createdBy;
-        cardBlock.spaceId = space!.id;
+        cardBlock.updatedBy = space.createdBy;
+        cardBlock.createdBy = space.createdBy;
+        cardBlock.spaceId = space.id;
 
         pageArgs.push(newPageContent);
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
-    } else if (node.type.match('board')) {
+    } else if (isBoardPageType(node.type)) {
       const boardBlock = node.blocks?.board;
-      const viewBlocks = node.blocks?.views;
+      const viewBlocks = node.blocks?.views ?? [];
 
-      if (boardBlock && !!viewBlocks?.length) {
+      // We don't want to create empty databases, but we do want to allow inline databases to be empty so they can be initialised
+      if (boardBlock && ((!node.type.match('inline') && viewBlocks.length > 0) || node.type.match('inline'))) {
         [boardBlock, ...viewBlocks].forEach((block) => {
           if (block.type === 'board') {
             block.id = newId;
@@ -209,38 +331,133 @@ export async function generateImportWorkspacePages({
           // eslint-disable @typescript-eslint/no-non-null-assertion
           block.updatedAt = undefined as any;
           block.createdAt = undefined as any;
-          block.createdBy = space!.createdBy;
-          block.updatedBy = space!.updatedBy;
-          block.spaceId = space!.id;
+          block.createdBy = space.createdBy;
+          block.updatedBy = space.updatedBy;
+          block.spaceId = space.id;
           blockArgs.push(block as Prisma.BlockCreateManyInput);
         });
         pageArgs.push(newPageContent);
 
         node.children?.forEach((child) => {
-          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+          recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
         });
       }
     } else if (node.type === 'page') {
       pageArgs.push(newPageContent);
       node.children?.forEach((child) => {
-        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
+        recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId, oldNewPermissionMap });
+      });
+    } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
+      pageArgs.push(newPageContent);
+      const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
+      bountyArgs.push({
+        ...bounty,
+        spaceId: space.id,
+        createdBy: space.createdBy,
+        id: oldNewPageIdHashMap[node.id]
+      });
+      permissions.forEach(({ id, ...bountyPermission }) => {
+        bountyPermissionArgs.push({
+          ...bountyPermission,
+          spaceId: bountyPermission.spaceId ? space.id : null,
+          bountyId: oldNewPageIdHashMap[node.id]
+        });
+      });
+    } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
+      // TODO: Handle cross space reviewers and authors
+      const { category, ...proposal } = node.proposal;
+      let categoryId: string | undefined;
+      if (category) {
+        categoryId =
+          space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
+          proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
+        if (!categoryId) {
+          categoryId = v4();
+          proposalCategoryArgs.push({
+            id: categoryId,
+            title: category.title,
+            color: category.color,
+            spaceId: space.id
+          });
+          proposalCategoryPermissionArgs.push({
+            permissionLevel: 'full_access',
+            proposalCategoryId: categoryId,
+            spaceId: space.id
+          });
+        }
+      }
+      proposalArgs.push({
+        ...proposal,
+        categoryId,
+        reviewedBy: undefined,
+        spaceId: space.id,
+        createdBy: space.createdBy,
+        status: 'draft',
+        id: oldNewPageIdHashMap[node.id]
+      });
+      pageArgs.push(newPageContent);
+    }
+
+    const { extractedPolls } = updateReferences({
+      oldNewPageIdHashMap,
+      pages: [node]
+    });
+
+    if (pageVotes) {
+      extractedPolls.forEach((extractedPoll) => {
+        const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
+
+        if (pageVote && pageVote.pageId) {
+          const { voteOptions, ...vote } = pageVote;
+          voteArgs.push({
+            ...vote,
+            createdBy: space.createdBy,
+            pageId: oldNewPageIdHashMap[pageVote.pageId],
+            id: extractedPoll.newPollId as string,
+            content: vote.content ?? Prisma.DbNull,
+            contentText: vote.contentText
+          });
+
+          voteOptions.forEach((voteOption) => {
+            voteOptionsArgs.push({
+              name: voteOption.name,
+              voteId: extractedPoll.newPollId as string
+            });
+          });
+        }
       });
     }
   }
 
   dataToImport.pages.forEach((page) => {
-    recursivePagePrep({ node: page, newParentId: null });
-  });
-
-  updateReferences({
-    oldNewHashMap: oldNewHashmap,
-    pages: flatPages
+    recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
   return {
     pageArgs,
     blockArgs: {
       data: blockArgs
+    },
+    voteArgs: {
+      data: voteArgs
+    },
+    voteOptionsArgs: {
+      data: voteOptionsArgs
+    },
+    bountyArgs: {
+      data: bountyArgs
+    },
+    bountyPermissionArgs: {
+      data: bountyPermissionArgs
+    },
+    proposalArgs: {
+      data: proposalArgs
+    },
+    proposalCategoryArgs: {
+      data: proposalCategoryArgs
+    },
+    proposalCategoryPermissionArgs: {
+      data: proposalCategoryPermissionArgs
     }
   };
 }
@@ -248,28 +465,63 @@ export async function generateImportWorkspacePages({
 export async function importWorkspacePages({
   targetSpaceIdOrDomain,
   exportData,
-  exportName
-}: WorkspaceImport): Promise<WorkspaceImportResult> {
-  const { pageArgs, blockArgs } = await generateImportWorkspacePages({ targetSpaceIdOrDomain, exportData, exportName });
+  exportName,
+  parentId,
+  updateTitle,
+  includePermissions
+}: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
+  const {
+    pageArgs,
+    blockArgs,
+    bountyArgs,
+    voteArgs,
+    voteOptionsArgs,
+    proposalArgs,
+    proposalCategoryArgs,
+    proposalCategoryPermissionArgs,
+    bountyPermissionArgs
+  } = await generateImportWorkspacePages({
+    targetSpaceIdOrDomain,
+    exportData,
+    exportName,
+    parentId,
+    updateTitle,
+    includePermissions
+  });
 
   const pagesToCreate = pageArgs.length;
 
-  let createdPages = 0;
-  const createdBlocks = 0;
+  let totalCreatedPages = 0;
 
-  await prisma.$transaction([
+  const createdData = await prisma.$transaction([
+    // The blocks needs to be created first before the page can connect with them
+    prisma.block.createMany(blockArgs),
+    prisma.bounty.createMany(bountyArgs),
+    prisma.bountyPermission.createMany(bountyPermissionArgs),
+    prisma.proposalCategory.createMany(proposalCategoryArgs),
+    prisma.proposalCategoryPermission.createMany(proposalCategoryPermissionArgs),
+    prisma.proposal.createMany(proposalArgs),
     ...pageArgs.map((p) => {
-      createdPages += 1;
-      log.debug(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
-      return createPage(p);
+      totalCreatedPages += 1;
+      log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
+      return createPage<PageMeta>(p);
     }),
-    prisma.block.createMany(blockArgs)
+    prisma.vote.createMany(voteArgs),
+    prisma.voteOptions.createMany(voteOptionsArgs)
   ]);
 
-  //  const blocks = await prisma.block.createMany(blockArgs);
+  const createdPages = createdData.filter((data) => 'id' in data) as PageMeta[];
+  const createdPagesRecord: Record<string, PageMeta> = {};
+  createdPages.forEach((createdPage) => {
+    createdPagesRecord[createdPage.id] = createdPage;
+  });
 
+  const blockIds = Array.isArray(blockArgs.data) ? blockArgs.data.map((blockArg) => blockArg.id) : [blockArgs.data.id];
   return {
+    blockIds,
+    totalPages: createdPages.length,
     pages: createdPages,
-    blocks: createdBlocks
+    totalBlocks: blockIds.length,
+    rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
   };
 }

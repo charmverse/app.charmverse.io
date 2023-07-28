@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
 
-import type { WebhookPayload } from 'lib/webhook/interfaces';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
+import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import type { LoggedInUser } from 'models';
 import { loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

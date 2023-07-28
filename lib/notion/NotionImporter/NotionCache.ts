@@ -1,9 +1,9 @@
+import { log } from '@charmverse/core/log';
+import type { Page } from '@charmverse/core/prisma';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import type { Page } from '@prisma/client';
 import { RateLimit } from 'async-sema';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import log from 'lib/log';
 
 import type { BlocksRecord, CreatePageInput } from '../types';
 

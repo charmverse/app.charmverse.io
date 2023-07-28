@@ -1,25 +1,16 @@
-import styled from '@emotion/styled';
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { StyledBanner } from 'components/common/Banners/Banner';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
-const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
-  width: 100%;
-  z-index: var(--z-index-appBar);
-  display: flex;
-  justify-content: center;
-  background-color: ${({ theme }) => theme.palette.error.main};
-  padding: ${({ theme }) => theme.spacing(1)};
-`;
-
 export default function PageDeleteBanner({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const router = useRouter();
   const { pages } = usePages();
 
@@ -32,19 +23,17 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
 
   async function deletePage() {
     if (space) {
-      await charmClient.deletePage(pageId);
-      router.push(
+      await router.push(
         `/${router.query.domain}/${
-          Object.values(pages).find((page) => page?.type !== 'card' && page?.deletedAt === null)?.path
+          Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path
         }`
       );
+      await charmClient.deletePage(pageId);
     }
   }
 
-  const isShowingCard = new URLSearchParams(window.location.search).get('cardId');
-
   return (
-    <StyledPageDeleteBanner card={isShowingCard ? isShowingCard !== 'undefined' && isShowingCard.length !== 0 : false}>
+    <StyledBanner errorBackground>
       <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
         <div
           style={{
@@ -64,6 +53,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             setIsMutating(false);
           }}
           variant='outlined'
+          size='small'
         >
           Restore Page
         </Button>
@@ -77,10 +67,11 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             setIsMutating(false);
           }}
           variant='outlined'
+          size='small'
         >
           Delete permanently
         </Button>
       </Box>
-    </StyledPageDeleteBanner>
+    </StyledBanner>
   );
 }

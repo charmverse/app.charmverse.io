@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
+import { InvalidStateError } from 'lib/middleware';
+import { superApiHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = superApiHandler();
 
-handler.use(requireSuperApiKey).get(searchUser);
+handler.get(searchUser);
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts

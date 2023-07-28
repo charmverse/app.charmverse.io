@@ -1,8 +1,9 @@
+import type { PostCategory } from '@charmverse/core/prisma';
+import styled from '@emotion/styled';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import type { PostCategory } from '@prisma/client';
-import { useState } from 'react';
 
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostSortOption } from 'lib/forums/posts/constants';
@@ -11,6 +12,17 @@ import { usePostCategoryPermissions } from '../hooks/usePostCategoryPermissions'
 
 import { CategoryContextMenu } from './CategoryContextMenu';
 
+const StyledMenuItem = styled(MenuItem)`
+  ${hoverIconsStyle({ marginForIcons: false })}
+
+  min-height: 36px;
+
+  &.Mui-focused,
+  &.Mui-selected,
+  &.Mui-selected.Mui-focused {
+    background-color: ${({ theme }) => theme.palette.action.selected};
+  }
+`;
 type ForumSortFilterLinkProps = {
   label: string;
   isSelected: boolean;
@@ -25,6 +37,16 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
   const category = value ? categories.find((c) => c.id === value) : null;
   const { permissions } = usePostCategoryPermissions(category?.id as string);
 
+  function handleChange(updatedCategory: PostCategory) {
+    updateForumCategory(updatedCategory)
+      .then(() => {
+        showMessage('Category updated');
+      })
+      .catch((err) => {
+        showMessage(err?.message || 'An error occurred while updating the category');
+      });
+  }
+
   function deleteCategory() {
     if (category) {
       deleteForumCategory(category).catch((err) => {
@@ -36,7 +58,7 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
   }
 
   return (
-    <MenuItem
+    <StyledMenuItem
       dense
       sx={{
         display: 'flex',
@@ -44,6 +66,7 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
+      selected={isSelected}
     >
       <Typography
         data-test={
@@ -68,12 +91,12 @@ export function ForumFilterListLink({ label, value, isSelected, handleSelect }: 
           <CategoryContextMenu
             permissions={permissions}
             category={category as PostCategory}
-            onChange={updateForumCategory}
+            onChange={handleChange}
             onDelete={deleteCategory}
             onSetNewDefaultCategory={setDefaultPostCategory}
           />
         </span>
       )}
-    </MenuItem>
+    </StyledMenuItem>
   );
 }

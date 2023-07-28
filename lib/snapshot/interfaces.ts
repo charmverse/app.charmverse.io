@@ -9,7 +9,10 @@ export interface SnapshotVotingStrategy {
  */
 export interface SnapshotSpace {
   about: string;
+  // All 3 categories are required
   admins: string[];
+  members: string[];
+  moderators: string[];
   avatar: string;
   categories: string[];
   id: string;
@@ -17,7 +20,6 @@ export interface SnapshotSpace {
     minScore: number;
     onlyMembers: boolean;
   };
-  members: string[];
   name: string;
   network: string;
   private: boolean;

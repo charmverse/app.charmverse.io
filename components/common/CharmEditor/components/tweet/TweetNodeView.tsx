@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -5,7 +6,6 @@ import { Box } from '@mui/material';
 import Script from 'next/script';
 import { useRef } from 'react';
 
-import log from 'lib/log';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import BlockAligner from '../BlockAligner';

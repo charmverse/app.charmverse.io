@@ -50,9 +50,11 @@ export function nestedPagePlugins({
         onEnter(_, __, view) {
           const selectedMenuItem = document.querySelector('.mention-selected');
           const value = selectedMenuItem?.getAttribute('data-value');
+          const type = selectedMenuItem?.getAttribute('data-type');
+          const path = selectedMenuItem?.getAttribute('data-path');
 
-          if (view && value) {
-            insertNestedPage(key, view, value);
+          if (view && value && type && path) {
+            insertNestedPage(key, view, value, type, path);
           }
           return false;
         },

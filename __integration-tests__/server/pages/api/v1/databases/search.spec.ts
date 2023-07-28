@@ -1,18 +1,18 @@
-import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type {
+  CardPage as ApiPage,
+  CardPageQuery,
   InvalidCustomPropertyKeyError,
   InvalidCustomPropertyValueError,
-  Page as ApiPage,
   PageProperty,
-  PageQuery,
   PaginatedQuery,
   PaginatedResponse,
   UnsupportedKeysError
 } from 'lib/public-api';
-import { createDatabase, createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
+import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { uniqueValues } from 'lib/utilities/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -128,7 +128,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         query: {}
       });
 
@@ -160,7 +160,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         query: {
           title: 'title'
         }
@@ -188,7 +188,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {}
       });
@@ -207,7 +207,7 @@ describe('POST /databases/{id}/search', () => {
       const response = await request(baseUrl)
         .post(`/api/v1/databases/${database.boardId}/search`)
         .set('Authorization', `Bearer ${apiToken.token}`)
-        .send(<PaginatedQuery<PageQuery>>{
+        .send(<PaginatedQuery<CardPageQuery>>{
           limit: 2,
           cursor,
           query: {}
@@ -238,7 +238,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         InvalidProp: true,
         query: {}
@@ -251,7 +251,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         InvalidProp: true,
         query: {}
@@ -271,7 +271,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {
           properties: {
@@ -287,7 +287,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {
           properties: {
@@ -308,7 +308,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {
           properties: {
@@ -324,7 +324,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {
           properties: {
@@ -336,7 +336,7 @@ describe('POST /databases/{id}/search', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const statusSchema = exampleBoardSchema.find((schema) => schema.name === 'Status')!;
 
-    statusSchema.options.forEach((option) => {
+    statusSchema.options?.forEach((option) => {
       expect((response.body as InvalidCustomPropertyValueError).error.validOptions).toContain(option.value);
     });
   });
@@ -345,7 +345,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', 'Bearer invalidKey')
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {}
       });
@@ -359,7 +359,7 @@ describe('POST /databases/{id}/search', () => {
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
       .set('Authorization', `Bearer ${differentSpace.apiToken.token}`)
-      .send(<PaginatedQuery<PageQuery>>{
+      .send(<PaginatedQuery<CardPageQuery>>{
         limit: 2,
         query: {}
       });

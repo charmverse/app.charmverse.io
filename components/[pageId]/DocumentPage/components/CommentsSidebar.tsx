@@ -1,7 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import type { BoxProps, SelectProps } from '@mui/material';
+import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -44,7 +45,7 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
+function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: PagePermissionFlags }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
@@ -96,10 +97,16 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
-      setThreadFilter('all');
-      // Remove query parameters from url
+      const isHighlightedResolved = resolvedThreads.some((thread) =>
+        thread.comments.some((comment) => comment.id === highlightedCommentId)
+      );
+      if (isHighlightedResolved) {
+        setThreadFilter('resolved');
+      }
 
+      // Remove query parameters from url
       setUrlWithoutRerender(router.pathname, { commentId: null });
+
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
         if (!highlightedCommentElement) {
@@ -150,7 +157,13 @@ function CommentsSidebarComponent({ inline }: BoxProps & { inline?: boolean }) {
           sortedThreadList.map(
             (resolvedThread) =>
               resolvedThread && (
-                <PageThread showFindButton inline={inline} key={resolvedThread.id} threadId={resolvedThread?.id} />
+                <PageThread
+                  permissions={permissions}
+                  showFindButton
+                  inline={inline}
+                  key={resolvedThread.id}
+                  threadId={resolvedThread?.id}
+                />
               )
           )
         )}

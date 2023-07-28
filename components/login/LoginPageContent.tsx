@@ -1,39 +1,42 @@
-import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
 import Image from 'components/common/Image';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
-import { Login } from './Login';
+import { Container } from './components/LoginLayout';
+import { LoginButton } from './LoginButton';
 import { LoginErrorModal } from './LoginErrorModal';
 
-export const Container = styled(Box)`
-  max-width: 100%;
-  width: 1170px;
-  margin: 0 auto;
-`;
-export function LoginPageContent() {
-  const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
+type Props = {
+  hideLoginOptions?: boolean;
+  isLoggingIn?: boolean;
+};
+
+export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
-  const [discordLoginError, setDiscordLoginError] = useState(
-    new URLSearchParams(decodeURIComponent(window.location.search)).get('discordError')
-  );
+  const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
 
   function clearError() {
     setDiscordLoginError(null);
     setUrlWithoutRerender(router.pathname, { discordError: null });
   }
+
+  useEffect(() => {
+    if (router.query.discordError) {
+      setDiscordLoginError(router.query.discordError as string);
+    }
+  }, [router.query]);
 
   useEffect(() => {
     if (discordLoginError && (discordLoginError as ErrorType) !== 'Disabled account') {
@@ -45,24 +48,22 @@ export function LoginPageContent() {
   return (
     <Container px={3} data-test='login-page-content'>
       <Grid container>
-        <Grid item xs={12} display={{ xs: 'flex', sm: 'none' }} justifyContent='center' py={3} px={6}>
-          <Image sx={{ maxWidth: 300 }} src={splashImage} />
-        </Grid>
         <Grid
           item
           xs={12}
-          sm={6}
+          md={6}
           sx={{
             display: 'flex',
             justifyContent: {
               xs: 'center',
-              sm: 'flex-start'
+              md: 'flex-start'
             }
           }}
         >
-          <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+          <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography
               sx={{
+                display: { xs: 'none', md: 'block' },
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
@@ -73,29 +74,32 @@ export function LoginPageContent() {
               Powering the Future <br />
               of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>
-              The solution for token communities to build relationships,
-              <br />
-              work together and vote
+
+            <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
+              <Image src={splashImage} maxWidth={400} />
+            </Box>
+            <Typography
+              sx={{
+                display: { xs: 'none', md: 'block' },
+                fontSize: 20,
+                mb: { sm: 2, md: 6 },
+                maxWidth: { md: '520px' }
+              }}
+            >
+              The solution for token communities to build relationships, work together and vote
             </Typography>
-            <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <Login />
-              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
-                or
-              </Typography>
-              <Button
-                data-test='connect-discord'
-                sx={{ width: '100%' }}
-                variant='outlined'
-                size='large'
-                href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}
-              >
-                Connect Discord
-              </Button>
+            <Box
+              display={{ md: 'flex' }}
+              gap={2}
+              alignItems='center'
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+            >
+              {isLoggingIn && <LoadingComponent label='Logging you in' />}
+              {!hideLoginOptions && <LoginButton />}
             </Box>
           </Box>
         </Grid>
-        <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
+        <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
           <Image px={3} src={splashImage} />
         </Grid>
       </Grid>

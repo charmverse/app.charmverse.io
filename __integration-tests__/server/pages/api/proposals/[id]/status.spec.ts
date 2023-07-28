@@ -1,8 +1,8 @@
-import type { Space, User } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createProposalWithUsers, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -83,7 +83,14 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       .expect(404);
   });
 
-  it('should throw error and return 401 if the author is not the one updating the status', async () => {
+  it('should throw error and return 400 if the user cannot update the status', async () => {
+    const spaceMember = await generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const spaceMemberCookie = await loginUser(spaceMember.id);
+
     const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
@@ -93,11 +100,11 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
 
     await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
-      .set('Cookie', reviewerCookie)
+      .set('Cookie', spaceMemberCookie)
       .send({
         newStatus: 'draft'
       })
-      .expect(401);
+      .expect(400);
   });
 
   it('should successfully update the status of proposal and return 200', async () => {

@@ -57,7 +57,7 @@ export abstract class BasePermissions<O extends string> implements AbstractPermi
    */
   hasPermissions(operations: O[]): boolean {
     for (const op of operations) {
-      if ((this as any)[op] !== true) {
+      if (this.operations[op] !== true) {
         return false;
       }
     }

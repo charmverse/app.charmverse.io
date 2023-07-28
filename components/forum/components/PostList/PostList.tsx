@@ -8,7 +8,7 @@ import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'r
 import useSWRInfinite from 'swr/infinite';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -35,7 +35,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 
 export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const ref = useRef();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const [morePostsAvailable, setMorePostsAvailable] = useState(false);
   const { members } = useMembers();
@@ -66,7 +66,8 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
         count: resultsPerQuery,
         page: args.arguments.page,
         sort: args.arguments.sort
-      })
+      }),
+    { revalidateOnFocus: !morePostsAvailable }
   );
 
   const {
@@ -191,7 +192,6 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
         <Snackbar
           open={morePostsAvailable && !search}
-          autoHideDuration={10000}
           anchorOrigin={{
             horizontal: 'center',
             vertical: 'top'

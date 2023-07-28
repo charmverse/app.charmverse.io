@@ -1,6 +1,6 @@
-import type { Application } from '@prisma/client';
+import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
 

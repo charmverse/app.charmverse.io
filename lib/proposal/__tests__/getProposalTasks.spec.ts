@@ -1,32 +1,38 @@
-import type { SpaceRole } from '@prisma/client';
-import { v4 } from 'uuid';
+import type { SpaceRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
-import {
-  createVote,
-  generateProposal,
-  generateRoleWithSpaceRole,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
+import { generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
-  it('Should only return non archived proposals', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+  it('Should only return non deleted proposals', async () => {
+    const { user, space } = await generateUserAndSpace();
 
-    // This proposal page was archived, this shouldn't be fetched
-    await generateProposal({
+    const visibleProposalCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'full_access'
+        }
+      ]
+    });
+
+    // This proposal page was deleted, this shouldn't be fetched
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
       userId: user.id,
-      deletedAt: new Date()
+      deletedAt: new Date(),
+      categoryId: visibleProposalCategory.id
     });
 
-    const privateDraftProposal1 = await generateProposal({
+    const discussionProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user.id],
@@ -36,11 +42,42 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    // sd d
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: privateDraftProposal1.proposal.status,
+          status: discussionProposal.status,
+          action: 'start_review'
+        })
+      ])
+    );
+  });
+  it('Should ignore proposals marked as archived', async () => {
+    const { user, space } = await generateUserAndSpace();
+
+    // This proposal page was archived, this shouldn't be fetched
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id,
+      archived: true
+    });
+
+    const privateDraftProposal1 = await testUtilsProposals.generateProposal({
+      proposalStatus: 'discussion',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: privateDraftProposal1.status,
           action: 'start_review'
         })
       ])
@@ -48,10 +85,10 @@ describe('getProposalTasks', () => {
   });
 
   it('Should not get draft and private draft proposals where the user is one of the authors', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -59,8 +96,8 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    await generateProposal({
-      proposalStatus: 'private_draft',
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -68,7 +105,7 @@ describe('getProposalTasks', () => {
     });
 
     // This shouldn't be returned as the user is not an author
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user2.id],
@@ -82,10 +119,10 @@ describe('getProposalTasks', () => {
   });
 
   it('Should get all reviewed proposals where the user is one of the authors', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
     const user2 = await createUserFromWallet();
 
-    const reviewedProposal1 = await generateProposal({
+    const reviewedProposal1 = await testUtilsProposals.generateProposal({
       proposalStatus: 'reviewed',
       spaceId: space.id,
       authors: [user.id],
@@ -93,7 +130,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'reviewed',
       spaceId: space.id,
       authors: [user2.id],
@@ -106,7 +143,7 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: reviewedProposal1.proposal.status,
+          status: reviewedProposal1.status,
           action: 'start_vote'
         })
       ])
@@ -114,16 +151,21 @@ describe('getProposalTasks', () => {
   });
 
   it('Should get all proposals to review where the user is one of the reviewer through both roleId and userId', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
     const user2 = await createUserFromWallet();
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        spaceId: space.id
+      }
+    });
 
     const { role } = await generateRoleWithSpaceRole({
       spaceId: space.id,
       createdBy: user.id,
-      spaceRoleId: (space.spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
+      spaceRoleId: (spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
     });
 
-    const proposalToReviewViaRole = await generateProposal({
+    const proposalToReviewViaRole = await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user2.id],
@@ -131,7 +173,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    const proposalToReviewViaUser = await generateProposal({
+    const proposalToReviewViaUser = await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user2.id],
@@ -139,7 +181,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    await generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'review',
       spaceId: space.id,
       authors: [user.id],
@@ -152,125 +194,185 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: proposalToReviewViaRole.proposal.status,
+          status: proposalToReviewViaRole.status,
           action: 'review'
         }),
         expect.objectContaining({
-          status: proposalToReviewViaUser.proposal.status,
+          status: proposalToReviewViaUser.status,
           action: 'review'
         })
       ])
     );
   });
 
-  it('Should get all proposals in discussion and active vote stage where the user is a member of the proposal space', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+  it('Should get all proposals in discussion stage where the user has permission to comment inside this category', async () => {
+    const { user: author, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    const spaceMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    const visibleCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'full_access'
+        }
+      ]
+    });
 
-    const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await generateUserAndSpaceWithApiToken();
-
-    // Making user2 a member of the proposal space
-    await prisma.spaceRole.create({
-      data: {
-        userId: user2.id,
-        spaceId: space.id
-      }
+    const readonlyCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'view'
+        }
+      ]
     });
 
     // This shouldn't be fetched as its private draft
-    await generateProposal({
-      proposalStatus: 'private_draft',
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'draft',
       spaceId: space.id,
-      authors: [user.id],
       reviewers: [],
-      userId: user.id
+      userId: author.id,
+      categoryId: visibleCategory.id
     });
 
-    const discussionProposal1 = await generateProposal({
+    const discussionProposalHiddenCategory = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id
+      userId: author.id,
+      categoryId: readonlyCategory.id
     });
 
-    const activeVoteProposal = await generateProposal({
-      proposalStatus: 'vote_active',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id
-    });
-
-    await createVote({
-      createdBy: user.id,
-      pageId: activeVoteProposal.id,
-      spaceId: space.id,
-      context: 'proposal'
-    });
-
-    const activeVoteWithUserVoteProposal = await generateProposal({
-      proposalStatus: 'vote_active',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id
-    });
-
-    // User has voted on this proposal
-    // So this shouldn't be returned as a proposal task
-    await createVote({
-      createdBy: user.id,
-      pageId: activeVoteWithUserVoteProposal.id,
-      spaceId: space.id,
-      userVotes: ['1'],
-      context: 'proposal'
-    });
-
-    // The user isn't an author, but it should be returned as its in discussion
-    const discussionProposal2 = await generateProposal({
+    const discussionProposalVisibleCategory = await testUtilsProposals.generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
-      authors: [user2.id],
-      reviewers: [],
-      userId: user2.id
+      userId: author.id,
+      categoryId: visibleCategory.id
     });
 
-    // This proposal is inaccessible as the user is not a member of the space
-    await generateProposal({
-      proposalStatus: 'discussion',
-      spaceId: inaccessibleSpace.id,
-      authors: [inaccessibleSpaceUser.id],
-      reviewers: [],
-      userId: inaccessibleSpaceUser.id
-    });
+    const proposalTasks = await getProposalTasks(spaceMember.id);
 
-    const proposalTasks = await getProposalTasks(user.id);
+    expect(proposalTasks.unmarked).toHaveLength(1);
 
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          status: discussionProposal1.proposal.status,
-          action: 'start_review'
-        }),
-        expect.objectContaining({
-          status: activeVoteProposal.proposal.status,
-          action: 'vote'
-        }),
-        expect.objectContaining({
-          status: discussionProposal2.proposal.status,
+          pageId: discussionProposalVisibleCategory.page.id,
+          status: discussionProposalVisibleCategory.status,
           action: 'discuss'
         })
       ])
     );
+  });
 
-    // Making double sure private draft wasn't fetched
+  it('Should get all proposals in vote stage where the user has permission to vote inside this category', async () => {
+    const { user: author, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    const spaceMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    const visibleCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'full_access'
+        }
+      ]
+    });
+
+    const nonVotableCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'view_comment'
+        }
+      ]
+    });
+
+    // This shouldn't be fetched as its private draft
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'draft',
+      spaceId: space.id,
+      reviewers: [],
+      userId: author.id,
+      categoryId: visibleCategory.id
+    });
+
+    const votingProposalHiddenCategory = await testUtilsProposals.generateProposal({
+      proposalStatus: 'vote_active',
+      spaceId: space.id,
+      userId: author.id,
+      categoryId: nonVotableCategory.id
+    });
+
+    const votingProposalVisibleCategory = await testUtilsProposals.generateProposal({
+      proposalStatus: 'vote_active',
+      spaceId: space.id,
+      userId: author.id,
+      categoryId: visibleCategory.id
+    });
+
+    const votingClosedProposalVisibleCategory = await testUtilsProposals.generateProposal({
+      proposalStatus: 'vote_closed',
+      spaceId: space.id,
+      userId: author.id,
+      categoryId: visibleCategory.id
+    });
+
+    const proposalTasks = await getProposalTasks(spaceMember.id);
+
+    expect(proposalTasks.unmarked).toHaveLength(1);
+
     expect(proposalTasks.unmarked).toEqual(
-      expect.not.arrayContaining([
+      expect.arrayContaining([
         expect.objectContaining({
-          status: 'private_draft'
+          pageId: votingProposalVisibleCategory.page.id,
+          status: votingProposalVisibleCategory.status,
+          action: 'vote'
         })
       ])
     );
+  });
+
+  it('Should not return public notifications when disabled by the space admin', async () => {
+    const { user, space } = await generateUserAndSpace({
+      notifyNewProposals: null
+    });
+
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'discussion',
+      spaceId: space.id,
+      authors: [],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual([]);
+  });
+
+  it('Should not return notifications when there is no action', async () => {
+    const { user, space } = await generateUserAndSpace({});
+
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'reviewed',
+      spaceId: space.id,
+      authors: [],
+      reviewers: [],
+      userId: user.id
+    });
+
+    const proposalTasks = await getProposalTasks(user.id);
+
+    expect(proposalTasks.unmarked).toEqual([]);
   });
 });

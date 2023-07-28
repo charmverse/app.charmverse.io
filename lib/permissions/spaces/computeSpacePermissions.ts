@@ -1,83 +1,42 @@
-import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import type { PermissionComputeRequest } from '../interfaces';
+import type { PermissionCompute } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
 export async function computeSpacePermissions({
-  allowAdminBypass,
   resourceId,
   userId
-}: PermissionComputeRequest): Promise<SpacePermissionFlags> {
+}: PermissionCompute): Promise<SpacePermissionFlags> {
   const allowedOperations = new AvailableSpacePermissions();
 
   if (!userId) {
     return allowedOperations.empty;
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { spaceRole } = await hasAccessToSpace({
     userId,
-    spaceId: resourceId,
-    adminOnly: false
+    spaceId: resourceId
   });
 
-  if (error) {
+  if (!spaceRole) {
     // Returns all permissions as false since user is not space member
     return allowedOperations.empty;
-  }
 
-  if (isAdmin && allowAdminBypass) {
+    // Provide full permissions to all space members independent of admin status
+  } else if (spaceRole.isAdmin) {
     return allowedOperations.full;
+  } else {
+    return {
+      createBounty: true,
+      createForumCategory: true,
+      createPage: true,
+      moderateForums: true,
+      reviewProposals: true,
+      deleteAnyBounty: false,
+      deleteAnyPage: false,
+      deleteAnyProposal: false
+    };
   }
-
-  // Rollup space permissions
-  const spacePermissions = await prisma.spacePermission.findMany({
-    where: {
-      AND: [
-        {
-          forSpaceId: resourceId
-        },
-        {
-          OR: [
-            {
-              space: {
-                // Extra protection to only consider space roles from the space this permission gives access to
-                id: resourceId,
-                spaceRoles: {
-                  some: {
-                    userId
-                  }
-                }
-              }
-            },
-            // Roles in the space this user has been assigned to
-            {
-              role: {
-                // Extra protection to only query roles belonging to the space
-                spaceId: resourceId,
-                spaceRolesToRole: {
-                  some: {
-                    spaceRole: {
-                      userId
-                    }
-                  }
-                }
-              }
-            },
-            {
-              userId
-            }
-          ]
-        }
-      ]
-    }
-  });
-
-  for (const permissionSet of spacePermissions) {
-    allowedOperations.addPermissions(permissionSet.operations);
-  }
-
-  return allowedOperations.operationFlags;
 }

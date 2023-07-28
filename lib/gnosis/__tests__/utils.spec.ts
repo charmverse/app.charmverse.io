@@ -19,7 +19,6 @@ describe('getGnosisTransactionQueueUrl', () => {
     expect(getGnosisTransactionQueueUrl(safeAddress, 42161)).toBe(`${baseUrl}/arb1:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 43114)).toBe(`${baseUrl}/avax:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 56)).toBe(`${baseUrl}/bnb:${safeAddress}/transactions/queue`);
-    expect(getGnosisTransactionQueueUrl(safeAddress, 10)).toBe(`${baseUrl}/oeth:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 137)).toBe(`${baseUrl}/matic:${safeAddress}/transactions/queue`);
   });
 });
@@ -32,7 +31,6 @@ describe('getGnosisSafeUrl', () => {
     expect(getGnosisSafeUrl(safeAddress, 42161)).toBe(`${baseUrl}/arb1:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 43114)).toBe(`${baseUrl}/avax:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 56)).toBe(`${baseUrl}/bnb:${safeAddress}`);
-    expect(getGnosisSafeUrl(safeAddress, 10)).toBe(`${baseUrl}/oeth:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 137)).toBe(`${baseUrl}/matic:${safeAddress}`);
   });
 });

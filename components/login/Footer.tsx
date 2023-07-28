@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { charmverseDiscordInvite } from 'config/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
-import { Container } from './LoginPageContent';
+import { Container } from './components/LoginLayout';
 
 const Background = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.dark};
@@ -52,6 +52,9 @@ export default function Footer() {
         <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
             <LinkHeader>Links</LinkHeader>
+            <StyledLink href='https://charmverse.io' target='_blank'>
+              What is CharmVerse?
+            </StyledLink>
             <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
               Privacy Policy
             </StyledLink>

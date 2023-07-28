@@ -1,7 +1,34 @@
-import type { Page as PrismaPage } from '@prisma/client';
+import type { Page as PrismaPage } from '@charmverse/core/prisma';
+
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { APISpaceTemplateType } from 'lib/spaces/config';
+
+export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ * @swagger
+ * components:
+ *  schemas:
+ *    PagePropertyOption:
+ *     type: object
+ *     properties:
+ *      id:
+ *        type: string
+ *        example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+ *      color:
+ *        type: string
+ *        example: propColorTeal
+ *      value:
+ *        type: string
+ *        example: Complete
+ */
+export interface PagePropertyOption {
+  id: string;
+  color: string;
+  value: string;
+}
+
+/**
  *
  * @swagger
  * components:
@@ -20,36 +47,19 @@ import type { Page as PrismaPage } from '@prisma/client';
  *          type: string
  *          example: select
  *        options:
- *          required: false
  *          type: array
  *          items:
  *            type: object
- *            properties:
- *               id:
- *                 type: string
- *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
- *               color:
- *                 type: string
- *                 example: propColorTeal
- *               value:
- *                 type: string
- *                 example: Complete
+ *            $ref: '#/components/schemas/PagePropertyOption'
  */
-
-export interface PageProperty {
-  id: string;
-  name: string;
-  type: string;
-  options: {
-    id: string;
-    color: string;
-    value: string;
-  }[];
-}
+export type PageProperty<T extends PropertyType = PropertyType> = Pick<IPropertyTemplate, 'id' | 'name'> &
+  Partial<Pick<IPropertyTemplate, 'description'>> & {
+    type: T;
+    options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+  } & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -111,12 +121,10 @@ export interface PageContentFormats {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
- *    Page:
+ *    CardPage:
  *      type: object
  *      properties:
  *        id:
@@ -155,7 +163,7 @@ export interface PageContentFormats {
  *                example: Medium
  *
  */
-export interface Page {
+export type CardPage = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -164,16 +172,14 @@ export interface Page {
   content: PageContentFormats;
   title: string;
   isTemplate: boolean;
-  properties: Record<string, string | number>;
-}
+  properties: Record<string, BoardPropertyValue>;
+};
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
- *    PageQuery:
+ *    CardPageQuery:
  *      type: object
  *      properties:
  *        title:
@@ -194,7 +200,72 @@ export interface Page {
  *              required: false
  *
  */
-export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>;
+export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageCreationData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: grants
+ *          required: true
+ *        contentMarkdown:
+ *          type: string
+ *          example: Markdown title content
+ *          required: false
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageCreationData = {
+  title: string;
+  properties?: Record<string, BoardPropertyValue>;
+  contentMarkdown?: string;
+};
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageUpdateData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: Grants - Summer
+ *          required: false
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageUpdateData = {
+  title?: string;
+  properties?: Record<string, BoardPropertyValue>;
+};
 
 /**
  *
@@ -210,12 +281,31 @@ export interface PaginatedResponse<T> {
 export type PaginatedQuery<T> = {
   cursor?: string;
   limit?: number;
-  query: T;
+  query?: T;
 };
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
+ * @swagger
+ * components:
+ *  schemas:
+ *    PaginatedCardPageQuery:
+ *      type: object
+ *      properties:
+ *         limit:
+ *           type: integer
+ *           required: false
+ *           example: 10
+ *         cursor:
+ *           type: string
+ *           required: false
+ *           example: e63758e2-de17-48b2-9c74-5a40ea5be761
+ *         query:
+ *           type: object
+ *           $ref: '#/components/schemas/CardPageQuery'
+ */
+export type PaginatedCardPageQuery = PaginatedQuery<CardPageQuery>;
+
+/**
  * @swagger
  * components:
  *  schemas:
@@ -277,16 +367,12 @@ export interface Workspace {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
  *    CreateWorkspaceRequestBody:
  *      required:
  *        - name
- *        - discordServerId
- *        - adminDiscordUserId
  *      type: object
  *      properties:
  *        name:
@@ -311,6 +397,11 @@ export interface Workspace {
  *          required: false
  *          type: url
  *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
+ *        template:
+ *          required: false
+ *          type: string
+ *          example: nft_community
+ *          enum: [nft_community, impact_community, hackathon, nounish_dao, creator]
  */
 export interface CreateWorkspaceRequestBody {
   name: string;
@@ -322,11 +413,47 @@ export interface CreateWorkspaceRequestBody {
   adminUsername?: string;
   webhookUrl?: string;
   avatar?: string;
+  template?: APISpaceTemplateType;
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
+ * @swagger
+ * components:
+ *  schemas:
+ *    Space:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        avatar:
+ *          type: string
+ *          example: https://google.com/image.png
+ *        createdAt:
+ *          type: string
+ *          example: 2023-04-28T21:43:41.388Z
+ *        name:
+ *          type: string
+ *          example: Test DAO Space
+ *        spaceUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/test-dao-space
+ *        joinUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/join?domain=test-dao-space
+ */
+export interface Space {
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  name: string;
+  avatar?: string;
+  spaceUrl: string;
+  joinUrl: string;
+}
+
+/**
  * @swagger
  * components:
  *  schemas:
@@ -344,10 +471,7 @@ export interface CreateWorkspaceRequestBody {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface CreateWorkspaceResponseBody {
-  id: string;
-  spaceUrl: string;
-  joinUrl: string;
+export interface CreateWorkspaceResponseBody extends Space {
   webhookSigningSecret?: string;
 }
 

@@ -1,20 +1,31 @@
-import type { PostCategoryPermission, Space, SpaceRole, User } from '@prisma/client';
+import type {
+  PostCategoryPermission,
+  ProposalCategoryPermission,
+  Space,
+  SpaceRole,
+  User
+} from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
-import { typedKeys } from 'lib/utilities/objects';
+import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
-import { spaceCreateTemplates } from '../config';
-import type { SpaceCreateInput } from '../createWorkspace';
-import { createWorkspace } from '../createWorkspace';
+import { staticSpaceTemplates } from '../config';
+import type { SpaceCreateInput } from '../createSpace';
+import { createWorkspace } from '../createSpace';
 
 let user: User;
 
 beforeAll(async () => {
-  user = await prisma.user.create({ data: { username: 'demo-user' } });
+  user = await prisma.user.create({
+    data: {
+      path: uid(),
+      username: 'demo-user'
+    }
+  });
 });
 
 describe('createWorkspace', () => {
@@ -71,7 +82,8 @@ describe('createWorkspace', () => {
     const bot = await prisma.user.create({
       data: {
         username: 'Bot user',
-        isBot: true
+        isBot: true,
+        path: uid()
       }
     });
 
@@ -171,6 +183,39 @@ describe('createWorkspace', () => {
       );
     });
   });
+  it('should create default proposal categories for the workspace that are accessible to all space members by default', async () => {
+    const newWorkspace = await createWorkspace({
+      userId: user.id,
+      spaceData: {
+        name: `Name-${v4()}`,
+        domain: `domain-${v4()}`
+      }
+    });
+
+    const categories = await prisma.proposalCategory.findMany({
+      where: {
+        spaceId: newWorkspace.id
+      },
+      include: {
+        proposalCategoryPermissions: true
+      }
+    });
+
+    expect(categories).toHaveLength(defaultProposalCategories.length);
+
+    expect(categories.every((c) => defaultProposalCategories.includes(c.title))).toBe(true);
+
+    categories.forEach((c) => {
+      expect(c.proposalCategoryPermissions).toHaveLength(1);
+      expect(c.proposalCategoryPermissions[0]).toMatchObject(
+        expect.objectContaining<Partial<ProposalCategoryPermission>>({
+          spaceId: newWorkspace.id,
+          proposalCategoryId: c.id,
+          permissionLevel: 'full_access'
+        })
+      );
+    });
+  });
 
   it('should auto-assign the space domain', async () => {
     const newWorkspace = await createWorkspace({
@@ -213,10 +258,10 @@ describe('createWorkspace', () => {
   });
 
   it('should always include the getting started page when creating a space', async () => {
-    for (const options of spaceCreateTemplates) {
+    for (const template of staticSpaceTemplates) {
       const newSpace = await createWorkspace({
         userId: user.id,
-        createSpaceOption: options,
+        spaceTemplate: template.id,
         spaceData: {
           name: `Name-${v4()}`
         }
@@ -270,5 +315,20 @@ describe('createWorkspace', () => {
     expect(secondSpace.name).toBe(newSpace.name);
     expect(secondSpace.domain).not.toBe(newSpace.domain);
     expect(secondSpace.id).not.toBe(newSpace.id);
+  });
+
+  it('should generate an initial block count', async () => {
+    const space = await createWorkspace({
+      spaceData: { name: `name-${v4()}` },
+      userId: user.id
+    });
+
+    const blockCounts = await prisma.blockCount.count({
+      where: {
+        spaceId: space.id
+      }
+    });
+
+    expect(blockCounts).toBe(1);
   });
 });

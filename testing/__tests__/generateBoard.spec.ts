@@ -1,10 +1,11 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 
-import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from '../setupDatabase';
+import { createPage, generateBoard } from '../setupDatabase';
 
 describe('generateBoard', () => {
   it('should generate a database page with 1 view and 2 nested cards by default', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
 
     const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
@@ -63,7 +64,7 @@ describe('generateBoard', () => {
   });
 
   it('should generate a database page with 1 view and X amount of nested cards', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
 
     const cardsToCreate = 10;
 
@@ -123,8 +124,24 @@ describe('generateBoard', () => {
     });
   });
 
+  it('should generate a database page with X amount of views', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: false
+    });
+    const board = await generateBoard({ createdBy: user.id, spaceId: space.id, views: 4 });
+
+    const viewBlocks = await prisma.block.findMany({
+      where: {
+        rootId: board.id,
+        type: 'view'
+      }
+    });
+
+    expect(viewBlocks.length).toBe(4);
+  });
+
   it('should generate a board under another page if this option is passed', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id

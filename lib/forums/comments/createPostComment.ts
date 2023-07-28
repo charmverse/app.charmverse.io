@@ -1,7 +1,8 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishPostCommentEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostCommentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { CreatePostCommentInput } from './interface';
 

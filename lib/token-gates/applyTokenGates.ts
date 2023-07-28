@@ -1,8 +1,8 @@
-import type { Role } from '@prisma/client';
-import { verifyJwt } from 'lit-js-sdk';
+import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { verifyJwt } from '@lit-protocol/lit-node-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -21,14 +21,11 @@ export async function applyTokenGates({
   userId,
   tokens,
   commit,
-  joinType = 'token_gate'
+  reevaluate = false
 }: TokenGateVerification): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
-
-  // Try to apply disocrd gate first
-  await applyDiscordGate({ spaceId, userId });
 
   const space = await prisma.space.findUnique({
     where: {
@@ -53,6 +50,17 @@ export async function applyTokenGates({
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
+  const spaceMembership = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId,
+      userId
+    }
+  });
+
+  if (!spaceMembership && reevaluate) {
+    throw new InvalidInputError('User is not a member of this space.');
+  }
+
   const { tokenGates } = space;
 
   // We need to have at least one token gate that succeeded in order to proceed
@@ -64,17 +72,17 @@ export async function applyTokenGates({
   const verifiedTokenGates: (TokenGateWithRoles & TokenGateJwtResult)[] = (
     await Promise.all(
       tokens.map(async (tk) => {
-        const result = await verifyJwt({ jwt: tk.signedToken });
+        const result = verifyJwt({ jwt: tk.signedToken });
         const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
-
+        const payload = result?.payload as any;
         // Only check against existing token gates for this space
         if (
           matchingTokenGate &&
           // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
           result?.verified &&
-          result.payload?.orgId === space.id
+          payload?.orgId === space.id
         ) {
-          const embeddedTokenGateId = JSON.parse(result.payload.extraData).tokenGateId;
+          const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
 
           if (embeddedTokenGateId === tk.tokenGateId) {
             return {
@@ -108,30 +116,27 @@ export async function applyTokenGates({
 
   const assignedRoles = roleIdsToAssign.map((roleId) => space.roles.find((role) => role.id === roleId) as Role);
 
-  const spaceMembership = await prisma.spaceRole.findFirst({
-    where: {
-      spaceId,
-      userId
-    }
-  });
-
   const returnValue: TokenGateVerificationResult = {
     userId,
     space,
     roles: assignedRoles
   };
 
-  trackUserAction('token_gate_verification', {
-    result: 'pass',
-    spaceId,
-    userId,
-    roles: assignedRoles.map((r) => r.name)
-  });
-  trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
+  if (!reevaluate) {
+    trackUserAction('token_gate_verification', {
+      result: 'pass',
+      spaceId,
+      userId,
+      roles: assignedRoles.map((r) => r.name)
+    });
+  }
 
   if (!commit) {
     return returnValue;
   }
+
+  // Try to apply discord gate first
+  await applyDiscordGate({ spaceId, userId });
 
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
@@ -170,7 +175,7 @@ export async function applyTokenGates({
     return returnValue;
   } else {
     const spaceRoleId = v4();
-    const createdSpaceRole = await prisma.spaceRole.create({
+    await prisma.spaceRole.create({
       data: {
         id: spaceRoleId,
         spaceRoleToRole: {
@@ -195,8 +200,6 @@ export async function applyTokenGates({
         }
       }
     });
-
-    updateTrackUserProfileById(userId);
 
     return returnValue;
   }

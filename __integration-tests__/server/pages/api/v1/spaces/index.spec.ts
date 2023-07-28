@@ -1,23 +1,23 @@
-import type { SuperApiToken } from '@prisma/client';
+import type { SuperApiToken } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
-import { prisma } from 'db';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateSuperApiToken } from 'testing/utils/middleware';
 
 let apiToken: SuperApiToken;
 
 const defaultSpaceData = {
   name: `Test Space`,
-  adminDiscordUserId: '1337'
+  adminDiscordUserId: `1337-${uuid()}`
 };
 
 beforeAll(async () => {
-  const superToken = await generateSuperApiToken({ name: 'test 1' });
-  apiToken = superToken;
+  apiToken = await generateSuperApiToken({ name: `test 1-${uuid()}` });
 });
 
 describe('GET /api/v1/spaces', () => {
@@ -107,7 +107,7 @@ describe('GET /api/v1/spaces', () => {
   it('should respond 201 and generate unique domain', async () => {
     const {
       space: { domain: existingDomain }
-    } = await generateUserAndSpaceWithApiToken();
+    } = await generateUserAndSpace();
 
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
@@ -123,7 +123,7 @@ describe('GET /api/v1/spaces', () => {
   });
 
   it('should create a space for XPS Engine', async () => {
-    const xpsEngineId = 'xps-4eva';
+    const xpsEngineId = `xps-4eva-${uuid()}`;
     const wallet = Wallet.createRandom();
 
     const response = await request(baseUrl)

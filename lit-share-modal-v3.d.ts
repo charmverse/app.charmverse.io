@@ -1,8 +1,8 @@
-import type { SigningConditions } from 'lit-js-sdk';
+import type { JsonStoreSigningRequest } from '@lit-protocol/types';
 import type * as React from 'react';
 
 declare module 'lit-share-modal-v3' {
-  export type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'>;
+  export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions' | 'permanant'>;
 
   interface Token {
     label: string;
@@ -22,6 +22,7 @@ declare module 'lit-share-modal-v3' {
     injectCSS?: boolean;
     permanentDefault?: boolean;
     onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
+    chainsAllowed?: string[];
   }
 
   declare const ShareModal: React.FC<ShareModalProps>;

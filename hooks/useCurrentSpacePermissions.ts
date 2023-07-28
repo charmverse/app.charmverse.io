@@ -6,7 +6,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
 export function useCurrentSpacePermissions() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   // We want dependency on user so we refetch permissions on space or user change
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user } = useUser();
@@ -15,7 +15,7 @@ export function useCurrentSpacePermissions() {
     () => (space ? `permissions-${space.id}` : null),
     () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return charmClient.computeUserSpacePermissions({ spaceId: space!.id });
+      return charmClient.permissions.spaces.computeUserSpacePermissions({ spaceId: space!.id });
     },
     { revalidateOnFocus: true, focusThrottleInterval: 0 }
   );

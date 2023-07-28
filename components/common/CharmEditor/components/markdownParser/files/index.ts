@@ -1,1 +1,0 @@
-export * from './The Singularity';

@@ -1,10 +1,12 @@
 import type { Page } from '@playwright/test';
 import { expect, test as base } from '@playwright/test';
 
+import { createDiscordUser } from 'testing/utils/discord';
+
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
-import { generateUserAndSpace, createDiscordUser } from '../utils/mocks';
+import { generateUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {

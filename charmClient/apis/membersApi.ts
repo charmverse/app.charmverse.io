@@ -1,6 +1,7 @@
-import type { MemberProperty } from '@prisma/client';
+import type { MemberProperty } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
+import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type {
   CreateMemberPropertyPermissionInput,
   Member,
@@ -11,10 +12,25 @@ import type {
   UpdateMemberPropertyValuePayload,
   UpdateMemberPropertyVisibilityPayload
 } from 'lib/members/interfaces';
+import type { RemoveMemberInput } from 'lib/members/removeMember';
 
 export class MembersApi {
   getMembers(spaceId: string, search?: string) {
     return http.GET<Member[]>(`/api/spaces/${spaceId}/members`, { search });
+  }
+
+  async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
+    const members = await this.getMembers(spaceId);
+
+    return members.map((member) => ({
+      id: member.id,
+      username: member.username,
+      email: '',
+      props: {},
+      create_at: new Date(member.createdAt).getTime(),
+      update_at: new Date(member.updatedAt).getTime(),
+      is_bot: false
+    }));
   }
 
   getMemberProperties(spaceId: string) {
@@ -58,5 +74,23 @@ export class MembersApi {
 
   updateMemberPropertyVisibility(spaceId: string, payload: UpdateMemberPropertyVisibilityPayload) {
     return http.PUT<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/visibility`, payload);
+  }
+
+  updateMemberRole({
+    spaceId,
+    userId,
+    isAdmin,
+    isGuest
+  }: {
+    spaceId: string;
+    userId: string;
+    isAdmin: boolean;
+    isGuest: boolean;
+  }) {
+    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin, isGuest });
+  }
+
+  removeMember({ spaceId, userId }: RemoveMemberInput) {
+    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
   }
 }

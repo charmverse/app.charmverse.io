@@ -15,11 +15,10 @@ export class SpacesDropdown {
     this.page = page;
     this.logoutButton = page.locator('data-test=logout-button');
     this.spaceMenuBtn = page.locator('data-test=sidebar-space-menu');
-    this.closeMemberPropertiesModalBtn = page.locator('data-test=close-member-properties-modal');
+    this.closeMemberPropertiesModalBtn = page.locator('data-test=close-modal');
   }
 
   async signOut() {
-    await this.closeMemberPropertiesModalBtn.click();
     await this.spaceMenuBtn.click();
     await this.logoutButton.click();
   }

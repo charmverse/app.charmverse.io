@@ -1,4 +1,4 @@
-import type { PageType } from '@prisma/client';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { BaseEventWithoutGroup, BaseEvent } from './BaseEvent';
 
@@ -15,12 +15,13 @@ type CustomPageViewEvent = BaseEventWithoutGroup & {
 };
 
 type PageTypeEvent = PageEvent & {
-  type: PageType;
+  type: PageType | 'billing/marketing' | 'billing/checkout' | 'billing/settings';
 };
 
 export interface PageEventMap {
   page_view: PageTypeEvent | CustomPageViewEvent;
   archive_page: PageEvent;
+  duplicate_page: PageTypeEvent;
   delete_page: PageEvent;
   restore_page: PageEvent;
   edit_page: PageEvent;

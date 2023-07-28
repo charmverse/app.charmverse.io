@@ -1,79 +1,69 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
+  AssignedPagePermission,
+  PagePermissionAssignment,
+  PagePermissionWithSource
+} from '@charmverse/core/permissions';
+import type {
+  ApiPageKey,
   Block,
+  FavoritePage,
   InviteLink,
   Page,
-  PagePermissionLevel,
   PaymentMethod,
-  Prisma,
-  Role,
   Space,
   TelegramUser,
-  TokenGate,
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe
-} from '@prisma/client';
+  UserGnosisSafe,
+  UserWallet
+} from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
-import { DiscordApi } from 'charmClient/apis/discordApi';
-import { MuxApi } from 'charmClient/apis/muxApi';
-import { PagesApi } from 'charmClient/apis/pagesApi';
-import { TrackApi } from 'charmClient/apis/trackApi';
-import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
-import type { Member } from 'lib/members/interfaces';
+import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { AssignedPermissionsQuery } from 'lib/permissions/interfaces';
-import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
-import type {
-  IPagePermissionFlags,
-  IPagePermissionToCreate,
-  IPagePermissionUserRequest,
-  IPagePermissionWithAssignee,
-  IPagePermissionWithSource,
-  SpaceDefaultPublicPageToggle
-} from 'lib/permissions/pages/page-permission-interfaces';
-import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
+import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
-import type {
-  TokenGateEvaluationAttempt,
-  TokenGateEvaluationResult,
-  TokenGateVerification,
-  TokenGateWithRoles
-} from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
-import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
+import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
-import { PermissionsApi } from './apis/permissionsApi';
+import { MuxApi } from './apis/muxApi';
+import { PagesApi } from './apis/pagesApi';
+import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { PublicProfileApi } from './apis/publicProfileApi';
+import { RolesApi } from './apis/rolesApi';
+import { SpacesApi } from './apis/spacesApi';
+import { SubscriptionApi } from './apis/subscriptionApi';
+import { SummonApi } from './apis/summonApi';
 import { TasksApi } from './apis/tasksApi';
+import { TokenGatesApi } from './apis/tokenGates';
+import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
@@ -86,8 +76,6 @@ class CharmClient {
   blockchain = new BlockchainApi();
 
   bounties = new BountiesApi();
-
-  collabland = new CollablandApi();
 
   comments = new CommentsApi();
 
@@ -109,7 +97,15 @@ class CharmClient {
 
   profile = new ProfileApi();
 
+  publicProfile = new PublicProfileApi();
+
   proposals = new ProposalsApi();
+
+  roles = new RolesApi();
+
+  spaces = new SpacesApi();
+
+  summon = new SummonApi();
 
   tasks = new TasksApi();
 
@@ -121,8 +117,12 @@ class CharmClient {
 
   votes = new VotesApi();
 
+  tokenGates = new TokenGatesApi();
+
+  subscription = new SubscriptionApi();
+
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
@@ -176,61 +176,16 @@ class CharmClient {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) {
-    const space = await http.POST<Space>('/api/spaces', spaceOptions);
-    return space;
-  }
-
-  deleteSpace(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}`);
-  }
-
-  updateSpace(spaceOpts: Prisma.SpaceUpdateInput) {
-    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
-  }
-
-  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
-    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
-  }
-
-  leaveSpace(spaceId: string) {
-    return http.POST(`/api/spaces/${spaceId}/leave`);
-  }
-
-  getSpaces() {
-    return http.GET<Space[]>('/api/spaces');
-  }
-
-  getSpaceWebhook(spaceId: string) {
-    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
-  }
-
-  checkDomain(params: { spaceId?: string; domain: string }) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
-  }
-
-  updateMember({ spaceId, userId, isAdmin }: { spaceId: string; userId: string; isAdmin: boolean }) {
-    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin });
-  }
-
-  removeMember({ spaceId, userId }: { spaceId: string; userId: string }) {
-    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
+  removeUserWallet(address: Pick<UserWallet, 'address'>) {
+    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
 
-  duplicatePage(pageId: string, parentId: string) {
-    return http.POST<IPageWithPermissions>(`/api/pages/${pageId}/duplicate`, { parentId });
-  }
-
   getBlockViewsByPageId(pageId: string) {
     return http.GET<Block[]>(`/api/blocks/views/${pageId}`);
-  }
-
-  getArchivedPages(spaceId: string) {
-    return http.GET<IPageWithPermissions[]>(`/api/spaces/${spaceId}/pages?archived=true`);
   }
 
   getPageLink(pageId: string) {
@@ -238,7 +193,7 @@ class CharmClient {
   }
 
   createPage(pageOpts: Partial<Page>) {
-    return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
+    return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
   archivePage(pageId: string) {
@@ -253,12 +208,20 @@ class CharmClient {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }
 
+  deletePages(pageIds: string[]) {
+    return http.DELETE<undefined>(`/api/pages`, { pageIds });
+  }
+
   favoritePage(pageId: string) {
     return http.POST<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
   }
 
   unfavoritePage(pageId: string) {
     return http.DELETE<Partial<LoggedInUser>>('/api/profile/favorites', { pageId });
+  }
+
+  updateFavoritePages(favorites: Omit<FavoritePage, 'userId'>[]) {
+    return http.PUT<FavoritePage[]>('/api/profile/favorites', favorites);
   }
 
   setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
@@ -269,7 +232,7 @@ class CharmClient {
     return http.GET('/api/profile/gnosis-safes');
   }
 
-  updateMyGnosisSafe(wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
+  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
     return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
   }
 
@@ -282,23 +245,27 @@ class CharmClient {
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.PUT<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
@@ -315,28 +282,6 @@ class CharmClient {
 
   importRolesFromGuild(payload: ImportGuildRolesPayload) {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
-  }
-
-  async getWorkspaceUsers(spaceId: string): Promise<IUser[]> {
-    const members = await this.members.getMembers(spaceId);
-
-    return members.map((member: Member) => ({
-      id: member.id,
-      username: member.username,
-      email: '',
-      props: {},
-      create_at: new Date(member.createdAt).getTime(),
-      update_at: new Date(member.updatedAt).getTime(),
-      is_bot: false
-    }));
-  }
-
-  async getSpaceByDomain(search: string): Promise<Space | null> {
-    return http.GET<Space | null>('/api/spaces/search-domain', { search });
-  }
-
-  async getSpacesByName(search: string): Promise<Space[]> {
-    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
@@ -397,6 +342,15 @@ class CharmClient {
     updater([fbBlock]);
   }
 
+  async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const fbBlocks = rootBlocks.map((rootBlock) => ({
+      ...this.blockToFBBlock(rootBlock),
+      deletedAt: new Date().getTime()
+    }));
+    updater(fbBlocks);
+  }
+
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
     const blocksInput = fbBlocks.map(this.fbBlockToBlock);
     const newBlocks = await http.POST<Block[]>('/api/blocks', blocksInput);
@@ -453,34 +407,6 @@ class CharmClient {
     return http.DELETE('/api/aws/s3-delete', { src });
   }
 
-  // Token Gates
-  getTokenGates(query: { spaceId: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  getTokenGatesForSpace(query: { spaceDomain: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  saveTokenGate(tokenGate: Partial<TokenGate>): Promise<TokenGate> {
-    return http.POST<TokenGate>('/api/token-gates', tokenGate);
-  }
-
-  deleteTokenGate(id: string) {
-    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate(verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string; success?: boolean }> {
-    return http.POST('/api/token-gates/verify', verification);
-  }
-
-  evalueTokenGateEligibility(
-    verification: Omit<TokenGateEvaluationAttempt, 'userId'>
-  ): Promise<TokenGateEvaluationResult> {
-    return http.POST('/api/token-gates/evaluate', verification);
-  }
-
   // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
 
   //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
@@ -497,7 +423,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
@@ -516,129 +442,32 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  createRole(role: Partial<Role>): Promise<Role> {
-    return http.POST('/api/roles', role);
-  }
-
-  updateRole(role: Partial<Role>): Promise<Role> {
-    return http.PUT(`/api/roles/${role.id}`, role);
-  }
-
-  deleteRole(roleId: string): Promise<Role> {
-    return http.DELETE(`/api/roles/${roleId}`);
-  }
-
-  listRoles(spaceId: string): Promise<ListSpaceRolesResponse[]> {
-    return http.GET('/api/roles', { spaceId });
-  }
-
-  assignRole(data: { spaceId: string; roleId: string; userId: string }): Promise<Role[]> {
-    return http.POST('/api/roles/assignment', data);
-  }
-
-  unassignRole(data: { spaceId: string; roleId: string; userId: string }): Promise<Role[]> {
-    return http.DELETE('/api/roles/assignment', data);
-  }
-
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  computeUserPagePermissions(request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
-    return http.GET('/api/permissions/query', request);
-  }
-
-  listPagePermissions(pageId: string): Promise<IPagePermissionWithAssignee[]> {
+  listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }
 
-  createPermission(permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
+  createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
   }
 
-  deletePermission(permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions', { permissionId });
+  deletePermission(query: PermissionResource): Promise<boolean> {
+    return http.DELETE('/api/permissions', query);
   }
 
-  restrictPagePermissions({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
+  restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  addSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/add`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  removeSpacePermissions({
-    forSpaceId,
-    operations,
-    roleId,
-    spaceId,
-    userId
-  }: SpacePermissionModification): Promise<SpacePermissionFlags> {
-    return http.POST<SpacePermissionFlags>(`/api/permissions/space/${forSpaceId}/remove`, {
-      operations,
-      roleId,
-      spaceId,
-      userId
-    } as Omit<SpacePermissionModification, 'forSpaceId'>);
-  }
-
-  queryGroupSpacePermissions({ group, id, resourceId }: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${resourceId}/query`, {
-      group,
-      id
-    });
-  }
-
-  computeUserSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
-    return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
-  }
-
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
-    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPagePermission({
-    spaceId,
-    pagePermissionLevel
-  }: {
-    spaceId: string;
-    pagePermissionLevel: PagePermissionLevel | null;
-  }) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-page-permissions`, {
-      pagePermissionLevel
-    });
-  }
-
-  setSpacePermissionMode({ permissionConfigurationMode, spaceId }: SpacePermissionConfigurationUpdate) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-permissions-mode`, { permissionConfigurationMode });
-  }
-
-  setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
-      defaultPublicPages
-    });
-  }
-
-  completeOnboarding({ spaceId }: { spaceId: string }) {
-    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
+  }
+
+  createProposalSource({ pageId }: { pageId: string }) {
+    return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
+  }
+
+  updateProposalSource({ pageId }: { pageId: string }) {
+    return http.PUT<void>(`/api/pages/${pageId}/proposal-source`);
   }
 
   getBuildId() {
@@ -647,6 +476,14 @@ class CharmClient {
 
   getAggregatedData(userId: string) {
     return http.GET<AggregatedProfileData>(`/api/public/profile/${userId}/aggregate`);
+  }
+
+  getApiPageKeys({ pageId }: { pageId: string }) {
+    return http.GET<ApiPageKey[]>(`/api/api-page-key?pageId=${pageId}`);
+  }
+
+  createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
+    return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
 }
 

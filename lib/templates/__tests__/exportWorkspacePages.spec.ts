@@ -2,25 +2,30 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 
-import { createBounty } from 'lib/bounties';
-import type { IPageWithPermissions } from 'lib/pages';
-import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createPage,
+  generateBounty,
+  generateBoard,
+  generateProposal,
+  generateUserAndSpace
+} from 'testing/setupDatabase';
 
-import { exportWorkspacePages } from '../exportWorkspacePages';
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 
 jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
-let root_1: IPageWithPermissions;
-let page_1_1: IPageWithPermissions;
-let page_1_1_1: IPageWithPermissions;
+let root_1: PageWithPermissions;
+let page_1_1: PageWithPermissions;
+let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   space = generated.space;
   user = generated.user;
 
@@ -57,7 +62,7 @@ beforeAll(async () => {
 
 describe('exportWorkspacePages', () => {
   it('should export the pages within a workspace to a list of root pages, and their children as a recursive tree structure', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.id
     });
 
@@ -79,7 +84,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should support a space domain for the source space', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain
     });
 
@@ -102,7 +107,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should save the block data for boards and cards inside their respective pages', async () => {
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.id
     });
 
@@ -120,7 +125,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should ignore deleted pages', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpace();
 
     await createPage({
       parentId: null,
@@ -139,7 +144,7 @@ describe('exportWorkspacePages', () => {
       spaceId: spaceWithDeletedPage.id
     });
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
@@ -147,34 +152,32 @@ describe('exportWorkspacePages', () => {
     expect(data.pages[0].id).toBe(returnedPage.id);
   });
 
-  it('should ignore bounties', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+  it('should not ignore bounties', async () => {
+    const { space: _space, user: _user } = await generateUserAndSpace();
 
-    await createBounty({
+    const bounty = await generateBounty({
       createdBy: _user.id,
-      spaceId: spaceWithDeletedPage.id
+      spaceId: _space.id
     });
 
-    const returnedPage = await createPage({
-      parentId: null,
-      title: 'Root 1',
-      index: 1,
-      createdBy: _user.id,
-      spaceId: spaceWithDeletedPage.id
-    });
-
-    const { data } = await exportWorkspacePages({
-      sourceSpaceIdOrDomain: spaceWithDeletedPage.id
+    const data = await exportWorkspacePages({
+      sourceSpaceIdOrDomain: _space.id
     });
 
     expect(data.pages.length).toBe(1);
-    expect(data.pages[0].id).toBe(returnedPage.id);
+    const page = data.pages[0];
+
+    expect(page).toMatchObject(
+      expect.objectContaining({
+        id: bounty.id
+      })
+    );
   });
 
-  it('should ignore proposals', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+  it('should not ignore proposals', async () => {
+    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpace();
 
-    await generateProposal({
+    const generatedProposal = await generateProposal({
       authors: [_user.id],
       spaceId: spaceWithDeletedPage.id,
       proposalStatus: 'discussion',
@@ -190,18 +193,20 @@ describe('exportWorkspacePages', () => {
       spaceId: spaceWithDeletedPage.id
     });
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: spaceWithDeletedPage.id
     });
 
-    expect(data.pages.length).toBe(1);
-    expect(data.pages[0].id).toBe(returnedPage.id);
+    const pageIds = [generatedProposal.id, returnedPage.id];
+    expect(data.pages.length).toBe(2);
+    expect(pageIds.includes(data.pages[0].id)).toBeTruthy();
+    expect(pageIds.includes(data.pages[1].id)).toBeTruthy();
   });
 
   it('should write the export to the given filename if provided', async () => {
     const exportName = 'test-export';
 
-    const { data, path: exportedPath } = await exportWorkspacePages({
+    const { data, path: exportedPath } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.id,
       exportName
     });

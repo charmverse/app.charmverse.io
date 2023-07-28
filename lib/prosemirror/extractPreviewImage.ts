@@ -13,6 +13,7 @@ function extractImageURL(item: BlockNode) {
       return item.attrs.src;
     }
   }
+  return '';
 }
 
 export function extractPreviewImage(content: PageContent) {

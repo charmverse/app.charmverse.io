@@ -1,18 +1,20 @@
-import type { NodeViewProps } from '@bangle.dev/core';
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { usePages } from 'hooks/usePages';
+import { usePage } from 'hooks/usePage';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import debouncePromise from 'lib/utilities/debouncePromise';
+
+import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -48,11 +50,8 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   // remove extra padding on Table view
   .Table {
     margin-top: 0;
-
-    // Hide calculations footer
-    .CalculationRow {
-      display: none;
-    }
+    width: fit-content;
+    min-width: 100%;
   }
 
   // remove extra padding on Kanban view
@@ -81,41 +80,37 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
   }
 `;
 
-interface DatabaseViewProps extends NodeViewProps {
+interface DatabaseViewProps extends CharmNodeViewProps {
   containerWidth?: number; // pass in the container width so we can extend full width
-  readOnly?: boolean;
 }
 
-interface DatabaseView {
-  // Not using linkedPageId as the source could be other things
-  // source field would be used to figure out what type of source it actually is
-  pageId: string;
-  source: 'board_page';
-}
-
-export default function DatabaseView({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
+export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
 
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
+
+  useEffect(() => {
+    if (!currentViewId && views.length > 0) {
+      setCurrentViewId(views[0].id);
+    }
+  }, [views?.length]);
+
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
-  const { pages, updatePage, getPagePermissions } = usePages();
+  const { page: boardPage, updatePage } = usePage({ pageIdOrPath: pageId });
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find((b) => b.id === pageId);
 
-  // TODO: Handle for other sources in future like workspace users
-  const currentPagePermissions = getPagePermissions(pageId || '');
+  const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
-  const debouncedPageUpdate = useCallback(() => {
+  const debouncedPageUpdate = useMemo(() => {
     return debouncePromise(async (updates: Partial<Page>) => {
-      const updatedPage = await updatePage({ id: pageId, ...updates });
-
-      return updatedPage;
+      await updatePage({ id: pageId, ...updates });
     }, 500);
   }, [updatePage]);
 
@@ -124,7 +119,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   }
 
   const readOnly =
-    typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+    typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
   const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   const deleteView = useCallback(
@@ -134,7 +129,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     [setCurrentViewId, views]
   );
 
-  if (!board) {
+  if (!board || !boardPage || boardPage.deletedAt !== null) {
     return null;
   }
 
@@ -155,11 +150,12 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
           readOnly={readOnly}
           readOnlySourceData={readOnlySourceData}
           board={board}
-          embeddedBoardPath={pages[pageId]?.path}
+          embeddedBoardPath={boardPage.path}
           setPage={debouncedPageUpdate}
           showCard={setShownCardId}
           activeView={currentView}
           views={views}
+          page={boardPage}
           // Show more tabs on shared inline database as the space gets increased
           maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
         />

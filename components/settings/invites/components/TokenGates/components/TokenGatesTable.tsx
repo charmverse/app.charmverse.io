@@ -1,4 +1,7 @@
+import { log } from '@charmverse/core/log';
+import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -8,9 +11,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { TokenGate } from '@prisma/client';
-import { humanizeAccessControlConditions } from 'lit-js-sdk';
-import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
@@ -21,11 +21,12 @@ import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import log from 'lib/log';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
 import TestConnectionModal from './TestConnectionModal';
@@ -63,13 +64,13 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
-  const space = useCurrentSpace();
-  const router = useRouter();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
+  const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
 
   function onCopy() {
@@ -107,7 +108,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           })
         )
       );
-      setDescriptions(results);
+      setDescriptions(results.filter(isTruthy));
     }
     main();
   }, [tokenGates]);
@@ -126,7 +127,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
         ...(tokenGate.conditions as any)
       });
 
-      await charmClient.verifyTokenGate({
+      await charmClient.tokenGates.verifyTokenGate({
         commit: false,
         spaceId: space?.id as string,
         tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }]
@@ -152,6 +153,21 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
 
   const padding = 32;
 
+  const copyLink =
+    sortedTokenGates.length === 0 ? (
+      <Tooltip title='Add a token gate to use this link'>
+        <span>
+          <CopyLinkButton />
+        </span>
+      </Tooltip>
+    ) : (
+      <CopyToClipboard text={shareLink} onCopy={onCopy}>
+        <span>
+          <CopyLinkButton clickable />
+        </span>
+      </CopyToClipboard>
+    );
+
   return (
     <>
       <Box overflow='auto'>
@@ -159,25 +175,14 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           <TableHead>
             <StyledTableRow>
               <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant='body1' fontWeight='600'>
+                <Typography variant='body1' fontWeight='600' mr={6} display='inline-flex'>
                   Token Gated Link
                 </Typography>
+                {isMobile && copyLink}
               </TableCell>
               <TableCell sx={{ width: 150 }}></TableCell>
               <TableCell sx={{ width: 90 + padding }} align='center'>
-                {sortedTokenGates.length === 0 ? (
-                  <Tooltip title='Add a token gate to use this link'>
-                    <span>
-                      <CopyLinkButton />
-                    </span>
-                  </Tooltip>
-                ) : (
-                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                    <span>
-                      <CopyLinkButton clickable />
-                    </span>
-                  </CopyToClipboard>
-                )}
+                {!isMobile && copyLink}
               </TableCell>
               <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
             </StyledTableRow>
@@ -199,11 +204,6 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                   >
                     {descriptions[tokenGateIndex]}
                   </Typography>
-                  {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='caption' sx={{ mt: 1 }}>
-                      -- OR --
-                    </Typography>
-                  )}
                 </TableCell>
                 <TableCell>
                   <TokenGateRolesSelect

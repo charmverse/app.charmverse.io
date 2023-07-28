@@ -1,14 +1,13 @@
-import type { BountyStatus } from '@prisma/client';
+import type { BountyStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { apiHandler } from 'lib/public-api/handler';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).get(getBounties);
+handler.get(getBounties);
 
 /**
  * @swagger
@@ -86,9 +85,10 @@ export interface PublicApiBounty {
     address: string;
   };
   reward: {
-    amount: number;
-    chain: number;
-    token: string;
+    amount: number | null;
+    chain: number | null;
+    token: string | null;
+    custom: string | null;
   };
   status: BountyStatus;
   title: string;
@@ -115,6 +115,8 @@ interface BountyVC {
  *   get:
  *     summary: Retrieve a list of bounties
  *     description: Retrieve bounties from your workspace.
+ *     tags:
+ *      - 'Space API'
  *     parameters:
  *      - in: query
  *        name: status
@@ -189,7 +191,6 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   for (const bounty of bounties) {
     try {
       const markdownText = await generateMarkdown({
-        title: bounty.page?.title ?? 'Untitled',
         content: bounty.page?.content ?? { type: 'doc', content: [] }
       });
       markdown.push(markdownText);
@@ -213,7 +214,8 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       reward: {
         amount: bounty.rewardAmount,
         chain: bounty.chainId,
-        token: bounty.rewardToken
+        token: bounty.rewardToken,
+        custom: bounty.customReward
       },
       title: bounty.page?.title ?? 'Untitled',
       status: bounty.status,

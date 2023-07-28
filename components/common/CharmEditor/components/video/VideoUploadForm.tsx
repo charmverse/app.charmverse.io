@@ -1,14 +1,14 @@
 // upload form src by mux: https://github.com/vercel/next.js/blob/canary/examples/with-mux-video/components/upload-form.js
 
+import { log } from '@charmverse/core/log';
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import log from 'lib/log';
 
 type Props = {
   onComplete: (upload: { assetId: string; playbackId: string }) => void;
@@ -21,7 +21,7 @@ export function VideoUploadForm(props: Props) {
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   // poll endpoint until video is ready
   const { data: upload, error } = useSwr(

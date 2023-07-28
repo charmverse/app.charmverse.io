@@ -1,21 +1,3 @@
-import type { SupportedChainId } from './provider/alchemy';
-
-export interface NftData {
-  id: string;
-  tokenId: string;
-  tokenIdInt: number | null;
-  contract: string;
-  title: string;
-  description: string;
-  chainId: SupportedChainId;
-  image: string;
-  imageRaw: string;
-  imageThumb?: string;
-  timeLastUpdated: string;
-  isHidden: boolean;
-  isPinned: boolean;
-}
-
 export interface ExtendedPoap {
   id: string;
   imageURL: string;
@@ -24,6 +6,7 @@ export interface ExtendedPoap {
   tokenId: string;
   created: string;
   name: string;
+  walletId: string | null;
 }
 
 /**
@@ -44,4 +27,5 @@ export interface Collectable {
   type: 'poap' | 'nft';
   link: string;
   isHidden: boolean;
+  walletId: string | null;
 }

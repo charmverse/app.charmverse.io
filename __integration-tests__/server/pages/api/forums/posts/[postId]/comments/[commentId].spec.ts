@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Space, User } from '@prisma/client';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
@@ -50,7 +50,8 @@ beforeAll(async () => {
     spaceId: space.id,
     title: 'Test Post',
     createdBy: user.id,
-    categoryId: postCategory.id
+    categoryId: postCategory.id,
+    isDraft: false
   };
 
   extraSpaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
@@ -105,7 +106,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', userCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(200);
   });
 
@@ -117,7 +118,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', adminUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(200);
   });
 
@@ -129,7 +130,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', extraSpaceUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(401);
   });
 
@@ -141,7 +142,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', nonSpaceUserCookie)
-      .send(updateInput)
+      .query(updateInput)
       .expect(401);
   });
 });

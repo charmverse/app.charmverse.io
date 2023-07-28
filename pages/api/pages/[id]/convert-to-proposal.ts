@@ -1,22 +1,32 @@
+import type { PageMeta } from '@charmverse/core/pages';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
+import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(convertToProposal);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .use(requireKeys(['categoryId'], 'body'))
+  .post(convertToProposal);
 
-async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -30,7 +40,8 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
       type: true,
       spaceId: true,
       content: true,
-      title: true
+      title: true,
+      contentText: true
     }
   });
 
@@ -38,8 +49,8 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new NotFoundError();
   }
 
-  const permissions = await computeUserPagePermissions({
-    pageId,
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: pageId,
     userId
   });
 
@@ -47,42 +58,39 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<IPage
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const spacePermissions = await computeSpacePermissions({
-    allowAdminBypass: true,
-    resourceId: page.spaceId,
+  const categoryId = req.body.categoryId;
+
+  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
+    resourceId: categoryId,
     userId
   });
 
-  if (!spacePermissions.createVote) {
-    throw new UnauthorisedActionError('You do not have permission to create a page in this space');
+  if (!proposalPermissions.create_proposal) {
+    throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
   }
 
-  const { page: updatedPage } = await createProposal({
-    id: page.id,
-    createdBy: userId,
-    spaceId: page.spaceId,
-    content: page.content ?? undefined,
-    title: page.title
+  const proposalPage = await convertPageToProposal({
+    page,
+    userId,
+    categoryId
   });
 
-  updateTrackPageProfile(updatedPage.id);
+  // Launch this job in the background
+  disconnectProposalChildren({
+    pageId: proposalPage.id
+  });
 
-  const updatedPageData = {
-    id: updatedPage.id,
-    spaceId: updatedPage.spaceId,
-    proposalId: updatedPage.proposalId,
-    type: updatedPage.type
-  };
+  updateTrackPageProfile(proposalPage.id);
 
   relay.broadcast(
     {
-      type: 'pages_meta_updated',
-      payload: [updatedPageData]
+      type: 'pages_created',
+      payload: [proposalPage]
     },
-    page.spaceId
+    proposalPage.spaceId
   );
 
-  return res.status(200);
+  return res.status(200).json(proposalPage);
 }
 
 export default withSessionRoute(handler);

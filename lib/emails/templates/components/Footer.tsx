@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { greyColor2 } from 'theme/colors';
 
 export default function Footer() {
-  const unsubscribeLink = `${process.env.DOMAIN}/nexus`;
+  const unsubscribeLink = `${process.env.DOMAIN}/?account=true`;
 
   return (
     <>

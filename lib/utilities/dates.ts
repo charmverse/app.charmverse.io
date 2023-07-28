@@ -1,4 +1,4 @@
-import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
+import type { DateTimeUnit as LuxonTimeUnit, DurationLikeObject } from 'luxon';
 import { Duration, DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
@@ -8,6 +8,7 @@ export type DateTimeFormat = 'relative' | 'absolute';
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 export type DateFormatConfig = {
+  month?: Intl.DateTimeFormatOptions['month'];
   withYear?: boolean;
 };
 
@@ -21,6 +22,10 @@ const SystemToLuxonUnitMapping: { [key in TimeUnit]: LuxonTimeUnit } = {
   month: 'month',
   year: 'year'
 };
+
+export function timeAgo(duration: DurationLikeObject): Date {
+  return DateTime.local().minus(Duration.fromObject(duration)).toJSDate();
+}
 
 export function convertToLuxonDate(date: DateInput): DateTime {
   if (date instanceof DateTime) {
@@ -162,7 +167,11 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
 
   return getFormattedDateTime(
     dateInput,
-    { day: 'numeric', month: 'short', year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined },
+    {
+      day: 'numeric',
+      month: config?.month ?? 'short',
+      year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined
+    },
     locale
   );
 }

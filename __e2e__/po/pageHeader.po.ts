@@ -13,11 +13,19 @@ export class PageHeader {
 
   readonly deleteCurrentPage: Locator;
 
+  readonly convertProposalAction: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.pageTopLevelMenu = this.page.locator('data-test=header--show-page-actions');
     this.forumPostActions = this.page.locator('data-test=header--forum-post-actions');
     this.pageActionsMenu = this.page.locator('data-test=header--page-actions');
     this.deleteCurrentPage = this.page.locator('data-test=header--delete-current-page');
+    this.convertProposalAction = this.page.locator('data-test=convert-proposal-action');
+  }
+
+  async convertToProposal() {
+    await this.pageTopLevelMenu.click();
+    await this.convertProposalAction.click();
   }
 }

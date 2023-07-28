@@ -1,21 +1,21 @@
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { Page } from '@prisma/client';
 import { memo } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
+import { PageHeaderIcon } from './PageHeaderIcon';
 import { PageTitleInput } from './PageTitleInput';
 
 const PageControlItem = styled(ListItemButton)`
@@ -83,7 +83,7 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
 
   return (
     <>
-      <EditorHeader>
+      <EditorHeader className='font-family-default'>
         {icon && (
           <MenuWrapper>
             <EmojiIcon size='large' icon={icon} />
@@ -102,8 +102,8 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
                     }}
                   />
                   <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
-                    <EmojiPicker
-                      onSelect={(emoji) => {
+                    <PageHeaderIcon
+                      updatePageIcon={(emoji) => {
                         updatePageIcon(emoji);
                       }}
                     />

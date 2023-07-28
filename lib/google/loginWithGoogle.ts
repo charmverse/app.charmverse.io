@@ -1,36 +1,56 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type LoginWithGoogleRequest = {
   accessToken: string;
-  displayName: string;
-  avatarUrl: string;
+  displayName?: string;
+  avatarUrl?: string;
   signupAnalytics?: Partial<SignupAnalytics>;
+  oauthParams?: GoogleLoginOauthParams;
 };
 export async function loginWithGoogle({
   accessToken,
-  displayName,
-  avatarUrl,
-  signupAnalytics = {}
+  displayName: providedDisplayName,
+  avatarUrl: providedAvatarUrl,
+  signupAnalytics = {},
+  oauthParams
 }: LoginWithGoogleRequest): Promise<LoggedInUser> {
   try {
-    const verified = await verifyGoogleToken(accessToken);
+    const verified = await verifyGoogleToken(accessToken, oauthParams);
 
     const email = verified.email;
+    const displayName = providedDisplayName || verified.name || '';
+    const avatarUrl = providedAvatarUrl || verified.picture || '';
 
     if (!email) {
       throw new InvalidInputError(`Email required to complete signup`);
     }
 
     const googleAccount = await prisma.googleAccount.findUnique({
+      where: {
+        email
+      },
+      include: {
+        user: {
+          select: {
+            deletedAt: true
+          }
+        }
+      }
+    });
+
+    const emailAccount = await prisma.verifiedEmail.findUnique({
       where: {
         email
       },
@@ -67,6 +87,26 @@ export async function loginWithGoogle({
       }
     }
 
+    if (emailAccount && !emailAccount.user.deletedAt) {
+      if (emailAccount.name !== displayName || emailAccount.avatarUrl !== avatarUrl) {
+        trackUserAction('sign_in', { userId: emailAccount.userId, identityType: 'Google' });
+
+        await prisma.verifiedEmail.update({
+          where: {
+            id: emailAccount.id
+          },
+          data: {
+            avatarUrl,
+            name: displayName
+          }
+        });
+
+        return updateUserProfile(emailAccount.userId, { identityType: 'Google', username: displayName });
+      } else {
+        return getUserProfile('id', emailAccount.userId);
+      }
+    }
+
     const createdGoogleAccount = await prisma.googleAccount.create({
       data: {
         name: displayName,
@@ -76,7 +116,8 @@ export async function loginWithGoogle({
           create: {
             identityType: 'Google',
             username: displayName,
-            avatar: avatarUrl
+            avatar: avatarUrl,
+            path: uid()
           }
         }
       }

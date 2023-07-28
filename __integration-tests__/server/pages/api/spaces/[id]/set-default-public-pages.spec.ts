@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
@@ -33,25 +33,6 @@ describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly crea
 
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-default-public-pages`)
-      .set('Cookie', userCookie)
-      .send({
-        defaultPublicPage: true
-      })
-      .expect(401);
-  });
-
-  it('should fail if the user is admin, but the space permission mode is not "custom", and respond 401', async () => {
-    const { space: extraSpace, user: extraAdminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-
-    await updateSpacePermissionConfigurationMode({
-      spaceId: extraSpace.id,
-      permissionConfigurationMode: 'collaborative'
-    });
-
-    const userCookie = await loginUser(extraAdminUser.id);
-
-    await request(baseUrl)
-      .post(`/api/spaces/${extraSpace.id}/set-default-public-pages`)
       .set('Cookie', userCookie)
       .send({
         defaultPublicPage: true

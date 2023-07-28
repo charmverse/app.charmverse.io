@@ -1,39 +1,40 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { apiHandler } from 'lib/public-api/handler';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
 
-handler.use(requireApiKey).post(createFormResponse);
+handler.post(createFormResponse);
 
-/**
- * @swagger
- * /databases/{databaseId}/form:
- *   post:
- *     summary: Create a new form response in the database.
- *     description: Create a new form response with array of questions and answers.
- *     requestBody:
- *       content:
- *          application/json:
- *             schema:
- *               oneOf:
- *                  - type: object
- *                    properties:
- *                       all_responses:
- *                          type: string
- *                  - type: string
- *     responses:
- *       200:
- *         description: Summary of the database
- *         content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Page'
- */
+// Unused endpoint, keeping it here for reference but removing from docs
+// /**
+//  * @swagger
+//  * /databases/{databaseId}/form:
+//  *   post:
+//  *     summary: Create a new form response in the database.
+//  *     description: Create a new form response with array of questions and answers.
+//  *     requestBody:
+//  *       content:
+//  *          application/json:
+//  *             schema:
+//  *               oneOf:
+//  *                  - type: object
+//  *                    properties:
+//  *                       all_responses:
+//  *                          type: string
+//  *                  - type: string
+//  *     responses:
+//  *       200:
+//  *         description: Summary of the database
+//  *         content:
+//  *            application/json:
+//  *              schema:
+//  *                $ref: '#/components/schemas/Page'
+//  */
 export async function createFormResponse(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const spaceId = req.authorizedSpaceId;
@@ -45,6 +46,11 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     databaseIdorPath: id as string,
     data: body,
     userId: req.botUser.id
+  });
+
+  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+    event: 'created',
+    pageId: card.id
   });
 
   return res.status(201).json(card);

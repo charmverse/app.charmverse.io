@@ -1,12 +1,12 @@
-import type { Space } from '@prisma/client';
+import type { PublicBountyToggle } from '@charmverse/core/permissions';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
-import { togglePublicBounties } from 'lib/spaces/togglePublicBounties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,6 +16,13 @@ handler
     requireSpaceMembership({
       adminOnly: true,
       spaceIdKey: 'id'
+    })
+  )
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'space'
     })
   )
   .post(setPublicBountyBoardController);
@@ -34,7 +41,7 @@ async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiR
     }
   });
 
-  const updatedSpace = await togglePublicBounties({
+  const updatedSpace = await req.premiumPermissionsClient.spaces.togglePublicBounties({
     publicBountyBoard,
     spaceId: spaceId as string
   });

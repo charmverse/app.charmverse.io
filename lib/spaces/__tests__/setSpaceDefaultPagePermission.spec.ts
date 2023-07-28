@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { SpaceNotFoundError } from 'lib/public-api';

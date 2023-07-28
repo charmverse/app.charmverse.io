@@ -1,6 +1,7 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
+import type { PageType } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -12,9 +13,8 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import type { PageType, SpaceOperation } from '@prisma/client';
-import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
@@ -46,8 +46,8 @@ function createTableCell(state: EditorState, text: string) {
 }
 
 function createTableHeader(state: EditorState, text: string) {
-  return state.schema.nodes.table_cell.create(
-    { header: true },
+  return state.schema.nodes.table_header.create(
+    undefined,
     Fragment.fromArray([state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([state.schema.text(text)]))])
   );
 }
@@ -71,7 +71,6 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           {
             uid: 'insert-page',
             title: 'Insert page',
-            requiredSpacePermission: 'createPage' as SpaceOperation,
             keywords: ['page', 'nested'],
             icon: (
               <DescriptionOutlinedIcon
@@ -166,6 +165,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           </svg>
         ),
         title: `Heading ${level}`,
+        keywords: [`h${level}`],
         description: `Create a heading level ${level}`,
         showInFloatingMenu: true,
         disabled: (state) => {
@@ -246,6 +246,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
+
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
@@ -386,7 +387,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           }}
         />
       ),
-      description: 'Link to a new page',
+      description: 'Link to an existing page',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (async (state, dispatch, view) => {
           if (nestedPagePluginKey) {
@@ -472,6 +473,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
   ];
 
   const allowedDynamicOtherItems = paletteItems.filter((paletteItem) => {
+    // Currently we don't consume this anymore. Leaving it here for future use.
     return (
       !paletteItem.requiredSpacePermission ||
       (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission])

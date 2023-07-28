@@ -3,32 +3,25 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import type { SelectProps } from '@mui/material/Select';
 import Select from '@mui/material/Select';
-import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
-export interface Props extends Omit<SelectProps, 'onChange'> {
-  onChange?: (option: string) => void;
-  defaultValue?: string;
+export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValue'> & {
+  onChange?: (option: T) => void;
+  renderValue?: (option: T) => ReactNode;
+  defaultValue?: T;
   title?: string;
-  keyAndLabel: Record<string | any, string | number>;
-}
+  keyAndLabel: Partial<Record<Exclude<T, ''>, string>>;
+};
 
-export default function InputEnumToOptions({
+export default function InputEnumToOptions<T extends string>({
   onChange = () => {},
   defaultValue,
   title,
   keyAndLabel,
   sx,
   ...props
-}: Props) {
-  const options = Object.entries(keyAndLabel);
-
-  const [value, setValue] = useState<string | null>('');
-
-  useEffect(() => {
-    if (defaultValue && !value) {
-      setValue(defaultValue);
-    }
-  }, [defaultValue]);
+}: Props<T>) {
+  const options = Object.entries(keyAndLabel) as [T, string][];
 
   return (
     <FormControl fullWidth>
@@ -36,16 +29,16 @@ export default function InputEnumToOptions({
 
       <Select
         sx={sx}
-        value={value}
+        value={defaultValue as any}
         onChange={(ev) => {
-          setValue(ev.target.value as string);
-          if (ev.target.value) {
-            onChange(ev.target.value as string);
-          }
+          onChange(ev.target.value as T);
         }}
         {...props}
       >
         {options.map((option) => {
+          if (option[0] === '') {
+            return null;
+          }
           return (
             <MenuItem value={option[0]} key={option[0]}>
               {option[1]}
@@ -57,7 +50,7 @@ export default function InputEnumToOptions({
   );
 }
 
-export function SmallSelect({ sx = {}, ...props }: Props) {
+export function SmallSelect<T extends string>({ sx = {}, ...props }: Props<T>) {
   return (
     <InputEnumToOptions
       {...props}
@@ -65,8 +58,8 @@ export function SmallSelect({ sx = {}, ...props }: Props) {
         ...sx,
         background: 'transparent',
         fontSize: '.8em',
-        borderColor: 'transparent',
-        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' }
+        borderColor: 'transparent !important',
+        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent !important' }
       }}
     />
   );

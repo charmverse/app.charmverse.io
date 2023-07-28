@@ -1,6 +1,6 @@
-import type { MemberProperty, Space } from '@prisma/client';
+import type { MemberProperty, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -25,7 +25,7 @@ beforeAll(async () => {
   // User with 2 spaces, 1 common with user 1
   const { user: u2 } = await generateUserAndSpaceWithApiToken(undefined, true);
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
-  await generateSpaceForUser(user2);
+  await generateSpaceForUser({ user: user2 });
 
   // Create name property manually as generateMemberProperty don't allow creating default properties
   property1 = await prisma.memberProperty.create({

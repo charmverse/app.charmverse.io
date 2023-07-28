@@ -1,6 +1,9 @@
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import { VoteType } from '@charmverse/core/prisma';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
+  Box,
   FormControlLabel,
   IconButton,
   ListItem,
@@ -9,23 +12,22 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography,
-  Box
+  Typography
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
-import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useUser } from 'hooks/useUser';
+import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { emptyDocument } from 'lib/prosemirror/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 interface InlineVoteOptionsProps {
@@ -96,24 +98,34 @@ interface CreateVoteModalProps {
   onCreateVote?: (vote: ExtendedVote) => void;
   onPublishToSnapshot?: () => void;
   open?: boolean;
+  pageId?: string;
+  postId?: string;
+  snapshotProposalId: string | null;
   proposal?: ProposalWithUsers;
+  proposalFlowFlags?: ProposalFlowPermissionFlags;
 }
 
-export default function CreateVoteModal({
+export function CreateVoteModal({
   open = true,
   onClose = () => null,
   onCreateVote = () => null,
   onPublishToSnapshot = () => null,
-  proposal
+  pageId,
+  postId,
+  snapshotProposalId,
+  proposal,
+  proposalFlowFlags
 }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
-  const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
   const [voteType, setVoteType] = useState<VoteType>(VoteType.Approval);
   const [options, setOptions] = useState<{ name: string }[]>([]);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const { user } = useUser();
-  const { createVote } = useVotes();
+  const { createVote } = useVotes({ pageId, postId });
+  const [voteContent, setVoteContent] = useState<{ content: PageContent; contentText: string }>({
+    content: emptyDocument,
+    contentText: ''
+  });
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -144,16 +156,16 @@ export default function CreateVoteModal({
   }, [voteType]);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
-  const { currentPageId } = useCurrentPage();
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
     e.preventDefault();
     const vote = await createVote({
       deadline: deadline.toJSDate(),
       voteOptions: options.map((option) => option.name),
       title: voteTitle,
-      description: voteDescription,
-      pageId: cardId ?? currentPageId,
+      content: voteContent.content,
+      contentText: voteContent.contentText,
+      pageId,
+      postId,
       threshold: +passThreshold,
       type: voteType,
       context: proposal ? 'proposal' : 'inline'
@@ -169,8 +181,6 @@ export default function CreateVoteModal({
     (!proposal && voteTitle.length === 0) ||
     (voteType === VoteType.SingleChoice && options.findIndex((option) => option.name.length === 0) !== -1) ||
     new Set(options.map((option) => option.name)).size !== options.length;
-
-  const isProposalAuthor = proposal?.authors.find((author) => author.userId === user?.id) ?? false;
 
   return (
     <Modal
@@ -196,20 +206,34 @@ export default function CreateVoteModal({
 
         {!proposal && (
           <Box flexDirection='column' display='flex'>
-            <TextField
-              placeholder='Details (Optional)'
-              multiline
-              rows={3}
-              value={voteDescription}
-              onChange={(e) => {
-                setVoteDescription(e.target.value);
+            <CharmEditor
+              disablePageSpecificFeatures
+              disableRowHandles
+              style={{
+                left: 0,
+                minHeight: 75,
+                backgroundColor: 'var(--input-bg)'
+              }}
+              disableMention
+              isPollOrVote
+              colorMode='dark'
+              placeholderText='Details (Optional)'
+              content={voteContent.content as PageContent}
+              enableVoting={false}
+              disableNestedPages
+              isContentControlled
+              onContentChange={(content) => {
+                setVoteContent({
+                  content: content.doc,
+                  contentText: content.rawText
+                });
               }}
             />
           </Box>
         )}
         <Box display='flex' gap={1}>
           <Box flexDirection='column' display='flex' flexGrow={1}>
-            <FieldLabel>Deadline</FieldLabel>
+            <FieldLabel>End date</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <DateTimePicker
               minDate={DateTime.fromMillis(Date.now())}
@@ -289,17 +313,24 @@ export default function CreateVoteModal({
           {proposal?.status === 'reviewed' && (
             <>
               or
-              <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+              <Tooltip
+                title={
+                  !proposalFlowFlags?.vote_active
+                    ? 'Only proposal authors and space admins can publish this proposal to snapshot'
+                    : ''
+                }
+              >
                 <div>
                   <PublishToSnapshot
                     renderContent={({ label, onClick, icon }) => (
-                      <Button disabled={!isProposalAuthor} onClick={onClick}>
+                      <Button disabled={!proposalFlowFlags?.vote_active} onClick={onClick}>
                         {icon}
                         <Typography>{label}</Typography>
                       </Button>
                     )}
                     onPublish={onPublishToSnapshot}
                     pageId={proposal.id}
+                    snapshotProposalId={snapshotProposalId}
                   />
                 </div>
               </Tooltip>

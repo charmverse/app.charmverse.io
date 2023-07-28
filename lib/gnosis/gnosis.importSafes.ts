@@ -1,3 +1,4 @@
+import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import type { Signer } from 'ethers';
 
 import charmClient from 'charmClient';
@@ -7,10 +8,10 @@ import { getSafesForAddresses } from './gnosis';
 interface ImportSafeProps {
   signer: Signer;
   addresses: string[];
-  getWalletName?: (address: string) => string | null | undefined;
+  getWalletDetails?: (address: string) => UserGnosisSafe | null | undefined;
 }
 
-export async function importSafesFromWallet({ signer, addresses, getWalletName }: ImportSafeProps) {
+export async function importSafesFromWallet({ signer, addresses, getWalletDetails }: ImportSafeProps) {
   const safes = await getSafesForAddresses(signer, addresses);
 
   const safesData = safes.map((safe) => ({
@@ -18,7 +19,11 @@ export async function importSafesFromWallet({ signer, addresses, getWalletName }
     owners: safe.owners,
     threshold: safe.threshold,
     chainId: safe.chainId,
-    name: getWalletName?.(safe.address) // get existing name if user gave us one
+    name: getWalletDetails?.(safe.address)?.name ?? null, // get existing name if user gave us one
+    isHidden: getWalletDetails?.(safe.address)?.isHidden ?? false
   }));
+
   await charmClient.setMyGnosisSafes(safesData);
+
+  return safes.length;
 }

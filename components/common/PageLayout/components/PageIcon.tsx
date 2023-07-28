@@ -1,14 +1,17 @@
 import styled from '@emotion/styled';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
 import EmptyPageIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import ArrowOutwardIcon from '@mui/icons-material/NorthEast';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import type { ComponentProps, ReactNode } from 'react';
 
+import type { AllPagesProp } from 'components/common/CharmEditor/components/PageList';
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
 
@@ -55,14 +58,27 @@ function LinkedIcon({ children }: { children: ReactNode }) {
   );
 }
 
-type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
-  icon?: ReactNode;
-  pageType?: Page['type'];
+type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
+  icon?: ReactNode | null;
+  pageType?: AllPagesProp['type'];
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
 };
 
+export function NoAccessPageIcon() {
+  return (
+    <StyledPageIcon
+      icon={
+        <LinkedIcon>
+          <VisibilityOffIcon />
+        </LinkedIcon>
+      }
+    />
+  );
+}
+
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
+  let iconComponent: ReactNode = icon;
   if (!icon) {
     if (pageType === 'linked_board') {
       return (
@@ -76,21 +92,34 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
         />
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
-      icon = <StyledDatabaseIcon />;
-    } else if (pageType === 'proposal') {
-      icon = <ProposalIcon />;
-    } else if (pageType === 'bounty') {
-      icon = <BountyIcon />;
+      iconComponent = <StyledDatabaseIcon />;
+    } else if (pageType === 'proposal' || pageType === 'proposals') {
+      iconComponent = <ProposalIcon />;
+    } else if (pageType === 'bounty' || pageType === 'bounties') {
+      iconComponent = <BountyIcon />;
+    } else if (pageType === 'members') {
+      iconComponent = <AccountCircleIcon />;
+    } else if (pageType === 'forum' || pageType === 'forum_category') {
+      iconComponent = <MessageOutlinedIcon />;
     } else if (isEditorEmpty) {
-      icon = <EmptyPageIcon />;
+      iconComponent = <EmptyPageIcon />;
     } else {
-      icon = <FilledPageIcon />;
+      iconComponent = <FilledPageIcon />;
     }
+  } else if (typeof icon === 'string' && icon.startsWith('http')) {
+    iconComponent = (
+      <img
+        src={icon}
+        style={{
+          objectFit: 'cover'
+        }}
+      />
+    );
   }
 
   return isLinkedPage ? (
-    <StyledPageIcon icon={<LinkedIcon>{icon}</LinkedIcon>} {...props} />
+    <StyledPageIcon icon={<LinkedIcon>{iconComponent}</LinkedIcon>} {...props} />
   ) : (
-    <StyledPageIcon icon={icon} {...props} />
+    <StyledPageIcon icon={iconComponent} {...props} />
   );
 }

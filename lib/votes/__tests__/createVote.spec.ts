@@ -1,6 +1,5 @@
-import { VoteStatus } from '@prisma/client';
+import { VoteStatus } from '@charmverse/core/prisma';
 
-import { addSpaceOperations } from 'lib/permissions/spaces';
 import { DuplicateDataError } from 'lib/utilities/errors';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -15,16 +14,11 @@ describe('createVote', () => {
       spaceId: space.id
     });
 
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
-    });
-
     const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: null,
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
@@ -58,16 +52,11 @@ describe('createVote', () => {
       spaceId: space.id
     });
 
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
-    });
-
     await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: null,
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
@@ -81,7 +70,8 @@ describe('createVote', () => {
       createVoteService({
         createdBy: user.id,
         deadline: new Date(),
-        description: null,
+        content: null,
+        contentText: '',
         pageId: page.id,
         spaceId: space.id,
         threshold: 50,

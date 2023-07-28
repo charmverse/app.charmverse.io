@@ -1,7 +1,7 @@
-import type { User } from '@prisma/client';
+import type { User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -77,5 +77,22 @@ describe('updateUserProfile', () => {
     expect(updatedUser.username).toBe(googleAccount.name);
     expect(updatedUser.identityType).toBe('Google');
     expect(updatedUser.avatar).toBe(googleAccount.avatarUrl);
+  });
+
+  it('should update the user email preferences', async () => {
+    const { user } = await generateUserAndSpaceWithApiToken();
+
+    const update: Partial<User> = {
+      email: 'user@charmverse.io',
+      emailNewsletter: true,
+      emailNotifications: false
+    };
+
+    const updatedUser = await updateUserProfile(user.id, update);
+
+    // Preserved values
+    expect(updatedUser.email).toBe(update.email);
+    expect(updatedUser.emailNewsletter).toBe(update.emailNewsletter);
+    expect(updatedUser.emailNotifications).toBe(update.emailNotifications);
   });
 });

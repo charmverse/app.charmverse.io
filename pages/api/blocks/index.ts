@@ -1,20 +1,29 @@
-import type { Block, Prisma } from '@prisma/client';
+import { copyAllPagePermissions } from '@charmverse/core/permissions';
+import type { Block, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { validate } from 'uuid';
 
-import { prisma } from 'db';
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardViewFields, GoogleFormSourceData } from 'lib/focalboard/boardView';
-import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
-import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import {
+  ActionNotPermittedError,
+  InvalidStateError,
+  NotFoundError,
+  onError,
+  onNoMatch,
+  requireUser
+} from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -22,7 +31,7 @@ export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks);
+handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks).delete(deleteBlocks);
 
 async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const referer = req.headers.referer as string;
@@ -31,7 +40,10 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
-  const spaceDomain = pathnameParts[1];
+  const domain = getValidSubdomain(req.headers.host) || pathnameParts[1];
+  const customDomain = getValidCustomDomain(req.headers.host);
+  const spaceDomain = customDomain || domain;
+
   if (!spaceDomain) {
     throw new InvalidStateError('invalid referrer url');
   }
@@ -41,10 +53,11 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     if (!pageId) {
       throw new InvalidStateError('invalid referrer url');
     }
-    const pageIdIsUUID = validate(pageId);
-    const page = pageIdIsUUID
-      ? await prisma.page.findUnique({ where: { id: pageId } })
-      : await prisma.page.findFirst({ where: { spaceId: req.query.spaceId as string, path: pageId } });
+    const searchQuery = generatePageQuery({
+      pageIdOrPath: pageId,
+      spaceIdOrDomain: req.query.spaceId as string
+    });
+    const page = await prisma.page.findFirst({ where: searchQuery });
     if (!page) {
       throw new NotFoundError('page not found');
     }
@@ -54,12 +67,9 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     let spaceId = req.query.spaceId as string | undefined;
 
     // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
+    // WARNING: patchBlock api method does not pass in spaceId, so this is needed.
     if (!spaceId) {
-      const space = await prisma.space.findUnique({
-        where: {
-          domain: spaceDomain
-        }
-      });
+      const space = await getSpaceByDomain(spaceDomain);
       spaceId = space?.id;
     }
 
@@ -89,16 +99,22 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  const spaceDomain = referer ? url.pathname.split('/')[1] : null;
+  const domain = getValidSubdomain(req.headers.host);
+  const customDomain = getValidCustomDomain(req.headers.host);
+  let spaceDomain = customDomain || domain;
+
+  if (!spaceDomain) {
+    spaceDomain = referer ? url.pathname.split('/')[1] : null;
+  }
 
   if (!spaceDomain) {
     return res.status(200).json(data);
   }
-  const space = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: spaceDomain
-    }
-  });
+
+  const space = await getSpaceByDomain(spaceDomain);
+  if (!space) {
+    throw new NotFoundError('space not found');
+  }
 
   const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId: space.id });
   if (error) {
@@ -284,6 +300,52 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   );
 
   return res.status(200).json(updatedBlocks);
+}
+
+async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
+  // TODO: remove use of req.body after browsers update - 06/2023
+  const blockIds: string[] = (req.query.blockIds || req.body) ?? [];
+  const userId = req.session.user.id as string | undefined;
+
+  const blocks = await prisma.block.findMany({
+    where: {
+      id: {
+        in: blockIds
+      }
+    }
+  });
+
+  const spaceIds = [...new Set(blocks.map((p) => p.spaceId).filter(isTruthy))];
+
+  // A user can delete only a batch of blocks from a single space
+  if (spaceIds.length > 1) {
+    throw new ActionNotPermittedError("You can't delete blocks from multiple spaces at once");
+  }
+
+  for (const blockId of blockIds) {
+    const permissions = await getPermissionsClient({ resourceId: blockId, resourceIdType: 'page' }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: blockId,
+        userId
+      })
+    );
+
+    if (permissions.delete !== true) {
+      throw new ActionNotPermittedError('You are not allowed to delete this block.');
+    } else if (permissions.delete === true) {
+      break;
+    }
+  }
+
+  await prisma.block.deleteMany({
+    where: {
+      id: {
+        in: [...blocks.map((block) => block.id)]
+      }
+    }
+  });
+
+  return res.status(200).json(blocks);
 }
 
 export default withSessionRoute(handler);

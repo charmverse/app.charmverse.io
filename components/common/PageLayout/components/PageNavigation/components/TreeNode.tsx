@@ -1,6 +1,6 @@
+import type { Page } from '@charmverse/core/prisma';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import type { Page } from '@prisma/client';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -33,6 +33,7 @@ type NodeProps = {
   deletePage?: (id: string) => void;
   selectedNodeId: string | null;
   onClick?: () => void;
+  isFavorites?: boolean;
   validateTarget?: ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => boolean;
 };
 
@@ -45,7 +46,8 @@ function DraggableTreeNode({
   addPage,
   deletePage,
   selectedNodeId,
-  validateTarget
+  validateTarget,
+  isFavorites
 }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
@@ -57,7 +59,7 @@ function DraggableTreeNode({
     })
   }));
 
-  const dndEnabled = !!onDropAdjacent && !!onDropChild;
+  const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
 
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
@@ -122,7 +124,8 @@ function DraggableTreeNode({
 
         return true;
       }
-    })
+    }),
+    [onDropAdjacent]
   );
 
   const focusListener = useCallback(
@@ -137,7 +140,7 @@ function DraggableTreeNode({
     [drag]
   );
 
-  const isActive = !isAdjacent && canDrop && isOverCurrent && item.type !== 'board';
+  const isActive = !isAdjacent && canDrop && !isFavorites && isOverCurrent && item.type !== 'board';
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;
 
   const addSubPage = useCallback(
@@ -182,6 +185,7 @@ function DraggableTreeNode({
       href={`${pathPrefix}/${item.path}${
         item.type.includes('board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
       }`}
+      pagePath={item.path}
       isActive={isActive}
       isAdjacent={isAdjacentActive}
       isEmptyContent={item.isEmptyContent}

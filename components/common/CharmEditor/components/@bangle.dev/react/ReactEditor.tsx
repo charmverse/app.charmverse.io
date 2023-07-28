@@ -5,6 +5,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -17,7 +18,6 @@ import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
@@ -46,7 +46,9 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   isContentControlled?: boolean;
+  initialContent?: any;
   enableComments?: boolean;
+  onConnectionError?: (error: Error) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -57,6 +59,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     state,
     children,
     isContentControlled,
+    initialContent,
     focusOnInit,
     pmViewOpts,
     renderNodeViews,
@@ -67,7 +70,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     trackChanges = false,
     onParticipantUpdate = () => {},
     readOnly = false,
-    enableComments = true
+    enableComments = true,
+    onConnectionError
   },
   ref
 ) {
@@ -76,11 +80,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
-  const [isLoading, setIsLoading] = useState(enableFidusEditor);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
-  const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
+  const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
+    charmClient.socket()
+  ); // refresh when user
 
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
@@ -95,7 +100,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
-
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');
   }
@@ -111,9 +115,21 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(error: Error) {
-    showMessage(error.message, 'warning');
-    log.error('[ws/ceditor]: Error message displayed to user', { error });
+  function _onError(_editor: CoreBangleEditor, error: Error) {
+    if (onConnectionError) {
+      onConnectionError(error);
+    } else {
+      // for now, just use a standard error message to be over-cautious
+      showMessage(error.message, 'warning');
+    }
+    log.error('[ws/ceditor]: Error message displayed to user', {
+      pageId,
+      error
+    });
+    if (isLoadingRef.current) {
+      isLoadingRef.current = false;
+      setEditorContent(_editor, initialContent);
+    }
   }
 
   useEffect(() => {
@@ -157,7 +173,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
 
     if (isContentControlled) {
-      setIsLoading(false);
+      isLoadingRef.current = false;
     } else if (useSockets) {
       if (authResponse) {
         log.info('Init FidusEditor');
@@ -166,33 +182,19 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           docId: pageId,
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
-            setIsLoading(false);
             isLoadingRef.current = false;
-            // console.log('set is loading false');
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, onError);
+        fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
+      } else if (authError) {
+        log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
-      charmClient.pages.getPageDetails(pageId).then((page) => {
-        if (_editor) {
-          setIsLoading(false);
-          isLoadingRef.current = false;
-          const schema = _editor.view.state.schema;
-          let doc = _editor.view.state.doc;
-          if (page.content) {
-            doc = schema.nodeFromJSON(page.content);
-          }
-          const stateConfig = {
-            schema,
-            doc,
-            plugins: _editor.view.state.plugins
-          };
-          // Set document in prosemirror
-          _editor.view.setProps({ state: EditorState.create(stateConfig) });
-        }
-      });
+      isLoadingRef.current = false;
+      setEditorContent(_editor, initialContent);
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
@@ -200,7 +202,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       fEditor?.close();
       _editor.destroy();
     };
-  }, [user, pageId, useSockets, authResponse, authResponse, ref]);
+  }, [user?.id, pageId, useSockets, authResponse, authError, ref]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 300);
@@ -210,6 +212,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
+
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}
@@ -217,9 +220,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className='bangle-editor-core'
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '200px' : undefined }}
+        style={{
+          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
+          cursor: readOnly ? 'default' : 'text'
+        }}
+        // onClick={() => !readOnly && editor?.view.focus()}
       >
-        <StyledLoadingComponent isLoading={showLoader && isLoading} />
+        <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
       {nodeViews.map((nodeView) => {
@@ -255,4 +262,20 @@ function updatePluginWatcher(editor: CoreBangleEditor) {
 
     editor.view.updateState(state);
   };
+}
+
+function setEditorContent(editor: CoreBangleEditor, content?: any) {
+  if (content) {
+    const schema = editor.view.state.schema;
+    const doc = schema.nodeFromJSON(content);
+    const stateConfig = {
+      schema,
+      doc,
+      plugins: editor.view.state.plugins
+    };
+    if (editor.view && !editor.view.isDestroyed) {
+      // Set document in prosemirror
+      editor.view.setProps({ state: EditorState.create(stateConfig) });
+    }
+  }
 }

@@ -1,16 +1,13 @@
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
-import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -24,47 +21,28 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
   const userId = req.session.user.id;
   const newStatus = req.body.newStatus as ProposalStatus;
 
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    include: {
-      authors: true,
-      reviewers: true,
-      category: true,
-      page: true
-    }
-  });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
-
-  const isUserAuthorizedToUpdateProposalStatus = await validateProposalStatusTransition({
-    proposal,
-    newStatus,
-    userId
-  });
-
-  if (
-    !isUserAuthorizedToUpdateProposalStatus &&
-    (await hasAccessToSpace({ spaceId: proposal.spaceId, userId, adminOnly: true })).error
-  ) {
-    throw new UnauthorisedActionError();
-  }
-
   const updatedProposal = await updateProposalStatus({
-    proposalId: proposal.id,
+    proposalId,
     newStatus,
     userId
+  });
+
+  const proposalPage = await prisma.page.findUnique({
+    where: {
+      proposalId
+    },
+    select: {
+      id: true,
+      spaceId: true
+    }
   });
 
   trackUserAction('new_proposal_stage', {
     userId,
-    pageId: proposal.page?.id || '',
+    pageId: proposalPage?.id || '',
     resourceId: proposalId,
     status: newStatus,
-    spaceId: proposal.spaceId
+    spaceId: proposalPage?.spaceId || ''
   });
 
   return res.status(200).send(updatedProposal.proposal);

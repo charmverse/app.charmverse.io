@@ -14,6 +14,7 @@ type MainFeedFilteredEvent = BaseEvent & {
 type PostCreateEvent = PostEvent & {
   categoryName: string;
   hasImage: boolean;
+  isDraft: boolean;
 };
 
 type PostDeleteEvent = PostEvent & {

@@ -1,7 +1,9 @@
-// import type { Block } from '@prisma/client';
+// import type { Block } from '@charmverse/core/prisma';
+
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
-import type { PageMeta } from 'lib/pages';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -11,7 +13,7 @@ export type SealedUserId = {
   userId: string;
 };
 
-export type SocketAuthReponse = {
+export type SocketAuthResponse = {
   authToken: string;
 };
 
@@ -32,7 +34,8 @@ type BlocksDeleted = {
 
 type PagesMetaUpdated = {
   type: 'pages_meta_updated';
-  payload: (Partial<PageMeta> & ResourceWithSpaceId)[];
+  // we use the full Page interface so that we can pass other fields for individual page views
+  payload: (Partial<Page> & ResourceWithSpaceId)[];
 };
 
 type PagesCreated = {
@@ -95,7 +98,15 @@ type SubscribeToWorkspace = {
   type: 'subscribe';
   payload: {
     spaceId: string;
-  } & SocketAuthReponse;
+  } & SocketAuthResponse;
+};
+
+type SpaceSubscriptionUpdated = {
+  type: 'space_subscription';
+  payload: {
+    type: 'activated' | 'cancelled' | 'updated';
+    paidTier: SubscriptionTier | null;
+  };
 };
 
 export type ClientMessage = SubscribeToWorkspace;
@@ -113,7 +124,8 @@ export type ServerMessage =
   | VotesUpdated
   | PostPublished
   | PostUpdated
-  | PostDeleted;
+  | PostDeleted
+  | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

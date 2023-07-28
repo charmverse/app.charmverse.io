@@ -5,11 +5,12 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
+import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
-import type { Member, MemberPropertyWithPermissions } from 'lib/members/interfaces';
+import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
@@ -29,32 +30,36 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = (typeof views)[number];
 
-function memberNamePropertyValue(member: Member, nameProperty: MemberPropertyWithPermissions | null) {
-  const memberNameProperty = member.properties.find((prop) => prop.memberPropertyId === nameProperty?.id);
-  const memberName = (memberNameProperty?.value ?? member.username).toString();
-
-  return memberName.startsWith('0x') ? `zzzzzzzz${memberName}` : memberName;
+function memberNamePropertyValue(member: Member) {
+  return member.username.startsWith('0x') ? `zzzzzzzz${member.username}` : member.username;
 }
 
 export default function MemberDirectoryPage() {
   const router = useRouter();
-  const { members } = useMembers();
-  const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
-  const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const nameProperty = properties.find((property) => property.type === 'name') ?? null;
+  const [searchQuery, setSearchQuery] = useState('');
+  const filteredMembers = useFilteredMembers(searchQuery);
+  const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
-  const sortedMembers = searchedMembers.sort((mem1, mem2) =>
-    memberNamePropertyValue(mem1, nameProperty) > memberNamePropertyValue(mem2, nameProperty) ? 1 : -1
+  const sortedMembers = filteredMembers.sort((mem1, mem2) =>
+    memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
   );
+
+  if (isLoadingAccess) {
+    return null;
+  }
+
+  if (!showDirectory) {
+    return <ErrorPage message='Guests cannot access the member directory' />;
+  }
 
   return (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>
         Member Directory
       </Typography>
-      <MemberDirectorySearchBar onChange={setSearchedMembers} />
+      <MemberDirectorySearchBar onChange={setSearchQuery} />
       <Stack flexDirection='row' justifyContent='space-between' mb={1}>
         <Tabs
           textColor='primary'

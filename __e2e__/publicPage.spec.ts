@@ -1,19 +1,20 @@
+import type { Page, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { Page, User } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
-import { generateBoard } from 'testing/setupDatabase';
+import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
+import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
 let browser: Browser;
 
 test.beforeAll(async () => {
   // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
+  browser = await chromium.launch({});
 });
 
 test.describe.serial('Make a page public and visit it', async () => {
@@ -73,9 +74,71 @@ test.describe.serial('Make a page public and visit it', async () => {
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
 
+    await expect(shareLinkInput).toBeVisible();
+
+    await page.pause();
+
     const inputValue = await shareLinkInput.inputValue();
 
     expect(inputValue.match(shareUrl)).not.toBe(null);
+  });
+
+  test('visit a public page with embedded poll', async () => {
+    // Arrange ------------------
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+    const page = await userContext.newPage();
+
+    const { space, user } = await generateUserAndSpace();
+
+    const createdPage = await generatePage({
+      content: [],
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const createdVote = await createVote({
+      pageId: createdPage.id,
+      createdBy: user.id,
+      spaceId: space.id,
+      voteOptions: ['1', '2'],
+      userVotes: ['1']
+    });
+
+    await prisma.page.update({
+      where: {
+        id: createdPage.id
+      },
+      data: {
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'poll',
+              attrs: {
+                track: [],
+                pollId: createdVote.id
+              }
+            }
+          ]
+        }
+      }
+    });
+
+    await prisma.pagePermission.create({
+      data: {
+        page: { connect: { id: createdPage.id } },
+        permissionLevel: 'view',
+        public: true
+      }
+    });
+
+    const domain = space.domain;
+
+    const targetPage = `${baseUrl}/${domain}/${createdPage.path}`;
+
+    await page.goto(targetPage);
+
+    await expect(page.locator(`data-test=view-poll-details-button`).first()).not.toBeDisabled();
   });
 
   test('open a page with invalid domain and path', async () => {

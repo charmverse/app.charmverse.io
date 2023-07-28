@@ -8,30 +8,21 @@ type Props = {
   children?: React.ReactNode;
   title?: string;
   icon?: React.ReactNode;
-  filled?: boolean;
-  active?: boolean;
-  submit?: boolean;
-  emphasis?: string;
   size?: string;
-  danger?: boolean;
   className?: string;
   rightIcon?: boolean;
 };
 
 function Button({ size = 'small', ...props }: Props): JSX.Element {
   const classNames: Record<string, boolean> = {
-    Button: true,
-    active: Boolean(props.active),
-    filled: Boolean(props.filled),
-    danger: Boolean(props.danger)
+    Button: true
   };
-  classNames[`emphasis--${props.emphasis}`] = Boolean(props.emphasis);
   classNames[`${props.className}`] = Boolean(props.className);
   classNames[`size--${size}`] = true;
 
   return (
     <button
-      type={props.submit ? 'submit' : 'button'}
+      type='button'
       onClick={props.onClick}
       className={Utils.generateClassName(classNames)}
       title={props.title}

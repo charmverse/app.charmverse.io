@@ -1,21 +1,18 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
-import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
+import { Button } from 'components/common/Button';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
+import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
-import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
-import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import SidebarSubmenu from './components/Sidebar/SidebarSubmenu';
@@ -35,12 +32,12 @@ interface NexusLayoutProps {
 
 function NexusLayout({ children }: NexusLayoutProps) {
   const { user, logoutUser, isLoaded } = useUser();
-  const { disconnectWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3AuthSig();
   const router = useRouter();
   const { onClick } = useSettingsDialog();
 
   async function logoutCurrentUser() {
-    disconnectWallet();
+    logoutWallet();
     await logoutUser();
     router.push('/');
   }
@@ -70,7 +67,7 @@ function NexusLayout({ children }: NexusLayoutProps) {
             {children}
             <SpaceSettingsDialog />
           </PageContainer>
-          <PageDialogGlobalModal />
+          <PageDialogGlobal />
         </PageActionDisplayProvider>
       </PageDialogProvider>
     </Box>

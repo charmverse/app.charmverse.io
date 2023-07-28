@@ -2,29 +2,29 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { Page, Space, User } from '@prisma/client';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Page, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
-import type { IPageWithPermissions } from 'lib/pages';
-import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { exportWorkspacePages } from '../exportWorkspacePages';
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
-let root_1: IPageWithPermissions;
-let page_1_1: IPageWithPermissions;
-let page_1_1_1: IPageWithPermissions;
+let root_1: PageWithPermissions;
+let page_1_1: PageWithPermissions;
+let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   space = generated.space;
   user = generated.user;
 
@@ -73,9 +73,9 @@ beforeAll(async () => {
 
 describe('importWorkspacePages', () => {
   it('should import data from the export function into the target workspace', async () => {
-    const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
+    const { space: targetSpace } = await generateUserAndSpace();
 
-    const { data } = await exportWorkspacePages({
+    const data = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain
     });
 
@@ -101,11 +101,11 @@ describe('importWorkspacePages', () => {
   });
 
   it('should accept a filename as the source data input', async () => {
-    const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
+    const { space: targetSpace } = await generateUserAndSpace();
 
     const exportName = `test-${v4()}`;
 
-    const { data, path } = await exportWorkspacePages({
+    const { data, path } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.domain,
       exportName
     });

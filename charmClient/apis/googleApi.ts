@@ -1,8 +1,8 @@
-import type { ProfileItem } from '@prisma/client';
+import type { ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccount';
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
+import type { EmailAccountDisconnect } from 'lib/google/disconnectVerifiedEmail';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { LoggedInUser } from 'models';
 import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/credentials';
@@ -14,16 +14,24 @@ export interface UpdateProfileItemRequest {
 }
 
 export class GoogleApi {
-  login(login: LoginWithGoogleRequest) {
-    return http.POST<LoggedInUser>('/api/google/login', login);
-  }
-
-  connectAccount(params: Omit<ConnectGoogleAccountRequest, 'userId'>) {
-    return http.POST<LoggedInUser>('/api/google/connect-account', params);
+  loginWithCode({ code, type, redirectUri }: { code: string; type?: 'login' | 'connect'; redirectUri?: string }) {
+    return http.POST<LoggedInUser>('/api/google/code', { code, type: type || 'login', redirectUri });
   }
 
   disconnectAccount(params: Omit<DisconnectGoogleAccountRequest, 'userId'>) {
     return http.POST<LoggedInUser>('/api/google/disconnect-account', params);
+  }
+
+  authenticateMagicLink(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
+    return http.POST<LoggedInUser>('/api/google/verify-magic-link', data);
+  }
+
+  connectEmailAccount(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
+    return http.POST<LoggedInUser>('/api/google/connect-email-account', data);
+  }
+
+  disconnectEmailAccount(data: Pick<EmailAccountDisconnect, 'email'>) {
+    return http.POST<LoggedInUser>('/api/google/disconnect-email-account', data);
   }
 
   forms = {

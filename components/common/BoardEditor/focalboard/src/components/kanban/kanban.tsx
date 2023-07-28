@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-// import Button from '../../widgets/buttons/button'
 import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -7,19 +6,17 @@ import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
-import KanbanCard from './kanbanCard';
-import KanbanColumn from './kanbanColumn';
 import KanbanColumnHeader from './kanbanColumnHeader';
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 
@@ -76,12 +73,10 @@ function Kanban(props: Props) {
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
-
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => i) as IPropertyTemplate[];
   const isManualSort = activeView.fields.sortOptions.length === 0;
-  const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId);
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {
@@ -245,10 +240,14 @@ function Kanban(props: Props) {
   );
 
   const [showCalculationsMenu, setShowCalculationsMenu] = useState<Map<string, boolean>>(new Map<string, boolean>());
-  const toggleOptions = (templateId: string, show: boolean) => {
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const toggleOptions = (templateId: string, _anchorEl?: HTMLElement) => {
     const newShowOptions = new Map<string, boolean>(showCalculationsMenu);
-    newShowOptions.set(templateId, show);
+    newShowOptions.set(templateId, !!_anchorEl);
     setShowCalculationsMenu(newShowOptions);
+    setAnchorEl(_anchorEl || null);
   };
 
   const createNewSelectProperty = async () => {
@@ -289,8 +288,9 @@ function Kanban(props: Props) {
             propertyNameChanged={propertyNameChanged}
             onDropToColumn={onDropToColumn}
             calculationMenuOpen={showCalculationsMenu.get(group.option.id) || false}
-            onCalculationMenuOpen={() => toggleOptions(group.option.id, true)}
-            onCalculationMenuClose={() => toggleOptions(group.option.id, false)}
+            onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
+            onCalculationMenuClose={() => toggleOptions(group.option.id)}
+            anchorEl={anchorEl}
           />
         ))}
 
@@ -325,39 +325,21 @@ function Kanban(props: Props) {
       <Box>
         <div className='octo-board-body' id='mainBoardBody'>
           {/* Columns */}
-
           {visibleGroups.map((group) => (
-            <KanbanColumn key={group.option.id || 'empty'} onDrop={(card: Card) => onDropToColumn(group.option, card)}>
-              {group.cards.map((card) => (
-                <KanbanCard
-                  card={card}
-                  board={board}
-                  visiblePropertyTemplates={visiblePropertyTemplates}
-                  key={card.id}
-                  readOnly={props.readOnly}
-                  isSelected={props.selectedCardIds.includes(card.id)}
-                  onClick={(e) => {
-                    props.onCardClicked(e, card);
-                  }}
-                  onDrop={onDropToCard}
-                  showCard={props.showCard}
-                  isManualSort={isManualSort}
-                />
-              ))}
-              {!props.readOnly && (
-                <Button
-                  size='small'
-                  variant='text'
-                  color='secondary'
-                  sx={{ justifyContent: 'flex-start' }}
-                  onClick={() => {
-                    props.addCard(group.option.id, true, {}, true);
-                  }}
-                >
-                  <FormattedMessage id='BoardComponent.new' defaultMessage='+ New' />
-                </Button>
-              )}
-            </KanbanColumn>
+            <KanbanGroupColumn
+              group={group}
+              board={board}
+              visiblePropertyTemplates={visiblePropertyTemplates}
+              key={group.option.id || 'empty'}
+              readOnly={props.readOnly}
+              onDropToCard={onDropToCard}
+              isManualSort={isManualSort}
+              selectedCardIds={props.selectedCardIds}
+              addCard={props.addCard}
+              onDropToColumn={onDropToColumn}
+              onCardClicked={props.onCardClicked}
+              showCard={props.showCard}
+            />
           ))}
 
           {/* Add whitespace underneath "Add a group" button */}

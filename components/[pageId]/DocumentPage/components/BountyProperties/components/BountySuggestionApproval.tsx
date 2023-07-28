@@ -1,14 +1,15 @@
+import type { Bounty } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { Bounty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   bounty: Bounty;
@@ -25,7 +26,9 @@ export default function BountySuggestionApproval({ bounty }: Props) {
   const userCanDecideOnSuggestion = bounty.status === 'suggestion' && isAdmin;
 
   // All conditions fulfilled to approve the bounty
-  const approvableBounty = userCanDecideOnSuggestion && bounty.rewardAmount > 0;
+  const approvableBounty =
+    userCanDecideOnSuggestion &&
+    ((isTruthy(bounty.rewardAmount) && bounty.rewardAmount > 0) || isTruthy(bounty.customReward));
 
   async function approveBountySuggestion() {
     await charmClient.bounties.reviewSuggestion({

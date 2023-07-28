@@ -19,7 +19,6 @@ type UpdateRoleEvent = BaseEvent & {
   name: string;
   createPage: boolean;
   createBounty: boolean;
-  createVote: boolean;
 };
 
 type TokenGateUpdateEvent = BaseEvent & {

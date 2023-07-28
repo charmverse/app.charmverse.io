@@ -1,11 +1,11 @@
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import ProposalsPageComponent from 'components/proposals/ProposalsPage';
+import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function ProposalsPage() {
+export default function ProposalsPageComponent() {
   setTitle('Proposals');
 
-  return <ProposalsPageComponent />;
+  return <ProposalsPage />;
 }
 
-ProposalsPage.getLayout = getPageLayout;
+ProposalsPageComponent.getLayout = getPageLayout;

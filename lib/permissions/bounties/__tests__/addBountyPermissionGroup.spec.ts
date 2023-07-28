@@ -1,8 +1,8 @@
-import type { BountyPermission, Space, User } from '@prisma/client';
-import { BountyPermissionLevel } from '@prisma/client';
+import type { BountyPermission, Space, User } from '@charmverse/core/prisma';
+import { BountyPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { ExpectedAnError } from 'testing/errors';

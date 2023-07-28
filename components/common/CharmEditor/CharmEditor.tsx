@@ -1,13 +1,11 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
-import type { RawPlugins } from '@bangle.dev/core';
-import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
-import { markdownSerializer } from '@bangle.dev/markdown';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { Node, PluginKey } from '@bangle.dev/pm';
+import { Node } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
+import { log } from '@charmverse/core/log';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
@@ -19,264 +17,63 @@ import { useSWRConfig } from 'swr';
 import charmClient from 'charmClient';
 import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
-import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
-import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import * as poll from 'components/common/CharmEditor/components/poll';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import log from 'lib/log';
-import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
-import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
-import * as bulletList from './components/bulletList';
-import Callout, * as callout from './components/callout';
-import { userDataPlugin } from './components/charm/charm.plugins';
-import * as columnLayout from './components/columnLayout';
-import LayoutColumn from './components/columnLayout/Column';
-import LayoutRow from './components/columnLayout/Row';
+import Callout from './components/callout/components/Callout';
 import { CryptoPrice } from './components/CryptoPrice';
-import * as disclosure from './components/disclosure';
-import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
-import { rejectAll } from './components/fiduswriter/track/rejectAll';
-import * as floatingMenu from './components/floatingMenu';
-import * as heading from './components/heading';
-import * as horizontalRule from './components/horizontalRule';
+import { File } from './components/file/File';
+import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as iframe from './components/iframe';
-import InlineCommentThread, * as inlineComment from './components/inlineComment';
-import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
+import InlineCommentThread from './components/inlineComment/inlineComment.components';
+import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
-import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
-import * as inlineVote from './components/inlineVote';
-import { plugins as linkPlugins } from './components/link/link.plugins';
 import { LinksPopup } from './components/link/LinksPopup';
-import * as listItem from './components/listItem/listItem';
-import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
-import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
-import * as nft from './components/nft/nft';
+import Mention, { MentionSuggest } from './components/mention';
+import NestedPage, { NestedPagesList } from './components/nestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
-import * as orderedList from './components/orderedList';
-import paragraph from './components/paragraph';
-import * as pasteChecker from './components/pasteChecker/pasteChecker';
-import { placeholderPlugin } from './components/placeholder/index';
-import Quote from './components/quote';
+import * as poll from './components/poll';
+import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
-import RowActionsMenu, * as rowActions from './components/rowActions';
+import RowActionsMenu from './components/rowActions/RowActionsMenu';
 import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
-import SuggestionsPopup from './components/suggestions/SuggestionPopup';
-import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
-import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
-import * as trailingNode from './components/trailingNode';
-import * as tweet from './components/tweet/tweet';
+import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
+import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
-import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
-import DevTools from './DevTools';
+import {
+  suggestionsPluginKey,
+  inlinePalettePluginKey,
+  floatingMenuPluginKey,
+  nestedPagePluginKey,
+  mentionPluginKey,
+  emojiPluginKey,
+  actionsPluginKey,
+  inlineCommentPluginKey,
+  linksPluginKey,
+  charmEditorPlugins
+} from './plugins';
 import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
   rawText: string;
 }
-
-const actionsPluginKey = new PluginKey('row-actions');
-const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
-const mentionPluginKey = new PluginKey(mentionPluginKeyName);
-const floatingMenuPluginKey = new PluginKey('floatingMenu');
-const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
-const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
-const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
-const suggestionsPluginKey = new PluginKey('suggestions');
-const linksPluginKey = new PluginKey('links');
-const inlinePalettePluginKey = new PluginKey('inlinePalette');
-
-export function charmEditorPlugins({
-  onContentChange,
-  onError = () => {},
-  onSelectionSet,
-  readOnly = false,
-  disablePageSpecificFeatures = false,
-  enableVoting,
-  enableComments = true,
-  userId = null,
-  pageId = null,
-  spaceId = null,
-  placeholderText,
-  disableRowHandles = false
-}: {
-  disableRowHandles?: boolean;
-  spaceId?: string | null;
-  pageId?: string | null;
-  userId?: string | null;
-  readOnly?: boolean;
-  onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
-  onSelectionSet?: (state: EditorState) => void;
-  onError?: (error: Error) => void;
-  disablePageSpecificFeatures?: boolean;
-  enableVoting?: boolean;
-  enableComments?: boolean;
-  placeholderText?: string;
-} = {}): () => RawPlugins[] {
-  const basePlugins: RawPlugins[] = [
-    // this trackPlugin should be called before the one below which calls onSelectionSet().
-    // TODO: find a cleaner way to combine this logic?
-    trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
-    linkPlugins({ key: linksPluginKey }),
-    pasteChecker.plugins({ onError }),
-    new Plugin({
-      view: (_view) => {
-        if (readOnly) {
-          rejectAll(_view);
-        }
-        return {
-          update: (view, prevState) => {
-            if (
-              // Update only if page is in editing mode or in viewing mode
-              (!readOnly || enableComments || enableVoting) &&
-              onContentChange &&
-              !view.state.doc.eq(prevState.doc)
-            ) {
-              onContentChange(view, prevState.doc);
-            }
-          }
-        };
-      }
-    }),
-    userDataPlugin({
-      userId,
-      pageId,
-      spaceId
-    }),
-    nestedPagePlugins({
-      key: nestedPagePluginKey
-    }),
-    imagePlugins({
-      handleDragAndDrop: false
-    }),
-    mentionPlugins({
-      key: mentionPluginKey
-    }),
-    inlinePalettePlugins({ key: inlinePalettePluginKey }),
-    bold.plugins(),
-    bulletList.plugins(),
-    code.plugins(),
-    codeBlock.plugins(),
-    hardBreak.plugins(),
-    heading.plugins(),
-    horizontalRule.plugins(),
-    italic.plugins(),
-    listItem.plugins({
-      readOnly
-    }),
-    orderedList.plugins(),
-    columnLayout.plugins(),
-    paragraph.plugins(),
-    strike.plugins(),
-    underline.plugins(),
-    emoji.plugins({
-      key: emojiPluginKey
-    }),
-    floatingMenu.plugins({
-      key: floatingMenuPluginKey,
-      readOnly,
-      enableComments
-    }),
-    callout.plugins(),
-    NodeView.createPlugin({
-      name: 'image',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'horizontalRule',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'pdf',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'cryptoPrice',
-      containerDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'quote',
-      containerDOM: ['blockquote', { class: 'charm-quote' }],
-      contentDOM: ['div']
-    }),
-    NodeView.createPlugin({
-      name: 'inlineDatabase',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
-      name: 'poll',
-      containerDOM: ['div', { draggable: 'false' }]
-    }),
-    bookmarkPlugins(),
-    tabIndent.plugins(),
-    table.tableEditing({ allowTableNodeSelection: true }),
-    table.columnHandles(),
-    table.columnResizing({}),
-    // @ts-ignore missing type
-    table.tablePopUpMenu(),
-    // @ts-ignore missing type
-    table.tableHeadersMenu(),
-    // @ts-ignore missing type
-    table.selectionShadowPlugin(),
-    // @ts-ignore missing type
-    table.TableFiltersMenu(),
-    disclosure.plugins(),
-    nft.plugins(),
-    tweet.plugins(),
-    trailingNode.plugins(),
-    videoPlugins(),
-    iframe.plugins()
-  ];
-
-  if (!readOnly) {
-    if (!disableRowHandles) {
-      basePlugins.push(
-        rowActions.plugins({
-          key: actionsPluginKey
-        })
-      );
-    }
-    basePlugins.push(placeholderPlugin(placeholderText));
-  }
-
-  if (!disablePageSpecificFeatures) {
-    basePlugins.push(
-      inlineComment.plugin({
-        key: inlineCommentPluginKey
-      })
-    );
-    if (enableVoting) {
-      basePlugins.push(
-        inlineVote.plugin({
-          key: inlineVotePluginKey
-        })
-      );
-    }
-  }
-
-  return () => {
-    return basePlugins;
-  };
-}
-
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   colorMode?: 'dark';
   disablePageSpecificFeatures?: boolean;
@@ -364,6 +161,7 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
+  insideModal?: boolean;
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -377,32 +175,19 @@ interface CharmEditorProps {
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
   pageId?: string;
+  postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
-  pagePermissions?: IPagePermissionFlags;
+  snapshotProposalId?: string | null;
+  pagePermissions?: PagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
-}
-
-export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
-  const serializer = markdownSerializer(specRegistry);
-
-  const state = new BangleEditorState({
-    specRegistry,
-    initialValue: Node.fromJSON(specRegistry.schema, content) ?? ''
-  });
-
-  let markdown = serializer.serialize(state.pmState.doc);
-
-  if (title) {
-    const pageTitleAsMarkdown = `# ${title}`;
-
-    markdown = `${pageTitleAsMarkdown}\r\n\r\n${markdown}`;
-  }
-
-  return markdown;
+  disableNestedPages?: boolean;
+  onConnectionError?: (error: Error) => void;
+  isPollOrVote?: boolean;
+  disableMention?: boolean;
 }
 
 function CharmEditor({
@@ -411,7 +196,7 @@ function CharmEditor({
   pageActionDisplay = null,
   content = defaultContent,
   children,
-  autoFocus,
+  insideModal,
   onContentChange,
   style,
   readOnly = false,
@@ -419,22 +204,28 @@ function CharmEditor({
   isContentControlled = false,
   enableVoting,
   pageId,
+  postId,
   containerWidth,
   pageType,
+  snapshotProposalId,
   pagePermissions,
   placeholderText,
   focusOnInit,
   onParticipantUpdate,
-  disableRowHandles = false
+  disableRowHandles = false,
+  disableNestedPages = false,
+  onConnectionError,
+  isPollOrVote = false,
+  disableMention = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
-  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
+  const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
@@ -523,18 +314,20 @@ function CharmEditor({
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      disableMention
     });
   }
 
   const state = useEditorState({
     specRegistry,
     plugins: getPlugins(),
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
+
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
@@ -568,11 +361,13 @@ function CharmEditor({
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
+      initialContent={content}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
       enableComments={enableComments}
+      onConnectionError={onConnectionError}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -588,6 +383,9 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           pageId,
+          pagePermissions,
+          postId,
+          snapshotProposalId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
@@ -603,12 +401,6 @@ function CharmEditor({
         switch (props.node.type.name) {
           case 'quote':
             return <Quote {...allProps}>{_children}</Quote>;
-          case 'columnLayout': {
-            return <LayoutRow node={props.node}>{_children}</LayoutRow>;
-          }
-          case 'columnBlock': {
-            return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
-          }
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
@@ -645,18 +437,21 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
+              return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
           case 'mention': {
-            return <Mention {...props}>{_children}</Mention>;
+            return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
             return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
+          }
+          case 'file': {
+            return <File {...allProps} />;
           }
           case 'bookmark': {
             return <BookmarkNodeView {...allProps} />;
@@ -667,6 +462,9 @@ function CharmEditor({
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
           }
+          case 'tableOfContents': {
+            return <TableOfContents {...allProps} />;
+          }
           case 'tweet': {
             return <TweetNodeView {...allProps} />;
           }
@@ -674,7 +472,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView isPost={pageType === 'post'} {...allProps} />;
+            return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
           }
           default: {
             return null;
@@ -682,7 +480,7 @@ function CharmEditor({
         }
       }}
     >
-      <floatingMenu.FloatingMenu
+      <FloatingMenu
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}
@@ -691,8 +489,9 @@ function CharmEditor({
         pagePermissions={pagePermissions}
         nestedPagePluginKey={nestedPagePluginKey}
         disableNestedPage={disableNestedPage}
+        pageId={pageId}
       />
-      <MentionSuggest pluginKey={mentionPluginKey} />
+      {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
@@ -701,38 +500,41 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}
+        pageId={pageId}
       />
       {children}
       {!disablePageSpecificFeatures && (
-        <>
-          <SidebarDrawer
-            id='page-action-sidebar'
-            title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
-            open={!!pageActionDisplay}
-          >
-            {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
-              <SuggestionsSidebar
-                pageId={pageId}
-                spaceId={currentSpace.id}
-                readOnly={!pagePermissions?.edit_content}
-                state={suggestionState}
-              />
-            )}
-            {pageActionDisplay === 'comments' && <CommentsSidebar />}
-          </SidebarDrawer>
-          <InlineCommentThread pluginKey={inlineCommentPluginKey} />
+        <span className='font-family-default'>
+          {(enableComments || enableSuggestingMode) && (
+            <SidebarDrawer
+              id='page-action-sidebar'
+              title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
+              open={!!pageActionDisplay}
+            >
+              {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
+                <SuggestionsSidebar
+                  pageId={pageId}
+                  spaceId={currentSpace.id}
+                  readOnly={!pagePermissions?.edit_content}
+                  state={suggestionState}
+                />
+              )}
+              {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+            </SidebarDrawer>
+          )}
+          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              insideModal={insideModal}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
-              readOnly={readOnly}
+              readOnly={!pagePermissions?.edit_content}
             />
           )}
           {currentSpace && pageId && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
-        </>
+        </span>
       )}
-      {!readOnly && <DevTools />}
     </StyledReactBangleEditor>
   );
 }

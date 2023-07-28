@@ -1,0 +1,1 @@
+export { getPermissionsClient } from './routers';

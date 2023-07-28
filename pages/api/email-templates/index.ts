@@ -4,10 +4,10 @@ import { v4 } from 'uuid';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
-import type { ForumTask } from 'lib/forums/comments/interface';
+import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
-import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
@@ -19,14 +19,18 @@ const handler = nc({
 const createDiscussionTask = ({
   pageTitle,
   spaceName,
-  mentionText
+  mentionText,
+  type = 'page'
 }: {
+  type?: DiscussionTask['type'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
 }): DiscussionTask => {
+  const id = v4();
   return {
-    mentionId: v4(),
+    mentionId: id,
+    taskId: id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -38,22 +42,13 @@ const createDiscussionTask = ({
     bountyId: null,
     bountyTitle: null,
     commentId: null,
-    type: 'page',
+    type,
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };
@@ -70,6 +65,8 @@ const createForumTask = ({
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
+    taskId: v4(),
+    taskType: 'forum_post',
     spaceName,
     postId: v4(),
     postTitle,
@@ -80,19 +77,10 @@ const createForumTask = ({
     mentionId: v4(),
     createdBy: {
       id: v4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      email: '',
       username: '',
       avatar: '',
       path: '',
-      isBot: false,
-      identityType: 'Discord',
-      avatarContract: null,
-      avatarTokenId: null,
-      avatarChain: null,
-      deletedAt: null,
-      spacesOrder: []
+      avatarTokenId: null
     }
   };
 };
@@ -130,12 +118,18 @@ const createProposalTasks = ({
   pageTitle,
   spaceName,
   status
-}: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId'>): ProposalTask => {
+}: Omit<
+  ProposalTask,
+  'id' | 'taskId' | 'spaceDomain' | 'pagePath' | 'pageId' | 'createdAt' | 'eventDate'
+>): ProposalTask => {
   return {
     id: v4(),
     action,
     pagePath: randomName(),
     pageTitle,
+    taskId: v4(),
+    eventDate: new Date(),
+    createdAt: new Date(),
     status,
     spaceDomain: randomName(),
     spaceName,
@@ -148,9 +142,14 @@ const createBountyTask = ({
   pageTitle,
   spaceName,
   status
-}: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+}: Omit<
+  BountyTask,
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt' | 'createdBy'
+>): BountyTask => {
+  const id = v4();
   return {
-    id: v4(),
+    id,
+    taskId: id,
     action,
     pagePath: randomName(),
     pageTitle,
@@ -158,7 +157,9 @@ const createBountyTask = ({
     spaceDomain: randomName(),
     spaceName,
     pageId: v4(),
-    eventDate: new Date()
+    eventDate: new Date(),
+    createdAt: new Date(),
+    createdBy: null
   };
 };
 
@@ -190,19 +191,21 @@ const templates = {
           action: 'start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
-          status: 'private_draft'
+          status: 'draft'
         })
       ],
       discussionTasks: [
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
+          spaceName: 'CharmVerse',
+          type: 'bounty'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",
@@ -217,6 +220,11 @@ const templates = {
         createDiscussionTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        }),
+        createDiscussionTask({
+          mentionText: 'We are facing issues @ghostpepper',
+          pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         })
       ],
@@ -246,70 +254,6 @@ const templates = {
           spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
         })
-      ],
-      gnosisSafeTasks: [
-        {
-          marked: true,
-          tasks: [
-            {
-              nonce: 3,
-              transactions: [
-                {
-                  id: '123',
-                  actions: [],
-                  date: new Date().toISOString(),
-                  confirmations: [],
-                  isExecuted: false,
-                  description: 'Send .02 ETH',
-                  gnosisUrl: 'https://gnosis.com',
-                  myAction: 'Sign',
-                  myActionUrl: 'https://gnosis.com',
-                  nonce: 3,
-                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-                  safeName: 'My Personal Safe',
-                  threshold: 2,
-                  snoozedUsers: [],
-                  safeChainId: 1
-                }
-              ]
-            }
-          ],
-          safeAddress: '0x123',
-          safeName: 'My Personal Safe',
-          safeUrl: 'https://app.charmverse.io',
-          taskId: '1'
-        },
-        {
-          marked: false,
-          tasks: [
-            {
-              nonce: 7,
-              transactions: [
-                {
-                  id: '123',
-                  actions: [],
-                  date: new Date().toISOString(),
-                  confirmations: [],
-                  isExecuted: false,
-                  description: 'Send 10 ETH',
-                  gnosisUrl: 'https://gnosis.com',
-                  myAction: 'Sign',
-                  myActionUrl: 'https://gnosis.com',
-                  nonce: 7,
-                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-                  safeName: 'Work Safe',
-                  threshold: 2,
-                  snoozedUsers: [],
-                  safeChainId: 1
-                }
-              ]
-            }
-          ],
-          safeAddress: '0x456',
-          safeName: 'Work Safe',
-          safeUrl: 'https://app.charmverse.io',
-          taskId: '2'
-        }
       ],
       forumTasks: [
         createForumTask({

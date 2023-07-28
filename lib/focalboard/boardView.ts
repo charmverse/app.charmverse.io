@@ -8,7 +8,7 @@ import { createFilterGroup } from 'lib/focalboard/filterGroup';
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
 
-export type ViewSourceType = 'board_page' | 'google_form';
+export type ViewSourceType = 'board_page' | 'google_form' | 'proposals';
 
 export type GoogleFormSourceData = {
   credentialId: string;
@@ -42,6 +42,7 @@ export type BoardViewFields = {
   sourceData?: GoogleFormSourceData;
   // TODO: migrate linkedSourceId to be inside sourceData
   linkedSourceId?: string;
+  columnWrappedIds?: string[];
 };
 
 export type BoardView = Block & {
@@ -66,7 +67,8 @@ function createBoardView(block?: Block): BoardView {
     defaultTemplateId: block?.fields.defaultTemplateId || '',
     linkedSourceId: block?.fields.linkedSourceId,
     sourceData: block?.fields.sourceData,
-    sourceType: block?.fields.sourceType
+    sourceType: block?.fields.sourceType,
+    columnWrappedIds: block?.fields.columnWrappedIds?.slice() || []
   };
 
   return {

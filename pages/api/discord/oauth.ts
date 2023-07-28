@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
+import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
+import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { onError, onNoMatch } from 'lib/middleware';
+import type { AuthType, OauthFlowType } from 'lib/oauth/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
@@ -18,11 +20,18 @@ handler.get(oauth);
 async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
     redirect: string;
-    type: 'connect' | 'server' | 'login';
+    type: AuthType;
+    authFlowType?: OauthFlowType;
   };
+
+  const authFlowType = query.authFlowType ?? 'page';
+  const host = req.headers.host;
+  const redirect = getDiscordRedirectUrl(host, query.redirect);
+  const callbackUrl = getDiscordCallbackUrl(host, authFlowType);
+
   const state = encodeURIComponent(
     JSON.stringify({
-      redirect: query.redirect,
+      redirect,
       type: query.type
     })
   );
@@ -34,10 +43,10 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
     discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
   }
 
-  const domain = isProdEnv || isStagingEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
   const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(
-    `${domain}/api/discord/callback`
+    callbackUrl
   )}`;
+
   res.redirect(oauthUrl);
 }
 

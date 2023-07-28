@@ -1,6 +1,5 @@
-import { VoteStatus } from '@prisma/client';
-
-import { prisma } from 'db';
+import { VoteStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';

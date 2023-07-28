@@ -1,36 +1,47 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
+import type { BountyWithDetails, UpdateableBountyFields } from 'lib/bounties';
 import { getBounty, updateBountySettings } from 'lib/bounties';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBountyController).put(updateBounty);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'bounty'
+    })
+  )
+  .get(getBountyController)
+  .put(updateBounty);
 
 async function getBountyController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id } = req.query;
 
   const bounty = await getBounty(id as string);
 
-  if (
-    !bounty ||
-    !bounty.page ||
-    (
-      await computeUserPagePermissions({
-        allowAdminBypass: true,
-        pageId: bounty.page.id,
-        userId: req.session.user.id
-      })
-    ).read !== true
-  ) {
+  if (!bounty || !bounty.page) {
     throw new DataNotFoundError(`Bounty with id ${id} not found.`);
+  }
+
+  const pageId = bounty.page.id;
+
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: pageId,
+    userId: req.session.user?.id
+  });
+
+  if (!permissions.read) {
+    throw new UnauthorisedActionError('You do not have permissions to view this bounty.');
   }
 
   res.status(200).json(bounty);
@@ -59,9 +70,8 @@ async function updateBounty(req: NextApiRequest, res: NextApiResponse<BountyWith
     throw new UnauthorisedActionError('You do not have permissions to edit this bounty.');
   }
 
-  const bountyPagePermissions = await computeUserPagePermissions({
-    allowAdminBypass: true,
-    pageId: bounty.page.id,
+  const bountyPagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: bounty.page.id,
     userId
   });
 

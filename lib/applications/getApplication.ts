@@ -1,4 +1,4 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { ApplicationWithBounty } from './interfaces';
 
@@ -8,7 +8,11 @@ export function getApplication(applicationId: string): Promise<ApplicationWithBo
       id: applicationId
     },
     include: {
-      bounty: true
+      bounty: {
+        include: {
+          page: true
+        }
+      }
     }
   });
 }

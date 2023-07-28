@@ -1,7 +1,7 @@
 # Install dependencies only when needed
 
 # Use node-slim because node-alpine does not seem to supports the `sharp` npm library that gets built
-FROM node:18-slim AS BASE_APP
+FROM node:18.15.0-slim AS BASE_APP
 
 # useful for node-alpine
 # RUN apk add --no-cache libc6-compat git
@@ -19,4 +19,5 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV LOG_LEVEL debug
 
 EXPOSE 3000
-CMD ["npm", "run", "start:test"]
+# need something to keep docker container running until docker-compose runs its command
+CMD ["tail", "-f", "/dev/null"]

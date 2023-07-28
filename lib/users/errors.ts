@@ -19,3 +19,13 @@ export class UserIsNotSpaceMemberError extends SystemError {
     });
   }
 }
+
+export class UserIsGuestError extends SystemError {
+  constructor() {
+    super({
+      errorType: 'Access denied',
+      message: 'User is only a guest within this space',
+      severity: 'warning'
+    });
+  }
+}

@@ -1,4 +1,6 @@
-import { prisma } from 'db';
+import { InvalidInputError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import { unassignRole } from 'lib/roles';
 
@@ -13,6 +15,10 @@ export async function unassignRolesDiscord({
 }) {
   const rolesToRemove = Array.isArray(roles) ? roles : [roles];
   const spacesAndUser = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+  if (!spacesAndUser) {
+    return;
+  }
+
   const { user } = spacesAndUser[0];
 
   const removeRoles = await prisma?.role.findMany({
@@ -20,6 +26,14 @@ export async function unassignRolesDiscord({
   });
 
   for (const role of removeRoles) {
-    await unassignRole({ userId: user.id, roleId: role.id });
+    try {
+      await unassignRole({ userId: user.id, roleId: role.id });
+    } catch (error) {
+      if (error instanceof InvalidInputError) {
+        return;
+      }
+
+      throw error;
+    }
   }
 }

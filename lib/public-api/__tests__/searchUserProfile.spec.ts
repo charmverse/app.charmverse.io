@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { createUserFromWallet } from 'lib/users/createUser';

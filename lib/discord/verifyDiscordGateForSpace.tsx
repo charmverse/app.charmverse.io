@@ -1,6 +1,6 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 
-import { canJoinSpaceViaDiscord } from 'lib/collabland/collablandClient';
+import { getDiscordUserState } from 'lib/collabland/collablandClient';
 
 type Props = {
   discordUserId?: string;
@@ -10,18 +10,19 @@ type Props = {
 export async function verifyDiscordGateForSpace({ discordUserId, space }: Props) {
   const discordServerId = space.discordServerId;
 
-  if (!discordServerId || !discordUserId) {
+  // this is a hack for now, discordServerId is used for both collab.land and import roles from discord feature
+  if (!discordServerId || !discordUserId || !space.superApiTokenId) {
     return {
-      isEligible: false,
-      hasDiscordServer: !!discordServerId,
+      isVerified: false,
+      hasDiscordServer: !!(discordServerId && space.superApiTokenId),
       roles: []
     };
   }
 
-  const { roles, isEligible } = await canJoinSpaceViaDiscord({ discordServerId, discordUserId });
+  const { roles, isVerified } = await getDiscordUserState({ discordServerId, discordUserId });
 
   return {
-    isEligible,
+    isVerified,
     hasDiscordServer: true,
     roles
   };

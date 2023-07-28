@@ -1,9 +1,11 @@
+import { GET } from '@charmverse/core/http';
+import { log } from '@charmverse/core/log';
 import orderBy from 'lodash/orderBy';
 
-import { GET } from 'adapters/http';
-
-export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
-export type SupportedChainId = (typeof SupportedChainIds)[number];
+// https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
+export const supportedChainIds = [1, 5, 10, 137, 80001, 42161] as const;
+export const supportedMainnets = [1, 10, 137, 42161] as const;
+export type SupportedChainId = (typeof supportedChainIds)[number];
 
 interface NftMedia {
   bytes: number;
@@ -22,7 +24,14 @@ export interface AlchemyNft {
   id: {
     tokenId: string;
   };
+  error?: string;
   title: string;
+  contractMetadata: {
+    name: string;
+    symbol: string;
+    contractDeployer: string;
+    tokenType: 'ERC1155' | 'ERC721';
+  };
   description: string;
   tokenUri: {
     raw: string;
@@ -30,18 +39,20 @@ export interface AlchemyNft {
   };
   media: NftMedia[];
   timeLastUpdated: string;
+  walletAddress: string;
 }
 
 interface AlchemyNftResponse {
   blockHash: string;
   ownedNfts: AlchemyNft[];
   totalCount: number;
+  pageKey?: string; // 100 nfts per page
 }
 
 const alchemyApis: Record<SupportedChainId, string> = {
   1: 'eth-mainnet',
-  4: 'eth-rinkeby',
   5: 'eth-goerli',
+  10: 'opt-mainnet',
   137: 'polygon-mainnet',
   80001: 'polygon-mumbai',
   42161: 'arb-mainnet'
@@ -71,8 +82,31 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 // Docs: https://docs.alchemy.com/reference/getnfts
 export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const res = await GET<AlchemyNftResponse>(url, { owner: address, excludeFilters: ['AIRDROPS', 'SPAM'] });
-  return res.ownedNfts;
+  const filterSpam = chainId === 1 || chainId === 137;
+
+  let pageKey: string | undefined;
+  const nfts: AlchemyNft[] = [];
+  do {
+    const res = await GET<AlchemyNftResponse>(url, {
+      owner: address,
+      pageKey,
+      // Only use spam filters on chains we know that work.
+      // Including the request params throw an error when calling for Arbitrum, maybe others
+      ...(filterSpam
+        ? {
+            spamConfidenceLevel: 'HIGH',
+            excludeFilters: ['SPAM']
+          }
+        : {})
+    }).catch((err) => {
+      log.error('Error fetching nfts from alchemy', err);
+      return Promise.reject(err);
+    });
+    pageKey = res.pageKey;
+    nfts.push(...res.ownedNfts);
+  } while (pageKey);
+
+  return { address, chainId, nfts };
 };
 
 export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
@@ -82,14 +116,26 @@ export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1
   const nfts = results
     .reduce((acc: AlchemyNft[], res) => {
       if (res.status === 'fulfilled') {
-        return [...acc, ...res.value];
+        return [...acc, ...res.value.nfts.map((nft) => ({ ...nft, walletAddress: res.value.address }))];
       } else {
         return acc;
       }
     }, [])
     // Filter out invalid NFTs
-    .filter((n) => !!n.media?.length && !!n.media[0].gateway && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
-
+    .filter((n) => {
+      if (FILTERED_NFT_CONTRACTS.includes(n.contract.address)) {
+        return false;
+      }
+      // The error is most likely to be "Contract returned a broken token uri"
+      if (n.error) {
+        return false;
+      }
+      // No artwork found (animations and videos dont seem to be picked up)
+      if (!n.media[0].gateway) {
+        return false;
+      }
+      return true;
+    });
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 
   return sortedNfts;
@@ -103,8 +149,8 @@ export const getNFT = async (contractAddress: string, tokenId: string, chainId: 
 };
 
 export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
-  const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken?contractAddress=${contractAddress}&tokenId=${tokenId}`;
-  const res = await GET<{ owners: string[] }>(url);
+  const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
+  const res = await GET<{ owners: string[] }>(url, { contractAddress, tokenId });
 
   return res.owners;
 };

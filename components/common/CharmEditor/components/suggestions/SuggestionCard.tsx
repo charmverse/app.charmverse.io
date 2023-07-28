@@ -6,6 +6,7 @@ import { memo, useMemo } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
 
 import { accept } from '../fiduswriter/track/accept';
@@ -72,7 +73,20 @@ type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: str
 
 function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
   const view = useEditorViewContext();
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
+  const { pages } = usePages();
+  let content = node.textContent;
+
+  if (node.type.name === 'emoji') {
+    content = node.attrs.emoji;
+  } else if (node.type.name === 'mention') {
+    if (node.attrs.type === 'user') {
+      content = getMemberById(node.attrs.value)?.username ?? '';
+    } else {
+      content = pages[node.attrs.value]?.title ?? 'Untitled';
+    }
+  }
+
   // get parentNode for lists
   const parentNode = useMemo(
     () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
@@ -97,7 +111,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
       <Stack gap={1}>
         <Box display='flex' justifyContent='space-between'>
           <Box display='flex' alignItems='center' gap={1}>
-            <SidebarUser user={members.find((member) => member.id === data.user)} />
+            <SidebarUser user={getMemberById(data.user)} />
             <RelativeDate createdAt={data.date} />
           </Box>
           <Box display='flex' gap={1}>
@@ -138,7 +152,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
               type={type}
               parentNodeType={parentNode?.type.name}
               nodeType={node.type.name}
-              content={node.textContent}
+              content={content}
             />
           )}
         </Typography>

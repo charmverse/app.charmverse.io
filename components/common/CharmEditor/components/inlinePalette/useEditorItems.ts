@@ -1,7 +1,7 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
@@ -21,34 +21,36 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 export function useEditorItems({
   disableNestedPage,
   nestedPagePluginKey,
-  enableVoting
+  enableVoting,
+  pageId
 }: {
   disableNestedPage: boolean;
   // Defaults to true
   enableVoting?: boolean;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  pageId?: string;
 }) {
-  const { addNestedPage } = useNestedPage();
-  const space = useCurrentSpace();
+  const { addNestedPage } = useNestedPage(pageId);
+  const { space } = useCurrentSpace();
   const { user } = useUser();
-  const { currentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+  const view = useEditorViewContext();
 
-  const pageType = currentPageId ? pages[currentPageId]?.type : undefined;
+  const pageType = pageId ? pages[pageId]?.type : undefined;
 
   const paletteItems = useMemo(() => {
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
       ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
       [
         'database',
-        user && space && !disableNestedPage
-          ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType })
+        user && space && !disableNestedPage && pageId
+          ? databaseItems({ addNestedPage, currentPageId: pageId, userId: user.id, space, pageType })
           : []
       ],
       ['media', mediaItems()],
       ['embed', embedItems()],
-      ['advanced blocks', advancedBlocks({ enableVoting })]
+      ['advanced blocks', advancedBlocks({ view, enableVoting })]
     ];
 
     const itemList = itemGroups
@@ -63,7 +65,8 @@ export function useEditorItems({
       .flat();
 
     return itemList;
-  }, [addNestedPage, currentPageId, user, space]);
+    // include selection since we use cursor position as context, but we should find a way to only generate this when the popup appears
+  }, [addNestedPage, pageId, user, space, view.state.selection]);
 
   return paletteItems;
 }

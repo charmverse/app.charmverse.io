@@ -1,4 +1,4 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 
 import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
 import { assignRole } from 'lib/roles';
@@ -17,12 +17,12 @@ beforeAll(async () => {
   const { user: u1, space } = await generateUserAndSpaceWithApiToken(undefined, true);
   user1 = u1;
   u1Space1 = space;
-  u1Space2 = await generateSpaceForUser(user1);
+  u1Space2 = await generateSpaceForUser({ user: user1 });
 
   // User with 2 spaces, 1 common with user 1
   const { user: u2 } = await generateUserAndSpaceWithApiToken(undefined, true);
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
-  await generateSpaceForUser(user2);
+  await generateSpaceForUser({ user: user2 });
 
   const role1 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 1', createdBy: u1.id });
   const role2 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 2', createdBy: u1.id });

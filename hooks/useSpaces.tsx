@@ -1,23 +1,28 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 
 import { useUser } from './useUser';
 
+/**
+ * @memberSpaces - Subset of spaces where user is not a guest (ie. they are normal member or admin)
+ */
 type IContext = {
   spaces: Space[];
-  setSpace: (spaces: Space) => void;
+  memberSpaces: Space[];
+  setSpace: (space: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => Promise<Space>;
+  createNewSpace: (data: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => Promise<Space>;
   isCreatingSpace: boolean;
 };
 
 export const SpacesContext = createContext<Readonly<IContext>>({
   spaces: [],
+  memberSpaces: [],
   setSpace: () => undefined,
   setSpaces: () => undefined,
   isLoaded: false,
@@ -34,7 +39,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       setIsLoaded(false);
-      charmClient
+      charmClient.spaces
         .getSpaces()
         .then((_spaces) => {
           setSpaces(_spaces);
@@ -46,11 +51,11 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'createSpaceOption' | 'spaceData'>) => {
+  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => {
     setIsCreatingSpace(true);
 
     try {
-      const space = await charmClient.createSpace(newSpace);
+      const space = await charmClient.spaces.createSpace(newSpace);
       setSpaces((s) => [...s, space]);
       // refresh user permissions
       const _user = await charmClient.getUser();
@@ -71,10 +76,15 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     [spaces, setSpaces]
   );
 
+  const memberSpaces = !user
+    ? []
+    : spaces.filter((s) => !!user?.spaceRoles.find((sr) => sr.spaceId === s.id && !sr.isGuest));
+
   const value = useMemo(
     () =>
       ({
         spaces,
+        memberSpaces,
         setSpace,
         setSpaces,
         isLoaded,

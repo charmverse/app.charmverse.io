@@ -1,11 +1,11 @@
 import type { EditorView } from '@bangle.dev/pm';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 
 export function extractTextFromSelection(
   view: EditorView,
-  members: Member[],
+  getMemberById: (id: string) => Member | undefined,
   pages: Record<string, PageMeta | undefined>
 ) {
   // Get the context from current selection
@@ -17,7 +17,7 @@ export function extractTextFromSelection(
     } else if (node.type.name === 'mention') {
       const { type, value } = node.attrs;
       if (type === 'user') {
-        const member = members.find((_member) => _member.id === value);
+        const member = getMemberById(value);
         if (member) {
           textContent += `@${member.username}`;
         }

@@ -1,9 +1,8 @@
-import type { Space } from '@prisma/client';
+import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core/permissions';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import { prisma } from 'db';
-import type { AssignedPostCategoryPermission } from 'lib/permissions/forum/interfaces';
-import type { PostCategoryPermissionInput } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -46,7 +45,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
       }
     });
 
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id
@@ -78,7 +77,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
       spaceId: space.id
     });
 
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id
@@ -109,7 +108,7 @@ describe('POST /api/permissions/forum - Add post category permissions', () => {
     const postCategory = await generatePostCategory({
       spaceId: space.id
     });
-    const permissionToCreate: PostCategoryPermissionInput = {
+    const permissionToCreate: PostCategoryPermissionAssignment = {
       assignee: { group: 'space', id: space.id },
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id
@@ -152,7 +151,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -169,7 +168,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', adminUserCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -187,7 +186,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(401);
   });
 });

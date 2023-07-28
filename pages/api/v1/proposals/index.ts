@@ -1,13 +1,14 @@
-import type { ProposalStatus } from '@prisma/client';
+import type { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { prisma } from 'db';
-import { InvalidStateError, onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/pages';
+import { InvalidStateError } from 'lib/middleware';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = apiHandler();
+
 type ProposalAuthor = {
   userId: string;
   address?: string;
@@ -104,7 +105,7 @@ export interface PublicApiProposal {
   url: string;
 }
 
-handler.use(requireApiKey).get(listProposals);
+handler.get(listProposals);
 
 /**
  * @swagger
@@ -112,6 +113,8 @@ handler.use(requireApiKey).get(listProposals);
  *   get:
  *     summary: Get active proposals.
  *     description: Get a list of all proposals that are currently active in the space.
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
  *         description: List of proposals of casted vote
@@ -142,7 +145,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       where: {
         spaceId: req.authorizedSpaceId,
         status: {
-          notIn: ['draft', 'private_draft']
+          not: 'draft'
         }
       },
       select: {
@@ -193,7 +196,6 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
   for (const proposal of proposals) {
     try {
       const markdownText = await generateMarkdown({
-        title: proposal.page?.title as string,
         content: proposal.page?.content as any
       });
       markdownTexts.push(markdownText);

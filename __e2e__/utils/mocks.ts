@@ -1,13 +1,13 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Bounty, Page, Prisma, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Page as BrowserPage } from '@playwright/test';
-import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -15,6 +15,27 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
+export async function loginBrowserUser({
+  browserPage,
+  userId
+}: {
+  browserPage: BrowserPage;
+  userId: string;
+}): Promise<LoggedInUser> {
+  return browserPage.request
+    .post(`${baseUrl}/api/profile/dev`, {
+      data: {
+        userId
+      }
+    })
+    .then((res) => res.json());
+}
+
+export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserPage }): Promise<void> {
+  await browserPage.request.post(`${baseUrl}/api/session/logout`);
+}
+
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function createUser({
   browserPage,
   address
@@ -31,12 +52,14 @@ export async function createUser({
     .then((res) => res.json());
 }
 
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function createSpace({
   browserPage,
-  permissionConfigurationMode
+  permissionConfigurationMode,
+  paidTier
 }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> &
-  Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
-  return browserPage.request
+  Partial<Pick<Space, 'permissionConfigurationMode' | 'paidTier'>>): Promise<Space> {
+  const space: Space = await browserPage.request
     .post(`${baseUrl}/api/spaces`, {
       data: {
         spaceData: {
@@ -46,43 +69,65 @@ export async function createSpace({
       }
     })
     .then((res) => res.json());
+
+  // Added this here instead of the API controller, so that we can control in prod which paid tier we initialise spaces with
+  if (paidTier) {
+    return prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        paidTier
+      }
+    });
+  } else {
+    return space;
+  }
 }
 
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function getPages({
   browserPage,
   spaceId
 }: {
   browserPage: BrowserPage;
   spaceId: string;
-}): Promise<IPageWithPermissions[]> {
+}): Promise<PageWithPermissions[]> {
   return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then((res) => res.json());
 }
 
 /**
+ *
+ * DEPRECATED - Use generateUserAndSpace instead. Mock data should be generated directly, not using webapp features
+ *
  * @browserPage - the page object for the browser context that will execute the requests
  *
  * @isOnboarded Default to true so all user / space pairs start as onboarded, and the tester can focus on the happy path they are targeting
+ *
+ *
+ * By Default, the user created with this method will be a space admin
  *
  * Returns a user and space along with this space's pages
  */
 export async function createUserAndSpace({
   browserPage,
   permissionConfigurationMode = 'collaborative',
-  isOnboarded = true
+  isOnboarded = true,
+  paidTier
 }: {
   browserPage: BrowserPage;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>> & { isOnboarded?: boolean }): Promise<{
+} & Partial<Pick<Space, 'permissionConfigurationMode' | 'paidTier'>> & { isOnboarded?: boolean }): Promise<{
   user: LoggedInUser;
   address: string;
   privateKey: string;
   space: Space;
-  pages: IPageWithPermissions[];
+  pages: PageWithPermissions[];
 }> {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
   const user = await createUser({ browserPage, address });
-  const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
+  const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode, paidTier });
   const pages = await getPages({ browserPage, spaceId: space.id });
 
   const updatedRole = await prisma.spaceRole.update({
@@ -123,16 +168,6 @@ export async function createUserAndSpace({
     user,
     pages
   };
-}
-
-export async function createDiscordUser({ userId, discordUserId }: { userId: string; discordUserId: string }) {
-  return prisma.discordUser.create({
-    data: {
-      account: {},
-      discordId: discordUserId,
-      userId
-    }
-  });
 }
 
 export async function generateBounty({
@@ -294,18 +329,20 @@ type UserAndSpaceInput = {
   spaceName?: string;
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
+  email?: string;
 };
 
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
   publicBountyBoard,
-  skipOnboarding = true
+  skipOnboarding = true,
+  email = `${v4()}@gmail.com`
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
-  const user = await createUserFromWallet({ address });
+  const user = await createUserFromWallet({ address, email });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 

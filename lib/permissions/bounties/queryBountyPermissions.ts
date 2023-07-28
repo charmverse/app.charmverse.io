@@ -1,4 +1,5 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { BountyPermissions } from './interfaces';

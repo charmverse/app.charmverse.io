@@ -1,13 +1,13 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
 import { deleteCredential, getCredentialsForUser, saveCredential } from 'lib/google/authorization/credentials';
 import { validateFormScopes } from 'lib/google/forms/validateFormScopes';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 export type CreateCredentialRequest = {
   code: string;
@@ -76,7 +76,8 @@ async function getCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) 
 async function deleteCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
-  const query = req.body as CredentialRequest;
+  // Remove req.body check after browser update - 06/2023
+  const query = (req.query || req.body) as CredentialRequest;
 
   if (!query.credentialId) {
     throw new InvalidInputError('Credential id is required');

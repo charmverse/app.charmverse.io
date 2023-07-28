@@ -1,5 +1,7 @@
-import type { UserWallet } from '@prisma/client';
+import type { UserWallet } from '@charmverse/core/prisma';
 import { utils } from 'ethers';
+import { customAlphabet } from 'nanoid';
+import * as dictionaries from 'nanoid-dictionary';
 import { validate } from 'uuid';
 
 export function fancyTrim(_text: string = '', maxLength: number = 40) {
@@ -112,9 +114,11 @@ export function isUUID(uuid: string) {
   return validate(uuid);
 }
 
+const uidGenerator = customAlphabet(dictionaries.lowercase + dictionaries.numbers, 8);
+
 // use this to generate smaller unique ids than uuid for storage
-export function uid() {
-  return Math.round(Date.now() + Math.random() * 1000).toString(36);
+export function uid(): string {
+  return uidGenerator();
 }
 /**
  * Converts a list of string to human friendly gramatically correct comma list, with an and / or at the end
@@ -214,4 +218,11 @@ export function matchWalletAddress(
   const baseAddress = typeof address2 === 'string' ? address2 : address2.address;
 
   return shortWalletAddress(address1) === shortWalletAddress(baseAddress);
+}
+const emailRegexp =
+  // eslint-disable-next-line max-len
+  /[a-z0-9!#$%&'*+/=?^_‘{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_‘{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i;
+
+export function isValidEmail(email: string) {
+  return !!email && !!email.match(emailRegexp);
 }

@@ -1,40 +1,38 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Check } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import type { BoxProps, ButtonProps, SxProps, Theme } from '@mui/material';
 import {
   Box,
   Collapse,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
-  ListItemText,
-  ListItemIcon,
   Paper,
-  Typography,
-  ListItem,
-  IconButton,
   Tooltip,
+  Typography,
   useMediaQuery
 } from '@mui/material';
-import type { ButtonProps, SxProps, Theme, BoxProps } from '@mui/material';
 import { DateTime } from 'luxon';
-import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
-import { forwardRef, memo, useRef, useEffect, useState } from 'react';
+import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { CommentWithUser } from 'lib/comments/interfaces';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
@@ -237,11 +235,12 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
+  permissions?: PagePermissionFlags;
 }
 
-export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt?: string | null }>(
+export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
   ({ createdAt, updatedAt }) => {
-    const getDateTime = () => DateTime.fromISO(createdAt);
+    const getDateTime = () => DateTime.fromISO(createdAt.toString());
     const { formatDateTime } = useDateFormatter();
 
     const [dateTime, setTime] = useState(getDateTime());
@@ -279,18 +278,15 @@ export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt
 );
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
-  ({ showFindButton = false, threadId, inline = false }, ref) => {
+  ({ showFindButton = false, threadId, inline = false, permissions }, ref) => {
     showFindButton = showFindButton ?? !inline;
     const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
     const { user } = useUser();
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
-    const { currentPageId } = useCurrentPage();
-    const { getPagePermissions } = usePages();
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
 
-    const permissions = currentPageId ? getPagePermissions(currentPageId) : new AllowedPagePermissions();
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
@@ -386,7 +382,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !permissions.comment}
+                          disabled={isMutating || !permissions?.comment}
                           onClick={toggleResolved}
                         />
                       )}
@@ -479,7 +475,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {permissions.comment && (
+        {permissions?.comment && (
           <AddCommentCharmEditor
             key={thread.comments[thread.comments.length - 1]?.id}
             readOnly={Boolean(editedCommentId)}

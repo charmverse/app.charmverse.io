@@ -5,6 +5,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import {
   Box,
   ClickAwayListener,
@@ -15,11 +16,16 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
+import type { OverridableComponent } from '@mui/material/OverridableComponent';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
+import type { IconType } from 'react-icons/lib';
 import { RiFolder2Line } from 'react-icons/ri';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -30,7 +36,7 @@ import mutator from '../../mutator';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
-import { ViewSourceOptions } from './viewSourceOptions';
+import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
   board?: Board;
@@ -39,6 +45,7 @@ interface Props {
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
+  pageId?: string;
 }
 
 export const StyledSidebar = styled.div`
@@ -49,8 +56,11 @@ export const StyledSidebar = styled.div`
   height: 300px;
   min-height: 100%;
   width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   ${({ theme }) => theme.breakpoints.up('md')} {
-    width: 250px;
+    width: 275px;
   }
 `;
 
@@ -70,7 +80,12 @@ function ViewSidebar(props: Props) {
     props.board?.fields.cardProperties.some((c) => c.id === id)
   ).length;
 
-  let SourceIcon = RiFolder2Line;
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${props.pageId}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+
+  let SourceIcon: IconType | OverridableComponent<SvgIconTypeMap<object, 'svg'>> = RiFolder2Line;
   let sourceTitle = 'None';
   const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
   if (sourcePage) {
@@ -78,14 +93,26 @@ function ViewSidebar(props: Props) {
   } else if (props.view.fields.sourceType === 'google_form') {
     sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
     SourceIcon = FcGoogle;
+  } else if (props.view.fields.sourceType === 'proposals') {
+    sourceTitle = 'Proposals';
+    SourceIcon = TaskOutlinedIcon;
   }
 
   function goBack() {
     setSidebarView(initialState);
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    const newView = createTableView(props.parentBoard, props.view);
+  async function selectViewSource(
+    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
+    sourceBoard?: Board
+  ) {
+    const board = {
+      // use parentBoard props like id and rootId by default
+      ...props.parentBoard,
+      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+      fields: sourceBoard?.fields || props.parentBoard.fields
+    };
+    const newView = createTableView(board, props.view);
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;
@@ -97,6 +124,12 @@ function ViewSidebar(props: Props) {
       setSidebarView(initialState);
     }
   }, [props.isOpen]);
+
+  useEffect(() => {
+    if (props.pageId && props.view.fields.sourceType === 'proposals' && props.view.parentId === props.pageId) {
+      updateProposalSource({ pageId: props.pageId });
+    }
+  }, [props.pageId, props.view.parentId, props.view.fields.sourceType]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
@@ -168,6 +201,7 @@ function ViewSidebar(props: Props) {
               goBack={goBack}
               onSelect={selectViewSource}
               closeSidebar={props.closeSidebar}
+              pageId={props.pageId}
             />
           )}
         </StyledSidebar>
@@ -216,9 +250,9 @@ export function SidebarHeader({
   goBack,
   title
 }: {
-  closeSidebar: () => void;
+  closeSidebar?: () => void;
   goBack?: () => void;
-  title: string;
+  title?: string;
 }) {
   return (
     <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
@@ -228,13 +262,17 @@ export function SidebarHeader({
             <BackIcon fontSize='small' color='secondary' />
           </IconButton>
         )}
-        <Typography fontWeight='bold' variant='body2'>
-          {title}
-        </Typography>
+        {title && (
+          <Typography fontWeight='bold' variant='body2'>
+            {title}
+          </Typography>
+        )}
       </Box>
-      <IconButton onClick={closeSidebar} size='small'>
-        <CloseIcon fontSize='small' />
-      </IconButton>
+      {closeSidebar && (
+        <IconButton onClick={closeSidebar} size='small'>
+          <CloseIcon fontSize='small' />
+        </IconButton>
+      )}
     </Box>
   );
 }

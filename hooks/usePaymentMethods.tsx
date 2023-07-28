@@ -1,4 +1,4 @@
-import type { PaymentMethod } from '@prisma/client';
+import type { PaymentMethod } from '@charmverse/core/prisma';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -16,7 +16,7 @@ export const PaymentMethodsContext = createContext<Readonly<IContext>>([[], () =
 
 export function PaymentMethodsProvider({ children }: { children: ReactNode }) {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   useEffect(() => {
     refreshPaymentMethods();

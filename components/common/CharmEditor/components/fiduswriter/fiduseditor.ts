@@ -1,8 +1,8 @@
 import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import log from 'lib/log';
 import type {
   ClientSubscribeMessage,
   SocketMessage,
@@ -144,6 +144,7 @@ export class FidusEditor {
             // define .sessionIds on each participant
             const participants = this.mod.collab.updateParticipantList(data.participant_list);
             if (resubscribed) {
+              log.debug('Check version after getting connections message', { pageId: this.docInfo.id });
               // check version if only reconnected after being offline
               this.mod.collab.doc.checkVersion(); // check version to sync the doc
               resubscribed = false;
@@ -153,7 +154,12 @@ export class FidusEditor {
           }
           case 'doc_data':
             this.onDocLoaded(); // call this first so that the loading state is up-to-date before transactions occur
-            this.mod.collab.doc.receiveDocument(data);
+            try {
+              this.mod.collab.doc.receiveDocument(data);
+            } catch (error) {
+              log.error('Error loading document from sockets', { data, error, pageId: this.docInfo.id });
+              onError(error as Error);
+            }
             // console.log('received doc');
             break;
           case 'confirm_version':
@@ -167,6 +173,7 @@ export class FidusEditor {
           case 'selection_change':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after selection change', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
@@ -179,6 +186,7 @@ export class FidusEditor {
               return;
             }
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after diff', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
@@ -201,33 +209,6 @@ export class FidusEditor {
             break;
         }
       }
-      // failedAuth: () => {
-      //   if (this.view.state.plugins.length && sendableSteps(this.view.state) && this.ws.connectionCount > 0) {
-      //     this.ws.online = false; // To avoid Websocket trying to reconnect.
-      //     new ExportFidusFile(
-      //       this.getDoc({ use_current_view: true }),
-      //       this.mod.db.bibDB,
-      //       this.mod.db.imageDB
-      //     );
-      //     const sessionDialog = new Dialog({
-      //       title: gettext('Session Expired'),
-      //       id: 'session_expiration_dialog',
-      //       body: gettext('Your session expired while you were offline, so we cannot save your work to the server any longer, and it is downloaded to your computer instead. Please consider importing it into a new document.'),
-      //       buttons: [{
-      //         text: gettext('Proceed to Login page'),
-      //         classes: 'fw-dark',
-      //         click: () => {
-      //           window.location.href = '/';
-      //         }
-      //       }],
-      //       canClose: false
-      //     });
-      //     sessionDialog.open();
-      //   }
-      //   else {
-      //     window.location.href = '/';
-      //   }
-      // }
     });
 
     this.initEditor(view);
@@ -281,12 +262,14 @@ export class FidusEditor {
       dispatchTransaction: (tr) => {
         // console.log('dispatchTransaction', tr.meta);
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
-        const { state: newState } = view.state.applyTransaction(trackedTr);
-        view.updateState(newState);
-        if (tr.steps.length) {
-          this.docInfo.updated = new Date();
+        if (!view.isDestroyed) {
+          const { state: newState } = view.state.applyTransaction(trackedTr);
+          view.updateState(newState);
+          if (tr.steps.length) {
+            this.docInfo.updated = new Date();
+          }
+          this.mod.collab.doc.sendToCollaborators();
         }
-        this.mod.collab.doc.sendToCollaborators();
       }
     });
     this.view = view;

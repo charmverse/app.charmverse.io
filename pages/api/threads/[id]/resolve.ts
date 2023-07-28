@@ -1,12 +1,12 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -18,7 +18,7 @@ export interface ResolveThreadRequest {
   resolved: boolean;
 }
 
-async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
+async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
   const userId = req.session.user.id as string;
   const threadId = req.query.id as string;
   const thread = await prisma.thread.findUnique({
@@ -38,10 +38,13 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId
-  });
+  const permissionSet = await getPermissionsClient({ resourceId: thread.pageId, resourceIdType: 'page' }).then(
+    ({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: thread.pageId,
+        userId
+      })
+  );
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();

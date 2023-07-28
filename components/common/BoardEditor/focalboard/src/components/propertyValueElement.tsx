@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
@@ -18,7 +22,7 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
+import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -29,13 +33,15 @@ type Props = {
   propertyTemplate: IPropertyTemplate;
   showEmptyPlaceholder: boolean;
   displayType?: PropertyValueDisplayType;
+  showTooltip?: boolean;
+  wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
 };
 
-function PropertyValueElement(props: Props): JSX.Element {
+function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-
   const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -46,6 +52,8 @@ function PropertyValueElement(props: Props): JSX.Element {
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
+  const router = useRouter();
+  const domain = router.query.domain as string;
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
@@ -86,9 +94,11 @@ function PropertyValueElement(props: Props): JSX.Element {
     }
   };
 
+  let propertyValueElement: ReactNode = null;
   if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
-    return (
+    propertyValueElement = (
       <SelectProperty
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
@@ -109,48 +119,38 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'person') {
-    return (
+    propertyValueElement = (
       <UserProperty
-        value={propertyValue?.toString()}
-        readOnly={readOnly}
+        displayType={displayType}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
+        wrapColumn={props.wrapColumn ?? false}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
-      return <div className='octo-propertyvalue'>{displayValue}</div>;
+      propertyValueElement = <div className='octo-propertyvalue'>{displayValue}</div>;
+    } else {
+      propertyValueElement = (
+        <DateRange
+          wrapColumn={props.wrapColumn}
+          className='octo-propertyvalue'
+          value={value.toString()}
+          showEmptyPlaceholder={showEmptyPlaceholder}
+          onChange={(newValue) => {
+            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          }}
+        />
+      );
     }
-    return (
-      <DateRange
-        className='octo-propertyvalue'
-        value={value.toString()}
-        showEmptyPlaceholder={showEmptyPlaceholder}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-        }}
-      />
-    );
-  } else if (propertyTemplate.type === 'url') {
-    return (
-      <URLProperty
-        value={value.toString()}
-        readOnly={readOnly}
-        placeholder={emptyDisplayValue}
-        onChange={setValue}
-        onSave={() => {
-          mutator.changePropertyValue(card, propertyTemplate.id, value);
-        }}
-        multiline={displayType === 'details'}
-        onCancel={() => setValue(propertyValue || '')}
-        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-      />
-    );
   } else if (propertyTemplate.type === 'checkbox') {
-    return (
+    propertyValueElement = (
       <Switch
-        isOn={Boolean(propertyValue)}
+        isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
@@ -159,36 +159,65 @@ function PropertyValueElement(props: Props): JSX.Element {
       />
     );
   } else if (propertyTemplate.type === 'createdBy') {
-    return <CreatedBy userID={card.createdBy} />;
+    propertyValueElement = <CreatedBy userId={card.createdBy} />;
   } else if (propertyTemplate.type === 'updatedBy') {
-    return <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
+    propertyValueElement = <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
-    return <CreatedAt createdAt={card.createdAt} />;
+    propertyValueElement = <CreatedAt createdAt={card.createdAt} />;
   } else if (propertyTemplate.type === 'updatedTime') {
-    return <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />;
-  }
-
-  if (editableFields.includes(propertyTemplate.type)) {
-    return (
-      <TextInput
-        className='octo-propertyvalue'
-        placeholderText={emptyDisplayValue}
-        readOnly={readOnly}
-        value={value.toString()}
-        autoExpand={false}
-        onChange={setValue}
-        multiline={true}
-        maxRows={displayType === 'details' ? undefined : 1}
-        onSave={() => {
-          mutator.changePropertyValue(card, propertyTemplate.id, value);
-        }}
-        onCancel={() => setValue(propertyValue || '')}
-        validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
-        spellCheck={propertyTemplate.type === 'text'}
-      />
+    propertyValueElement = (
+      <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
     );
   }
-  return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: emptyDisplayValue,
+    readOnly,
+    value: value.toString(),
+    autoExpand: true,
+    onChange: setValue,
+    displayType,
+    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    onSave: () => {
+      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    },
+    onCancel: () => setValue(propertyValue || ''),
+    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false,
+    columnRef: props.columnRef
+  };
+
+  if (editableFields.includes(propertyTemplate.type)) {
+    if (propertyTemplate.type === 'url') {
+      propertyValueElement = <URLProperty {...commonProps} />;
+    } else {
+      propertyValueElement = <TextInput {...commonProps} />;
+    }
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+    propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
+  } else if (propertyValueElement === null) {
+    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+  }
+
+  const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);
+  const hasArrayValue = Array.isArray(value) && value.length > 0;
+  const hasStringValue = !Array.isArray(value) && !!value;
+  const hasValue = hasCardValue || hasArrayValue || hasStringValue;
+  if (!hasValue && props.readOnly && displayType !== 'details') {
+    return null;
+  }
+
+  if (props.showTooltip) {
+    return (
+      <Tooltip title={props.propertyTemplate.name}>
+        <div style={{ width: '100%' }}>{propertyValueElement}</div>
+      </Tooltip>
+    );
+  }
+  return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);

@@ -1,16 +1,16 @@
+import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import type { MouseEvent } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import type { Social } from 'components/profile/interfaces';
+import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { SocialIcons } from 'components/u/components/UserDetails/SocialIcons';
+import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -31,15 +31,17 @@ const StyledBox = styled(Box)`
   position: relative;
   cursor: pointer;
 `;
+
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
-  const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+  const visibleProperties = getDisplayProperties('gallery');
+  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
     return record;
   }, {} as any);
 
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
@@ -47,14 +49,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserProfile } = useUserProfile();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    showMemberProfile(member.id);
+    showUserProfile(member.id);
   }
 
   const social = (member.profile?.social as Social) ?? {};
@@ -78,7 +80,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
       />
       <Stack p={2} gap={1}>
         {!isNameHidden && (
-          <Typography gutterBottom variant='h6' mb={0} component='div'>
+          <Typography gutterBottom variant='h6' mb={0} component='div' noWrap>
             {(member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
               ?.value as string) ?? member.username}
           </Typography>
@@ -91,12 +93,8 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
           showDiscord={!isDiscordHidden}
           showTwitter={!isTwitterHidden}
         />
-        {properties.map((property) => {
+        {visibleProperties.map((property) => {
           const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);
-          const hiddenInGallery = !property.enabledViews.includes('gallery');
-          if (hiddenInGallery) {
-            return null;
-          }
           switch (property.type) {
             case 'bio': {
               return (
@@ -130,18 +128,16 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
             }
             case 'role': {
               return (
-                member.roles.length !== 0 && (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>
-                      Role
-                    </Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {member.roles.map((role) => (
-                        <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                      ))}
-                    </Stack>
+                <Stack gap={0.5} key={property.id}>
+                  <Typography fontWeight='bold' variant='subtitle2'>
+                    Role
+                  </Typography>
+                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                    {member.roles.map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
-                )
+                </Stack>
               );
             }
             case 'timezone': {
@@ -190,6 +186,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
               return memberProperty ? (
                 <SelectPreview
                   size='small'
+                  wrapColumn
                   options={property.options as SelectOptionType[]}
                   value={memberProperty.value as string | string[]}
                   name={property.name}

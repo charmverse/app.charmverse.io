@@ -119,12 +119,16 @@ export function scrollToThread(threadId: string) {
     for (let i = 0; i < 10; i++) {
       element = element?.parentElement ?? null;
       // Get the first paragraph parent element
-      if (element?.tagName === 'p' || element?.tagName.startsWith('h')) {
+      const tagName = element?.tagName.toLowerCase() || '';
+      if (tagName === 'p' || tagName.startsWith('h')) {
         parentElement = element;
         break;
       }
     }
 
-    createHighlightDomElement(parentElement);
+    if (parentElement) {
+      createHighlightDomElement(parentElement);
+      parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 }

@@ -1,5 +1,5 @@
+import type { Space } from '@charmverse/core/prisma';
 import { expect, test } from '@playwright/test';
-import type { Space } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
 
@@ -12,7 +12,9 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     // const userContext = await browser.newContext();
     // const page = await userContext.newPage();
 
-    const { space, user } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace({
+      email: undefined
+    });
 
     await login({ page, userId: user.id });
 
@@ -58,7 +60,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.waitForURL(`**/${createdSpace.domain}`);
 
     // Await new onboarding form popup so we can close it and click on new space
-    let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    let closePropertiesModalBtn = page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
@@ -80,7 +82,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.waitForURL(`**/${uniqueDomainName2}`);
 
     // Close the modal again
-    closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    closePropertiesModalBtn = page.locator('data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 

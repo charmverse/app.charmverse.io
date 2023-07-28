@@ -1,43 +1,33 @@
 // playwright-dev-page.ts
+import type { Space } from '@charmverse/core/prisma';
 import type { Locator, Page } from '@playwright/test';
-import type { Space } from '@prisma/client';
 
-import type { SpaceCreateTemplate } from 'lib/spaces/config';
+import type { SpaceTemplateType } from 'lib/spaces/config';
 
 // capture actions on the pages in signup flow
 export class SignUpPage {
   readonly page: Page;
 
-  readonly selectNewWorkspaceButton: Locator;
-
   readonly workspaceFormSubmit: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.selectNewWorkspaceButton = page.locator('data-test=goto-create-workspace');
     this.workspaceFormSubmit = page.locator('data-test=create-workspace');
   }
 
-  async waitForURL() {
-    await this.page.waitForURL('**/signup');
+  async waitForCreateSpacePage() {
+    await this.page.waitForURL('**/createSpace');
   }
 
-  async waitForWorkspaceForm() {
-    await this.page.waitForURL('**/createWorkspace');
-  }
-
-  async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceCreateTemplate) {
+  async selectNewSpaceFormTemplate(spaceTemplateOption: SpaceTemplateType) {
     await this.page.click(`data-test=space-template-${spaceTemplateOption}`);
-    await this.page.waitForURL('**/createWorkspace');
   }
 
   async waitForWorkspaceLoaded({ domain }: { domain: string }) {
     await this.page.waitForURL(`**/${domain}`);
-    await this.page.locator('text=[Your DAO] Home').first().waitFor();
-  }
-
-  async selectCreateWorkspace() {
-    await this.selectNewWorkspaceButton.click();
+    await this.page.locator('text=[Your DAO] Home').first().waitFor({
+      timeout: 60000
+    });
   }
 
   async submitWorkspaceForm(): Promise<Space> {

@@ -1,36 +1,44 @@
-import type { Prisma } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages/server';
-import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPages);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'space'
+    })
+  )
+  .get(getPages);
 
-async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions[]>) {
+async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const spaceId = req.query.id as string;
   const archived = req.query.archived === 'true';
   const userId = req.session?.user?.id;
-  const meta = req.query.meta === 'true';
+  const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : undefined;
   const search = typeof req.query.search === 'string' ? req.query.search : undefined;
 
-  const accessiblePages = await getAccessiblePages({
+  const accessiblePages = await req.basePermissionsClient.pages.getAccessiblePages({
     spaceId,
     userId,
     archived,
-    meta,
+    limit,
     search
   });
 
-  const createdPages: IPageWithPermissions[] = [];
+  const createdPages: PageMeta[] = [];
 
   if (accessiblePages.length === 0 && !search) {
     const totalPages = await prisma.page.count({
@@ -40,18 +48,20 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermi
     });
 
     if (totalPages === 0) {
-      const createdPage = (await createPage({
+      const createdPage = await createPage({
         data: untitledPage({
           userId,
           spaceId
-        }) as Prisma.PageUncheckedCreateInput,
-        include: {
-          ...includePagePermissionsMeta()
-        }
-      })) as IPageWithPermissions;
+        }) as Prisma.PageUncheckedCreateInput
+      });
 
-      await setupPermissionsAfterPageCreated(createdPage.id);
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+        event: 'created',
+        pageId: createdPage.id
+      });
+
       createdPages.push(createdPage);
+      log.warn(`Created default first page for space ${spaceId}`, { spaceId, userId });
     }
   }
 

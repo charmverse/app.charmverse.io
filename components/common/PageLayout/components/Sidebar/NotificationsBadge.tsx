@@ -1,25 +1,19 @@
+import type { BadgeProps } from '@mui/material';
 import { Badge } from '@mui/material';
 
-import useTasks from 'components/nexus/hooks/useTasks';
-import { useUser } from 'hooks/useUser';
+import { useTasks } from 'components/nexus/hooks/useTasks';
 
-export default function NotificationsBadge({ children }: { children: JSX.Element }) {
-  const { user } = useUser();
-  const { tasks, gnosisTasks } = useTasks();
+export default function NotificationsBadge({ children, ...badgeProps }: BadgeProps & { children: JSX.Element }) {
+  const { tasks } = useTasks();
 
-  const userNotificationState = user?.notificationState;
-
-  const voteTasksCount =
-    tasks?.votes.filter((vote) => !vote.userChoice && new Date() < new Date(vote.deadline)).length ?? 0;
+  const voteTasksCount = tasks?.votes.unmarked.filter((vote) => new Date() < new Date(vote.deadline)).length ?? 0;
   const mentionTasksCount = tasks?.discussions.unmarked?.length ?? 0;
   // If the user has snoozed multisig tasks don't count them
-  const excludeGnosisTasks =
-    userNotificationState?.snoozedUntil && new Date(userNotificationState.snoozedUntil) > new Date();
-  const gnosisTasksCount = excludeGnosisTasks ? 0 : gnosisTasks?.filter((gnosisTask) => !gnosisTask.marked).length ?? 0;
   const proposalTasksCount = tasks?.proposals.unmarked.length ?? 0;
   const forumTasksCount = tasks?.forum.unmarked.length ?? 0;
+  const bountyTasksCount = tasks?.bounties.unmarked.length ?? 0;
 
-  const totalTasks = voteTasksCount + mentionTasksCount + gnosisTasksCount + proposalTasksCount + forumTasksCount;
+  const totalTasks = voteTasksCount + mentionTasksCount + proposalTasksCount + forumTasksCount + bountyTasksCount;
 
   return (
     <Badge
@@ -28,6 +22,8 @@ export default function NotificationsBadge({ children }: { children: JSX.Element
       color='error'
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       max={99}
+      sx={{ cursor: 'pointer' }}
+      {...badgeProps}
     >
       {children}
     </Badge>

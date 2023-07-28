@@ -1,8 +1,6 @@
-import type { Prisma } from '@prisma/client';
-
-import { prisma } from 'db';
-
-import { resolvePageTree } from './server';
+import { resolvePageTree } from '@charmverse/core/pages';
+import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export type ChildModificationAction = 'delete' | 'restore' | 'archive';
 
@@ -47,7 +45,9 @@ export async function modifyChildPages(parentId: string, userId: string, action:
             {
               id: {
                 in: modifiedChildPageIds
-              },
+              }
+            },
+            {
               parentId: {
                 in: modifiedChildPageIds
               }
@@ -72,7 +72,10 @@ export async function modifyChildPages(parentId: string, userId: string, action:
           in: modifiedChildPageIds
         }
       },
-      data: data as Prisma.PageUncheckedUpdateManyInput
+      data: {
+        ...data,
+        deletedBy: action === 'restore' ? null : userId
+      }
     });
 
     await prisma.block.updateMany({

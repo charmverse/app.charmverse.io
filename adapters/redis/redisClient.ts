@@ -1,7 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { RedisClientType } from 'redis';
 import { createClient } from 'redis';
-
-import log from 'lib/log';
 
 // Export the singleton instance
 declare global {

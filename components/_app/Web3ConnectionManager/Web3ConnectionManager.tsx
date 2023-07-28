@@ -4,9 +4,9 @@ import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
-import { createContext, useEffect, useState } from 'react';
+import { useContext, createContext, useEffect, useState } from 'react';
 
-import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal/NetworkModal';
+import NetworkModal from 'components/_app/Web3ConnectionManager/components/NetworkModal/NetworkModal';
 
 import WalletSelectorModal from './components/WalletSelectorModal';
 import useEagerConnect from './hooks/useEagerConnect';
@@ -57,10 +57,6 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
 
-  useEffect(() => {
-    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
-  }, [triedEager, active, router.query]);
-
   return (
     <Web3Connection.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
@@ -84,4 +80,7 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
     </Web3Connection.Provider>
   );
 }
+
+export const useWeb3ConnectionManager = () => useContext(Web3Connection);
+
 export { Web3Connection, Web3ConnectionManager };

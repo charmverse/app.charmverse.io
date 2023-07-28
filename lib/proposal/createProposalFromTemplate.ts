@@ -1,7 +1,8 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 
+import type { CreatedProposal } from './createProposal';
 import { createProposal } from './createProposal';
 import { getProposal } from './getProposal';
 
@@ -11,7 +12,11 @@ export interface CreateProposalFromTemplateInput {
   templateId: string;
 }
 
-export async function createProposalFromTemplate({ createdBy, spaceId, templateId }: CreateProposalFromTemplateInput) {
+export async function createProposalFromTemplate({
+  createdBy,
+  spaceId,
+  templateId
+}: CreateProposalFromTemplateInput): Promise<CreatedProposal> {
   const proposalTemplate = await getProposal({ proposalId: templateId });
 
   if (!proposalTemplate) {
@@ -22,22 +27,18 @@ export async function createProposalFromTemplate({ createdBy, spaceId, templateI
 
   const title = `Copy of ${proposalTemplate.title}`;
 
-  return createProposal(
-    {
+  return createProposal({
+    pageProps: {
+      title,
       contentText: proposalTemplate?.contentText ?? '',
-      content: (proposalTemplate?.content as Prisma.InputJsonValue) ?? undefined,
-      createdBy,
-      spaceId,
-      title
+      content: proposalTemplate?.content as Prisma.JsonValue
     },
-    {
-      categoryId: proposalTemplate.proposal?.categoryId || null,
-      reviewers: (proposalTemplate.proposal?.reviewers ?? []).map((r) => {
-        return {
-          roleId: r.roleId ? r.roleId : undefined,
-          userId: r.userId ? r.userId : undefined
-        };
-      })
-    }
-  );
+    userId: createdBy,
+    spaceId,
+    categoryId: proposalTemplate.proposal?.categoryId as string,
+    reviewers: proposalTemplate.proposal?.reviewers.map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : 'user',
+      id: (reviewer.roleId ?? reviewer.userId) as string
+    }))
+  });
 }

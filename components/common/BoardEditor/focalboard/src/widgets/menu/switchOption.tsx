@@ -23,7 +23,7 @@ function SwitchOption(props: SwitchOptionProps): JSX.Element {
         props.onClick(props.id);
       }}
     >
-      {icon ?? <div className='noicon' />}
+      {icon && <div className='noicon' />}
       <div className='menu-name'>{name}</div>
       <Switch isOn={isOn} onChanged={() => {}} />
     </div>

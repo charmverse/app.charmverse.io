@@ -1,12 +1,12 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -32,11 +32,15 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    pageId: thread.pageId,
-    userId,
-    allowAdminBypass: false
-  });
+  const permissionSet = await getPermissionsClient({
+    resourceId: thread.pageId,
+    resourceIdType: 'page'
+  }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: thread.pageId,
+      userId
+    })
+  );
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();

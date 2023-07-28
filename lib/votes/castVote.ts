@@ -1,9 +1,9 @@
-import type { UserVote, Vote, VoteOptions } from '@prisma/client';
+import type { UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhook/interfaces';
-import { publishUserProposalEvent } from 'lib/webhook/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { isVotingClosed } from './utils';
 
@@ -51,7 +51,7 @@ export async function castVote(
     }
   });
 
-  if (isFirstVote && userVote.vote.context === 'proposal') {
+  if (isFirstVote && userVote.vote.pageId && userVote.vote.context === 'proposal') {
     await publishUserProposalEvent({
       scope: WebhookEventNames.ProposalUserVoted,
       userId,

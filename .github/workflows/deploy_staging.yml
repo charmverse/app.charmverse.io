@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [labeled, opened, synchronize]
 
+env:
+  SELECTED_PERMISSION_API_TAG:
+
 jobs:
   deploy:
     if: |
@@ -25,17 +28,22 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'staging'
-          # NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co' - disabled so that each instance uses its own socket router by default
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          # disabled so that each instance uses its own socket router by default
+          # NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co'
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID_STG }}
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
           NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY_STG }}
           NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN_STG }}
           NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID_STG }}
           NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET_STG }}
           NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID_STG }}
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY_STG }}
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID_STG }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_STG }}
           NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID_STG }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID_STG }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -46,10 +54,13 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
-          sed -i 's/production/staging/g' .ebextensions_websockets/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions_websockets/00_env_vars.config
+          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
+
+          for conf_file in $ebextension_files $ebstalk_apps_env_files; do
+            sed -i 's/prd/stg/g' $conf_file
+            sed -i 's/production/staging/g' $conf_file
+          done
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -71,6 +82,16 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
+      - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
+        if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .PERMISSION_IMGTAG = "${{ env.SELECTED_PERMISSION_API_TAG }}")
+              ' .ebextensions/00_env_vars.config
+
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
         uses: mikefarah/yq@master
@@ -79,6 +100,7 @@ jobs:
 
       - name: Set STAGE and DDENABLED variable in environment for build and deploy steps
         run: |
+          cat  .ebextensions/00_env_vars.config
           echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
@@ -106,7 +128,8 @@ jobs:
           aws-region: us-east-1
 
       - name: Package
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy

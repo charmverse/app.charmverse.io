@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { getPostCategoryPath } from './getPostCategoryPath';
@@ -17,6 +17,7 @@ export function generateDefaultPostCategories(spaceId: string): Required<Prisma.
     id: v4(),
     name: category,
     spaceId,
-    path: getPostCategoryPath(category)
+    path: getPostCategoryPath(category),
+    description: ''
   }));
 }

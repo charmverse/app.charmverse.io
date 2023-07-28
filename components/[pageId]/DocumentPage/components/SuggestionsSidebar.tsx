@@ -5,7 +5,7 @@ import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { activateTrack } from 'components/common/CharmEditor/components/fiduswriter/state_plugins/track/helpers';
 import { acceptAll } from 'components/common/CharmEditor/components/fiduswriter/track/acceptAll';
 import { rejectAll } from 'components/common/CharmEditor/components/fiduswriter/track/rejectAll';

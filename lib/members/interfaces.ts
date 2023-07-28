@@ -8,7 +8,7 @@ import type {
   User,
   UserDetails,
   VisibilityView
-} from '@prisma/client';
+} from '@charmverse/core/prisma';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 
@@ -31,24 +31,25 @@ export type PropertyValueDetails = {
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 
-export type Member = Omit<User, 'addresses'> & {
-  isAdmin: boolean;
+export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> & {
+  avatar?: string;
+  isBot?: boolean;
+  path: string;
+  deletedAt?: Date;
+  avatarTokenId?: string;
+  isAdmin?: boolean;
+  isGuest?: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
-  profile: UserDetails | null;
+  profile?: UserDetails;
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
   onboarded: boolean;
+  searchValue: string;
 };
-
-export type PublicMember = Pick<Member, 'id' | 'username'>;
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>;
-
-export type MemberPropertyWithSpace = MemberProperty & {
-  space: Space;
-};
 
 export type MemberPropertyValuesBySpace = {
   spaceId: string;

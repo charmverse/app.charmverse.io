@@ -1,4 +1,4 @@
-import type { Space, User } from '@prisma/client';
+import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { countValidSubmissions } from 'lib/applications/shared';

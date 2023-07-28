@@ -1,15 +1,12 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Alert, Collapse, FormLabel, IconButton, Box, Tooltip, TableCell, TableRow, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import { Alert, Box, Collapse, IconButton, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
-import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import Button from 'components/common/Button';
+import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
+import { useRefreshApplicationStatus } from 'components/bounties/hooks/useRefreshApplicationStatus';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
@@ -23,8 +20,8 @@ import type { SystemError } from 'lib/utilities/errors';
 
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
-import BountyApplicantStatus from '../BountyApplicantStatus';
 
+import { ApplicationComments } from './ApplicationComments';
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {
@@ -32,7 +29,7 @@ interface Props {
   submission: ApplicationWithTransactions;
   permissions: AssignedBountyPermissions;
   bounty: BountyWithDetails;
-  refreshSubmissions: () => Promise<void>;
+  refreshSubmissions: () => void;
 }
 
 export default function BountyApplicantTableRow({
@@ -42,15 +39,14 @@ export default function BountyApplicantTableRow({
   submissionsCapReached,
   refreshSubmissions
 }: Props) {
-  const { members } = useMembers();
+  const { getMemberById } = useMembers();
   const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
-  const member = members.find((c) => c.id === submission.createdBy);
+  const member = getMemberById(submission.createdBy);
   const { refreshBounty } = useBounties();
-  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
   const { formatDateTime } = useDateFormatter();
+  useRefreshApplicationStatus({ application: submission, onRefresh: refreshSubmissions });
 
-  const [defaultComment, setDefaultComment] = useState<CommentBlock['fields'] | null>(null);
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
   const [apiError, setApiError] = useState<SystemError | null>();
 
@@ -60,31 +56,11 @@ export default function BountyApplicantTableRow({
   const showAcceptSubmission =
     !showAcceptApplication && submission.status === 'review' && submission.createdBy !== user?.id;
 
-  function onSendClicked(newComment: CommentBlock['fields']) {
-    const comment = createCommentBlock();
-    const { content, contentText } = newComment;
-    comment.parentId = bounty.page.id;
-    comment.rootId = bounty.page.id;
-    comment.title = contentText || '';
-    comment.fields = { content };
-    mutator.insertBlock(comment, 'add comment');
-    resetInput();
-  }
-
-  function resetInput() {
-    if (user && member) {
-      const content = getContentWithMention({ myUserId: user?.id, targetUserId: member?.id });
-      setDefaultComment({ content });
-    } else {
-      setDefaultComment(null);
-    }
-    setEditorKey((key) => key + 1);
-  }
-
   async function approveApplication(applicationId: string) {
     if (!submissionsCapReached) {
       await charmClient.bounties.approveApplication(applicationId);
       refreshBounty(bounty.id);
+      refreshSubmissions();
     }
   }
 
@@ -96,6 +72,7 @@ export default function BountyApplicantTableRow({
         // Closes the modal
         setReviewDecision(null);
         refreshBounty(bounty.id);
+        refreshSubmissions();
       })
       .catch((err) => {
         setApiError(err);
@@ -107,10 +84,6 @@ export default function BountyApplicantTableRow({
     setApiError(null);
   }
 
-  useEffect(() => {
-    resetInput();
-  }, [user, member]);
-
   return (
     <>
       <TableRow key={submission.id} hover sx={{ '.MuiTableCell-root': { borderBottom: 0 } }}>
@@ -121,7 +94,18 @@ export default function BountyApplicantTableRow({
           <BountyApplicantStatus submission={submission} />
         </TableCell>
         <TableCell>{formatDateTime(submission.updatedAt)}</TableCell>
-        <TableCell>
+
+        <TableCell align='right'>
+          <BountyApplicantActions
+            bounty={bounty}
+            isExpanded={isExpandedRow}
+            submission={submission}
+            expandRow={() => setIsExpandedRow(true)}
+            refreshSubmissions={refreshSubmissions}
+          />
+        </TableCell>
+
+        <TableCell align='right'>
           <Tooltip title={isExpandedRow ? 'Hide details' : 'View details'}>
             <IconButton
               size='small'
@@ -133,14 +117,6 @@ export default function BountyApplicantTableRow({
             </IconButton>
           </Tooltip>
         </TableCell>
-        <TableCell align='right'>
-          <BountyApplicantActions
-            bounty={bounty}
-            isExpanded={isExpandedRow}
-            submission={submission}
-            expandRow={() => setIsExpandedRow(true)}
-          />
-        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell sx={{ p: 0 }} colSpan={5}>
@@ -149,25 +125,16 @@ export default function BountyApplicantTableRow({
               {bounty.approveSubmitters && (
                 <Box mb={2}>
                   <ApplicationInput
+                    permissions={permissions}
+                    refreshSubmissions={refreshSubmissions}
                     bountyId={bounty.id}
                     alwaysExpanded={!submission.submission}
-                    proposal={submission}
+                    application={submission}
                     readOnly={user?.id !== submission.createdBy || submission.status !== 'applied'}
                     mode='update'
                   />
                   {showAcceptApplication && (
-                    <Box display='flex' gap={1} mb={3}>
-                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
-                        <Button
-                          disabled={submissionsCapReached}
-                          color='primary'
-                          onClick={() => {
-                            approveApplication(submission.id);
-                          }}
-                        >
-                          Accept application
-                        </Button>
-                      </Tooltip>
+                    <Box display='flex' gap={1} mb={3} justifyContent='flex-end'>
                       <Button
                         color='error'
                         variant='outlined'
@@ -182,6 +149,18 @@ export default function BountyApplicantTableRow({
                       >
                         Reject
                       </Button>
+
+                      <Tooltip title={submissionsCapReached ? 'Submissions cap reached' : ''}>
+                        <Button
+                          disabled={submissionsCapReached}
+                          color='primary'
+                          onClick={() => {
+                            approveApplication(submission.id);
+                          }}
+                        >
+                          Accept application
+                        </Button>
+                      </Tooltip>
                     </Box>
                   )}
                 </Box>
@@ -189,6 +168,7 @@ export default function BountyApplicantTableRow({
               {submission.submission && (
                 <Box mb={2}>
                   <SubmissionInput
+                    hasCustomReward={bounty.customReward !== null}
                     bountyId={bounty.id}
                     readOnly={
                       user?.id !== submission.createdBy ||
@@ -201,8 +181,8 @@ export default function BountyApplicantTableRow({
                       setIsExpandedRow(false);
                     }}
                     permissions={permissions}
-                    expandedOnLoad={submission.status === 'review'}
-                    alwaysExpanded={false}
+                    expandedOnLoad
+                    alwaysExpanded
                   />
                   {/* disabled - maybe we dont need to show address here? <Box mb={3}>
                     <Typography variant='body2'>
@@ -220,20 +200,7 @@ export default function BountyApplicantTableRow({
                     </Typography>
                   </Box> */}
                   {showAcceptSubmission && (
-                    <Box display='flex' gap={1} mb={3}>
-                      <Button
-                        color='primary'
-                        disabled={submission.status === 'inProgress'}
-                        onClick={() => {
-                          setReviewDecision({
-                            decision: 'approve',
-                            submissionId: submission.id,
-                            userId: user?.id as string
-                          });
-                        }}
-                      >
-                        Approve submission
-                      </Button>
+                    <Box display='flex' gap={1} mb={3} justifyContent='flex-end'>
                       <Button
                         color='error'
                         variant='outlined'
@@ -248,28 +215,25 @@ export default function BountyApplicantTableRow({
                       >
                         Reject
                       </Button>
+                      <Button
+                        color='primary'
+                        disabled={submission.status === 'inProgress'}
+                        onClick={() => {
+                          setReviewDecision({
+                            decision: 'approve',
+                            submissionId: submission.id,
+                            userId: user?.id as string
+                          });
+                        }}
+                      >
+                        Approve submission
+                      </Button>
                     </Box>
                   )}
                 </Box>
               )}
 
-              {submission.status !== 'rejected' && submission.createdBy !== user?.id && (
-                <>
-                  <FormLabel>
-                    <strong>Send a message (optional)</strong>
-                  </FormLabel>
-                  <div className='CommentsList' style={{ padding: 0 }}>
-                    <NewCommentInput
-                      $key={editorKey}
-                      key={editorKey}
-                      initialValue={defaultComment}
-                      username={user?.username}
-                      avatar={user?.avatar}
-                      onSubmit={onSendClicked}
-                    />
-                  </div>
-                </>
-              )}
+              <ApplicationComments applicationId={submission.id} status={submission.status} />
             </Box>
 
             {/* Modal which provides review confirmation */}
@@ -297,7 +261,11 @@ export default function BountyApplicantTableRow({
                 </Alert>
               )}
 
-              <Box display='flex' gap={2} mt={3}>
+              <Box display='flex' gap={2} mt={3} justifyContent='flex-end'>
+                <Button variant='outlined' color='secondary' onClick={cancel}>
+                  Cancel
+                </Button>
+
                 {reviewDecision?.decision === 'approve' && (
                   <Button
                     color='primary'
@@ -312,10 +280,6 @@ export default function BountyApplicantTableRow({
                     Reject submission
                   </Button>
                 )}
-
-                <Button variant='outlined' color='secondary' onClick={cancel}>
-                  Cancel
-                </Button>
               </Box>
             </Modal>
           </Collapse>
@@ -323,31 +287,4 @@ export default function BountyApplicantTableRow({
       </TableRow>
     </>
   );
-}
-
-function getContentWithMention({ myUserId, targetUserId }: { myUserId: string; targetUserId: string }) {
-  return {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'mention',
-            attrs: {
-              id: uuid(),
-              type: 'user',
-              value: targetUserId,
-              createdAt: new Date().toISOString(),
-              createdBy: myUserId
-            }
-          },
-          {
-            type: 'text',
-            text: ' '
-          }
-        ]
-      }
-    ]
-  };
 }

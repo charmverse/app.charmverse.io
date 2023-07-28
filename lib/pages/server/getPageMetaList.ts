@@ -1,6 +1,5 @@
-import { prisma } from 'db';
-
-import type { PageMeta } from '../interfaces';
+import type { PageMeta } from '@charmverse/core/pages';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
   return prisma.page.findMany({
@@ -18,6 +17,9 @@ export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
       createdAt: true,
       createdBy: true,
       deletedAt: true,
+      deletedBy: true,
+      fontFamily: true,
+      fontSizeSmall: true,
       fullWidth: true,
       galleryImage: true,
       hasContent: true,
@@ -34,6 +36,7 @@ export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
       updatedAt: true,
       updatedBy: true,
       type: true,
+      convertedProposalId: true,
       permissions: {
         select: {
           id: true,

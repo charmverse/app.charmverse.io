@@ -1,10 +1,11 @@
-import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission, VisibilityView } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type {
   CreateMemberPropertyPayload,
   CreateMemberPropertyPermissionInput,
@@ -13,9 +14,11 @@ import type {
 } from 'lib/members/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useIsFreeSpace } from './useIsFreeSpace';
 
 type Context = {
   properties: MemberPropertyWithPermissions[] | undefined;
+  getDisplayProperties: (displayType: VisibilityView) => MemberPropertyWithPermissions[];
   addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
   updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<void>;
   deleteProperty: (id: string) => Promise<void>;
@@ -30,6 +33,7 @@ type Context = {
 
 const MemberPropertiesContext = createContext<Readonly<Context>>({
   properties: undefined,
+  getDisplayProperties: () => [],
   addProperty: () => Promise.resolve({} as any),
   updateProperty: () => Promise.resolve({} as any),
   deleteProperty: () => Promise.resolve(),
@@ -40,7 +44,9 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
 });
 
 export function MemberPropertiesProvider({ children }: { children: ReactNode }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
+
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { data: properties, mutate: mutateProperties } = useSWR(
     () => (space ? `members/properties/${space?.id}` : null),
@@ -149,10 +155,26 @@ export function MemberPropertiesProvider({ children }: { children: ReactNode }) 
     [space?.id]
   );
 
+  const getDisplayProperties = useCallback(
+    (displayType: VisibilityView) => {
+      return (
+        properties?.filter((p) => {
+          if (isFreeSpace) {
+            return p.enabledViews.includes(displayType) && !PREMIUM_MEMBER_PROPERTIES.includes(p.type);
+          } else {
+            return p.enabledViews.includes(displayType);
+          }
+        }) || []
+      );
+    },
+    [properties, isFreeSpace]
+  );
+
   const value = useMemo(
     () =>
       ({
         properties,
+        getDisplayProperties,
         addProperty,
         updateProperty,
         deleteProperty,

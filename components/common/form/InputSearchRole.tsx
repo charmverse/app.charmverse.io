@@ -1,11 +1,9 @@
-import { Autocomplete, TextField } from '@mui/material';
-import Alert from '@mui/material/Alert';
-import type { Role } from '@prisma/client';
+import type { Role } from '@charmverse/core/prisma';
+import { Alert, Autocomplete, TextField } from '@mui/material';
 import type { ComponentProps } from 'react';
 
-import Button from 'components/common/Button';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useRoles from 'hooks/useRoles';
+import Link from 'components/common/Link';
+import { useRoles } from 'hooks/useRoles';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
@@ -36,12 +34,11 @@ function InputSearchRoleBase({
   filter,
   showWarningOnNoRoles = false,
   placeholder,
+  readOnly,
   ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
-  const space = useCurrentSpace();
   const { onClick } = useSettingsDialog();
-
   const defaultRole =
     typeof defaultValue === 'string'
       ? roles?.find((role) => {
@@ -53,13 +50,13 @@ function InputSearchRoleBase({
 
   const filteredRoles = !!filter && !!roles ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
 
-  if (roles?.length === 0 && showWarningOnNoRoles) {
+  if (roles?.length === 0 && showWarningOnNoRoles && !readOnly) {
     return (
-      <Alert severity='warning'>
-        There are no roles in this space. Space admins can create roles in the{' '}
-        <Button variant='text' sx={{ fontWeight: 'bold' }} onClick={() => onClick(`${space?.name}-roles`)}>
-          space settings page
-        </Button>
+      <Alert severity='info'>
+        There are no roles in this space. Space admins can create roles in{' '}
+        <Link href='#' onClick={() => onClick(`roles`)}>
+          Space Settings
+        </Link>
         .
       </Alert>
     );
@@ -67,7 +64,7 @@ function InputSearchRoleBase({
 
   return (
     <Autocomplete<ReducedRole>
-      defaultValue={defaultRole as any}
+      value={defaultRole as any}
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
@@ -76,7 +73,7 @@ function InputSearchRoleBase({
       // @ts-ignore - not sure why this fails
       options={filteredRoles}
       autoHighlight
-      getOptionLabel={(role) => role.name}
+      getOptionLabel={(role) => role?.name}
       renderOption={(_props, role) => <li {..._props}>{role.name}</li>}
       renderInput={(params) => (
         <TextField

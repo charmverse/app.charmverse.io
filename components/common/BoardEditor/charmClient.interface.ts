@@ -1,12 +1,9 @@
 import type { Block, BlockPatch } from 'lib/focalboard/block';
 
-import type { IUser } from './focalboard/src/user';
-
 export type BlockUpdater = (blocks: Block[]) => void;
 
 export interface ICharmClient {
   getAllBlocks(): Promise<Block[]>;
-  getWorkspaceUsers(): Promise<IUser[]>;
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
   patchBlocks(_blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
   deleteBlock(blockId: string, updater: BlockUpdater): Promise<void>;

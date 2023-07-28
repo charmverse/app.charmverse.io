@@ -14,13 +14,17 @@ async function exportImport({
   sourceSpaceIdOrDomain: string;
   targetSpaceIdOrDomain: string;
 }): Promise<true> {
-  const { data } = await exportWorkspacePages({
-    sourceSpaceIdOrDomain
+  const data = await exportWorkspacePages({
+    sourceSpaceIdOrDomain,
+    skipBounties: true,
+    skipProposals: true,
+    skipBountyTemplates: true,
+    skipProposalTemplates: true
   });
 
   const result = await importWorkspacePages({
     targetSpaceIdOrDomain,
-    exportData: data
+    exportData: data,
   });
 
   console.log('Success ! Imported ', result.pages);

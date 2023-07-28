@@ -1,12 +1,15 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { CreateSpaceProps } from 'lib/spaces/createWorkspace';
-import { createWorkspace } from 'lib/spaces/createWorkspace';
+import type { CreateSpaceProps } from 'lib/spaces/createSpace';
+import { createWorkspace } from 'lib/spaces/createSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -61,7 +64,14 @@ async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const userId = req.session.user.id;
   const data = req.body as CreateSpaceProps;
 
-  const space = await createWorkspace({ spaceData: data.spaceData, createSpaceOption: data.createSpaceOption, userId });
+  const space = await createWorkspace({
+    spaceData: data.spaceData,
+    spaceTemplate: data.spaceTemplate,
+    userId
+  });
+  updateTrackGroupProfile(space);
+  updateTrackUserProfileById(userId);
+  trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: data.spaceTemplate || 'default' });
 
   return res.status(200).json(space);
 }

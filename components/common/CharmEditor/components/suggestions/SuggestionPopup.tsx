@@ -14,12 +14,14 @@ import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';
 import type { SuggestionPluginState } from './suggestions.plugins';
 
-export default function SuggestionsPopup({
+export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,
-  spaceId
+  spaceId,
+  insideModal
 }: {
+  insideModal?: boolean;
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
   pageId: string;
@@ -30,8 +32,7 @@ export default function SuggestionsPopup({
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
 
-  const isInPageDialog = new URLSearchParams(window.location.href).get('cardId');
-  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
+  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || insideModal) && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });
@@ -39,7 +40,12 @@ export default function SuggestionsPopup({
       .map((row) => row.marks)
       .flat()
       .find((mark) => mark.active);
-    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find((row) => row.pos === rowPos)?.marks ?? [];
+    const suggestions =
+      rowPos !== undefined
+        ? rows.find((row) => row.pos === rowPos)?.marks ?? []
+        : activeSuggestion
+        ? [activeSuggestion]
+        : [];
 
     return createPortal(
       <ClickAwayListener

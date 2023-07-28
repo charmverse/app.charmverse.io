@@ -1,11 +1,10 @@
+import { log } from '@charmverse/core/log';
 import type { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { injected } from 'connectors';
 import { useEffect } from 'react';
 
-import log from 'lib/log';
-
-type WindowType = Window & typeof globalThis & { ethereum: Web3Provider };
+type WindowType = Window & typeof globalThis & { ethereum?: Web3Provider };
 
 const useInactiveListener = (suppress = false): void => {
   const { active, activate } = useWeb3React();
@@ -13,7 +12,7 @@ const useInactiveListener = (suppress = false): void => {
   useEffect((): any => {
     const { ethereum } = window as WindowType;
 
-    if (ethereum && !active && !suppress) {
+    if (ethereum?.on && !active && !suppress) {
       const handleChainChanged = (_chainId: string | number) => {
         activate(injected).catch((err) => {
           log.warn('Failed to activate after chain changed', err);

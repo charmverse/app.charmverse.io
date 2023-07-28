@@ -60,7 +60,7 @@ function EmptyImageContainer({
 const StyledImageContainer = styled.div<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
-  margin: 0 auto;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const StyledImage = styled.img`
@@ -118,7 +118,7 @@ function imageSpec(): RawSpecs {
         const { src } = node.attrs;
 
         if (src) {
-          const toWrite = `![](${src})`;
+          const toWrite = `[](${src})`;
           state.text(toWrite, false);
           state.ensureNewLine();
         }
@@ -251,7 +251,7 @@ function getFileBinary(src: string): File | null {
 
 export function spec() {
   // this is a dummy marker to let us know to show the image selector
-  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image' });
+  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image', excludes: '_' });
   tooltipSpec.schema.inclusive = false;
   return [tooltipSpec, imageSpec()];
 }

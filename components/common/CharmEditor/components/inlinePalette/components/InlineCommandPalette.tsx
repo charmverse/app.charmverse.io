@@ -65,6 +65,7 @@ interface InlineCommentGroupProps {
   handleActiveItem?: (item: string) => void;
   palettePluginKey: PluginKey;
   enableVoting?: boolean;
+  pageId?: string;
 }
 
 function defaultFilterItem(item: PaletteItem, { disableNestedPage }: { disableNestedPage: boolean }) {
@@ -75,6 +76,7 @@ export default function InlineCommandPalette({
   menuKey,
   nestedPagePluginKey,
   disableNestedPage = false,
+  pageId,
   filterItem,
   externalPopupState,
   isFloatingMenuList = false,
@@ -84,7 +86,7 @@ export default function InlineCommandPalette({
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems({ disableNestedPage, nestedPagePluginKey, enableVoting });
+  const editorItems = useEditorItems({ pageId, disableNestedPage, nestedPagePluginKey, enableVoting });
   const isItemDisabled = useCallback(
     (item: PaletteItem) => {
       return typeof item.disabled === 'function' ? item.disabled(view.state) : item.disabled;

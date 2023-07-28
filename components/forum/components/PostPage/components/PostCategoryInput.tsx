@@ -1,5 +1,5 @@
+import type { PostCategory } from '@charmverse/core/prisma';
 import { Autocomplete, Box, Chip, TextField } from '@mui/material';
-import type { PostCategory } from '@prisma/client';
 import type { HTMLAttributes } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -31,7 +31,7 @@ export function PostCategoryInput({
 }) {
   const { categories, getPostableCategories } = useForumCategories();
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const postCategory = categories?.find((category) => {
     if (!categoryId && space?.defaultPostCategoryId && category.id === space.defaultPostCategoryId) {

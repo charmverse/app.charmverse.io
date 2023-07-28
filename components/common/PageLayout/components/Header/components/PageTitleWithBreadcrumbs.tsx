@@ -1,6 +1,6 @@
+import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Typography, CircularProgress } from '@mui/material';
-import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
@@ -157,7 +157,7 @@ function BountyPageTitle({ basePath }: { basePath: string }) {
 }
 
 function PublicBountyPageTitle() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   return (
     <PageTitle>
       {space && (
@@ -181,7 +181,6 @@ function EmptyPageTitle() {
 
 export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
-  const space = useCurrentSpace();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
@@ -190,11 +189,11 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
   } else if (pageType === 'proposal') {
     return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
   } else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.includes('/[domain]/forum')) {
     return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.startsWith('/u/')) {
     return <EmptyPageTitle />;
   } else {

@@ -1,5 +1,6 @@
-import type { CommunityDetails } from 'components/profile/components/CommunityRow';
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { CommunityDetails } from 'components/u/components/CommunityRow';
 import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 
 import { combineCommunityData } from './combineCommunityData';
@@ -17,10 +18,15 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
     apiToken
   });
 
-  const proposals = profiles.reduce<DeepDaoProfile['proposals']>(
-    (_proposals, profile) => [..._proposals, ...profile.data.proposals],
-    []
-  );
+  const proposals = profiles
+    .map((profile) =>
+      profile.data.proposals.map((proposal) => ({
+        ...proposal,
+        // sometimes the title includes the whole body of the proposal with "&&" as a separator
+        title: proposal.title?.split('&&')[0]
+      }))
+    )
+    .flat();
 
   const [bountiesCreated, bountyApplications, userProposalsCount] = await Promise.all([
     prisma.bounty.findMany({
@@ -91,7 +97,8 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
         }
       },
       spaceId: true,
-      description: true,
+      content: true,
+      contentText: true,
       title: true,
       id: true,
       createdAt: true,
@@ -120,7 +127,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
       (vote) =>
         ({
           createdAt: vote.createdAt.toString(),
-          description: vote.description ?? '',
+          description: vote.contentText ?? '',
           organizationId: vote.spaceId,
           title: vote.title || vote.page?.title,
           voteId: vote.id,

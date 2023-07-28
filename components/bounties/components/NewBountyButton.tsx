@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -9,12 +9,11 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function NewBountyButton() {
+export function NewBountyButton() {
   const { user } = useUser();
   const router = useRouter();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
@@ -61,17 +60,14 @@ export default function NewBountyButton() {
         });
       }
       mutatePage(createdBounty.page);
+      router.push({ pathname: router.pathname, query: { ...router.query, bountyId: createdBounty.page.id } });
       setBounties((bounties) => [...bounties, createdBounty]);
-      showPage({
-        pageId: createdBounty.page.id,
-        hideToolsMenu: suggestBounties,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { bountyId: null });
-        }
-      });
-      setUrlWithoutRerender(router.pathname, { bountyId: createdBounty.page.id });
     }
   }
 
-  return <Button onClick={onClickCreate}>{suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}</Button>;
+  return (
+    <Button data-test='create-suggest-bounty' onClick={onClickCreate}>
+      {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
+    </Button>
+  );
 }

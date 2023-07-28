@@ -12,5 +12,7 @@ export function countConnectableIdentities(user: LoggedInUser): number {
 
   count += user.googleAccounts.length;
 
+  count += user.verifiedEmails.length;
+
   return count;
 }

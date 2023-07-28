@@ -1,6 +1,6 @@
-import type { Application } from '@prisma/client';
+import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 
 import { getApplication } from '../getApplication';

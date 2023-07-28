@@ -21,10 +21,11 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
+import { useUserDetails } from 'components/u/components/UserDetails/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { headerHeight } from '../Header/Header';
 
@@ -62,6 +63,17 @@ const SidebarHeader = styled(Box)(
   }`
 );
 
+const StyledCreateSpaceForm = styled(CreateSpaceForm)`
+  // add styling so that the container takes full height of screen
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    .space-templates-container {
+      max-height: calc(100vh - 250px);
+      padding: 0;
+      margin: 0;
+    }
+  }
+`;
+
 export default function SidebarSubmenu({
   closeSidebar,
   logoutCurrentUser,
@@ -74,11 +86,11 @@ export default function SidebarSubmenu({
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { spaces, isCreatingSpace, setSpaces, isLoaded } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
-  const { handleUserUpdate, isSaving } = useUserDetails({});
+  const { saveUser, isSaving } = useUserDetails();
 
   function showSpaceForm() {
     setSpaceFormOpen(true);
@@ -97,11 +109,11 @@ export default function SidebarSubmenu({
       newOrder.splice(propIndex, 1); // remove the dragged property from the array
       const droppedOnIndex = newOrder.indexOf(droppedOnProperty); // find the index of the space that was dropped on
       newOrder.splice(droppedOnIndex, 0, draggedProperty); // add the property to the new index
-      await handleUserUpdate({ spacesOrder: newOrder });
+      await saveUser({ spacesOrder: newOrder });
       const newOrderedSpaces = spaces.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
       setSpaces(newOrderedSpaces);
     },
-    [handleUserUpdate, spaces]
+    [saveUser, spaces]
   );
 
   return (
@@ -122,7 +134,7 @@ export default function SidebarSubmenu({
             </Typography>
           </>
         ) : user ? (
-          <Avatar name={user.username} avatar={user.avatar ?? null} />
+          <Avatar name={user.username} avatar={user.avatar ?? null} isNft={hasNftAvatar(user)} />
         ) : null}
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
@@ -179,7 +191,7 @@ export default function SidebarSubmenu({
         onClose={closeSpaceForm}
         mobileDialog
       >
-        <CreateSpaceForm onCancel={closeSpaceForm} />
+        <StyledCreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>
   );

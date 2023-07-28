@@ -18,8 +18,6 @@ import messages_tr from '../i18n/tr.json';
 import messages_zhHans from '../i18n/zh_Hans.json';
 import messages_zhHant from '../i18n/zh_Hant.json';
 
-import { UserSettings } from './userSettings';
-
 const supportedLanguages = [
   'ca',
   'de',
@@ -81,19 +79,17 @@ export function getMessages(lang: string): { [key: string]: string } {
   }
 }
 export function getCurrentLanguage(): string {
-  let lang = UserSettings.language;
-  if (!lang) {
-    if (supportedLanguages.includes(navigator.language)) {
-      lang = navigator.language;
-    } else if (supportedLanguages.includes(navigator.language.split(/[-_]/)[0])) {
-      lang = navigator.language.split(/[-_]/)[0];
-    } else {
-      lang = 'en';
-    }
+  let lang: string;
+  if (supportedLanguages.includes(navigator.language)) {
+    lang = navigator.language;
+  } else if (supportedLanguages.includes(navigator.language.split(/[-_]/)[0])) {
+    lang = navigator.language.split(/[-_]/)[0];
+  } else {
+    lang = 'en';
   }
   return lang;
 }
 
 export function storeLanguage(lang: string): void {
-  UserSettings.language = lang;
+  // TODO: save to user settings
 }

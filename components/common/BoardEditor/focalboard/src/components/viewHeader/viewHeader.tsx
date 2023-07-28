@@ -1,18 +1,19 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Popover, Tooltip } from '@mui/material';
-import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
+import { Box, Menu, Popover, Tooltip } from '@mui/material';
+import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
 
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
@@ -55,6 +56,8 @@ function ViewHeader(props: Props) {
   const router = useRouter();
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
+  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
+  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const views = props.views.filter((view) => !view.fields.inline);
 
@@ -107,6 +110,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
+        viewIds={viewsBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -125,7 +129,10 @@ function ViewHeader(props: Props) {
 
       <div className='octo-spacer' />
 
-      <div className='view-actions'>
+      <Box
+        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1 !important' : undefined }}
+        className='view-actions'
+      >
         {!props.readOnly && activeView && (
           <>
             {/* Display by */}
@@ -139,46 +146,65 @@ function ViewHeader(props: Props) {
             )}
 
             {/* Filter */}
-
-            <PopupState variant='popover' popupId='view-filter'>
-              {(popupState) => (
-                <>
-                  <Button
-                    color={hasFilter ? 'primary' : 'secondary'}
-                    variant='text'
-                    size='small'
-                    sx={{ minWidth: 0 }}
-                    {...bindTrigger(popupState)}
-                  >
-                    <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
-                  </Button>
-                  <Popover
-                    {...bindPopover(popupState)}
-                    disablePortal
-                    PaperProps={{
-                      sx: {
-                        overflow: 'visible'
-                      }
-                    }}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left'
-                    }}
-                  >
-                    <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
-                  </Popover>
-                </>
-              )}
-            </PopupState>
+            <Button
+              color={hasFilter ? 'primary' : 'secondary'}
+              variant='text'
+              size='small'
+              sx={{ minWidth: 0 }}
+              {...bindTrigger(viewFilterPopup)}
+            >
+              <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
+            </Button>
+            <Popover
+              {...bindPopover(viewFilterPopup)}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left'
+              }}
+              sx={{
+                overflow: 'auto'
+              }}
+            >
+              <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
+            </Popover>
 
             {/* Sort */}
 
             {withSortBy && (
-              <ViewHeaderSortMenu
-                properties={activeBoard?.fields.cardProperties ?? []}
-                activeView={activeView}
-                orderedCards={cards}
-              />
+              <>
+                <Button
+                  color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
+                  variant='text'
+                  size='small'
+                  sx={{ minWidth: 0 }}
+                  {...bindTrigger(viewSortPopup)}
+                >
+                  <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
+                </Button>
+                <Menu
+                  {...bindMenu(viewSortPopup)}
+                  PaperProps={{
+                    sx: {
+                      overflow: 'visible'
+                    }
+                  }}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right'
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right'
+                  }}
+                  onClick={() => viewSortPopup.close()}
+                >
+                  <ViewHeaderSortMenu
+                    properties={activeBoard?.fields.cardProperties ?? []}
+                    activeView={activeView}
+                    orderedCards={cards}
+                  />
+                </Menu>
+              </>
             )}
           </>
         )}
@@ -191,7 +217,12 @@ function ViewHeader(props: Props) {
         {props.embeddedBoardPath && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
+              <span>
+                <IconButton
+                  icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                  style={{ width: '32px' }}
+                />
+              </span>
             </Tooltip>
           </Link>
         )}
@@ -217,7 +248,7 @@ function ViewHeader(props: Props) {
             )}
           </>
         )}
-      </div>
+      </Box>
     </div>
   );
 }

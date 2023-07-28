@@ -9,11 +9,11 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PublicPageResponse } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
 
 type Props = {
   publicPage: PublicPageResponse;
@@ -24,15 +24,20 @@ export function SharedPage({ publicPage }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
-  // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
+
   const basePageId = publicPage?.page?.id || '';
 
-  async function onLoad() {
-    if (!publicPage) {
-      return;
-    }
+  const { setBounties, loadingBounties } = useBounties();
 
-    const { page: rootPage, cards, boards, views } = publicPage;
+  // Pre-populate bounties state in place of prop drilling
+  useEffect(() => {
+    if (publicPage?.bounty && !loadingBounties) {
+      setBounties([publicPage.bounty]);
+    }
+  }, [publicPage, loadingBounties]);
+
+  async function onLoad(_publicPage: PublicPageResponse) {
+    const { page: rootPage, cards, boards, views } = _publicPage;
 
     charmClient.track.trackAction('page_view', {
       type: rootPage.type,
@@ -57,16 +62,15 @@ export function SharedPage({ publicPage }: Props) {
 
   useEffect(() => {
     if (publicPage) {
-      onLoad();
+      onLoad(publicPage);
     }
 
     return () => {
       setCurrentPageId('');
     };
-  }, [publicPage]);
+  }, [publicPage?.page.id]);
 
   const currentPage = pages?.[basePageId];
-  const parentProposalId = findParentOfType({ pageId: basePageId, pageType: 'proposal', pageMap: pages || {} });
 
   if (!currentPage && publicPage) {
     return <LoadingComponent isLoading />;
@@ -77,8 +81,8 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   return currentPage.type.match(/board/) ? (
-    <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
+    <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
+    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
   );
 }

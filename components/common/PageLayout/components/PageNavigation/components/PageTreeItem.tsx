@@ -1,5 +1,5 @@
+import type { Page, PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
@@ -9,24 +9,27 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page, PageType } from '@prisma/client';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { PageHeaderIcon } from 'components/[pageId]/DocumentPage/components/PageHeaderIcon';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import Link from 'components/common/Link';
+import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
+import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
+import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
@@ -46,6 +49,7 @@ interface PageTreeItemProps {
   label: string;
   pageType: PageType;
   pageId: string;
+  pagePath: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
   onClick?: () => void;
@@ -56,9 +60,17 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
 }>(({ isActive, theme }) => ({
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
+  marginLeft: 3,
+  marginRight: 3,
+  // unset margin on child tree items
+  '.MuiTreeItem-root': {
+    marginLeft: 0,
+    marginRight: 0
+  },
 
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
+    marginBottom: 1,
     // paddingRight: theme.spacing(1),
     // fontWeight: theme.typography.fontWeightMedium,
     '.MuiTypography-root': {
@@ -89,11 +101,12 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: 'inherit',
+      paddingLeft: 0,
       color: 'inherit'
     },
     [`& .${treeItemClasses.iconContainer}`]: {
       marginRight: 0,
-      width: '28px'
+      width: '24px'
     },
     [`& .${treeItemClasses.iconContainer} svg`]: {
       color: greyColor2
@@ -186,7 +199,7 @@ interface PageLinkProps {
   children?: ReactNode;
   href: string;
   label?: string;
-  labelIcon?: React.ReactNode;
+  labelIcon?: ReactNode;
   isEmptyContent?: boolean;
   pageType: Page['type'];
   pageId?: string;
@@ -210,6 +223,11 @@ export function PageLink({
     variant: 'popover'
   });
 
+  const [iconClicked, setIconClicked] = useState(false);
+  const { data: permissions } = useSWRImmutable(iconClicked && pageId ? `check-page-permissions-${pageId}` : null, () =>
+    charmClient.permissions.pages.computePagePermissions({ pageIdOrPath: pageId as string })
+  );
+
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
@@ -220,25 +238,29 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
-
   const triggerState = bindTrigger(popupState);
 
+  function handleIconClicked(ev: any) {
+    triggerState.onClick(ev);
+    setIconClicked(ev);
+  }
+
   return (
-    <PageAnchor href={href} onClick={stopPropagation}>
+    <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
       <span onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
           isEditorEmpty={isEmptyContent}
           icon={labelIcon}
           {...triggerState}
-          onClick={showPicker ? triggerState.onClick : undefined}
+          onClick={showPicker ? handleIconClicked : undefined}
         />
       </span>
       <PageTitle hasContent={isempty} onClick={onClick}>
         {isempty ? 'Untitled' : label}
       </PageTitle>
       {children}
-      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
+      {showPicker && pageId && permissions?.edit_content && <EmojiMenu popupState={popupState} pageId={pageId} />}
     </PageAnchor>
   );
 }
@@ -259,7 +281,7 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
         e.stopPropagation();
       }}
     >
-      <EmojiPicker onSelect={onSelectEmoji} />
+      <PageHeaderIcon updatePageIcon={onSelectEmoji} />
     </Menu>
   );
 }
@@ -272,12 +294,6 @@ const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemCo
     </div>
   )
 );
-
-const PageMenuItem = styled(ListItemButton)`
-  .MuiTypography-root {
-    font-weight: 600;
-  }
-`;
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
@@ -293,6 +309,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     label,
     pageType,
     pageId,
+    pagePath,
     hasSelectedChildView,
     onClick
   } = props;
@@ -369,7 +386,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={href} />}
+        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
@@ -378,18 +395,16 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
-  const { deletePage, getPagePermissions, pages } = usePages();
-  const { showMessage } = useSnackbar();
-  const permissions = getPagePermissions(pageId);
+  const { deletePage, pages } = usePages();
+  const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const router = useRouter();
-
-  const deletePageDisabled = !permissions.delete;
+  const deletePageDisabled = !pagePermissions?.delete;
+  const page = pages[pageId];
 
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
-    const page = pages[pageId];
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,
@@ -402,38 +417,26 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
     }
   }
 
-  function onCopy() {
-    closeMenu();
-    showMessage('Link copied to clipboard');
-  }
-
-  function getAbsolutePath() {
-    if (typeof window !== 'undefined') {
-      return window.location.origin + pagePath;
-    }
-    return '';
-  }
-
   return (
     <>
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
-          <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
+          <ListItemButton dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon>
               <DeleteOutlinedIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
-          </PageMenuItem>
+          </ListItemButton>
         </div>
       </Tooltip>
-      <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
-        <PageMenuItem dense>
-          <ListItemIcon>
-            <ContentCopyIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>Copy link</ListItemText>
-        </PageMenuItem>
-      </CopyToClipboard>
+      <AddToFavoritesAction pageId={pageId} onComplete={closeMenu} />
+      <DuplicatePageAction
+        pageId={pageId}
+        pageType={page?.type}
+        pagePermissions={pagePermissions}
+        onComplete={closeMenu}
+      />
+      <CopyPageLinkAction path={`/${pagePath}`} onComplete={closeMenu} />
     </>
   );
 }

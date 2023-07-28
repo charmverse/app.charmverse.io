@@ -1,4 +1,4 @@
-import type { VoteContext, VoteStatus } from '@prisma/client';
+import type { VoteContext, VoteStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
@@ -36,13 +36,7 @@ async function setupVoteData(params?: { context?: VoteContext; status?: VoteStat
 
 describe('updateVote', () => {
   it('should update and return vote', async () => {
-    const { vote, space, user } = await setupVoteData();
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
-    });
+    const { vote, user } = await setupVoteData();
 
     const updatedVote = await updateVote(vote.id, user.id, { status: 'Cancelled' });
     expect(updatedVote.status).toBe('Cancelled');
@@ -70,14 +64,8 @@ describe('updateVote', () => {
   // });
 
   it('should throw error if a proposal context vote is being cancelled', async () => {
-    const { vote, user, space } = await setupVoteData({
+    const { vote, user } = await setupVoteData({
       context: 'proposal'
-    });
-
-    await addSpaceOperations({
-      forSpaceId: space.id,
-      operations: ['createVote'],
-      spaceId: space.id
     });
 
     await expect(updateVote(vote.id, user.id, { status: 'Cancelled' })).rejects.toBeInstanceOf(

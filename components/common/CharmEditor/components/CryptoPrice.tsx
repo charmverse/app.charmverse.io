@@ -8,7 +8,7 @@ import { CryptoCurrencies, getChainById } from 'connectors';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
@@ -111,7 +111,10 @@ export function CryptoPrice({
 
     setLoadingState(true);
 
-    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
+    const symbol = getTokenInfo({
+      methods: paymentMethods,
+      symbolOrAddress: baseCurrency
+    }).tokenSymbol;
 
     charmClient
       .getPricing(symbol, quoteCurrency)
@@ -176,7 +179,7 @@ export function CryptoPrice({
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
+              <CoinLogoAndTicker {...getTokenInfo({ methods: paymentMethods, symbolOrAddress: baseCurrency })} />
             </StyledButton>
             <Typography component='span' color='secondary'>
               /
@@ -186,7 +189,7 @@ export function CryptoPrice({
               active={selectionList === 'quote'}
               onClick={() => toggleSelectionList('quote')}
             >
-              {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
+              {getTokenInfo({ methods: paymentMethods, symbolOrAddress: quoteCurrency }).tokenSymbol}
             </StyledButton>
             <IconButton disabled={readOnly} size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />

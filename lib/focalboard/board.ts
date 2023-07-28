@@ -6,7 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
-type PropertyType =
+export type PropertyType =
   | 'text'
   | 'number'
   | 'select'
@@ -16,6 +16,7 @@ type PropertyType =
   | 'file'
   | 'checkbox'
   | 'url'
+  | 'proposalUrl'
   | 'email'
   | 'phone'
   | 'createdTime'
@@ -30,20 +31,22 @@ interface IPropertyOption {
 }
 
 // A template for card properties attached to a board
-interface IPropertyTemplate {
+interface IPropertyTemplate<T extends PropertyType = PropertyType> {
   id: string;
   name: string;
-  type: PropertyType;
+  type: T;
   options: IPropertyOption[];
+  description?: string;
 }
 
-type BoardFields = {
+export type BoardFields = {
   icon: string;
   description: PageContent;
   showDescription?: boolean;
   isTemplate?: boolean;
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
+  viewIds: string[];
 };
 
 type Board = Block & {
@@ -57,9 +60,7 @@ function createBoard({
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {
-        id: o.id,
-        name: o.name,
-        type: o.type,
+        ...o,
         options: o.options ? o.options.map((option) => ({ ...option })) : []
       };
     }) ?? [];
@@ -102,6 +103,7 @@ function createBoard({
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
+      viewIds: block?.fields?.viewIds ?? [],
       ...block?.fields,
       cardProperties
     }
@@ -115,4 +117,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, PropertyType, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };

@@ -17,10 +17,10 @@ const StyledListItemText = styled(ListItemText)`
 
 function InviteIntro() {
   return (
-    <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
-      <Typography variant='h2' fontSize='inherit' fontWeight={700} marginBottom='24px'>
+    <>
+      <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
         Invite Members to this Space
-      </Typography>
+      </Legend>
       <Typography variant='body1' gutterBottom>
         There are 2 ways admins can invite users to this Space:
       </Typography>
@@ -30,7 +30,7 @@ function InviteIntro() {
           Token Gates: Control access to your space automatically with tokens/NFTs.
         </StyledListItemText>
       </StyledList>
-    </Legend>
+    </>
   );
 }
 

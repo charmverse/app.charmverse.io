@@ -1,8 +1,8 @@
-import type { Application } from '@prisma/client';
+import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { createApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -64,7 +64,7 @@ async function createApplicationController(req: NextApiRequest, res: NextApiResp
   const { bountyId, message } = req.body;
 
   // Get the space ID so we can make sure requester has access
-  const bountySpaceId = await prisma.bounty.findUnique({
+  const bounty = await prisma.bounty.findUnique({
     where: {
       id: bountyId
     },
@@ -73,11 +73,12 @@ async function createApplicationController(req: NextApiRequest, res: NextApiResp
       spaceId: true,
       rewardAmount: true,
       rewardToken: true,
-      page: true
+      page: true,
+      customReward: true
     }
   });
 
-  if (!bountySpaceId) {
+  if (!bounty) {
     throw new DataNotFoundError(`Bounty with id ${bountyId}`);
   }
 
@@ -91,9 +92,7 @@ async function createApplicationController(req: NextApiRequest, res: NextApiResp
 
   if (!permissions.work) {
     throw new UnauthorisedActionError(
-      `You do not have the permission to ${
-        bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'
-      } to this bounty`
+      `You do not have the permission to ${bounty.approveSubmitters === true ? 'apply' : 'submit work'} to this bounty`
     );
   }
 
@@ -103,14 +102,15 @@ async function createApplicationController(req: NextApiRequest, res: NextApiResp
     userId: req.session.user.id
   });
 
-  const { spaceId, rewardAmount, rewardToken, page } = bountySpaceId;
+  const { spaceId, rewardAmount, rewardToken, page, customReward } = bounty;
   trackUserAction('bounty_application', {
     userId,
     spaceId,
     pageId: page?.id || '',
     rewardAmount,
     rewardToken,
-    resourceId: bountyId
+    resourceId: bountyId,
+    customReward
   });
 
   return res.status(201).json(createdApplication);

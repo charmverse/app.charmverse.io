@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -6,13 +7,12 @@ import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import { PageActionsMenu } from 'components/common/PageActionsMenu';
+import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { Constants } from '../../constants';
@@ -20,7 +20,7 @@ import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import Editable from '../../widgets/editable';
+import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -71,7 +71,7 @@ function TableRow(props: Props) {
     pageUpdatedBy,
     saveTitle
   } = props;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -89,21 +89,6 @@ function TableRow(props: Props) {
     }
     await mutator.deleteBlock(card, 'delete card');
     mutate(`pages/${space?.id}`);
-  };
-
-  const duplicateCard = () => {
-    if (space && cardPage) {
-      mutator.duplicateCard({
-        cardId: card.id,
-        board,
-        cardPage,
-        afterRedo: async (newCardId) => {
-          props.showCard(newCardId);
-          mutate(`pages/${space.id}`);
-        },
-        beforeUndo: async () => {}
-      });
-    }
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -139,6 +124,18 @@ function TableRow(props: Props) {
     }
   }
 
+  const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
+  const commonProps = {
+    ref: titleRef,
+    value: title,
+    placeholderText: 'Untitled',
+    onChange: (newTitle: string) => setTitle(newTitle),
+    onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
+    onCancel: () => setTitle(card.title || ''),
+    readOnly: props.readOnly,
+    spellCheck: true
+  };
+
   return (
     <div
       className={className}
@@ -147,7 +144,7 @@ function TableRow(props: Props) {
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {/* Columns, one per property */}
-      {visiblePropertyTemplates.map((template) => {
+      {visiblePropertyTemplates.map((template, templateIndex) => {
         if (template.id === Constants.titleColumnId) {
           return (
             <Box
@@ -164,59 +161,62 @@ function TableRow(props: Props) {
               key={template.id}
               onPaste={(e) => e.stopPropagation()}
             >
-              {!props.readOnly && (
+              {!props.readOnly && templateIndex === 0 && (
                 <IconButton className='icons' onClick={handleClick} size='small'>
                   <DragIndicatorIcon color='secondary' />
                 </IconButton>
               )}
-              <div className='octo-icontitle'>
-                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+              <div style={{ display: 'flex', width: '100%' }}>
+                <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
+                  <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+                  <TextInput {...commonProps} multiline={wrapColumn} />
+                </div>
 
-                <Editable
-                  ref={titleRef}
-                  value={title}
-                  placeholderText='Untitled'
-                  onChange={(newTitle: string) => setTitle(newTitle)}
-                  onSave={(saveType) => saveTitle(saveType, card.id, title, pageTitle)}
-                  onCancel={() => setTitle(card.title || '')}
-                  readOnly={props.readOnly}
-                  spellCheck={true}
-                />
-              </div>
-
-              <div className='open-button'>
-                <Button onClick={() => props.showCard(props.card.id || '')}>
-                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                </Button>
+                <div className='open-button'>
+                  <Button onClick={() => props.showCard(props.card.id || '')}>
+                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                  </Button>
+                </div>
               </div>
             </Box>
           );
         }
+
+        const columnRef = columnRefs.get(template.id);
+
         return (
           <div
             className='octo-table-cell'
             key={template.id}
             style={{
+              alignItems: 'flex-start',
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
-            ref={columnRefs.get(template.id)}
+            ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
+            {!props.readOnly && templateIndex === 0 && (
+              <IconButton className='icons' onClick={handleClick} size='small'>
+                <DragIndicatorIcon color='secondary' />
+              </IconButton>
+            )}
             <PropertyValueElement
               readOnly={props.readOnly}
               card={card}
               board={board}
+              showEmptyPlaceholder={false}
               propertyTemplate={template}
-              showEmptyPlaceholder={true}
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
+              displayType='table'
+              columnRef={columnRef}
+              wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
             />
           </div>
         );
       })}
-      {cardPage && !props.readOnly && (
+      {!props.readOnly && (
         <PageActionsMenu
-          onClickDuplicate={duplicateCard}
           onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}

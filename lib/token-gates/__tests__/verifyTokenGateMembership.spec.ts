@@ -1,15 +1,16 @@
-import type { Space } from '@prisma/client';
-import * as litSDK from 'lit-js-sdk';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import * as litSDK from '@lit-protocol/lit-node-client';
 
-import { prisma } from 'db';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/token-gates/verifyTokenGateMemberships';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('lit-js-sdk');
+jest.mock('@lit-protocol/lit-node-client');
 
 // @ts-ignore
 const mockedLitSDK: jest.Mocked<typeof litSDK> = litSDK;
@@ -59,9 +60,9 @@ describe('verifyTokenGateMembership', () => {
     space = s;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     mockedLitSDK.verifyJwt.mockClear();
-    // jest.unmock('lit-js-sdk');
+    // jest.unmock('@lit-protocol/lit-node-client');
     jest.resetModules();
   });
 
@@ -84,7 +85,7 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -115,7 +116,7 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.user.userTokenGates.length).toBe(1);
     expect(verifyUser.user.userTokenGates[0].tokenGate).toBeNull();
     expect(res).toEqual({ removedRoles: 0, verified: false });
-    expect(spaceUser).not.toBeNull();
+    expect(spaceUser).toBeNull();
   });
 
   it('should not verify and remove user with all token gates being not verified', async () => {
@@ -123,7 +124,7 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -133,7 +134,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -156,7 +157,7 @@ describe('verifyTokenGateMembership', () => {
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     // do not verify token gates anymore
-    mockedLitSDK.verifyJwt.mockResolvedValue(verifiedJWTResponse({ verified: false }));
+    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -168,7 +169,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
     expect(res).toEqual({ removedRoles: 0, verified: false });
-    expect(spaceUser).not.toBeNull();
+    expect(spaceUser).toBeNull();
   });
 
   it('should verify user with at least one valid token gate', async () => {
@@ -177,7 +178,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -187,7 +188,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -209,7 +210,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(async ({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
       // verify only one of token gates
       if (jwt === 'jwt1') {
         return verifiedJWTResponse({
@@ -248,7 +249,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -258,7 +259,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -280,7 +281,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(verifiedJWTResponse({ verified: false }));
+    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -295,7 +296,7 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
     expect(res).toEqual({ removedRoles: 2, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
+    expect(spaceUser?.spaceRoleToRole.length).toBe(0);
   });
 
   it('should remove roles assigned via deleted token gate', async () => {
@@ -310,7 +311,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -320,7 +321,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -343,7 +344,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockResolvedValueOnce(
+    mockedLitSDK.verifyJwt.mockReturnValueOnce(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -366,8 +367,8 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
     expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
-    // expect(spaceUser?.spaceRoleToRole[0].roleId).toBe(role2.id);
+    expect(spaceUser?.spaceRoleToRole.length).toBe(1);
+    expect(spaceUser?.spaceRoleToRole[0].roleId).toBe(role2.id);
   });
 
   it('should not remove role assigned via at least one valid token gate', async () => {
@@ -385,7 +386,7 @@ describe('verifyTokenGateMembership', () => {
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -395,7 +396,7 @@ describe('verifyTokenGateMembership', () => {
         })
       )
       // verify to apply token gate
-      .mockResolvedValueOnce(
+      .mockReturnValueOnce(
         verifiedJWTResponse({
           verified: true,
           payload: {
@@ -417,7 +418,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(async ({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
       // verify only one of token gates
       if (jwt === 'jwt2') {
         return verifiedJWTResponse({
@@ -444,43 +445,15 @@ describe('verifyTokenGateMembership', () => {
     expect(verifyUser.spaceRoleToRole.length).toBe(3);
     expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
-    expect(spaceUser?.spaceRoleToRole.length).toBe(3);
-    // expect(spaceUser?.spaceRoleToRole).toEqual(
-    //   expect.arrayContaining([
-    //     expect.objectContaining({ roleId: role2.id }),
-    //     expect.objectContaining({ roleId: role3.id })
-    //   ])
-    // );
-    // expect(spaceUser?.spaceRoleToRole).toEqual(
-    //   expect.not.arrayContaining([
-    //     expect.objectContaining({ roleId: role.id })
-    //   ])
-    // );
+    expect(spaceUser?.spaceRoleToRole.length).toBe(2);
+    expect(spaceUser?.spaceRoleToRole).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ roleId: role2.id }),
+        expect.objectContaining({ roleId: role3.id })
+      ])
+    );
+    expect(spaceUser?.spaceRoleToRole).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ roleId: role.id })])
+    );
   });
 });
-
-type LitResponse = Awaited<ReturnType<typeof litSDK.verifyJwt>>;
-
-function verifiedJWTResponse(
-  response: Partial<Omit<LitResponse, 'payload'> & { payload: Partial<LitResponse['payload']> }>
-): LitResponse {
-  return {
-    header: '',
-    verified: true,
-    signature: new Uint8Array(),
-    ...response,
-    payload: {
-      iss: 'LIT',
-      sub: 'user',
-      chain: 'ethereum',
-      iat: 1,
-      exp: 1,
-      baseUrl: 'https://app.charmverse.io',
-      path: '',
-      orgId: '',
-      role: 'member',
-      extraData: `{ "tokenGateId": "id" }`,
-      ...(response.payload || {})
-    }
-  };
-}

@@ -69,7 +69,7 @@ export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onC
   title?: string | ReactNode;
   position?: ModalPosition;
   noPadding?: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   mobileDialog?: boolean;
 };
 

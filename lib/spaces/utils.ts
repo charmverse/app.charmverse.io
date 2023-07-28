@@ -1,4 +1,4 @@
-import { DOMAIN_BLACKLIST } from './config';
+import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 
 export function isSpaceDomain(path?: string) {
   if (!path) {
@@ -13,6 +13,10 @@ export function isSpaceDomain(path?: string) {
 export function getSpaceDomainFromName(name: string) {
   return name
     .replace(/[^\w\s-]/gu, '')
-    .replace(/\s/g, '-')
+    .replace(/(\s|\.)/g, '-')
     .toLowerCase();
+}
+
+export function isCustomDomain(domain: string) {
+  return domain.includes('.');
 }

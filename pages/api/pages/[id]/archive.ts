@@ -1,13 +1,14 @@
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { PageNotFoundError } from 'lib/pages/server';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -15,6 +16,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys(['archive'], 'body'))
   .put(togglePageArchiveStatus);
 
@@ -36,20 +44,14 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await computeUserPagePermissions({
-    pageId,
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: pageId,
     userId
   });
 
   if (permissions.delete !== true) {
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
-
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: pageId
-    }
-  });
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
   // If we are restoring page then severe the link with parent, only if its not of type card
@@ -84,23 +86,31 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
         });
       }
 
-      await setupPermissionsAfterPageRepositioned(pageId);
+      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({ event: 'repositioned', pageId });
     }
   }
 
   trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId: pageSpaceId.spaceId, pageId });
 
+  log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
+    pageId,
+    pageIds: modifiedChildPageIds,
+    spaceId: pageSpaceId.spaceId,
+    userId
+  });
+
   const deletedAt = archive ? new Date() : null;
+  const deletedBy = archive ? userId : null;
 
   relay.broadcast(
     {
       type: 'pages_meta_updated',
-      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId }))
+      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId, deletedBy }))
     },
     pageSpaceId.spaceId
   );
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
+  return res.status(200).json({ pageIds: modifiedChildPageIds });
 }
 
 export default withSessionRoute(handler);

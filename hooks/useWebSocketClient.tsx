@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
@@ -6,7 +7,6 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { websocketsHost } from 'config/constants';
-import log from 'lib/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 
@@ -46,7 +46,7 @@ let socket: SocketConnection;
 export function WebSocketClientProvider({ children }: { children: ReactNode }) {
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { current: eventFeed } = useRef(new PubSub<ServerMessage['type'], ServerMessage['payload']>());
 

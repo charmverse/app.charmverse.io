@@ -19,6 +19,8 @@ export async function getSnapshotSpace(spaceDomain: string): Promise<SnapshotSpa
           params
         }
         admins
+        members
+        moderators
         avatar
         terms
         filters {
@@ -28,7 +30,6 @@ export async function getSnapshotSpace(spaceDomain: string): Promise<SnapshotSpa
         plugins
         private
         __typename
-        members
         categories
         about
         voting {

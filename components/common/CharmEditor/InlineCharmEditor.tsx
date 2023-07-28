@@ -1,4 +1,4 @@
-import { bold, code, italic, link, paragraph, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
@@ -7,14 +7,18 @@ import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
+import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
+import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import * as floatingMenu from './components/floatingMenu';
+import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
@@ -27,7 +31,7 @@ export interface ICharmEditorOutput {
   rawText: string;
 }
 
-const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
+const emojiPluginKey = new PluginKey(emojiSuggestKeyName);
 const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 const floatingMenuPluginKey = new PluginKey('floatingMenu');
 const linksPluginKey = new PluginKey('links');
@@ -83,7 +87,7 @@ export function charmEditorPlugins({
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),
-    emoji.plugins({
+    emojiPlugins({
       key: emojiPluginKey
     }),
     mentionPlugins({
@@ -164,7 +168,7 @@ export default function CharmEditor({
   placeholderText,
   readOnly = false
 }: InlineCharmEditorProps) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
   const onContentChangeDebounced = onContentChange
@@ -235,7 +239,7 @@ export default function CharmEditor({
         }
       }}
     >
-      <floatingMenu.FloatingMenu inline pluginKey={floatingMenuPluginKey} />
+      <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {currentSpace && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}

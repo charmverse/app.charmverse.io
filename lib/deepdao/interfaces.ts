@@ -49,10 +49,10 @@ export interface DeepDaoOrganizationDetails {
   name: string;
   description: string;
   logo: string | null;
-  members: 21;
-  activeMembers: 0;
-  proposals: 1;
-  votes: 20;
+  members: number;
+  activeMembers: number;
+  proposals: number;
+  votes: number;
   tokens: string[];
   governance: {
     platform: string;

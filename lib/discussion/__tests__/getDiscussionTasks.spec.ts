@@ -1,7 +1,7 @@
-import type { Comment, Block, Bounty, Page, Space, User } from '@prisma/client';
+import type { Comment, Block, Bounty, Page, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import {
   createPage,
   createBlock,

@@ -1,7 +1,8 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { countValidSubmissions } from 'lib/applications/shared';
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissions } from 'lib/pages/server';
+import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
 
 import { getBountyOrThrow } from './getBounty';
 
@@ -40,7 +41,7 @@ export async function closeOutBounty(bountyId: string): Promise<BountyWithDetail
     include: {
       applications: true,
       page: {
-        include: includePagePermissions()
+        include: includePagePermissionsWithSource()
       }
     }
   }) as Promise<BountyWithDetails>;

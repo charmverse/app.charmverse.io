@@ -3,6 +3,8 @@
 /node_modules
 jspm_packages
 
+/prisma
+
 # Serverless directories
 .serverless
 .build
@@ -10,6 +12,10 @@ jspm_packages
 # next.js
 /.next/
 /out/
+/dist/
+
+# Tests
+/__e2e-dist__/
 
 # production
 *.zip
@@ -29,6 +35,8 @@ playwright-report
 ./pages/api/script/*
 
 scripts/exportData/exports
+
+jsonoutputs
 
 # cdk
 cdk.out
@@ -50,3 +58,4 @@ todo.md
 /test-results/
 /playwright-report/
 /playwright/.cache/
+storybook-static

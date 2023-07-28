@@ -1,0 +1,27 @@
+.lsm-choose-access-button {
+    width: calc(100% - 1em);
+    box-sizing: border-box;
+    margin: 0.5em auto;
+    /*padding: 0.5em;*/
+    height: 4.5em;
+    border: var(--lsm-secondary-color) 1px solid;
+    background-color: var(--lsm-secondary-background-color);
+    border-radius: var(--lsm-border-radius);
+    color: var(--lsm-primary-color);
+    font-family: var(--lsm-primary-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: var(--lsm-primary-font-weight);
+}
+
+.lsm-choose-access-button:hover {
+
+}
+
+.lsm-choose-access-button-icon {
+    height: 2.5em;
+    margin-right: 1em;
+}

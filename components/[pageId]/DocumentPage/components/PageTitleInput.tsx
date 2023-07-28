@@ -1,10 +1,10 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
+import type { TextFieldProps } from '@mui/material';
 import { TextField, Typography } from '@mui/material';
-import { TextSelection } from 'prosemirror-state';
-import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 
+import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
@@ -12,12 +12,16 @@ const StyledPageTitle = styled(TextField)`
     width: 100%;
   }
 
+  & .MuiInput-root {
+    font-size: inherit;
+  }
+
   & .MuiInput-input {
     background: transparent;
     border: 0 none;
     color: ${({ theme }) => theme.palette.text.primary};
     cursor: text;
-    font-size: 40px;
+    font-size: 2.4em;
     font-weight: 700;
     outline: none;
     line-height: 1.25em;
@@ -60,37 +64,51 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
     }
   }, [value, updatedAtExternal]);
 
-  function _onChange(event: ChangeEvent<HTMLInputElement>) {
-    const _title = event.target.value;
+  function updateTitle(newTitle: string) {
     const _updatedAt = new Date().toISOString();
-    setTitle(_title);
+    setTitle(newTitle);
     setUpdatedAt(_updatedAt);
-    onChange({ title: _title, updatedAt: _updatedAt });
+    onChange({ title: newTitle, updatedAt: _updatedAt });
   }
+
+  const handleKeyDown: TextFieldProps['onKeyDown'] = (event) => {
+    const pressedEnter = event.key === 'Enter';
+    const pressedCtrl = event.ctrlKey;
+    if (pressedEnter) {
+      if (!pressedCtrl) {
+        event.preventDefault();
+        insertAndFocusFirstLine(view);
+      } else {
+        const inputElement = event.target as HTMLInputElement;
+        updateTitle(`${inputElement.value}\n`);
+      }
+    }
+  };
 
   if (readOnly) {
     return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
-    <StyledPageTitle
-      data-test='editor-page-title'
-      inputRef={titleInput}
-      value={title}
-      onChange={_onChange}
-      placeholder='Untitled'
-      autoFocus={!value && !readOnly && !isTouchScreen()}
-      multiline
-      variant='standard'
-      onKeyDown={(e) => {
-        if (e.code === 'Enter') {
-          // prevent inserting a new line into the editor
-          e.preventDefault();
-          const { tr } = view.state;
-          // set cursor at beginning of first line
-          view.dispatch(tr.setSelection(TextSelection.atStart(tr.doc)));
-          view.focus();
-        }
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        insertAndFocusFirstLine(view);
       }}
-    />
+    >
+      <StyledPageTitle
+        className='page-title'
+        data-test='editor-page-title'
+        inputRef={titleInput}
+        value={title}
+        multiline
+        placeholder='Untitled'
+        autoFocus={!value && !readOnly && !isTouchScreen()}
+        variant='standard'
+        onKeyDown={handleKeyDown}
+        onChange={(e) => {
+          updateTitle(e.target.value);
+        }}
+      />
+    </form>
   );
 }

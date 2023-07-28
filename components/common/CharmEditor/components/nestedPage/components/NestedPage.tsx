@@ -1,12 +1,16 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 const NestedPageContainer = styled(Link)`
@@ -33,25 +37,30 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== 'showBorderBottom'
-})<{ showBorderBottom?: boolean }>`
+const StyledTypography = styled(Typography)`
   font-weight: 600;
-  ${({ showBorderBottom }) =>
-    showBorderBottom &&
-    `
-    border-bottom: 0.05em solid var(--link-underline);
-  `}
+  border-bottom: 0.05em solid var(--link-underline);
 `;
 
 export default function NestedPage({ node, currentPageId, getPos }: NodeViewProps & { currentPageId?: string }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const { pages } = usePages();
-  const nestedPage = pages[node.attrs.id];
-  const parentPage = nestedPage?.parentId ? pages[nestedPage.parentId] : null;
+  const { categories } = useForumCategories();
+  const documentPage = pages[node.attrs.id];
+  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
 
-  const appPath = `${space?.domain}/${nestedPage?.path}`;
+  const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
+
+  const pageTitle =
+    (documentPage || staticPage)?.title || (forumCategoryPage ? `Forum > ${forumCategoryPage?.name}` : '');
+  const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
+
+  const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
+  const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';
+  const categoryPath = forumCategoryPage ? `${space?.domain}/forum/${forumCategoryPage.path}` : '';
+  const appPath = pagePath || staticPath || categoryPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
@@ -59,11 +68,11 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
 
   return (
     <NestedPageContainer
-      data-test={`nested-page-${nestedPage?.id}`}
-      href={nestedPage ? `/${appPath}` : ''}
+      data-test={`nested-page-${pageId}`}
+      href={appPath ? `/${appPath}` : undefined}
       color='inherit'
-      data-id={`page-${nestedPage?.id}`}
-      data-title={nestedPage?.title}
+      data-id={`page-${pageId}`}
+      data-title={pageTitle}
       data-path={fullPath}
       onDragStart={() => {
         const nodePos = getPos();
@@ -73,20 +82,46 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
             .setSelection(new TextSelection(view.state.doc.resolve(nodePos), view.state.doc.resolve(nodePos + 1)))
         );
       }}
+      data-type={node.attrs.type}
     >
       <div>
-        {nestedPage && (
-          <PageIcon
-            isLinkedPage={isLinkedPage}
-            isEditorEmpty={!nestedPage.hasContent}
-            icon={nestedPage.icon}
-            pageType={nestedPage.type}
-          />
-        )}
+        <LinkIcon
+          isLinkedPage={isLinkedPage}
+          documentPage={documentPage}
+          staticPage={staticPage}
+          isCategoryPage={!!forumCategoryPage}
+        />
       </div>
-      <StyledTypography showBorderBottom={isLinkedPage}>
-        {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}
-      </StyledTypography>
+      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
     </NestedPageContainer>
   );
+}
+
+function LinkIcon({
+  isLinkedPage,
+  documentPage,
+  staticPage,
+  isCategoryPage
+}: {
+  isLinkedPage: boolean;
+  documentPage?: PageMeta;
+  staticPage?: StaticPage;
+  isCategoryPage: boolean;
+}) {
+  if (staticPage) {
+    return <PageIcon pageType={staticPage.path} />;
+  } else if (isCategoryPage) {
+    return <PageIcon pageType='forum_category' />;
+  } else if (documentPage) {
+    return (
+      <PageIcon
+        isLinkedPage={isLinkedPage}
+        isEditorEmpty={!documentPage.hasContent}
+        icon={documentPage.icon}
+        pageType={documentPage.type}
+      />
+    );
+  } else {
+    return <NoAccessPageIcon />;
+  }
 }

@@ -1,4 +1,6 @@
 /* eslint-disable default-param-last */
+import type { PageMeta } from '@charmverse/core/pages';
+
 import charmClient from 'charmClient';
 import type { Block, BlockPatch } from 'lib/focalboard/block';
 import { createPatchesFromBlocks } from 'lib/focalboard/block';
@@ -8,14 +10,14 @@ import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalb
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
 import { Constants } from './constants';
-import octoClient, { OctoClient } from './octoClient';
+import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
 import { IDType, Utils } from './utils';
@@ -170,6 +172,26 @@ class Mutator {
         await afterUndo?.();
       },
       actualDescription,
+      this.undoGroupId
+    );
+  }
+
+  async deleteBlocks(
+    blockIds: string[],
+    description = 'delete blocks',
+    beforeRedo?: () => Promise<void>,
+    afterUndo?: () => Promise<void>
+  ) {
+    await undoManager.perform(
+      async () => {
+        await beforeRedo?.();
+        await charmClient.deleteBlocks(blockIds, publishIncrementalUpdate);
+      },
+      async () => {
+        // await charmClient.insertBlock(block, publishIncrementalUpdate)
+        await afterUndo?.();
+      },
+      description,
       this.undoGroupId
     );
   }
@@ -573,7 +595,8 @@ class Mutator {
     cards: Card[],
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
-    newName: string
+    newName: string,
+    views: BoardView[]
   ) {
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
@@ -658,6 +681,17 @@ class Mutator {
     }
 
     await this.updateBlocks(newBlocks, oldBlocks, 'change property type and name');
+    for (const view of views) {
+      const affectedFilters = view.fields.filter.filters.filter(
+        (filter) => (filter as FilterClause).propertyId !== propertyTemplate.id
+      );
+      if (affectedFilters.length !== view.fields.filter.filters.length) {
+        await this.changeViewFilter(view.id, view.fields.filter, {
+          operation: 'and',
+          filters: affectedFilters
+        });
+      }
+    }
   }
 
   // Views
@@ -727,6 +761,32 @@ class Mutator {
       },
       'display by',
       this.undoDisplayId
+    );
+  }
+
+  async changeBoardViewsOrder(
+    boardId: string,
+    currentViewIds: string[],
+    droppedView: BoardView,
+    dropzoneView: BoardView
+  ) {
+    const tempViewIds = [...currentViewIds];
+    const droppedViewIndex = tempViewIds.indexOf(droppedView.id);
+    const dropzoneViewIndex = tempViewIds.indexOf(dropzoneView.id);
+    tempViewIds.splice(dropzoneViewIndex, 0, tempViewIds.splice(droppedViewIndex, 1)[0]);
+
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(boardId, { updatedFields: { viewIds: tempViewIds } }, publishIncrementalUpdate);
+      },
+      async () => {
+        await charmClient.patchBlock(
+          boardId,
+          { updatedFields: { visiblePropertyIds: currentViewIds } },
+          publishIncrementalUpdate
+        );
+      },
+      "change board's views order"
     );
   }
 
@@ -857,6 +917,39 @@ class Mutator {
     );
   }
 
+  async toggleColumnWrap(
+    viewId: string,
+    templateId: string,
+    currentColumnWrappedIds: string[],
+    description = 'toggle column wrap'
+  ): Promise<void> {
+    const currentColumnWrap = currentColumnWrappedIds.includes(templateId);
+    await undoManager.perform(
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          {
+            updatedFields: {
+              columnWrappedIds: currentColumnWrap
+                ? currentColumnWrappedIds.filter((currentColumnWrappedId) => currentColumnWrappedId !== templateId)
+                : [...currentColumnWrappedIds, templateId]
+            }
+          },
+          publishIncrementalUpdate
+        );
+      },
+      async () => {
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { columnWrappedIds: currentColumnWrappedIds } },
+          publishIncrementalUpdate
+        );
+      },
+      description,
+      this.undoGroupId
+    );
+  }
+
   async hideViewColumn(view: BoardView, columnOptionId: string): Promise<void> {
     if (view.fields.hiddenOptionIds.includes(columnOptionId)) {
       return;
@@ -912,7 +1005,7 @@ class Mutator {
     beforeUndo?: () => Promise<void>;
   }): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
-    const pageDetails = await charmClient.pages.getPageDetails(cardId);
+    const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       Block[],
       Card,
@@ -953,79 +1046,6 @@ class Mutator {
       beforeUndo
     );
     return [newBlocks, newCard.id];
-  }
-
-  async duplicateBoard(
-    boardId: string,
-    description = 'duplicate board',
-    asTemplate = false,
-    afterRedo?: (newBoardId: string) => Promise<void>,
-    beforeUndo?: () => Promise<void>
-  ): Promise<[Block[], string]> {
-    const blocks = await charmClient.getSubtree(boardId, 3);
-    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [
-      Block[],
-      Board,
-      Record<string, string>
-    ];
-    const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
-    Utils.log(`duplicateBoard: duplicating ${newBlocks.length} blocks`);
-
-    if (asTemplate === newBoard.fields.isTemplate) {
-      newBoard.title = `${newBoard.title} copy`;
-    } else if (asTemplate) {
-      // Template from board
-      newBoard.title = 'New board template';
-    } else {
-      // Board from template
-    }
-    newBoard.fields.isTemplate = asTemplate;
-    const createdBlocks = await this.insertBlocks(
-      newBlocks,
-      description,
-      async (respBlocks: Block[]) => {
-        await afterRedo?.(respBlocks[0].id);
-      },
-      beforeUndo
-    );
-    return [createdBlocks, createdBlocks[0].id];
-  }
-
-  async duplicateFromRootBoard(
-    boardId: string,
-    description = 'duplicate board',
-    asTemplate = false,
-    afterRedo?: (newBoardId: string) => Promise<void>,
-    beforeUndo?: () => Promise<void>
-  ): Promise<[Block[], string]> {
-    const rootClient = new OctoClient(octoClient.serverUrl, '0');
-    const blocks = await rootClient.getSubtree(boardId, 3, '0');
-    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [
-      Block[],
-      Board,
-      Record<string, string>
-    ];
-    const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
-    Utils.log(`duplicateBoard: duplicating ${newBlocks.length} blocks`);
-
-    if (asTemplate === newBoard.fields.isTemplate) {
-      newBoard.title = `${newBoard.title} copy`;
-    } else if (asTemplate) {
-      // Template from board
-      newBoard.title = 'New board template';
-    } else {
-      // Board from template
-    }
-    newBoard.fields.isTemplate = asTemplate;
-    const createdBlocks = await this.insertBlocks(
-      newBlocks,
-      description,
-      async (respBlocks: Block[]) => {
-        await afterRedo?.(respBlocks[0].id);
-      },
-      beforeUndo
-    );
-    return [createdBlocks, createdBlocks[0].id];
   }
 
   // Other methods

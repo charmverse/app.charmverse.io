@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PostCategory, Space, User } from '@prisma/client';
+import type { PostCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import { prisma } from 'db';
 import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -89,7 +89,6 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
     await request(baseUrl)
       .delete(`/api/spaces/${firstSpace.id}/post-categories/${postCategory.id}`)
       .set('Cookie', adminUserCookie)
-      .send()
       .expect(200);
 
     const category = await prisma.postCategory.findUnique({
@@ -115,7 +114,6 @@ describe('DELETE /api/spaces/[id]/post-categories/[postCategoryId] - Delete a po
     await request(baseUrl)
       .delete(`/api/spaces/${firstSpace.id}/post-categories/${postCategory.id}`)
       .set('Cookie', userCookie)
-      .send()
       .expect(401);
   });
 });

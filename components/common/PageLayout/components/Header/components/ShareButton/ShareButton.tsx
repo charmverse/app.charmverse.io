@@ -1,37 +1,22 @@
-import { IosShare, Share } from '@mui/icons-material';
+import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
-import type { PageType } from '@prisma/client';
+import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { memo, useEffect } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import { memo } from 'react';
 
-import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import Loader from 'components/common/Loader';
-import { usePages } from 'hooks/usePages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
+import { Button } from 'components/common/Button';
 
-import PagePermissions from './components/PagePermissions';
-import ShareToWeb from './components/ShareToWeb';
+import { PagePermissionsContainer } from './components/PagePermissionsContainer';
 
-function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: string }) {
-  const { refreshPage, pages } = usePages();
+type Props = {
+  headerHeight: number;
+  pageId: string;
+};
+
+function ShareButton({ headerHeight, pageId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(
-    pageId ? `/api/pages/${pageId}/permissions` : null,
-    () => charmClient.listPagePermissions(pageId)
-  );
+
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-
-  const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
-
-  // watch changes to the page in case permissions get updated
-  useEffect(() => {
-    if (pageId) {
-      refreshPage(pageId);
-    }
-  }, [pageId, pagePermissions]);
 
   return (
     <>
@@ -43,7 +28,6 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
             variant='text'
             size='small'
             onClick={() => {
-              refreshPermissions();
               popupState.open();
             }}
           >
@@ -53,7 +37,6 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           <IconButton
             data-test='toggle-page-permissions-dialog'
             onClick={() => {
-              refreshPermissions();
               popupState.open();
             }}
           >
@@ -80,28 +63,7 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           }
         }}
       >
-        {!pagePermissions ? (
-          <Box sx={{ height: 100 }}>
-            <Loader size={20} sx={{ height: 600 }} />
-          </Box>
-        ) : (
-          <>
-            <ShareToWeb
-              pageId={pageId}
-              pagePermissions={pagePermissions}
-              refreshPermissions={refreshPermissions}
-              proposalParentId={proposalParentId}
-            />
-            <Divider />
-            <PagePermissions
-              pageId={pageId}
-              refreshPermissions={refreshPermissions}
-              pagePermissions={pagePermissions}
-              pageType={pages[pageId]?.type as PageType}
-              proposalParentId={proposalParentId}
-            />
-          </>
-        )}
+        <PagePermissionsContainer pageId={pageId} />
       </Popover>
     </>
   );

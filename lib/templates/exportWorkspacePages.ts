@@ -1,27 +1,76 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { Block, PageType } from '@prisma/client';
+import type { PageNodeWithChildren } from '@charmverse/core/pages';
+import { resolvePageTree } from '@charmverse/core/pages';
+import type {
+  Block,
+  Bounty,
+  BountyPermission,
+  Page,
+  PagePermission,
+  Proposal,
+  ProposalCategory,
+  Vote,
+  VoteOptions
+} from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
-import type { PageNodeWithChildren } from 'lib/pages';
-import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
+import { isBoardPageType } from 'lib/pages/isBoardPageType';
+import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { ExportedPage, WorkspaceExport } from './interfaces';
-
-export interface ExportWorkspacePage {
-  sourceSpaceIdOrDomain: string;
-  exportName?: string;
+export interface PageWithBlocks {
+  blocks: {
+    board?: Block;
+    views?: Block[];
+    card?: Block;
+  };
+  votes?: (Vote & { voteOptions: VoteOptions[] })[];
+  proposal?:
+    | (Proposal & {
+        category: null | ProposalCategory;
+      })
+    | null;
+  bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
 }
 
-const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
+export type ExportedPage = PageNodeWithChildren<
+  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
+>;
+
+export interface WorkspaceExport {
+  pages: ExportedPage[];
+}
+function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
+  if (node?.content) {
+    node?.content.forEach((childNode) => {
+      recurse(childNode, cb);
+    });
+  }
+  if (node) {
+    cb(node);
+  }
+}
+
+type ExportWorkspaceOptions = {
+  sourceSpaceIdOrDomain: string;
+  rootPageIds?: string[];
+  skipBounties?: boolean;
+  skipProposals?: boolean;
+  skipBountyTemplates?: boolean;
+  skipProposalTemplates?: boolean;
+};
 
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
-  exportName
-}: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
+  rootPageIds,
+  skipBounties = false,
+  skipProposals = false,
+  skipBountyTemplates = false,
+  skipProposalTemplates = false
+}: ExportWorkspaceOptions): Promise<WorkspaceExport> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -34,14 +83,14 @@ export async function exportWorkspacePages({
 
   const rootPages = await prisma.page.findMany({
     where: {
-      spaceId: space.id,
-      deletedAt: null,
-      parentId: null,
-      type: {
-        notIn: excludedPageTypes
-      }
+      ...(rootPageIds ? { id: { in: rootPageIds } } : { spaceId: space.id, parentId: null }),
+      deletedAt: null
     }
   });
+
+  const exportData: WorkspaceExport = {
+    pages: []
+  };
 
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
@@ -51,18 +100,16 @@ export async function exportWorkspacePages({
   );
 
   // Console reporting for manual exports
-  const pageIndexes = mappedTrees.reduce((acc, val) => {
-    let pageCount = Object.keys(acc).length;
+  // const pageIndexes = mappedTrees.reduce((acc, val) => {
+  //   let pageCount = Object.keys(acc).length;
 
-    [val.targetPage, ...val.flatChildren].forEach((p) => {
-      pageCount += 1;
-      acc[p.id] = pageCount;
-    });
+  //   [val.targetPage, ...val.flatChildren].forEach((p) => {
+  //     pageCount += 1;
+  //     acc[p.id] = pageCount;
+  //   });
 
-    return acc;
-  }, {} as Record<string, number>);
-
-  const totalPages = Object.keys(pageIndexes).length;
+  //   return acc;
+  // }, {} as Record<string, number>);
 
   /**
    * Mutates the given node to provision its block data
@@ -71,7 +118,7 @@ export async function exportWorkspacePages({
     // eslint-disable-next-line no-console
     // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
-    if (node.type.match('board')) {
+    if (isBoardPageType(node.type)) {
       const boardblocks = await prisma.block.findMany({
         where: {
           rootId: node.id as string,
@@ -96,22 +143,78 @@ export async function exportWorkspacePages({
       node.blocks = {
         card: cardBlock as Block
       };
+    } else if (
+      node.bountyId &&
+      ((node.type === 'bounty' && !skipBounties) || (node.type === 'bounty_template' && !skipBountyTemplates))
+    ) {
+      node.bounty = await prisma.bounty.findUnique({
+        where: {
+          id: node.bountyId
+        },
+        include: {
+          permissions: true
+        }
+      });
+    } else if (
+      node.proposalId &&
+      ((node.type === 'proposal' && !skipProposals) || (node.type === 'proposal_template' && !skipProposalTemplates))
+    ) {
+      node.proposal = await prisma.proposal.findUnique({
+        where: {
+          id: node.proposalId
+        },
+        include: {
+          category: true
+        }
+      });
     }
 
-    node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
+    // node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
 
     await Promise.all(
       (node.children ?? []).map(async (child) => {
         await recursiveResolveBlocks({ node: child });
       })
     );
+    const pollIds: string[] = [];
+
+    recurse(node.content as PageContent, (_node) => {
+      if (_node.type === 'poll') {
+        const attrs = _node.attrs as { pollId: string };
+        if (attrs.pollId) {
+          pollIds.push(attrs.pollId);
+        }
+      }
+    });
+
+    if (pollIds.length) {
+      node.votes = await prisma.vote.findMany({
+        where: {
+          id: {
+            in: pollIds
+          }
+        },
+        include: {
+          voteOptions: true
+        }
+      });
+    }
   }
 
-  await Promise.all(
-    mappedTrees.map(async (tree) => {
-      await recursiveResolveBlocks({ node: tree.targetPage });
-    })
-  );
+  await Promise.all(mappedTrees.map((tree) => recursiveResolveBlocks({ node: tree.targetPage })));
+
+  mappedTrees.forEach((t) => {
+    exportData.pages.push(t.targetPage);
+  });
+
+  return exportData;
+}
+
+export async function exportWorkspacePagesToDisk({
+  exportName,
+  ...props
+}: ExportWorkspaceOptions & { exportName: string }): Promise<{ data: WorkspaceExport; path: string }> {
+  const exportData = await exportWorkspacePages(props);
 
   const exportFolder = path.join(__dirname, 'exports');
 
@@ -119,16 +222,6 @@ export async function exportWorkspacePages({
     await fs.readdir(exportFolder);
   } catch (err) {
     await fs.mkdir(exportFolder);
-  }
-
-  const exportData: WorkspaceExport = {
-    pages: mappedTrees.map((t) => t.targetPage)
-  };
-
-  if (!exportName) {
-    return {
-      data: exportData
-    };
   }
 
   // Continue writing only if an export name was provided

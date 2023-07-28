@@ -1,9 +1,9 @@
-import type { Role } from '@prisma/client';
-import { LitNodeClient } from 'lit-js-sdk';
+import { log } from '@charmverse/core/log';
+import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import { validate } from 'uuid';
 
-import { prisma } from 'db';
-import log from 'lib/log';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 
@@ -13,17 +13,15 @@ const litClient = new LitNodeClient({
   debug: false
 } as any);
 
-export async function evalueTokenGateEligibility({
+export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain,
   userId
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
-    if (process.env.ENABLE_LIT) {
-      await litClient.connect().catch((err) => {
-        log.debug('Error connecting to lit node', err);
-      });
-    }
+    await litClient.connect().catch((err) => {
+      log.debug('Error connecting to lit node', err);
+    });
   }
 
   const validUuid = validate(spaceIdOrDomain);
@@ -48,10 +46,6 @@ export async function evalueTokenGateEligibility({
 
   if (!space) {
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
-  }
-
-  if (space.tokenGates.length === 0) {
-    throw new MissingDataError('There are no token gates available in this space.');
   }
 
   if (!litClient.ready) {

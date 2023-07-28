@@ -1,15 +1,15 @@
-import type { Page } from '@prisma/client';
+import type { Bounty, Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
-import type { PublicPageResponse } from 'lib/pages';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import type { PublicPageResponse } from 'lib/pages/interfaces';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
@@ -178,9 +178,11 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Page not found');
   }
 
-  const computed = await computeUserPagePermissions({
-    pageId: page.id
-  });
+  const computed = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: page!.id
+    })
+  );
 
   if (computed.read !== true && page.type !== 'bounty') {
     throw new NotFoundError('Page not found');
@@ -192,8 +194,9 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let boards: Board[] = [];
   let cards: Card[] = [];
   let views: BoardView[] = [];
+  let bounty: Bounty | null = null;
 
-  if (page.type === 'card' && page.parentId) {
+  if (page.cardId && page.parentId) {
     const boardPage = await prisma.page.findFirst({
       where: {
         deletedAt: null,
@@ -207,23 +210,23 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     const card = (await prisma.block.findFirst({
       where: {
         deletedAt: null,
-        id: page.id
+        id: page.cardId
       }
     })) as unknown as Card;
 
     if (card) {
       cards.push(card);
-    }
+      // google synced cards have a board that is attached to another board, we need both boards
+      const _boards = (await prisma.block.findMany({
+        where: {
+          deletedAt: null,
+          id: {
+            in: [card.parentId, card.rootId].filter(Boolean)
+          }
+        }
+      })) as unknown as Board[];
 
-    const board = (await prisma.block.findFirst({
-      where: {
-        deletedAt: null,
-        id: page.parentId
-      }
-    })) as unknown as Board;
-
-    if (board) {
-      boards.push(board);
+      boards.push(..._boards);
     }
   } else if (page.type === 'page') {
     const linkedPageIds: string[] = [];
@@ -246,10 +249,29 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     boards = linkedBoards;
     cards = linkedCards;
     views = linkedViews;
+  } else if (page.type === 'bounty') {
+    bounty = await prisma.bounty.findUnique({
+      where: {
+        id: page.id
+      }
+    });
   }
 
   return res.status(200).json({
-    page,
+    bounty: bounty
+      ? {
+          ...bounty,
+          page: {
+            ...page,
+            permissions: []
+          },
+          applications: []
+        }
+      : null,
+    page: {
+      ...page,
+      permissionFlags: computed
+    },
     boardPages,
     cards,
     boards,

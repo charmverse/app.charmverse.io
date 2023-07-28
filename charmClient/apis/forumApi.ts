@@ -1,4 +1,6 @@
-import type { Post, PostCategory, PostComment, Space } from '@prisma/client';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -10,11 +12,10 @@ import type {
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
+import type { ListDraftPostsRequest } from 'lib/forums/posts/listDraftPosts';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
-import type { PageMeta } from 'lib/pages';
-import type { PostCategoryWithPermissions } from 'lib/permissions/forum/interfaces';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
@@ -23,6 +24,10 @@ export class ForumApi {
 
   listForumPosts({ spaceId, count, page, sort, categoryId }: ListForumPostsRequest): Promise<PaginatedPostList> {
     return http.GET('/api/forums/posts', { spaceId, sort, categoryId, count, page });
+  }
+
+  listDraftPosts({ spaceId }: Omit<ListDraftPostsRequest, 'userId'>): Promise<Post[]> {
+    return http.GET('/api/forums/posts/drafts', { spaceId });
   }
 
   searchForumPosts(searchQuery: SearchForumPostsRequest): Promise<PaginatedPostList> {
@@ -68,9 +73,10 @@ export class ForumApi {
   updatePostCategory({
     spaceId,
     id,
-    name
+    name,
+    description
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategoryWithPermissions> {
-    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name, description });
   }
 
   updatePostComment({
@@ -97,7 +103,7 @@ export class ForumApi {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
 
-  convertToProposal(postId: string) {
-    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`);
+  convertToProposal({ postId, categoryId }: { postId: string; categoryId: string }) {
+    return http.POST<PageMeta>(`/api/forums/posts/${postId}/convert-to-proposal`, { categoryId });
   }
 }

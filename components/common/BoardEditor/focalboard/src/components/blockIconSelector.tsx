@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-expressions */
+import type { Page } from '@charmverse/core/prisma';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
-import type { Page } from '@prisma/client';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
+import { PageHeaderIcon } from 'components/[pageId]/DocumentPage/components/PageHeaderIcon';
 import PageIcon from 'components/common/Emoji';
 
 import { BlockIcons } from '../blockIcons';
@@ -48,10 +49,9 @@ const BlockIconSelector = React.memo((props: Props) => {
               icon={<EmojiEmotionsOutlinedIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
             >
-              <EmojiPicker
-                onSelect={(emoji) => {
-                  // onSelectEmoji(emoji);
-                  setPage({ icon: emoji });
+              <PageHeaderIcon
+                updatePageIcon={(icon) => {
+                  setPage({ icon });
                 }}
               />
             </Menu.SubMenu>

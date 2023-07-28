@@ -1,14 +1,15 @@
-import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+import type { WorkspaceEvent } from '@charmverse/core/prisma';
+import { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
-import { MissingDataError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 
+import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsers } from './interface';
-import { proposalStatusTransitionRecord } from './proposalStatusTransition';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus({
   proposalId,
@@ -22,71 +23,70 @@ export async function updateProposalStatus({
   proposal: ProposalWithUsers;
   workspaceEvent: WorkspaceEvent;
 }> {
-  const proposal = (await prisma.proposal.findUnique({
+  if (!newStatus || !ProposalStatus[newStatus]) {
+    throw new InvalidInputError('Please provide a valid status');
+  } else if (!proposalId) {
+    throw new InvalidInputError('Please provide a valid proposalId');
+  }
+
+  const proposal = await prisma.proposal.findUnique({
     where: {
       id: proposalId
     },
-    include: {
-      category: true,
-      authors: true,
-      reviewers: true,
+    select: {
+      archived: true
+    }
+  });
+
+  if (!proposal) {
+    throw new ProposalNotFoundError(proposalId);
+  } else if (proposal.archived) {
+    throw new InvalidStateError(`Archived proposals cannot be updated`);
+  }
+
+  const statusFlow = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(
+    ({ client }) =>
+      client.proposals.computeProposalFlowPermissions({
+        resourceId: proposalId,
+        userId
+      })
+  );
+
+  if (!statusFlow[newStatus]) {
+    throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
+  }
+
+  await prisma.proposal.update({
+    where: {
+      id: proposalId
+    },
+    data: {
+      status: newStatus,
+      // Only record these if the new proposal status is reviewed
+      // If moving back to discussion, remove the reviewer and reviewedAt
+      reviewedBy: newStatus === 'reviewed' ? userId : newStatus === 'discussion' ? null : undefined,
+      reviewedAt: newStatus === 'reviewed' ? new Date() : newStatus === 'discussion' ? null : undefined
+    }
+  });
+
+  const proposalInfo = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    select: {
+      spaceId: true,
+      status: true,
       page: {
         select: {
           snapshotProposalId: true
         }
       }
     }
-  })) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
+  });
 
-  if (!proposal) {
-    throw new MissingDataError(`Proposal with id ${proposal} not found`);
-  }
+  const snapshotProposalId = proposalInfo?.page?.snapshotProposalId;
 
-  const currentStatus = proposal.status;
-  const proposalSpaceId = proposal.spaceId;
-
-  // Going from review to review, mark the reviewer in the proposal
-  if (currentStatus === 'review' && newStatus === 'reviewed') {
-    await prisma.proposal.update({
-      where: {
-        id: proposalId
-      },
-      data: {
-        reviewer: {
-          connect: {
-            id: userId
-          }
-        },
-        reviewedAt: new Date()
-      }
-    });
-  } else if (currentStatus === 'reviewed' && newStatus === 'discussion') {
-    await prisma.proposal.update({
-      where: {
-        id: proposalId
-      },
-      data: {
-        reviewedBy: null,
-        reviewedAt: null
-      }
-    });
-  }
-
-  if (newStatus === 'review' && proposal.reviewers.length === 0) {
-    throw new InvalidStateError('Proposal must have atleast one reviewer');
-  }
-
-  if (!proposalStatusTransitionRecord[currentStatus].includes(newStatus)) {
-    throw new InvalidStateError();
-  }
-
-  if (!proposalStatusTransitionRecord[proposal.status].includes(newStatus)) {
-    throw new InvalidStateError();
-  }
-
-  const snapshotProposal = proposal.page.snapshotProposalId
-    ? await getSnapshotProposal(proposal.page.snapshotProposalId)
-    : null;
+  const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
 
   return prisma.$transaction(async (tx) => {
     const createdWorkspaceEvent = await tx.workspaceEvent.create({
@@ -94,10 +94,10 @@ export async function updateProposalStatus({
         type: 'proposal_status_change',
         actorId: userId,
         pageId: proposalId,
-        spaceId: proposalSpaceId,
+        spaceId: proposalInfo?.spaceId as string,
         meta: {
           newStatus,
-          oldStatus: currentStatus
+          oldStatus: proposalInfo?.status as string
         }
       }
     });
@@ -116,13 +116,6 @@ export async function updateProposalStatus({
       }
     });
 
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, tx });
-
-    await tx.pagePermission.deleteMany(deleteArgs);
-
-    for (const arg of createArgs) {
-      await tx.pagePermission.create(arg);
-    }
     return {
       workspaceEvent: createdWorkspaceEvent,
       proposal: updatedProposal

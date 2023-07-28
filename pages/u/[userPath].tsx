@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import log from 'loglevel';
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -11,8 +12,7 @@ import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import NexusLayout from 'components/common/PageLayout/NexusLayout';
-import PublicProfile from 'components/profile/PublicProfile';
-import { prisma } from 'db';
+import { PublicProfile } from 'components/u/PublicProfile';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { isUUID } from 'lib/utilities/strings';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -36,6 +36,7 @@ export const getServerSideProps: GetServerSideProps<{ publicUser: PublicUser | n
           id: true,
           username: true,
           avatar: true,
+          avatarTokenId: true, // used to determine if user has an NFT avatar
           path: true,
           profile: true
         }
@@ -51,11 +52,7 @@ export const getServerSideProps: GetServerSideProps<{ publicUser: PublicUser | n
 
       return {
         props: {
-          publicUser: {
-            ...user,
-            visibleNfts: [],
-            visiblePoaps: []
-          }
+          publicUser: user
         }
       };
     }

@@ -1,5 +1,9 @@
-import { prisma } from 'db';
+import { prisma } from '@charmverse/core/prisma-client';
+import { v4 } from 'uuid';
+
 import { sessionUserRelations } from 'lib/session/config';
+import { uid } from 'lib/utilities/strings';
+import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { countConnectableIdentities } from '../countConnectableIdentities';
 
@@ -8,7 +12,8 @@ describe('countConnectableIdentities', () => {
     // 0 ID
     const userWithNoIdentities = await prisma.user.create({
       data: {
-        username: 'userWithNoIdentities'
+        username: 'userWithNoIdentities',
+        path: uid()
       },
       include: sessionUserRelations
     });
@@ -18,10 +23,11 @@ describe('countConnectableIdentities', () => {
     // 1 ID
     const userWithOneIdentity = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentity',
         wallets: {
           create: {
-            address: '0x1'
+            address: randomETHWalletAddress()
           }
         }
       },
@@ -33,15 +39,16 @@ describe('countConnectableIdentities', () => {
     // 2 ID
     const userWithTwoIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithNoIdentities',
         wallets: {
           create: {
-            address: '0x2'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test2@example.com',
+            email: `test2-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -56,15 +63,16 @@ describe('countConnectableIdentities', () => {
     // 4 ID
     const userWithFourIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentities',
         wallets: {
           create: {
-            address: '0x4'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test4@example.com',
+            email: `test4-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -73,10 +81,10 @@ describe('countConnectableIdentities', () => {
           createMany: {
             data: [
               {
-                domain: 'example4a.nft'
+                domain: `example4a-${v4()}.nft`
               },
               {
-                domain: 'example4b.nft'
+                domain: `example4b-${v4()}.nft`
               }
             ]
           }
@@ -90,15 +98,16 @@ describe('countConnectableIdentities', () => {
     // 5 ID
     const userWithFiveIdentities = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentities',
         wallets: {
           create: {
-            address: '0x5'
+            address: randomETHWalletAddress()
           }
         },
         googleAccounts: {
           create: {
-            email: 'test5@example.com',
+            email: `test5-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
@@ -107,17 +116,17 @@ describe('countConnectableIdentities', () => {
           createMany: {
             data: [
               {
-                domain: 'example5a.nft'
+                domain: `example5a-${v4()}.nft`
               },
               {
-                domain: 'example5b.nft'
+                domain: `example5b${v4()}.nft`
               }
             ]
           }
         },
         discordUser: {
           create: {
-            discordId: '1234567890',
+            discordId: `1234567890-${Math.random()}`,
             account: {}
           }
         }
@@ -126,11 +135,59 @@ describe('countConnectableIdentities', () => {
     });
     count = countConnectableIdentities(userWithFiveIdentities);
     expect(count).toBe(5);
+    // 6 ID
+    const userWithSixIdentities = await prisma.user.create({
+      data: {
+        path: uid(),
+        username: 'userWithSixIdentities',
+        wallets: {
+          create: {
+            address: randomETHWalletAddress()
+          }
+        },
+        googleAccounts: {
+          create: {
+            email: `test6-${v4()}@example.com`,
+            name: 'test user',
+            avatarUrl: 'https://example.com/avatar.png'
+          }
+        },
+        unstoppableDomains: {
+          createMany: {
+            data: [
+              {
+                domain: `example6a-${v4()}.nft`
+              },
+              {
+                domain: `example6b-${v4()}.nft`
+              }
+            ]
+          }
+        },
+        discordUser: {
+          create: {
+            discordId: `1234567890${Math.random()}`,
+            account: {}
+          }
+        },
+        verifiedEmails: {
+          create: {
+            avatarUrl: '',
+            email: `test-${v4()}@example.com`,
+            name: 'test user'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+    count = countConnectableIdentities(userWithSixIdentities);
+    expect(count).toBe(6);
   });
 
   it('should ignore Telegram as we cannot login with this identity', async () => {
     const userWithTelegramIdentity = await prisma.user.create({
       data: {
+        path: uid(),
         username: 'userWithOneIdentity',
         identityType: 'Telegram',
         telegramUser: {

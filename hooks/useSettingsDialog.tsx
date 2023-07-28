@@ -1,44 +1,83 @@
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, createContext, useContext, useState } from 'react';
+import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
-import type { TasksPageProps } from 'components/nexus/TasksPage';
+import type { ACCOUNT_TABS } from 'components/settings/config';
+import { SETTINGS_TABS } from 'components/settings/config';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export type PathProps = TasksPageProps;
+export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
+  open: boolean;
   activePath: string;
-  pathProps?: PathProps | null;
   onClose: () => any;
-  onClick: (path?: string, props?: PathProps) => void;
+  onClick: (path?: SettingsPath, section?: string) => void;
+  openUpgradeSubscription: () => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
+  open: false,
   activePath: '',
   onClose: () => {},
-  onClick: () => undefined
+  onClick: () => undefined,
+  openUpgradeSubscription: () => null
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
+  const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
-  const [pathProps, setPathProps] = useState<PathProps | undefined>();
+  const router = useRouter();
 
-  const onClick = (_path?: string, props?: PathProps) => {
+  const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
-    setPathProps(props);
+    settingsModalState.open();
+    setTimeout(() => {
+      if (_section) {
+        const domSection = document.getElementById(_section);
+        domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
   };
 
   const onClose = () => {
+    settingsModalState.close();
     setActivePath('');
   };
 
+  useEffect(() => {
+    const close = () => {
+      if (router.query.pageId) {
+        onClose();
+      }
+    };
+
+    if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
+      onClick(router.query.settingTab as string);
+      setUrlWithoutRerender(router.pathname, { settingTab: null });
+    }
+    // If the user clicks a link inside the modal, close the modal only
+    router.events.on('routeChangeStart', close);
+
+    return () => {
+      router.events.off('routeChangeStart', close);
+    };
+  }, [router]);
+
+  function openUpgradeSubscription() {
+    onClick('subscription');
+  }
+
   const value = useMemo<IContext>(
     () => ({
+      open: settingsModalState.isOpen,
       activePath,
-      pathProps,
       onClick,
-      onClose
+      onClose,
+      openUpgradeSubscription
     }),
-    [activePath]
+    [activePath, settingsModalState.isOpen]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;

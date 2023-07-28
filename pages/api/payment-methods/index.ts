@@ -1,12 +1,12 @@
-import type { PaymentMethod, Prisma } from '@prisma/client';
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import type { PaymentMethod, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { isUniqueConstraintError } from 'lib/utilities/errors/prisma';
 
 import { InvalidInputError } from '../../../lib/utilities/errors';
 
@@ -82,8 +82,7 @@ async function createPaymentMethod(req: NextApiRequest, res: NextApiResponse<Pay
 
     return res.status(200).json(paymentMethod);
   } catch (err) {
-    // P2002 is thrown by prisma when a duplicate write fails
-    if ((err as PrismaClientKnownRequestError).code === 'P2002') {
+    if (isUniqueConstraintError(err)) {
       throw new InvalidInputError('A payment method with this contract address and chain ID already exists.');
     }
     throw err;

@@ -6,13 +6,14 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
-import * as callout from './components/callout';
-import * as columnLayout from './components/columnLayout';
+import * as callout from './components/callout/callout';
+import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
-import * as emoji from './components/emojiSuggest';
+import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
+import { specs as fileSpecs } from './components/file/file.specs';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -24,15 +25,16 @@ import { spec as linkSpec } from './components/link/link.specs';
 import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
-import * as nft from './components/nft/nftSpec';
+import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as poll from './components/poll/pollSpec';
-import * as quote from './components/quote';
+import * as quote from './components/quote/quote';
 import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
+import { spec as tableSpec } from './components/table/table.schema';
+import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
@@ -52,7 +54,6 @@ export const specRegistry = new SpecRegistry([
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   mentionSpecs(), // NO
-  inlineComment.spec(),
   inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
@@ -75,20 +76,23 @@ export const specRegistry = new SpecRegistry([
   cryptoPriceSpec(), // NO
   pdfSpec(), // NO
   image.spec(), // OK
-  columnLayout.rowSpec(), // NO
-  columnLayout.columnSpec(), // NO
+  columnLayout.spec(), // NO
   nestedPageSpec(), // NO
   quote.spec(), // OK
   tabIndent.spec(),
-  table.spec(), // OK - only for text content
+  tableSpec(), // OK - only for text content
   disclosure.spec(),
   inlineDatabase.spec(),
   deletion,
   insertion,
   formatChange,
+  // This should be below text format and track specs
+  inlineComment.spec(),
   video.spec(),
   textColor.spec(),
   nft.spec(),
   poll.spec(),
-  bookmarkSpec()
+  bookmarkSpec(),
+  tableOfContentSpec(),
+  fileSpecs()
 ]);

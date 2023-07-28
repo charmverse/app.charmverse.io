@@ -1,17 +1,19 @@
-import type { Page } from '@prisma/client';
+import { log } from '@charmverse/core/log';
+import { resolvePageTree } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { resolvePageTree } from 'lib/pages/server';
-import { getPage } from 'lib/pages/server/getPage';
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { getPermissionsClient } from 'lib/permissions/api';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
@@ -20,42 +22,61 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireKeys(['id'], 'query'))
   .get(getPageRoute)
   // Only require user on update and delete
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .put(updatePageHandler)
   .delete(deletePage);
 
-async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-  const pageId = req.query.id as string;
+async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithContent>) {
+  const { id: pageIdOrPath, spaceId: spaceIdOrDomain } = req.query as { id: string; spaceId: string };
   const userId = req.session?.user?.id;
-
-  const page = await getPage(pageId, req.query.spaceId as string | undefined);
+  const searchQuery = generatePageQuery({
+    pageIdOrPath,
+    spaceIdOrDomain
+  });
+  const page = await prisma.page.findFirst({
+    where: searchQuery
+  });
 
   if (!page) {
     throw new NotFoundError();
   }
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-  const permissions = await computeUserPagePermissions({
-    pageId: page.id,
-    userId
-  });
+  const permissions = await getPermissionsClient({ resourceId: page.spaceId, resourceIdType: 'space' }).then(
+    ({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: page.id,
+        userId
+      })
+  );
 
-  if (permissions.read !== true) {
-    throw new ActionNotPermittedError('You do not have permission to view this page');
+  if (!permissions.read) {
+    throw new ActionNotPermittedError('You do not have permissions to view this page');
   }
 
-  return res.status(200).json(page);
+  const result: PageWithContent = {
+    ...page,
+    permissionFlags: permissions
+  };
+
+  return res.status(200).json(result);
 }
 
-async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await computeUserPagePermissions({
-    pageId,
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: pageId,
     userId
   });
 
@@ -104,8 +125,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   }
 
   const hasNewParentPage =
-    updateContent.parentId !== page.parentId &&
-    (typeof updateContent.parentId === 'string' || updateContent.parentId === null);
+    updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || !updateContent.parentId);
 
   // Only perform validation if repositioning below another page
   if (hasNewParentPage && typeof updateContent.parentId === 'string') {
@@ -137,18 +157,22 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   );
 
   if (hasNewParentPage) {
-    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
-    return res.status(200).json(updatedPage);
+    await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+      event: 'repositioned',
+      pageId
+    });
   }
 
-  return res.status(200).json(pageWithPermission);
+  log.info(`Update page success`, { pageId, userId });
+
+  return res.status(200).end();
 }
 
 async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const pageToDelete = await prisma.page.findUnique({
+  const pageToDelete = await prisma.page.findUniqueOrThrow({
     where: {
       id: pageId
     },
@@ -157,8 +181,8 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     }
   });
 
-  const permissions = await computeUserPagePermissions({
-    pageId,
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: pageId,
     userId
   });
 
@@ -166,28 +190,27 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const rootBlock = await prisma.block.findUnique({
-    where: {
-      id: pageId
-    }
-  });
-
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
   updateTrackPageProfile(pageId);
 
-  if (pageToDelete) {
-    relay.broadcast(
-      {
-        type: 'pages_deleted',
-        payload: modifiedChildPageIds.map((id) => ({ id }))
-      },
-      pageToDelete.spaceId
-    );
-    trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
-  }
+  relay.broadcast(
+    {
+      type: 'pages_deleted',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
+    },
+    pageToDelete.spaceId
+  );
+  trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
 
-  return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
+  log.info('User deleted a page', {
+    userId,
+    pageId,
+    pageIds: modifiedChildPageIds,
+    spaceId: pageToDelete.spaceId
+  });
+
+  return res.status(200).json({ pageIds: modifiedChildPageIds });
 }
 
 export default withSessionRoute(handler);

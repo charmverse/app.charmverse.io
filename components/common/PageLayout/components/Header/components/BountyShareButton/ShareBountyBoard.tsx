@@ -1,3 +1,4 @@
+import type { SpacePermissionConfigurationMode } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -7,7 +8,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import type { SpacePermissionConfigurationMode } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeName } from 'lib/permissions/meta/preset-templates';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -48,7 +49,7 @@ interface Props {
 export default function ShareBountyBoard({ padding = 1 }: Props) {
   const [copied, setCopied] = useState<boolean>(false);
   const { setSpace } = useSpaces();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   // Current values of the public permission
@@ -77,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
+      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }

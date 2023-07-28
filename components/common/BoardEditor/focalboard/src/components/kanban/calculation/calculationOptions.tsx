@@ -10,6 +10,7 @@ type Props = CommonCalculationOptionProps & {
   cardProperties: IPropertyTemplate[];
   onChange: (data: { calculation: string; propertyId: string }) => void;
   property: IPropertyTemplate;
+  anchorEl: HTMLElement | null;
 };
 
 // contains mapping of property types which are effectly the same as other property type.
@@ -64,9 +65,10 @@ export function KanbanCalculationOptions(props: Props): JSX.Element {
       value={props.value}
       menuOpen={props.menuOpen}
       onClose={props.onClose}
-      onChange={props.onChange}
+      // onChange={props.onChange}
       options={options}
-      components={{ Option }}
+      anchorEl={props.anchorEl}
+      menuItemComponent={Option}
     />
   );
 }

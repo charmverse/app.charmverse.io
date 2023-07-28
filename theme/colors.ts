@@ -4,7 +4,6 @@ export const blackColor = '#111';
 export const yellowColor = '#EAD637';
 
 export const blueColor = '#009Fb7';
-export const blueColorRGB = '0, 159, 183';
 export const darkBlueColor = darken(blueColor, 0.1);
 export const whiteColor = '#fff';
 export const lightGreyColor = '#edf2f4';
@@ -29,8 +28,8 @@ export const linkUnderlineColor = 'rgba(55,53,47,0.25)';
 export const primaryTextColorDarkMode = '#ededed';
 export const secondaryTextColorDarkMode = '#999';
 export const backgroundColorDarkMode = '#191919';
-export const backgroundLightColorDarkMode = '#202020';
-export const backgroundDarkColorDarkMode = darken(backgroundColorDarkMode, 0.3);
+export const backgroundLightColorDarkMode = '#262626';
+export const backgroundDarkColorDarkMode = '#171717';
 export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.3);
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
@@ -50,6 +49,10 @@ export const colors = {
   yellow: {
     dark: '#81730E',
     light: '#EFE9CB'
+  },
+  green: {
+    dark: '#1D7324',
+    light: '#D0EFD6'
   },
   teal: {
     dark: '#007C8F',
@@ -86,6 +89,7 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',
   propColorGray: 'gray',
   propColorTurquoise: 'turquoise',
+  propColorGreen: 'green',
   propColorOrange: 'orange',
   propColorYellow: 'yellow',
   propColorTeal: 'teal',

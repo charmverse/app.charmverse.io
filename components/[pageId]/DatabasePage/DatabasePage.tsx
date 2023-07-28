@@ -1,4 +1,6 @@
-import type { Page } from '@prisma/client';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -20,11 +22,7 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PageMeta } from 'lib/pages';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-
-import PageDeleteBanner from '../DocumentPage/components/PageDeleteBanner';
 
 /**
  *
@@ -35,7 +33,7 @@ interface Props {
   page: PageMeta;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
 }
 
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
@@ -52,7 +50,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const readOnlySourceData = activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+  // TODO: remove this feature entirely after some time has passed and we are sure we dont need it. Disabled on April 4, 2023.
+  const readOnlySourceData = false; // activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -85,7 +84,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
     }
-  }, [page.boardId, router.query.viewId, boardViews]);
+  }, [page.boardId, boardViews]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
@@ -163,6 +162,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             showView={showView}
             activeView={activeView || undefined}
             views={boardViews}
+            page={page}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
             <CardDialog

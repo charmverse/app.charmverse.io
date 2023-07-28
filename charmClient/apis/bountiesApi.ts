@@ -1,8 +1,10 @@
-import type { Application, Space } from '@prisma/client';
+import type { PublicBountyToggle } from '@charmverse/core/permissions';
+import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type {
   ApplicationWithTransactions,
+  CreateApplicationCommentPayload,
   ReviewDecision,
   SubmissionContent,
   SubmissionCreationData
@@ -15,7 +17,6 @@ import type {
   BountyWithDetails
 } from 'lib/bounties';
 import type { Resource } from 'lib/permissions/interfaces';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { TransactionCreationData } from 'lib/transactions/interface';
 
 export class BountiesApi {
@@ -42,10 +43,6 @@ export class BountiesApi {
     return http.GET<BountyWithDetails>(`/api/bounties/${bountyId}`);
   }
 
-  deleteBounty(bountyId: string): Promise<any> {
-    return http.DELETE(`/api/bounties/${bountyId}`);
-  }
-
   updateBounty({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
     return http.PUT<BountyWithDetails>(`/api/bounties/${bountyId}`, updateContent);
   }
@@ -56,6 +53,10 @@ export class BountiesApi {
 
   closeBounty(bountyId: string): Promise<BountyWithDetails> {
     return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/close`);
+  }
+
+  markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
+    return http.POST<BountyWithDetails>(`/api/bounties/${bountyId}/mark-paid`);
   }
 
   approveApplication(applicationId: string): Promise<Application> {
@@ -74,7 +75,7 @@ export class BountiesApi {
     return http.GET('/api/applications', { bountyId });
   }
 
-  createSubmission(content: Omit<SubmissionCreationData, 'userId'>): Promise<Application> {
+  createSubmission(content: Omit<SubmissionCreationData, 'userId' | 'customReward'>): Promise<Application> {
     return http.POST<Application>('/api/submissions', content);
   }
 
@@ -106,5 +107,29 @@ export class BountiesApi {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
       publicBountyBoard
     });
+  }
+
+  addApplicationComment(applicationId: string, payload: CreateApplicationCommentPayload) {
+    return http.POST<PageComment>(`/api/applications/${applicationId}/comments`, payload);
+  }
+
+  deleteApplicationComment(applicationId: string, pageCommentId: string) {
+    return http.DELETE(`/api/applications/${applicationId}/comments/${pageCommentId}`);
+  }
+
+  editApplicationComment(applicationId: string, pageCommentId: string, payload: CreateApplicationCommentPayload) {
+    return http.PUT<PageComment>(`/api/applications/${applicationId}/comments/${pageCommentId}`, payload);
+  }
+
+  getApplicationComments(applicationId: string) {
+    return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
+  }
+
+  refreshApplicationStatus(applicationId: string) {
+    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
+  }
+
+  isBountyEditable(bountyId: string) {
+    return http.GET<{ editable: boolean }>(`/api/bounties/${bountyId}/is-editable`);
   }
 }

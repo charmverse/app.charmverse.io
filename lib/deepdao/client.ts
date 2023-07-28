@@ -1,6 +1,6 @@
+import { GET } from '@charmverse/core/http';
 import log from 'loglevel';
 
-import fetch from 'adapters/http/fetch.server';
 import { isTestEnv } from 'config/constants';
 
 import type { DeepDaoOrganizationDetails, DeepDaoParticipationScore, DeepDaoProfile } from './interfaces';
@@ -9,13 +9,13 @@ type ApiResponse<T> = { data: T };
 
 type GetParticipationScoreResponse = ApiResponse<DeepDaoParticipationScore>;
 type GetProfileResponse = ApiResponse<DeepDaoProfile>;
-type GetOrganizationsResponse = ApiResponse<{
+export type GetOrganizationsResponse = ApiResponse<{
   totalResources: number;
   resources: DeepDaoOrganizationDetails[];
 }>;
 
-export const { DEEPDAO_API_KEY, DEEPDAO_BASE_URL } = process.env;
-
+export const { DEEPDAO_API_KEY } = process.env;
+export const DEEPDAO_BASE_URL = 'https://api.deepdao.io';
 export async function getParticipationScore(
   address: string,
   apiToken = DEEPDAO_API_KEY
@@ -42,14 +42,13 @@ export async function getAllOrganizations(apiToken?: string): Promise<GetOrganiz
 function _requestGET<T>(endpoint: string, { apiToken = DEEPDAO_API_KEY }: { apiToken: string | undefined }) {
   // run requests even in test mode for now (see getAggregatedData.spec.ts)
   if (isTestEnv) {
-    return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, { method: 'GET' });
+    return GET<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, {});
   }
-  if (!apiToken || !DEEPDAO_BASE_URL) {
+  if (!apiToken) {
     log.debug('Skip request: No API Key or URL for DeepDAO');
     return Promise.resolve(null);
   }
-  return fetch<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, {
-    method: 'GET',
+  return GET<T>(`${DEEPDAO_BASE_URL}/v0.1${endpoint}`, undefined, {
     headers: {
       'x-api-key': apiToken
     }

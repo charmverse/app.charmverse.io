@@ -1,6 +1,6 @@
-import type { Space } from '@prisma/client';
+import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -22,9 +22,9 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
     throw new InvalidInputError('User not found');
   }
 
-  const { isEligible, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
+  const { isVerified, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
-  if (!isEligible) {
+  if (!isVerified) {
     return null;
   }
 

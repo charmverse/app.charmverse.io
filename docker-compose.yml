@@ -1,27 +1,86 @@
 services:
-  webapp:
+  defaults:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
-    ports:
-      - '80:3000'
-    command: ['npm', 'run', '${NPM_SCRIPT}']
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}"}]'
-    volumes:
-      - $PWD/.env:/app/.env
+      com.datadoghq.tags.service: '${SERVICE_NAME}'
+    ports:
+      - '80:3000'
     env_file:
       - '.env'
+    environment:
+      - NODE_ENV=production
     profiles:
-      - stg
-      - tst
-      - prd
-      - webapp
+      # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
+      - default_config
+
+  prd-cron:
+    extends:
+      service: defaults
+    command: ['npm', 'run', 'cron:prod']
+    profiles:
+      - prd-cron
+
+  stg-cron:
+    extends:
+      service: defaults
+    command: ['npm', 'run', 'cron:staging']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
+    profiles:
+      - stg-cron
+
+  prd-webapp:
+    extends:
+      service: defaults
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+      ]
+    # environment:
+    #   - FORCE_SUBDOMAINS=true
+    profiles:
+      - prd-webapp
+
+  stg-webapp:
+    extends:
+      service: defaults
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+      ]
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
+      - PERMISSIONS_API_URL=http://permissions-api:3001
+    profiles:
+      - stg-webapp
+
+  prd-sockets:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    profiles:
+      - prd-sockets
+
+  stg-sockets:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
+    profiles:
+      - stg-sockets
 
   devapp:
     build:
       context: .
     ports:
       - '80:3000'
-    command: ['npm', 'run', 'start']
+    command: ['npm', 'start']
     volumes:
       - $PWD:/app
     env_file:
@@ -30,6 +89,16 @@ services:
       - localpostgres
     profiles:
       - dev
+
+  permissions-api:
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
+    command: ['sh', '-c', 'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js']
+    env_file:
+      - '.env'
+    environment:
+      - HOST=permissions-api
+    profiles:
+      - stg-webapp
 
   localpostgres:
     image: postgres
@@ -48,7 +117,7 @@ services:
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - $PWD/.env:/app/.env
+      - /var/log:/host/var/log:ro
     env_file:
       - '.env'
     environment:
@@ -59,8 +128,11 @@ services:
       DD_APM_ENABLED: 'true'
       DD_APM_NON_LOCAL_TRAFFIC: 'true'
       DD_ENV: '${SERVICE_ENV:-tst}'
+      DD_SERVICE: '${SERVICE_NAME}'
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:
-      - prd
+      - prd-cron
+      - prd-webapp
+      - prd-sockets
       - ddtst

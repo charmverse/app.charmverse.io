@@ -1,8 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
-import log from 'lib/log';
 import type {
   ClientMessage,
   ClientRestartMessage,
@@ -36,12 +36,17 @@ type WebSocketConnectorProps = {
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
 };
 
+type ServerToClientEvents = { message: (message: WrappedMessage | RequestResendMessage) => void };
+type ClientToServerEvents = {
+  [event: string]: any;
+};
+
 export interface WebSocketConnector extends WebSocketConnectorProps {}
 
 /* Sets up communicating with server (retrieving document, saving, collaboration, etc.).
  */
 export class WebSocketConnector {
-  socket: Socket<{ message: (message: WrappedMessage | RequestResendMessage) => void }>;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
   // Messages object used to ensure that data is received in right order.
   messages: { server: number; client: number; lastTen: WrappedMessage[] } = {
@@ -93,12 +98,14 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onError = onError;
+
+    // socket.io client options: https://socket.io/docs/v4/client-options/
     this.socket = io(socketHost, {
       withCredentials: true,
       auth: {
         authToken
-      }
-      // path: '/api/socket'
+      },
+      transports: ['websocket'] // skip long-polling
     });
     this.createWSConnection();
   }
@@ -141,10 +148,10 @@ export class WebSocketConnector {
       if (data.type === 'request_resend') {
         this.resendMessages(data.from);
       } else if (data.s < expectedServer) {
-        log.debug('[charm ws] ignore old message', data);
+        log.debug(`[ws${namespace}] ignore old message`, { expectedServer, data });
         // Receive a message already received at least once. Ignore.
       } else if (data.s > expectedServer) {
-        // console.log('[charm ws] resend messages');
+        log.warn(`[ws${namespace}] request server to resend messages`, { expectedServer, data });
         // Messages from the server have been lost.
         // Request resend.
         this.waitForWS().then(() =>
@@ -160,7 +167,10 @@ export class WebSocketConnector {
           // console.log('[charm] receive messages');
           this.receive(data);
         } else if (data.c < this.messages.client) {
-          // console.log('received all messages but server is missing client messages');
+          log.warn(`[ws${namespace}] received all messages but server is missing client messages`, {
+            data,
+            clientMessages: this.messages.client
+          });
           // We have received all server messages, but the server seems
           // to have missed some of the client's messages. They could
           // have been sent simultaneously.
@@ -169,6 +179,10 @@ export class WebSocketConnector {
             const clientDifference = this.messages.client - data.c;
             this.messages.client = data.c;
             if (clientDifference > this.messages.lastTen.length) {
+              log.debug(`[ws${namespace}] reset the document because we are too far ahead of the server`, {
+                messagesAvailableToResend: this.messages.lastTen.length,
+                clientDifference
+              });
               // We cannot fix the situation
               this.send(this.restartMessage);
               return;
@@ -199,7 +213,7 @@ export class WebSocketConnector {
 
     this.socket.on('connect', () => {
       // // console.log('connected');
-      log.info(`[ws${namespace}] Client connected`, this.connectionCount);
+      log.info(`[ws${namespace}] Client connected`, { connectionCount: this.connectionCount });
       this.open();
       // try {
       //   const sendable = this.anythingToSend();
@@ -229,12 +243,25 @@ export class WebSocketConnector {
     this.socket.on('connect_error', (error) => {
       const errorType = (error as any).type as string;
       if (errorType === 'TransportError') {
+        // ..... TODO HERE
         // server is probably restarting
+        log.warn(`[ws${namespace}] Connection error`, {
+          error,
+          errorType,
+          client: this.messages.client,
+          server: this.messages.server,
+          toSend: this.messagesToSend.length
+        });
+        // if no messages, then we never made a connection
+        if (this.messages.client === 0 && this.messages.server === 0) {
+          this.onError(new Error('Error connecting to document server'));
+        }
       } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
       } else {
         log.error(`[ws${namespace}] Connection error`, {
           error,
+          errorType,
           client: this.messages.client,
           server: this.messages.server,
           toSend: this.messagesToSend.length
@@ -274,6 +301,11 @@ export class WebSocketConnector {
   subscribed() {
     this.connectionCount += 1;
     if (this.connectionCount > 1) {
+      log.debug('Resubscribed to document', {
+        client: this.messages.client,
+        server: this.messages.server,
+        messagesToSend: this.oldMessages.length
+      });
       this.resubscribed();
       while (this.oldMessages.length > 0) {
         const message = this.oldMessages.shift();
@@ -306,7 +338,7 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        log.debug(`[ws${namespace}] Sent message`, wrappedMessage);
+        log.debug(`[ws${namespace}] Send message`, { data: wrappedMessage });
         this.socket.emit(socketEvent, wrappedMessage);
         this.setRecentlySentTimer(timer);
       });
@@ -331,23 +363,25 @@ export class WebSocketConnector {
   }
 
   resendMessages(from: number) {
-    const toSend = this.messages.client - from;
-    this.messages.client = from;
-    if (toSend > this.messages.lastTen.length) {
-      // Too many messages requested. Abort.
-      this.send(this.restartMessage);
-      return;
-    }
-    this.messages.lastTen.slice(0 - toSend).forEach((data) => {
-      this.messages.client += 1;
-      data.c = this.messages.client;
-      data.s = this.messages.server;
-      this.socket?.emit(socketEvent, data);
+    return this.waitForWS().then(() => {
+      const toSend = this.messages.client - from;
+      this.messages.client = from;
+      if (toSend > this.messages.lastTen.length) {
+        // Too many messages requested. Abort.
+        this.send(this.restartMessage);
+        return;
+      }
+      this.messages.lastTen.slice(0 - toSend).forEach((data) => {
+        this.messages.client += 1;
+        data.c = this.messages.client;
+        data.s = this.messages.server;
+        this.socket?.emit(socketEvent, data);
+      });
     });
   }
 
   receive(data: WrappedServerMessage) {
-    log.debug(`[ws${namespace}] Received event`, data);
+    log.debug(`[ws${namespace}] Received event`, { serverMessages: this.messages.server, data });
     switch (data.type) {
       case 'welcome':
         // this.open();

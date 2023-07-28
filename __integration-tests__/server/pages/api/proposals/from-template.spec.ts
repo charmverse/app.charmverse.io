@@ -1,34 +1,59 @@
-import type { Page } from '@prisma/client';
+import type { Page, Role, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { prisma } from 'db';
-import { addSpaceOperations } from 'lib/permissions/spaces';
+import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposalCategory } from 'testing/utils/proposals';
+
+let space: Space;
+let adminUser: User;
+let nonAdminUser: User;
+let reviewerRole: Role;
+
+beforeAll(async () => {
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+  space = generated.space;
+  adminUser = generated.user;
+  nonAdminUser = await testUtilsUser.generateSpaceUser({
+    isAdmin: false,
+    spaceId: space.id
+  });
+  reviewerRole = await testUtilsMembers.generateRole({
+    createdBy: adminUser.id,
+    spaceId: space.id
+  });
+});
 
 describe('POST /api/proposals/from-template - Instantiate a proposal template', () => {
-  it('should copy a proposal template if the user has the space.createVotes permission and respond with 201', async () => {
-    const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    await addSpaceOperations({
-      spaceId: space.id,
-      forSpaceId: space.id,
-      operations: ['createVote']
+  it('should copy a proposal from a template if the user can create proposals in this category and respond with 201', async () => {
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
     });
 
-    const nonAdminCookie = await loginUser(nonAdminUser.id);
+    await upsertProposalCategoryPermission({
+      permissionLevel: 'full_access',
+      proposalCategoryId: proposalCategory.id,
+      assignee: {
+        group: 'space',
+        id: space.id
+      }
+    });
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
-      userId: nonAdminUser.id,
+      userId: adminUser.id,
+      categoryId: proposalCategory.id,
       reviewers: [
         {
-          group: 'user',
-          id: nonAdminUser.id
+          group: 'role',
+          id: reviewerRole.id
         }
       ]
     });
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const createdProposal = (
       await request(baseUrl)
@@ -50,29 +75,28 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       }
     });
 
-    expect(proposal?.reviewers?.some((r) => r.userId === nonAdminUser.id)).toBe(true);
+    expect(proposal?.reviewers?.length).toBe(1);
+    expect(proposal?.reviewers?.some((r) => r.roleId === reviewerRole.id)).toBe(true);
+    expect(proposal?.categoryId).toBe(proposalCategory.id);
   });
 
-  it('should copy a proposal template if the user is an admin, even if the space has no createVote permissions and respond with 201', async () => {
-    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.id);
-
-    await prisma.spacePermission.deleteMany({
-      where: {
-        forSpaceId: space.id
-      }
+  it('should copy a proposal from a template if the user is an admin, even if there are no permissions for this category, and respond with 201', async () => {
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
     });
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
+      userId: nonAdminUser.id,
+      categoryId: proposalCategory.id,
       reviewers: [
         {
-          group: 'user',
-          id: adminUser.id
+          group: 'role',
+          id: reviewerRole.id
         }
       ]
     });
+    const adminCookie = await loginUser(adminUser.id);
 
     const createdProposal = (
       await request(baseUrl)
@@ -94,22 +118,20 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       }
     });
 
-    expect(proposal?.reviewers?.some((r) => r.userId === adminUser.id)).toBe(true);
+    expect(proposal?.reviewers?.length).toBe(1);
+    expect(proposal?.reviewers?.some((r) => r.roleId === reviewerRole.id)).toBe(true);
+    expect(proposal?.categoryId).toBe(proposalCategory.id);
   });
 
-  it('should copy a proposal template if the user does not have createVote space permission and respond with 401', async () => {
-    const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const nonAdminCookie = await loginUser(nonAdminUser.id);
-
-    await prisma.spacePermission.deleteMany({
-      where: {
-        forSpaceId: space.id
-      }
+  it('should fail to create a proposal from a template if the user does not have create_proposal permission and respond with 401', async () => {
+    const proposalCategory = await generateProposalCategory({
+      spaceId: space.id
     });
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
       userId: nonAdminUser.id,
+      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',
@@ -118,6 +140,7 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       ]
     });
 
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     await request(baseUrl)
       .post('/api/proposals/from-template')
       .set('Cookie', nonAdminCookie)

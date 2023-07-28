@@ -1,6 +1,6 @@
-import type { Application } from '@prisma/client';
+import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 
@@ -10,7 +10,8 @@ import { bountyCanReceiveNewSubmissionsOrApplications } from '../shared';
 export async function createSubmission({
   bountyId,
   submissionContent,
-  userId
+  userId,
+  customReward
 }: SubmissionCreationData): Promise<Application> {
   const bounty = await getBountyOrThrow(bountyId);
 
@@ -32,7 +33,7 @@ export async function createSubmission({
     throw new MissingDataError('You must provide content in your submission');
   }
 
-  if (!submissionContent.walletAddress) {
+  if (!submissionContent.walletAddress && !customReward) {
     throw new MissingDataError('You must provide a wallet address in your submission');
   }
 

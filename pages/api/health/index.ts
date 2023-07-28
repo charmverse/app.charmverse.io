@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import log from 'lib/log';
 import { gauge, count } from 'lib/metrics';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
