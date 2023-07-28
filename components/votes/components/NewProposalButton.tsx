@@ -97,7 +97,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
     <>
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
-          <ButtonGroup variant='contained' ref={buttonRef} disableElevation>
+          <ButtonGroup variant='contained' ref={buttonRef}>
             <Button disabled={!canCreateProposal} onClick={onClickCreate}>
               {isXsScreen ? 'Create' : 'Create Proposal'}
             </Button>

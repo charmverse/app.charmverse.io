@@ -32,7 +32,7 @@ export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementTyp
   const { children, loading, loadingMessage, disabledTooltip, disabled, ...props } = _props;
 
   const buttonComponent = (
-    <StyledButton ref={ref} {...props} disabled={loading || disabled} disableElevation>
+    <StyledButton ref={ref} {...props} disabled={loading || disabled}>
       {loading && loadingMessage ? loadingMessage : children}
       {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
