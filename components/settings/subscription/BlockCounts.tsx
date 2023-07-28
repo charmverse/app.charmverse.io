@@ -49,7 +49,7 @@ export function BlockCounts() {
         <Typography variant='caption' color={passedBlockQuota ? 'error' : undefined}>
           {blockCount.count.toLocaleString()}
         </Typography>
-        /{blockQuota}
+        /{blockQuota.toLocaleString()}
         <HelpOutlineIcon
           onClick={openExplanationModal}
           color={theme.palette.background.default as any}
