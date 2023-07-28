@@ -305,7 +305,7 @@ export function CheckoutForm({
               . After you click Upgrade a popup will appear with instructions on finishing your payment.
             </Typography>
             <Typography mb={1}>
-              The suggested allowence for your subscription is {price * blockQuota * (period === 'annual' ? 12 : 1)}{' '}
+              The suggested allowance for your subscription is {price * blockQuota * (period === 'annual' ? 12 : 1)}{' '}
               USDC. Learn more how it works{' '}
               <Link href='https://www.loopcrypto.xyz/frequently-asked-questions' external target='_blank'>
                 here
