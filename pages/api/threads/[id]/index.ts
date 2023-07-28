@@ -8,6 +8,7 @@ import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { deleteThread } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -21,7 +22,8 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
       id: threadId
     },
     select: {
-      pageId: true
+      pageId: true,
+      spaceId: true
     }
   });
 
@@ -44,6 +46,18 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
   }
 
   await deleteThread(threadId);
+
+  relay.broadcast(
+    {
+      type: 'threads_updated',
+      payload: {
+        pageId: thread.pageId,
+        threadId
+      }
+    },
+    thread.spaceId
+  );
+
   log.info(`Deleted page inline comment thread`, { userId, pageId: thread.pageId, threadId });
 
   return res.status(200).json({ ok: true });

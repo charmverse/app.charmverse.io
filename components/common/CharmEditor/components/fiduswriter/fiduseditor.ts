@@ -38,6 +38,7 @@ type EditorProps = {
   enableSuggestionMode: boolean;
   onDocLoaded?: () => void;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  onCommentUpdate?: VoidFunction;
 };
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -81,15 +82,21 @@ export class FidusEditor {
 
   onDocLoaded: NonNullable<EditorProps['onDocLoaded']> = () => {};
 
+  onCommentUpdate: VoidFunction = () => {};
+
   onParticipantUpdate: NonNullable<EditorProps['onParticipantUpdate']> = () => {};
 
-  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate }: EditorProps) {
+  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate, onCommentUpdate }: EditorProps) {
     this.user = user;
     if (onDocLoaded) {
       this.onDocLoaded = onDocLoaded;
     }
     if (onParticipantUpdate) {
       this.onParticipantUpdate = onParticipantUpdate;
+    }
+
+    if (onCommentUpdate) {
+      this.onCommentUpdate = onCommentUpdate;
     }
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -179,7 +186,7 @@ export class FidusEditor {
             }
             this.mod.collab.doc.receiveSelectionChange(data);
             break;
-          case 'diff':
+          case 'diff': {
             if (data.cid === this.client_id) {
               // The diff origins from the local user.
               this.mod.collab.doc.confirmDiff(data.rid);
@@ -191,7 +198,14 @@ export class FidusEditor {
               return;
             }
             this.mod.collab.doc.receiveDiff(data);
+            const isCommentUpdate = data.ds.find(
+              (step) => step.stepType === 'addMark' && step.mark?.type === 'inline-comment'
+            );
+            if (isCommentUpdate) {
+              this.onCommentUpdate();
+            }
             break;
+          }
           case 'confirm_diff':
             this.mod.collab.doc.confirmDiff(data.rid);
             break;

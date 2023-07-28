@@ -189,7 +189,7 @@ function EditCommentCharmEditor({
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}
-            key={comment.id + isEditable}
+            key={comment.id + isEditable + comment.updatedAt}
             content={comment.content as PageContent}
             onContentChange={({ doc }) => {
               setCommentContent(doc);

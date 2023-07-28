@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Comment, Page, SubscriptionTier, Thread } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -119,6 +119,14 @@ export type NotionImportCompleted = {
   };
 };
 
+type ThreadsUpdated = {
+  type: 'threads_updated';
+  payload: {
+    threadId: string;
+    pageId: string;
+  };
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -135,6 +143,7 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
+  | ThreadsUpdated
   | SpaceSubscriptionUpdated
   | NotionImportCompleted;
 
