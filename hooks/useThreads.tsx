@@ -1,5 +1,5 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
@@ -71,11 +71,14 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     return threadsAndAuthors;
   }
 
-  function threadsUpdatedHandler(payload: WebSocketPayload<'threads_updated'>) {
-    if (payload.pageId === currentPageId) {
-      mutate();
-    }
-  }
+  const threadsUpdatedHandler = useCallback(
+    (payload: WebSocketPayload<'threads_updated'>) => {
+      if (payload.pageId === currentPageId) {
+        mutate();
+      }
+    },
+    [currentPageId]
+  );
 
   useEffect(() => {
     if (spaceRole && !spaceRole.isGuest) {
@@ -85,7 +88,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
         unsubscribeFromThreadsUpdatedEvent();
       };
     }
-  }, [spaceRole]);
+  }, [spaceRole, currentPageId]);
 
   useEffect(() => {
     if (data) {
