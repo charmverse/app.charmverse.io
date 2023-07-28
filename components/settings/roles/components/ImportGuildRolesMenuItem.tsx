@@ -5,13 +5,12 @@ import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { Button, StyledSpinner } from 'components/common/Button';
 import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-
-import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 import GuildsAutocomplete from './GuildsAutocomplete';
 
@@ -114,7 +113,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
                 selectedGuildIds={selectedGuildIds}
                 guilds={guilds}
               />
-              <PimpedButton
+              <Button
                 loading={importingRoles}
                 sx={{
                   mt: 2
@@ -123,7 +122,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
                 onClick={importRoles}
               >
                 Import Roles
-              </PimpedButton>
+              </Button>
             </Box>
           )}
         </Box>

@@ -9,10 +9,11 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
+import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -259,7 +260,7 @@ export function SpaceSettings({ space }: { space: Space }) {
               <Button disableElevation size='large' data-test='submit-space-update' disabled={!isDirty} type='submit'>
                 Save
               </Button>
-              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
+              <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
                 Delete Space
               </Button>
             </Grid>
@@ -296,6 +297,12 @@ export function SpaceSettings({ space }: { space: Space }) {
             if (isAdmin) {
               await charmClient.spaces.deleteSpace(space.id);
               const filteredSpaces = spaces.filter((s) => s.id !== space.id);
+              // redirect user to the next space if they have one
+              if (filteredSpaces.length > 0) {
+                await router.push(getDefaultWorkspaceUrl(filteredSpaces));
+              } else {
+                await router.push('/createSpace');
+              }
               setSpaces(filteredSpaces);
             }
           }}

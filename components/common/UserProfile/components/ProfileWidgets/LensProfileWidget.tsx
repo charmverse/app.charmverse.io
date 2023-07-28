@@ -27,7 +27,7 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
   );
 }
 
-export function LensDefaultProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
+export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
   return (
     <ProfileWidget
       link={`https://www.lensfrens.xyz/${lensProfile.handle}`}

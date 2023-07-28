@@ -3,13 +3,11 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getTimeDifference } from 'lib/utilities/dates';
 
 import { BlocksExplanationModal } from './BlocksExplanation';
+import { useBlockCount } from './hooks/useBlockCount';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 
 /**
@@ -18,25 +16,23 @@ import { useSpaceSubscription } from './hooks/useSpaceSubscription';
  * @returns
  */
 export function BlockCounts() {
-  const { space: currentSpace } = useCurrentSpace();
   const theme = useTheme();
-
   const { spaceSubscription } = useSpaceSubscription();
+  const { blockCount } = useBlockCount();
+
   const {
     isOpen: isExplanationModalOpen,
     close: closeExplanationModal,
     open: openExplanationModal
   } = usePopupState({ variant: 'popover', popupId: 'block-count-info' });
 
-  const { data: blockCount } = useSWR(currentSpace ? `space-block-count-${currentSpace.id}` : null, () =>
-    charmClient.spaces.getBlockCount({
-      spaceId: currentSpace!.id
-    })
-  );
-
   if (!blockCount) {
     return null;
   }
+
+  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
+  const passedBlockQuota = blockCount.count > blockQuota;
+
   return (
     <Box width='100%' display='block' justifyContent='space-between' alignItems='center'>
       <Typography
@@ -47,15 +43,16 @@ export function BlockCounts() {
           whiteSpace: 'break-spaces'
         }}
       >
-        Current block usage: {`${blockCount.count.toLocaleString()}`}
+        Current block usage:{' '}
+        <Typography variant='caption' color={passedBlockQuota ? 'error' : undefined}>
+          {blockCount.count.toLocaleString()}
+        </Typography>
+        /{blockQuota}
         <HelpOutlineIcon
           onClick={openExplanationModal}
           color={theme.palette.background.default as any}
           fontSize='small'
-          sx={{
-            ml: 1,
-            cursor: 'pointer'
-          }}
+          sx={{ ml: 1, cursor: 'pointer' }}
         />
       </Typography>
       {spaceSubscription?.status === 'free_trial' && spaceSubscription.expiresOn && (

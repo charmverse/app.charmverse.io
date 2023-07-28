@@ -3,7 +3,7 @@ import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/mater
 import Alert from '@mui/material/Alert';
 import useSWR from 'swr';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';

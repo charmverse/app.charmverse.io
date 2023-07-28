@@ -26,6 +26,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -47,7 +48,8 @@ export function IdentityProviders() {
     useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
-  const { disconnectGoogleAccount, isConnectingGoogle, disconnectVerifiedEmailAccount } = useFirebaseAuth();
+  const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
+  const { disconnectGoogleAccount } = useGoogleLogin();
   const identityTypes = useIdentityTypes();
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
   const deleteWalletPopupState = usePopupState({ variant: 'popover', popupId: 'deleteWalletModal' });
@@ -254,7 +256,6 @@ export function IdentityProviders() {
             key={acc.email}
             text={acc.name}
             type='Google'
-            loading={isConnectingGoogle}
             disabled={cannotDisconnect}
             connected={true}
             actions={<MenuItem onClick={disconnectGoogleAccount}>Disconnect</MenuItem>}

@@ -81,11 +81,7 @@ export function PublicProfile(props: {
   const allCommunities = communities.sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
   return (
     <Stack spacing={2}>
-      {readOnly ? (
-        <UserDetailsReadonly showSocials={false} {...props} />
-      ) : (
-        <UserDetailsFormWithSave user={props.user as LoggedInUser} />
-      )}
+      {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user as LoggedInUser} />}
 
       {readOnly && !props.hideAggregateData && (
         <AggregatedData

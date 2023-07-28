@@ -21,7 +21,7 @@ describe('getPermissionsClient', () => {
   });
 
   it('should return the premium client for a space with pro, cancelled or enterprise tier', async () => {
-    const statuses: SubscriptionTier[] = ['pro', 'cancelled', 'enterprise'];
+    const statuses: SubscriptionTier[] = ['community', 'cancelled', 'enterprise'];
 
     for (const status of statuses) {
       const { space } = await testUtilsUser.generateUserAndSpace({

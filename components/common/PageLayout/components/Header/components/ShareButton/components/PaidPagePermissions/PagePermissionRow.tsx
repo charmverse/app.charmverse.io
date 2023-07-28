@@ -73,7 +73,12 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
         {isGuest && <GuestChip />}
         <div style={{ width: '160px', textAlign: 'right' }}>
           <SmallSelect
-            renderValue={(value) => permissionsWithRemove[value] || 'No access'}
+            renderValue={(value) => {
+              if (!value) {
+                return 'No Access';
+              }
+              return permissionsWithRemove[value] ?? 'No access';
+            }}
             onChange={(level: keyof typeof permissionsWithRemove) => {
               if (level === 'delete' && existingPermission) {
                 onDelete(existingPermission.id);
@@ -85,7 +90,7 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
               }
             }}
             keyAndLabel={permissionsWithRemove as Record<string, string>}
-            defaultValue={existingPermission?.permissionLevel as ApplicablePagePermissionLevel | undefined}
+            value={(existingPermission?.permissionLevel as ApplicablePagePermissionLevel | undefined) ?? 'No Access'}
           />
         </div>
       </Box>

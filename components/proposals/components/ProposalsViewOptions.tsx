@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -34,8 +34,10 @@ export function ProposalsViewOptions({
   setStatusFilter,
   categories,
   categoryIdFilter,
-  setCategoryIdFilter
-}: Props) {
+  setCategoryIdFilter,
+  // Needed for the playwright selector to get the correct item (since we use this component twice)
+  testKey = ''
+}: Props & { testKey?: string }) {
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
 
   const isAdmin = useIsAdmin();
@@ -57,7 +59,7 @@ export function ProposalsViewOptions({
 
   return (
     <ViewOptions label='Filter'>
-      <Box display='flex' gap={1}>
+      <Box data-test={`proposal-view-options-${testKey}`} display='flex' gap={1}>
         <Select
           variant='outlined'
           value={statusFilter}
@@ -74,6 +76,7 @@ export function ProposalsViewOptions({
         </Select>
 
         <Select
+          data-test='proposal-category-list'
           variant='outlined'
           value={categoryIdFilter || ''}
           renderValue={(value) => {
@@ -96,7 +99,12 @@ export function ProposalsViewOptions({
         >
           <MenuItem value='all'>All categories</MenuItem>
           {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id} sx={{ justifyContent: 'space-between' }}>
+            <MenuItem
+              data-test={`proposal-category-${category.id}`}
+              key={category.id}
+              value={category.id}
+              sx={{ justifyContent: 'space-between' }}
+            >
               <ProposalCategoryChip color={category.color} title={category.title} />
               <ProposalCategoryContextMenu category={category} key={category.id} />
             </MenuItem>

@@ -9,7 +9,7 @@ import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import type { CommentSortType } from 'components/common/comments/CommentSort';

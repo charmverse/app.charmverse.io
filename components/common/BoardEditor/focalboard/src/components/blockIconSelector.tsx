@@ -5,6 +5,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import React from 'react';
 import { useIntl } from 'react-intl';
 
+import { PageHeaderIcon } from 'components/[pageId]/DocumentPage/components/PageHeaderIcon';
 import PageIcon from 'components/common/Emoji';
 
 import { BlockIcons } from '../blockIcons';
@@ -48,10 +49,9 @@ const BlockIconSelector = React.memo((props: Props) => {
               icon={<EmojiEmotionsOutlinedIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
             >
-              <EmojiPicker
-                onSelect={(emoji) => {
-                  // onSelectEmoji(emoji);
-                  setPage({ icon: emoji });
+              <PageHeaderIcon
+                updatePageIcon={(icon) => {
+                  setPage({ icon });
                 }}
               />
             </Menu.SubMenu>

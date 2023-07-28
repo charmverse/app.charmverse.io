@@ -7,7 +7,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
@@ -72,7 +72,7 @@ export default function JoinWorkspace() {
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
-      <AlternateRouteButton href={`${getAppUrl()}/createSpace`}>Create a space</AlternateRouteButton>
+      <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>
     </Box>
   );
 }

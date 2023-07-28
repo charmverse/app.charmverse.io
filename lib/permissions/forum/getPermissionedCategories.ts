@@ -22,8 +22,7 @@ export async function getPermissionedCategories({
 
   const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId,
-    userId,
-    disallowGuest: true
+    userId
   });
 
   const permissions = new AvailablePostCategoryPermissions();

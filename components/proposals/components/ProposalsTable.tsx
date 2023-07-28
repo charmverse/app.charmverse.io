@@ -3,7 +3,7 @@ import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';

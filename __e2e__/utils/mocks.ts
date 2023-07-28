@@ -35,7 +35,7 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
-// Note: the endpoint creates a user when wallet address is provided
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function createUser({
   browserPage,
   address
@@ -52,6 +52,7 @@ export async function createUser({
     .then((res) => res.json());
 }
 
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function createSpace({
   browserPage,
   permissionConfigurationMode,
@@ -84,6 +85,7 @@ export async function createSpace({
   }
 }
 
+// DEPRECATED - mock data should be generated directly, not using webapp features
 export async function getPages({
   browserPage,
   spaceId
@@ -95,9 +97,15 @@ export async function getPages({
 }
 
 /**
+ *
+ * DEPRECATED - Use generateUserAndSpace instead. Mock data should be generated directly, not using webapp features
+ *
  * @browserPage - the page object for the browser context that will execute the requests
  *
  * @isOnboarded Default to true so all user / space pairs start as onboarded, and the tester can focus on the happy path they are targeting
+ *
+ *
+ * By Default, the user created with this method will be a space admin
  *
  * Returns a user and space along with this space's pages
  */

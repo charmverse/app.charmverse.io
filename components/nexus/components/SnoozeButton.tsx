@@ -9,7 +9,7 @@ import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-p
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useUser } from 'hooks/useUser';

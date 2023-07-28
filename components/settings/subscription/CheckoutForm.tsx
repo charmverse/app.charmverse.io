@@ -12,7 +12,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
@@ -120,7 +120,7 @@ export function CheckoutForm({
       charmClient.subscription.validateDiscount(arg.spaceId, arg.payload),
     {
       onSuccess(data) {
-        setValue('coupon', data === null ? '' : data.id);
+        setValue('coupon', data === null ? '' : data.code);
       },
       onError() {
         showMessage('Your coupon is not valid', 'error');
@@ -194,7 +194,7 @@ export function CheckoutForm({
           blockQuota,
           period,
           name: space.name,
-          coupon: couponData?.id || undefined
+          coupon: couponData?.code || undefined
         }
       });
 
@@ -209,7 +209,9 @@ export function CheckoutForm({
             name: space.name,
             email: emailField
           }
-        }
+        },
+        receipt_email: emailField,
+        return_url: `${window?.location.origin}?settingTab=subscription`
       });
 
       if (confirmCardError) {
@@ -247,7 +249,7 @@ export function CheckoutForm({
       spaceId: space.id,
       payload: {
         billingEmail: emailField,
-        coupon: couponData?.id || undefined,
+        coupon: couponData?.code || undefined,
         blockQuota,
         period,
         name: space.name

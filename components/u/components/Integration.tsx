@@ -4,7 +4,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Box, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 const IntegrationName = styled(Typography)`
   background-color: ${({ theme }) => theme.palette.background.dark};

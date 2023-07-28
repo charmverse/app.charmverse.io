@@ -4,7 +4,7 @@ import { Box, Collapse, Stack, Typography } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 

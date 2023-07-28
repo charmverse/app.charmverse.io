@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
+import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
@@ -45,11 +46,11 @@ import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
-import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
+import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
@@ -132,9 +133,8 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
 };
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
-  const router = useRouter();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -163,6 +163,14 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       refreshSignupData();
     }
   }, [router.isReady]);
+
+  if (router.pathname.startsWith('/authenticate')) {
+    return (
+      <BaseAuthenticateProviders>
+        <Component {...pageProps} />
+      </BaseAuthenticateProviders>
+    );
+  }
 
   return (
     <AppThemeProvider>

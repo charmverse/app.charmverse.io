@@ -31,7 +31,7 @@ import { injectIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board } from 'lib/focalboard/board';
