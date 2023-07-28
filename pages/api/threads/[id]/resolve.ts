@@ -66,8 +66,11 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
 
     relay.broadcast(
       {
-        type: 'thread_updated',
-        payload: updatedThread
+        type: 'threads_updated',
+        payload: {
+          pageId: thread.pageId,
+          threadId
+        }
       },
       thread.spaceId
     );

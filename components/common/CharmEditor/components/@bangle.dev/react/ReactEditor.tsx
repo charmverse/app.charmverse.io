@@ -18,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -186,7 +187,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             isLoadingRef.current = false;
           },
           onCommentUpdate: () => {
-            mutate(`pages/${pageId}/threads`);
+            mutate(getThreadsKey(pageId));
           },
           onParticipantUpdate
         });

@@ -49,8 +49,11 @@ async function deleteThreadController(req: NextApiRequest, res: NextApiResponse)
 
   relay.broadcast(
     {
-      type: 'thread_deleted',
-      payload: threadId
+      type: 'threads_updated',
+      payload: {
+        pageId: thread.pageId,
+        threadId
+      }
     },
     thread.spaceId
   );

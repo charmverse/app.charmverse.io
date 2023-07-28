@@ -199,7 +199,7 @@ export class FidusEditor {
             }
             this.mod.collab.doc.receiveDiff(data);
             const isCommentUpdate = data.ds.find(
-              (step) => step.stepType === 'addMark' && step.mark.type === 'inline-comment'
+              (step) => step.stepType === 'addMark' && step.mark?.type === 'inline-comment'
             );
             if (isCommentUpdate) {
               this.onCommentUpdate();

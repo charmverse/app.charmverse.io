@@ -1,4 +1,3 @@
-import type { Comment } from '@charmverse/core/prisma-client';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -26,6 +25,10 @@ type IContext = {
   refetchThreads: KeyedMutator<ThreadWithComments[]>;
 };
 
+export function getThreadsKey(pageId: string) {
+  return `pages/${pageId}/threads`;
+}
+
 export const ThreadsContext = createContext<Readonly<IContext>>({
   isValidating: true,
   threads: {},
@@ -48,7 +51,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { spaceRole } = useCurrentSpace();
 
   const { data, isValidating, mutate } = useSWR(
-    () => (currentPageId ? `pages/${currentPageId}/threads` : null),
+    () => (currentPageId ? getThreadsKey(currentPageId) : null),
     () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
   );
@@ -68,112 +71,18 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     return threadsAndAuthors;
   }
 
-  function inlineCommentCreatedHandler(comment: Comment) {
-    setThreads((_threads) => {
-      const thread = _threads[comment.threadId];
-      if (thread) {
-        return {
-          ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: [
-              ...thread.comments,
-              {
-                ...comment,
-                user: members.find((m) => m.id === comment.userId) || ({} as any)
-              }
-            ]
-          }
-        };
-      }
-
-      return _threads;
-    });
-  }
-
-  function inlineCommentDeletedHandler(payload: WebSocketPayload<'inline_comment_deleted'>) {
-    setThreads((_threads) => {
-      const thread = _threads[payload.threadId];
-      if (thread) {
-        return {
-          ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: thread.comments.filter((_comment) => _comment.id !== payload.commentId)
-          }
-        };
-      }
-
-      return _threads;
-    });
-  }
-
-  function inlineCommentUpdatedHandler(payload: WebSocketPayload<'inline_comment_updated'>) {
-    setThreads((_threads) => {
-      const thread = _threads[payload.threadId];
-      if (thread) {
-        return {
-          ..._threads,
-          [thread.id]: {
-            ...thread,
-            comments: thread.comments.map((_comment) => {
-              if (_comment.id === payload.id) {
-                return {
-                  ..._comment,
-                  ...payload
-                };
-              }
-              return _comment;
-            })
-          }
-        };
-      }
-
-      return _threads;
-    });
-  }
-
-  function threadUpdatedHandler(payload: WebSocketPayload<'thread_updated'>) {
-    setThreads((_threads) => {
-      const thread = _threads[payload.id];
-      if (thread) {
-        return {
-          ..._threads,
-          [thread.id]: {
-            ...thread,
-            ...payload
-          }
-        };
-      }
-
-      return _threads;
-    });
-  }
-
-  function threadDeletedHandler(threadId: WebSocketPayload<'thread_deleted'>) {
-    setThreads((_threads) => {
-      if (_threads) {
-        delete _threads[threadId];
-      }
-
-      return _threads;
-    });
+  function threadsUpdatedHandler(payload: WebSocketPayload<'threads_updated'>) {
+    if (payload.pageId === currentPageId) {
+      mutate();
+    }
   }
 
   useEffect(() => {
     if (spaceRole && !spaceRole.isGuest) {
-      const unsubscribeFromInlineCommentCreatedEvent = subscribe('inline_comment_created', inlineCommentCreatedHandler);
-      const unsubscribeFromInlineCommentUpdatedEvent = subscribe('inline_comment_updated', inlineCommentUpdatedHandler);
-      const unsubscribeFromInlineCommentDeletedEvent = subscribe('inline_comment_deleted', inlineCommentDeletedHandler);
-      const unsubscribeFromThreadUpdatedEvent = subscribe('thread_updated', threadUpdatedHandler);
-      const unsubscribeFromThreadDeletedEvent = subscribe('thread_deleted', threadDeletedHandler);
+      const unsubscribeFromThreadsUpdatedEvent = subscribe('threads_updated', threadsUpdatedHandler);
 
       return () => {
-        unsubscribeFromInlineCommentCreatedEvent();
-        unsubscribeFromInlineCommentDeletedEvent();
-        unsubscribeFromInlineCommentUpdatedEvent();
-        unsubscribeFromThreadUpdatedEvent();
-        unsubscribeFromThreadDeletedEvent();
+        unsubscribeFromThreadsUpdatedEvent();
       };
     }
   }, [spaceRole]);

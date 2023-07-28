@@ -61,8 +61,11 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
 
   relay.broadcast(
     {
-      type: 'inline_comment_created',
-      payload: createdComment
+      type: 'threads_updated',
+      payload: {
+        pageId: thread.pageId,
+        threadId
+      }
     },
     thread.spaceId
   );

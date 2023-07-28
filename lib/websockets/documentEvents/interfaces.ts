@@ -46,30 +46,24 @@ export type ClientSelectionMessage = {
   v: number;
 };
 
-export type ProsemirrorJSONStep =
-  | {
-      stepType: 'replace';
-      from: number;
-      to: number;
-      slice?: {
-        content?: {
-          type: string;
-          attrs?: any;
-          marks?: { type: string; attrs: any }[];
-          content?: any[];
-          text?: string;
-        }[];
-      };
-    }
-  | {
-      stepType: 'addMark';
-      from: number;
-      to: number;
-      mark: {
-        type: string;
-        attrs: Record<string, any>;
-      };
-    };
+export type ProsemirrorJSONStep = {
+  stepType: 'replace' | 'addMark';
+  from: number;
+  to: number;
+  slice?: {
+    content?: {
+      type: string;
+      attrs?: any;
+      marks?: { type: string; attrs: any }[];
+      content?: any[];
+      text?: string;
+    }[];
+  };
+  mark?: {
+    type: string;
+    attrs: Record<string, any>;
+  };
+};
 
 export type ClientDiffMessage = {
   type: 'diff';

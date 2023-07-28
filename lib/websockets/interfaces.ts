@@ -109,32 +109,12 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
-type InlineCommentCreated = {
-  type: 'inline_comment_created';
-  payload: Comment;
-};
-
-type InlineCommentDeleted = {
-  type: 'inline_comment_deleted';
+type ThreadsUpdated = {
+  type: 'threads_updated';
   payload: {
-    commentId: string;
     threadId: string;
+    pageId: string;
   };
-};
-
-type InlineCommentUpdated = {
-  type: 'inline_comment_updated';
-  payload: Comment;
-};
-
-type ThreadUpdated = {
-  type: 'thread_updated';
-  payload: Thread;
-};
-
-type ThreadDeleted = {
-  type: 'thread_deleted';
-  payload: string;
 };
 
 export type ClientMessage = SubscribeToWorkspace;
@@ -153,11 +133,7 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
-  | InlineCommentCreated
-  | InlineCommentUpdated
-  | InlineCommentDeleted
-  | ThreadUpdated
-  | ThreadDeleted
+  | ThreadsUpdated
   | SpaceSubscriptionUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;

@@ -49,8 +49,11 @@ async function updateCommentController(req: NextApiRequest, res: NextApiResponse
 
   relay.broadcast(
     {
-      type: 'inline_comment_updated',
-      payload: commentAfterUpdate
+      type: 'threads_updated',
+      payload: {
+        pageId: commentAfterUpdate.pageId,
+        threadId: commentAfterUpdate.threadId
+      }
     },
     commentAfterUpdate.spaceId
   );
@@ -70,7 +73,8 @@ async function deleteCommentController(req: NextApiRequest, res: NextApiResponse
     select: {
       threadId: true,
       userId: true,
-      spaceId: true
+      spaceId: true,
+      pageId: true
     }
   });
 
@@ -86,9 +90,9 @@ async function deleteCommentController(req: NextApiRequest, res: NextApiResponse
 
   relay.broadcast(
     {
-      type: 'inline_comment_deleted',
+      type: 'threads_updated',
       payload: {
-        commentId: commentId as string,
+        pageId: comment.pageId,
         threadId: comment.threadId
       }
     },
