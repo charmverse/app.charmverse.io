@@ -277,11 +277,6 @@ function Kanban(props: Props) {
   };
   const menuTriggerProps = !props.readOnly ? { ...restBindings, onClick: addNewGroupHandler } : {};
 
-  // eslint-disable-next-line no-console
-  console.log({
-    groupedBy: props.groupByProperty
-  });
-
   return (
     <Box className='Kanban'>
       <div className='octo-board-header' id='mainBoardHeader'>
