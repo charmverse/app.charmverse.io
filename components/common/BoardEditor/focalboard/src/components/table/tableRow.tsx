@@ -43,6 +43,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
+  readOnlyTitle?: boolean;
 };
 
 export const columnWidth = (
@@ -132,7 +133,7 @@ function TableRow(props: Props) {
     onChange: (newTitle: string) => setTitle(newTitle),
     onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
     onCancel: () => setTitle(card.title || ''),
-    readOnly: props.readOnly,
+    readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
 

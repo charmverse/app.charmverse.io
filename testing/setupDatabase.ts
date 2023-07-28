@@ -21,12 +21,14 @@ import type {
   WorkspaceEvent
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { ViewSourceType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -1056,14 +1058,18 @@ export async function generateBoard({
   parentId,
   cardCount,
   views,
-  addPageContent
+  addPageContent,
+  viewDataSource,
+  boardPageType
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
   views?: number;
+  viewDataSource?: ViewSourceType;
   addPageContent?: boolean;
+  boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1071,7 +1077,9 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
-    addPageContent
+    addPageContent,
+    viewDataSource,
+    boardPageType
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

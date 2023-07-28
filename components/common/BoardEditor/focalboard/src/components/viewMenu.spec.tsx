@@ -23,7 +23,7 @@ beforeEach(() => {
 describe('/components/viewMenu', () => {
   const board = TestBlockFactory.createBoard();
   const boardView = TestBlockFactory.createBoardView(board);
-  const tableView = TestBlockFactory.createTableView(board);
+  const tableView = TestBlockFactory.createTableView({ board });
   const activeView = boardView;
   const views = [boardView, tableView];
 
