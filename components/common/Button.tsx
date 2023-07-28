@@ -29,10 +29,10 @@ export type InputProps<C extends ElementType = ElementType> = ButtonProps &
   };
 
 export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
-  const { children, loading, loadingMessage, disabledTooltip, ...props } = _props;
+  const { children, loading, loadingMessage, disabledTooltip, disabled, ...props } = _props;
 
   const buttonComponent = (
-    <StyledButton ref={ref} disabled={loading} {...props}>
+    <StyledButton ref={ref} {...props} disabled={loading || disabled}>
       {loading && loadingMessage ? loadingMessage : children}
       {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
