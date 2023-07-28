@@ -1,4 +1,4 @@
-import { builders } from 'testing/prosemirror';
+import { builders } from 'testing/prosemirror/builders';
 
 import { extractSummary } from '../extractSummary';
 

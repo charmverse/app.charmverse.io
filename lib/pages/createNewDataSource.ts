@@ -22,7 +22,7 @@ export async function createNewDataSource({
   if (currentPageType === 'linked_board') {
     newPageType = 'board';
   }
-  const view = createTableView(board);
+  const view = createTableView({ board, views: [] });
   await mutator.insertBlocks([view], 'convert board');
 
   await updatePage({ id: board.id, type: newPageType }, true);

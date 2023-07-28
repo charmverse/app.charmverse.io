@@ -88,35 +88,13 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   board.id = boardId;
   board.rootId = board.id;
 
-  const view = createTableView(board);
+  const view = createTableView({ board, views: [] });
 
   return {
     board,
     view,
     cards: []
   };
-}
-
-export function createDefaulBoardViewAndCards({ board }: { board: Board }) {
-  const view = createBoardView();
-  view.fields.viewType = 'board';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.title = '';
-
-  const cards: Card[] = [];
-
-  for (let index = 0; index < 3; index++) {
-    const card = createCard();
-    card.parentId = board.id;
-    card.rootId = board.rootId;
-    card.title = `Card ${index + 1}`;
-    card.fields.contentOrder = [];
-    view.fields.cardOrder.push(card.id);
-    cards.push(card);
-  }
-
-  return { view, cards };
 }
 
 export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {

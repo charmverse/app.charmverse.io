@@ -19,6 +19,7 @@ type Props = {
   addCard: (show: boolean) => Promise<void>;
   selectedCardIds: string[];
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  disableAddingCards?: boolean;
 };
 
 function Gallery(props: Props): JSX.Element {
@@ -76,7 +77,7 @@ function Gallery(props: Props): JSX.Element {
 
       {/* Add New row */}
 
-      {!props.readOnly && (
+      {!props.readOnly && !props.disableAddingCards && (
         <div
           className='octo-gallery-new'
           onClick={() => {

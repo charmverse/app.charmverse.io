@@ -380,7 +380,7 @@ ol li {
 .bangle-editor ul:not(.MuiList-root) {
   list-style-type: disc;
   list-style-position: outside;
-  padding-left: 1.5rem;
+  padding-left: 24px;
 }
 
 .bangle-editor ul,
@@ -585,7 +585,7 @@ ol li {
 .charm-column-resizer {
   cursor: col-resize;
   position: relative;
-  flex: 0 0 20px; //  this is also set by the column-resizer library
+  flex: 0 0 50px; //  this is the bar width, also set by the column-resizer library
   > div {
     position: absolute;
     top: 0;

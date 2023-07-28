@@ -4,6 +4,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Comment, Page, SubscriptionTier, Thread } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -109,6 +110,15 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+    failedImports: FailedImportsError[];
+  };
+};
+
 type ThreadsUpdated = {
   type: 'threads_updated';
   payload: {
@@ -134,7 +144,8 @@ export type ServerMessage =
   | PostUpdated
   | PostDeleted
   | ThreadsUpdated
-  | SpaceSubscriptionUpdated;
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
