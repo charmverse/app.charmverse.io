@@ -6,7 +6,7 @@ import { Box, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typogr
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';

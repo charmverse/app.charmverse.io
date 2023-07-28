@@ -8,7 +8,6 @@ import { stripeClient } from './stripe';
 
 export type SpaceSubscriptionRequest = {
   spaceId: string;
-  returnUrl?: string;
 };
 
 export type SpaceSubscriptionWithStripeData = StripeSubscription & SubscriptionFieldsFromStripe;
@@ -16,25 +15,27 @@ export type SpaceSubscriptionWithStripeData = StripeSubscription & SubscriptionF
 export const subscriptionExpandFields = ['customer', 'default_payment_method'];
 
 export async function getActiveSpaceSubscription({
-  spaceId,
-  returnUrl,
-  requestCustomerPortal
-}: SpaceSubscriptionRequest & { requestCustomerPortal?: boolean }): Promise<SpaceSubscriptionWithStripeData | null> {
+  spaceId
+}: SpaceSubscriptionRequest): Promise<SpaceSubscriptionWithStripeData | null> {
   const space = await prisma.space.findUnique({
     where: {
-      id: spaceId
+      id: spaceId,
+      deletedAt: null
     },
     select: {
       stripeSubscription: {
         take: 1,
         orderBy: {
           createdAt: 'desc'
+        },
+        where: {
+          deletedAt: null
         }
       }
     }
   });
 
-  const activeSpaceSubscription = space?.stripeSubscription[0];
+  const activeSpaceSubscription = space?.stripeSubscription?.[0];
 
   if (!activeSpaceSubscription) {
     return null;
@@ -49,14 +50,6 @@ export async function getActiveSpaceSubscription({
     spaceId,
     subscription: subscriptionInStripe as Stripe.Subscription & { customer: Stripe.Customer }
   });
-
-  if (stripeData.paymentMethod && requestCustomerPortal && returnUrl) {
-    const portal = await stripeClient.billingPortal.sessions.create({
-      customer: (subscriptionInStripe.customer as Stripe.Customer).id,
-      return_url: returnUrl
-    });
-    stripeData.paymentMethod.updateUrl = portal.url;
-  }
 
   if (stripeData.status === 'cancelled') {
     return null;

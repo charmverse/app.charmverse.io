@@ -33,12 +33,12 @@ async function getReviewerPoolController(req: NextApiRequest, res: NextApiRespon
     throw new ProposalNotFoundError(resourceId);
   }
 
-  const { error } = await hasAccessToSpace({
+  const { spaceRole } = await hasAccessToSpace({
     spaceId: proposal.spaceId,
     userId: req.session.user.id
   });
 
-  if (error) {
+  if (!spaceRole) {
     throw new SpaceMembershipRequiredError();
   }
 

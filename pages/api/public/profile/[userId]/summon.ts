@@ -12,9 +12,9 @@ handler.get(getSummonProfileController);
 async function getSummonProfileController(req: NextApiRequest, res: NextApiResponse<SummonUserProfile | null>) {
   const userId = req.query.userId as string;
 
-  const game7Profile = await getSummonProfile({ userId });
+  const summonProfile = await getSummonProfile({ userId });
 
-  res.status(200).json(game7Profile);
+  res.status(200).json(summonProfile);
 }
 
 export default handler;

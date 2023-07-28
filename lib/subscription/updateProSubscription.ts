@@ -3,15 +3,13 @@ import type Stripe from 'stripe';
 import { InvalidStateError } from 'lib/middleware';
 
 import type { SubscriptionStatusType } from './constants';
-import type { SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
-import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
+import { getActiveSpaceSubscription, type SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';
 import { stripeClient } from './stripe';
 
-export type UpdateSubscriptionRequest = Partial<
-  Pick<SpaceSubscriptionWithStripeData, 'status' | 'billingEmail' | 'coupon' | 'subscriptionId'> & {
-    status?: Extract<SubscriptionStatusType, 'active' | 'cancel_at_end'>;
-  }
->;
+export type UpdateSubscriptionRequest = {
+  status?: Extract<SubscriptionStatusType, 'active' | 'cancel_at_end'>;
+  billingEmail?: SpaceSubscriptionWithStripeData['billingEmail'];
+};
 
 export async function updateProSubscription({
   spaceId,
@@ -20,51 +18,47 @@ export async function updateProSubscription({
   spaceId: string;
   payload: UpdateSubscriptionRequest;
 }) {
-  const { billingEmail, status, coupon } = payload;
+  const { billingEmail, status } = payload;
 
-  const stripeSubscription = await stripeClient.subscriptions.search({
-    query: `metadata['spaceId']:'${spaceId}'`,
-    expand: ['data.customer']
-  });
+  const spaceSubscription = await getActiveSpaceSubscription({ spaceId });
 
-  const existingStripeSubscription: Stripe.Subscription | undefined = stripeSubscription.data?.find(
-    (sub) =>
-      (sub.customer as Stripe.Customer | Stripe.DeletedCustomer)?.deleted !== true &&
-      (sub.customer as Stripe.Customer).metadata.spaceId === spaceId
-  );
-
-  const existingStripeCustomer =
-    typeof existingStripeSubscription?.customer !== 'string' ? existingStripeSubscription?.customer : undefined;
-
-  if (existingStripeSubscription && existingStripeCustomer) {
-    if (billingEmail && !existingStripeCustomer.deleted) {
-      await stripeClient.customers.update(existingStripeCustomer.id, {
-        email: billingEmail
-      });
-    }
-
-    if (coupon) {
-      await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        coupon
-      });
-    }
-
-    if (status === 'cancel_at_end') {
-      await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        cancel_at_period_end: true
-      });
-    } else if (status === 'active') {
-      await stripeClient.subscriptions.update(existingStripeSubscription.id, {
-        cancel_at_period_end: false
-      });
-    }
+  if (!spaceSubscription) {
+    throw new InvalidStateError(`No subscription to update for space ${spaceId}`);
   }
 
-  const subscription = await getActiveSpaceSubscription({
-    spaceId
+  const subscriptionId = spaceSubscription.subscriptionId;
+
+  const stripeSubscription = await stripeClient.subscriptions.retrieve(subscriptionId, {
+    expand: ['customer']
   });
 
-  if (subscription?.status === 'cancelled') {
-    throw new InvalidStateError(`Subscription ${subscription.id} is not active`);
+  if (stripeSubscription.metadata.spaceId !== spaceId) {
+    throw new InvalidStateError(`Subscription ${subscriptionId} is not related to space ${spaceId}`);
+  }
+
+  const stripeCustomer = stripeSubscription.customer as Stripe.Customer;
+
+  if (stripeCustomer.deleted) {
+    throw new InvalidStateError(`Can't update the subscription of a deleted customer ${stripeCustomer.id}`);
+  }
+
+  if (stripeSubscription?.status !== 'active') {
+    throw new InvalidStateError(`Subscription ${stripeSubscription.id} is not active`);
+  }
+
+  if (billingEmail) {
+    await stripeClient.customers.update(stripeCustomer.id, {
+      email: billingEmail
+    });
+  }
+
+  if (status === 'cancel_at_end') {
+    await stripeClient.subscriptions.update(stripeSubscription.id, {
+      cancel_at_period_end: true
+    });
+  } else if (status === 'active') {
+    await stripeClient.subscriptions.update(stripeSubscription.id, {
+      cancel_at_period_end: false
+    });
   }
 }

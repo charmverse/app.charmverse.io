@@ -8,7 +8,7 @@ import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'r
 import useSWRInfinite from 'swr/infinite';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';

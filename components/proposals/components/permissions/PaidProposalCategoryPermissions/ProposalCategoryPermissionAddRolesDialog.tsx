@@ -2,7 +2,7 @@ import type { ProposalCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 

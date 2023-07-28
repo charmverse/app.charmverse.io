@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesForm } from 'components/common/UserProfile/components/MemberPropertiesForm';
 import { useMemberPropertyValues } from 'components/common/UserProfile/hooks/useMemberPropertyValues';

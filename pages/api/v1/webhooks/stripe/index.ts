@@ -101,18 +101,23 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         };
 
         await prisma.$transaction([
-          prisma.stripeSubscription.create({
-            data: {
+          prisma.stripeSubscription.upsert({
+            where: {
+              subscriptionId: stripeSubscription.id,
+              spaceId
+            },
+            create: {
               ...newData,
               spaceId
-            }
+            },
+            update: {}
           }),
           prisma.space.update({
             where: {
               id: space.id
             },
             data: {
-              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'pro'
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'community'
             }
           })
         ]);
@@ -154,6 +159,23 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
                 deletedAt: new Date()
               }
             });
+
+            if (invoice.paid) {
+              const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
+              trackUserAction('subscription_payment', {
+                spaceId,
+                blockQuota,
+                period,
+                status: 'success',
+                subscriptionId: stripeSubscription.id,
+                paymentMethod: invoice.metadata?.transaction_hash
+                  ? 'crypto'
+                  : charge?.payment_method_details?.type?.startsWith('ach')
+                  ? 'ach'
+                  : 'card',
+                userId: space.createdBy
+              });
+            }
           }
 
           trackUserAction('create_subscription', {
@@ -162,23 +184,6 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             spaceId,
             userId: space.createdBy,
             subscriptionId: stripeSubscription.id
-          });
-        }
-
-        if (invoice.paid) {
-          const charge = invoice.charge ? await stripeClient.charges.retrieve(invoice.charge as string) : null;
-          trackUserAction('subscription_payment', {
-            spaceId,
-            blockQuota,
-            period,
-            status: 'success',
-            subscriptionId: stripeSubscription.id,
-            paymentMethod: invoice.metadata?.transaction_hash
-              ? 'crypto'
-              : charge?.payment_method_details?.type?.startsWith('ach')
-              ? 'ach'
-              : 'card',
-            userId: space.createdBy
           });
         }
 
@@ -343,9 +348,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         });
 
         if (!spaceSubscription) {
-          log.warn(
-            `Can't delete the space subscription. Space subscription not found for subscription ${subscription.id}`
-          );
+          // Continue only of the subscription deletion was triggered from the stripe dashboard and there is an active space subscription.
           break;
         }
 

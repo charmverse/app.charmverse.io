@@ -6,14 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
-/**
- * @returnUrl - Used for when we generate the customer portal link
- */
-type Props = {
-  returnUrl?: string;
-};
-
-export function useSpaceSubscription({ returnUrl }: Props = {}) {
+export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
@@ -23,8 +16,8 @@ export function useSpaceSubscription({ returnUrl }: Props = {}) {
     isLoading,
     mutate: refetchSpaceSubscription
   } = useSWR(
-    currentSpace ? `/spaces/${currentSpace.id}/subscription?returnUrl=${returnUrl}` : null,
-    () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id, returnUrl }),
+    currentSpace ? `/spaces/${currentSpace.id}/subscription` : null,
+    () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false

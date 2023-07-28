@@ -7,7 +7,7 @@ import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Too
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';

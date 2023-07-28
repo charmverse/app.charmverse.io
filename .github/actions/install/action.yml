@@ -7,6 +7,13 @@ inputs:
   commit_core_pkg_upgrade:
     description: "Whether commit the update to core package back to branch"
     required: false
+  use_github_core_branch:
+    description: |
+      Optional, core branch name to install from github. 
+      If set core_pkg_version and commit_core_pkg_upgrade will be ignored. 
+      Add your branch to this variable below to install your custom branch.
+    required: false
+    default:
 
 runs:
   using: "composite"
@@ -33,12 +40,14 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    # If installing specific version of core via npmjs 
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
       shell: bash
       if: inputs.core_pkg_version
       run: |
         npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
+    # Commits pkg upgrade back to main. Only done on push event with main branch.
     - name: Commit package and lock file back into repo
       if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -46,10 +55,12 @@ runs:
         file_pattern: "package*.json"
         commit_message: "Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}"
 
-    # Include this step to deploy and test a different branch of core
-    # 1. Set the webapp branch
-    # 2. Set core branch
-    - name: Install special core library
+    # If installing core via github branch
+    - name: Install custom core branch
       shell: bash
-      if: github.head_ref == 'ux/filter-proposal-notifications'
-      run: rm -rf ./node_modules/@charmverse && npm install github:charmverse/core#ux/filter-proposal-notifications && cd node_modules/@charmverse/core && npm run build 
+      if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
+      run: |
+        rm -fr node_modules/@charmverse/core 
+        npm install github:charmverse/core#${{inputs.use_github_core_branch}}
+        cd node_modules/@charmverse/core
+        npm run build

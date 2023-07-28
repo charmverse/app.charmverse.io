@@ -16,14 +16,14 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Stack
 } from '@mui/material';
-import { Stack } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';

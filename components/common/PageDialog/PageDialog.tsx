@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';

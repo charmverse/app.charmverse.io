@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle, Modal } from 'components/common/Modal';
 

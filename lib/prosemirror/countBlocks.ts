@@ -34,7 +34,10 @@ const INLINE_NODES_TO_IGNORE = [
   'underline'
 ];
 
-export function countBlocks(pageContent: any | null, spaceId?: string) {
+export function countBlocks(
+  pageContent: any | null,
+  meta: { spaceId?: string; blockId?: string; postId?: string; pageId?: string } = {}
+) {
   let count = 0;
   if (pageContent) {
     try {
@@ -48,13 +51,11 @@ export function countBlocks(pageContent: any | null, spaceId?: string) {
       }
     } catch (error) {
       // assume that spaceId is passed if we care about logging
-      if (spaceId) {
-        log.error('Error counting prosemirror blocks', {
-          error,
-          pageContent,
-          spaceId
-        });
-      }
+      log.error('Error counting prosemirror blocks', {
+        error,
+        pageContent,
+        ...meta
+      });
     }
   }
   return count;

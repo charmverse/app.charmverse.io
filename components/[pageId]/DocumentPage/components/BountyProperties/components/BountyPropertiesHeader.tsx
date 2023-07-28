@@ -8,7 +8,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BountyWithDetails } from 'lib/bounties';

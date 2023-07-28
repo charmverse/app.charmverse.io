@@ -119,7 +119,17 @@ export function MembersProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      members: members || [],
+      members:
+        members?.map((member) => ({
+          ...member,
+          roles: [
+            ...member.roles,
+            {
+              id: member.isAdmin ? 'admin' : member.isGuest ? 'guest' : 'member',
+              name: member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
+            }
+          ]
+        })) || [],
       membersRecord,
       guests: members?.filter((member) => member.isGuest) || [],
       mutateMembers,

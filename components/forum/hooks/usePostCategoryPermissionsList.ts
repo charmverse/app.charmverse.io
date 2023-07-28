@@ -23,6 +23,7 @@ export function usePostCategoryPermissionsList({ postCategoryId }: Props) {
 
   async function deletePermission(permissionId: string) {
     await charmClient.permissions.forum.deletePostCategoryPermission(permissionId);
+    refreshPermissionsList();
   }
 
   async function addRolePermissions({

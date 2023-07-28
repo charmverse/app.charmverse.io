@@ -4,7 +4,7 @@ import Tooltip from '@mui/material/Tooltip';
 import type { Blockchain } from 'connectors';
 import { RPC } from 'connectors';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { greyColor2 } from 'theme/colors';
 
