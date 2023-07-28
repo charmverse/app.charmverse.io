@@ -252,7 +252,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     updatedAt={page.updatedAt.toString()}
                     readOnly={readOnly || !!enableSuggestingMode}
                     setPage={savePage}
-                    readonlyTitle={!!page.syncWithPageId}
+                    readOnlyTitle={!!page.syncWithPageId}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                     <Box my={2} className='font-family-default'>

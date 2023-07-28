@@ -18,7 +18,6 @@ import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import PropertyValueElement from '../propertyValueElement';
-import type { DisabledAddCardProp } from '../shared';
 
 const oneDay = 60 * 60 * 24 * 1000;
 
@@ -31,7 +30,8 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate;
   showCard: (cardId: string) => void;
   addCard: (properties: Record<string, string>) => void;
-} & DisabledAddCardProp;
+  disableAddingCards?: boolean;
+};
 
 const timeZoneOffset = (date: number): number => {
   return new Date(date).getTimezoneOffset() * 60 * 1000;

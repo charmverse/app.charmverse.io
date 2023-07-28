@@ -11,8 +11,6 @@ import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
-import type { CustomReadonlyViewProps, DisabledAddCardProp } from '../../focalboard/src/components/shared';
-
 type Props = {
   group: BoardGroup;
   board: Board;
@@ -25,7 +23,8 @@ type Props = {
   onDropToCard: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
-} & DisabledAddCardProp;
+  disableAddingCards?: boolean;
+};
 
 export function KanbanGroupColumn({
   group,

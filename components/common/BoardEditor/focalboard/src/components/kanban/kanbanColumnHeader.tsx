@@ -22,7 +22,6 @@ import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import type { ReadonlyTitleProp } from '../shared';
 
 import { KanbanCalculation } from './calculation/calculation';
 
@@ -40,7 +39,8 @@ type Props = {
   onCalculationMenuOpen: (anchorEl: HTMLElement) => void;
   onCalculationMenuClose: () => void;
   anchorEl: HTMLElement | null;
-} & ReadonlyTitleProp;
+  readOnlyTitle?: boolean;
+};
 
 const defaultCalculation = 'count';
 const defaultProperty: IPropertyTemplate = {
@@ -137,7 +137,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             onCancel={() => {
               setGroupTitle(group.option.value);
             }}
-            readOnly={props.readOnly || props.readonlyTitle}
+            readOnly={props.readOnly || props.readOnlyTitle}
             spellCheck={true}
           />
         </Label>

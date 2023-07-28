@@ -8,7 +8,6 @@ import type { Card } from 'lib/focalboard/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import type { DisabledAddCardProp } from '../shared';
 
 import GalleryCard from './galleryCard';
 
@@ -20,7 +19,8 @@ type Props = {
   addCard: (show: boolean) => Promise<void>;
   selectedCardIds: string[];
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-} & DisabledAddCardProp;
+  disableAddingCards?: boolean;
+};
 
 function Gallery(props: Props): JSX.Element {
   const { activeView, board, cards } = props;

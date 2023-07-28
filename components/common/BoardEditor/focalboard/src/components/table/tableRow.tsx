@@ -22,8 +22,6 @@ import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
-import type { ReadonlyTitleProp } from '../shared';
-import { CustomReadonlyViewProps } from '../shared';
 
 type Props = {
   hasContent?: boolean;
@@ -45,7 +43,8 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
-} & ReadonlyTitleProp;
+  readOnlyTitle?: boolean;
+};
 
 export const columnWidth = (
   resizingColumn: string,
@@ -134,7 +133,7 @@ function TableRow(props: Props) {
     onChange: (newTitle: string) => setTitle(newTitle),
     onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
     onCancel: () => setTitle(card.title || ''),
-    readOnly: props.readOnly || props.readonlyTitle,
+    readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
 

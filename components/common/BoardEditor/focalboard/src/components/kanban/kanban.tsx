@@ -17,7 +17,6 @@ import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
-import type { CustomReadonlyViewProps } from '../shared';
 
 import KanbanColumnHeader from './kanbanColumnHeader';
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
@@ -68,7 +67,9 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
   showCard: (cardId: string | null) => void;
-} & CustomReadonlyViewProps;
+  disableAddingCards?: boolean;
+  readOnlyTitle?: boolean;
+};
 
 function Kanban(props: Props) {
   const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
@@ -302,7 +303,7 @@ function Kanban(props: Props) {
             onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
             onCalculationMenuClose={() => toggleOptions(group.option.id)}
             anchorEl={anchorEl}
-            readonlyTitle={props.readonlyTitle}
+            readOnlyTitle={props.readOnlyTitle}
           />
         ))}
 

@@ -23,7 +23,6 @@ import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import type { CustomReadonlyViewProps } from '../shared';
 
 type Props = {
   board: Board;
@@ -35,7 +34,9 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
-} & CustomReadonlyViewProps;
+  disableAddingCards?: boolean;
+  readOnlyTitle?: boolean;
+};
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, groupByProperty } = props;
@@ -114,7 +115,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               onCancel={() => {
                 setGroupTitle(group.option.value);
               }}
-              readOnly={props.readOnly || !group.option.id || props.readonlyTitle}
+              readOnly={props.readOnly || !group.option.id || props.readOnlyTitle}
               spellCheck={true}
             />
           </Label>
