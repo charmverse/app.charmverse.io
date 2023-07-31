@@ -100,6 +100,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           deletedAt: null
         };
 
+        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+
         await prisma.$transaction([
           prisma.stripeSubscription.upsert({
             where: {
@@ -117,13 +119,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
               id: space.id
             },
             data: {
-              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'community'
+              paidTier: paidTier === 'enterprise' ? 'enterprise' : 'community',
+              blockQuota: blockQuota && space.blockQuota !== blockQuota ? blockQuota : undefined
             }
           })
         ]);
-
-        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
-
         if (invoice.billing_reason === 'subscription_create' && invoice.payment_intent) {
           // The subscription automatically activates after successful payment
           // Set the payment method used to pay the first invoice
