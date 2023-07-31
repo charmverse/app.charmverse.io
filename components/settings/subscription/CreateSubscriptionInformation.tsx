@@ -50,6 +50,7 @@ export function CreateSubscriptionInformation({
 }) {
   const { refetchSpaceSubscription } = useSpaceSubscription();
   const { showMessage } = useSnackbar();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
 
   const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
     `spaces/${spaceId}/switch-to-free-tier`,
@@ -57,6 +58,7 @@ export function CreateSubscriptionInformation({
     {
       onSuccess() {
         refetchSpaceSubscription();
+        refreshCurrentSpace();
         showMessage('You have successfully switch to free tier!', 'success');
       },
       onError(err) {
@@ -83,16 +85,14 @@ export function CreateSubscriptionInformation({
         : `Free trial finished`
       : '';
 
-  const { space } = useCurrentSpace();
-
   useEffect(() => {
-    if (space) {
+    if (space?.id) {
       charmClient.track.trackAction('page_view', {
         spaceId: space.id,
         type: 'billing/marketing'
       });
     }
-  }, [space]);
+  }, [space?.id]);
 
   return (
     <>

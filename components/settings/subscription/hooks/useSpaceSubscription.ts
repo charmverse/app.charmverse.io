@@ -4,19 +4,21 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
+  const { user } = useUser();
 
   const {
     data: spaceSubscription,
     isLoading,
     mutate: refetchSpaceSubscription
   } = useSWR(
-    currentSpace ? `/spaces/${currentSpace.id}/subscription` : null,
+    !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/subscription` : null,
     () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
     {
       shouldRetryOnError: false,

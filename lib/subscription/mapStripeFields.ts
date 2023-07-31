@@ -29,6 +29,9 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
       return 'cancelled';
     case 'past_due':
       return 'past_due';
+    // A paused subscription is like an ended trial subscription.
+    // It has 0 days left and the user is obliged to take an action to downgrade or pay for another one.
+    case 'paused':
     case 'trialing':
       return 'free_trial';
     case 'unpaid':

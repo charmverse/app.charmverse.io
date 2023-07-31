@@ -14,15 +14,15 @@ import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/Sid
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
+import { getTimeDifference } from 'lib/utilities/dates';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
-import { ACCOUNT_TABS, getSettingsTabs } from './config';
+import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
@@ -39,9 +39,8 @@ interface TabPanelProps extends BoxProps {
 
 function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
-  const isAdmin = useIsAdmin();
 
-  const settingsTab = getSettingsTabs({ space, isAdmin }).find((settingTab) => settingTab.path === tab.path);
+  const settingsTab = SETTINGS_TABS.find((settingTab) => settingTab.path === tab.path);
   const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
 
   if (!settingsTab && !accountsTab) {
@@ -105,12 +104,16 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const isAdmin = useIsAdmin();
   const { spaceSubscription } = useSpaceSubscription();
   const { blockCount } = useBlockCount();
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
+  const freeTrialEnds =
+    spaceSubscription?.status === 'free_trial'
+      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
+      : 0;
+  const freeTrialEned = spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0;
 
   return (
     <Dialog
@@ -126,7 +129,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={onClose}
+      onClose={freeTrialEned ? undefined : onClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -159,7 +162,7 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <SidebarLink
                 data-test={`space-settings-tab-${tab.path}`}
                 key={tab.path}
@@ -197,7 +200,7 @@ export function SpaceSettingsDialog() {
             </Box>
           )}
           {currentSpace &&
-            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>
@@ -213,7 +216,8 @@ export function SpaceSettingsDialog() {
           <Button
             variant='text'
             color='inherit'
-            onClick={onClose}
+            disabled={freeTrialEned}
+            onClick={freeTrialEned ? undefined : onClose}
             sx={{
               position: 'absolute',
               right: 10,
@@ -227,7 +231,8 @@ export function SpaceSettingsDialog() {
           <IconButton
             data-test='close-settings-modal'
             aria-label='close the settings modal'
-            onClick={onClose}
+            disabled={freeTrialEned}
+            onClick={freeTrialEned ? undefined : onClose}
             sx={{
               position: 'absolute',
               right: 15,

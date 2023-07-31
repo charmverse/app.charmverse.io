@@ -1,4 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
@@ -30,12 +29,6 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
 ];
-
-export function getSettingsTabs({ isAdmin, space }: { space: Space; isAdmin: boolean }): SpaceSettingsTab[] {
-  return SETTINGS_TABS.filter((tab) => {
-    return tab.path === 'subscription' ? !!isAdmin : true;
-  });
-}
 
 export const accountSettingsSections = ['account', 'profile'] as const;
 
