@@ -32,7 +32,7 @@ type Props = {
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
-
+// Note: this component is only used before a page is saved to the DB
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();

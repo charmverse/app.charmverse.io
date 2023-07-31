@@ -129,7 +129,8 @@ export function Comment({
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
       content: commentEditContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      enableComments: false
     };
 
     if (!inlineCharmEditor) {
