@@ -8,7 +8,9 @@ import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/com
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import mutator from '../mutator';
@@ -95,14 +97,23 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
+  if (
+    propertyTemplate.type === 'select' ||
+    propertyTemplate.type === 'multiSelect' ||
+    propertyTemplate.type === 'proposalCategory' ||
+    propertyTemplate.type === 'proposalStatus'
+  ) {
     propertyValueElement = (
       <SelectProperty
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
-        readOnly={readOnly || !board}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
-        options={propertyTemplate.options}
+        options={
+          propertyTemplate.type === 'proposalStatus'
+            ? mapProposalStatusPropertyToDisplayValue({ property: propertyTemplate }).options
+            : propertyTemplate.options
+        }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -173,7 +184,7 @@ function PropertyValueElement(props: Props) {
   const commonProps = {
     className: 'octo-propertyvalue',
     placeholderText: emptyDisplayValue,
-    readOnly,
+    readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,

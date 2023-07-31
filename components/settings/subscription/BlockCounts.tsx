@@ -9,6 +9,7 @@ import { getTimeDifference } from 'lib/utilities/dates';
 import { BlocksExplanationModal } from './BlocksExplanation';
 import { useBlockCount } from './hooks/useBlockCount';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import { UpgradeChip } from './UpgradeWrapper';
 
 /**
  * In future, we may bring back a version of block counts with a modal.
@@ -35,6 +36,7 @@ export function BlockCounts() {
 
   return (
     <Box width='100%' display='block' justifyContent='space-between' alignItems='center'>
+      {passedBlockQuota && <UpgradeChip forceDisplay />}
       <Typography
         variant='caption'
         display='flex'
@@ -47,7 +49,7 @@ export function BlockCounts() {
         <Typography variant='caption' color={passedBlockQuota ? 'error' : undefined}>
           {blockCount.count.toLocaleString()}
         </Typography>
-        /{blockQuota}
+        /{blockQuota.toLocaleString()}
         <HelpOutlineIcon
           onClick={openExplanationModal}
           color={theme.palette.background.default as any}

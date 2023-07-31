@@ -20,6 +20,11 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   vote_closed: 'Vote Closed'
 };
 
+export const PROPOSAL_STATUS_LABELS_WITH_ARCHIVED: Record<ProposalStatus | 'archived', string> = {
+  ...PROPOSAL_STATUS_LABELS,
+  archived: 'Archived'
+};
+
 export type ProposalUserGroup = 'reviewer' | 'author';
 
 export const proposalStatusTransitionPermission: Partial<

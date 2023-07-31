@@ -37,10 +37,10 @@ const StyledButton = styled(Button)`
 `;
 
 function DeprecatedButton<C extends ElementType>(props: InputProps<C>) {
-  const { children, loading, loadingMessage, ...rest } = props;
+  const { children, loading, loadingMessage, disabled, ...rest } = props;
 
   return (
-    <StyledButton disabled={loading} {...rest}>
+    <StyledButton {...rest} disabled={loading || disabled}>
       {loading && loadingMessage ? loadingMessage : children}
       {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>

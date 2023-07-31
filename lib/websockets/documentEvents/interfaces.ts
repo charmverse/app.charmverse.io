@@ -47,7 +47,7 @@ export type ClientSelectionMessage = {
 };
 
 export type ProsemirrorJSONStep = {
-  stepType: 'replace';
+  stepType: 'replace' | 'addMark';
   from: number;
   to: number;
   slice?: {
@@ -58,6 +58,10 @@ export type ProsemirrorJSONStep = {
       content?: any[];
       text?: string;
     }[];
+  };
+  mark?: {
+    type: string;
+    attrs: Record<string, any>;
   };
 };
 

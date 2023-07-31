@@ -73,7 +73,13 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       justifyContent={{ xs: 'center', md: 'flex-start' }}
       py={{ xs: 2, md: 0 }}
     >
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' color='primary'>
+      <StyledButton
+        size='large'
+        onClick={handleClickOpen}
+        data-test='universal-connect-button'
+        color='primary'
+        disableElevation={false}
+      >
         Sign up
       </StyledButton>
       <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>

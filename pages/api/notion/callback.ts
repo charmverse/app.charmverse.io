@@ -4,8 +4,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 const handler = nc({
   onError,
@@ -25,18 +23,15 @@ handler.get(async (req, res) => {
     return;
   }
 
-  // use cookies to pass response to frontend because they're easier to delete than query params
-  const domain = isLocalhostAlias(req.headers.host) ? undefined : getAppApexDomain();
   const cookies = new Cookies(req, res);
 
   if (typeof tempAuthCode === 'string') {
-    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict', domain });
+    cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict' });
   } else {
     log.warn('Error importing from notion', req.query);
     cookies.set(AUTH_ERROR_COOKIE, 'There was an error from Notion. Please try again', {
       httpOnly: false,
-      sameSite: 'strict',
-      domain
+      sameSite: 'strict'
     });
   }
 

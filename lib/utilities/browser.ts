@@ -287,7 +287,7 @@ export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
         ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
         : window.location.origin;
 
-    return origin + getSubdomainPath(absolutePath);
+    return origin + getSubdomainPath(absolutePath, { domain: spaceDomain || '', customDomain: getValidCustomDomain() });
   }
 
   return absolutePath;
