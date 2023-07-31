@@ -133,8 +133,8 @@ export function ApiSettings({ space }: { space: Space }) {
       <br />
       <Typography variant='h6'>Webhook (beta)</Typography>
       <Typography>
-        Subscribe to user events in CharmVerse using webhooks. You must provide us with an http endpoint which returns a
-        200 response upon reception of the event.
+        Subscribe to user events in CharmVerse using webhooks. You must provide us with a http endpoint accepting POST
+        requests which returns a 200 response upon reception of the event.
       </Typography>
       {spaceWebhook && events && (
         <form
