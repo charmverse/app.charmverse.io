@@ -7,6 +7,8 @@ import { isTruthy } from 'lib/utilities/types';
 
 import type { NFTData } from '../getNFTs';
 
+import { toInt } from './ankr';
+
 // Find supported chains: https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
 const alchemyApis = {
   1: 'eth-mainnet',
@@ -176,7 +178,7 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
     // errors include "Contract does not have any code"
     return null;
   }
-  const tokenIdInt = parseInt(nft.id.tokenId, 16);
+  const tokenIdInt = toInt(nft.id.tokenId);
   const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdInt }) ?? '';
 
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382

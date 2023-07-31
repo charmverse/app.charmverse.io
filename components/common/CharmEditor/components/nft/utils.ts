@@ -1,12 +1,14 @@
 import { log } from '@charmverse/core/log';
 
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/getNFTs';
 
 import type { NodeAttrs } from './nft.specs';
 
 const openseaChainsByPath: Record<string, SupportedChainId | undefined> = {
   ethereum: 1,
+  bsc: 56,
   arbitrum: 42161,
+  avalanche: 43114,
   matic: 137,
   optimism: 10
 };
@@ -50,14 +52,22 @@ export function getNFTUrl({
 }): string | null {
   let link: null | string = null;
   switch (chain) {
+    case 1:
+    case 10:
+    case 56:
+    case 137:
+    case 43114:
+      link = `https://opensea.io/assets/${openseaPathsByChain[chain]}/${contract}/${token}`;
+      break;
+    // fantom chain
+    case 250:
+      link = `https://artion.io/explore/${contract}/${token}`;
+      break;
+    // Aribitrum One
     case 42161:
       link = `https://stratosnft.io/assets/${contract}/${token}`;
       break;
-    case 1:
-    case 10:
-    case 137:
-      link = `https://opensea.io/assets/${openseaPathsByChain[chain]}/${contract}/${token}`;
-      break;
+    case 5000:
     default:
       log.warn('Chain not configured for NFT URL', { chain });
       break;

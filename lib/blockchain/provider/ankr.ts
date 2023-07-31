@@ -1,6 +1,11 @@
 import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
+import { GET } from '@charmverse/core/http';
+import { log } from '@charmverse/core/log';
+import type { Provider } from '@ethersproject/providers';
+import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
+import { ethers } from 'ethers';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { paginatedCall } from 'lib/utilities/async';
@@ -31,7 +36,7 @@ const rpcApis = [5000] as const;
 export const supportedChainIds = [...typedKeys(ankrAdvancedApis), ...rpcApis];
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
-export const supportedMainnets: SupportedChainId[] = [56, 250, 43114];
+export const supportedMainnets: SupportedChainId[] = [56, 250, 43114, 5000];
 
 const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
 const mantleRPCEndpoint = `https://rpc.ankr.com/mantle/${process.env.ANKR_API_ID}`;
@@ -81,6 +86,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
   // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
   if (chainId === 5000) {
     const provider = new AnkrProvider(mantleRPCEndpoint);
+    const nft = await getTokenInfoOnMantle(provider, { address, tokenId });
     return null;
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
@@ -89,7 +95,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
   await rateLimiter();
   const nft = await provider.getNFTMetadata({
     blockchain,
-    tokenId,
+    tokenId: toInt(tokenId).toString(),
     contractAddress: address,
     forceFetch: false
   });
@@ -109,7 +115,7 @@ type GetNFTOwnerInput = {
 export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Promise<string[]> {
   // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
   if (chainId === 5000) {
-    const provider = new AnkrProvider(mantleRPCEndpoint);
+    log.warn('TODO: Support mantle NFT for owner validation');
     return [];
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
@@ -132,12 +138,11 @@ export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Prom
 type NFTFields = Pick<Nft, 'contractAddress' | 'tokenId' | 'imageUrl' | 'name'>;
 
 function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedChainId): NFTData {
-  const tokenIdInt = parseInt(nft.tokenId, 16);
-  const link = getNFTUrl({ chain: chainId, contract: nft.contractAddress, token: tokenIdInt }) ?? '';
+  const link = getNFTUrl({ chain: chainId, contract: nft.contractAddress, token: nft.tokenId }) ?? '';
   return {
     id: `${nft.contractAddress}:${nft.tokenId}`,
     tokenId: nft.tokenId,
-    tokenIdInt,
+    tokenIdInt: toInt(nft.tokenId),
     contract: nft.contractAddress,
     imageRaw: nft.imageUrl,
     image: nft.imageUrl,
@@ -151,4 +156,23 @@ function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedC
     link,
     walletId
   };
+}
+
+export function toInt(tokenId: string) {
+  if (tokenId.includes('0x')) {
+    return parseInt(tokenId, 16);
+  }
+  return parseInt(tokenId);
+}
+
+// run this multiple times by putting in its own function
+export async function getTokenInfoOnMantle(
+  provider: AnkrProvider,
+  { address, tokenId }: Omit<GetNFTInput, 'chainId'> // assume chainId is mantle
+) {
+  const contract = new ethers.Contract(address, ERC721_ABI, provider as Provider);
+
+  const [tokenUri] = await Promise.all([contract.tokenURI(tokenId)]);
+  const metadata = await GET(tokenUri, null);
+  return { tokenUri, metadata };
 }
