@@ -485,6 +485,10 @@ class CharmClient {
   createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
     return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
+
+  testSpaceWebhook({ spaceId, webhookUrl }: { spaceId: string; webhookUrl: string }) {
+    return http.POST<{ status: number }>(`/api/spaces/${spaceId}/test-webhook`, { webhookUrl });
+  }
 }
 
 const charmClient = new CharmClient();
