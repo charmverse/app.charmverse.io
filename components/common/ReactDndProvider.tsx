@@ -8,8 +8,13 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 
 // ignore events inside prosemirror unless we are also inside an inline database
 function shouldIgnoreTarget(domNode: HTMLElement) {
-  const isInsideProsemirror = domNode.closest?.('.bangle-editor-core') || domNode.closest?.('.bangle-nv-container');
-  return Boolean(isInsideProsemirror && !domNode.closest?.('.focalboard-body'));
+  const insideProsemirror = Boolean(
+    domNode.closest?.('.bangle-editor-core') ||
+      // sometimes this extra check is needed drag/dropping pm nodes and we dont seem to find the container
+      domNode.closest?.('.bangle-nv-container')
+  );
+  // if (!insideProsemirror) console.log('domNode', domNode.parentNode, domNode);
+  return Boolean(insideProsemirror && !domNode.closest?.('.focalboard-body'));
 }
 // Prevent react-dnd from messing with prosemirror dnd. see: https://github.com/react-dnd/react-dnd-html5-backend/issues/7
 function ModifiedHTML5Backend(...args: any) {

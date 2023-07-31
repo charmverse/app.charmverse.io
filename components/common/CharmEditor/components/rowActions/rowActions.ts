@@ -6,6 +6,8 @@ import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
+import { toggleCursorParking, cursorParkingPlugin, pluginKey } from './cursorParking';
+
 // TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
 const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList'];
 
@@ -48,10 +50,9 @@ export function plugins({ key }: { key: PluginKey }) {
     if (e.target === view.dom) {
       return;
     }
-
-    // ignore UL and OL tags, using native browser list icons means we need to use padding on these container elements
+    // Because we use native list item icons, padding has to be on UL and OL tags. But we don't want it to affect the hovered "row"
     // @ts-ignore
-    if (e.target.nodeName === 'OL' || e.target.nodeName === 'UL') {
+    if (e.target.nodeName === 'UL' || e.target.nodeName === 'OL') {
       return;
     }
     // @ts-ignore
@@ -155,20 +156,29 @@ export function plugins({ key }: { key: PluginKey }) {
       },
       view: (view) => {
         function onDragStart(e: DragEvent) {
+          // park the cursor temporarily until drag is over, to fix a bug in Firefox where cursor disappears
+          // see https://github.com/ProseMirror/prosemirror/issues/583
+          toggleCursorParking(view, true);
           return dragStart(view, e);
+        }
+        function onDragEnd(e: DragEvent) {
+          toggleCursorParking(view, false);
         }
         view.dom.parentNode?.appendChild(tooltipDOM);
         tooltipDOM.addEventListener('dragstart', onDragStart);
+        tooltipDOM.addEventListener('dragend', onDragEnd);
 
         return {
           destroy() {
             // remove tooltip from DOM
             tooltipDOM.parentNode?.removeChild(tooltipDOM);
             tooltipDOM.removeEventListener('dragstart', onDragStart);
+            tooltipDOM.removeEventListener('dragend', onDragEnd);
           }
         };
       }
-    })
+    }),
+    cursorParkingPlugin
   ];
 }
 
