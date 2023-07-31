@@ -50,9 +50,9 @@ export function plugins({ key }: { key: PluginKey }) {
     if (e.target === view.dom) {
       return;
     }
-    // Because we use native list item icons, padding has to be on UL and OL tags. But we don't want it to affect the hovered "row"
+    // ignore UL and OL tags, using native browser list icons means we need to use padding on these container elements
     // @ts-ignore
-    if (e.target.nodeName === 'UL' || e.target.nodeName === 'OL') {
+    if (e.target.nodeName === 'OL' || e.target.nodeName === 'UL') {
       return;
     }
     // @ts-ignore
