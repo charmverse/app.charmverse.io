@@ -26,6 +26,7 @@ import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/
 import React, { useMemo, useRef, useState } from 'react';
 
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
@@ -231,7 +232,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={type === 'proposalUrl'}
+            disabled={proposalPropertyTypesList.includes(type as any)}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -243,7 +244,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
-            disabled={type === 'proposalUrl'}
+            disabled={proposalPropertyTypesList.includes(type as any)}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}

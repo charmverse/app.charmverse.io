@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import {
   ActionNotPermittedError,
   InvalidStateError,
@@ -119,6 +120,62 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId: space.id });
   if (error) {
     throw new UnauthorisedActionError();
+  }
+
+  // Make sure we can't create a card in a proposals database
+  if (data.length === 1 && data[0].type === 'card' && data[0].parentId) {
+    const candidateParentId = data[0].parentId;
+    const [candidateParentBoardPage, candidateParentProposalViewBlocks] = await Promise.all([
+      prisma.page.findUniqueOrThrow({
+        where: {
+          id: candidateParentId
+        },
+        select: {
+          type: true
+        }
+      }),
+      prisma.block.findMany({
+        where: {
+          type: 'view',
+          rootId: candidateParentId,
+          fields: {
+            path: ['sourceType'],
+            equals: 'proposals'
+          }
+        }
+      })
+    ]);
+
+    if (
+      (candidateParentBoardPage?.type === 'board' || candidateParentBoardPage.type === 'inline_board') &&
+      candidateParentProposalViewBlocks.length > 0
+    ) {
+      if (data[0].id) {
+        // Focalboard pre-emptively adds the card to the cardOrder prop. This prevents invalid property IDs building up in the cardOrder prop
+        const viewsToClean = candidateParentProposalViewBlocks.filter((viewBlock) =>
+          (viewBlock.fields as BoardViewFields).cardOrder.includes(data[0].id as string)
+        );
+        if (viewsToClean.length > 0) {
+          await prisma.$transaction(
+            viewsToClean.map((viewBlock) =>
+              prisma.block.update({
+                where: {
+                  id: viewBlock.id
+                },
+                data: {
+                  fields: {
+                    ...(viewBlock.fields as any),
+                    cardOrder: (viewBlock.fields as BoardViewFields).cardOrder.filter((cardId) => cardId !== data[0].id)
+                  }
+                }
+              })
+            )
+          );
+        }
+      }
+
+      throw new InvalidStateError(`You can't create a card in a proposals database`);
+    }
   }
 
   const newBlocks = data.map((block) => ({
@@ -260,7 +317,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     })()
   ]);
 
-  return res.status(200).json(newBlocks);
+  return res.status(201).json(newBlocks);
 }
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {

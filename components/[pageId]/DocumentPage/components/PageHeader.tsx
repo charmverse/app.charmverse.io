@@ -54,16 +54,17 @@ const EditorHeader = styled.div`
   }
 `;
 
-interface PageHeaderProps {
+type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
   setPage: (p: Partial<Page>) => void;
   updatedAt: string;
-}
+  readOnlyTitle?: boolean;
+};
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
+function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readOnlyTitle }: PageHeaderProps) {
   function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
@@ -136,7 +137,7 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
           )}
         </Controls>
       </EditorHeader>
-      <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageTitleInput readOnly={readOnly || readOnlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>
   );
 }

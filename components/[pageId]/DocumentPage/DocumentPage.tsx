@@ -224,7 +224,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   }
                   key={editorKey}
                   content={page.content as PageContent}
-                  readOnly={readOnly}
+                  readOnly={readOnly || !!page.syncWithPageId}
                   autoFocus={false}
                   pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
                   pageId={page.id}
@@ -252,6 +252,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     updatedAt={page.updatedAt.toString()}
                     readOnly={readOnly || !!enableSuggestingMode}
                     setPage={savePage}
+                    readOnlyTitle={!!page.syncWithPageId}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                     <Box my={2} className='font-family-default'>

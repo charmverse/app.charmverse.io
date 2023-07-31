@@ -51,6 +51,8 @@ export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions
           >
             <SnackbarContext.Provider
               value={{
+                autoHideDuration: 5000,
+                setAutoHideDuration: () => {},
                 isOpen: false,
                 handleClose: () => {},
                 showMessage: () => {},

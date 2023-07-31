@@ -27,6 +27,9 @@ import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
+import { useBlockCount } from './subscription/hooks/useBlockCount';
+import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
+import { UpgradeChip } from './subscription/UpgradeWrapper';
 
 interface TabPanelProps extends BoxProps {
   children?: ReactNode;
@@ -103,6 +106,11 @@ export function SpaceSettingsDialog() {
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
   const isAdmin = useIsAdmin();
+  const { spaceSubscription } = useSpaceSubscription();
+  const { blockCount } = useBlockCount();
+
+  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
+  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
 
   return (
     <Dialog
@@ -160,7 +168,11 @@ export function SpaceSettingsDialog() {
                 onClick={() => onClick(tab.path)}
                 active={activePath === tab.path}
                 section={tab.path}
-              />
+              >
+                {tab.path === 'subscription' && passedBlockQuota ? (
+                  <UpgradeChip forceDisplay upgradeContext='upgrade' />
+                ) : null}
+              </SidebarLink>
             ))}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>

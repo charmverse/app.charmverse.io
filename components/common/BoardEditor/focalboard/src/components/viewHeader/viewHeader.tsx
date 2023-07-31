@@ -235,7 +235,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && (
+            {!props.readOnlySourceData && activeView.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

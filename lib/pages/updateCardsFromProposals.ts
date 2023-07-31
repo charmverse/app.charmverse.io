@@ -1,15 +1,15 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { InvalidStateError } from 'lib/middleware';
-import { isTruthy } from 'lib/utilities/types';
+import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from './createCardPage';
+import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { extractCardProposalProperties, extractDatabaseProposalProperties } from './utils';
 
 export async function updateCardsFromProposals({
   boardId,
@@ -20,18 +20,9 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
-  const board = (await prisma.block.findUnique({
-    where: {
-      type: 'board',
-      id: boardId,
-      spaceId
-    }
-  })) as unknown as Board | undefined;
-
-  if (!board) {
-    throw new DataNotFoundError('Database was not found');
-  }
-
+  const database = await setDatabaseProposalProperties({
+    databaseId: boardId
+  });
   const views = (
     await prisma.block.findMany({
       where: {
@@ -51,15 +42,19 @@ export async function updateCardsFromProposals({
       spaceId,
       type: 'proposal',
       proposal: {
-        archived: {
-          not: true
-        },
         status: {
           not: 'draft'
         }
       }
     },
     include: {
+      proposal: {
+        select: {
+          status: true,
+          categoryId: true,
+          archived: true
+        }
+      },
       workspaceEvents: true
     }
   });
@@ -69,43 +64,155 @@ export async function updateCardsFromProposals({
       type: 'card',
       parentId: boardId,
       spaceId,
-      AND: [{ syncWithPageId: { not: null } }, { syncWithPageId: { not: undefined } }]
+      syncWithPageId: {
+        not: null
+      }
     }
   });
 
-  const existingSyncWithPageIds = existingCards.map((card) => card.syncWithPageId).filter(isTruthy);
+  const existingCardBlocks = await prisma.block
+    .findMany({
+      where: {
+        id: {
+          in: existingCards.map((c) => c.id)
+        }
+      }
+    })
+    .then((data) =>
+      data.reduce((acc, val) => {
+        acc[val.id] = val;
+        return acc;
+      }, {} as Record<string, Block>)
+    );
 
-  const oldPageProposals = pageProposals.filter((page) => existingSyncWithPageIds.includes(page.id));
+  // Synced pages with a key referencing the proposal they belong to
+  const existingSyncedCardsWithBlocks = existingCards
+    .filter((card) => !!card.syncWithPageId)
+    .reduce((acc, card) => {
+      const cardPage = card;
+      if (existingCardBlocks[cardPage.id]) {
+        (card as Page & { block: Block }).block = existingCardBlocks[card.id];
+        acc[cardPage.syncWithPageId as string] = card as Page & { block: Block };
+      }
+      return acc;
+    }, {} as Record<string, Page & { block: Block }>);
+
+  const databaseProposalProps = extractDatabaseProposalProperties({
+    database
+  });
 
   /**
    * Case for cards that are linked to a proposal page and need to be updated
    */
   const updatedCards: Page[] = [];
-  for (const pageProposal of oldPageProposals) {
-    const card = existingCards.find((_card) => _card.syncWithPageId === pageProposal.id);
-    if (
-      card &&
-      (card.title !== pageProposal.title ||
-        card.hasContent !== pageProposal.hasContent ||
-        card.content !== pageProposal.content ||
-        card.contentText !== pageProposal.contentText ||
-        card.deletedAt !== pageProposal.deletedAt)
-    ) {
-      const updatedCard = await prisma.page.update({
-        where: {
-          id: card.id
-        },
-        data: {
-          updatedAt: new Date(),
-          updatedBy: userId,
-          deletedAt: pageProposal.deletedAt,
-          title: pageProposal.title,
-          hasContent: pageProposal.hasContent,
-          content: pageProposal.content || undefined,
-          contentText: pageProposal.contentText
-        }
+  const updatedBlocks: Block[] = [];
+  const newCards: { page: Page; block: Block }[] = [];
+
+  for (const pageWithProposal of pageProposals) {
+    const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
+
+    if (card) {
+      const { cardProposalCategory, cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({
+        card: card.block,
+        databaseProperties: databaseProposalProps
       });
-      updatedCards.push(updatedCard);
+
+      const archivedStatusValueId = databaseProposalProps.proposalStatus?.options.find(
+        (opt) => opt.value === 'archived'
+      )?.id;
+      if (
+        card.title !== pageWithProposal.title ||
+        card.hasContent !== pageWithProposal.hasContent ||
+        card.content?.toString() !== pageWithProposal.content?.toString() ||
+        card.contentText !== pageWithProposal.contentText ||
+        card.deletedAt !== pageWithProposal.deletedAt ||
+        cardProposalCategory?.optionId !== pageWithProposal.proposal?.categoryId ||
+        cardProposalUrl?.value !== pageWithProposal.path ||
+        (pageWithProposal.proposal?.archived && cardProposalStatus?.value !== 'archived') ||
+        (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === 'archived') ||
+        (!pageWithProposal.proposal?.archived &&
+          cardProposalStatus?.optionId !==
+            databaseProposalProps.proposalStatus?.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
+              ?.id)
+      ) {
+        const newProps = {
+          ...(card.block.fields as any).properties,
+          [cardProposalUrl?.propertyId ?? '']: pageWithProposal.path,
+          [cardProposalCategory?.propertyId ?? '']: pageWithProposal.proposal?.categoryId,
+          [cardProposalStatus?.propertyId ?? '']: pageWithProposal.proposal?.archived
+            ? archivedStatusValueId
+            : databaseProposalProps.proposalStatus?.options.find(
+                (opt) => opt.value === pageWithProposal.proposal?.status
+              )?.id ?? ''
+        };
+
+        const { updatedCardPage, updatedCardBlock } = await prisma.$transaction(async (tx) => {
+          const updatedPage = await prisma.page.update({
+            where: {
+              id: card.id
+            },
+            data: {
+              updatedAt: new Date(),
+              updatedBy: userId,
+              deletedAt: pageWithProposal.deletedAt,
+              title: pageWithProposal.title,
+              hasContent: pageWithProposal.hasContent,
+              content: pageWithProposal.content || undefined,
+              contentText: pageWithProposal.contentText
+            }
+          });
+
+          const updatedBlock = await prisma.block.update({
+            where: {
+              id: updatedPage.id
+            },
+            data: {
+              fields: {
+                ...(card.block.fields as any),
+                properties: newProps
+              } as any
+            }
+          });
+
+          return { updatedCardPage: updatedPage, updatedCardBlock: updatedBlock };
+        });
+        updatedCards.push(updatedCardPage);
+        updatedBlocks.push(updatedCardBlock);
+      }
+
+      // Don't create new cards from archived cards
+    } else if (!card && !pageWithProposal.proposal?.archived) {
+      const properties: Record<string, BoardPropertyValue> = {};
+
+      if (databaseProposalProps.proposalCategory) {
+        properties[databaseProposalProps.proposalCategory.id] = pageWithProposal.proposal?.categoryId ?? '';
+      }
+
+      if (databaseProposalProps.proposalUrl) {
+        properties[databaseProposalProps.proposalUrl.id] = pageWithProposal.path;
+      }
+
+      if (databaseProposalProps.proposalStatus) {
+        properties[databaseProposalProps.proposalStatus.id] =
+          databaseProposalProps.proposalStatus.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
+            ?.id ?? '';
+      }
+      const createdAt = pageWithProposal.workspaceEvents.find(
+        (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
+      )?.createdAt;
+      const _card = await createCardPage({
+        title: pageWithProposal.title,
+        boardId,
+        spaceId: pageWithProposal.spaceId,
+        createdAt,
+        createdBy: userId,
+        properties,
+        hasContent: pageWithProposal.hasContent,
+        content: pageWithProposal.content,
+        contentText: pageWithProposal.contentText,
+        syncWithPageId: pageWithProposal.id
+      });
+      newCards.push(_card);
     }
   }
 
@@ -131,41 +238,22 @@ export async function updateCardsFromProposals({
     );
   }
 
-  const newPageProposals = pageProposals.filter(
-    (page) => !existingSyncWithPageIds.includes(page.id) && !page.deletedAt
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: [prismaToBlock(database)]
+    },
+    spaceId
   );
 
-  const boardBlock = (await prisma.block.findUnique({
-    where: {
-      type: 'board',
-      id: boardId,
+  if (updatedBlocks.length > 0) {
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: updatedBlocks.map((block) => prismaToBlock(block))
+      },
       spaceId
-    }
-  })) as unknown as Board | null;
-
-  const boardCardProp = boardBlock?.fields.cardProperties.find((field) => field.type === 'proposalUrl');
-
-  /**
-   * Case for new cards to be created from proposal pages and are not included in the current list of cards
-   */
-  const newCards: { page: Page; block: Block }[] = [];
-  for (const pageProposal of newPageProposals) {
-    const createdAt = pageProposal.workspaceEvents.find(
-      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
-    )?.createdAt;
-    const _card = await createCardPage({
-      title: pageProposal.title,
-      boardId,
-      spaceId: pageProposal.spaceId,
-      createdAt,
-      createdBy: userId,
-      properties: { [boardCardProp?.id || '']: `${pageProposal.path}` },
-      hasContent: pageProposal.hasContent,
-      content: pageProposal.content,
-      contentText: pageProposal.contentText,
-      syncWithPageId: pageProposal.id
-    });
-    newCards.push(_card);
+    );
   }
 
   if (newCards.length > 0) {
@@ -185,17 +273,24 @@ export async function updateCardsFromProposals({
     );
   }
 
+  const reducedPageProposals = pageProposals.reduce((acc, val) => {
+    acc[val.id] = val.id;
+    return acc;
+  }, {} as Record<string, string>);
+
   const nonExistingProposalPagesIds = existingCards
-    .filter((card) => card.syncWithPageId && !pageProposals.map((page) => page.id).includes(card.syncWithPageId))
+    .filter((card) => card.syncWithPageId && !reducedPageProposals[card.syncWithPageId])
     .map((card) => card.id);
 
   /**
    * Case where a user permanently deleted a proposal page
    */
-  for (const cardToBeDeleted of nonExistingProposalPagesIds) {
-    await prisma.page.delete({
+  if (nonExistingProposalPagesIds.length > 0) {
+    await prisma.page.deleteMany({
       where: {
-        id: cardToBeDeleted
+        id: {
+          in: nonExistingProposalPagesIds
+        }
       }
     });
   }

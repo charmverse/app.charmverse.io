@@ -277,7 +277,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       MuiButtonGroup: {
         defaultProps: {
-          disableRipple: true
+          disableRipple: true,
+          disableElevation: true
         },
         styleOverrides: {
           groupedContained: {
@@ -289,7 +290,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       MuiButton: {
         defaultProps: {
-          variant: 'contained'
+          variant: 'contained',
+          disableElevation: true
         },
         styleOverrides: {
           root: {

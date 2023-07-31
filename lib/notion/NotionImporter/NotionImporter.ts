@@ -3,6 +3,8 @@ import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
+import { relay } from 'lib/websockets/relay';
+
 import { createPrismaPage } from '../createPrismaPage';
 
 import { NotionCache } from './NotionCache';
@@ -92,13 +94,22 @@ export class NotionImporter {
 
     const workspacePageId = v4();
 
-    await createPrismaPage({
+    // Create a root level page for the notion workspace
+    const rootPage = await createPrismaPage({
       createdBy: this.userId,
       spaceId: this.spaceId,
       id: workspacePageId,
       title: workspaceName,
       icon: workspaceIcon
     });
+
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: [rootPage]
+      },
+      this.spaceId
+    );
 
     const notionPage = new NotionPage({
       blocksPerRequest: this.blocksPerRequest,
