@@ -4,8 +4,9 @@ import { v4 as uuid } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
-import type { ExtractedCardProposalProperties } from '../utils';
-import { extractCardProposalProperties, extractDatabaseProposalProperties } from '../utils';
+import type { ExtractedCardProposalProperties } from '../extractCardProposalProperties';
+import { extractCardProposalProperties } from '../extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 
 const categoryProp: IPropertyTemplate = {
   id: uuid(),
