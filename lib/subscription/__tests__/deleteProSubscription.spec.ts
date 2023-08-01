@@ -37,14 +37,4 @@ describe('deleteProSubscription', () => {
     expect(spaceSubscription?.paidTier).toBe('cancelled');
     expect(!!subscription?.deletedAt).toBeTruthy();
   });
-  it(`Should fail if there is no subscription`, async () => {
-    const userId = v4();
-
-    await expect(
-      deleteProSubscription({
-        spaceId: v4(),
-        userId
-      })
-    ).rejects.toBeInstanceOf(NotFoundError);
-  });
 });

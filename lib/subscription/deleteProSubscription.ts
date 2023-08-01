@@ -20,6 +20,7 @@ export async function deleteProSubscription({ spaceId, userId }: { spaceId: stri
   await prisma.space.update({
     where: {
       id: spaceId,
+      deletedAt: null,
       paidTier: {
         not: 'free'
       }
