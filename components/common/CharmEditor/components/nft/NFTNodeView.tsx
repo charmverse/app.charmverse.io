@@ -245,6 +245,7 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
               height={124}
               width={124}
               bgcolor='sidebar.background'
+              overflow='hidden'
             >
               {isLoading ? (
                 <LoadingComponent />
