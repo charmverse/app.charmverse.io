@@ -18,6 +18,7 @@ describe('deleteProSubscription', () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     (stripeClient.subscriptions.cancel as jest.Mock) = stripeMock.stripeClient.subscriptions.cancel;
+    (stripeClient.subscriptions.retrieve as jest.Mock) = stripeMock.stripeClient.subscriptions.retrieve;
 
     await addSpaceSubscription({
       spaceId: space.id,
