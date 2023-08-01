@@ -20,6 +20,14 @@ const StyledCallout = styled.div`
   ${({ theme }) => theme.breakpoints.down('sm')} {
     flex-wrap: wrap;
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    margin: 0 !important; // override global editor styles
+  }
 `;
 
 const CalloutEmoji = styled.div`
@@ -116,7 +124,7 @@ export default function Callout({
             />
           </Menu>
         </CalloutEmoji>
-        {children}
+        <Box my={0.5}>{children}</Box>
       </StyledCallout>
     </Box>
   );
