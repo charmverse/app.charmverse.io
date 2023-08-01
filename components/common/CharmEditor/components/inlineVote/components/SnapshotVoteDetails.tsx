@@ -28,8 +28,6 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
   );
   const { formatDate } = useDateFormatter();
 
-  const loading = snapshotProposal === undefined;
-
   const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
 
   // Either the number of votes or tokens
@@ -43,17 +41,26 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   const remainingTime = relativeTime(proposalEndDate);
 
-  const needsYourVote = !hasPassedDeadline && !currentUserChoices;
+  const needsYourVote = !hasPassedDeadline && !currentUserChoices && snapshotProposal?.state !== 'pending';
+
+  let statusText = 'Loading...';
+  if (snapshotProposal) {
+    if (snapshotProposal.state === 'pending') {
+      statusText = 'Pending';
+    } else if (hasPassedDeadline) {
+      statusText = `Voting ended on ${formatDate(new Date(proposalEndDate))}`;
+    } else {
+      statusText = `Voting ends ${remainingTime}`;
+    }
+  } else if (snapshotProposal === null) {
+    statusText = '';
+  }
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
         <Typography color='secondary' variant='subtitle1'>
-          {!snapshotProposal && loading && 'Loading...'}
-          {snapshotProposal &&
-            (hasPassedDeadline
-              ? `Voting ended on ${formatDate(new Date(proposalEndDate))}`
-              : `Voting ends ${remainingTime}`)}
+          Status: {statusText}
         </Typography>
         <Button
           startIcon={<PublishIcon />}
