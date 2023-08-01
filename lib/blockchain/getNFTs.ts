@@ -38,7 +38,7 @@ export type NFTData = {
 };
 
 export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
-  const [alchemyNFts, mantleNFTs] = await Promise.all([
+  const [alchemyNFTs, ankrNFTs] = await Promise.all([
     (async (): Promise<NFTData[]> => {
       const nftsByChain = await Promise.all(
         supportedMainnetsByAlchemy
@@ -70,7 +70,7 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
       return nftsByChain.flat();
     })()
   ]);
-  const nfts = [...alchemyNFts, ...mantleNFTs];
+  const nfts = [...alchemyNFTs, ...ankrNFTs];
   const sortedNfts = orderBy(nfts, ['timeLastUpdated', 'title'], ['desc', 'asc']);
   return sortedNfts;
 }

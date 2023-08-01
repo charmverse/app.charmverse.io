@@ -56,6 +56,7 @@ export function getNFTUrl({
     case 10:
     case 56:
     case 137:
+    case 42161:
     case 43114:
       link = `https://opensea.io/assets/${openseaPathsByChain[chain]}/${contract}/${token}`;
       break;
@@ -63,13 +64,9 @@ export function getNFTUrl({
     case 250:
       link = `https://artion.io/explore/${contract}/${token}`;
       break;
-    // Aribitrum One
-    case 42161:
-      link = `https://stratosnft.io/assets/${contract}/${token}`;
-      break;
     case 5000:
     default:
-      log.warn('Chain not configured for NFT URL', { chain });
+      log.warn('NFT Url is not configured for chain', { chain });
       break;
   }
   return link;
