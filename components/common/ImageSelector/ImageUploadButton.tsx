@@ -24,11 +24,11 @@ export function ImageUploadButton({
     setImage(url);
   };
 
-  const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput(
+  const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput({
     onFileUpload,
     fileSizeLimitMB,
     resize
-  );
+  });
 
   return (
     <Stack alignItems='center' gap={1}>

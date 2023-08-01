@@ -23,7 +23,6 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import { convertResponseToFile } from 'lib/file/convertResponseToBlob';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
@@ -487,19 +486,10 @@ class CharmClient {
     return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
 
-  async resizeImage(file: File) {
-    const formData = new FormData();
-    formData.append('uploadedFile', file);
-
-    const response = await fetch('/api/image/resize', {
+  resizeImage(formData: FormData) {
+    return fetch('/api/image/resize', {
       method: 'POST',
       body: formData
-    });
-
-    return convertResponseToFile({
-      fileName: file.name || '',
-      fileType: 'image/webp',
-      response
     });
   }
 }
