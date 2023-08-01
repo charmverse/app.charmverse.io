@@ -1,11 +1,10 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Chip, Divider, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import useSWR from 'swr';
 
 import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
-import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { SnapshotProposal } from 'lib/snapshot';
@@ -40,7 +39,11 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   const hasPassedDeadline = proposalEndDate < Date.now();
 
+  const currentUserChoices = (userVotes ?? []).map((v) => voteChoices[v.choice - 1]).join(',');
+
   const remainingTime = relativeTime(proposalEndDate);
+
+  const needsYourVote = !hasPassedDeadline && !currentUserChoices;
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
@@ -55,13 +58,13 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         <Button
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
-          color={hasPassedDeadline ? 'secondary' : 'primary'}
-          variant={hasPassedDeadline ? 'outlined' : 'contained'}
+          color={needsYourVote ? 'primary' : 'secondary'}
+          variant={needsYourVote ? 'contained' : 'outlined'}
           external
           target='_blank'
           disabled={!snapshotProposal}
         >
-          {hasPassedDeadline ? 'View' : 'Vote'} on snapshot
+          {needsYourVote ? 'Vote' : 'View'} on snapshot
         </Button>
       </Box>
 
@@ -74,7 +77,10 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         <Box display='flex' flexDirection='column' gap={1}>
           {voteChoices.map((voteOption, index) => (
             <Box key={voteOption} display='flex' justifyContent='space-between'>
-              <span>{voteOption}</span>
+              <Box gap={1} display='flex'>
+                {voteOption}
+                {currentUserChoices === voteOption && <Chip color='teal' size='small' label='Your vote' />}
+              </Box>
               <Typography variant='subtitle1' color='secondary'>
                 {!voteScores[index]
                   ? 'No votes yet'
