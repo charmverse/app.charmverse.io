@@ -20,7 +20,6 @@ import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { fancyTrimWords } from 'lib/utilities/strings';
 
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
@@ -37,7 +36,7 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const blockchains = [1, 10, 137, 42161];
+const blockchains = [1, 10, 56, 137, 250, 5000, 42161, 43114];
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
@@ -246,6 +245,7 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
               height={124}
               width={124}
               bgcolor='sidebar.background'
+              overflow='hidden'
             >
               {isLoading ? (
                 <LoadingComponent />

@@ -2,8 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getNFT } from 'lib/blockchain/getNFTs';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
+import { getNFT, verifyNFTOwner } from 'lib/blockchain/getNFTs';
 import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -34,9 +33,11 @@ export async function updateProfileAvatar({
         userId
       }
     });
-    const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
-    const isOwner = wallets.some((a) => {
-      return owners.find((o) => o.toLowerCase() === a.address.toLowerCase());
+    const isOwner = await verifyNFTOwner({
+      address: updatedContract,
+      chainId: avatarChain,
+      tokenId: updatedTokenId,
+      userAddresses: wallets.map((w) => w.address)
     });
 
     if (!isOwner) {
