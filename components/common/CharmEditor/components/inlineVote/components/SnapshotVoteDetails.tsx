@@ -43,6 +43,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   const needsYourVote = !hasPassedDeadline && !currentUserChoices && snapshotProposal?.state !== 'pending';
 
+  const isLoading = snapshotProposal === undefined;
   let statusText = 'Loading...';
   if (snapshotProposal) {
     if (snapshotProposal.state === 'pending') {
@@ -52,8 +53,8 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
     } else {
       statusText = `Voting ends ${remainingTime}`;
     }
-  } else if (snapshotProposal === null) {
-    statusText = '';
+  } else if (!isLoading) {
+    statusText = 'Not found';
   }
 
   return (
@@ -75,11 +76,12 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         </Button>
       </Box>
 
-      {!snapshotProposal && loading && <Loader isLoading={true} />}
+      <Divider sx={{ my: 2 }} />
 
-      {!snapshotProposal && !loading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
+      {!snapshotProposal && isLoading && <Loader isLoading={true} />}
 
-      {snapshotProposal && <Divider sx={{ my: 2 }} />}
+      {!snapshotProposal && !isLoading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
+
       {snapshotProposal && (
         <Box display='flex' flexDirection='column' gap={1}>
           {voteChoices.map((voteOption, index) => (
