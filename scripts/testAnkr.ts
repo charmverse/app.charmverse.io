@@ -1,10 +1,10 @@
-import { getNFTs } from 'lib/blockchain/provider/ankr';
+import { getNFT } from 'lib/blockchain/provider/ankr';
 
 async function init() {
-  const nfts = await getNFTs({
-    address: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-    chainId: 56,
-    walletId: ''
+  const nfts = await getNFT({
+    address: '0x22fa785f3bd88b54ac076ad253b1b68332c27d58',
+    chainId: 5000,
+    tokenId: '1'
   });
   console.log(nfts);
 }

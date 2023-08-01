@@ -1,8 +1,8 @@
 import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
+import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
 import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
-import type { Provider } from '@ethersproject/providers';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
@@ -26,20 +26,24 @@ const ankrAdvancedApis = {
   // 137: 'polygon',
   250: 'fantom',
   // 42161: 'arbitrum',
-  43114: 'avalanche'
+  43114: 'avalanche',
+  5000: 'mantle'
 } as const;
-
-// We can still support chains that dont have an advanced api
-const rpcApis = [5000] as const;
-
 // https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
-export const supportedChainIds = [...typedKeys(ankrAdvancedApis), ...rpcApis];
+export const supportedChainIds = typedKeys(ankrAdvancedApis);
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
+// We can still support chains that dont have an advanced api
+const rpcApis: SupportedChainId[] = [5000];
 export const supportedMainnets: SupportedChainId[] = [56, 250, 43114, 5000];
 
 const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
-const mantleRPCEndpoint = `https://rpc.ankr.com/mantle/${process.env.ANKR_API_ID}`;
+
+function getRPCEndpoint(chainId: SupportedChainId) {
+  const chainPath = ankrAdvancedApis[chainId];
+  if (!chainPath) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
+  return `https://rpc.ankr.com/${chainPath}/${process.env.ANKR_API_ID}`;
+}
 
 // Docs: https://api-docs.ankr.com/reference/post_ankr-getnftholders
 export async function getNFTs({
@@ -83,18 +87,15 @@ type GetNFTInput = {
 };
 
 export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
-  // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
-  if (chainId === 5000) {
-    const provider = new AnkrProvider(mantleRPCEndpoint);
-    const nft = await getTokenInfoOnMantle(provider, { address, tokenId });
-    return null;
+  if (rpcApis.includes(chainId)) {
+    return getTokenInfoOnMantle({ address, chainId, tokenId });
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
   const blockchain = ankrAdvancedApis[chainId];
   if (!blockchain) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   await rateLimiter();
   const nft = await provider.getNFTMetadata({
-    blockchain,
+    blockchain: blockchain as AnkrBlockchain,
     tokenId: toInt(tokenId).toString(),
     contractAddress: address,
     forceFetch: false
@@ -165,14 +166,44 @@ export function toInt(tokenId: string) {
   return parseInt(tokenId);
 }
 
-// run this multiple times by putting in its own function
-export async function getTokenInfoOnMantle(
-  provider: AnkrProvider,
-  { address, tokenId }: Omit<GetNFTInput, 'chainId'> // assume chainId is mantle
-) {
-  const contract = new ethers.Contract(address, ERC721_ABI, provider as Provider);
+type TokenMetadata = {
+  image: string;
+  name: string;
+  description: string;
+};
+
+type RPCTokenInput = GetNFTInput & { walletId?: string | null };
+
+// assume chainId is mantle
+export async function getTokenInfoOnMantle({
+  address,
+  chainId,
+  walletId = null,
+  tokenId
+}: RPCTokenInput): Promise<NFTData> {
+  const provider = new ethers.providers.JsonRpcProvider(getRPCEndpoint(chainId));
+  const contract = new ethers.Contract(address, ERC721_ABI, provider);
 
   const [tokenUri] = await Promise.all([contract.tokenURI(tokenId)]);
-  const metadata = await GET(tokenUri, null);
-  return { tokenUri, metadata };
+  const tokenUriDNSVersion = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  const metadata = await GET<TokenMetadata>(tokenUriDNSVersion, null);
+  const imageUrl = metadata.image?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  return {
+    id: `${address}:${tokenId}`,
+    tokenId,
+    tokenIdInt: toInt(tokenId),
+    contract: address,
+    imageRaw: imageUrl,
+    image: imageUrl,
+    imageThumb: imageUrl,
+    title: metadata.name,
+    description: '',
+    chainId: 5000,
+    timeLastUpdated: new Date(1970).toISOString(),
+    isHidden: false,
+    isPinned: false,
+    // TODO: find a marketplace that supports mantle NFTs
+    link: '',
+    walletId
+  };
 }
