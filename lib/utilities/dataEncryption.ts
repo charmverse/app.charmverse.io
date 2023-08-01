@@ -20,15 +20,19 @@ export function encryptData(data: string | number | Record<string, any>) {
 }
 
 // Decrypt data
-export function decryptData(encryptedData: string) {
-  const buff = Buffer.from(encryptedData, 'base64');
-  const decipher = crypto.createDecipheriv(method, key, encryptionIV);
-
-  const decrypted = decipher.update(buff.toString('utf8'), 'hex', 'utf8') + decipher.final('utf8'); // Decrypts data and converts to utf8
-
+export function decryptData(encryptedData: string): string | number | Record<string, any> | null {
   try {
-    return JSON.parse(decrypted);
+    const buff = Buffer.from(encryptedData, 'base64');
+    const decipher = crypto.createDecipheriv(method, key, encryptionIV);
+
+    const decrypted = decipher.update(buff.toString('utf8'), 'hex', 'utf8') + decipher.final('utf8'); // Decrypts data and converts to utf8
+
+    try {
+      return JSON.parse(decrypted);
+    } catch (e) {
+      return decrypted;
+    }
   } catch (e) {
-    return decrypted;
+    return null;
   }
 }
