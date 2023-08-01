@@ -1,16 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { NotFoundError } from 'lib/middleware';
-
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
 import { stripeClient } from './stripe';
 
 export async function deleteProSubscription({ spaceId, userId }: { spaceId: string; userId: string }) {
   const spaceSubscription = await getActiveSpaceSubscription({ spaceId });
-
-  if (!spaceSubscription) {
-    throw new NotFoundError('Space subscription not found');
-  }
 
   await prisma.stripeSubscription.updateMany({
     where: {
@@ -37,6 +31,8 @@ export async function deleteProSubscription({ spaceId, userId }: { spaceId: stri
     }
   });
 
-  // Always try to cancel the subscription
-  await stripeClient.subscriptions.cancel(spaceSubscription.subscriptionId);
+  // Always try to cancel the stripe subscription
+  if (spaceSubscription?.subscriptionId) {
+    await stripeClient.subscriptions.cancel(spaceSubscription.subscriptionId);
+  }
 }
