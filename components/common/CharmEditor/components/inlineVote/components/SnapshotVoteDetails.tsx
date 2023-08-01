@@ -79,7 +79,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
             <Box key={voteOption} display='flex' justifyContent='space-between'>
               <Box gap={1} display='flex'>
                 {voteOption}
-                {currentUserChoices === voteOption && <Chip color='teal' size='small' label='Your vote' />}
+                {currentUserChoices.includes(voteOption) && <Chip color='teal' size='small' label='Your vote' />}
               </Box>
               <Typography variant='subtitle1' color='secondary'>
                 {!voteScores[index]
