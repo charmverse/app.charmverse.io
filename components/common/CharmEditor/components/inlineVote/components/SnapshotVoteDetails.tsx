@@ -1,5 +1,5 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import useSWR from 'swr';
 
@@ -13,7 +13,7 @@ import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
 import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
 import { percent } from 'lib/utilities/numbers';
 
-import { StyledFormControl, VotesWrapper } from './VotesWrapper';
+import { VotesWrapper } from './VotesWrapper';
 
 type Props = {
   snapshotProposalId: string;
@@ -42,69 +42,51 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   const remainingTime = relativeTime(proposalEndDate);
 
-  const currentUserChoices = (userVotes ?? []).map((v) => voteChoices[v.choice - 1]).join(',');
-
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
-        <Typography variant='h6' fontWeight='bold'>
-          Snapshot votes on this proposal
+        <Typography color='secondary' variant='subtitle1'>
+          {!snapshotProposal && loading && 'Loading...'}
+          {snapshotProposal &&
+            (hasPassedDeadline
+              ? `Voting ended on ${formatDate(new Date(proposalEndDate))}`
+              : `Voting ends ${remainingTime}`)}
         </Typography>
-
         <Button
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
-          size='small'
-          color='secondary'
-          variant='outlined'
+          color={hasPassedDeadline ? 'secondary' : 'primary'}
+          variant={hasPassedDeadline ? 'outlined' : 'contained'}
           external
           target='_blank'
           disabled={!snapshotProposal}
         >
-          View on snapshot
+          {hasPassedDeadline ? 'View' : 'Vote'} on snapshot
         </Button>
-      </Box>
-      <Box display='flex' justifyContent='space-between'>
-        <Typography color='secondary' variant='subtitle1'>
-          {!snapshotProposal && loading && 'Loading...'}
-          {snapshotProposal &&
-            (hasPassedDeadline ? `Finished on ${formatDate(new Date(proposalEndDate))}` : `Finishes ${remainingTime}`)}
-        </Typography>
-        {snapshotProposal && <VoteStatusChip size='small' status={hasPassedDeadline ? 'Complete' : 'InProgress'} />}
       </Box>
 
       {!snapshotProposal && loading && <Loader isLoading={true} />}
 
       {!snapshotProposal && !loading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
 
+      {snapshotProposal && <Divider sx={{ my: 2 }} />}
       {snapshotProposal && (
-        <StyledFormControl>
-          <RadioGroup name={snapshotProposal.id} value={currentUserChoices as any}>
-            {voteChoices.map((voteOption, index) => (
-              <FormControlLabel
-                key={voteOption}
-                control={<Radio size='small' />}
-                disabled
-                value={voteOption}
-                label={
-                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                    <span>{voteOption}</span>
-                    <Typography variant='subtitle1' color='secondary'>
-                      {!voteScores[index]
-                        ? 'No votes yet'
-                        : percent({
-                            value: voteScores[index],
-                            total: snapshotProposal.scores_total,
-                            significantDigits: 2
-                          })}
-                    </Typography>
-                  </Box>
-                }
-                disableTypography
-              />
-            ))}
-          </RadioGroup>
-        </StyledFormControl>
+        <Box display='flex' flexDirection='column' gap={1}>
+          {voteChoices.map((voteOption, index) => (
+            <Box key={voteOption} display='flex' justifyContent='space-between'>
+              <span>{voteOption}</span>
+              <Typography variant='subtitle1' color='secondary'>
+                {!voteScores[index]
+                  ? 'No votes yet'
+                  : percent({
+                      value: voteScores[index],
+                      total: snapshotProposal.scores_total,
+                      significantDigits: 2
+                    })}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       )}
     </VotesWrapper>
   );

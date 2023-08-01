@@ -111,6 +111,12 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
   }, [printRef, _printRef]);
 
+  const cannotComment = readOnly || !pagePermissions.comment;
+
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
+
+  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
+
   const card = useAppSelector((state) => {
     if (page.cardId) {
       return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
@@ -151,26 +157,17 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
 
+  const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
-  const cannotComment = readOnly || !pagePermissions.comment;
-
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
-  const isPageTemplate = page.type.includes('template');
-  const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar =
-    currentPageActionDisplay !== null && !insideModal && (currentPageActionDisplay !== 'comments' || enableComments);
-
-  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
-
-  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
-  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
-
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
+  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
 
   function onConnectionError(error: Error) {
     setConnectionError(error);
@@ -234,7 +231,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   disablePageSpecificFeatures={isSharedPage}
                   enableSuggestingMode={enableSuggestingMode}
                   enableVoting={page.type !== 'proposal'}
-                  enableComments={enableComments}
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
