@@ -1,11 +1,9 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, IconButton, Menu } from '@mui/material';
-import type { BaseEmoji } from 'emoji-mart';
-import { Picker } from 'emoji-mart';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
@@ -59,8 +57,9 @@ export default function Callout({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const theme = useTheme();
-  const twemojiImage = getTwitterEmoji(node.attrs.emoji);
+
+  const emoji = node.attrs.emoji;
+  const twemojiImage = emoji?.startsWith('http') ? emoji : getTwitterEmoji(emoji);
 
   return (
     <Box py={0.5}>
@@ -89,7 +88,10 @@ export default function Callout({
               <img
                 style={{
                   cursor: 'pointer',
-                  transition: 'background 100ms ease-in-out'
+                  transition: 'background 100ms ease-in-out',
+                  objectFit: 'cover',
+                  width: 22,
+                  height: 22
                 }}
                 src={twemojiImage}
               />
@@ -105,11 +107,10 @@ export default function Callout({
             )}
           </IconButton>
           <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-            <Picker
-              theme={theme.palette.mode}
-              onSelect={(emoji: BaseEmoji) => {
+            <CustomEmojiPicker
+              onUpdate={(_emoji) => {
                 updateAttrs({
-                  emoji: emoji.native
+                  emoji: _emoji
                 });
                 handleClose();
               }}
