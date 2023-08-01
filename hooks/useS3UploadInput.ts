@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -12,7 +13,8 @@ export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 
 export const useS3UploadInput = (
   onFileUpload: UploadedFileCallback,
-  fileSizeLimitMB: number = DEFAULT_MAX_FILE_SIZE_MB
+  fileSizeLimitMB: number = DEFAULT_MAX_FILE_SIZE_MB,
+  resize: boolean = false
 ) => {
   const { showMessage } = useSnackbar();
   const [isUploading, setIsUploading] = useState(false);
@@ -30,6 +32,13 @@ export const useS3UploadInput = (
     setFileName(file.name || '');
 
     try {
+      if (resize) {
+        try {
+          file = await charmClient.resizeImage(file);
+        } catch (err) {
+          log.error('Error resizing image', { err });
+        }
+      }
       const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
       onFileUpload({ url, fileName: file.name || '', size: file.size });
     } catch (error) {

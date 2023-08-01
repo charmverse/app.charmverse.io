@@ -47,6 +47,7 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
               }}
               uploadDisclaimer='Recommended size is 280 × 280 pixels'
               setImage={updatePageIcon}
+              resize
             />
           </Stack>
         ]

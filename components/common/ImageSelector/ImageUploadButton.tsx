@@ -11,18 +11,24 @@ export function ImageUploadButton({
   uploadDisclaimer,
   variant = 'contained',
   fileSizeLimitMB,
+  resize = false,
   ...props
 }: {
   setImage: (image: string) => void;
   uploadDisclaimer?: string;
   variant?: ButtonProps['variant'];
   fileSizeLimitMB?: number;
+  resize?: boolean;
 } & ButtonProps) {
   const onFileUpload: UploadedFileCallback = ({ url }) => {
     setImage(url);
   };
 
-  const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput(onFileUpload, fileSizeLimitMB);
+  const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput(
+    onFileUpload,
+    fileSizeLimitMB,
+    resize
+  );
 
   return (
     <Stack alignItems='center' gap={1}>
