@@ -2,17 +2,19 @@ import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Alert, Button, FormControlLabel, FormGroup, Grid, InputLabel, Stack, Switch, TextField } from '@mui/material';
+import { Alert, FormControlLabel, FormGroup, Grid, InputLabel, Stack, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
+import { isUrl } from 'lib/utilities/strings';
 
 import Legend from '../Legend';
 import { UpgradeChip } from '../subscription/UpgradeWrapper';
@@ -97,9 +99,9 @@ export function ApiSettings({ space }: { space: Space }) {
       });
 
       if (status === 200) {
-        showMessage('Webhook successfully sent', 'success');
+        showMessage('Webhook successfully sent - Status 200', 'success');
       } else {
-        showMessage('Webhook failed to send', 'error');
+        showMessage(`Webhook failed to send - Status ${status}`, 'error');
       }
     } catch (err) {
       log.error('There was an error sending test webhook', err);
@@ -162,7 +164,9 @@ export function ApiSettings({ space }: { space: Space }) {
                   placeholder='https://your-api.com/webhook'
                 />
                 <Button
-                  disabled={!webhookUrl || isLoading || !isDirty || isSubmitting || isTestingWebhook}
+                  disabled={
+                    !webhookUrl || isLoading || !isDirty || isSubmitting || isTestingWebhook || !isUrl(webhookUrl)
+                  }
                   onClick={testSpaceWebhook}
                 >
                   Test
