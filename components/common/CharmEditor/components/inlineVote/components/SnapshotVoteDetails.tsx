@@ -64,7 +64,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
           target='_blank'
           disabled={!snapshotProposal}
         >
-          {needsYourVote ? 'Vote' : 'View'} on snapshot
+          {needsYourVote ? 'Vote' : 'View'} on Snapshot
         </Button>
       </Box>
 
