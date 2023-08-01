@@ -5,6 +5,7 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import type { ACCOUNT_TABS } from 'components/settings/config';
 import { SETTINGS_TABS } from 'components/settings/config';
+import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
@@ -29,6 +30,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
+  const { spaceSubscription, freeTrialEnds } = useSpaceSubscription();
 
   const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
@@ -64,6 +66,12 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', close);
     };
   }, [router]);
+
+  useEffect(() => {
+    if (spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0) {
+      openUpgradeSubscription();
+    }
+  }, [spaceSubscription?.status, freeTrialEnds]);
 
   function openUpgradeSubscription() {
     onClick('subscription');

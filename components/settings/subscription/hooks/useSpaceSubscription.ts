@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -6,6 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import { getTimeDifference } from 'lib/utilities/dates';
 
 export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
@@ -24,6 +25,14 @@ export function useSpaceSubscription() {
       shouldRetryOnError: false,
       revalidateOnFocus: false
     }
+  );
+
+  const freeTrialEnds = useMemo(
+    () =>
+      spaceSubscription?.status === 'free_trial'
+        ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
+        : 0,
+    [spaceSubscription?.status, spaceSubscription?.expiresOn]
   );
 
   useEffect(() => {
@@ -45,6 +54,7 @@ export function useSpaceSubscription() {
   return {
     spaceSubscription,
     isLoading,
+    freeTrialEnds,
     refetchSpaceSubscription
   };
 }

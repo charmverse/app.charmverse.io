@@ -17,7 +17,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
-import { getTimeDifference } from 'lib/utilities/dates';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
@@ -104,16 +103,12 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const { spaceSubscription } = useSpaceSubscription();
+  const { spaceSubscription, freeTrialEnds } = useSpaceSubscription();
   const { blockCount } = useBlockCount();
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
-  const freeTrialEnds =
-    spaceSubscription?.status === 'free_trial'
-      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
-      : 0;
-  const freeTrialEned = spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0;
+  const freeTrialEnded = spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0;
 
   return (
     <Dialog
@@ -129,7 +124,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={freeTrialEned ? undefined : onClose}
+      onClose={freeTrialEnded ? undefined : onClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -216,8 +211,8 @@ export function SpaceSettingsDialog() {
           <Button
             variant='text'
             color='inherit'
-            disabled={freeTrialEned}
-            onClick={freeTrialEned ? undefined : onClose}
+            disabled={freeTrialEnded}
+            onClick={freeTrialEnded ? undefined : onClose}
             sx={{
               position: 'absolute',
               right: 10,
@@ -231,8 +226,8 @@ export function SpaceSettingsDialog() {
           <IconButton
             data-test='close-settings-modal'
             aria-label='close the settings modal'
-            disabled={freeTrialEned}
-            onClick={freeTrialEned ? undefined : onClose}
+            disabled={freeTrialEnded}
+            onClick={freeTrialEnded ? undefined : onClose}
             sx={{
               position: 'absolute',
               right: 15,
