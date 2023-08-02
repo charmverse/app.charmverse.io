@@ -69,6 +69,7 @@
     ]
   },
   "dependencies": {
+    "@ankr.com/ankr.js": "^0.4.0",
     "@apollo/client": "^3.6.2",
     "@aws-sdk/client-acm": "^3.363.0",
     "@aws-sdk/client-elastic-load-balancing-v2": "^3.363.0",
