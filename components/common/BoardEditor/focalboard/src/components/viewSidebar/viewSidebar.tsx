@@ -28,7 +28,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, ViewSourceType } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
@@ -93,7 +93,7 @@ function ViewSidebar(props: Props) {
   } else if (props.view.fields.sourceType === 'google_form') {
     sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
     SourceIcon = FcGoogle;
-  } else if (props.view.fields.sourceType === 'proposals') {
+  } else if (props.board?.fields.sourceType === 'proposals') {
     sourceTitle = 'Proposals';
     SourceIcon = TaskOutlinedIcon;
   }
@@ -113,8 +113,12 @@ function ViewSidebar(props: Props) {
       fields: sourceBoard?.fields || props.parentBoard.fields
     };
     const newView = createTableView({ board, activeView: props.view });
+
+    // TODO - Migrate this to the board only
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
+
+    // After migrating sourceData and sourceType, this should only be used for linked views
     newView.fields.linkedSourceId = fields.linkedSourceId;
     await mutator.updateBlock(newView, props.view, 'change view source');
   }
@@ -126,10 +130,10 @@ function ViewSidebar(props: Props) {
   }, [props.isOpen]);
 
   useEffect(() => {
-    if (props.pageId && props.view.fields.sourceType === 'proposals' && props.view.parentId === props.pageId) {
+    if (props.pageId && props.board?.fields.sourceType === 'proposals' && props.view.parentId === props.pageId) {
       updateProposalSource({ pageId: props.pageId });
     }
-  }, [props.pageId, props.view.parentId, props.view.fields.sourceType]);
+  }, [props.pageId, props.view.parentId, props.board?.fields.sourceType]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
@@ -162,14 +166,17 @@ function ViewSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {props.view.fields.sourceType !== 'proposals' && (
-                <MenuRow
-                  onClick={() => setSidebarView('source')}
-                  icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
-                  title='Source'
-                  value={sourceTitle}
-                />
-              )}
+              {props &&
+                !(['board_page', 'google_form', 'proposals'] as ViewSourceType[]).includes(
+                  props.board?.fields.sourceType as ViewSourceType
+                ) && (
+                  <MenuRow
+                    onClick={() => setSidebarView('source')}
+                    icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
+                    title='Source'
+                    value={sourceTitle}
+                  />
+                )}
             </>
           )}
           {sidebarView === 'layout' && (

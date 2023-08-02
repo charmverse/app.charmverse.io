@@ -78,7 +78,9 @@ export type BoardFields = {
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
   viewIds: string[];
+  // Currently only for boards of type proposal
   sourceType?: ViewSourceType;
+  // Currently unused. We will migrate Google Data here in a subsequent PR
   sourceData?: GoogleFormSourceData;
 };
 

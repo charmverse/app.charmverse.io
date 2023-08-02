@@ -14,7 +14,8 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
-import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
+import type { ViewSourceType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 
 import { SidebarHeader } from '../viewSidebar';
 

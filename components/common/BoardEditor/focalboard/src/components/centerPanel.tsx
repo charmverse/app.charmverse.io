@@ -516,8 +516,8 @@ function CenterPanel(props: Props) {
   const isLoadingSourceData =
     !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
-  const readOnlyTitle = activeView?.fields.sourceType === 'proposals';
-  const disableAddingNewCards = activeView?.fields.sourceType === 'proposals';
+  const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
+  const disableAddingNewCards = activeBoard?.fields.sourceType === 'proposals';
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
