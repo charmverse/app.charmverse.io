@@ -1,9 +1,10 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Comment, Page, SubscriptionTier, Thread } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -109,6 +110,23 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+    failedImports: FailedImportsError[];
+  };
+};
+
+type ThreadsUpdated = {
+  type: 'threads_updated';
+  payload: {
+    threadId: string;
+    pageId: string;
+  };
+};
+
 export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage =
@@ -125,7 +143,9 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
-  | SpaceSubscriptionUpdated;
+  | ThreadsUpdated
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

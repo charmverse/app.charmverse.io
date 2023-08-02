@@ -15,12 +15,14 @@ export function PlanSelection({
   period,
   blockQuotaInThousands,
   disabled = false,
-  onSelect
+  onSelect,
+  hideSelection
 }: {
   disabled?: boolean;
   onSelect: (blockQuotaInThousands: number | null, period: SubscriptionPeriod | null) => void;
   period: SubscriptionPeriod;
   blockQuotaInThousands: number;
+  hideSelection?: boolean;
 }) {
   const theme = useTheme();
   const price = period === 'annual' ? communityProduct.pricing.annual / 12 : communityProduct.pricing.monthly;
@@ -28,6 +30,9 @@ export function PlanSelection({
   return (
     <>
       <Stack my={2}>
+        <InputLabel sx={{ mb: 1 }} htmlFor='payment-period'>
+          Payment Period
+        </InputLabel>
         <StyledToggleButtonGroup
           value={period}
           exclusive
@@ -36,6 +41,7 @@ export function PlanSelection({
             onSelect(null, _period);
           }}
           aria-label='annual or monthly selection'
+          id='payment-period'
         >
           <ToggleButton value='annual' aria-label='left aligned'>
             Yearly (17% off)
@@ -64,30 +70,32 @@ export function PlanSelection({
           <Typography>${price * 500}/mo</Typography>
         </Stack>
       </Stack>
-      <Stack
-        display='flex'
-        justifyContent='space-between'
-        flexDirection='row'
-        alignItems='center'
-        maxWidth='400px'
-        padding={2}
-        mb={1}
-        sx={{ border: `1px solid ${theme.palette.secondary.main}` }}
-      >
-        <Stack>
-          <Typography variant='h6' mb={2}>
-            Current selection
-          </Typography>
-          <Typography>{`$${price * blockQuotaInThousands}/mo`}</Typography>
-          <Typography>{`${String(communityProduct.blockQuotaIncrement * blockQuotaInThousands).slice(
-            0,
-            -3
-          )}K blocks`}</Typography>
+      {!hideSelection && (
+        <Stack
+          display='flex'
+          justifyContent='space-between'
+          flexDirection='row'
+          alignItems='center'
+          maxWidth='400px'
+          padding={2}
+          mb={1}
+          sx={{ border: `1px solid ${theme.palette.secondary.main}` }}
+        >
+          <Stack>
+            <Typography variant='h6' mb={2}>
+              Current selection
+            </Typography>
+            <Typography>{`$${price * blockQuotaInThousands}/mo`}</Typography>
+            <Typography>{`${String(communityProduct.blockQuotaIncrement * blockQuotaInThousands).slice(
+              0,
+              -3
+            )}K blocks`}</Typography>
+          </Stack>
+          <Stack>
+            <Lock width='100px' height='100px' />
+          </Stack>
         </Stack>
-        <Stack>
-          <Lock width='100px' height='100px' />
-        </Stack>
-      </Stack>
+      )}
     </>
   );
 }

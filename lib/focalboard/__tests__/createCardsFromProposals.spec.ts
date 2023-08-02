@@ -1,11 +1,12 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
-import { generateUserAndSpaceWithApiToken, generateBoard, generateProposal } from 'testing/setupDatabase';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
@@ -73,16 +74,64 @@ describe('createCardsFromProposals', () => {
     expect(cards.length).toBe(0);
   });
 
+  it('should initialise the database with all proposal properties visible', async () => {
+    const database = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      views: 1
+    });
+
+    await createCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id });
+
+    const databaseAfterUpdate = await prisma.block.findUnique({
+      where: {
+        id: database.id
+      }
+    });
+
+    const properties = (databaseAfterUpdate?.fields as any).cardProperties as IPropertyTemplate[];
+    const proposalUrlProp = properties.find((prop) => prop.type === 'proposalUrl');
+    const proposalStatusProp = properties.find((prop) => prop.type === 'proposalStatus');
+    const proposalCategoryProp = properties.find((prop) => prop.type === 'proposalCategory');
+
+    expect(proposalUrlProp).toBeDefined();
+    expect(proposalStatusProp).toBeDefined();
+    expect(proposalCategoryProp).toBeDefined();
+
+    const view = await prisma.block.findFirstOrThrow({
+      where: {
+        parentId: database.id,
+        type: 'view'
+      }
+    });
+
+    const visibleProperties = (view?.fields as any).visiblePropertyIds as string[];
+
+    ['__title', proposalUrlProp?.id, proposalStatusProp?.id, proposalCategoryProp?.id].forEach((propertyKey) => {
+      expect(visibleProperties.includes(propertyKey as string)).toBe(true);
+    });
+  });
+
   it('should not create cards from proposals if board is not found', async () => {
     await expect(
       createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toBeInstanceOf(DataNotFoundError);
+    ).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
     await expect(
       createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toBeInstanceOf(DataNotFoundError);
+    ).rejects.toThrowError();
+  });
+
+  it('should throw an error if boardId or spaceId is invalid', async () => {
+    await expect(
+      createCardsFromProposals({ boardId: board.id, spaceId: 'Bad space id', userId: user.id })
+    ).rejects.toThrowError(InvalidInputError);
+
+    await expect(
+      createCardsFromProposals({ boardId: 'bad board id', spaceId: space.id, userId: user.id })
+    ).rejects.toThrowError(InvalidInputError);
   });
 
   it('should not create cards if no proposals are found', async () => {

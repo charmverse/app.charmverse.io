@@ -13,6 +13,7 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
@@ -275,28 +276,42 @@ export function CheckoutForm({
 
   return (
     <>
-      <Stack maxWidth='400px'>
-        <Typography variant='h6'>Billing Information</Typography>
-        <Stack gap={0.5} my={1}>
-          <InputLabel>Email (required)</InputLabel>
-          <TextField {...register('email')} placeholder='johndoe@gmail.com' disabled={isValidationLoading} />
-        </Stack>
-      </Stack>
       <Divider sx={{ mb: 1 }} />
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
           <PaymentTabs value={paymentType} onChange={changePaymentType} />
+          <Stack gap={0.5} mt={2}>
+            <InputLabel sx={{ color: (theme) => theme.palette.text.primary }}>Email (required)</InputLabel>
+            <TextField
+              {...register('email')}
+              placeholder='johndoe@gmail.com'
+              disabled={isValidationLoading}
+              InputProps={{
+                sx: {
+                  boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02)',
+                  backgroundColor: 'transparent'
+                }
+              }}
+            />
+          </Stack>
           <PaymentTabPanel value={paymentType} index='card'>
             <CardSection disabled={isProcessing} handleCardDetails={handleCardDetails} />
           </PaymentTabPanel>
           <PaymentTabPanel value={paymentType} index='crypto'>
             <Typography mb={1}>
-              We accept crypto payments through our partner Loop. After you click Upgrade a popup will appear with
-              instructions on finishing your payment.
+              We accept crypto payments through our partner{' '}
+              <Link href='https://www.loopcrypto.xyz' external target='_blank'>
+                Loop
+              </Link>
+              . After you click Upgrade a popup will appear with instructions on finishing your payment.
             </Typography>
             <Typography mb={1}>
-              The suggested allowence for your subscription is {price * blockQuota * (period === 'annual' ? 12 : 1)}{' '}
-              USDC
+              The suggested allowance for your subscription is {price * blockQuota * (period === 'annual' ? 12 : 1)}{' '}
+              USDC. Learn more how it works{' '}
+              <Link href='https://www.loopcrypto.xyz/frequently-asked-questions' external target='_blank'>
+                here
+              </Link>
+              .
             </Typography>
           </PaymentTabPanel>
         </Grid>

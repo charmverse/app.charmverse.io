@@ -5,10 +5,11 @@ import { v4 } from 'uuid';
 
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import type { BoardPropertyValue } from 'lib/public-api';
 
 export async function createCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, string | string[]>;
+    properties: Record<string, BoardPropertyValue>;
   } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>>
 ): Promise<{ page: Page; block: Block }> {
   const board = await prisma.block.findFirst({
@@ -48,7 +49,7 @@ export async function createCardPage(
         headerImage: null,
         icon: '',
         isTemplate: false,
-        properties: pageInfo.properties ?? {}
+        properties: (pageInfo.properties ?? {}) as any
       }
     }
   });

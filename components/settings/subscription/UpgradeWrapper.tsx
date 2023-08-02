@@ -17,7 +17,8 @@ export const upgradeMessages = {
   invite_guests: 'Upgrade to a paid plan to invite members with guest-level access',
   customise_member_property: 'Upgrade to a paid plan to use this member property',
   api_access: 'Upgrade to a paid plan to get access to the API',
-  custom_domain: 'Upgrade to a paid plan to use a custom app domain'
+  custom_domain: 'Upgrade to a paid plan to use a custom app domain',
+  upgrade: 'Upgrade your subscription'
 };
 
 export type UpgradeContext = keyof typeof upgradeMessages;

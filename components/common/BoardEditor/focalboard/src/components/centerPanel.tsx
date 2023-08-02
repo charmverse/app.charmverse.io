@@ -6,13 +6,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -45,8 +45,8 @@ import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
@@ -131,6 +131,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
@@ -159,7 +160,13 @@ function CenterPanel(props: Props) {
   }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
-  if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
+  if (
+    (!groupByProperty ||
+      (_groupByProperty?.type !== 'select' &&
+        _groupByProperty?.type !== 'proposalCategory' &&
+        _groupByProperty?.type !== 'proposalStatus')) &&
+    activeView?.fields.viewType === 'board'
+  ) {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
   let dateDisplayProperty = _dateDisplayProperty;
@@ -397,7 +404,7 @@ function CenterPanel(props: Props) {
       // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
       fields: sourceBoard?.fields || board.fields
     };
-    const view = createTableView(_board);
+    const view = createTableView({ board: _board, views });
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -509,6 +516,8 @@ function CenterPanel(props: Props) {
   const isLoadingSourceData =
     !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
+  const readOnlyTitle = activeView?.fields.sourceType === 'proposals';
+  const disableAddingNewCards = activeView?.fields.sourceType === 'proposals';
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -657,6 +666,8 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   addCard={addCard}
                   showCard={showCard}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'table' && (
@@ -674,6 +685,8 @@ function CenterPanel(props: Props) {
                   showCard={showCard}
                   addCard={addCard}
                   onCardClicked={cardClicked}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'calendar' && (
@@ -687,6 +700,7 @@ function CenterPanel(props: Props) {
                   addCard={(properties: Record<string, string>) => {
                     addCard('', true, properties);
                   }}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'gallery' && (
@@ -698,6 +712,7 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   selectedCardIds={state.selectedCardIds}
                   addCard={(show) => addCard('', show)}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
@@ -711,6 +726,7 @@ function CenterPanel(props: Props) {
                 isOpen={state.showSettings === 'view-options'}
                 closeSidebar={closeSettings}
                 groupByProperty={groupByProperty}
+                views={views}
               />
             )}
           </Box>

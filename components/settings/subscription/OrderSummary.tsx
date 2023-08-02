@@ -39,7 +39,10 @@ export function OrderSummary({
       <Stack display='flex' flexDirection='row' justifyContent='space-between'>
         <Stack>
           <Typography mb={1}>Community Edition</Typography>
-          <Typography variant='body2'>Billed {period}</Typography>
+          <Typography variant='body2' mb={1}>
+            {blockQuota}K blocks
+          </Typography>
+          <Typography variant='body2'>Billed {period === 'annual' ? 'annually' : 'monthly'}</Typography>
         </Stack>
         <Stack>
           <Typography>${(price * blockQuota).toFixed(2)}/mo</Typography>

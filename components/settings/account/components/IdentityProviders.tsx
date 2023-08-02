@@ -254,7 +254,7 @@ export function IdentityProviders() {
         {user?.googleAccounts?.map((acc) => (
           <IdentityProviderItem
             key={acc.email}
-            text={acc.name}
+            text={`${acc.name} (${acc.email})`}
             type='Google'
             disabled={cannotDisconnect}
             connected={true}

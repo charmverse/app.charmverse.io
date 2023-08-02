@@ -2,6 +2,7 @@ import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
 import type { SpaceSettingsSection } from 'components/settings/config';
@@ -57,6 +58,7 @@ export function SidebarLink({
   icon,
   label,
   section,
+  children,
   ...props
 }: {
   active: boolean;
@@ -67,6 +69,7 @@ export function SidebarLink({
   onClick?: () => void;
   className?: string;
   section?: SpaceSettingsSection;
+  children?: ReactNode;
 }) {
   return (
     <StyledSidebarLink {...props}>
@@ -82,6 +85,7 @@ export function SidebarLink({
             />
           </span>
         )}
+        {children}
       </Box>
     </StyledSidebarLink>
   );

@@ -148,6 +148,8 @@
   "PropertyType.Text": "Text",
   "PropertyType.URL": "URL",
   "PropertyType.ProposalUrl": "Proposal Url",
+  "PropertyType.ProposalCategory": "Proposal Category",
+  "PropertyType.ProposalStatus": "Proposal Status",
   "PropertyType.UpdatedBy": "Last updated by",
   "PropertyType.UpdatedTime": "Last updated time",
   "PropertyValueElement.empty": "Empty",
