@@ -21,7 +21,12 @@ export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => vo
             onSelect={(emoji) => {
               onUpdate(emoji);
             }}
-          />
+          />,
+          {
+            sx: {
+              p: 0
+            }
+          }
         ],
         [
           'Custom',

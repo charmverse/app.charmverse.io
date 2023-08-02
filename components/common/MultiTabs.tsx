@@ -34,7 +34,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 interface MultiTabsProps {
-  tabs: [string, React.ReactNode][];
+  tabs: [string, React.ReactNode, { sx?: SxProps }?][];
   disabled?: boolean;
   tabPanelSx?: SxProps;
 }
@@ -67,12 +67,15 @@ export default function MultiTabs(props: MultiTabsProps) {
           ))}
         </Tabs>
       </Box>
-      {tabs.map(([tabLabel, tabComponent], tabIndex) => (
-        /* eslint-disable-next-line */
-        <TabPanel value={value} label={tabLabel} sx={tabPanelSx} index={tabIndex} key={tabIndex}>
-          {tabComponent}
-        </TabPanel>
-      ))}
+      {tabs.map(([tabLabel, tabComponent, _props], tabIndex) => {
+        const sxProps = _props?.sx ?? ({} as SxProps);
+        return (
+          /* eslint-disable-next-line */
+          <TabPanel value={value} label={tabLabel} sx={{ ...tabPanelSx, ...sxProps } as SxProps} index={tabIndex} key={tabIndex}>
+            {tabComponent}
+          </TabPanel>
+        );
+      })}
     </Box>
   );
 }
