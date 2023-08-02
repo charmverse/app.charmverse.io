@@ -41,7 +41,7 @@ const RPC = {
       logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     blockExplorerUrls: ['https://etherscan.io'],
-    gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth'
@@ -58,7 +58,7 @@ const RPC = {
     },
     rpcUrls: ['https://bsc-dataseed.binance.org'],
     blockExplorerUrls: ['https://bscscan.com'],
-    gnosisUrl: 'https://safe-transaction.bsc.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-bsc.safe.global',
     iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
     shortName: 'bnb'
   },
@@ -74,7 +74,7 @@ const RPC = {
     },
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
-    gnosisUrl: 'https://safe-transaction.polygon.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     shortName: 'matic'
   },
@@ -90,7 +90,7 @@ const RPC = {
     },
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     blockExplorerUrls: ['https://snowtrace.io'],
-    gnosisUrl: 'https://safe-transaction.avalanche.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-avalanche.safe.global',
     iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg',
     shortName: 'avax'
   },
@@ -106,7 +106,7 @@ const RPC = {
     },
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
-    gnosisUrl: 'https://safe-transaction.xdai.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-gnosis-chain.safe.global',
     iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg',
     shortName: 'gno'
   },
@@ -137,7 +137,7 @@ const RPC = {
     },
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
-    gnosisUrl: 'https://safe-transaction.arbitrum.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
     iconUrl: '/images/cryptoLogos/arbitrum.svg',
     shortName: 'arb1'
   },
@@ -198,7 +198,7 @@ const RPC = {
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-goerli.safe.global',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'gor'
@@ -246,7 +246,7 @@ const RPC = {
       logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://mainnet.optimism.io'],
-    gnosisUrl: 'https://safe-transaction.optimism.gnosis.io',
+    gnosisUrl: 'https://safe-transaction-optimism.safe.global',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
