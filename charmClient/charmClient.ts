@@ -487,9 +487,9 @@ class CharmClient {
   }
 
   resizeImage(formData: FormData) {
-    return fetch('/api/image/resize', {
-      method: 'POST',
-      body: formData
+    return http.POST<{ url: string }>('/api/image/resize', formData, {
+      noHeaders: true,
+      skipStringifying: true
     });
   }
 }

@@ -7,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import sharp from 'sharp';
 
+import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 import { DEFAULT_IMAGE_SIZE, DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME } from 'lib/file/constants';
 import { makeDirectory } from 'lib/file/makeDirectory';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -18,7 +19,7 @@ handler.use(requireUser).post(resizeImage);
 
 async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
   const uploadDir = join(process.env.ROOT_DIR || process.cwd(), `/uploads/${DateTime.now().toFormat('dd-MM-yyyy')}`);
-
+  const userId = req.session.user.id;
   await makeDirectory(uploadDir);
 
   const form = formidable({
@@ -44,9 +45,13 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
     // Delete the temporary file
     await fs.unlink(image.filepath);
 
-    res.status(200);
-    res.setHeader('Content-Type', 'image/webp');
-    res.send(optimizedBuffer);
+    const { fileUrl: url } = await uploadFileToS3({
+      pathInS3: getUserS3FilePath({ userId, url: image.originalFilename ?? image.newFilename }),
+      content: optimizedBuffer,
+      contentType: 'image/webp'
+    });
+
+    res.status(200).send({ url });
   } else {
     res.status(400).end();
   }
