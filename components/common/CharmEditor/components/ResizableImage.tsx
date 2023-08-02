@@ -1,6 +1,5 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
-import { NodeSelection, TextSelection } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -14,6 +13,8 @@ import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+
+import { enableDragAndDrop } from '../utils';
 
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import BlockAligner from './BlockAligner';
@@ -204,11 +205,7 @@ function ResizableImage({
         <StyledImage
           onDragStart={() => {
             const nodePos = getPos();
-            view.dispatch(
-              view.state.tr
-                .setMeta('row-handle-is-dragging', true)
-                .setSelection(new TextSelection(view.state.doc.resolve(nodePos), view.state.doc.resolve(nodePos + 1)))
-            );
+            enableDragAndDrop(view, nodePos);
           }}
           src={node.attrs.src}
           alt={node.attrs.alt}

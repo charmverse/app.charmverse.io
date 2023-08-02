@@ -1,5 +1,4 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
@@ -12,6 +11,8 @@ import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/ut
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+
+import { enableDragAndDrop } from '../../../utils';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -76,11 +77,7 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
       data-path={fullPath}
       onDragStart={() => {
         const nodePos = getPos();
-        view.dispatch(
-          view.state.tr
-            .setMeta('row-handle-is-dragging', true)
-            .setSelection(new TextSelection(view.state.doc.resolve(nodePos), view.state.doc.resolve(nodePos + 1)))
-        );
+        enableDragAndDrop(view, nodePos);
       }}
       data-type={node.attrs.type}
     >
