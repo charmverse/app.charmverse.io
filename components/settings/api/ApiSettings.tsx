@@ -163,14 +163,14 @@ export function ApiSettings({ space }: { space: Space }) {
                   helperText={errors.webhookUrl?.message}
                   placeholder='https://your-api.com/webhook'
                 />
-                <Button
-                  disabled={
-                    !webhookUrl || isLoading || !isDirty || isSubmitting || isTestingWebhook || !isUrl(webhookUrl)
-                  }
-                  onClick={testSpaceWebhook}
-                >
-                  Test
-                </Button>
+                {spaceWebhook?.webhookSigningSecret && (
+                  <Button
+                    disabled={!webhookUrl || isLoading || isSubmitting || isTestingWebhook || !isUrl(webhookUrl)}
+                    onClick={testSpaceWebhook}
+                  >
+                    Test
+                  </Button>
+                )}
               </Stack>
               {errors?.webhookUrl && <Alert severity='error'>Invalid webhook url</Alert>}
             </Grid>
