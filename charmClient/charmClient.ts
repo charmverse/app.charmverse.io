@@ -485,6 +485,13 @@ class CharmClient {
   createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
     return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
   }
+
+  resizeImage(formData: FormData) {
+    return http.POST<{ url: string }>('/api/image/resize', formData, {
+      noHeaders: true,
+      skipStringifying: true
+    });
+  }
 }
 
 const charmClient = new CharmClient();

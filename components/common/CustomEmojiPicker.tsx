@@ -5,6 +5,7 @@ import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/em
 import { Button } from 'components/common/Button';
 import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadButton';
 import MultiTabs from 'components/common/MultiTabs';
+import { DEFAULT_IMAGE_SIZE } from 'lib/file/constants';
 
 export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => void }) {
   const [imageLink, setImageLink] = useState('');
@@ -53,8 +54,9 @@ export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => vo
               sx={{
                 width: '100%'
               }}
-              uploadDisclaimer='Recommended size is 280 × 280 pixels'
+              uploadDisclaimer={`Recommended size is ${DEFAULT_IMAGE_SIZE} × ${DEFAULT_IMAGE_SIZE} pixels`}
               setImage={onUpdate}
+              resize
             />
           </Stack>
         ]
