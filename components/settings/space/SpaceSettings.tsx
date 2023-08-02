@@ -12,10 +12,10 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
 import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
+import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
@@ -282,10 +282,8 @@ export function SpaceSettings({ space }: { space: Space }) {
 
       <SetupCustomDomain space={space} />
 
-      <Legend mt={3}>Snapshot.org Integration</Legend>
-      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
-        <ConnectSnapshot />
-      </Box>
+      <SpaceIntegrations />
+
       {space && (
         <ConfirmDeleteModal
           title='Delete space'

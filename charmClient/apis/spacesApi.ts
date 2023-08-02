@@ -101,4 +101,8 @@ export class SpacesApi {
   verifyCustomDomain(spaceId: string) {
     return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
   }
+
+  getCollablandCode(spaceId: string) {
+    return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
+  }
 }
