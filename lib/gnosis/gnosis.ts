@@ -9,7 +9,7 @@ import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
 
-import * as http from 'adapters/http';
+import { getSafesByOwner, getSafeData } from './mantleClient';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 
@@ -56,32 +56,6 @@ interface GetSafesForAddressProps {
 
 export type SafeData = { chainId: number } & SafeInfoResponse;
 
-type MantleMultisigSafe = {
-  address: {
-    value: string;
-  };
-  chainId: string;
-  nonce: number;
-  threshold: number;
-  owners: {
-    value: string;
-  }[];
-  implementation: {
-    value: string;
-  };
-  modules: null;
-  fallbackHandler: {
-    value: string;
-  };
-  guard: null;
-  version: string;
-  implementationVersionState: string;
-  collectiblesTag: string;
-  txQueuedTag: string;
-  txHistoryTag: string;
-  messagesTag: string;
-};
-
 export async function getSafesForAddress({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
@@ -97,14 +71,10 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
 
   const checksumAddress = getAddress(address); // convert to checksum address
   if (chainId === 5001 || chainId === 5000) {
-    const { address: eip3770Address } = await ethAdapter.getEip3770Address(checksumAddress);
-    const safes = await http.GET<string[]>(`${serviceUrl}/v1/chains/${chainId}/owners/${eip3770Address}/safes`);
+    const { safes } = await getSafesByOwner({ serviceUrl, chainId, address: checksumAddress });
     return Promise.all(
       safes.map(async (safeAddr) => {
-        const { address: eip3770SafeAddress } = await ethAdapter.getEip3770Address(safeAddr);
-        const safeData = await http.GET<MantleMultisigSafe>(
-          `${serviceUrl}/v1/chains/${chainId}/safes/${eip3770SafeAddress}`
-        );
+        const safeData = await getSafeData({ serviceUrl, chainId, address });
         return {
           chainId,
           address: safeAddr,

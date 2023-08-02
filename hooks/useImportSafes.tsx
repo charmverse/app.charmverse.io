@@ -45,13 +45,13 @@ export function useImportSafes() {
   return { isLoadingSafes, importSafes };
 }
 
-interface ImportSafeProps {
+type ImportSafeProps = {
   signer: Signer;
   addresses: string[];
-  getWalletDetails?: (address: string) => UserGnosisSafe | null | undefined;
-}
+  getWalletDetails: (address: string) => UserGnosisSafe | null | undefined;
+};
 
-export async function importSafesFromWallet({ signer, addresses, getWalletDetails }: ImportSafeProps) {
+async function importSafesFromWallet({ signer, addresses, getWalletDetails }: ImportSafeProps) {
   const safes = await getSafesForAddresses(signer, addresses);
 
   const safesData = safes.map((safe) => ({
@@ -59,8 +59,8 @@ export async function importSafesFromWallet({ signer, addresses, getWalletDetail
     owners: safe.owners,
     threshold: safe.threshold,
     chainId: safe.chainId,
-    name: getWalletDetails?.(safe.address)?.name ?? null, // get existing name if user gave us one
-    isHidden: getWalletDetails?.(safe.address)?.isHidden ?? false
+    name: getWalletDetails(safe.address)?.name ?? null, // get existing name if user gave us one
+    isHidden: getWalletDetails(safe.address)?.isHidden ?? false
   }));
 
   await charmClient.gnosisSafe.setMyGnosisSafes(safesData);
