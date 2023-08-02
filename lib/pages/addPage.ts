@@ -88,7 +88,7 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   board.id = boardId;
   board.rootId = board.id;
 
-  const view = createTableView({ board, views: [] });
+  const view = createTableView({ board });
 
   return {
     board,

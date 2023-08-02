@@ -404,7 +404,7 @@ function CenterPanel(props: Props) {
       // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
       fields: sourceBoard?.fields || board.fields
     };
-    const view = createTableView({ board: _board, views });
+    const view = createTableView({ board: _board });
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -726,7 +726,6 @@ function CenterPanel(props: Props) {
                 isOpen={state.showSettings === 'view-options'}
                 closeSidebar={closeSettings}
                 groupByProperty={groupByProperty}
-                views={views}
               />
             )}
           </Box>
