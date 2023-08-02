@@ -95,7 +95,8 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
-    onFileUpload: updateImageAvatar
+    onFileUpload: updateImageAvatar,
+    resize: true
   });
 
   function onEditClick(event: React.MouseEvent<HTMLElement>) {
