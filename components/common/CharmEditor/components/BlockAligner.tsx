@@ -11,6 +11,7 @@ interface BlockAlignerProps {
   onDelete: () => void;
   onEdit?: () => void;
   readOnly?: boolean;
+  onDragStart?: () => void;
 }
 
 const StyledBlockAligner = styled.div`
@@ -40,7 +41,7 @@ const Controls = styled.div`
 `;
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
-  const { children, onDelete, onEdit, readOnly } = props;
+  const { children, onDelete, onEdit, readOnly, onDragStart } = props;
   const theme = useTheme();
 
   function handleEdit(e: MouseEvent) {
@@ -54,7 +55,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
   }
 
   return (
-    <StyledBlockAligner draggable={false}>
+    <StyledBlockAligner onDragStart={onDragStart}>
       {children}
       {!readOnly && (
         <Controls className='controls'>
