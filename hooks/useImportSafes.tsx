@@ -23,8 +23,8 @@ export function useImportSafes() {
     [data]
   );
 
-  const importSafes = async (gnosisSigner: Signer | null) => {
-    if (gnosisSigner && user) {
+  async function importSafes(gnosisSigner: Signer) {
+    if (user) {
       setIsLoadingSafes(true);
       try {
         await importSafesFromWallet({
@@ -40,7 +40,7 @@ export function useImportSafes() {
         setIsLoadingSafes(false);
       }
     }
-  };
+  }
 
   return { isLoadingSafes, importSafes };
 }
