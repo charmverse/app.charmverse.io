@@ -2,7 +2,6 @@ import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardView } from 'lib/focalboard/boardView';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
@@ -25,17 +24,8 @@ export async function updateCardsFromProposals({
   const database = await setDatabaseProposalProperties({
     databaseId: boardId
   });
-  const views = (
-    await prisma.block.findMany({
-      where: {
-        type: 'view',
-        parentId: boardId
-      }
-    })
-  ).map(prismaToBlock) as BoardView[];
-
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
-  if (!views.find((view) => view.fields.sourceType === 'proposals')) {
+  if (database.fields.sourceType === 'proposals') {
     throw new InvalidStateError('Board does not have a proposals view');
   }
 

@@ -11,6 +11,7 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
+import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 
@@ -81,11 +82,11 @@ export async function createCardsFromProposals({
         where: { id: block.id },
         data: {
           fields: {
-            ...(block.fields as any),
+            ...(block.fields as BoardViewFields),
             visiblePropertyIds: [
               ...new Set([
-                ...(block.fields as any).visiblePropertyIds,
-                ...(database.fields as any).cardProperties.map((p: IPropertyTemplate) => p.id)
+                ...(block.fields as BoardViewFields).visiblePropertyIds,
+                ...database.fields.cardProperties.map((p) => p.id)
               ])
             ],
             sourceType: 'proposals'

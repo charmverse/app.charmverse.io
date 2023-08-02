@@ -43,7 +43,14 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type {
+  Board,
+  BoardGroup,
+  IPropertyOption,
+  IPropertyTemplate,
+  DataSourceType,
+  BoardFields
+} from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
@@ -413,10 +420,15 @@ function CenterPanel(props: Props) {
     showView(view.id);
   }
 
-  async function createDatabase() {
+  async function createDatabase({ sourceType }: { sourceType: DataSourceType }) {
     if (!boardPageType) {
       throw new Error('No board page type exists');
     }
+    await mutator.updateBlock(
+      { ...board, fields: { ...board.fields, sourceType } as Partial<BoardFields> },
+      board,
+      'Update board datasource'
+    );
     const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
     showView(view.id);
     return view;
@@ -489,7 +501,7 @@ function CenterPanel(props: Props) {
             showMessage('Importing your csv file...', 'info');
 
             try {
-              const view = await createDatabase();
+              const view = await createDatabase({ sourceType: 'board_page' });
               await addNewCards({
                 board,
                 members,
@@ -643,16 +655,18 @@ function CenterPanel(props: Props) {
                     {activePage?.title || 'Untitled'}
                   </Button>
                 )}
-              {!activeView && state.showSettings === 'create-linked-view' && (
-                <CreateLinkedView
-                  readOnly={props.readOnly}
-                  onSelect={selectViewSource}
-                  // if it links to deleted db page then the board can't be inline_board type
-                  onCreate={views.length === 0 ? createDatabase : undefined}
-                  onCsvImport={onCsvImport}
-                  pageId={props.page?.id}
-                />
-              )}
+              {!activeView &&
+                (views.length === 0 || activeBoard?.fields.sourceType === 'linked') &&
+                state.showSettings === 'create-linked-view' && (
+                  <CreateLinkedView
+                    readOnly={props.readOnly}
+                    onSelect={selectViewSource}
+                    // if it links to deleted db page then the board can't be inline_board type
+                    onCreateDatabase={activeBoard?.fields.sourceType !== 'linked' ? createDatabase : undefined}
+                    onCsvImport={onCsvImport}
+                    pageId={props.page?.id}
+                  />
+                )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
                 <Kanban
                   board={activeBoard}

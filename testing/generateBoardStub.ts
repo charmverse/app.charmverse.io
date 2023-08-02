@@ -1,7 +1,7 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { BoardFields, ViewSourceType } from 'lib/focalboard/board';
+import type { BoardFields, DataSourceType } from 'lib/focalboard/board';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
@@ -34,7 +34,7 @@ export function boardWithCardsArgs({
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
-  viewDataSource?: ViewSourceType;
+  viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();

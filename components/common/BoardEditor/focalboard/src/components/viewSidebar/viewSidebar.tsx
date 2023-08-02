@@ -28,7 +28,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate, ViewSourceType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, DataSourceType } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
@@ -167,8 +167,8 @@ function ViewSidebar(props: Props) {
                 />
               )}
               {props &&
-                !(['board_page', 'google_form', 'proposals'] as ViewSourceType[]).includes(
-                  props.board?.fields.sourceType as ViewSourceType
+                !(['board_page', 'google_form', 'proposals'] as DataSourceType[]).includes(
+                  props.board?.fields.sourceType as DataSourceType
                 ) && (
                   <MenuRow
                     onClick={() => setSidebarView('source')}
@@ -202,14 +202,17 @@ function ViewSidebar(props: Props) {
             </>
           )}
           {sidebarView === 'source' && (
-            <ViewSourceOptions
-              title='Data source'
-              view={props.view}
-              goBack={goBack}
-              onSelect={selectViewSource}
-              closeSidebar={props.closeSidebar}
-              pageId={props.pageId}
-            />
+            <>
+              SIDEBAR
+              <ViewSourceOptions
+                title='Data source'
+                view={props.view}
+                goBack={goBack}
+                onSelect={selectViewSource}
+                closeSidebar={props.closeSidebar}
+                pageId={props.pageId}
+              />
+            </>
           )}
         </StyledSidebar>
       </Collapse>

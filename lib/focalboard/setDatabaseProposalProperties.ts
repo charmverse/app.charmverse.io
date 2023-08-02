@@ -140,7 +140,11 @@ export async function generateUpdatedProposalUrlProperty({
   return proposalStatusProp;
 }
 
-export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Block> {
+export async function setDatabaseProposalProperties({
+  databaseId
+}: {
+  databaseId: string;
+}): Promise<Block & { fields: BoardFields }> {
   const database = (await prisma.block.findUniqueOrThrow({
     where: {
       id: databaseId
@@ -193,5 +197,5 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
         cardProperties: boardProperties
       }
     }
-  });
+  }) as any as Promise<Block & { fields: BoardFields }>;
 }

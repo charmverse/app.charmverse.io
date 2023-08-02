@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
-import { ListItemIcon, MenuItem, TextField, Typography } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -8,11 +7,10 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { usePages } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
 
 export type DatabaseSourceProps = {
-  onCreate?: () => Promise<BoardView>;
   onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>, boardBlock?: Board) => void;
 };
 
@@ -24,7 +22,7 @@ const SidebarContent = styled.div`
 
 const databasePageTypes = ['board', 'inline_board'];
 
-export function CharmVerseDatabasesSource(props: DatabaseSourceProps & { activePageId?: string }) {
+export function LinkCharmVerseDatabase(props: DatabaseSourceProps & { activePageId?: string }) {
   const { pages } = usePages();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -48,41 +46,29 @@ export function CharmVerseDatabasesSource(props: DatabaseSourceProps & { activeP
     );
   }
   return (
-    <>
-      <SidebarContent>
-        <TextField
-          autoFocus
-          placeholder='Search pages'
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-          sx={{
-            mb: 1
-          }}
-          fullWidth
-        />
-        <PagesList
-          emptyText='No databases found'
-          pages={sortedPages}
-          activePageId={props.activePageId}
-          onSelectPage={onSelect}
-          style={{
-            height: '250px',
-            overflow: 'auto'
-          }}
-        />
-      </SidebarContent>
-      {props.onCreate && (
-        <MenuItem onClick={props.onCreate}>
-          <ListItemIcon>
-            <AddIcon color='secondary' />
-          </ListItemIcon>
-          <Typography variant='body2' color='secondary'>
-            New database
-          </Typography>
-        </MenuItem>
-      )}
-    </>
+    <SidebarContent>
+      <TextField
+        autoFocus
+        placeholder='Search pages'
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+        }}
+        sx={{
+          mb: 1
+        }}
+        fullWidth
+      />
+      <PagesList
+        emptyText='No databases found'
+        pages={sortedPages}
+        activePageId={props.activePageId}
+        onSelectPage={onSelect}
+        style={{
+          height: '250px',
+          overflow: 'auto'
+        }}
+      />
+    </SidebarContent>
   );
 }

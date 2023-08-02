@@ -28,7 +28,7 @@ import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { ViewSourceType } from 'lib/focalboard/board';
+import type { DataSourceType } from 'lib/focalboard/board';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -1067,7 +1067,7 @@ export async function generateBoard({
   parentId?: string;
   cardCount?: number;
   views?: number;
-  viewDataSource?: ViewSourceType;
+  viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {

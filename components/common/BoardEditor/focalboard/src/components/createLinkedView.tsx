@@ -9,14 +9,16 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { StyledSidebar } from './viewSidebar/viewSidebar';
-import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions/components/CharmVerseDatabases';
+import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
+import type { NewDatabaseSourceProps } from './viewSidebar/viewSourceOptions/components/NewCharmVerseDatabase';
 import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOptions';
 
-type CreateLinkedViewProps = DatabaseSourceProps & {
-  readOnly: boolean;
-  onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
-  pageId?: string;
-};
+type CreateLinkedViewProps = DatabaseSourceProps &
+  Partial<NewDatabaseSourceProps> & {
+    readOnly: boolean;
+    onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
+    pageId?: string;
+  };
 
 type SidebarState = 'select-source' | null;
 

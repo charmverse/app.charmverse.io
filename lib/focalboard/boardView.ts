@@ -5,7 +5,7 @@ import { createBlock } from 'lib/focalboard/block';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
-import type { GoogleFormSourceData, ViewSourceType } from './board';
+import type { GoogleFormSourceData, DataSourceType } from './board';
 
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
@@ -31,7 +31,7 @@ export type BoardViewFields = {
   kanbanCalculations: Record<string, KanbanCalculationFields>;
   defaultTemplateId: string;
   // The sourceType & sourceData fields will be deleted once we complete the migration of these fields to the board block level
-  sourceType?: ViewSourceType;
+  sourceType?: DataSourceType;
   sourceData?: GoogleFormSourceData;
   // This field is only used for linked views
   linkedSourceId?: string;

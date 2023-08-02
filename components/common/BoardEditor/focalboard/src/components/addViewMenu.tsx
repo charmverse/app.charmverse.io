@@ -17,7 +17,7 @@ import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyTemplate, ViewSourceType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, DataSourceType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
@@ -108,7 +108,7 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView({ board, activeView, intl, views: props.views });
+    const view = createTableView({ board, activeView, intl });
     view.id = uuid();
 
     const oldViewId = activeView?.id;

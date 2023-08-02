@@ -14,33 +14,47 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
-import type { ViewSourceType } from 'lib/focalboard/board';
+import type { Board, DataSourceType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 import { SidebarHeader } from '../viewSidebar';
 
-import type { DatabaseSourceProps } from './components/CharmVerseDatabases';
-import { CharmVerseDatabasesSource } from './components/CharmVerseDatabases';
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
+import type { DatabaseSourceProps } from './components/LinkCharmVerseDatabase';
+import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
+import type { NewDatabaseSourceProps } from './components/NewCharmVerseDatabase';
+import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
 import { SourceType } from './components/viewSourceType';
 
 type FormStep = 'select_source' | 'configure_source';
 
-type ViewSourceOptionsProps = DatabaseSourceProps & {
-  closeSidebar?: () => void;
-  onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
-  goBack?: () => void;
-  title?: string;
-  view?: BoardView;
-  pageId?: string;
-};
+type ViewSourceOptionsProps = DatabaseSourceProps &
+  Partial<NewDatabaseSourceProps> & {
+    closeSidebar?: () => void;
+    onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
+    goBack?: () => void;
+    title?: string;
+    view?: BoardView;
+    pageId?: string;
+    board: Board;
+  };
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
-  const { view: activeView, pageId, title, onCreate, onSelect, onCsvImport, goBack, closeSidebar } = props;
+  const {
+    view: activeView,
+    pageId,
+    board,
+    title,
+    onCreateDatabase,
+    onSelect,
+    onCsvImport,
+    goBack,
+    closeSidebar
+  } = props;
 
-  const activeSourceType = activeView?.fields.sourceType;
+  const activeSourceType = board.fields.sourceType ?? activeView?.fields.sourceType;
 
-  const [sourceType, setSourceType] = useState<ViewSourceType | undefined>();
+  const [sourceType, setSourceType] = useState<DataSourceType | undefined>();
   const [formStep, setStep] = useState<FormStep>('select_source');
 
   const {
@@ -68,13 +82,13 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   }
 
   async function handleProposalSource() {
-    if (pageId && onCreate) {
-      await onCreate?.();
+    if (pageId && onCreateDatabase) {
+      await onCreateDatabase?.({ sourceType: 'proposals' });
       await createProposalSource({ pageId });
     }
   }
 
-  function selectSourceType(_source: ViewSourceType) {
+  function selectSourceType(_source: DataSourceType) {
     return () => {
       setSourceType(_source);
       setStep('configure_source');
@@ -95,7 +109,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
       <Box onClick={(e) => e.stopPropagation()}>
         {formStep === 'select_source' && (
           <Grid container spacing={1} px={1}>
-            <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
+            <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('linked')}>
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
@@ -129,20 +143,19 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SiTypeform style={{ fontSize: 24 }} />
               Typeform
             </SourceType>
-            {onCreate && (
-              <SourceType onClick={onCreate}>
+            {onCreateDatabase && (
+              <SourceType onClick={onCreateDatabase}>
                 <AddCircleIcon style={{ fontSize: 24 }} />
                 New database
               </SourceType>
             )}
           </Grid>
         )}
-        {formStep === 'configure_source' && sourceType === 'board_page' && (
-          <CharmVerseDatabasesSource
-            onSelect={onSelect}
-            activePageId={activeView?.fields.linkedSourceId}
-            onCreate={onCreate}
-          />
+        {formStep === 'configure_source' && (sourceType === 'board_page' || sourceType === 'linked') && (
+          <>
+            <LinkCharmVerseDatabase onSelect={onSelect} activePageId={activeView?.fields.linkedSourceId} />
+            {onCreateDatabase && <NewCharmVerseDatabase onCreateDatabase={onCreateDatabase} />}
+          </>
         )}
         {formStep === 'configure_source' && sourceType === 'google_form' && (
           <GoogleFormsSource
@@ -166,7 +179,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         open={typeformPopup.isOpen}
         onClose={typeformPopup.close}
         onConfirm={() => {
-          onCreate?.();
+          onCreateDatabase?.({ sourceType: 'board_page' });
           typeformPopup.close();
         }}
       />
