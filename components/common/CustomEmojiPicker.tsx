@@ -7,19 +7,27 @@ import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadBu
 import MultiTabs from 'components/common/MultiTabs';
 import { DEFAULT_IMAGE_SIZE } from 'lib/file/constants';
 
-export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: string) => void }) {
+export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => void }) {
   const [imageLink, setImageLink] = useState('');
   return (
     <MultiTabs
+      tabPanelSx={{
+        p: 1
+      }}
       tabs={[
         [
           'Emojis',
           <EmojiPicker
             key='upload'
             onSelect={(emoji) => {
-              updatePageIcon(emoji);
+              onUpdate(emoji);
             }}
-          />
+          />,
+          {
+            sx: {
+              p: 0
+            }
+          }
         ],
         [
           'Custom',
@@ -34,7 +42,7 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
               />
               <Button
                 onClick={() => {
-                  updatePageIcon(imageLink);
+                  onUpdate(imageLink);
                 }}
                 disabled={imageLink.length === 0}
               >
@@ -47,7 +55,7 @@ export function PageHeaderIcon({ updatePageIcon }: { updatePageIcon: (icon: stri
                 width: '100%'
               }}
               uploadDisclaimer={`Recommended size is ${DEFAULT_IMAGE_SIZE} × ${DEFAULT_IMAGE_SIZE} pixels`}
-              setImage={updatePageIcon}
+              setImage={onUpdate}
               resize
             />
           </Stack>
