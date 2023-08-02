@@ -124,7 +124,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   return (
     <Modal
       open={isOpen}
-      onClose={isUserWalletActive ? close : undefined}
+      onClose={!isUserWalletActive && identityToAdd === 'wallet' ? undefined : close}
       title={!identityToAdd ? 'Add an account' : modalTitles[identityToAdd]}
       aria-labelledby='Conect an account modal'
       size='600px'
