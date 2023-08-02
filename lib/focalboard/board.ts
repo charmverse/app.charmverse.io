@@ -60,6 +60,16 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
 };
 
+export type ViewSourceType = 'board_page' | 'google_form' | 'proposals' | 'linked';
+
+export type GoogleFormSourceData = {
+  credentialId: string;
+  boardId?: string; // the board which contains the blocks that are synced from this form
+  formId: string;
+  formName: string;
+  formUrl: string;
+};
+
 export type BoardFields = {
   icon: string;
   description: PageContent;
@@ -68,6 +78,8 @@ export type BoardFields = {
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
   viewIds: string[];
+  sourceType?: ViewSourceType;
+  sourceData?: GoogleFormSourceData;
 };
 
 type Board = Block & {

@@ -5,18 +5,10 @@ import { createBlock } from 'lib/focalboard/block';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
+import type { GoogleFormSourceData, ViewSourceType } from './board';
+
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
-
-export type ViewSourceType = 'board_page' | 'google_form' | 'proposals';
-
-export type GoogleFormSourceData = {
-  credentialId: string;
-  boardId?: string; // the board which contains the blocks that are synced from this form
-  formId: string;
-  formName: string;
-  formUrl: string;
-};
 
 export type KanbanCalculationFields = {
   calculation: string;
@@ -38,9 +30,10 @@ export type BoardViewFields = {
   columnCalculations: Record<string, string>;
   kanbanCalculations: Record<string, KanbanCalculationFields>;
   defaultTemplateId: string;
+  // The sourceType & sourceData fields will be deleted once we complete the migration of these fields to the board block level
   sourceType?: ViewSourceType;
   sourceData?: GoogleFormSourceData;
-  // TODO: migrate linkedSourceId to be inside sourceData
+  // This field is only used for linked views
   linkedSourceId?: string;
   columnWrappedIds?: string[];
 };
