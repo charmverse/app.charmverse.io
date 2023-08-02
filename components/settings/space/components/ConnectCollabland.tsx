@@ -25,7 +25,7 @@ export function ConnectCollabland() {
     try {
       const { code } = await charmClient.spaces.getCollablandCode(space.id);
 
-      // window.location.href = `${collablandStoreUrl}?state=${code}`;
+      window.location.href = `${collablandStoreUrl}?state=${code}`;
     } catch (error) {
       showMessage('Error connecting to Collabland. Please try again.', 'error');
     }
@@ -50,7 +50,7 @@ export function ConnectCollabland() {
 
   return (
     <Stack>
-      <Stack direction='row' gap={2}>
+      <Stack direction='row' gap={2} justifyContent='space-between' alignItems='center'>
         <Typography variant='body2'>
           To connect your space with collabland you will need to install mini app in Collabland's marketplace
         </Typography>
