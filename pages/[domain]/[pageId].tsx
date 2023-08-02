@@ -11,9 +11,7 @@ export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
   const { isSpaceMember } = useIsSpaceMember();
-  const { spaceSubscription, freeTrialEnds } = useSpaceSubscription();
-
-  const subscriptionEnded = spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0;
+  const { subscriptionEnded } = useSpaceSubscription();
 
   if (!isSpaceMember && publicPage) {
     if (subscriptionEnded) {

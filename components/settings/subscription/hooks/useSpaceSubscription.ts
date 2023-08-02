@@ -35,6 +35,14 @@ export function useSpaceSubscription() {
     [spaceSubscription?.status, spaceSubscription?.expiresOn]
   );
 
+  const subscriptionEnded = useMemo(
+    () =>
+      (spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0) ||
+      spaceSubscription?.status === 'past_due' ||
+      spaceSubscription?.status === 'unpaid',
+    [spaceSubscription?.status, freeTrialEnds]
+  );
+
   useEffect(() => {
     const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription', (payload) => {
       refetchSpaceSubscription();
@@ -55,6 +63,7 @@ export function useSpaceSubscription() {
     spaceSubscription,
     isLoading,
     freeTrialEnds,
+    subscriptionEnded,
     refetchSpaceSubscription
   };
 }

@@ -1,14 +1,18 @@
 import type { Space } from '@charmverse/core/prisma';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Menu, MenuItem, Typography } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
@@ -17,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
@@ -103,12 +108,12 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const { spaceSubscription, freeTrialEnds } = useSpaceSubscription();
+  const { spaceSubscription, subscriptionEnded } = useSpaceSubscription();
   const { blockCount } = useBlockCount();
+  const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
-  const freeTrialEnded = spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0;
 
   return (
     <Dialog
@@ -124,7 +129,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={freeTrialEnded ? undefined : onClose}
+      onClose={onClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -172,6 +177,30 @@ export function SpaceSettingsDialog() {
                 ) : null}
               </SidebarLink>
             ))}
+          {subscriptionEnded && memberSpaces.length > 1 && (
+            <Box>
+              <SidebarLink
+                data-test='space-settings-tab-switch-space'
+                label='Switch space'
+                icon={<ChangeCircleIcon fontSize='small' />}
+                {...bindTrigger(switchSpaceMenu)}
+                active={false}
+              />
+              <Menu {...bindMenu(switchSpaceMenu)} sx={{ width: '100%' }}>
+                {memberSpaces.map((_space) => (
+                  <MenuItem
+                    key={_space.id}
+                    component={Link}
+                    href={getSpaceUrl({ domain: _space.domain, customDomain: _space.customDomain })}
+                  >
+                    <Typography noWrap ml={1}>
+                      {_space.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          )}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (
@@ -211,8 +240,7 @@ export function SpaceSettingsDialog() {
           <Button
             variant='text'
             color='inherit'
-            disabled={freeTrialEnded}
-            onClick={freeTrialEnded ? undefined : onClose}
+            onClick={onClose}
             sx={{
               position: 'absolute',
               right: 10,
@@ -226,8 +254,7 @@ export function SpaceSettingsDialog() {
           <IconButton
             data-test='close-settings-modal'
             aria-label='close the settings modal'
-            disabled={freeTrialEnded}
-            onClick={freeTrialEnded ? undefined : onClose}
+            onClick={onClose}
             sx={{
               position: 'absolute',
               right: 15,

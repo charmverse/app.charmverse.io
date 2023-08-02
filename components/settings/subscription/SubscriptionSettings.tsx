@@ -62,10 +62,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription) {
+    if (pendingPayment && spaceSubscription?.id) {
       setPendingPayment(false);
     }
-  }, [spaceSubscription, pendingPayment]);
+  }, [spaceSubscription?.id, pendingPayment]);
 
   async function handleShowCheckoutForm() {
     if (minimumBlockQuota > blockQuota) {

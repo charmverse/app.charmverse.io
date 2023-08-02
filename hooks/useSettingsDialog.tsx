@@ -13,7 +13,7 @@ export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCO
 type IContext = {
   open: boolean;
   activePath: string;
-  onClose: () => any;
+  onClose: () => void;
   onClick: (path?: SettingsPath, section?: string) => void;
   openUpgradeSubscription: () => void;
 };
@@ -30,7 +30,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
-  const { spaceSubscription, freeTrialEnds } = useSpaceSubscription();
+  const { subscriptionEnded } = useSpaceSubscription();
 
   const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
@@ -68,10 +68,10 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   useEffect(() => {
-    if (spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0) {
+    if (subscriptionEnded) {
       openUpgradeSubscription();
     }
-  }, [spaceSubscription?.status, freeTrialEnds]);
+  }, [subscriptionEnded]);
 
   function openUpgradeSubscription() {
     onClick('subscription');
@@ -82,7 +82,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       open: settingsModalState.isOpen,
       activePath,
       onClick,
-      onClose,
+      onClose: subscriptionEnded ? () => {} : onClose,
       openUpgradeSubscription
     }),
     [activePath, settingsModalState.isOpen]
