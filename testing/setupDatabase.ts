@@ -28,7 +28,7 @@ import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { ViewSourceType } from 'lib/focalboard/boardView';
+import type { ViewSourceType } from 'lib/focalboard/board';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';

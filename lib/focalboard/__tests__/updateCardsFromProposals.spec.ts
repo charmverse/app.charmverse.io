@@ -1,11 +1,11 @@
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { BoardView } from 'lib/focalboard/boardView';
 import { InvalidStateError } from 'lib/middleware';
-import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBoard } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { extractCardProposalProperties } from '../extractCardProposalProperties';
@@ -18,12 +18,13 @@ describe('updateCardsFromProposals()', () => {
   let board: Page;
 
   beforeAll(async () => {
-    const generated = await generateUserAndSpaceWithApiToken();
+    const generated = await testUtilsUser.generateUserAndSpace();
     user = generated.user;
     space = generated.space;
     board = await generateBoard({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      viewDataSource: 'proposals'
     });
   });
 

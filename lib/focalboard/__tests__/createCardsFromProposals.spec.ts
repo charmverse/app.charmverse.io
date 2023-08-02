@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
@@ -16,12 +16,13 @@ describe('createCardsFromProposals', () => {
   let board: Page;
 
   beforeAll(async () => {
-    const generated = await generateUserAndSpaceWithApiToken();
+    const generated = await testUtilsUser.generateUserAndSpace();
     user = generated.user;
     space = generated.space;
     const generatedBoard = await generateBoard({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      viewDataSource: 'proposals'
     });
     board = generatedBoard;
   });
@@ -78,7 +79,8 @@ describe('createCardsFromProposals', () => {
     const database = await generateBoard({
       createdBy: user.id,
       spaceId: space.id,
-      views: 1
+      views: 1,
+      viewDataSource: 'proposals'
     });
 
     await createCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id });
@@ -146,7 +148,8 @@ describe('createCardsFromProposals', () => {
 
     const testBoard = await generateBoard({
       createdBy: testUser.id,
-      spaceId: testSpace.id
+      spaceId: testSpace.id,
+      viewDataSource: 'proposals'
     });
 
     const visibleProposal = await testUtilsProposals.generateProposal({
