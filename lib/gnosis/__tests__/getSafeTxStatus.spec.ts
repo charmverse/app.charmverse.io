@@ -37,6 +37,7 @@ describe('getGnosisTransactionQueueUrl', () => {
     const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
 
     const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
+
     expect(status?.status).toBe('processing');
 
     getTransactionMock.mockResolvedValue({ value: '1', isExecuted: false, isSuccessful: false });

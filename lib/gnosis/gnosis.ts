@@ -23,10 +23,7 @@ interface GetGnosisServiceProps {
   serviceUrl?: string;
 }
 
-export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): {
-  safeService: SafeServiceClient | null;
-  ethAdapter: EthersAdapter;
-} | null {
+export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
   const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
@@ -42,10 +39,7 @@ export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServi
     ethAdapter
   });
 
-  return {
-    safeService,
-    ethAdapter
-  };
+  return safeService;
 }
 
 interface GetSafesForAddressProps {
@@ -62,10 +56,8 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
     return [];
   }
 
-  const gnosisService = getGnosisService({ signer, serviceUrl });
-  const safeService = gnosisService?.safeService;
-  const ethAdapter = gnosisService?.ethAdapter;
-  if (!safeService || !ethAdapter) {
+  const safeService = getGnosisService({ signer, serviceUrl });
+  if (!safeService) {
     return [];
   }
 
@@ -111,9 +103,9 @@ export async function getSafesForAddresses(signer: ethers.Signer, addresses: str
 }
 
 async function getTransactionsforSafe(signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
-  const gnosisService = getGnosisService({ signer, chainId: wallet.chainId });
-  if (gnosisService?.safeService) {
-    const transactions = await gnosisService.safeService.getPendingTransactions(wallet.address);
+  const safeService = getGnosisService({ signer, chainId: wallet.chainId });
+  if (safeService) {
+    const transactions = await safeService.getPendingTransactions(wallet.address);
     return transactions.results;
   }
   return [];
