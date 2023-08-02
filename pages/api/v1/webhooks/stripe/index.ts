@@ -100,7 +100,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
           deletedAt: null
         };
 
-        const blockQuota = stripeSubscription.items.data[0]?.quantity as number;
+        const blockQuota = stripeSubscription.items.data[0]?.quantity;
 
         await prisma.$transaction([
           prisma.stripeSubscription.upsert({

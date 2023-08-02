@@ -7,7 +7,7 @@ type StripeBaseEvent = BaseEvent & {
 };
 
 export type CreateSubscriptionEvent = StripeBaseEvent & {
-  blockQuota: number;
+  blockQuota?: number;
   period: SubscriptionPeriod;
 };
 
@@ -24,7 +24,7 @@ export type UpdateSubscriptionEvent = StripeBaseEvent & {
 
 export type SubscriptionPaymentEvent = StripeBaseEvent & {
   paymentMethod: 'card' | 'ach' | 'crypto';
-  blockQuota: number;
+  blockQuota?: number;
   period: SubscriptionPeriod;
   status: 'success' | 'failure';
 };
