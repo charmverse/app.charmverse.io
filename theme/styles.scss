@@ -42,6 +42,11 @@ blockquote .bangle-nv-child-container {
   width: 100%;
 }
 
+// remove horizontal padding for emoji picker inside tab panel
+[id^="tabpanel-Emojis"] > div {
+  padding: 8px 0;
+}
+
 // fix for Autofill by Safari turning background yellow - https://stackoverflow.com/questions/41871618/how-to-change-safari-autofill-yellow-background-color
 // Note: we use --bg-gray instead of --bg-input since it is an opaque color
 input:-webkit-autofill,

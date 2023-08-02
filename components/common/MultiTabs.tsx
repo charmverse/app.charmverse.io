@@ -9,18 +9,19 @@ interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   value: React.ReactNode;
   index: number;
+  label: string;
   sx?: SxProps;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, sx = {}, ...other } = props;
+  const { children, value, index, label, sx = {}, ...other } = props;
 
   return (
     <div
       role='tabpanel'
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`tabpanel-${label}-${index}`}
+      aria-labelledby={`tab-${label}-${index}`}
       {...other}
     >
       {value === index && (
@@ -66,9 +67,9 @@ export default function MultiTabs(props: MultiTabsProps) {
           ))}
         </Tabs>
       </Box>
-      {tabs.map(([_, tabComponent], tabIndex) => (
+      {tabs.map(([tabLabel, tabComponent], tabIndex) => (
         /* eslint-disable-next-line */
-        <TabPanel value={value} sx={tabPanelSx} index={tabIndex} key={tabIndex}>
+        <TabPanel value={value} label={tabLabel} sx={tabPanelSx} index={tabIndex} key={tabIndex}>
           {tabComponent}
         </TabPanel>
       ))}
