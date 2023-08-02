@@ -9,9 +9,10 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from './createCardPage';
+import { createCardPage } from '../pages/createCardPage';
+
+import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
-import { extractDatabaseProposalProperties } from './utils';
 
 export async function createCardsFromProposals({
   boardId,
