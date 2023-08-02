@@ -1,3 +1,4 @@
+import type { SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -8,10 +9,11 @@ interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   value: React.ReactNode;
   index: number;
+  sx?: SxProps;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, sx = {}, ...other } = props;
 
   return (
     <div
@@ -22,7 +24,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 3, ...sx }}>
           <Typography component='div'>{children}</Typography>
         </Box>
       )}
@@ -33,11 +35,12 @@ function TabPanel(props: TabPanelProps) {
 interface MultiTabsProps {
   tabs: [string, React.ReactNode][];
   disabled?: boolean;
+  tabPanelSx?: SxProps;
 }
 
 export default function MultiTabs(props: MultiTabsProps) {
   const [value, setValue] = React.useState(0);
-  const { tabs, disabled = false } = props;
+  const { tabs, disabled = false, tabPanelSx = {} } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
     setValue(newValue);
   };
@@ -65,7 +68,7 @@ export default function MultiTabs(props: MultiTabsProps) {
       </Box>
       {tabs.map(([_, tabComponent], tabIndex) => (
         /* eslint-disable-next-line */
-        <TabPanel value={value} index={tabIndex} key={tabIndex}>
+        <TabPanel value={value} sx={tabPanelSx} index={tabIndex} key={tabIndex}>
           {tabComponent}
         </TabPanel>
       ))}
