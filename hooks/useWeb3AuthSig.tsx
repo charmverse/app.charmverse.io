@@ -93,24 +93,10 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
 
-  function getStoredSignature(_account: string): AuthSig | null {
-    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${getAddress(_account)}`);
-
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as AuthSig;
-
-        return parsed;
-      } catch (e) {
-        log.error('Error parsing stored signature', e);
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }
-
   async function loginFromWeb3Account(authSig?: AuthSig) {
+    if (!account) {
+      throw new Error('No wallet address connected');
+    }
     if (!verifiableWalletDetected && !authSig) {
       throw new MissingWeb3AccountError();
     }
@@ -125,7 +111,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
       const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
 
-      setSignature(signature, true);
+      setSignature(account, signature, true);
       setUser(refreshedProfile);
 
       return refreshedProfile;
@@ -135,14 +121,14 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       }
 
       const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
-      setSignature(signature, true);
+      setSignature(account, signature, true);
       setUser(newProfile);
       return newProfile;
     }
   }
-  function setSignature(signature: AuthSig | null, writeToLocalStorage?: boolean) {
+  function setSignature(_account: string, signature: AuthSig | null, writeToLocalStorage?: boolean) {
     if (writeToLocalStorage) {
-      window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
+      window.localStorage.setItem(getStorageKey(_account), JSON.stringify(signature));
     }
 
     // Ensures Lit signature is always in sync
@@ -163,7 +149,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature(account);
-      setSignature(storedWalletSignature);
+      setSignature(account, storedWalletSignature);
     }
     // Case 3: user is switching wallets
     else if (
@@ -179,14 +165,14 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       if (storedSignature) {
         log.debug('Logging user in with previous wallet signature');
         loginFromWeb3Account(storedSignature).catch((e) => {
-          setSignature(null);
+          setSignature(account, null);
           setStoredAccount(null);
           logoutUser();
         });
         // user is currently signed in to a different wallet, log them out
       } else {
         log.debug('Logging out user due to wallet switch');
-        setSignature(null);
+        setSignature(account, null);
         setStoredAccount(null);
         logoutUser();
       }
@@ -237,7 +223,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         address: signatureAddress
       };
 
-      setSignature(generated, true);
+      setSignature(account, generated, true);
       setIsSigning(false);
 
       return generated;
@@ -248,7 +234,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   }
   const logoutWallet = useCallback(() => {
     if (account) {
-      window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
+      window.localStorage.removeItem(getStorageKey(account));
       setWalletAuthSignature(null);
     }
   }, [account]);
@@ -319,6 +305,37 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   );
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
+}
+
+function getStorageKey(address: string) {
+  return `${PREFIX}.wallet-auth-sig-${getAddress(address)}`;
+}
+
+function getStoredSignatureString(address: string) {
+  const value = window.localStorage.getItem(getStorageKey(address));
+  if (value) {
+    return value;
+  }
+  const oldKeyValue = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${address}`);
+  if (oldKeyValue) {
+    log.warn('Found old wallet auth sig key');
+  }
+  return oldKeyValue;
+}
+
+function getStoredSignature(_account: string) {
+  const stored = getStoredSignatureString(_account);
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored) as AuthSig;
+      return parsed;
+    } catch (e) {
+      log.error('Error parsing stored signature', e);
+      return null;
+    }
+  } else {
+    return null;
+  }
 }
 
 export const useWeb3AuthSig = () => useContext(Web3Context);

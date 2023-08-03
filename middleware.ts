@@ -1,14 +1,16 @@
-/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { isTestEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { getSpaceDomainFromUrlPath } from 'lib/utilities/getSpaceDomainFromUrlPath';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
+
+const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
 export async function middleware(req: NextRequest) {
   if (isTestEnv) {
@@ -25,7 +27,7 @@ export async function middleware(req: NextRequest) {
   if (url.pathname.includes('/api/')) return;
   // Skip public pages
   const isPublicPage = DOMAIN_BLACKLIST.some((page) => url.pathname.startsWith(`/${page}`));
-  // console.log('isPublicPage:', isPublicPage);
+
   if (isPublicPage) return;
 
   const host = req.headers.get('host');
@@ -33,11 +35,22 @@ export async function middleware(req: NextRequest) {
   const subdomain = customDomain ? null : getValidSubdomain(host);
   const spaceDomainFromPath = getSpaceDomainFromUrlPath(url.pathname);
 
+  if (FORCE_SUBDOMAINS && !subdomain && !customDomain && spaceDomainFromPath) {
+    // We are on url without subdomain AND domain in path - redirect to subdomain url
+    const subdomainHost = `${spaceDomainFromPath}.${getAppApexDomain()}`;
+    const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
+    const port = isDevEnv ? `:${url.port}` : '';
+    const baseUrl = `${url.protocol}//${subdomainHost}${port}`;
+    const redirectUrl = new URL(pathWithoutSpaceDomain, baseUrl);
+
+    return NextResponse.redirect(redirectUrl);
+  }
+
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
-    const pathWithourSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
-    console.debug(`>>> Redirecting: ${url.pathname} to ${pathWithourSpaceDomain}`);
-    url.pathname = pathWithourSpaceDomain;
+    const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
+
+    url.pathname = pathWithoutSpaceDomain;
 
     return NextResponse.redirect(url);
   }
@@ -45,9 +58,8 @@ export async function middleware(req: NextRequest) {
   const rewriteDomain = customDomain || subdomain;
   if (rewriteDomain) {
     // Subdomain available, rewriting
-
-    console.debug(`>>> Rewriting: ${url.pathname} to /${rewriteDomain}${url.pathname}`);
     url.pathname = `/${rewriteDomain}${url.pathname}`;
+
     return NextResponse.rewrite(url);
   }
 }

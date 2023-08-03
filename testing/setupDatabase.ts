@@ -10,7 +10,6 @@ import type {
   Page,
   Post,
   PostComment,
-  Prisma,
   ProposalStatus,
   Role,
   RoleSource,
@@ -21,12 +20,15 @@ import type {
   Vote,
   WorkspaceEvent
 } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { ViewSourceType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -231,9 +233,9 @@ export async function generateBounty({
   contentText = '',
   spaceId,
   createdBy,
-  status,
+  status = 'open',
   maxSubmissions,
-  approveSubmitters,
+  approveSubmitters = false,
   title = 'Example',
   rewardToken = 'ETH',
   rewardAmount = 1,
@@ -243,8 +245,10 @@ export async function generateBounty({
   page = {},
   type = 'bounty',
   id
-}: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> &
-  Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> &
+}: Pick<Bounty, 'createdBy' | 'spaceId'> &
+  Partial<
+    Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'status' | 'approveSubmitters'>
+  > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
@@ -673,7 +677,8 @@ export async function createVote({
   status = 'InProgress',
   title = 'Vote Title',
   context = 'inline',
-  description = null
+  content,
+  contentText = null
 }: Partial<Vote> &
   Pick<Vote, 'spaceId' | 'createdBy'> & {
     pageId?: string | null;
@@ -728,7 +733,8 @@ export async function createVote({
         }
       },
       type: 'Approval',
-      description
+      content: content ?? Prisma.DbNull,
+      contentText
     },
     include: {
       voteOptions: true
@@ -1050,14 +1056,31 @@ export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
-  cardCount
+  cardCount,
+  views,
+  addPageContent,
+  viewDataSource,
+  boardPageType
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  views?: number;
+  viewDataSource?: ViewSourceType;
+  addPageContent?: boolean;
+  boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({
+    createdBy,
+    spaceId,
+    parentId,
+    cardCount,
+    views,
+    addPageContent,
+    viewDataSource,
+    boardPageType
+  });
 
   const pagePermissions = pageArgs.map((createArg) => ({
     pageId: createArg.data.id as string,

@@ -1,178 +1,160 @@
 import type { Space } from '@charmverse/core/prisma';
 import { useTheme } from '@emotion/react';
-import { Divider, InputLabel, Skeleton, Tooltip, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Stack, Typography } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
-import { capitalize } from 'lodash';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import Link from 'components/common/Link';
-import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
-import { SUBSCRIPTION_PRODUCTS_RECORD } from 'lib/subscription/constants';
-import { inputBackground } from 'theme/colors';
+import { useSessionStorage } from 'hooks/useSessionStorage';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
+
+import Legend from '../Legend';
 
 import { CheckoutForm } from './CheckoutForm';
+import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
+import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
+import { useBlockCount } from './hooks/useBlockCount';
+import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
 import { loadStripe } from './loadStripe';
+import { PlanSelection } from './PlanSelection';
+import { SubscriptionInformation } from './SubscriptionInformation';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
-  const {
-    data: spaceSubscription = null,
-    isLoading,
-    mutate: refetchSpaceSubscription
-  } = useSWR(
-    `${space.id}-subscription`,
-    () => {
-      return charmClient.subscription.getSpaceSubscription({ spaceId: space.id });
-    },
+  const { showMessage } = useSnackbar();
+  const isAdmin = useIsAdmin();
+
+  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
+
+  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>('pending-payment', false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+
+  const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
+    `/api/spaces/${space?.id}/subscription`,
+    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateProSubscriptionRequest } }>) =>
+      charmClient.subscription.createSubscription(arg.spaceId, arg.payload),
     {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false
+      onError() {
+        showMessage('Checkout failed! Please try again', 'error');
+      }
     }
   );
 
-  const isAdmin = useIsAdmin();
+  const { blockCount: blockCountData } = useBlockCount();
 
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const blockCount = blockCountData?.count || 0;
 
-  const { members } = useMembers();
+  const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
+
+  const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
+  const [blockQuota, setBlockQuota] = useState(10);
 
   useEffect(() => {
-    charmClient.track.trackAction('view_subscription', {
-      spaceId: space.id
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
     });
   }, []);
 
-  function handleShowCheckoutForm() {
+  useEffect(() => {
+    // Ensure that we remove the pending screen after the subscription is created
+    if (pendingPayment && spaceSubscription?.id) {
+      setPendingPayment(false);
+    }
+  }, [spaceSubscription?.id, pendingPayment]);
+
+  async function handleShowCheckoutForm() {
+    if (minimumBlockQuota > blockQuota) {
+      setBlockQuota(minimumBlockQuota);
+    }
+
     setShowCheckoutForm(true);
-    charmClient.track.trackAction('initiate_subscription', {
-      spaceId: space.id
-    });
   }
+
+  const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
+    if (_blockQuota) {
+      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
+    } else if (_period) {
+      setPeriod(_period);
+    }
+  };
 
   const theme = useTheme();
 
   const stripePromise = loadStripe();
 
-  return (
-    <Stack>
+  const handleCreateSubscription = async (args: { spaceId: string; payload: CreateProSubscriptionRequest }) => {
+    return createSubscription(args);
+  };
+
+  if (!isAdmin) {
+    return <Typography>Please talk to an administrator about this space.</Typography>;
+  }
+
+  if (space.paidTier === 'enterprise') {
+    return <EnterpriseBillingScreen />;
+  }
+
+  if (!showCheckoutForm) {
+    return (
       <Stack gap={1}>
-        <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
-          {spaceSubscription === null ? 'Upgrade to Community' : 'Space subscription'}
-        </Legend>
-        <Typography>
-          More blocks, user roles, guests, custom domains and more.{' '}
-          <Link href='https://charmverse.io/pricing' target='_blank'>
-            Read about all the benefits
-          </Link>
-        </Typography>
-        {isLoading ? (
-          <Stack gap={1} mt={2}>
-            <Skeleton variant='rectangular' width={150} height={16} />
-            <Skeleton variant='rectangular' width='100%' height={55} />
-            <Skeleton variant='rectangular' width={150} height={16} sx={{ mt: 1 }} />
-            <Skeleton variant='rectangular' width='100%' height={35} />
-          </Stack>
+        {isLoadingSpaceSubscription ? (
+          <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
+        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
+          <SubscriptionInformation
+            minimumBlockQuota={minimumBlockQuota}
+            space={space}
+            spaceSubscription={spaceSubscription}
+            refetchSpaceSubscription={refetchSpaceSubscription}
+          />
         ) : (
-          <>
-            <Stack>
-              <InputLabel>Current tier</InputLabel>
-              <Typography>{capitalize(space.paidTier)}</Typography>
-            </Stack>
-            {spaceSubscription?.period && (
-              <Stack>
-                <InputLabel>Period</InputLabel>
-                <Typography>{capitalize(spaceSubscription.period)}</Typography>
-              </Stack>
-            )}
-            {spaceSubscription?.productId && (
-              <Stack>
-                <InputLabel>Plan</InputLabel>
-                <Stack>
-                  <Typography>
-                    Blocks: 0/{SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].blockLimit}
-                  </Typography>
-                  <Typography>
-                    Members: {members.length}/
-                    {SUBSCRIPTION_PRODUCTS_RECORD[spaceSubscription.productId].monthlyActiveUserLimit}
-                  </Typography>
-                </Stack>
-              </Stack>
-            )}
-            <Divider sx={{ mb: 1 }} />
-            {showCheckoutForm ? (
-              <Elements
-                stripe={stripePromise}
-                options={{
-                  appearance: {
-                    variables: {
-                      colorTextPlaceholder: theme.palette.text.disabled
-                    },
-                    rules: {
-                      '.Label': {
-                        color: theme.palette.text.secondary
-                      },
-                      '.Input:focus': {
-                        boxShadow: `none`,
-                        borderRadius: '2px',
-                        border: `1px solid ${theme.palette.primary.main}`
-                      },
-                      '.Input': {
-                        color: theme.palette.text.primary,
-                        // hex code with opacity channel doesn't work
-                        backgroundColor: theme.palette.mode === 'dark' ? '#252525' : inputBackground,
-                        // css variable doesn't work
-                        border: `1px solid ${
-                          theme.palette.mode === 'dark' ? 'rgba(15, 15, 15, 0.2)' : 'rgba(15, 15, 15, 0.1)'
-                        }`
-                      }
-                    }
-                  }
-                }}
-              >
-                <CheckoutForm
-                  spaceSubscription={spaceSubscription}
-                  refetch={refetchSpaceSubscription}
-                  onCancel={() => setShowCheckoutForm(false)}
-                />
-              </Elements>
-            ) : (
-              <Stack flexDirection='row' gap={1}>
-                {spaceSubscription === null && (
-                  <Tooltip title={!isAdmin ? 'Only admin is able to upgrade space subscription' : ''}>
-                    <div>
-                      <Button
-                        disabled={!isAdmin}
-                        sx={{
-                          width: 'fit-content'
-                        }}
-                        onClick={handleShowCheckoutForm}
-                      >
-                        Upgrade
-                      </Button>
-                    </div>
-                  </Tooltip>
-                )}
-                {/* {spaceSubscription !== null && (
-                  <Button
-                    onClick={() => {
-                      setShowCheckoutForm(false);
-                    }}
-                    color='error'
-                    variant='outlined'
-                  >
-                    Cancel Plan
-                  </Button>
-                )} */}
-              </Stack>
-            )}
-          </>
+          <CreateSubscriptionInformation
+            pendingPayment={pendingPayment || false}
+            spaceSubscription={spaceSubscription}
+            onUpgrade={handleShowCheckoutForm}
+            spaceId={space.id}
+          />
         )}
       </Stack>
+    );
+  }
+
+  return (
+    <Stack gap={1}>
+      <Legend mb={1}>Upgrade to Community</Legend>
+      <Typography>
+        Community Edition includes comprehensive access control, roles, guests, custom domain, API access and more.
+      </Typography>
+      {!!blockCountData && (
+        <PlanSelection
+          disabled={isSubscriptionCreationLoading}
+          onSelect={handlePlanSelect}
+          blockQuotaInThousands={blockQuota}
+          period={period}
+          hideSelection
+        />
+      )}
+      <Elements
+        stripe={stripePromise}
+        options={{
+          appearance: {
+            theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+          }
+        }}
+      >
+        <CheckoutForm
+          space={space}
+          blockQuota={blockQuota}
+          period={period}
+          handlePending={() => setPendingPayment(true)}
+          onCloseCheckout={() => setShowCheckoutForm(false)}
+          handleCreateSubscription={handleCreateSubscription}
+        />
+      </Elements>
     </Stack>
   );
 }

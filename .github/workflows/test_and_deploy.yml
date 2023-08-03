@@ -8,6 +8,11 @@ on:
     branches: [main]
   pull_request:
     branches: ['**']
+  workflow_dispatch:
+    inputs:
+      core_pkg_version:
+        description: 'Core pkg version to update to'
+        required: true
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
@@ -16,29 +21,33 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
+      - name: Print Triggering event context payload
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
+        run: |
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
 
-      - name: Debug
-        shell: bash
-        run: echo -e "Debug" && pwd && ls -a
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-
-      # We might even delete this step since CI seems to work without it
-      - name: Provision API key
-        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
-
-      - name: Build and install API
-        uses: ./.github/actions/build_permissions_api
-        with:
-          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
@@ -56,11 +65,14 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -109,6 +121,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -135,6 +149,7 @@ jobs:
                      -p "3001:3001"     \
                      -e HOST=0.0.0.0    \
                      -e PORT=3001       \
+                     -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
                      --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
@@ -152,6 +167,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -159,6 +175,8 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
@@ -169,6 +187,15 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+          commit_core_pkg_upgrade: true
+
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Build app
         uses: ./.github/actions/build
@@ -190,6 +217,8 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image

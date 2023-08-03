@@ -26,7 +26,7 @@ import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -189,7 +189,7 @@ function EditCommentCharmEditor({
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}
-            key={comment.id + isEditable}
+            key={comment.id + isEditable + comment.updatedAt}
             content={comment.content as PageContent}
             onContentChange={({ doc }) => {
               setCommentContent(doc);

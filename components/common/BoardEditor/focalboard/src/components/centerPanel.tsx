@@ -6,13 +6,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
-import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
+import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
@@ -31,10 +31,10 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
-import { webhookBaseUrl } from 'config/constants';
+import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -45,8 +45,8 @@ import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
@@ -107,7 +107,7 @@ function CenterPanel(props: Props) {
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
@@ -131,6 +131,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
@@ -148,14 +149,24 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards
-    .map((card) => ({ card, page: pages[card.id]! }))
-    .filter(({ page }) => !!page && !page.deletedAt);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
-  if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
+  if (
+    (!groupByProperty ||
+      (_groupByProperty?.type !== 'select' &&
+        _groupByProperty?.type !== 'proposalCategory' &&
+        _groupByProperty?.type !== 'proposalStatus')) &&
+    activeView?.fields.viewType === 'board'
+  ) {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
   let dateDisplayProperty = _dateDisplayProperty;
@@ -329,7 +340,9 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      e.stopPropagation();
+      if (activeView?.fields.viewType !== 'table') {
+        e.stopPropagation();
+      }
     },
     [activeView]
   );
@@ -365,7 +378,7 @@ function CenterPanel(props: Props) {
   ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
-      unassignedOptionIds = groupByProperty.options
+      unassignedOptionIds = (groupByProperty.options ?? [])
         .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
         .map((o: IPropertyOption) => o.id);
     }
@@ -391,7 +404,7 @@ function CenterPanel(props: Props) {
       // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
       fields: sourceBoard?.fields || board.fields
     };
-    const view = createTableView(_board);
+    const view = createTableView({ board: _board, views });
     view.id = uuid();
     view.fields.sourceData = fields.sourceData;
     view.fields.sourceType = fields.sourceType;
@@ -503,6 +516,8 @@ function CenterPanel(props: Props) {
   const isLoadingSourceData =
     !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
+  const readOnlyTitle = activeView?.fields.sourceType === 'proposals';
+  const disableAddingNewCards = activeView?.fields.sourceType === 'proposals';
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -511,7 +526,7 @@ function CenterPanel(props: Props) {
           <PageWebhookBanner
             key={key.apiKey}
             type={key.type}
-            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            url={`${window.location.origin}/${webhookEndpoint}/${key?.apiKey}`}
             sx={{
               ...(isEmbedded && {
                 border: (theme) => `2px solid ${theme.palette.text.primary}`,
@@ -651,6 +666,8 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   addCard={addCard}
                   showCard={showCard}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'table' && (
@@ -668,6 +685,8 @@ function CenterPanel(props: Props) {
                   showCard={showCard}
                   addCard={addCard}
                   onCardClicked={cardClicked}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'calendar' && (
@@ -681,6 +700,7 @@ function CenterPanel(props: Props) {
                   addCard={(properties: Record<string, string>) => {
                     addCard('', true, properties);
                   }}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'gallery' && (
@@ -692,6 +712,7 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   selectedCardIds={state.selectedCardIds}
                   addCard={(show) => addCard('', show)}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
@@ -705,6 +726,7 @@ function CenterPanel(props: Props) {
                 isOpen={state.showSettings === 'view-options'}
                 closeSidebar={closeSettings}
                 groupByProperty={groupByProperty}
+                views={views}
               />
             )}
           </Box>
@@ -723,7 +745,7 @@ export function groupCardsByOptions(
 
   for (const optionId of optionIds) {
     if (optionId) {
-      const option = groupByProperty?.options.find((o) => o.id === optionId);
+      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
       if (groupByProperty && option) {
         const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
@@ -737,7 +759,7 @@ export function groupCardsByOptions(
       // Empty group
       const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },

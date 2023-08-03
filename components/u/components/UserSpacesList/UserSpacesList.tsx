@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesForm } from 'components/common/UserProfile/components/MemberPropertiesForm';
 import { useMemberPropertyValues } from 'components/common/UserProfile/hooks/useMemberPropertyValues';
@@ -61,7 +61,7 @@ export function UserSpacesList({ userId }: Props) {
   const isFormClean = memberDetails.length === 0;
 
   return (
-    <Box mt={4} mb={2}>
+    <Box mt={2} mb={2}>
       <Legend noBorder>My Charmverse Spaces</Legend>
       <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (

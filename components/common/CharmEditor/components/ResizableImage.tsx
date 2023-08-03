@@ -14,6 +14,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
+import { enableDragAndDrop } from '../utils';
+
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import BlockAligner from './BlockAligner';
 import type { CharmNodeViewProps } from './nodeView/nodeView';
@@ -59,7 +61,7 @@ function EmptyImageContainer({
 const StyledImageContainer = styled.div<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
-  margin: 0 auto;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const StyledImage = styled.img`
@@ -200,7 +202,14 @@ function ResizableImage({
   } else {
     return (
       <Resizable initialSize={node.attrs.size} minWidth={MIN_IMAGE_WIDTH} updateAttrs={updateAttrs} onDelete={onDelete}>
-        <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} />
+        <StyledImage
+          onDragStart={() => {
+            const nodePos = getPos();
+            enableDragAndDrop(view, nodePos);
+          }}
+          src={node.attrs.src}
+          alt={node.attrs.alt}
+        />
       </Resizable>
     );
   }

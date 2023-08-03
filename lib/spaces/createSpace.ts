@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -14,6 +15,8 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { communityProduct, defaultFreeTrialBlockQuota } from 'lib/subscription/constants';
+import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
@@ -22,6 +25,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
+import { countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -56,7 +60,7 @@ export async function createWorkspace({
   spaceTemplate = 'default',
   extraAdmins = []
 }: CreateSpaceProps) {
-  let domain = spaceData.domain;
+  let domain = spaceData.domain?.toLowerCase();
 
   if (!domain) {
     domain = await getAvailableDomainName(spaceData.name);
@@ -92,6 +96,7 @@ export async function createWorkspace({
       webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
+      blockQuota: defaultFreeTrialBlockQuota,
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -229,10 +234,31 @@ export async function createWorkspace({
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
+  try {
+    await createProSubscription({
+      //    billingEmail: undefined as any,
+      period: 'monthly',
+      spaceId: space.id,
+      name: spaceData.name,
+      freeTrial: true,
+      blockQuota: defaultFreeTrialBlockQuota
+    });
+  } catch (err) {
+    log.error('Error creating pro subscription', {
+      error: err,
+      spaceId: space.id,
+      productId: communityProduct.id,
+      period: 'monthly'
+    });
+  }
+
   // Add default subscriptions
   if (webhookUrl) {
     await subscribeToAllEvents({ spaceId: space.id, userId });
   }
+
+  // Generate the first count
+  await countSpaceBlocksAndSave({ spaceId: space.id });
 
   logSpaceCreation(space);
 

@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -33,16 +32,13 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
     const { space, user } = await generateUserAndSpaceWithApiToken({}, false);
     const userCookie = await loginUser(user.id);
 
-    const paymentMethodId = v4();
-
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/subscription`)
       .set('Cookie', userCookie)
       .send({
-        paymentMethodId,
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(401);
   });
@@ -52,20 +48,16 @@ describe('POST /api/spaces/[id]/subscription - Create subscription for space', (
     const userCookie = await loginUser(user.id);
 
     await addSpaceSubscription({
-      spaceId: space.id,
-      createdBy: user.id
+      spaceId: space.id
     });
-
-    const paymentMethodId = v4();
 
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/subscription`)
       .set('Cookie', userCookie)
       .send({
-        paymentMethodId,
         period: 'monthly',
         billingEmail: 'test@gmail.com',
-        productId: 'community_5k'
+        productId: 'community'
       })
       .expect(400);
   });

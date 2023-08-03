@@ -31,15 +31,17 @@ const StyledBox = styled(Box)`
   position: relative;
   cursor: pointer;
 `;
+
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
-  const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+  const visibleProperties = getDisplayProperties('gallery');
+  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
     return record;
   }, {} as any);
 
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
@@ -91,12 +93,8 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
           showDiscord={!isDiscordHidden}
           showTwitter={!isTwitterHidden}
         />
-        {properties.map((property) => {
+        {visibleProperties.map((property) => {
           const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);
-          const hiddenInGallery = !property.enabledViews.includes('gallery');
-          if (hiddenInGallery) {
-            return null;
-          }
           switch (property.type) {
             case 'bio': {
               return (
@@ -130,18 +128,16 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
             }
             case 'role': {
               return (
-                member.roles.length !== 0 && (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>
-                      Role
-                    </Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {member.roles.map((role) => (
-                        <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                      ))}
-                    </Stack>
+                <Stack gap={0.5} key={property.id}>
+                  <Typography fontWeight='bold' variant='subtitle2'>
+                    Role
+                  </Typography>
+                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                    {member.roles.map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
-                )
+                </Stack>
               );
             }
             case 'timezone': {

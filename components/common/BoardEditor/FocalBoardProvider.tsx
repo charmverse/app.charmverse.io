@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
@@ -14,7 +13,7 @@ import { initialLoad } from './focalboard/src/store/initialLoad';
 // load focalboard data when a workspace is selected
 function FocalBoardWatcher({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { subscribe } = useWebSocketClient();
 

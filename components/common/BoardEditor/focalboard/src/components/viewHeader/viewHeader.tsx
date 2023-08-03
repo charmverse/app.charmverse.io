@@ -8,7 +8,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -110,7 +110,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
-        viewIds={activeBoard?.fields.viewIds ?? []}
+        viewIds={viewsBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -217,7 +217,12 @@ function ViewHeader(props: Props) {
         {props.embeddedBoardPath && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
+              <span>
+                <IconButton
+                  icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                  style={{ width: '32px' }}
+                />
+              </span>
             </Tooltip>
           </Link>
         )}
@@ -230,7 +235,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && (
+            {!props.readOnlySourceData && activeView.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

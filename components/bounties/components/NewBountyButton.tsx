@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -13,7 +13,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 export function NewBountyButton() {
   const { user } = useUser();
   const router = useRouter();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();

@@ -20,4 +20,12 @@ export class ProposalsListPage extends GlobalPage {
   getProposalRowOpenLocator(proposalId: string): Locator {
     return this.page.locator(`data-test=open-proposal-${proposalId}`);
   }
+
+  getProposalCategoryLocator(categoryId: string) {
+    return this.page.locator(`data-test=proposal-category-${categoryId}`);
+  }
+
+  getProposalCategoryListButtonLocator() {
+    return this.page.locator('data-test=proposal-view-options-desktop').locator(`data-test=proposal-category-list`);
+  }
 }

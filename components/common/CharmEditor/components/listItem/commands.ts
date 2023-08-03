@@ -8,10 +8,10 @@ import {
   NodeSelection,
   ReplaceAroundStep,
   Selection,
-  sinkListItem,
   Slice,
   TextSelection,
-  wrapInList as pmWrapInList
+  wrapInList as pmWrapInList,
+  sinkListItem
 } from '@bangle.dev/pm';
 import type { MoveDirection } from '@bangle.dev/pm-commands';
 import {
@@ -39,7 +39,7 @@ import {
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';
 
-const maxIndentation = 4;
+const maxIndentation = 15;
 
 // Returns the number of nested lists that are ancestors of the given selection
 const numberNestedLists = (resolvedPos: ResolvedPos, nodes: Schema['nodes']) => {
@@ -390,12 +390,90 @@ export function indentList(type: NodeType) {
     if (!listItem) {
       ({ listItem } = state.schema.nodes);
     }
-
     if (isInsideListItem(listItem)(state)) {
       // Record initial list indentation
       const initialIndentationLevel = numberNestedLists(state.selection.$from, state.schema.nodes);
       if (canSink(initialIndentationLevel, state)) {
-        sinkListItem(listItem)(state, extendDispatch(dispatch, handleTodo(state.schema)));
+        const { paragraph } = state.schema.nodes;
+
+        const { $from, $to } = state.selection;
+
+        // Step 1: The current selection is in Item 2 paragraph
+        if ($from.node().type === paragraph) {
+          // Step 2: Go to its parent node and find the 2nd child (orderedList)
+          const parentListItem = $from.node($from.depth - 1);
+          if (parentListItem.childCount > 1) {
+            const childOrderedList = parentListItem.child(1);
+
+            const nodes: Node[] = [];
+            childOrderedList.content.forEach((child) => {
+              const node = state.schema.nodeFromJSON(child.toJSON());
+              nodes.push(node);
+            });
+            const itemType = state.schema.nodes.listItem;
+
+            // Step 3: Copy the content of orderedList
+            // Step 4: Create a new list of the following structure
+            const fragment = Fragment.fromArray([
+              state.schema.nodes.listItem.create(undefined, parentListItem.child(0)),
+              ...nodes
+            ]);
+
+            // Based on https://github.com/ProseMirror/prosemirror-schema-list/blob/master/src/schema-list.ts#LL219C47-L219C47
+            const range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild?.type === itemType);
+            if (!range) return false;
+            const startIndex = range.startIndex;
+            if (startIndex === 0) {
+              if (range.$from.pos === range.$to.pos) {
+                // Regular indentation
+                return false;
+              }
+              // Multi line selection, thus assume indentation
+              return true;
+            }
+            const parent = range.parent;
+            const nodeBefore = parent.child(startIndex - 1);
+            if (nodeBefore.type !== itemType) return false;
+            if (dispatch) {
+              const nestedBefore = nodeBefore.lastChild && nodeBefore.lastChild.type === parent.type;
+              const inner = Fragment.from(nestedBefore ? itemType.create() : null);
+              const slice = new Slice(
+                Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))),
+                nestedBefore ? 3 : 1,
+                0
+              );
+              const before = range.start;
+              const after = range.end;
+              // Combine the transactions together (indenting the list + leveling the children list items), which was not possible in sinkListItem
+              let tr = state.tr
+                .step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice, 1, true))
+                .replace(
+                  $from.start($from.depth - 1) - (nestedBefore ? 3 : 1),
+                  $from.end($from.depth - 1),
+                  new Slice(fragment, fragment.firstChild ? 0 : 1, fragment.lastChild ? 0 : 1)
+                );
+              // Retain the previous selection
+              tr = tr.setSelection(TextSelection.create(tr.doc, $from.start() - 2));
+              // Step 5: Replace the whole listItem node with the above fragment
+              dispatch(tr);
+            }
+
+            return true;
+          } else {
+            const sinkedListItem = sinkListItem(listItem)(state, extendDispatch(dispatch, handleTodo(state.schema)));
+            if (!sinkedListItem) {
+              if ($from.pos === $to.pos) {
+                // Regular indentation
+                return false;
+              }
+              // Multi line selection, thus assume indentation
+              return true;
+            }
+            return true;
+          }
+        }
+
+        return false;
       }
       return true;
     }

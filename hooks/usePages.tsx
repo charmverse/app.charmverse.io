@@ -47,7 +47,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 });
 
 export function PagesProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace, spaceRole } = useCurrentSpace();
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
@@ -219,26 +219,29 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const handleNewPageEvent = useCallback((value: WebSocketPayload<'pages_created'>) => {
-    const newPages = value.reduce<PagesMap>((pageMap, page) => {
-      if (page.spaceId === currentSpaceId.current) {
-        pageMap[page.id] = page;
-      }
-      return pageMap;
-    }, {});
+  const handleNewPageEvent = useCallback(
+    (value: WebSocketPayload<'pages_created'>) => {
+      const newPages = value.reduce<PagesMap>((pageMap, page) => {
+        if (page.spaceId === currentSpaceId.current) {
+          pageMap[page.id] = page;
+        }
+        return pageMap;
+      }, {});
 
-    mutatePagesList(
-      (existingPages) => {
-        return {
-          ...(existingPages ?? {}),
-          ...newPages
-        };
-      },
-      {
-        revalidate: false
-      }
-    );
-  }, []);
+      mutatePagesList(
+        (existingPages) => {
+          return {
+            ...(existingPages ?? {}),
+            ...newPages
+          };
+        },
+        {
+          revalidate: false
+        }
+      );
+    },
+    [spaceRole]
+  );
 
   const handleDeleteEvent = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
     mutatePagesList(
@@ -262,16 +265,20 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   }, [currentSpace]);
 
   useEffect(() => {
+    let unsubscribeFromNewPages: (() => void) | undefined;
+    if (spaceRole && !spaceRole.isGuest) {
+      unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
+    }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
-    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
+
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
-      unsubscribeFromNewPages();
+      unsubscribeFromNewPages?.();
       unsubscribeFromPageDeletes();
     };
-  }, []);
+  }, [spaceRole]);
 
   const value: PagesContext = useMemo(
     () => ({

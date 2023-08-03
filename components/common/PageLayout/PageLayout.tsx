@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Tooltip, Box } from '@mui/material';
+import { Tooltip, Box, Typography } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
@@ -11,6 +11,8 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
+import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
+import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -20,12 +22,11 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
-import { PaidAnnouncementBanner } from '../Banners/PaidAnnouncementBanner';
-
+import { AnnouncementBanner } from './components/AnnouncementBanner';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, headerHeight } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
-import Sidebar from './components/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
 const MIN_SIDEBAR_WIDTH = 200;
@@ -152,8 +153,9 @@ function PageLayout({ children }: PageLayoutProps) {
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const space = useCurrentSpace();
-
+  const { space } = useCurrentSpace();
+  const { spaceSubscription } = useSpaceSubscription();
+  const { blockCount } = useBlockCount();
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
   const { accessChecked, publicPage } = useSharedPage();
@@ -190,6 +192,10 @@ function PageLayout({ children }: PageLayoutProps) {
     [handleDrawerClose, !!user, isMobile]
   );
 
+  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
+  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
+  const showUpgradeBanner = spaceSubscription && !!user && passedBlockQuota && space?.paidTier !== 'enterprise';
+
   if (!accessChecked) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
@@ -219,7 +225,14 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    <PaidAnnouncementBanner />
+                    {showUpgradeBanner && (
+                      <AnnouncementBanner hideClose={true} errorBackground>
+                        <Typography>
+                          This space has passed the block limit of{' '}
+                          <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
+                        </Typography>
+                      </AnnouncementBanner>
+                    )}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

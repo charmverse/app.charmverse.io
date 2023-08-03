@@ -97,7 +97,8 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
         }
       },
       spaceId: true,
-      description: true,
+      content: true,
+      contentText: true,
       title: true,
       id: true,
       createdAt: true,
@@ -126,7 +127,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
       (vote) =>
         ({
           createdAt: vote.createdAt.toString(),
-          description: vote.description ?? '',
+          description: vote.contentText ?? '',
           organizationId: vote.spaceId,
           title: vote.title || vote.page?.title,
           voteId: vote.id,

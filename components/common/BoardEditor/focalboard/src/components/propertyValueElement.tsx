@@ -1,14 +1,16 @@
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import mutator from '../mutator';
@@ -22,7 +24,7 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
+import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -35,6 +37,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   showTooltip?: boolean;
   wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
 };
 
 function PropertyValueElement(props: Props) {
@@ -94,14 +97,23 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
+  if (
+    propertyTemplate.type === 'select' ||
+    propertyTemplate.type === 'multiSelect' ||
+    propertyTemplate.type === 'proposalCategory' ||
+    propertyTemplate.type === 'proposalStatus'
+  ) {
     propertyValueElement = (
       <SelectProperty
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
-        readOnly={readOnly || !board}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
-        options={propertyTemplate.options}
+        options={
+          propertyTemplate.type === 'proposalStatus'
+            ? mapProposalStatusPropertyToDisplayValue({ property: propertyTemplate }).options
+            : propertyTemplate.options
+        }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -127,7 +139,7 @@ function PropertyValueElement(props: Props) {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
         wrapColumn={props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {
@@ -172,17 +184,20 @@ function PropertyValueElement(props: Props) {
   const commonProps = {
     className: 'octo-propertyvalue',
     placeholderText: emptyDisplayValue,
-    readOnly,
+    readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,
+    displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
     onSave: () => {
       mutator.changePropertyValue(card, propertyTemplate.id, value);
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-    spellCheck: propertyTemplate.type === 'text'
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false,
+    columnRef: props.columnRef
   };
 
   if (editableFields.includes(propertyTemplate.type)) {
@@ -216,4 +231,4 @@ function PropertyValueElement(props: Props) {
   return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);

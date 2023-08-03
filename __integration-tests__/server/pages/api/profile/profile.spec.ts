@@ -20,9 +20,11 @@ beforeAll(async () => {
 
 describe('PUT /api/profile - Update user profile', () => {
   it('should allow the user to set an unstoppable domain as their username, responding with 200', async () => {
+    const domainValue = `test-domain-${v4()}`;
+
     const domain = await prisma.unstoppableDomain.create({
       data: {
-        domain: 'test-domain',
+        domain: domainValue,
         user: {
           connect: {
             id: user.id

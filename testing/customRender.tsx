@@ -10,7 +10,8 @@ import type { IContext } from 'hooks/useUser';
 import { UserContext } from 'hooks/useUser';
 import { createThemeLightSensitive } from 'theme';
 
-import { createMockSpace, createMockUser } from './mocks/user';
+import { createMockSpace } from './mocks/space';
+import { createMockUser } from './mocks/user';
 
 export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions }: { value?: Partial<IContext> }) => {
   const theme = createThemeLightSensitive('light');
@@ -50,6 +51,8 @@ export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions
           >
             <SnackbarContext.Provider
               value={{
+                autoHideDuration: 5000,
+                setAutoHideDuration: () => {},
                 isOpen: false,
                 handleClose: () => {},
                 showMessage: () => {},

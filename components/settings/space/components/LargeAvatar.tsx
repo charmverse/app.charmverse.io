@@ -10,7 +10,7 @@ import AvatarWithIcons from 'components/common/AvatarWithIcons';
 import { NftAvatarGalleryPopup } from 'components/common/UserProfile/components/NftAvatarGallery/NftAvatarGalleryPopup';
 import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditMenu';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
-import type { NftData } from 'lib/blockchain/interfaces';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import type { UserAvatar } from 'lib/users/interfaces';
 
@@ -67,7 +67,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
 
-  function onNftSelect(nft: NftData) {
+  function onNftSelect(nft: NFTData) {
     const userAvatar: UserAvatar = {
       avatar: nft.image,
       avatarContract: nft.contract,
@@ -94,7 +94,10 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
-  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput(updateImageAvatar);
+  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
+    onFileUpload: updateImageAvatar,
+    resize: true
+  });
 
   function onEditClick(event: React.MouseEvent<HTMLElement>) {
     if (canSetNft) {

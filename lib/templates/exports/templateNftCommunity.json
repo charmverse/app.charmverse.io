@@ -3138,7 +3138,7 @@
                         ]
                       },
                       {
-                        "text": "/opensea",
+                        "text": "/nft",
                         "type": "text",
                         "marks": [
                           {
@@ -3151,15 +3151,10 @@
                 ]
               },
               {
-                "type": "columnLayout",
+                "type": "paragraph",
                 "attrs": {
                   "track": []
-                },
-                "content": [
-                  {
-                    "type": "columnBlock"
-                  }
-                ]
+                }
               },
               {
                 "type": "columnLayout",
@@ -3170,12 +3165,6 @@
                   {
                     "type": "columnBlock",
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
@@ -3200,12 +3189,6 @@
                     "type": "columnBlock",
                     "content": [
                       {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
-                      {
                         "type": "nft",
                         "attrs": {
                           "chain": 1,
@@ -3228,15 +3211,10 @@
                 ]
               },
               {
-                "type": "columnLayout",
+                "type": "paragraph",
                 "attrs": {
                   "track": []
-                },
-                "content": [
-                  {
-                    "type": "columnBlock"
-                  }
-                ]
+                }
               },
               {
                 "type": "columnLayout",
@@ -3247,12 +3225,6 @@
                   {
                     "type": "columnBlock",
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
@@ -3276,12 +3248,6 @@
                   {
                     "type": "columnBlock",
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {

@@ -10,10 +10,13 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-
+import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/browser';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
+// pages that should be always available to logged in users
+const publicLoggedInPages = ['createSpace'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -24,7 +27,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
-  const hasSpaceDomain = !!spaceDomain;
 
   useEffect(() => {
     const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
@@ -47,7 +49,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
 
     async function authCheckAndRedirect(path: string) {
-      const result = await authCheck(path);
+      const result = await authCheck(path, spaceDomain);
 
       setAuthorized(result.authorized);
 
@@ -63,10 +65,10 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     return () => {
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, user, spaces]);
+  }, [isLoading, user, spaces, spaceDomain, router.query?.returnUrl]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
+  async function authCheck(url: string, _spaceDomain: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
     const path = url.split('?')[0];
 
     const firstPathSegment =
@@ -76,38 +78,48 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
       })[0] ?? '/';
     const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath);
     // special case, when visiting main app url on space subdomain
-    const isSpaceSubdomainPath = firstPathSegment === '/' && !!spaceDomain;
+    const isSpaceSubdomainPath = firstPathSegment === '/' && !!_spaceDomain;
+    // visiting page that shoould be alway available to logged in users
+    const isAvailableToLoggedInUsers = publicLoggedInPages.some((basePath) => firstPathSegment === basePath);
 
     // condition: public page
     if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
       return { authorized: true };
     }
 
-    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
-      return { authorized: true };
-    }
-
     // condition: no user session and no wallet address
     else if (!user) {
-      // condition: space subdomain / custom domain main path
-      // do not redirect - it will display login
-      if (isSpaceSubdomainPath) {
+      if (getValidCustomDomain()) {
+        // if app is running on a custom domain, main url will handle login
         return { authorized: true };
       }
 
+      // if app is running on a subdomain, redirect to main app login
+      if (shouldRedirectToAppLogin() && redirectToAppLogin()) {
+        return { authorized: false };
+      }
+
       log.info('[RouteGuard]: redirect to login');
-      return {
-        authorized: true,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
+
+      // Don't return a redirect if we already have a return url
+      if (router.query.returnUrl) {
+        return {
+          authorized: true
+        };
+      } else {
+        return {
+          authorized: true,
+          redirect: {
+            pathname: '/',
+            query: { returnUrl: router.asPath }
+          }
+        };
+      }
     }
     // condition: trying to access a space without access
-    else if (hasSpaceDomain && !filterSpaceByDomain(spaces, spaceDomain)) {
+    else if (!isAvailableToLoggedInUsers && !!_spaceDomain && !filterSpaceByDomain(spaces, _spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
-      if (authorizedSpaceDomainRef.current === spaceDomain) {
+      if (authorizedSpaceDomainRef.current === _spaceDomain) {
         authorizedSpaceDomainRef.current = '';
         return {
           authorized: false,
@@ -121,11 +133,11 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         authorized: false,
         redirect: {
           pathname: '/join',
-          query: { domain: spaceDomain, returnUrl: router.asPath }
+          query: { domain: _spaceDomain, returnUrl: router.asPath }
         }
       };
     } else {
-      authorizedSpaceDomainRef.current = spaceDomain;
+      authorizedSpaceDomainRef.current = _spaceDomain;
       return { authorized: true };
     }
   }

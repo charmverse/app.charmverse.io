@@ -1,9 +1,28 @@
 import { GET } from '@charmverse/core/http';
-import { log } from '@charmverse/core/log';
-import orderBy from 'lodash/orderBy';
 
-export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
-export type SupportedChainId = (typeof SupportedChainIds)[number];
+import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
+import { paginatedCall } from 'lib/utilities/async';
+import { typedKeys } from 'lib/utilities/objects';
+import { isTruthy } from 'lib/utilities/types';
+
+import type { NFTData } from '../getNFTs';
+
+import { toInt } from './ankr';
+
+// Find supported chains: https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
+const alchemyApis = {
+  1: 'eth-mainnet',
+  5: 'eth-goerli',
+  10: 'opt-mainnet',
+  137: 'polygon-mainnet',
+  80001: 'polygon-mumbai',
+  42161: 'arb-mainnet'
+} as const;
+
+export const supportedChainIds = typedKeys(alchemyApis);
+export type SupportedChainId = (typeof supportedChainIds)[number];
+
+export const supportedMainnets: SupportedChainId[] = [1, 10, 137, 42161];
 
 interface NftMedia {
   bytes: number;
@@ -47,15 +66,6 @@ interface AlchemyNftResponse {
   pageKey?: string; // 100 nfts per page
 }
 
-const alchemyApis: Record<SupportedChainId, string> = {
-  1: 'eth-mainnet',
-  4: 'eth-rinkeby',
-  5: 'eth-goerli',
-  137: 'polygon-mainnet',
-  80001: 'polygon-mumbai',
-  42161: 'arb-mainnet'
-};
-
 const FILTERED_NFT_CONTRACTS = [
   '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85' // ENS
 ];
@@ -68,6 +78,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
   }
 
   const apiSubdomain = alchemyApis[chainId];
+  if (!apiSubdomain) throw new Error(`Chain id "${chainId}" not supported by Alchemy`);
   const apiSuffixPath = apiSuffix ? `${apiSuffix}/` : '';
 
   if (!apiSubdomain) {
@@ -78,47 +89,40 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 };
 
 // Docs: https://docs.alchemy.com/reference/getnfts
-export const getAddressNfts = async (address: string, chainId: SupportedChainId = 1) => {
+export async function getNFTs({
+  address,
+  chainId = 1,
+  walletId
+}: {
+  address: string;
+  chainId: SupportedChainId;
+  walletId: string;
+}): Promise<NFTData[]> {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
   const filterSpam = chainId === 1 || chainId === 137;
 
-  let pageKey: string | undefined;
-  const nfts: AlchemyNft[] = [];
-  do {
-    const res = await GET<AlchemyNftResponse>(url, {
-      owner: address,
-      pageKey,
-      // Only use spam filters on chains we know that work.
-      // Including the request params throw an error when calling for Arbitrum, maybe others
-      ...(filterSpam
-        ? {
-            spamConfidenceLevel: 'HIGH',
-            excludeFilters: ['SPAM']
-          }
-        : {})
-    }).catch((err) => {
-      log.error('Error fetching nfts from alchemy', err);
-      return Promise.reject(err);
-    });
-    pageKey = res.pageKey;
-    nfts.push(...res.ownedNfts);
-  } while (pageKey);
+  const responses = await paginatedCall(
+    (params) => {
+      return GET<AlchemyNftResponse>(url, {
+        ...params,
+        owner: address,
+        // Only use spam filters on chains we know that work.
+        // Including the request params throw an error when calling for Arbitrum, maybe others
+        ...(filterSpam
+          ? {
+              spamConfidenceLevel: 'HIGH',
+              excludeFilters: ['SPAM']
+            }
+          : {})
+      });
+    },
+    (response) => (response.pageKey ? { pageKey: response.pageKey } : null)
+  );
 
-  return { address, chainId, nfts };
-};
-
-export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
-  const promises = addresses.map((address) => getAddressNfts(address, chainId));
-
-  const results = await Promise.allSettled(promises);
-  const nfts = results
-    .reduce((acc: AlchemyNft[], res) => {
-      if (res.status === 'fulfilled') {
-        return [...acc, ...res.value.nfts.map((nft) => ({ ...nft, walletAddress: res.value.address }))];
-      } else {
-        return acc;
-      }
-    }, [])
+  const mappedNfts = responses
+    // extract nft array from responses
+    .map((response) => response.ownedNfts)
+    .flat()
     // Filter out invalid NFTs
     .filter((n) => {
       if (FILTERED_NFT_CONTRACTS.includes(n.contract.address)) {
@@ -128,27 +132,72 @@ export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1
       if (n.error) {
         return false;
       }
-      // No artwork found (animations and videos dont seem to be picked up)
+      // No artwork found (animations and videos dotimeLastUpdatednt seem to be picked up)
       if (!n.media[0].gateway) {
         return false;
       }
       return true;
-    });
-  const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
+    })
+    .map((nft) => mapNFTData(nft, walletId, chainId))
+    .filter(isTruthy);
 
-  return sortedNfts;
-};
+  return mappedNfts;
+}
 
-export const getNFT = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
+export async function getNFT({
+  address,
+  tokenId,
+  chainId = 1
+}: {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+}) {
   const url = `${getAlchemyBaseUrl(chainId)}/getNFTMetadata`;
-  const res = await GET<AlchemyNft>(url, { contractAddress, tokenId });
+  const res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId });
+  return mapNFTData(res, null, chainId);
+}
 
-  return res;
-};
-
-export const getOwners = async (contractAddress: string, tokenId: string, chainId: SupportedChainId = 1) => {
+export async function getNFTOwners({
+  address,
+  tokenId,
+  chainId = 1
+}: {
+  address: string;
+  tokenId: string;
+  chainId: SupportedChainId;
+}) {
   const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
-  const res = await GET<{ owners: string[] }>(url, { contractAddress, tokenId });
+  const res = await GET<{ owners: string[] }>(url, { contractAddress: address, tokenId });
 
   return res.owners;
-};
+}
+
+function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: SupportedChainId): NFTData | null {
+  if (nft.error) {
+    // errors include "Contract does not have any code"
+    return null;
+  }
+  const tokenIdInt = toInt(nft.id.tokenId);
+  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdInt }) ?? '';
+
+  // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
+  const image = nft.media[0].gateway?.startsWith('https://') ? nft.media[0].gateway : nft.media[0].raw;
+  return {
+    id: `${nft.contract.address}:${nft.id.tokenId}`,
+    tokenId: nft.id.tokenId,
+    tokenIdInt,
+    contract: nft.contract.address,
+    imageRaw: nft.media[0].raw,
+    image,
+    imageThumb: nft.media[0].thumbnail,
+    title: nft.title,
+    description: nft.description,
+    chainId,
+    timeLastUpdated: nft.timeLastUpdated,
+    isHidden: false,
+    isPinned: false,
+    link,
+    walletId
+  };
+}

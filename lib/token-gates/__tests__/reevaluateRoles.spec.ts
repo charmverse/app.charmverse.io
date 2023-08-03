@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import * as litSDK from 'lit-js-sdk';
+import * as litSDK from '@lit-protocol/lit-node-client';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
@@ -8,7 +8,7 @@ import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDat
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('lit-js-sdk');
+jest.mock('@lit-protocol/lit-node-client');
 
 // @ts-ignore
 const mockedLitSDK: jest.Mocked<typeof litSDK> = litSDK;
@@ -18,6 +18,7 @@ describe('reevaluateRoles', () => {
   let space: Space;
 
   beforeAll(() => {
+    // @ts-ignore didnt want to add 45 more properties we dont use to make this compile
     mockedLitSDK.LitNodeClient.mockImplementation(() => ({
       ready: true,
       connect: () => Promise.resolve(),
@@ -58,7 +59,7 @@ describe('reevaluateRoles', () => {
     const role2 = await generateRole({ spaceId: space.id, createdBy: user.id });
     await updateTokenGateRoles([role1.id, role2.id], tokenGate.id);
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {
@@ -86,7 +87,7 @@ describe('reevaluateRoles', () => {
     await updateTokenGateRoles([role1.id, role2.id], tokenGate.id);
     await assignRole({ roleId: role1.id, userId: user.id });
 
-    mockedLitSDK.verifyJwt.mockResolvedValue(
+    mockedLitSDK.verifyJwt.mockReturnValue(
       verifiedJWTResponse({
         verified: true,
         payload: {

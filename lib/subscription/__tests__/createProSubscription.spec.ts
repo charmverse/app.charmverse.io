@@ -1,178 +1,263 @@
-/* eslint-disable camelcase */
-
-import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { stripeMock, stripeMockIds } from 'testing/stripeMock';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
-import { SUBSCRIPTION_PRODUCTS_RECORD } from '../constants';
+import { communityProduct } from '../constants';
 import { createProSubscription } from '../createProSubscription';
 import { stripeClient } from '../stripe';
 
-jest.mock('../stripe', () => ({
-  stripeClient: {
-    customers: {
-      create: jest.fn(),
-      list: jest.fn()
-    },
-    products: {
-      retrieve: jest.fn()
-    },
-    subscriptions: {
-      create: jest.fn()
-    }
-  }
-}));
+jest.doMock('../stripe', () => ({ ...stripeMock }));
 
 describe('createProSubscription', () => {
-  it('should successfully create pro subscription for space and return client secret along with subscriptionId', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-
-    const paymentMethodId = v4();
-    const subscriptionId = v4();
-    const client_secret = v4();
-    const customerId = v4();
-    const productId = v4();
-    const paymentId = v4();
-
-    const createCustomersMockFn = jest.fn().mockResolvedValue({
-      id: customerId
-    });
-
-    const retrieveProductsMockFn = jest.fn().mockResolvedValue({
-      id: productId
-    });
-
-    const listCustomersMockFn = jest.fn().mockResolvedValue({
-      data: []
-    });
+  it('should successfully create pro subscription in Stripe and return client secret and payment intent', async () => {
+    const { space } = await generateUserAndSpaceWithApiToken();
 
     const createSubscriptionsMockFn = jest.fn().mockResolvedValue({
-      id: subscriptionId,
+      id: stripeMockIds.subscriptionId,
       latest_invoice: {
+        id: stripeMockIds.invoiceId,
         payment_intent: {
-          client_secret,
-          status: 'succeeded',
-          id: paymentId
+          client_secret: stripeMockIds.clientSecret,
+          status: 'incomplete',
+          id: stripeMockIds.paymentId
         }
-      }
+      },
+      metadata: {
+        spaceId: space.id,
+        tier: 'community',
+        period: 'monthly',
+        productId: communityProduct.id
+      },
+      customer: {
+        id: stripeMockIds.customerId,
+        metadata: {
+          spaceId: space.id,
+          domain: space.domain
+        },
+        email: 'test@gmail.com'
+      },
+      coupon: stripeMockIds.couponId
     });
 
-    (stripeClient.customers.create as jest.Mock<any, any>) = createCustomersMockFn;
-    (stripeClient.products.retrieve as jest.Mock<any, any>) = retrieveProductsMockFn;
     (stripeClient.subscriptions.create as jest.Mock<any, any>) = createSubscriptionsMockFn;
-    (stripeClient.customers.list as jest.Mock<any, any>) = listCustomersMockFn;
+    (stripeClient.subscriptions.list as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.list;
+    (stripeClient.subscriptions.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.retrieve;
+    (stripeClient.subscriptions.del as jest.Mock<any, any>) = stripeMock.stripeClient.subscriptions.del;
+    (stripeClient.customers.create as jest.Mock<any, any>) = stripeMock.stripeClient.customers.create;
+    (stripeClient.customers.update as jest.Mock<any, any>) = stripeMock.stripeClient.customers.update;
+    (stripeClient.customers.search as jest.Mock<any, any>) = stripeMock.stripeClient.customers.search;
+    (stripeClient.prices.list as jest.Mock<any, any>) = stripeMock.stripeClient.prices.list;
+    (stripeClient.coupons.retrieve as jest.Mock<any, any>) = stripeMock.stripeClient.coupons.retrieve;
+    (stripeClient.promotionCodes.list as jest.Mock<any, any>) = stripeMock.stripeClient.promotionCodes.list;
 
-    const { clientSecret, paymentIntentStatus } = await createProSubscription({
-      paymentMethodId,
-      period: 'monthly',
-      spaceId: space.id,
-      productId: 'community_5k',
-      userId: user.id,
-      billingEmail: 'test@gmail.com'
-    });
-
-    expect(createCustomersMockFn).toHaveBeenCalledWith({
-      name: space.name,
-      payment_method: paymentMethodId,
-      invoice_settings: { default_payment_method: paymentMethodId },
-      email: 'test@gmail.com',
-      metadata: {
-        spaceId: space.id
-      }
-    });
-
-    expect(retrieveProductsMockFn).toHaveBeenCalledWith(`community_5k`);
-
-    expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
-      metadata: {
-        tier: 'pro',
+    const { paymentIntent, blockQuota, email, customerId, invoiceId, priceId, productId, subscriptionId } =
+      await createProSubscription({
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k'
+        blockQuota: 10,
+        billingEmail: 'test@gmail.com',
+        coupon: stripeMockIds.couponId
+      });
+
+    expect(stripeMock.stripeClient.customers.create).toHaveBeenCalledWith({
+      name: space.name,
+      email: 'test@gmail.com',
+      metadata: {
+        spaceId: space.id,
+        domain: space.domain
+      }
+    });
+
+    expect(stripeMock.stripeClient.prices.list).toHaveBeenCalledWith({
+      product: 'community',
+      type: 'recurring',
+      active: true
+    });
+
+    expect(createSubscriptionsMockFn).toHaveBeenCalledWith({
+      coupon: undefined,
+      promotion_code: undefined,
+      metadata: {
+        tier: 'community',
+        period: 'monthly',
+        spaceId: space.id,
+        productId: communityProduct.id
       },
-      customer: customerId,
+      customer: stripeMockIds.customerId,
       items: [
         {
-          price_data: {
-            currency: 'USD',
-            product: productId,
-            unit_amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
-            recurring: {
-              interval: 'month'
-            }
-          }
+          price: stripeMockIds.priceId,
+          quantity: 10
         }
       ],
       payment_settings: {
-        payment_method_types: ['card'],
         save_default_payment_method: 'on_subscription'
       },
+      trial_period_days: undefined,
+      trial_settings: undefined,
+      payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent']
     });
 
-    expect(
-      await prisma.stripeSubscription.findFirstOrThrow({
-        where: {
-          spaceId: space.id,
-          customerId,
-          subscriptionId,
-          productId,
-          period: 'monthly'
-        }
-      })
-    ).not.toBeFalsy();
-
-    expect(
-      await prisma.stripePayment.findFirstOrThrow({
-        where: {
-          amount: SUBSCRIPTION_PRODUCTS_RECORD.community_5k.pricing.monthly * 100,
-          currency: 'USD',
-          paymentId,
-          status: 'success'
-        }
-      })
-    ).not.toBeFalsy();
-
-    expect(paymentIntentStatus).toStrictEqual('succeeded');
-    expect(clientSecret).toStrictEqual(client_secret);
+    expect(paymentIntent?.paymentIntentStatus).toStrictEqual('incomplete');
+    expect(paymentIntent?.clientSecret).toStrictEqual(stripeMockIds.clientSecret);
+    expect(blockQuota).toStrictEqual(10);
+    expect(email).toStrictEqual('test@gmail.com');
+    expect(customerId).toStrictEqual(stripeMockIds.customerId);
+    expect(invoiceId).toStrictEqual(stripeMockIds.invoiceId);
+    expect(priceId).toStrictEqual(stripeMockIds.priceId);
+    expect(productId).toStrictEqual(communityProduct.id);
+    expect(subscriptionId).toStrictEqual(stripeMockIds.subscriptionId);
+    expect(paymentIntent?.coupon).toStrictEqual(stripeMockIds.couponId);
   });
 
   it("should throw error if space doesn't exist", async () => {
-    const paymentMethodId = v4();
-
     await expect(
       createProSubscription({
-        paymentMethodId,
         period: 'monthly',
         spaceId: v4(),
-        productId: 'community_5k',
-        billingEmail: 'test@gmail.com',
-        userId: v4()
+        blockQuota: 10,
+        billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw error if space already has an active subscription', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space } = await generateUserAndSpaceWithApiToken();
+    const subscriptionId = v4();
 
     await addSpaceSubscription({
       spaceId: space.id,
-      createdBy: user.id
+      subscriptionId,
+      customerId: stripeMockIds.customerId
     });
 
-    const paymentMethodId = v4();
+    const retrieveSubscriptionsMockFn = jest.fn().mockResolvedValue({
+      id: subscriptionId,
+      latest_invoice: {
+        payment_intent: {
+          client_secret: stripeMockIds.clientSecret,
+          status: 'incomplete',
+          id: stripeMockIds.paymentId
+        }
+      },
+      metadata: {
+        spaceId: space.id,
+        tier: 'pro',
+        period: 'monthly',
+        productId: communityProduct.id
+      },
+      customer: {
+        id: stripeMockIds.customerId,
+        metadata: {
+          spaceId: space.id,
+          domain: space.domain
+        }
+      },
+      items: {
+        data: [
+          {
+            quantity: 10,
+            price: {
+              id: stripeMockIds.priceId,
+              recurring: {
+                interval: 'month'
+              },
+              unit_amount: 10000
+            }
+          }
+        ]
+      },
+      default_payment_method: {
+        type: 'card',
+        card: {
+          last4: '4242',
+          brand: 'visa'
+        }
+      },
+      status: 'active'
+    });
+
+    (stripeClient.subscriptions.retrieve as jest.Mock<any, any>) = retrieveSubscriptionsMockFn;
 
     await expect(
       createProSubscription({
-        paymentMethodId,
         period: 'monthly',
         spaceId: space.id,
-        productId: 'community_5k',
+        blockQuota: 10,
+        billingEmail: 'test@gmail.com'
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
+  it('should throw error if space already has an active free trial', async () => {
+    const { space } = await generateUserAndSpaceWithApiToken();
+    const subscriptionId = v4();
+
+    await addSpaceSubscription({
+      spaceId: space.id,
+      subscriptionId,
+      customerId: stripeMockIds.customerId
+    });
+
+    const retrieveSubscriptionsMockFn = jest.fn().mockResolvedValue({
+      id: subscriptionId,
+      latest_invoice: {
+        payment_intent: {
+          client_secret: stripeMockIds.clientSecret,
+          status: 'incomplete',
+          id: stripeMockIds.paymentId
+        }
+      },
+      metadata: {
+        spaceId: space.id,
+        tier: 'pro',
+        period: 'monthly',
+        productId: communityProduct.id
+      },
+      customer: {
+        id: stripeMockIds.customerId,
+        metadata: {
+          spaceId: space.id,
+          domain: space.domain
+        }
+      },
+      items: {
+        data: [
+          {
+            quantity: 10,
+            price: {
+              id: stripeMockIds.priceId,
+              recurring: {
+                interval: 'month'
+              },
+              unit_amount: 10000
+            }
+          }
+        ]
+      },
+      default_payment_method: {
+        type: 'card',
+        card: {
+          last4: '4242',
+          brand: 'visa'
+        }
+      },
+      status: 'trialing'
+    });
+
+    (stripeClient.subscriptions.retrieve as jest.Mock<any, any>) = retrieveSubscriptionsMockFn;
+
+    await expect(
+      createProSubscription({
+        period: 'monthly',
+        spaceId: space.id,
+        blockQuota: 10,
         billingEmail: 'test@gmail.com',
-        userId: v4()
+        freeTrial: true
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

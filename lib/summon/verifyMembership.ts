@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 
-import { findUserByIdentity, getUserProfile } from './api';
+import { findUserByIdentity, getUserSummonProfile } from './api';
 
 export type VerificationResponse =
   | {
@@ -70,7 +70,7 @@ export async function verifyMembership({
     if (!summonUserId) {
       return { isVerified: false, reason: 'User does not have a Summon ID' };
     }
-    const summonUserInfo = await getUserProfile(summonUserId);
+    const summonUserInfo = await getUserSummonProfile(summonUserId);
     if (!summonUserInfo) {
       return { isVerified: false, reason: 'User does not have a Summon account' };
     }

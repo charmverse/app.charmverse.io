@@ -64,16 +64,14 @@ export function MemberProperties({ properties }: { properties: PropertyValueWith
           case 'role': {
             const roles = property.value as string[];
             return (
-              roles.length !== 0 && (
-                <Stack key={property.memberPropertyId}>
-                  <Typography fontWeight='bold'>{property.name}</Typography>
-                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {roles.map((role) => (
-                      <Chip label={role} key={role} size='small' variant='outlined' />
-                    ))}
-                  </Stack>
+              <Stack key={property.memberPropertyId}>
+                <Typography fontWeight='bold'>{property.name}</Typography>
+                <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                  {roles.map((role) => (
+                    <Chip label={role} key={role} size='small' variant='outlined' />
+                  ))}
                 </Stack>
-              )
+              </Stack>
             );
           }
           default: {

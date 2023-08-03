@@ -1,8 +1,7 @@
-import type { Space } from '@charmverse/core/prisma';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -11,6 +10,9 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'api', 'subscription'] as const;
 
 export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
+
+export const premiumSettingSections: Extract<SpaceSettingsSection, 'roles' | 'api'>[] = ['roles', 'api'];
+
 type SettingsTab<T extends string> = {
   icon: JSX.Element;
   path: T;
@@ -25,18 +27,8 @@ export const SETTINGS_TABS: SpaceSettingsTab[] = [
   { icon: <GroupAddOutlinedIcon fontSize='small' />, path: 'invites', label: 'Invites' },
   { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
-  { icon: <AttachMoneyIcon fontSize='small' />, path: 'subscription', label: 'Subscription' }
+  { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
 ];
-
-export function getSettingsTabs(space: Space): SpaceSettingsTab[] {
-  return SETTINGS_TABS.filter((settingsTab) =>
-    settingsTab.path === 'subscription' ? space.domain.startsWith('cvt-') : true
-  ).map((settingsTab) =>
-    settingsTab.path === 'subscription'
-      ? { ...settingsTab, label: space.paidTier === 'free' ? 'Upgrade' : 'Plans & Billings' }
-      : settingsTab
-  );
-}
 
 export const accountSettingsSections = ['account', 'profile'] as const;
 

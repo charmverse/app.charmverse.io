@@ -9,7 +9,7 @@ import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';
 import { config } from './config';
-import { DocumentEventHandler } from './documentEvents';
+import { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ServerMessage } from './interfaces';
 import { SpaceEventHandler } from './spaceEvents';
 
@@ -96,6 +96,9 @@ export class WebsocketBroadcaster {
 
     if (!spaceRole) {
       socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
+      return;
+    } else if (spaceRole.isGuest && roomId === spaceRole.spaceId) {
+      socket.send(new SpaceMembershipRequiredError(`Guests cannot subscribe to room events ${roomId}`));
       return;
     }
 

@@ -3,14 +3,20 @@ import type { Space, Prisma } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
+import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
 import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
+import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
 export class SpacesApi {
+  getSpace(spaceId: string) {
+    return http.GET<Space>(`/api/spaces/${spaceId}`);
+  }
+
   searchByDomain(search: string) {
     return http.GET<SpaceWithGates | null>('/api/spaces/search-domain', { search });
   }
@@ -82,5 +88,17 @@ export class SpacesApi {
 
   completeOnboarding({ spaceId }: { spaceId: string }) {
     return http.PUT(`/api/spaces/${spaceId}/onboarding`);
+  }
+
+  getBlockCount({ spaceId }: { spaceId: string }) {
+    return http.GET<BlockCountInfo>(`/api/spaces/${spaceId}/block-count`);
+  }
+
+  updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {
+    return http.PUT<UpdateCustomDomainResponse>(`/api/spaces/${spaceId}/custom-domain`, { customDomain });
+  }
+
+  verifyCustomDomain(spaceId: string) {
+    return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
   }
 }

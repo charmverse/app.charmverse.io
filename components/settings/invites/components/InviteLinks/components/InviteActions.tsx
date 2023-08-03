@@ -10,7 +10,7 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent, SyntheticEvent } from 'react';
 import { memo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu

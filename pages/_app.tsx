@@ -1,4 +1,4 @@
-import { CacheProvider } from '@emotion/react';
+import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
@@ -8,12 +8,12 @@ import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
+import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
@@ -31,6 +31,7 @@ import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
 import { PagesProvider } from 'hooks/usePages';
@@ -44,12 +45,12 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
-import { createEmotionCache } from 'theme/createEmotionCache';
-import '@bangle.dev/tooltip/style.css';
+
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
+import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
@@ -96,15 +97,34 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'lit-share-modal-v3/dist/ShareModal.css';
 import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
+import 'lib/lit-protocol-modal/index.css';
+import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
+import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
+import 'lib/lit-protocol-modal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal';
+import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
+import 'lib/lit-protocol-modal/reusableComponents/litDeleteModal/LitDeleteModal.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitBackButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitFooter.css';
+import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitNextButton.css';
+import 'lib/lit-protocol-modal/reusableComponents/litHeader/LitHeader.css';
+import 'lib/lit-protocol-modal/reusableComponents/litInput/LitInput.css';
+import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading';
+import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading.css';
+import 'lib/lit-protocol-modal/reusableComponents/litReusableSelect/LitReusableSelect.css';
+import 'lib/lit-protocol-modal/reusableComponents/litTokenSelect/LitTokenSelect.css';
+import 'lib/lit-protocol-modal/shareModal/devMode/DevModeContent.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
+import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
+import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css';
+import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
+import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
-
-const clientSideEmotionCache = createEmotionCache();
-
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
@@ -113,9 +133,8 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
 };
-export default function App({ Component, emotionCache = clientSideEmotionCache, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
-  const router = useRouter();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -130,8 +149,9 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
       setIsOldBuild(true);
+      log.info('Requested user to refresh their browser to get new version');
     }
   }, 180000);
 
@@ -145,52 +165,57 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     }
   }, [router.isReady]);
 
-  // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
+  if (router.pathname.startsWith('/authenticate')) {
+    return (
+      <BaseAuthenticateProviders>
+        <Component {...pageProps} />
+      </BaseAuthenticateProviders>
+    );
+  }
+
   return (
-    <CacheProvider value={emotionCache}>
-      <AppThemeProvider>
-        <SnackbarProvider>
-          <ReactDndProvider>
-            <DataProviders>
-              <SettingsDialogProvider>
-                <NotificationsProvider>
-                  <LocalizationProvider>
-                    <FocalBoardProvider>
-                      <NotionProvider>
-                        <IntlProvider>
-                          <PageHead />
+    <AppThemeProvider>
+      <SnackbarProvider>
+        <ReactDndProvider>
+          <DataProviders>
+            <SettingsDialogProvider>
+              <NotificationsProvider>
+                <LocalizationProvider>
+                  <FocalBoardProvider>
+                    <NotionProvider>
+                      <IntlProvider>
+                        <PageHead />
 
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                              {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </IntlProvider>
-                      </NotionProvider>
-                    </FocalBoardProvider>
-                  </LocalizationProvider>
-                </NotificationsProvider>
-              </SettingsDialogProvider>
-            </DataProviders>
-          </ReactDndProvider>
-        </SnackbarProvider>
-      </AppThemeProvider>
-    </CacheProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </NotionProvider>
+                  </FocalBoardProvider>
+                </LocalizationProvider>
+              </NotificationsProvider>
+            </SettingsDialogProvider>
+          </DataProviders>
+        </ReactDndProvider>
+      </SnackbarProvider>
+    </AppThemeProvider>
   );
 }
 
@@ -216,9 +241,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                           <BountiesProvider>
                             <PaymentMethodsProvider>
                               <PagesProvider>
-                                <UserProfileProvider>
-                                  <PageTitleProvider>{children}</PageTitleProvider>
-                                </UserProfileProvider>
+                                <MemberPropertiesProvider>
+                                  <UserProfileProvider>
+                                    <PageTitleProvider>{children}</PageTitleProvider>
+                                  </UserProfileProvider>
+                                </MemberPropertiesProvider>
                               </PagesProvider>
                             </PaymentMethodsProvider>
                           </BountiesProvider>

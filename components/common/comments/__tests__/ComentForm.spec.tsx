@@ -1,5 +1,3 @@
-import type { ClientOptions } from '@uauth/js';
-
 import { customRenderWithContext } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
@@ -8,7 +6,7 @@ jest.mock('hooks/useFirebaseAuth', () => ({
   useFirebaseAuth: {}
 }));
 
-jest.mock('lit-js-sdk', () => ({
+jest.mock('@lit-protocol/lit-node-client', () => ({
   humanizeAccessControlConditions: () => {}
 }));
 

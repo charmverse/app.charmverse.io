@@ -44,7 +44,7 @@ export function UserProfileDialog({
     <StyledDialog toolbar={<div />} fluidSize={fluidSize} onClose={onClickClose}>
       <ScrollableWindow>
         <Container fullWidth={fullWidth} top={20}>
-          {title && <Legend>{title}</Legend>}
+          {title && <Legend wrap>{title}</Legend>}
           {children}
         </Container>
       </ScrollableWindow>

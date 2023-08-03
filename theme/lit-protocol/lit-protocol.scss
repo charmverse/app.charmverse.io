@@ -11,13 +11,13 @@
 
 // begin hide the token search
 
-// :has() is not supported by Firefox, but everyone else
-.lsm-condition-container .lsm-condition-prompt-text:has(+ .lsm-token-select) {
-  display: none;
-}
+// // :has() is not supported by Firefox, but everyone else
+// .lsm-condition-container .lsm-condition-prompt-text:has(+ .lsm-token-select) {
+//   display: none;
+// }
 
-.lsm-token-select {
-  display: none;
-}
+// .lsm-token-select {
+//   display: none;
+// }
 
 // end hide the token search

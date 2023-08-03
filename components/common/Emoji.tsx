@@ -78,7 +78,15 @@ function EmojiIcon({
 }: ComponentProps<typeof Emoji> & { icon: string | ReactNode; size?: ImgSize }) {
   let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
-    iconContent = <img src={icon} />;
+    iconContent = (
+      <img
+        src={icon}
+        // Transferred from notion
+        style={{
+          objectFit: 'cover'
+        }}
+      />
+    );
   } else if (typeof icon === 'string') {
     const twemojiImage = getTwitterEmoji(icon);
     if (twemojiImage) {

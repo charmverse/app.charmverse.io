@@ -42,6 +42,7 @@ interface Props {
   board?: Board;
   parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
+  views: BoardView[];
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
@@ -112,7 +113,7 @@ function ViewSidebar(props: Props) {
       // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
       fields: sourceBoard?.fields || props.parentBoard.fields
     };
-    const newView = createTableView(board, props.view);
+    const newView = createTableView({ board, activeView: props.view, views: props.views });
     newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;
@@ -126,10 +127,10 @@ function ViewSidebar(props: Props) {
   }, [props.isOpen]);
 
   useEffect(() => {
-    if (props.pageId && props.view.fields.sourceType === 'proposals') {
+    if (props.pageId && props.view.fields.sourceType === 'proposals' && props.view.parentId === props.pageId) {
       updateProposalSource({ pageId: props.pageId });
     }
-  }, [props.pageId]);
+  }, [props.pageId, props.view.parentId, props.view.fields.sourceType]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
@@ -162,7 +163,7 @@ function ViewSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {props.view.fields.sourceType && (
+              {props.view.fields.sourceType !== 'proposals' && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
                   icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
