@@ -403,6 +403,8 @@ function CharmEditor({
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
+                view={allProps.view}
+                getPos={allProps.getPos}
                 readOnly={readOnly}
                 base={attrs.base}
                 quote={attrs.quote}

@@ -20,7 +20,7 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
-export default function NoProposalsMessage({ message }: { message: string }) {
+export function NoProposalsMessage({ message }: { message: string }) {
   return (
     <EmptyProposalContainerBox>
       <Center>

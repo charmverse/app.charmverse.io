@@ -13,11 +13,12 @@ import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import NoProposalsMessage from './NoProposalsMessage';
-import ProposalActionsMenu from './ProposalActionsMenu';
-import { ProposalCategoryChip } from './ProposalChip';
-import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
-import { ProposalStatusChip } from './ProposalStatusBadge';
+import { ProposalCategoryChip } from '../ProposalChip';
+import { useProposalDialog } from '../ProposalDialog/hooks/useProposalDialog';
+import { ProposalStatusChip } from '../ProposalStatusBadge';
+
+import { NoProposalsMessage } from './components/NoProposalsMessage';
+import ProposalActionsMenu from './components/ProposalActionsMenu';
 
 export function ProposalsTable({
   proposals,

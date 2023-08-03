@@ -14,9 +14,9 @@ import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { useProposalCategories } from '../hooks/useProposalCategories';
+import { useProposalCategories } from '../../../hooks/useProposalCategories';
 
-import { ProposalCategoryPermissionsDialog } from './permissions/ProposalCategoryPermissions';
+import { ProposalCategoryPermissionsDialog } from './ProposalCategoryPermissionsDialog/ProposalCategoryPermissionsDialog';
 
 type Props = {
   category: ProposalCategoryWithPermissions;

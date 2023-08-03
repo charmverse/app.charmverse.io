@@ -4,17 +4,15 @@ import { ListItemButton, ListItemText } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 
+import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { usePage } from 'hooks/usePage';
-import { useProposal } from 'hooks/useProposal';
-
-import { useProposalDetails } from './hooks/useProposalDetails';
 
 /**
  * We only want to refresh individual page data if user is currently on the page
  */
-export function ArchiveProposalMenuItem({
+export function ArchiveProposalAction({
   proposalId,
   refreshPageOnChange,
   containerStyle = {}
