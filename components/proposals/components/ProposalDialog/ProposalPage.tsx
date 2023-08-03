@@ -21,10 +21,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalFormInputs } from '../interfaces';
+import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
+import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
 import { useProposalDialog } from './hooks/useProposalDialog';
-import { ProposalDialogProperties } from './ProposalDialogProperties';
 
 type Props = {
   setFormInputs: (params: Partial<ProposalFormInputs>) => void;
@@ -32,7 +32,7 @@ type Props = {
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
-
+// Note: this component is only used before a page is saved to the DB
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
@@ -138,7 +138,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                 icon={null}
                 readOnly={false}
                 updatedAt={new Date().toString()}
-                title={formInputs.title}
+                title={formInputs.title || ''}
                 // readOnly={readOnly || !!enableSuggestingMode}
                 setPage={(updatedPage) => {
                   setFormInputs({
@@ -148,9 +148,9 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
-                  <ProposalDialogProperties
-                    // Detect whether proposal page is template
+                  <ProposalProperties
                     isTemplate={false}
+                    proposalStatus='draft'
                     proposalFormInputs={formInputs}
                     setProposalFormInputs={setFormInputs}
                   />

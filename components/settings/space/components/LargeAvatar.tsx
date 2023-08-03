@@ -94,7 +94,10 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
-  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput(updateImageAvatar);
+  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
+    onFileUpload: updateImageAvatar,
+    resize: true
+  });
 
   function onEditClick(event: React.MouseEvent<HTMLElement>) {
     if (canSetNft) {

@@ -12,7 +12,7 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 
-import type { ProposalFormInputs } from '../interfaces';
+import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
 
 import { ProposalPage } from './ProposalPage';
 

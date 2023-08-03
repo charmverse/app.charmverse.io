@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSessionStorage } from 'hooks/useSessionStorage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
@@ -24,10 +26,11 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
+  const isAdmin = useIsAdmin();
 
   const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
-  const [pendingPayment, setPendingPayment] = useState(false);
+  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>('pending-payment', false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
@@ -59,10 +62,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription) {
+    if (pendingPayment && spaceSubscription?.id) {
       setPendingPayment(false);
     }
-  }, [spaceSubscription, pendingPayment]);
+  }, [spaceSubscription?.id, pendingPayment]);
 
   async function handleShowCheckoutForm() {
     if (minimumBlockQuota > blockQuota) {
@@ -88,6 +91,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     return createSubscription(args);
   };
 
+  if (!isAdmin) {
+    return <Typography>Please talk to an administrator about this space.</Typography>;
+  }
+
   if (space.paidTier === 'enterprise') {
     return <EnterpriseBillingScreen />;
   }
@@ -97,11 +104,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
-        ) : pendingPayment && (!spaceSubscription || spaceSubscription.status === 'free_trial') ? (
-          <Typography>
-            Your payment is being processed. This screen will be automatically updated as soon as the process is
-            complete.
-          </Typography>
         ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
           <SubscriptionInformation
             minimumBlockQuota={minimumBlockQuota}
@@ -110,7 +112,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             refetchSpaceSubscription={refetchSpaceSubscription}
           />
         ) : (
-          <CreateSubscriptionInformation onClick={handleShowCheckoutForm} spaceSubscription={spaceSubscription} />
+          <CreateSubscriptionInformation
+            pendingPayment={pendingPayment || false}
+            spaceSubscription={spaceSubscription}
+            onUpgrade={handleShowCheckoutForm}
+            spaceId={space.id}
+          />
         )}
       </Stack>
     );
@@ -118,15 +125,17 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   return (
     <Stack gap={1}>
-      <Legend>Upgrade to Community</Legend>
-      <Typography variant='h6'>Onboard & Engage Community Members</Typography>
-      <Typography>Comprehensive access control, roles, guests, custom domain, API access and more.</Typography>
+      <Legend mb={1}>Upgrade to Community</Legend>
+      <Typography>
+        Community Edition includes comprehensive access control, roles, guests, custom domain, API access and more.
+      </Typography>
       {!!blockCountData && (
         <PlanSelection
           disabled={isSubscriptionCreationLoading}
           onSelect={handlePlanSelect}
           blockQuotaInThousands={blockQuota}
           period={period}
+          hideSelection
         />
       )}
       <Elements

@@ -150,6 +150,10 @@ export function SubscriptionInformation({
         return 'Pending';
       case 'cancel_at_end':
         return 'Your subscription was cancelled and will end on the next billing date';
+      case 'past_due':
+        return `Your subscription is past due. Please check your balance, update your payment details or your subscription will be cancelled.`;
+      case 'unpaid':
+        return `Your subscription is unpaid. Please check your balance, update your payment details or your subscription will be cancelled.`;
       case 'cancelled':
       default:
         return null;
@@ -239,7 +243,7 @@ export function SubscriptionInformation({
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
-      {spaceSubscription?.paymentMethod && (
+      {(!spaceSubscription.paymentMethod || spaceSubscription.paymentMethod.type === 'card') && (
         <>
           <PaymentMethod
             paymentMethod={spaceSubscription.paymentMethod}
