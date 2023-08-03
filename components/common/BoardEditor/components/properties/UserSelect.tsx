@@ -19,7 +19,6 @@ type Props = {
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
-  placeholder?: string;
 };
 
 type ContainerProps = {
@@ -109,8 +108,7 @@ export function UserSelect({
   onChange,
   readOnly,
   showEmptyPlaceholder,
-  wrapColumn,
-  placeholder
+  wrapColumn
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -133,8 +131,8 @@ export function UserSelect({
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
         <Stack gap={0.5}>
-          {showEmptyPlaceholder && memberIds.length === 0 ? (
-            <EmptyPlaceholder>Empty</EmptyPlaceholder>
+          {memberIds.length === 0 ? (
+            showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
             <MembersDisplay
               wrapColumn={wrapColumn ?? false}
@@ -161,7 +159,7 @@ export function UserSelect({
         onChange={_onChange}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={readOnly}
-        placeholder={memberIds.length === 0 ? placeholder || 'Search for an option...' : ''}
+        placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
         inputVariant='standard'
         forcePopupIcon={false}
         renderTags={() => (

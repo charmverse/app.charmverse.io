@@ -103,7 +103,6 @@ export function InputSearchMemberBase({
           placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
-          // eslint-disable-next-line react/jsx-no-duplicate-props
           InputProps={{
             ...params.InputProps,
             disableUnderline: true

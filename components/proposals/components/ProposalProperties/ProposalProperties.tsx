@@ -9,7 +9,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -30,7 +30,6 @@ import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
-import { ReviewersSelect } from './components/ReviewersSelect';
 
 export type ProposalFormInputs = {
   title?: string; // title is saved to the same state that's used in ProposalPage
@@ -337,35 +336,26 @@ export function ProposalProperties({
               </Box>
             </div>
           </Box>
-          <Box justifyContent='space-between' gap={2} alignItems='center'>
-            <div
-              className='octo-propertyrow'
-              style={{
-                display: 'flex',
-                height: 'fit-content',
-                flexGrow: 1
-              }}
-            >
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
-              <div style={{ width: '100%' }}>
-                <ReviewersSelect
-                  disabled={readOnly}
-                  readOnly={readOnly || canUpdateProposalProperties === false}
-                  value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
-                  disableCloseOnSelect
-                  excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
-                  onChange={async (e, options) => {
-                    setProposalFormInputs({
-                      ...proposalFormInputs,
-                      reviewers: options.map((option) => ({ group: option.group, id: option.id }))
-                    });
-                  }}
-                  sx={{
-                    width: '100%'
-                  }}
-                />
-              </div>
-            </div>
+              <UserAndRoleSelect
+                disabled={readOnly}
+                readOnly={readOnly || canUpdateProposalProperties === false}
+                value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
+                disableCloseOnSelect
+                excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
+                onChange={async (e, options) => {
+                  setProposalFormInputs({
+                    ...proposalFormInputs,
+                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
+                  });
+                }}
+                sx={{
+                  width: '100%'
+                }}
+              />
+            </Box>
           </Box>
         </Collapse>
 
