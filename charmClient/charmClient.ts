@@ -16,7 +16,6 @@ import type {
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe,
   UserWallet
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';

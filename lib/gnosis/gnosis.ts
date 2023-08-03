@@ -66,7 +66,7 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
     const { safes } = await getSafesByOwner({ serviceUrl, chainId, address: checksumAddress });
     return Promise.all(
       safes.map(async (safeAddr) => {
-        const safeData = await getSafeData({ serviceUrl, chainId, address: checksumAddress });
+        const safeData = await getSafeData({ serviceUrl, chainId, address: getAddress(safeAddr) });
         return {
           chainId,
           address: safeAddr,
