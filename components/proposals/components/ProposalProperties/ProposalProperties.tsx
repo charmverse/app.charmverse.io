@@ -267,12 +267,12 @@ export function ProposalProperties({
               />
             </Grid>
           )}
-          <Grid container mb={2}>
+          <Grid container mb={1}>
             <Typography variant='subtitle1'>Properties</Typography>
           </Grid>
 
           {/* Select a category */}
-          <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
@@ -288,7 +288,7 @@ export function ProposalProperties({
 
           {/* Select a template */}
           {!isTemplate && isNewProposal && (
-            <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Template</PropertyLabel>
                 <Box display='flex' flex={1}>
@@ -323,7 +323,7 @@ export function ProposalProperties({
               }}
             >
               <PropertyLabel readOnly>Author</PropertyLabel>
-              <div style={{ width: '100%' }}>
+              <Box display='flex' flex={1}>
                 <AuthorsSelect
                   readOnly={readOnly || canUpdateProposalProperties === false}
                   value={proposalAuthorIds}
@@ -334,7 +334,7 @@ export function ProposalProperties({
                     });
                   }}
                 />
-              </div>
+              </Box>
             </div>
           </Box>
           <Box justifyContent='space-between' gap={2} alignItems='center'>
