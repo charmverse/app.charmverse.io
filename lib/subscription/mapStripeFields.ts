@@ -29,9 +29,13 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
       return 'cancelled';
     case 'past_due':
       return 'past_due';
+    // A paused subscription is like an ended trial subscription.
+    // It has 0 days left and the user is obliged to take an action to downgrade or pay for another one.
+    case 'paused':
     case 'trialing':
       return 'free_trial';
     case 'unpaid':
+      return 'unpaid';
     case 'incomplete':
     default:
       log.error(`Invalid subscription status ${subscription.status}`);
@@ -69,7 +73,10 @@ export function mapStripeFields({
   subscription,
   spaceId
 }: {
-  subscription: Stripe.Subscription & { customer: Stripe.Customer };
+  subscription: Stripe.Subscription & {
+    customer: Stripe.Customer;
+    default_payment_method: Stripe.PaymentMethod | null;
+  };
   spaceId: string;
 }): SubscriptionFieldsFromStripe {
   // We expect to always have a quantity, but we'll log an error if we don't
@@ -82,7 +89,8 @@ export function mapStripeFields({
       customerId: subscription.customer.id
     });
   }
-  const paymentDetails = subscription.default_payment_method as Stripe.PaymentMethod | null;
+
+  const paymentDetails = subscription.default_payment_method;
   const paymentType = paymentDetails?.type;
   const paymentCard = paymentDetails?.card?.brand ?? paymentDetails?.us_bank_account?.bank_name;
   const last4 = paymentDetails?.card?.last4 ?? paymentDetails?.us_bank_account?.last4;

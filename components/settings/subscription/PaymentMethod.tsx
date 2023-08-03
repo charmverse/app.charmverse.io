@@ -14,7 +14,7 @@ export function PaymentMethod({
   spaceId,
   refetchSubscription
 }: {
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod | null;
   spaceId: string;
   refetchSubscription: () => void;
 }) {
@@ -27,23 +27,21 @@ export function PaymentMethod({
         <Typography variant='h6' mb={1}>
           Payment Method
         </Typography>
-        <Typography>
-          {paymentMethod.type === 'card' &&
-            `${stringUtils.capitalize(paymentMethod?.brand || '')} **** ${paymentMethod.digits}`}
-          {paymentMethod.type === 'us_bank_account' && `ACH Debit **** ${paymentMethod.digits}`}
-        </Typography>
-        {paymentMethod.type === 'card' && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              appearance: {
-                theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-              }
-            }}
-          >
-            <ChangeCardDetails spaceId={spaceId} refetchSubscription={refetchSubscription} />
-          </Elements>
+        {paymentMethod?.brand && paymentMethod.digits && (
+          <Typography>
+            {stringUtils.capitalize(paymentMethod.brand)} **** {paymentMethod.digits}
+          </Typography>
         )}
+        <Elements
+          stripe={stripePromise}
+          options={{
+            appearance: {
+              theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
+            }
+          }}
+        >
+          <ChangeCardDetails spaceId={spaceId} refetchSubscription={refetchSubscription} />
+        </Elements>
       </Grid>
       <Grid item xs={12} sm={4} />
     </Grid>

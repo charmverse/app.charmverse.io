@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSessionStorage } from 'hooks/useSessionStorage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
@@ -25,6 +26,7 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
+  const isAdmin = useIsAdmin();
 
   const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
@@ -60,10 +62,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription) {
+    if (pendingPayment && spaceSubscription?.id) {
       setPendingPayment(false);
     }
-  }, [spaceSubscription, pendingPayment]);
+  }, [spaceSubscription?.id, pendingPayment]);
 
   async function handleShowCheckoutForm() {
     if (minimumBlockQuota > blockQuota) {
@@ -88,6 +90,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const handleCreateSubscription = async (args: { spaceId: string; payload: CreateProSubscriptionRequest }) => {
     return createSubscription(args);
   };
+
+  if (!isAdmin) {
+    return <Typography>Please talk to an administrator about this space.</Typography>;
+  }
 
   if (space.paidTier === 'enterprise') {
     return <EnterpriseBillingScreen />;
