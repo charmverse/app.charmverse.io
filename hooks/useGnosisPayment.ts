@@ -3,8 +3,10 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
 import { ethers, utils } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import log from 'loglevel';
 
+import * as http from 'adapters/http';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -55,15 +57,38 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       signerOrProvider: signer
     });
 
+    const senderAddress = utils.getAddress(account);
+
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    await safeService.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash: txHash,
-      senderAddress: utils.getAddress(account),
-      senderSignature: senderSignature.data,
-      origin
-    });
+    if (chainId === 5001 || chainId === 5000) {
+      await http.POST(
+        `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/${getAddress(safeAddress)}/propose`,
+        {
+          ...safeTransaction.data,
+          // Need to convert to string because mantle doesn't support big numbers
+          baseGas: safeTransaction.data.baseGas.toString(),
+          gasPrice: safeTransaction.data.gasPrice.toString(),
+          nonce: safeTransaction.data.nonce.toString(),
+          safeTxGas: safeTransaction.data.safeTxGas.toString(),
+          safeTxHash: txHash,
+          sender: senderAddress,
+          signature: senderSignature.data,
+          origin
+        },
+        {
+          credentials: 'omit'
+        }
+      );
+    } else {
+      await safeService.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: txHash,
+        senderAddress,
+        senderSignature: senderSignature.data,
+        origin
+      });
+    }
     onSuccess({ safeAddress, transactions, txHash });
   }
 
