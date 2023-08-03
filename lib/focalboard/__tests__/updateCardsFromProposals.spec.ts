@@ -8,8 +8,9 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createCardsFromProposals } from '../createCardsFromProposals';
+import { extractCardProposalProperties } from '../extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
-import { extractCardProposalProperties, extractDatabaseProposalProperties } from '../utils';
 
 describe('updateCardsFromProposals()', () => {
   let user: User;

@@ -3,13 +3,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from './createCardPage';
+import { createCardPage } from '../pages/createCardPage';
+
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
-import { extractCardProposalProperties, extractDatabaseProposalProperties } from './utils';
 
 export async function updateCardsFromProposals({
   boardId,

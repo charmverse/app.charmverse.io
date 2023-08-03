@@ -48,7 +48,7 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       if (
         !commentPageActionToggledOnce.current &&
         (highlightedCommentId ||
-          (isLargeScreen && cachedInlineCommentData?.find((thread) => thread && !thread.resolved)))
+          (isLargeScreen && cachedInlineCommentData?.some((thread) => thread && !thread.resolved)))
       ) {
         commentPageActionToggledOnce.current = true;
         return setCurrentPageActionDisplay('comments');

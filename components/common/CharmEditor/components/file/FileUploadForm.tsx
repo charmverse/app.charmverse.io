@@ -10,8 +10,9 @@ type Props = {
 };
 
 export function FileUploadForm({ onComplete }: Props) {
-  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } =
-    useS3UploadInput(onComplete);
+  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } = useS3UploadInput({
+    onFileUpload: onComplete
+  });
 
   return (
     <Box

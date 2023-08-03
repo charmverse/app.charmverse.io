@@ -174,6 +174,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
+  enableComments?: boolean;
   pageId?: string;
   postId?: string;
   containerWidth?: number;
@@ -202,6 +203,7 @@ function CharmEditor({
   readOnly = false,
   disablePageSpecificFeatures = false,
   isContentControlled = false,
+  enableComments,
   enableVoting,
   pageId,
   postId,
@@ -349,10 +351,6 @@ function CharmEditor({
       // console.log('destroy charmeditor');
     };
   }, [editorRef.current]);
-
-  const enableComments =
-    !disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate && !!pagePermissions?.comment;
-
   return (
     <StyledReactBangleEditor
       colorMode={colorMode}
@@ -405,6 +403,8 @@ function CharmEditor({
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
+                view={allProps.view}
+                getPos={allProps.getPos}
                 readOnly={readOnly}
                 base={attrs.base}
                 quote={attrs.quote}
