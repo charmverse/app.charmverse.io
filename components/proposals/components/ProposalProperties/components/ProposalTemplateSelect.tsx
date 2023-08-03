@@ -12,7 +12,7 @@ type Props = {
   onChange: (value: PageMeta | null) => void;
 };
 
-export function ProposalTemplateInput({ disabled, options, value, onChange }: Props) {
+export function ProposalTemplateSelect({ disabled, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     value: fancyTrim(option.title || 'Untitled', maxTitleLength)
@@ -29,6 +29,7 @@ export function ProposalTemplateInput({ disabled, options, value, onChange }: Pr
       onChange(option);
     }
   }
+
   return (
     <TagSelect
       wrapColumn

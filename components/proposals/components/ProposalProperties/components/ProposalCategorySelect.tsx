@@ -8,7 +8,7 @@ type Props = {
   onChange: (value: ProposalCategory | null) => void;
 };
 
-export function ProposalCategoryInput({ disabled, options, value, onChange }: Props) {
+export function ProposalCategorySelect({ disabled, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     value: option.title,

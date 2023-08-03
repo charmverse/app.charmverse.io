@@ -17,7 +17,7 @@ import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import { InputSearchReviewers } from 'components/proposals/components/ProposalProperties/components/InputSearchReviewers';
+import { InputSearchReviewers } from 'components/proposals/components/ProposalProperties/components/ReviewersSelect';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';

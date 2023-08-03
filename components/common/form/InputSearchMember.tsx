@@ -57,7 +57,6 @@ export function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
-
   return (
     <StyledAutocomplete
       disabled={options.length === 0 && !allowEmail}
@@ -206,6 +205,7 @@ export function InputSearchMemberMultiple({
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
       options={members}
     />

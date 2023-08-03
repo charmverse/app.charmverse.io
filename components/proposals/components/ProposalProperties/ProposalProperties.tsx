@@ -25,11 +25,12 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
-import { InputSearchReviewers } from './components/InputSearchReviewers';
-import { ProposalCategoryInput } from './components/ProposalCategoryInput';
+import { AuthorsSelect } from './components/AuthorsSelect';
+import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
-import { ProposalTemplateInput } from './components/ProposalTemplateInput';
+import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
+import { ReviewersSelect } from './components/ReviewersSelect';
 
 export type ProposalFormInputs = {
   title?: string; // title is saved to the same state that's used in ProposalPage
@@ -240,12 +241,12 @@ export function ProposalProperties({
 
             <Stack
               direction='row'
-              gap={4}
+              gap={1}
               alignItems='center'
               sx={{ cursor: 'pointer' }}
               onClick={() => setDetailsExpanded((v) => !v)}
             >
-              <Typography variant='subtitle1'>Details</Typography>
+              <Typography fontWeight='bold'>Details</Typography>
               <IconButton size='small'>
                 <KeyboardArrowDown
                   fontSize='small'
@@ -275,7 +276,7 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
-                <ProposalCategoryInput
+                <ProposalCategorySelect
                   disabled={disabledCategoryInput}
                   options={categories || []}
                   value={proposalCategory ?? null}
@@ -291,7 +292,7 @@ export function ProposalProperties({
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Template</PropertyLabel>
                 <Box display='flex' flex={1}>
-                  <ProposalTemplateInput
+                  <ProposalTemplateSelect
                     options={templateOptions}
                     value={proposalTemplatePage ?? null}
                     onChange={(template) => {
@@ -323,26 +324,14 @@ export function ProposalProperties({
             >
               <PropertyLabel readOnly>Author</PropertyLabel>
               <div style={{ width: '100%' }}>
-                <InputSearchMemberBase
-                  filterSelectedOptions
-                  multiple
-                  placeholder='Select authors'
-                  value={members.filter((member) => proposalAuthorIds.some((authorId) => member.id === authorId))}
-                  disableCloseOnSelect
-                  onChange={async (_, _members) => {
-                    // Must have atleast one author of proposal
-                    if ((_members as Member[]).length !== 0) {
-                      setProposalFormInputs({
-                        ...proposalFormInputs,
-                        authors: (_members as Member[]).map((member) => member.id)
-                      });
-                    }
-                  }}
-                  disabled={readOnly}
+                <AuthorsSelect
                   readOnly={readOnly || canUpdateProposalProperties === false}
-                  options={members}
-                  sx={{
-                    width: '100%'
+                  value={proposalAuthorIds}
+                  onChange={(authors) => {
+                    setProposalFormInputs({
+                      ...proposalFormInputs,
+                      authors
+                    });
                   }}
                 />
               </div>
@@ -359,7 +348,7 @@ export function ProposalProperties({
             >
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <div style={{ width: '100%' }}>
-                <InputSearchReviewers
+                <ReviewersSelect
                   disabled={readOnly}
                   readOnly={readOnly || canUpdateProposalProperties === false}
                   value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}

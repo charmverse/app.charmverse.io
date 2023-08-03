@@ -24,7 +24,7 @@ type GroupedOption = GroupedRole | GroupedMember;
  *
  * In public mode, custom roles are hidden
  */
-export function InputSearchReviewers({
+export function ReviewersSelect({
   disableCloseOnSelect = false,
   excludedIds,
   proposalId,

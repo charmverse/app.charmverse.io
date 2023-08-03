@@ -19,6 +19,7 @@ type Props = {
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
+  placeholder?: string;
 };
 
 type ContainerProps = {
@@ -103,12 +104,13 @@ function MembersDisplay({
 }
 
 export function UserSelect({
-  displayType,
+  displayType = 'details',
   memberIds,
   onChange,
   readOnly,
   showEmptyPlaceholder,
-  wrapColumn
+  wrapColumn,
+  placeholder
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -130,23 +132,24 @@ export function UserSelect({
   if (!isOpen) {
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
-        {showEmptyPlaceholder && memberIds.length === 0 ? (
-          <EmptyPlaceholder>Empty</EmptyPlaceholder>
-        ) : (
-          <MembersDisplay
-            wrapColumn={wrapColumn ?? false}
-            readOnly={true}
-            memberIds={memberIds}
-            setMemberIds={_onChange}
-          />
-        )}
+        <Stack gap={0.5}>
+          {showEmptyPlaceholder && memberIds.length === 0 ? (
+            <EmptyPlaceholder>Empty</EmptyPlaceholder>
+          ) : (
+            <MembersDisplay
+              wrapColumn={wrapColumn ?? false}
+              readOnly={true}
+              memberIds={memberIds}
+              setMemberIds={_onChange}
+            />
+          )}
+        </Stack>
       </SelectPreviewContainer>
     );
   }
   return (
     <StyledUserPropertyContainer displayType={displayType}>
       <InputSearchMemberMultiple
-        // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
         disableClearable
         clearOnBlur
         open
@@ -158,7 +161,7 @@ export function UserSelect({
         onChange={_onChange}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={readOnly}
-        placeholder={memberIds.length === 0 ? 'Search for an option...' : ''}
+        placeholder={memberIds.length === 0 ? placeholder || 'Search for an option...' : ''}
         inputVariant='standard'
         forcePopupIcon={false}
         renderTags={() => (

@@ -72,7 +72,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   }
 
   .MuiInputBase-root.MuiInputBase-sizeSmall {
-    padding: 1px 4px;
+    padding: 4px;
   }
 `;
 
