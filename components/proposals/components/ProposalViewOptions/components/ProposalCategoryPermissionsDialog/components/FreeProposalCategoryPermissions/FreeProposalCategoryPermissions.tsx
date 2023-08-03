@@ -5,8 +5,8 @@ import Grid from '@mui/material/Grid';
 import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
-import { AddRolesButton } from '../components/AddRolesButton';
-import { ProposalCategoryRolePermissionRow } from '../components/ProposalCategoryPermissionRow';
+import { AddRolesButton } from '../AddRolesButton';
+import { ProposalCategoryRolePermissionRow } from '../ProposalCategoryPermissionRow';
 
 /**
  * @permissions The actions a user can perform on a proposal category

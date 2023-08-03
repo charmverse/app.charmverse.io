@@ -1,18 +1,17 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, Proposal } from '@charmverse/core/prisma';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import type { Page, Proposal, ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { PropertyLabel } from 'components/common/BoardEditor/components/PropertyLabel';
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
-import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
-import ProposalTemplateInput from 'components/proposals/components/ProposalTemplateInput';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -24,37 +23,76 @@ import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
-import type { ProposalFormInputs } from '../interfaces';
-import { ProposalStepper } from '../ProposalStepper/ProposalStepper';
-import { ProposalStepSummary } from '../ProposalStepSummary';
+import { useProposalCategories } from '../../hooks/useProposalCategories';
+
+import { InputSearchReviewers } from './components/InputSearchReviewers';
+import ProposalCategoryInput from './components/ProposalCategoryInput';
+import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
+import { ProposalStepSummary } from './components/ProposalStepSummary';
+import ProposalTemplateInput from './components/ProposalTemplateInput';
+
+export type ProposalFormInputs = {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  // id?: string;
+  categoryId?: string | null;
+  authors: string[];
+  reviewers: ProposalReviewerInput[];
+  proposalTemplateId?: string | null;
+};
 
 interface ProposalPropertiesProps {
-  readOnly?: boolean;
+  archived?: boolean;
+  canUpdateProposalProperties?: boolean;
+  disabledCategoryInput?: boolean;
   isTemplate: boolean;
+  pageId?: string;
+  proposalId?: string;
+  proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalFormInputs: ProposalFormInputs;
-  setProposalFormInputs: (params: Partial<ProposalFormInputs>) => void;
+  proposalStatus?: ProposalStatus;
+  readOnly?: boolean;
+  setProposalFormInputs: (values: ProposalFormInputs) => void;
+  snapshotProposalId?: string | null;
+  updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
 }
 
-export function ProposalDialogProperties({
-  setProposalFormInputs,
+export function ProposalProperties({
+  archived,
+  canUpdateProposalProperties,
+  disabledCategoryInput,
+  isTemplate,
   proposalFormInputs,
+  pageId,
+  proposalId,
+  proposalFlowFlags,
+  proposalStatus,
   readOnly,
-  isTemplate
+  setProposalFormInputs,
+  snapshotProposalId,
+  updateProposalStatus
 }: ProposalPropertiesProps) {
   const { categories } = useProposalCategories();
 
+  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const { space: currentSpace } = useCurrentSpace();
-  const [detailsExpanded, setDetailsExpanded] = useState(true);
+  const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
+  const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const { members } = useMembers();
   const { roles = [] } = useRoles();
   const { user } = useUser();
-  const [proposalTemplatePages, setProposalTemplatePages] = useState<PageMeta[]>([]);
   const { data: proposalTemplates = [] } = useSWR(
     () => (currentSpace ? `proposals-templates/${currentSpace.id}` : null),
     () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: currentSpace!.id })
   );
+
+  const proposalTemplatePages = useMemo(() => {
+    return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
+  }, [pages]);
+
   const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
@@ -65,37 +103,12 @@ export function ProposalDialogProperties({
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isProposalAuthor = user && proposalAuthorIds.some((authorId) => authorId === user.id);
+  const isNewProposal = !pageId;
+  const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
     : null;
-
-  useEffect(() => {
-    if (pages) {
-      setProposalTemplatePages(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
-    }
-  }, [pages]);
-
-  async function selectProposalTemplate(templatePage: PageMeta | null) {
-    if (templatePage && templatePage.proposalId) {
-      // Fetch the proposal page to get its content
-      const proposalTemplate = proposalTemplates.find(
-        (_proposalTemplate) => _proposalTemplate.page.id === templatePage.id
-      );
-      if (proposalTemplate) {
-        setProposalFormInputs({
-          ...proposalFormInputs,
-          content: proposalTemplate.page.content as PageContent,
-          contentText: proposalTemplate.page.contentText,
-          reviewers: proposalTemplate.reviewers.map((reviewer) => ({
-            group: reviewer.roleId ? 'role' : 'user',
-            id: reviewer.roleId ?? (reviewer.userId as string)
-          })),
-          proposalTemplateId: templatePage.id
-        });
-      }
-    }
-  }
 
   const isProposalReviewer =
     user &&
@@ -146,6 +159,38 @@ export function ProposalDialogProperties({
     }
   }
 
+  function onChangeTemplate(templatePage: PageMeta | null) {
+    if (templatePage && templatePage.proposalId) {
+      // Fetch the proposal page to get its content
+      const proposalTemplate = proposalTemplates.find(
+        (_proposalTemplate) => _proposalTemplate.page.id === templatePage.id
+      );
+      if (proposalTemplate) {
+        setProposalFormInputs({
+          ...proposalFormInputs,
+          content: proposalTemplate.page.content as PageContent,
+          contentText: proposalTemplate.page.contentText,
+          reviewers: proposalTemplate.reviewers.map((reviewer) => ({
+            group: reviewer.roleId ? 'role' : 'user',
+            id: reviewer.roleId ?? (reviewer.userId as string)
+          })),
+          proposalTemplateId: templatePage.id
+        });
+      }
+    }
+  }
+
+  function openVoteModal() {
+    setIsVoteModalOpen(true);
+  }
+
+  useEffect(() => {
+    if (!prevStatusRef.current && proposalStatus === 'draft') {
+      setDetailsExpanded(true);
+    }
+
+    prevStatusRef.current = proposalStatus || '';
+  }, [detailsExpanded, proposalStatus]);
   return (
     <Box
       className='octo-propertylist'
@@ -159,7 +204,13 @@ export function ProposalDialogProperties({
       {!isTemplate && (
         <>
           <Grid container mb={2}>
-            <ProposalStepSummary proposalStatus='draft' />
+            <ProposalStepSummary
+              archived={archived}
+              proposalFlowFlags={proposalFlowFlags}
+              proposalStatus={proposalStatus}
+              openVoteModal={openVoteModal}
+              updateProposalStatus={updateProposalStatus}
+            />
           </Grid>
 
           <Stack
@@ -182,7 +233,12 @@ export function ProposalDialogProperties({
       <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
         {!isTemplate && (
           <Grid container mb={2} mt={2}>
-            <ProposalStepper proposalStatus='draft' />
+            <ProposalStepper
+              proposalFlowPermissions={proposalFlowFlags}
+              proposalStatus={proposalStatus}
+              openVoteModal={openVoteModal}
+              updateProposalStatus={updateProposalStatus}
+            />
           </Grid>
         )}
         <Grid container mb={2}>
@@ -193,13 +249,13 @@ export function ProposalDialogProperties({
           </Grid>
         </Grid>
 
+        {/* Select a category */}
         <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Category</Button>
-            </div>
+            <PropertyLabel readOnly>Category</PropertyLabel>
             <Box display='flex' flex={1}>
               <ProposalCategoryInput
+                disabled={disabledCategoryInput}
                 options={categories || []}
                 value={proposalCategory ?? null}
                 onChange={onChangeCategory}
@@ -208,12 +264,11 @@ export function ProposalDialogProperties({
           </Box>
         </Box>
 
-        {!isTemplate && (
+        {/* Select a template */}
+        {!isTemplate && isNewProposal && (
           <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <div className='octo-propertyname octo-propertyname--readonly'>
-                <Button>Template</Button>
-              </div>
+              <PropertyLabel readOnly>Template</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalTemplateInput
                   options={
@@ -233,7 +288,7 @@ export function ProposalDialogProperties({
                   value={proposalTemplatePage ?? null}
                   onChange={(page) => {
                     if (proposalFormInputs.contentText?.length === 0) {
-                      selectProposalTemplate(page);
+                      onChangeTemplate(page);
                     } else {
                       setSelectedProposalTemplateId(page?.id ?? null);
                     }
@@ -244,6 +299,7 @@ export function ProposalDialogProperties({
           </Box>
         )}
 
+        {/* Select authors */}
         <Box justifyContent='space-between' gap={2} alignItems='center'>
           <div
             className='octo-propertyrow'
@@ -253,15 +309,13 @@ export function ProposalDialogProperties({
               flexGrow: 1
             }}
           >
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Author</Button>
-            </div>
+            <PropertyLabel readOnly>Author</PropertyLabel>
             <div style={{ width: '100%' }}>
               <InputSearchMemberBase
                 filterSelectedOptions
                 multiple
                 placeholder='Select authors'
-                value={members.filter((member) => proposalAuthorIds.find((authorId) => member.id === authorId))}
+                value={members.filter((member) => proposalAuthorIds.some((authorId) => member.id === authorId))}
                 disableCloseOnSelect
                 onChange={async (_, _members) => {
                   // Must have atleast one author of proposal
@@ -273,7 +327,7 @@ export function ProposalDialogProperties({
                   }
                 }}
                 disabled={readOnly}
-                readOnly={readOnly}
+                readOnly={readOnly || canUpdateProposalProperties === false}
                 options={members}
                 sx={{
                   width: '100%'
@@ -291,15 +345,13 @@ export function ProposalDialogProperties({
               flexGrow: 1
             }}
           >
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Reviewer</Button>
-            </div>
+            <PropertyLabel readOnly>Reviewer</PropertyLabel>
             <div style={{ width: '100%' }}>
               <InputSearchReviewers
                 disabled={readOnly}
-                readOnly={readOnly}
+                readOnly={readOnly || canUpdateProposalProperties === false}
                 value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
-                disableCloseOnSelect={true}
+                disableCloseOnSelect
                 excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
                 onChange={async (e, options) => {
                   setProposalFormInputs({
@@ -327,13 +379,31 @@ export function ProposalDialogProperties({
         question='Are you sure you want to overwrite your current content with the proposal template content?'
         onConfirm={() => {
           const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
-          selectProposalTemplate(templatePage ?? null);
+          onChangeTemplate(templatePage ?? null);
           setSelectedProposalTemplateId(null);
         }}
       />
       <Divider
         sx={{
           my: 2
+        }}
+      />
+      <CreateVoteModal
+        proposalFlowFlags={proposalFlowFlags}
+        proposal={voteProposal}
+        pageId={pageId}
+        snapshotProposalId={snapshotProposalId || null}
+        open={isVoteModalOpen}
+        onCreateVote={() => {
+          setIsVoteModalOpen(false);
+          updateProposalStatus?.('vote_active');
+        }}
+        onPublishToSnapshot={() => {
+          setIsVoteModalOpen(false);
+          updateProposalStatus?.('vote_active');
+        }}
+        onClose={() => {
+          setIsVoteModalOpen?.(false);
         }}
       />
     </Box>

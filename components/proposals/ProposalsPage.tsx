@@ -13,8 +13,8 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
-import { ProposalsTable } from './components/ProposalsTable';
-import { ProposalsViewOptions } from './components/ProposalsViewOptions';
+import { ProposalsTable } from './components/ProposalsTable/ProposalsTable';
+import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
