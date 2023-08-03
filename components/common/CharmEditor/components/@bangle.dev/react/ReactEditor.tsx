@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -17,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -184,6 +186,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           onDocLoaded: () => {
             isLoadingRef.current = false;
           },
+          onCommentUpdate: () => {
+            mutate(getThreadsKey(pageId));
+          },
           onParticipantUpdate
         });
         fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
@@ -224,7 +229,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
           cursor: readOnly ? 'default' : 'text'
         }}
-        onClick={() => !readOnly && editor?.view.focus()}
+        // onClick={() => !readOnly && editor?.view.focus()}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />

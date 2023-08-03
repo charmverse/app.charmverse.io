@@ -1,8 +1,9 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import type { FormEvent, ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
+import { generatePriceDetails } from 'lib/subscription/generatePriceDetails';
 import type { CouponDetails } from 'lib/subscription/getCouponDetails';
 
 export type OrderSummaryProps = {
@@ -15,28 +16,6 @@ export type OrderSummaryProps = {
   children: ReactNode;
   handleCheckout: (e: FormEvent) => Promise<void>;
   handleCancelCheckout: () => void;
-};
-
-const generatePriceDetails = (discount: CouponDetails | null | undefined, standardPrice: number) => {
-  if (discount?.discountType === 'percent') {
-    return {
-      discount: (standardPrice * discount.discount) / 100,
-      subTotal: standardPrice,
-      total: standardPrice - (standardPrice * discount.discount) / 100
-    };
-  }
-  if (discount?.discountType === 'fixed') {
-    return {
-      discount: discount.discount >= standardPrice ? standardPrice : discount.discount,
-      subTotal: standardPrice,
-      total: discount.discount >= standardPrice ? 0 : standardPrice - discount.discount
-    };
-  }
-  return {
-    discount: 0,
-    subTotal: standardPrice,
-    total: standardPrice
-  };
 };
 
 export function OrderSummary({
@@ -60,7 +39,10 @@ export function OrderSummary({
       <Stack display='flex' flexDirection='row' justifyContent='space-between'>
         <Stack>
           <Typography mb={1}>Community Edition</Typography>
-          <Typography variant='body2'>Billed {period}</Typography>
+          <Typography variant='body2' mb={1}>
+            {blockQuota}K blocks
+          </Typography>
+          <Typography variant='body2'>Billed {period === 'annual' ? 'annually' : 'monthly'}</Typography>
         </Stack>
         <Stack>
           <Typography>${(price * blockQuota).toFixed(2)}/mo</Typography>

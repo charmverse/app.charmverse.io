@@ -8,7 +8,7 @@ import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
-import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const notificationTaskLimiter = RateLimit(100);
@@ -86,9 +86,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const voteTasksNotSent = voteTasks.unmarked;
     const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
     const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
-      workspaceEventsNotSent.length !== 0
-        ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent)
-        : {};
+      workspaceEventsNotSent.length !== 0 ? await getProposalStatusChangeTasks(user.id, workspaceEventsNotSent) : {};
 
     const totalTasks =
       discussionTasks.unmarked.length +

@@ -10,7 +10,6 @@ const LitFooter = ({
                      nextButtonLabel = null
                    }) => {
 
-  console.log('disable next button', disableNextButton)
 
   return (
     <div className={`${backgroundColor} lsm-lit-footer`}>

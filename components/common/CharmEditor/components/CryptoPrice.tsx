@@ -1,5 +1,5 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import type { DOMOutputSpec } from '@bangle.dev/pm';
+import type { DOMOutputSpec, EditorView } from '@bangle.dev/pm';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
@@ -8,7 +8,7 @@ import { CryptoCurrencies, getChainById } from 'connectors';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
@@ -17,6 +17,8 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
+
+import { enableDragAndDrop } from '../utils';
 
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
@@ -43,6 +45,7 @@ export function cryptoPriceSpec() {
           default: []
         }
       },
+      draggable: true,
       group: 'block',
       parseDOM: [{ tag: 'div.charm-crypto-price' }],
       toDOM: (): DOMOutputSpec => {
@@ -61,13 +64,17 @@ export function CryptoPrice({
   quote,
   onQuoteCurrencyChange,
   onBaseCurrencyChange,
-  readOnly
+  readOnly,
+  view,
+  getPos
 }: {
   readOnly: boolean;
   base: CryptoCurrency | null;
   quote: FiatCurrency | null;
   onQuoteCurrencyChange: (currency: FiatCurrency) => void;
   onBaseCurrencyChange: (currency: CryptoCurrency) => void;
+  view: EditorView;
+  getPos: () => number;
 }) {
   const [loading, setLoadingState] = useState(false);
   const [baseCurrency, setBaseCurrency] = useState<CryptoCurrency | null>(base);
@@ -151,8 +158,10 @@ export function CryptoPrice({
 
   return (
     <Card
-      draggable={false}
       className='cryptoPrice'
+      onDragStart={() => {
+        enableDragAndDrop(view, getPos());
+      }}
       component='div'
       raised={true}
       // disable propagation for bangle.dev

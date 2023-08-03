@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 

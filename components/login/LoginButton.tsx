@@ -12,7 +12,7 @@ import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -73,7 +73,13 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       justifyContent={{ xs: 'center', md: 'flex-start' }}
       py={{ xs: 2, md: 0 }}
     >
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' color='primary'>
+      <StyledButton
+        size='large'
+        onClick={handleClickOpen}
+        data-test='universal-connect-button'
+        color='primary'
+        disableElevation={false}
+      >
         Sign up
       </StyledButton>
       <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>
@@ -100,25 +106,16 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { loginWithGooglePopup } = useGoogleLogin();
   const { verifiableWalletDetected } = useWeb3AuthSig();
-  async function handleLogin(loggedInUser: AnyIdLogin) {
+  async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
-
   async function handleGoogleLogin() {
-    if (isOnCustomDomain) {
-      return loginWithGooglePopup();
-    }
-
-    try {
-      const googleLoginResult = await loginWithGoogle();
-      handleLogin(googleLoginResult);
-    } catch (err) {
-      handleLoginError(err);
-    }
+    const onSuccess = () => handleLogin({ identityType: 'Google' });
+    return loginWithGooglePopup({ onSuccess });
   }
 
   async function handleMagicLinkRequest(email: string) {

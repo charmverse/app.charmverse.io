@@ -3,7 +3,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
 import { usePostCategoryPermissionsList } from 'components/forum/hooks/usePostCategoryPermissionsList';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

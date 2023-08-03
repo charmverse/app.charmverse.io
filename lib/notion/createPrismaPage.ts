@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 
 import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
-import { checkSpaceSpaceSubscriptionInfo, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 
 import type { CreatePageInput } from './types';
 

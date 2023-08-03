@@ -14,8 +14,7 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import { ArchiveProposalMenuItem } from 'components/proposals/ArchiveProposalMenuItem';
+import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
@@ -28,6 +27,7 @@ import { fontClassName } from 'theme/fonts';
 import { exportMarkdown } from '../utils/exportMarkdown';
 
 import { AddToFavoritesAction } from './AddToFavoritesAction';
+import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { BountyActions } from './BountyActions';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DocumentHistory } from './DocumentHistory';
@@ -317,7 +317,7 @@ export function DocumentPageActionList({
       )}
 
       <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
-      {pageType === 'proposal' && pageId && <ArchiveProposalMenuItem proposalId={pageId} refreshPageOnChange />}
+      {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
       {undoEditorChanges && (
         <UndoAction
           onClick={undoEditorChanges}

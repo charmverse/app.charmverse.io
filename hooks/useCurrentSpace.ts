@@ -1,18 +1,25 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, SpaceRole } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
 import { useSpaces } from './useSpaces';
+import { useUser } from './useUser';
 
-export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshCurrentSpace: () => void } {
+export function useCurrentSpace(): {
+  space?: Space;
+  isLoading: boolean;
+  refreshCurrentSpace: () => void;
+  spaceRole?: SpaceRole;
+} {
   const router = useRouter();
   const { spaces, isLoaded: isSpacesLoaded, setSpace } = useSpaces();
-  const { publicSpace, accessChecked } = useSharedPage();
-
+  const { user } = useUser();
+  const { publicSpace, accessChecked: publicAccessChecked, isPublicPath } = useSharedPage();
+  const isSharedPageLoaded = isPublicPath && publicAccessChecked;
   // Support for extracting domain from logged in view or shared bounties view
   // domain in query can be either space domain or custom domain
   const domainOrCustomDomain = router.query.domain;
@@ -25,10 +32,18 @@ export function useCurrentSpace(): { space?: Space; isLoading: boolean; refreshC
     }
   }, [space]);
 
-  if (!accessChecked && !isSpacesLoaded) {
-    return { isLoading: true, refreshCurrentSpace };
-  }
+  const spaceToReturn = space ?? (publicSpace || undefined);
 
-  // We always want to return the space as priority since it's not just set by the URL
-  return { space: space ?? (publicSpace || undefined), isLoading: false, refreshCurrentSpace };
+  const spaceRole = useMemo(() => {
+    if (!user || !spaceToReturn) {
+      return undefined;
+    }
+    return user.spaceRoles.find((sr) => sr.spaceId === spaceToReturn.id);
+  }, [user, spaceToReturn]);
+
+  // if page is public and we are not loading space anymore OR if spaces are loaded
+  if (isSpacesLoaded || isSharedPageLoaded) {
+    return { space: spaceToReturn, isLoading: false, refreshCurrentSpace, spaceRole };
+  }
+  return { isLoading: true, refreshCurrentSpace };
 }

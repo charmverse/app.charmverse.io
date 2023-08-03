@@ -17,7 +17,7 @@ import { getChainById } from 'connectors';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useImportSafes } from 'hooks/useImportSafes';

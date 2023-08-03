@@ -11,13 +11,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import CharmButton from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
+import { InputSearchReviewers } from 'components/proposals/components/ProposalProperties/components/InputSearchReviewers';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -251,7 +251,7 @@ export default function BountyProperties(props: {
             alignSelf: 'center'
           }}
         >
-          <Button>Reward</Button>
+          <ButtonBoard>Reward</ButtonBoard>
         </div>
         <Tabs
           indicatorColor={readOnly ? 'secondary' : 'primary'}
@@ -284,7 +284,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Chain</Button>
+              <ButtonBoard>Chain</ButtonBoard>
             </div>
             <InputSearchBlockchain
               disabled={readOnly}
@@ -311,7 +311,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Token</Button>
+              <ButtonBoard>Token</ButtonBoard>
             </div>
             <InputSearchCrypto
               disabled={readOnly || !isTruthy(currentBounty?.chainId)}
@@ -340,7 +340,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Amount</Button>
+              <ButtonBoard>Amount</ButtonBoard>
             </div>
             <TextField
               data-test='bounty-property-amount'
@@ -402,7 +402,7 @@ export default function BountyProperties(props: {
         }}
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>Advanced settings</Button>
+          <ButtonBoard>Advanced settings</ButtonBoard>
         </div>
         <Tooltip title={isShowingAdvancedSettings ? 'Hide advanced settings' : 'Expand advanced settings'}>
           <IconButton size='small'>
@@ -417,7 +417,7 @@ export default function BountyProperties(props: {
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
           <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Require applications</Button>
+            <ButtonBoard>Require applications</ButtonBoard>
           </div>
           <Switch
             isOn={Boolean(currentBounty?.approveSubmitters)}
@@ -441,7 +441,7 @@ export default function BountyProperties(props: {
               className='octo-propertyname octo-propertyname--readonly'
               style={{ alignSelf: 'baseline', paddingTop: 8 }}
             >
-              <Button>Applicant role(s)</Button>
+              <ButtonBoard>Applicant role(s)</ButtonBoard>
             </div>
             <div style={{ width: '100%' }}>
               <InputSearchRoleMultiple
@@ -487,7 +487,7 @@ export default function BountyProperties(props: {
           }}
         >
           <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Submission limit</Button>
+            <ButtonBoard>Submission limit</ButtonBoard>
           </div>
           <Switch
             isOn={capSubmissions}
@@ -509,7 +509,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Max submissions</Button>
+              <ButtonBoard>Max submissions</ButtonBoard>
             </div>
             <TextField
               required
@@ -563,7 +563,7 @@ export default function BountyProperties(props: {
             className='octo-propertyname octo-propertyname--readonly'
             style={{ alignSelf: 'baseline', paddingTop: 12 }}
           >
-            <Button>Reviewer</Button>
+            <ButtonBoard>Reviewer</ButtonBoard>
           </div>
           <div style={{ width: '100%' }}>
             <InputSearchReviewers
@@ -606,12 +606,12 @@ export default function BountyProperties(props: {
 
       {draftBounty && !bountyFromContext && (
         <Box display='flex' gap={2} my={2}>
-          <CharmButton color='primary' onClick={confirmNewBounty}>
+          <Button color='primary' onClick={confirmNewBounty}>
             Confirm new bounty
-          </CharmButton>
-          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
+          </Button>
+          <Button color='secondary' variant='outlined' onClick={cancelDraftBounty}>
             Cancel
-          </CharmButton>
+          </Button>
         </Box>
       )}
 

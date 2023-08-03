@@ -191,7 +191,7 @@ export function stripeSubscriptionStub({
       period: 'annual',
       productId: 'community',
       spaceId: 'd763059c-2e4e-4c78-8bf2-36a553927309',
-      tier: 'pro'
+      tier: 'community'
     },
     next_pending_invoice_item_invoice: null,
     on_behalf_of: null,

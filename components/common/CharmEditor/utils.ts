@@ -1,8 +1,8 @@
+import { NodeSelection } from '@bangle.dev/pm';
 import type { EditorView } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
-import { TextSelection } from 'prosemirror-state';
 
 export const undoEventName = 'editor-undo';
 
@@ -46,3 +46,8 @@ export const safeRequestAnimationFrame =
         (window as any).lastTime = currTime + timeToCall;
         return id;
       };
+export function enableDragAndDrop(view: EditorView, nodePos: number) {
+  view.dispatch(
+    view.state.tr.setMeta('row-handle-is-dragging', true).setSelection(NodeSelection.create(view.state.doc, nodePos))
+  );
+}

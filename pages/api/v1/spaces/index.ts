@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { requireKeys } from 'lib/middleware';
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
 import { superApiHandler } from 'lib/public-api/handler';
-import type { CreateWorkspaceResponseBody, CreateWorkspaceRequestBody } from 'lib/public-api/interfaces';
+import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { spaceTemplateApiNames, spaceTemplateIds } from 'lib/spaces/config';
+import { spaceTemplateApiNames } from 'lib/spaces/config';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 

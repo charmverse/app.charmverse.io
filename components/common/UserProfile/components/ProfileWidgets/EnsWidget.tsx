@@ -38,12 +38,12 @@ function CustomChip({ label, value, icon }: { label: string; value: string; icon
 }
 
 export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
-  const email = ensProfile.emails ? ensProfile.emails[0] : undefined;
-  const discord = ensProfile.discord ? ensProfile.discord : undefined;
-  const twitter = ensProfile.twitter ? ensProfile.twitter : undefined;
-  const github = ensProfile.github ? ensProfile.github : undefined;
-  const reddit = ensProfile.reddit ? ensProfile.reddit : undefined;
-  const linkedin = ensProfile.linkedin ? ensProfile.linkedin : undefined;
+  const email = ensProfile.emails?.[0];
+  const discord = ensProfile.discord;
+  const twitter = ensProfile.twitter;
+  const github = ensProfile.github;
+  const reddit = ensProfile.reddit;
+  const linkedin = ensProfile.linkedin;
 
   const showEmails = !!email;
   const showAccounts = !!discord || !!twitter || !!github || !!reddit || !!linkedin;
@@ -54,52 +54,54 @@ export function EnsWidget({ ensProfile }: { ensProfile: EnsProfile }) {
       title='Ethereum Naming Service'
       avatarSrc='/images/logos/ens_logo.svg'
     >
-      <Stack spacing={2}>
-        <Stack spacing={1}>
-          <Avatar size='large' name={ensProfile.ensname ?? ''} avatar={ensProfile.avatar} variant='circular' />
-          <Typography variant='body1' fontWeight='bold'>
-            {ensProfile?.ensname}
-          </Typography>
-          {ensProfile?.description && <Typography variant='subtitle1'>{ensProfile?.description}</Typography>}
+      {ensProfile && (
+        <Stack spacing={2}>
+          <Stack spacing={1}>
+            <Avatar size='large' name={ensProfile.ensname ?? ''} avatar={ensProfile.avatar} variant='circular' />
+            <Typography variant='body1' fontWeight='bold'>
+              {ensProfile.ensname}
+            </Typography>
+            {ensProfile.description && <Typography variant='subtitle1'>{ensProfile.description}</Typography>}
+          </Stack>
+          {showEmails || showAccounts ? (
+            <Divider
+              sx={{
+                my: 1
+              }}
+            />
+          ) : null}
+
+          {showAccounts && (
+            <Stack spacing={1}>
+              <Typography variant='subtitle2'>Accounts</Typography>
+              <StyledChipStack direction='row' flexWrap='wrap'>
+                {discord && <CustomChip label='Discord' value={discord} icon={<DiscordIcon />} />}
+                {twitter && (
+                  <CustomChip label='Twitter' value={twitter} icon={<TwitterIcon style={{ color: '#00ACEE' }} />} />
+                )}
+                {github && (
+                  <CustomChip label='Github' value={github} icon={<GitHubIcon style={{ color: '#141414' }} />} />
+                )}
+                {reddit && (
+                  <CustomChip label='Reddit' value={reddit} icon={<RedditIcon style={{ color: '#FF5700' }} />} />
+                )}
+                {linkedin && (
+                  <CustomChip label='Linkedin' value={linkedin} icon={<LinkedInIcon style={{ color: '#0072B1' }} />} />
+                )}
+              </StyledChipStack>
+            </Stack>
+          )}
+
+          {showEmails && (
+            <Stack spacing={1}>
+              <Typography variant='subtitle2'>Other Records</Typography>
+              <StyledChipStack direction='row' flexWrap='wrap'>
+                <CustomChip label='Email' value={email} />
+              </StyledChipStack>
+            </Stack>
+          )}
         </Stack>
-        {showEmails || showAccounts ? (
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-        ) : null}
-
-        {showAccounts && (
-          <Stack spacing={1}>
-            <Typography variant='subtitle2'>Accounts</Typography>
-            <StyledChipStack direction='row' flexWrap='wrap'>
-              {discord && <CustomChip label='Discord' value={discord} icon={<DiscordIcon />} />}
-              {twitter && (
-                <CustomChip label='Twitter' value={twitter} icon={<TwitterIcon style={{ color: '#00ACEE' }} />} />
-              )}
-              {github && (
-                <CustomChip label='Github' value={github} icon={<GitHubIcon style={{ color: '#141414' }} />} />
-              )}
-              {reddit && (
-                <CustomChip label='Reddit' value={reddit} icon={<RedditIcon style={{ color: '#FF5700' }} />} />
-              )}
-              {linkedin && (
-                <CustomChip label='Linkedin' value={linkedin} icon={<LinkedInIcon style={{ color: '#0072B1' }} />} />
-              )}
-            </StyledChipStack>
-          </Stack>
-        )}
-
-        {showEmails && (
-          <Stack spacing={1}>
-            <Typography variant='subtitle2'>Other Records</Typography>
-            <StyledChipStack direction='row' flexWrap='wrap'>
-              <CustomChip label='Email' value={email} />
-            </StyledChipStack>
-          </Stack>
-        )}
-      </Stack>
+      )}
     </ProfileWidget>
   );
 }

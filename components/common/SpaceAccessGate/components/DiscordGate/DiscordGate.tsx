@@ -1,6 +1,6 @@
 import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 

@@ -30,6 +30,7 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate;
   showCard: (cardId: string) => void;
   addCard: (properties: Record<string, string>) => void;
+  disableAddingCards?: boolean;
 };
 
 const timeZoneOffset = (date: number): number => {
@@ -238,9 +239,13 @@ function CalendarFullView(props: Props): JSX.Element | null {
     (args: DayCellContentArg): JSX.Element | null => {
       return (
         <div className='dateContainer'>
-          <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
-            +
-          </div>
+          {props.readOnly || props.disableAddingCards ? (
+            <div></div>
+          ) : (
+            <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
+              +
+            </div>
+          )}
           <div className='dateDisplay'>{args.dayNumberText}</div>
         </div>
       );

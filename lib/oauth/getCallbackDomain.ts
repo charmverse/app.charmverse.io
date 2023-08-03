@@ -12,7 +12,7 @@ export function getCallbackDomain(host?: string | undefined) {
   }
 
   if (!host) {
-    return `${protocol}//${appSubdomain}.${getAppApexDomain()}`;
+    return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
 
   if (getValidCustomDomain(host)) {

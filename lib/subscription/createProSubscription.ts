@@ -108,7 +108,7 @@ export async function createProSubscription({
     metadata: {
       productId,
       period,
-      tier: 'pro',
+      tier: 'community',
       spaceId
     },
     trial_period_days: freeTrial ? communityProduct.trial : undefined,
@@ -125,11 +125,11 @@ export async function createProSubscription({
     payment_settings: {
       save_default_payment_method: 'on_subscription'
     },
-    // This ensures the subscription will expire after the trial and is not accidentally billed
+    // This ensures the subscription will be paused after the trial and is not accidentally billed
     trial_settings: freeTrial
       ? {
           end_behavior: {
-            missing_payment_method: 'cancel'
+            missing_payment_method: 'pause'
           }
         }
       : undefined,

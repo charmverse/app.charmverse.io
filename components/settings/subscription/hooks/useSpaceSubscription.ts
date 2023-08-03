@@ -1,34 +1,46 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import { getTimeDifference } from 'lib/utilities/dates';
 
-/**
- * @returnUrl - Used for when we generate the customer portal link
- */
-type Props = {
-  returnUrl?: string;
-};
-
-export function useSpaceSubscription({ returnUrl }: Props = {}) {
+export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
+  const { user } = useUser();
 
   const {
     data: spaceSubscription,
     isLoading,
     mutate: refetchSpaceSubscription
   } = useSWR(
-    currentSpace ? `/spaces/${currentSpace.id}/subscription?returnUrl=${returnUrl}` : null,
-    () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id, returnUrl }),
+    !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/subscription` : null,
+    () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false
     }
+  );
+
+  const freeTrialEnds = useMemo(
+    () =>
+      spaceSubscription?.status === 'free_trial'
+        ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
+        : 0,
+    [spaceSubscription?.status, spaceSubscription?.expiresOn]
+  );
+
+  const subscriptionEnded = useMemo(
+    () =>
+      (spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0) ||
+      spaceSubscription?.status === 'past_due' ||
+      spaceSubscription?.status === 'unpaid',
+    [spaceSubscription?.status, freeTrialEnds]
   );
 
   useEffect(() => {
@@ -50,6 +62,8 @@ export function useSpaceSubscription({ returnUrl }: Props = {}) {
   return {
     spaceSubscription,
     isLoading,
+    freeTrialEnds,
+    subscriptionEnded,
     refetchSpaceSubscription
   };
 }

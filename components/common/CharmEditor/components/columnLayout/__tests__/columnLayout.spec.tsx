@@ -1,6 +1,6 @@
 import { CharmEditor } from 'components/common/CharmEditor';
 import { customRenderWithContext } from 'testing/customRender';
-import { jsonDoc, builders as _ } from 'testing/prosemirror';
+import { jsonDoc, builders as _ } from 'testing/prosemirror/builders';
 
 jest.mock('hooks/useFirebaseAuth', () => ({
   useFirebaseAuth: {}

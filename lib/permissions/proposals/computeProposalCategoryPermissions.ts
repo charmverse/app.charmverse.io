@@ -11,7 +11,7 @@ import { isUUID } from 'lib/utilities/strings';
 export function buildProposalCategoryPermissions({
   spaceRole
 }: {
-  spaceRole?: SpaceRole;
+  spaceRole?: SpaceRole | null;
 }): ProposalCategoryPermissionFlags {
   const permissions = new AvailableProposalCategoryPermissions();
 

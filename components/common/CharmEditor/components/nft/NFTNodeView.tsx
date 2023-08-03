@@ -16,12 +16,12 @@ import { RiNftLine } from 'react-icons/ri';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { fancyTrimWords } from 'lib/utilities/strings';
 
+import { enableDragAndDrop } from '../../utils';
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
@@ -37,9 +37,9 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const blockchains = [1, 10, 137, 42161];
+const blockchains = [1, 10, 56, 137, 250, 5000, 42161, 43114];
 
-export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
+export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs, view, getPos }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -113,6 +113,9 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
   if (!nftData) {
     return (
       <Resizable
+        onDragStart={() => {
+          enableDragAndDrop(view, getPos());
+        }}
         readOnly={readOnly}
         initialSize={node.attrs.size}
         minWidth={MIN_IMAGE_WIDTH}
@@ -131,6 +134,9 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
 
   return (
     <Resizable
+      onDragStart={() => {
+        enableDragAndDrop(view, getPos());
+      }}
       readOnly={readOnly}
       initialSize={node.attrs.size}
       minWidth={MIN_IMAGE_WIDTH}
@@ -246,6 +252,7 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
               height={124}
               width={124}
               bgcolor='sidebar.background'
+              overflow='hidden'
             >
               {isLoading ? (
                 <LoadingComponent />

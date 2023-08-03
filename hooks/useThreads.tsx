@@ -1,5 +1,5 @@
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
@@ -8,6 +8,10 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useMembers } from 'hooks/useMembers';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithCommentsAndAuthors, ThreadWithComments } from 'lib/threads/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
+
+import { useCurrentSpace } from './useCurrentSpace';
+import { useWebSocketClient } from './useWebSocketClient';
 
 type IContext = {
   isValidating: boolean;
@@ -20,6 +24,10 @@ type IContext = {
   deleteThread: (threadId: string) => Promise<void>;
   refetchThreads: KeyedMutator<ThreadWithComments[]>;
 };
+
+export function getThreadsKey(pageId: string) {
+  return `pages/${pageId}/threads`;
+}
 
 export const ThreadsContext = createContext<Readonly<IContext>>({
   isValidating: true,
@@ -39,15 +47,17 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
   const [threads, setThreads] = useState<CommentThreadsMap>({});
   const { members } = useMembers();
+  const { subscribe } = useWebSocketClient();
+  const { spaceRole } = useCurrentSpace();
 
   const { data, isValidating, mutate } = useSWR(
-    () => (currentPageId ? `pages/${currentPageId}/threads` : null),
+    () => (currentPageId ? getThreadsKey(currentPageId) : null),
     () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
   );
 
   function populateThreads(_threads: ThreadWithComments[]): CommentThreadsMap {
-    const threadsandAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
+    const threadsAndAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
       const newThread: ThreadWithCommentsAndAuthors = {
         ...thread,
         comments: thread.comments.map((comment) => ({
@@ -58,8 +68,27 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       acc[thread.id] = newThread;
       return acc;
     }, {});
-    return threadsandAuthors;
+    return threadsAndAuthors;
   }
+
+  const threadsUpdatedHandler = useCallback(
+    (payload: WebSocketPayload<'threads_updated'>) => {
+      if (payload.pageId === currentPageId) {
+        mutate();
+      }
+    },
+    [currentPageId]
+  );
+
+  useEffect(() => {
+    if (spaceRole && !spaceRole.isGuest) {
+      const unsubscribeFromThreadsUpdatedEvent = subscribe('threads_updated', threadsUpdatedHandler);
+
+      return () => {
+        unsubscribeFromThreadsUpdatedEvent();
+      };
+    }
+  }, [spaceRole, currentPageId]);
 
   useEffect(() => {
     if (data) {

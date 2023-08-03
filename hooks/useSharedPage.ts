@@ -87,6 +87,7 @@ export const useSharedPage = () => {
     hasError,
     hasSharedPageAccess,
     publicSpace: space,
+    isPublicPath,
     publicPage,
     publicPageType: (isBountiesPath
       ? 'bounties'

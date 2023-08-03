@@ -1,6 +1,5 @@
 import { Add } from '@mui/icons-material';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -35,6 +34,8 @@ type Props = {
   showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  readOnlyTitle?: boolean;
+  disableAddingCards?: boolean;
 };
 
 function Table(props: Props): JSX.Element {
@@ -252,6 +253,8 @@ function Table(props: Props): JSX.Element {
                   onDropToGroupHeader={onDropToGroupHeader}
                   onDropToCard={onDropToCard}
                   onDropToGroup={onDropToGroup}
+                  readOnlyTitle={props.readOnlyTitle}
+                  disableAddingCards={props.disableAddingCards}
                 />
               );
             })}
@@ -272,27 +275,31 @@ function Table(props: Props): JSX.Element {
               addCard={props.addCard}
               onCardClicked={props.onCardClicked}
               onDrop={onDropToCard}
+              readOnlyTitle={props.readOnlyTitle}
             />
           )}
         </div>
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readOnly && !props.readOnlySourceData && !activeView.fields.groupById && (
-            <div
-              className='octo-table-cell'
-              onClick={() => {
-                props.addCard('');
-              }}
-            >
-              <Box display='flex' gap={1} alignItems='center'>
-                <Add fontSize='small' />
-                <Typography fontSize='small' id='TableComponent.plus-new'>
-                  New
-                </Typography>
-              </Box>
-            </div>
-          )}
+          {!props.readOnly &&
+            !props.readOnlySourceData &&
+            !activeView.fields.groupById &&
+            !props.disableAddingCards && (
+              <div
+                className='octo-table-cell'
+                onClick={() => {
+                  props.addCard('');
+                }}
+              >
+                <Box display='flex' gap={1} alignItems='center'>
+                  <Add fontSize='small' />
+                  <Typography fontSize='small' id='TableComponent.plus-new'>
+                    New
+                  </Typography>
+                </Box>
+              </div>
+            )}
         </div>
 
         <CalculationRow

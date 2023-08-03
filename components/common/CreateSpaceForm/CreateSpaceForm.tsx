@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -27,7 +27,6 @@ import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImport
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
 import { getSpaceUrl } from 'lib/utilities/browser';
-import debounce from 'lib/utilities/debounce';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
@@ -88,6 +87,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
   }, [watchName, watchSpaceImage]);
 
   const editableFields = !newSpace || (newSpace && watchSpaceTemplate === 'importMarkdown');
+  const submitLabel = newSpace ? 'Redirecting...' : submitText || 'Create';
 
   function onClose() {
     setNewSpace(null);
@@ -131,41 +131,38 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     }
   }
 
-  const onSubmit = useCallback(
-    debounce(async (values: FormValues) => {
-      try {
-        setSaveError(null);
-        const space = await createNewSpace({
-          spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
-          spaceData: {
-            name: values.name,
-            spaceImage: values.spaceImage
-          }
+  const onSubmit = useCallback(async (values: FormValues) => {
+    try {
+      setSaveError(null);
+      const space = await createNewSpace({
+        spaceTemplate: values.spaceTemplateOption as SpaceTemplateType,
+        spaceData: {
+          name: values.name,
+          spaceImage: values.spaceImage
+        }
+      });
+
+      setNewSpace(space);
+
+      if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
+        const notionUrl = generateNotionImportRedirectUrl({
+          origin: window?.location.origin,
+          spaceDomain: space.domain
         });
 
-        setNewSpace(space);
-
-        if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
-          const notionUrl = generateNotionImportRedirectUrl({
-            origin: window?.location.origin,
-            spaceDomain: space.domain
-          });
-
-          router.push(notionUrl);
-          // We want to make the user import markdown after creating the space
-        } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
-          // Give time for spaces hook to update so user doesn't end up on Routeguard
-          setTimeout(() => {
-            router.push(getSpaceUrl({ domain: space.domain }));
-          }, 200);
-        }
-      } catch (err) {
-        log.error('Error creating space', err);
-        setSaveError((err as Error).message || err);
+        router.push(notionUrl);
+        // We want to make the user import markdown after creating the space
+      } else if ((values.spaceTemplateOption as SpaceTemplateType) !== 'importMarkdown') {
+        // Give time for spaces hook to update so user doesn't end up on Routeguard
+        setTimeout(() => {
+          router.push(getSpaceUrl({ domain: space.domain }));
+        }, 200);
       }
-    }, 2000),
-    []
-  );
+    } catch (err) {
+      log.error('Error creating space', err);
+      setSaveError((err as Error).message || err);
+    }
+  }, []);
 
   function randomizeName() {
     const name = randomName();
@@ -257,14 +254,16 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
             </Grid>
             <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
               {watchSpaceTemplate !== 'importMarkdown' && (
-                <PrimaryButton
+                <Button
+                  size='large'
                   disabled={!watchName || !!newSpace}
                   type='submit'
                   data-test='create-workspace'
                   loading={isCreatingSpace}
+                  sx={{ px: 4 }}
                 >
-                  {submitText || 'Create'}
-                </PrimaryButton>
+                  {submitLabel}
+                </Button>
               )}
               {watchSpaceTemplate === 'importMarkdown' && (
                 <ImportZippedMarkdown

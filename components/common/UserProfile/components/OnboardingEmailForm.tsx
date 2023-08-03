@@ -1,12 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Checkbox, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 
 export const schema = yup.object({

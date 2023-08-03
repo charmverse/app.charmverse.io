@@ -7,7 +7,7 @@ describe('getProposalTemplates', () => {
   it('should return only templates in proposal categories user can create a proposal in within a paid space', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
-      spacePaidTier: 'pro'
+      spacePaidTier: 'community'
     });
 
     const createableCategory = await testUtilsProposals.generateProposalCategory({
@@ -78,7 +78,7 @@ describe('getProposalTemplates', () => {
   it('should return an empty list for people outside the space since they cannot create proposals', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
-      spacePaidTier: 'pro'
+      spacePaidTier: 'community'
     });
 
     const createableCategory = await testUtilsProposals.generateProposalCategory({

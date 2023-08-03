@@ -16,7 +16,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 });
 
 interface CustomizedSnackbarProps {
-  autoHideDuration?: number;
+  autoHideDuration?: number | null;
   severity?: AlertColor;
   message?: string;
   actions?: ReactNode[];
@@ -26,13 +26,25 @@ interface CustomizedSnackbarProps {
 }
 
 export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
-  const { setIsOpen, severity, message, actions, origin, handleClose, isOpen } = useSnackbar();
+  const {
+    setIsOpen,
+    severity,
+    message,
+    actions,
+    origin,
+    handleClose,
+    isOpen,
+    autoHideDuration = props.autoHideDuration ?? 5000
+  } = useSnackbar();
   const router = useRouter();
 
   // Close the snackbar if we change url
   useEffect(() => {
-    setIsOpen(false);
-  }, [router.asPath]);
+    // When autoHideDuration is null, we don't want to close the snackbar automatically and instead wait for close action
+    if (autoHideDuration !== null) {
+      setIsOpen(false);
+    }
+  }, [router.asPath, autoHideDuration]);
 
   const {
     actions: actionsProp,
@@ -40,8 +52,7 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     isOpen: isOpenProp,
     message: messageProp,
     origin: originProp,
-    severity: severityProp,
-    autoHideDuration = 5000
+    severity: severityProp
   } = props;
 
   return (

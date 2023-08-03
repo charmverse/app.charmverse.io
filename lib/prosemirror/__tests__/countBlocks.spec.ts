@@ -1,5 +1,5 @@
-import type { NodeType, Builder } from 'testing/prosemirror';
-import { builders as _, jsonDoc } from 'testing/prosemirror';
+import type { NodeType, Builder } from 'testing/prosemirror/builders';
+import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { countBlocks } from '../countBlocks';
 

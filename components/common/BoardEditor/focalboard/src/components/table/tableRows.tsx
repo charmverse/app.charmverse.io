@@ -25,6 +25,7 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
+  readOnlyTitle?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -73,6 +74,7 @@ function TableRows(props: Props): JSX.Element {
           resizingColumn={props.resizingColumn}
           columnRefs={props.columnRefs}
           cardPage={page}
+          readOnlyTitle={props.readOnlyTitle}
         />
       ))}
 
