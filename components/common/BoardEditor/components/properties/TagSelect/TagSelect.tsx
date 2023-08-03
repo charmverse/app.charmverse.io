@@ -21,13 +21,13 @@ type ContainerProps = {
 export const SelectPreviewContainer = styled(Stack, {
   shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly'
 })<ContainerProps>`
-  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-
-  justify-content: center;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  transition: background-color 0.2s ease-in-out;
-
+  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+  width: 100%;
+  height: 100%;
+  justify-content: center;
   padding: ${({ theme }) => theme.spacing(0.25, 0)};
+  transition: background-color 0.2s ease-in-out;
 
   ${({ displayType, theme }) => {
     // Styles depending on a view type
@@ -54,13 +54,6 @@ export const SelectPreviewContainer = styled(Stack, {
       }
     }
     `}
-
-  // div {
-  //   pointer-events: none;
-  // }
-
-  width: 100%;
-  height: 100%;
 `;
 
 const StyledSelect = styled(SelectField)<ContainerProps>`
@@ -79,16 +72,8 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   }
 
   .MuiInputBase-root.MuiInputBase-sizeSmall {
-    padding: 4px;
+    padding: 1px 4px;
   }
-  ${({ displayType }) =>
-    displayType !== 'details'
-      ? `
-      .MuiInputBase-root.MuiInputBase-sizeSmall {
-        padding: 1px;
-      }
-  `
-      : ''}
 `;
 
 type Props = {

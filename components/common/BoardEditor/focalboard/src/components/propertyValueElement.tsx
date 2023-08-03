@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -56,7 +57,6 @@ function PropertyValueElement(props: Props) {
     : '';
   const router = useRouter();
   const domain = router.query.domain as string;
-  const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
@@ -206,11 +206,15 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
-  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
-    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${displayValue}`, domain);
     propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
   } else if (propertyValueElement === null) {
-    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+    propertyValueElement = (
+      <div className='octo-propertyvalue'>
+        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+      </div>
+    );
   }
 
   const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);
