@@ -172,7 +172,7 @@ export function SpaceSettingsDialog() {
                 active={activePath === tab.path}
                 section={tab.path}
               >
-                {tab.path === 'subscription' && passedBlockQuota ? (
+                {tab.path === 'subscription' && passedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
                   <UpgradeChip forceDisplay upgradeContext='upgrade' />
                 ) : null}
               </SidebarLink>
