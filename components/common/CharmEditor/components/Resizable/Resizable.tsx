@@ -17,6 +17,7 @@ interface ResizableProps {
   onEdit?: VoidFunction;
   readOnly?: boolean;
   defaultFullWidth?: boolean;
+  onDragStart?: () => void;
 }
 
 const StaticContainer = styled.div<{ size: number }>`
@@ -35,7 +36,8 @@ function Resizable(props: ResizableProps) {
     initialSize = 100,
     aspectRatio,
     children,
-    minWidth
+    minWidth,
+    onDragStart
   } = props;
   const [size, setSize] = useState(initialSize || minWidth);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,7 +76,7 @@ function Resizable(props: ResizableProps) {
   }
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} onDragStart={onDragStart}>
       <BlockAligner readOnly={readOnly} onEdit={onEdit} onDelete={onDelete}>
         <HorizontalResizer
           aspectRatio={aspectRatio}

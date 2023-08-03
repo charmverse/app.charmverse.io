@@ -21,6 +21,7 @@ import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockch
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
+import { enableDragAndDrop } from '../../utils';
 import { EmptyEmbed } from '../common/EmptyEmbed';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
@@ -38,7 +39,7 @@ const StyledCard = styled(Card)`
 
 const blockchains = [1, 10, 56, 137, 250, 5000, 42161, 43114];
 
-export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
+export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs, view, getPos }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -112,6 +113,9 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
   if (!nftData) {
     return (
       <Resizable
+        onDragStart={() => {
+          enableDragAndDrop(view, getPos());
+        }}
         readOnly={readOnly}
         initialSize={node.attrs.size}
         minWidth={MIN_IMAGE_WIDTH}
@@ -130,6 +134,9 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs 
 
   return (
     <Resizable
+      onDragStart={() => {
+        enableDragAndDrop(view, getPos());
+      }}
       readOnly={readOnly}
       initialSize={node.attrs.size}
       minWidth={MIN_IMAGE_WIDTH}

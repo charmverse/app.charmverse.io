@@ -15,7 +15,7 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { communityProduct } from 'lib/subscription/constants';
+import { communityProduct, defaultFreeTrialBlockQuota } from 'lib/subscription/constants';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -96,6 +96,7 @@ export async function createWorkspace({
       webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
+      blockQuota: defaultFreeTrialBlockQuota,
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -240,7 +241,7 @@ export async function createWorkspace({
       spaceId: space.id,
       name: spaceData.name,
       freeTrial: true,
-      blockQuota: 30
+      blockQuota: defaultFreeTrialBlockQuota
     });
   } catch (err) {
     log.error('Error creating pro subscription', {

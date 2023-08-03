@@ -48,7 +48,10 @@ export async function getActiveSpaceSubscription({
 
   const stripeData = mapStripeFields({
     spaceId,
-    subscription: subscriptionInStripe as Stripe.Subscription & { customer: Stripe.Customer }
+    subscription: subscriptionInStripe as Stripe.Subscription & {
+      customer: Stripe.Customer;
+      default_payment_method: Stripe.PaymentMethod;
+    }
   });
 
   if (stripeData.status === 'cancelled') {
