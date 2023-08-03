@@ -14,10 +14,10 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
-import { useProposalCategories } from '../hooks/useProposalCategories';
+import { useProposalCategories } from '../../hooks/useProposalCategories';
+import { ProposalCategoryChip } from '../ProposalChip';
 
-import { ProposalCategoryContextMenu } from './ProposalCategoryContextMenu';
-import { ProposalCategoryChip } from './ProposalChip';
+import { ProposalCategoryContextMenu } from './components/ProposalCategoryContextMenu';
 
 export type ProposalStatusFilter = ProposalStatus | 'all' | 'archived';
 

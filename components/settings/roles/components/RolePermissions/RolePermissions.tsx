@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
-import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/permissions/components/ProposalCategoryPermissionRow';
+import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/ProposalViewOptions/components/ProposalCategoryPermissionsDialog/components/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

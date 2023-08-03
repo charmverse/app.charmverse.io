@@ -15,10 +15,11 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
-import { AddRolesButton } from '../components/AddRolesButton';
-import { ProposalCategoryRolePermissionRow } from '../components/ProposalCategoryPermissionRow';
-import { ProposalCategoryPermissionsAddRoles } from '../PaidProposalCategoryPermissions/ProposalCategoryPermissionAddRolesDialog';
-import type { BulkRoleProposalCategoryPermissionUpsert } from '../shared';
+import type { BulkRoleProposalCategoryPermissionUpsert } from '../../shared';
+import { AddRolesButton } from '../AddRolesButton';
+import { ProposalCategoryRolePermissionRow } from '../ProposalCategoryPermissionRow';
+
+import { ProposalCategoryPermissionsAddRoles } from './ProposalCategoryPermissionAddRolesDialog';
 
 /**
  * @permissions The actions a user can perform on a proposal category

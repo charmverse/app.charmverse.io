@@ -5,8 +5,8 @@ import Box from '@mui/material/Box';
 import Modal from 'components/common/Modal';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
-import { FreeProposalCategoryPermissions } from './FreeProposalCategoryPermissions/FreeProposalCategoryPermissions';
-import { PaidProposalCategoryPermissions } from './PaidProposalCategoryPermissions/PaidProposalCategoryPermissions';
+import { FreeProposalCategoryPermissions } from './components/FreeProposalCategoryPermissions/FreeProposalCategoryPermissions';
+import { PaidProposalCategoryPermissions } from './components/PaidProposalCategoryPermissions/PaidProposalCategoryPermissions';
 
 /**
  * @permissions The actions a user can perform on a proposal category

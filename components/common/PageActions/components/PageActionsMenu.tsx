@@ -6,13 +6,12 @@ import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/m
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { ArchiveProposalMenuItem } from 'components/proposals/ArchiveProposalMenuItem';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 
+import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
 
@@ -93,7 +92,7 @@ export function PageActionsMenu({
       </MenuItem>
       {page.type === 'proposal' && (
         <MenuItem>
-          <ArchiveProposalMenuItem proposalId={page.id} containerStyle={{ ml: -2 }} />
+          <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
         </MenuItem>
       )}
 

@@ -6,8 +6,8 @@ import { Button } from 'components/common/Button';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 
-import type { BulkRoleProposalCategoryPermissionUpsert } from '../shared';
-import { proposalCategoryPermissionLabels } from '../shared';
+import type { BulkRoleProposalCategoryPermissionUpsert } from '../../shared';
+import { proposalCategoryPermissionLabels } from '../../shared';
 
 type Props = {
   onClose: () => void;
