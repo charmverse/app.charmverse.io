@@ -26,7 +26,7 @@ export async function getSafeTxStatus({
   }
 
   try {
-    const safeTx = await safeService.getTransaction(safeTxHash);
+    const safeTx = (await safeService.getTransaction(safeTxHash)) as SafeMultisigTransactionResponse;
 
     const { isExecuted, isSuccessful, transactionHash: chainTxHash, nonce } = safeTx;
 

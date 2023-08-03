@@ -1,3 +1,6 @@
+import type { SafeTransactionData } from '@safe-global/safe-core-sdk-types';
+import { utils } from 'ethers';
+
 import * as http from 'adapters/http';
 
 type MantleMultisigSafe = {
@@ -52,4 +55,34 @@ export function getSafeData({
   return http.GET<MantleMultisigSafe>(`${serviceUrl}/v1/chains/${chainId}/safes/${address}`, undefined, {
     credentials: 'omit'
   });
+}
+
+export function proposeTransaction({
+  safeTransactionData,
+  txHash,
+  signature,
+  safeAddress,
+  senderAddress,
+  chainId
+}: {
+  txHash: string;
+  signature: string;
+  senderAddress: string;
+  safeAddress: string;
+  safeTransactionData: SafeTransactionData;
+  chainId: number;
+}) {
+  return http.POST(
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/${utils.getAddress(safeAddress)}/propose`,
+    {
+      ...safeTransactionData,
+      safeTxHash: txHash,
+      sender: senderAddress,
+      signature,
+      origin
+    },
+    {
+      credentials: 'omit'
+    }
+  );
 }

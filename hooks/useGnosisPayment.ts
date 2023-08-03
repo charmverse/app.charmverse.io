@@ -3,14 +3,13 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
 import { ethers, utils } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import log from 'loglevel';
 
-import * as http from 'adapters/http';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
 import useGnosisSafes from './useGnosisSafes';
 
@@ -61,24 +60,22 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
 
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
     if (chainId === 5001 || chainId === 5000) {
-      await http.POST(
-        `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/${getAddress(safeAddress)}/propose`,
-        {
+      await proposeTransaction({
+        safeTransactionData: {
           ...safeTransaction.data,
           // Need to convert to string because mantle doesn't support big numbers
           baseGas: safeTransaction.data.baseGas.toString(),
           gasPrice: safeTransaction.data.gasPrice.toString(),
+          // @ts-ignore
           nonce: safeTransaction.data.nonce.toString(),
-          safeTxGas: safeTransaction.data.safeTxGas.toString(),
-          safeTxHash: txHash,
-          sender: senderAddress,
-          signature: senderSignature.data,
-          origin
+          safeTxGas: safeTransaction.data.safeTxGas.toString()
         },
-        {
-          credentials: 'omit'
-        }
-      );
+        txHash,
+        senderAddress,
+        safeAddress,
+        signature: senderSignature.data,
+        chainId
+      });
     } else {
       await safeService.proposeTransaction({
         safeAddress,
