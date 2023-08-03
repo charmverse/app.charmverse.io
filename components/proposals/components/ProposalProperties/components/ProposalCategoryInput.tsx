@@ -3,6 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import type { HTMLAttributes } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
 import { brandColorNames } from 'theme/colors';
@@ -50,7 +51,7 @@ type Props = {
   onChange: (value: ProposalCategory | null) => void;
 };
 
-export default function ProposalCategoryInput({ disabled, options, value, onChange }: Props) {
+export function ProposalCategoryInput({ disabled, options, value, onChange }: Props) {
   const internalValue = useMemo(() => (value ? [value] : []), [value]);
   const [tempValue, setTempValue] = useState<TempOption | null>(null);
 
@@ -60,74 +61,85 @@ export default function ProposalCategoryInput({ disabled, options, value, onChan
     }
   }, [value, tempValue]);
 
-  async function onValueChange(values: OptionType[]) {
-    const newValue = values.pop();
-
-    if (newValue === undefined) {
-      onChange(null);
-      return;
-    }
-
-    if ('id' in newValue) {
-      onChange(newValue);
-    }
+  function onValueChange(values: string | string[]) {
+    const newValue = Array.isArray(values) ? values[0] : values;
+    const option = options.find(({ title }) => title === newValue);
+    onChange(option || null);
   }
 
   const colorToDisplay = tempValue?.color || value?.color || 'gray';
 
+  const propertyOptions = options.map((option) => ({
+    id: option.title,
+    value: option.title,
+    color: option.color
+  }));
+
+  const propertyValue = value?.title || [];
+
   return (
-    <Autocomplete
-      disabled={disabled}
-      value={tempValue ? [tempValue] : internalValue}
-      selectOnFocus
-      clearOnBlur
-      handleHomeEndKeys
-      multiple
-      filterSelectedOptions
-      sx={{ minWidth: 150, width: '100%' }}
-      options={options}
-      autoHighlight
-      clearIcon={null}
-      renderOption={(_props, category) => (
-        <ProposalCategoryOption category={category} props={_props} key={category.title} />
-      )}
-      ChipProps={{
-        // Avoids a bug where an error is thrown if the color is unsupported
-        color: brandColorNames.includes(colorToDisplay as BrandColor) ? (colorToDisplay as BrandColor) : undefined,
-        // Hack for preventing delete from showing
-        onDelete: null as any
-      }}
-      noOptionsText='No categories available'
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder='Select category'
-          size='small'
-          inputProps={{
-            ...params.inputProps,
-            // Hack hiding input for single-value tag input
-            style: { opacity: tempValue || internalValue.length ? 0 : 1 }
-          }}
-        />
-      )}
-      getOptionLabel={(option: OptionType) => {
-        // Regular option
-        return option?.title;
-      }}
-      isOptionEqualToValue={(option, checkValue) => {
-        if ('inputValue' in option) {
-          return 'inputValue' in checkValue && option.inputValue === checkValue.inputValue;
-        }
-
-        if ('id' in option) {
-          return 'id' in checkValue && option.id === checkValue.id;
-        }
-
-        return false;
-      }}
-      onChange={(_, values) => {
-        onValueChange(values);
-      }}
+    <TagSelect
+      wrapColumn
+      readOnly={disabled}
+      options={propertyOptions}
+      propertyValue={propertyValue}
+      onChange={onValueChange}
     />
   );
+
+  // return (
+  //   <Autocomplete
+  //     disabled={disabled}
+  //     value={tempValue ? [tempValue] : internalValue}
+  //     selectOnFocus
+  //     clearOnBlur
+  //     handleHomeEndKeys
+  //     multiple
+  //     filterSelectedOptions
+  //     sx={{ minWidth: 150, width: '100%' }}
+  //     options={options}
+  //     autoHighlight
+  //     clearIcon={null}
+  //     renderOption={(_props, category) => (
+  //       <ProposalCategoryOption category={category} props={_props} key={category.title} />
+  //     )}
+  //     ChipProps={{
+  //       // Avoids a bug where an error is thrown if the color is unsupported
+  //       color: brandColorNames.includes(colorToDisplay as BrandColor) ? (colorToDisplay as BrandColor) : undefined,
+  //       // Hack for preventing delete from showing
+  //       onDelete: null as any
+  //     }}
+  //     noOptionsText='No categories available'
+  //     renderInput={(params) => (
+  //       <TextField
+  //         {...params}
+  //         placeholder='Select category'
+  //         size='small'
+  //         inputProps={{
+  //           ...params.inputProps,
+  //           // Hack hiding input for single-value tag input
+  //           style: { opacity: tempValue || internalValue.length ? 0 : 1 }
+  //         }}
+  //       />
+  //     )}
+  //     getOptionLabel={(option: OptionType) => {
+  //       // Regular option
+  //       return option?.title;
+  //     }}
+  //     isOptionEqualToValue={(option, checkValue) => {
+  //       if ('inputValue' in option) {
+  //         return 'inputValue' in checkValue && option.inputValue === checkValue.inputValue;
+  //       }
+
+  //       if ('id' in option) {
+  //         return 'id' in checkValue && option.id === checkValue.id;
+  //       }
+
+  //       return false;
+  //     }}
+  //     onChange={(_, values) => {
+  //       onValueChange(values);
+  //     }}
+  //   />
+  // );
 }

@@ -1,7 +1,7 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { Box, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import {
   proposalStatusDetails,
   PROPOSAL_STATUSES,
@@ -36,9 +36,7 @@ export function MobileStepper({
     >
       <Box width='100%' justifyContent='space-between' gap={2} alignItems='center' my='6px'>
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Status</Button>
-          </div>
+          <PropertyLabel readOnly>Status</PropertyLabel>
           <Tooltip title={archived ? 'Archived proposals cannot be updated' : ''}>
             <Box display='flex' flex={1}>
               <Select

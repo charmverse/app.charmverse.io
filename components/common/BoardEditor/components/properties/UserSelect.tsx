@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, Box, Stack, Typography } from '@mui/material';
+import { IconButton, Box, Stack } from '@mui/material';
 import { useCallback, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -9,7 +9,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { isTruthy } from 'lib/utilities/types';
 
-import { SelectPreviewContainer } from '../SelectProperty/SelectProperty';
+import { EmptyPlaceholder } from './EmptyPlaceholder';
+import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
 type Props = {
   memberIds: string[];
@@ -47,18 +48,8 @@ const StyledUserPropertyContainer = styled(Box, {
 
   // dont let the input extend over neighbor columns in table mode when it is expanded
   overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
-
-  ${(props) =>
-    props.displayType !== 'table'
-      ? `
-        // & .MuiInputBase-root,
-        // & input.MuiInputBase-input {
-        //   /** this overflows to the next line on smaller width */
-        //   position: absolute;
-        // }
-      `
-      : ''}
 `;
+
 function MembersDisplay({
   memberIds,
   readOnly,
@@ -111,7 +102,7 @@ function MembersDisplay({
   );
 }
 
-export function UserProperty({
+export function UserSelect({
   displayType,
   memberIds,
   onChange,
@@ -140,9 +131,7 @@ export function UserProperty({
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
         {showEmptyPlaceholder && memberIds.length === 0 ? (
-          <Typography component='span' variant='subtitle2' color='secondary'>
-            Empty
-          </Typography>
+          <EmptyPlaceholder>Empty</EmptyPlaceholder>
         ) : (
           <MembersDisplay
             wrapColumn={wrapColumn ?? false}

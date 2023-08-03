@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { PropertyLabel } from 'components/common/BoardEditor/components/PropertyLabel';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
@@ -26,7 +26,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
 import { InputSearchReviewers } from './components/InputSearchReviewers';
-import ProposalCategoryInput from './components/ProposalCategoryInput';
+import { ProposalCategoryInput } from './components/ProposalCategoryInput';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import ProposalTemplateInput from './components/ProposalTemplateInput';
@@ -193,7 +193,7 @@ export function ProposalProperties({
   }, [detailsExpanded, proposalStatus]);
   return (
     <Box
-      className='octo-propertylist'
+      className='CardDetail content'
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
@@ -201,211 +201,213 @@ export function ProposalProperties({
       }}
       mt={2}
     >
-      {!isTemplate && (
-        <>
-          <Grid container mb={2}>
-            <ProposalStepSummary
-              archived={archived}
-              proposalFlowFlags={proposalFlowFlags}
-              proposalStatus={proposalStatus}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
-
-          <Stack
-            direction='row'
-            gap={4}
-            alignItems='center'
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setDetailsExpanded((v) => !v)}
-          >
-            <Typography variant='subtitle1'>Additional information</Typography>
-            <IconButton size='small'>
-              <KeyboardArrowDown
-                fontSize='small'
-                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
-              />
-            </IconButton>
-          </Stack>
-        </>
-      )}
-      <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
+      <div className='octo-propertylist'>
         {!isTemplate && (
-          <Grid container mb={2} mt={2}>
-            <ProposalStepper
-              proposalFlowPermissions={proposalFlowFlags}
-              proposalStatus={proposalStatus}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
-        )}
-        <Grid container mb={2}>
-          <Grid item xs={8}>
-            <Box display='flex' gap={1} alignItems='center'>
-              <Typography fontWeight='bold'>Proposal information</Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
-        {/* Select a category */}
-        <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Category</PropertyLabel>
-            <Box display='flex' flex={1}>
-              <ProposalCategoryInput
-                disabled={disabledCategoryInput}
-                options={categories || []}
-                value={proposalCategory ?? null}
-                onChange={onChangeCategory}
+          <>
+            <Grid container mb={2}>
+              <ProposalStepSummary
+                archived={archived}
+                proposalFlowFlags={proposalFlowFlags}
+                proposalStatus={proposalStatus}
+                openVoteModal={openVoteModal}
+                updateProposalStatus={updateProposalStatus}
               />
-            </Box>
-          </Box>
-        </Box>
+            </Grid>
 
-        {/* Select a template */}
-        {!isTemplate && isNewProposal && (
+            <Stack
+              direction='row'
+              gap={4}
+              alignItems='center'
+              sx={{ cursor: 'pointer' }}
+              onClick={() => setDetailsExpanded((v) => !v)}
+            >
+              <Typography variant='subtitle1'>Additional information</Typography>
+              <IconButton size='small'>
+                <KeyboardArrowDown
+                  fontSize='small'
+                  sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
+                />
+              </IconButton>
+            </Stack>
+          </>
+        )}
+        <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
+          {!isTemplate && (
+            <Grid container mb={2} mt={2}>
+              <ProposalStepper
+                proposalFlowPermissions={proposalFlowFlags}
+                proposalStatus={proposalStatus}
+                openVoteModal={openVoteModal}
+                updateProposalStatus={updateProposalStatus}
+              />
+            </Grid>
+          )}
+          <Grid container mb={2}>
+            <Grid item xs={8}>
+              <Box display='flex' gap={1} alignItems='center'>
+                <Typography fontWeight='bold'>Proposal information</Typography>
+              </Box>
+            </Grid>
+          </Grid>
+
+          {/* Select a category */}
           <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Template</PropertyLabel>
+              <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
-                <ProposalTemplateInput
-                  options={
-                    proposalTemplatePages.filter((proposalTemplate) => {
-                      if (!proposalTemplate.proposalId) {
-                        return false;
-                      }
-
-                      const _proposal = proposalsRecord[proposalTemplate.proposalId];
-                      if (!_proposal) {
-                        return false;
-                      }
-
-                      return _proposal.categoryId === proposalCategory?.id;
-                    }) || []
-                  }
-                  value={proposalTemplatePage ?? null}
-                  onChange={(page) => {
-                    if (proposalFormInputs.contentText?.length === 0) {
-                      onChangeTemplate(page);
-                    } else {
-                      setSelectedProposalTemplateId(page?.id ?? null);
-                    }
-                  }}
+                <ProposalCategoryInput
+                  disabled={disabledCategoryInput}
+                  options={categories || []}
+                  value={proposalCategory ?? null}
+                  onChange={onChangeCategory}
                 />
               </Box>
             </Box>
           </Box>
-        )}
 
-        {/* Select authors */}
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <PropertyLabel readOnly>Author</PropertyLabel>
-            <div style={{ width: '100%' }}>
-              <InputSearchMemberBase
-                filterSelectedOptions
-                multiple
-                placeholder='Select authors'
-                value={members.filter((member) => proposalAuthorIds.some((authorId) => member.id === authorId))}
-                disableCloseOnSelect
-                onChange={async (_, _members) => {
-                  // Must have atleast one author of proposal
-                  if ((_members as Member[]).length !== 0) {
+          {/* Select a template */}
+          {!isTemplate && isNewProposal && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly>Template</PropertyLabel>
+                <Box display='flex' flex={1}>
+                  <ProposalTemplateInput
+                    options={
+                      proposalTemplatePages.filter((proposalTemplate) => {
+                        if (!proposalTemplate.proposalId) {
+                          return false;
+                        }
+
+                        const _proposal = proposalsRecord[proposalTemplate.proposalId];
+                        if (!_proposal) {
+                          return false;
+                        }
+
+                        return _proposal.categoryId === proposalCategory?.id;
+                      }) || []
+                    }
+                    value={proposalTemplatePage ?? null}
+                    onChange={(page) => {
+                      if (proposalFormInputs.contentText?.length === 0) {
+                        onChangeTemplate(page);
+                      } else {
+                        setSelectedProposalTemplateId(page?.id ?? null);
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* Select authors */}
+          <Box justifyContent='space-between' gap={2} alignItems='center'>
+            <div
+              className='octo-propertyrow'
+              style={{
+                display: 'flex',
+                height: 'fit-content',
+                flexGrow: 1
+              }}
+            >
+              <PropertyLabel readOnly>Author</PropertyLabel>
+              <div style={{ width: '100%' }}>
+                <InputSearchMemberBase
+                  filterSelectedOptions
+                  multiple
+                  placeholder='Select authors'
+                  value={members.filter((member) => proposalAuthorIds.some((authorId) => member.id === authorId))}
+                  disableCloseOnSelect
+                  onChange={async (_, _members) => {
+                    // Must have atleast one author of proposal
+                    if ((_members as Member[]).length !== 0) {
+                      setProposalFormInputs({
+                        ...proposalFormInputs,
+                        authors: (_members as Member[]).map((member) => member.id)
+                      });
+                    }
+                  }}
+                  disabled={readOnly}
+                  readOnly={readOnly || canUpdateProposalProperties === false}
+                  options={members}
+                  sx={{
+                    width: '100%'
+                  }}
+                />
+              </div>
+            </div>
+          </Box>
+          <Box justifyContent='space-between' gap={2} alignItems='center'>
+            <div
+              className='octo-propertyrow'
+              style={{
+                display: 'flex',
+                height: 'fit-content',
+                flexGrow: 1
+              }}
+            >
+              <PropertyLabel readOnly>Reviewer</PropertyLabel>
+              <div style={{ width: '100%' }}>
+                <InputSearchReviewers
+                  disabled={readOnly}
+                  readOnly={readOnly || canUpdateProposalProperties === false}
+                  value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
+                  disableCloseOnSelect
+                  excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
+                  onChange={async (e, options) => {
                     setProposalFormInputs({
                       ...proposalFormInputs,
-                      authors: (_members as Member[]).map((member) => member.id)
+                      reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                     });
-                  }
-                }}
-                disabled={readOnly}
-                readOnly={readOnly || canUpdateProposalProperties === false}
-                options={members}
-                sx={{
-                  width: '100%'
-                }}
-              />
+                  }}
+                  sx={{
+                    width: '100%'
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </Box>
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <PropertyLabel readOnly>Reviewer</PropertyLabel>
-            <div style={{ width: '100%' }}>
-              <InputSearchReviewers
-                disabled={readOnly}
-                readOnly={readOnly || canUpdateProposalProperties === false}
-                value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
-                disableCloseOnSelect
-                excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
-                onChange={async (e, options) => {
-                  setProposalFormInputs({
-                    ...proposalFormInputs,
-                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
-                  });
-                }}
-                sx={{
-                  width: '100%'
-                }}
-              />
-            </div>
-          </div>
-        </Box>
-      </Collapse>
+          </Box>
+        </Collapse>
 
-      <ConfirmDeleteModal
-        onClose={() => {
-          setSelectedProposalTemplateId(null);
-        }}
-        open={!!selectedProposalTemplateId}
-        title='Overwriting your content'
-        buttonText='Overwrite'
-        secondaryButtonText='Go back'
-        question='Are you sure you want to overwrite your current content with the proposal template content?'
-        onConfirm={() => {
-          const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
-          onChangeTemplate(templatePage ?? null);
-          setSelectedProposalTemplateId(null);
-        }}
-      />
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
-      <CreateVoteModal
-        proposalFlowFlags={proposalFlowFlags}
-        proposal={voteProposal}
-        pageId={pageId}
-        snapshotProposalId={snapshotProposalId || null}
-        open={isVoteModalOpen}
-        onCreateVote={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onPublishToSnapshot={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onClose={() => {
-          setIsVoteModalOpen?.(false);
-        }}
-      />
+        <ConfirmDeleteModal
+          onClose={() => {
+            setSelectedProposalTemplateId(null);
+          }}
+          open={!!selectedProposalTemplateId}
+          title='Overwriting your content'
+          buttonText='Overwrite'
+          secondaryButtonText='Go back'
+          question='Are you sure you want to overwrite your current content with the proposal template content?'
+          onConfirm={() => {
+            const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
+            onChangeTemplate(templatePage ?? null);
+            setSelectedProposalTemplateId(null);
+          }}
+        />
+        <Divider
+          sx={{
+            my: 2
+          }}
+        />
+        <CreateVoteModal
+          proposalFlowFlags={proposalFlowFlags}
+          proposal={voteProposal}
+          pageId={pageId}
+          snapshotProposalId={snapshotProposalId || null}
+          open={isVoteModalOpen}
+          onCreateVote={() => {
+            setIsVoteModalOpen(false);
+            updateProposalStatus?.('vote_active');
+          }}
+          onPublishToSnapshot={() => {
+            setIsVoteModalOpen(false);
+            updateProposalStatus?.('vote_active');
+          }}
+          onClose={() => {
+            setIsVoteModalOpen?.(false);
+          }}
+        />
+      </div>
     </Box>
   );
 }

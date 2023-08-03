@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -24,7 +25,6 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -104,7 +104,7 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalStatus'
   ) {
     propertyValueElement = (
-      <SelectProperty
+      <TagSelect
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
@@ -131,7 +131,7 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
-      <UserProperty
+      <UserSelect
         displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}

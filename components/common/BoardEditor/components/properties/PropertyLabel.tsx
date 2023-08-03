@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import Button from '../focalboard/src/widgets/buttons/button';
+import Button from '../../focalboard/src/widgets/buttons/button';
 
 type PropertyLabelProps = {
   children: ReactNode;
