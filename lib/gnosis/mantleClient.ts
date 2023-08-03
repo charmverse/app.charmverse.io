@@ -29,6 +29,65 @@ type MantleMultisigSafe = {
   messagesTag: string;
 };
 
+interface SafeTransaction {
+  safeAddress: string;
+  txId: string;
+  executedAt: number;
+  txStatus: 'SUCCESS' | 'FAILED' | 'AWAITING_EXECUTION';
+  txInfo: {
+    type: string;
+    sender: {
+      value: string;
+    };
+    recipient: {
+      value: string;
+    };
+    direction: string;
+    transferInfo: {
+      type: string;
+      value: string;
+    };
+  };
+  txData: {
+    hexData: null;
+    dataDecoded: null;
+    to: {
+      value: string;
+    };
+    value: string;
+    operation: number;
+  };
+  detailedExecutionInfo: {
+    type: string;
+    submittedAt: number;
+    nonce: number;
+    safeTxGas: string;
+    baseGas: string;
+    gasPrice: string;
+    gasToken: string;
+    refundReceiver: {
+      value: string;
+    };
+    safeTxHash: string;
+    executor: {
+      value: string;
+    };
+    signers: {
+      value: string;
+    }[];
+    confirmationsRequired: number;
+    confirmations: {
+      signer: {
+        value: string;
+      };
+      signature: string;
+      submittedAt: number;
+    }[];
+    trusted: boolean;
+  };
+  txHash: string;
+}
+
 export function getSafesByOwner({
   serviceUrl,
   chainId,
@@ -86,3 +145,41 @@ export function proposeTransaction({
     }
   );
 }
+
+export function getTransaction({
+  safeAddress,
+  safeTxHash,
+  chainId
+}: {
+  safeAddress: string;
+  chainId: number;
+  safeTxHash: string;
+}) {
+  return http.GET<SafeTransaction>(
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/multisig_${safeAddress}_${safeTxHash}`,
+    undefined,
+    {
+      credentials: 'omit'
+    }
+  );
+}
+
+// export function getAllTransactions({}: {
+//   safeAddress: string;
+// }) {
+//   const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
+
+//   const trusted = options?.trusted?.toString() || 'true'
+//   url.searchParams.set('trusted', trusted)
+
+//   const queued = options?.queued?.toString() || 'true'
+//   url.searchParams.set('queued', queued)
+
+//   const executed = options?.executed?.toString() || 'false'
+//   url.searchParams.set('executed', executed)
+
+//   return sendRequest({
+//     url: url.toString(),
+//     method: HttpMethod.Get
+//   })
+// }
