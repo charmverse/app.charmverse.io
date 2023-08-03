@@ -29,7 +29,7 @@ import { InputSearchReviewers } from './components/InputSearchReviewers';
 import { ProposalCategoryInput } from './components/ProposalCategoryInput';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
-import ProposalTemplateInput from './components/ProposalTemplateInput';
+import { ProposalTemplateInput } from './components/ProposalTemplateInput';
 
 export type ProposalFormInputs = {
   title?: string; // title is saved to the same state that's used in ProposalPage
@@ -93,11 +93,6 @@ export function ProposalProperties({
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
   }, [pages]);
 
-  const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, Proposal & { page: Page }>);
-
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -105,6 +100,21 @@ export function ProposalProperties({
   const isProposalAuthor = user && proposalAuthorIds.some((authorId) => authorId === user.id);
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
+
+  const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
+    acc[_proposal.id] = _proposal;
+    return acc;
+  }, {} as Record<string, Proposal & { page: Page }>);
+
+  const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
+    const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
+    if (!_proposal) {
+      return false;
+    } else if (!proposalCategoryId) {
+      return true;
+    }
+    return _proposal.categoryId === proposalCategoryId;
+  });
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
@@ -156,10 +166,16 @@ export function ProposalProperties({
         categoryId: updatedCategory.id,
         proposalTemplateId: null
       });
+    } else if (!updatedCategory) {
+      setProposalFormInputs({
+        ...proposalFormInputs,
+        categoryId: null,
+        proposalTemplateId: null
+      });
     }
   }
 
-  function onChangeTemplate(templatePage: PageMeta | null) {
+  function applyTemplate(templatePage: PageMeta) {
     if (templatePage && templatePage.proposalId) {
       // Fetch the proposal page to get its content
       const proposalTemplate = proposalTemplates.find(
@@ -168,6 +184,7 @@ export function ProposalProperties({
       if (proposalTemplate) {
         setProposalFormInputs({
           ...proposalFormInputs,
+          categoryId: proposalTemplate.categoryId,
           content: proposalTemplate.page.content as PageContent,
           contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
@@ -178,6 +195,13 @@ export function ProposalProperties({
         });
       }
     }
+  }
+
+  function clearTemplate() {
+    setProposalFormInputs({
+      ...proposalFormInputs,
+      proposalTemplateId: null
+    });
   }
 
   function openVoteModal() {
@@ -221,7 +245,7 @@ export function ProposalProperties({
               sx={{ cursor: 'pointer' }}
               onClick={() => setDetailsExpanded((v) => !v)}
             >
-              <Typography variant='subtitle1'>Additional information</Typography>
+              <Typography variant='subtitle1'>Details</Typography>
               <IconButton size='small'>
                 <KeyboardArrowDown
                   fontSize='small'
@@ -243,11 +267,7 @@ export function ProposalProperties({
             </Grid>
           )}
           <Grid container mb={2}>
-            <Grid item xs={8}>
-              <Box display='flex' gap={1} alignItems='center'>
-                <Typography fontWeight='bold'>Proposal information</Typography>
-              </Box>
-            </Grid>
+            <Typography variant='subtitle1'>Properties</Typography>
           </Grid>
 
           {/* Select a category */}
@@ -272,26 +292,17 @@ export function ProposalProperties({
                 <PropertyLabel readOnly>Template</PropertyLabel>
                 <Box display='flex' flex={1}>
                   <ProposalTemplateInput
-                    options={
-                      proposalTemplatePages.filter((proposalTemplate) => {
-                        if (!proposalTemplate.proposalId) {
-                          return false;
-                        }
-
-                        const _proposal = proposalsRecord[proposalTemplate.proposalId];
-                        if (!_proposal) {
-                          return false;
-                        }
-
-                        return _proposal.categoryId === proposalCategory?.id;
-                      }) || []
-                    }
+                    options={templateOptions}
                     value={proposalTemplatePage ?? null}
-                    onChange={(page) => {
-                      if (proposalFormInputs.contentText?.length === 0) {
-                        onChangeTemplate(page);
+                    onChange={(template) => {
+                      if (template === null) {
+                        clearTemplate();
+                        // if user has not updated the content, then just overwrite everything
+                      } else if (proposalFormInputs.contentText?.length === 0) {
+                        applyTemplate(template);
                       } else {
-                        setSelectedProposalTemplateId(page?.id ?? null);
+                        // set value to trigger a prompt
+                        setSelectedProposalTemplateId(template?.id ?? null);
                       }
                     }}
                   />
@@ -380,7 +391,9 @@ export function ProposalProperties({
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
             const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
-            onChangeTemplate(templatePage ?? null);
+            if (templatePage) {
+              applyTemplate(templatePage);
+            }
             setSelectedProposalTemplateId(null);
           }}
         />

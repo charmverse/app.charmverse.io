@@ -20,12 +20,13 @@ export function SelectPreview({ sx, wrapColumn, value, options = [], name, size,
   const valueOptions = values
     .map((v) => options?.find((o) => (o as SelectOptionType).id === v))
     .filter(Boolean) as SelectOptionType[];
-
   return (
     <Stack sx={sx} gap={name ? 0.5 : 0}>
-      <Typography component='span' fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
-        {name}
-      </Typography>
+      {name && (
+        <Typography component='span' fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
+          {name}
+        </Typography>
+      )}
       <Stack gap={0.5} flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} overflow='hidden'>
         {valueOptions.length !== 0
           ? valueOptions.map((valueOption) => (

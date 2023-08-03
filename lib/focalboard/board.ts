@@ -48,7 +48,7 @@ export const propertyTypesList: PropertyType[] = [
 interface IPropertyOption {
   id: string;
   value: string;
-  color: string;
+  color?: string;
 }
 
 // A template for card properties attached to a board

@@ -1,8 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { ListItemIcon, ListItemText, MenuItem, TextField } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
 
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { fancyTrim } from 'lib/utilities/strings';
 
 const maxTitleLength = 35;
@@ -14,49 +12,33 @@ type Props = {
   onChange: (value: PageMeta | null) => void;
 };
 
-export default function ProposalTemplateInput({ disabled, options, value, onChange }: Props) {
+export function ProposalTemplateInput({ disabled, options, value, onChange }: Props) {
+  const propertyOptions = options.map((option) => ({
+    id: option.id,
+    value: fancyTrim(option.title || 'Untitled', maxTitleLength)
+  }));
+
+  const propertyValue = value?.id ?? '';
+
+  function onValueChange(values: string | string[]) {
+    const newValue = Array.isArray(values) ? values[0] : values;
+    const option = options.find(({ id }) => id === newValue);
+    if (option === undefined) {
+      onChange(null);
+    } else if ('id' in option) {
+      onChange(option);
+    }
+  }
   return (
-    <Autocomplete
-      disabled={disabled}
-      value={value}
-      selectOnFocus
-      clearOnBlur
-      handleHomeEndKeys
-      filterSelectedOptions
-      sx={{ minWidth: 150, width: '100%' }}
-      options={options}
-      autoHighlight
-      clearIcon={null}
-      renderOption={(_props, page) => (
-        <MenuItem {..._props}>
-          <ListItemIcon>
-            <DescriptionOutlinedIcon />
-          </ListItemIcon>
-          <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
-        </MenuItem>
-      )}
-      ChipProps={{
-        // Hack for preventing delete from showing
-        onDelete: null as any
-      }}
-      noOptionsText='No templates available'
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder={options.length > 0 ? 'Select template' : 'No templates available'}
-          size='small'
-        />
-      )}
-      getOptionLabel={(templatePage: PageMeta) => {
-        // Regular option
-        return templatePage?.title;
-      }}
-      isOptionEqualToValue={(templatePage, checkValue) => {
-        return templatePage.id === checkValue.id;
-      }}
-      onChange={(_, _value) => {
-        onChange(_value);
-      }}
+    <TagSelect
+      wrapColumn
+      readOnly={disabled}
+      options={propertyOptions}
+      noOptionsText={
+        propertyValue ? 'No more options available for this category' : 'No options available for this category'
+      }
+      propertyValue={propertyValue}
+      onChange={onValueChange}
     />
   );
 }

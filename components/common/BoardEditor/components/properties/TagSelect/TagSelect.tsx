@@ -79,6 +79,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 type Props = {
   readOnly?: boolean;
   multiselect?: boolean;
+  noOptionsText?: string;
   options: IPropertyOption[];
   propertyValue: string | string[];
   displayType?: PropertyValueDisplayType;
@@ -99,6 +100,7 @@ export function TagSelect({
   onDeleteOption,
   onCreateOption,
   displayType = 'details',
+  noOptionsText,
   wrapColumn
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
@@ -148,7 +150,6 @@ export function TagSelect({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
-
   if (!isOpened) {
     return (
       <SelectPreviewContainer onClick={onEdit} displayType={displayType} readOnly={readOnly}>
@@ -168,6 +169,7 @@ export function TagSelect({
   return (
     <StyledSelect
       placeholder='Search for an option...'
+      noOptionsText={noOptionsText}
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}
