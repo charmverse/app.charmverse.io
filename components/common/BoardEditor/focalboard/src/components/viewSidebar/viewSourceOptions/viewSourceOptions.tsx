@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { ApiPageKey } from '@charmverse/core/prisma';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
@@ -35,8 +36,10 @@ type ViewSourceOptionsProps = DatabaseSourceProps &
     goBack?: () => void;
     title?: string;
     view?: BoardView;
+    views: BoardView[];
     pageId?: string;
-    board: Board;
+    page?: PageMeta;
+    board?: Board;
   };
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
@@ -44,6 +47,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     view: activeView,
     pageId,
     board,
+    views,
+    page,
     title,
     onCreateDatabase,
     onSelect,
@@ -52,10 +57,14 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     closeSidebar
   } = props;
 
-  const activeSourceType = board.fields.sourceType ?? activeView?.fields.sourceType;
+  console.log({ goBack });
 
-  const [sourceType, setSourceType] = useState<DataSourceType | undefined>();
-  const [formStep, setStep] = useState<FormStep>('select_source');
+  const activeSourceType = board?.fields.sourceType ?? activeView?.fields.sourceType;
+
+  const [sourceType, setSourceType] = useState<DataSourceType | undefined>(activeSourceType);
+  const [formStep, setStep] = useState<FormStep>(
+    !onCreateDatabase || activeSourceType === 'google_form' ? 'configure_source' : 'select_source'
+  );
 
   const {
     data: webhookApi,
@@ -99,59 +108,63 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     setStep('select_source');
   }
 
+  const isLinkedPage = String(page?.type).match('linked');
+
+  console.log({ isLinkedPage });
+
+  const goBackFunction = (isLinkedPage && views.length === 0) || formStep === 'select_source' ? goBack : goToFirstStep;
+
   return (
     <>
-      <SidebarHeader
-        goBack={formStep === 'select_source' ? goBack : goToFirstStep}
-        title={title}
-        closeSidebar={closeSidebar}
-      />
+      <SidebarHeader goBack={goBackFunction} title={title} closeSidebar={closeSidebar} />
       <Box onClick={(e) => e.stopPropagation()}>
         {formStep === 'select_source' && (
           <Grid container spacing={1} px={1}>
-            <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('linked')}>
+            <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
               <TbDatabase style={{ fontSize: 24 }} />
               CharmVerse database
             </SourceType>
-            <SourceType
-              active={activeSourceType === 'proposals'}
-              onClick={
-                isLoadingProposalSource
-                  ? undefined
-                  : () => {
-                      selectSourceType('proposals');
-                      handleProposalSource();
-                    }
-              }
-            >
-              <TaskOutlinedIcon fontSize='small' />
-              Charmverse Proposals
-            </SourceType>
-            <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-              <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
-              <BsFiletypeCsv style={{ fontSize: 24 }} />
-              Import CSV
-            </SourceType>
-            <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
-              <RiGoogleFill style={{ fontSize: 24 }} />
-              Google Form
-            </SourceType>
-            <SourceType
-              active={false}
-              onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
-            >
-              <SiTypeform style={{ fontSize: 24 }} />
-              Typeform
-            </SourceType>
             {onCreateDatabase && (
-              <SourceType onClick={onCreateDatabase}>
-                <AddCircleIcon style={{ fontSize: 24 }} />
-                New database
-              </SourceType>
+              <>
+                <SourceType
+                  active={activeSourceType === 'proposals'}
+                  onClick={
+                    isLoadingProposalSource
+                      ? undefined
+                      : () => {
+                          selectSourceType('proposals');
+                          handleProposalSource();
+                        }
+                  }
+                >
+                  <TaskOutlinedIcon fontSize='small' />
+                  Charmverse Proposals
+                </SourceType>
+                <SourceType active={false} component='label' htmlFor='dbcsvfile'>
+                  <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
+                  <BsFiletypeCsv style={{ fontSize: 24 }} />
+                  Import CSV
+                </SourceType>
+                <SourceType active={activeSourceType === 'google_form'} onClick={selectSourceType('google_form')}>
+                  <RiGoogleFill style={{ fontSize: 24 }} />
+                  Google Form
+                </SourceType>
+                <SourceType
+                  active={false}
+                  onClick={() => (isLoadingWebhookApiKeyCreation ? {} : handleApiKeyClick('typeform'))}
+                >
+                  <SiTypeform style={{ fontSize: 24 }} />
+                  Typeform
+                </SourceType>
+                <SourceType onClick={onCreateDatabase}>
+                  <AddCircleIcon style={{ fontSize: 24 }} />
+                  New database
+                </SourceType>
+              </>
             )}
           </Grid>
         )}
-        {formStep === 'configure_source' && (sourceType === 'board_page' || sourceType === 'linked') && (
+        {formStep === 'configure_source' && sourceType === 'board_page' && (
           <>
             <LinkCharmVerseDatabase onSelect={onSelect} activePageId={activeView?.fields.linkedSourceId} />
             {onCreateDatabase && <NewCharmVerseDatabase onCreateDatabase={onCreateDatabase} />}

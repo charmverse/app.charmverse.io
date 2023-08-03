@@ -1,3 +1,5 @@
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import BackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
@@ -40,8 +42,10 @@ import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
   board?: Board;
+  page?: PageMeta;
   parentBoard: Board; // we need the parent board when creating or updating the view
   view: BoardView;
+  views: BoardView[];
   closeSidebar: () => void;
   isOpen: boolean;
   groupByProperty?: IPropertyTemplate;
@@ -135,6 +139,14 @@ function ViewSidebar(props: Props) {
     }
   }, [props.pageId, props.view.parentId, props.board?.fields.sourceType]);
 
+  const isLinkedPage = String(props.page?.type).match('linked');
+
+  const allowSourceSelection =
+    props.views.length === 0 ||
+    isLinkedPage ||
+    props.board?.fields?.sourceType === 'google_form' ||
+    props.view.fields.sourceType === 'google_form';
+
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
       <Collapse
@@ -166,17 +178,14 @@ function ViewSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {props &&
-                !(['board_page', 'google_form', 'proposals'] as DataSourceType[]).includes(
-                  props.board?.fields.sourceType as DataSourceType
-                ) && (
-                  <MenuRow
-                    onClick={() => setSidebarView('source')}
-                    icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
-                    title='Source'
-                    value={sourceTitle}
-                  />
-                )}
+              {props && allowSourceSelection && (
+                <MenuRow
+                  onClick={() => setSidebarView('source')}
+                  icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
+                  title='Source'
+                  value={sourceTitle}
+                />
+              )}
             </>
           )}
           {sidebarView === 'layout' && (
@@ -202,17 +211,18 @@ function ViewSidebar(props: Props) {
             </>
           )}
           {sidebarView === 'source' && (
-            <>
-              SIDEBAR
-              <ViewSourceOptions
-                title='Data source'
-                view={props.view}
-                goBack={goBack}
-                onSelect={selectViewSource}
-                closeSidebar={props.closeSidebar}
-                pageId={props.pageId}
-              />
-            </>
+            <ViewSourceOptions
+              views={props.views}
+              page={props.page}
+              board={props.board}
+              title='Data source'
+              view={props.view}
+              // We don't want to allow going back if this board is locked to charmverse databases
+              goBack={goBack}
+              onSelect={selectViewSource}
+              closeSidebar={props.closeSidebar}
+              pageId={props.pageId}
+            />
           )}
         </StyledSidebar>
       </Collapse>

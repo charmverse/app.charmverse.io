@@ -60,9 +60,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
 };
 
-export type PrimaryDataSource = 'board_page' | 'google_form' | 'proposals';
-
-export type DataSourceType = PrimaryDataSource | 'linked';
+export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
 
 export type GoogleFormSourceData = {
   credentialId: string;

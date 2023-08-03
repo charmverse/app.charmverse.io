@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Collapse, Stack, Typography } from '@mui/material';
@@ -7,6 +8,8 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 
 import { StyledSidebar } from './viewSidebar/viewSidebar';
 import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
@@ -15,6 +18,9 @@ import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOpt
 
 type CreateLinkedViewProps = DatabaseSourceProps &
   Partial<NewDatabaseSourceProps> & {
+    page?: PageMeta;
+    board: Board;
+    views: BoardView[];
     readOnly: boolean;
     onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
     pageId?: string;

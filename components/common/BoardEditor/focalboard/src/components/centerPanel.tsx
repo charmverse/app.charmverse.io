@@ -111,6 +111,8 @@ function CenterPanel(props: Props) {
     showSettings: null
   });
 
+  console.log({ views });
+
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
@@ -529,7 +531,13 @@ function CenterPanel(props: Props) {
     !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
 
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
-  const disableAddingNewCards = activeBoard?.fields.sourceType === 'proposals';
+
+  const boardSourceType = activeBoard?.fields.sourceType ?? activeView?.fields.sourceType;
+
+  const disableAddingNewCards = boardSourceType === 'proposals';
+
+  const isLinkedDatabase = String(props.page?.type).match('linked');
+
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
@@ -656,13 +664,16 @@ function CenterPanel(props: Props) {
                   </Button>
                 )}
               {!activeView &&
-                (views.length === 0 || activeBoard?.fields.sourceType === 'linked') &&
+                (views.length === 0 || isLinkedDatabase) &&
                 state.showSettings === 'create-linked-view' && (
                   <CreateLinkedView
+                    views={views}
+                    page={props.page}
+                    board={board}
                     readOnly={props.readOnly}
                     onSelect={selectViewSource}
                     // if it links to deleted db page then the board can't be inline_board type
-                    onCreateDatabase={activeBoard?.fields.sourceType !== 'linked' ? createDatabase : undefined}
+                    onCreateDatabase={views.length === 0 ? createDatabase : undefined}
                     onCsvImport={onCsvImport}
                     pageId={props.page?.id}
                   />
@@ -733,6 +744,8 @@ function CenterPanel(props: Props) {
             </Box>
             {activeView && (
               <ViewSidebar
+                views={views}
+                page={props.page}
                 board={activeBoard}
                 pageId={activePage?.id}
                 parentBoard={board}
