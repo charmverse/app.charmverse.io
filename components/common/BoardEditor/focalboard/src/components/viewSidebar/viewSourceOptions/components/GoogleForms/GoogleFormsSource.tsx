@@ -16,13 +16,10 @@ import type { GoogleFormItem } from 'pages/api/google/forms';
 
 import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 
-export type GoogleFormHandlerProp = {
-  onSelectSourceGoogleForm: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
-};
-
-type Props = GoogleFormHandlerProp & {
+type Props = {
   activeCredential?: string;
   activeFormId?: string;
+  onSelectSourceGoogleForm: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
 };
 
 export function GoogleFormsSource(props: Props) {

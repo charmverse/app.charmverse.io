@@ -12,7 +12,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { Board, BoardFields, DataSourceType } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createTableView } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/focalboard/createNewDataSource';
 
@@ -134,7 +134,20 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       });
     }
   }
-  const onSelectSourceGoogleForm = (input?: any) => null;
+  function onSelectSourceGoogleForm(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
+    // const googleBoard = boards[fields.linkedSourceId];
+    // const board = {
+    //   // use parentBoard props like id and rootId by default
+    //   ...board,
+    //   // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
+    //   fields: sourceBoard?.fields || props.parentBoard.fields
+    // };
+    // const newView = createTableView({ board, activeView: props.view, views: props.views });
+    // newView.fields.sourceData = fields.sourceData;
+    // newView.fields.sourceType = fields.sourceType;
+    // newView.fields.linkedSourceId = fields.linkedSourceId;
+    // await mutator.updateBlock(newView, props.view, 'change view source');
+  }
 
   async function onCreateDatabase({ sourceType }: { sourceType: Exclude<DataSourceType, 'google_form'> }) {
     if (!rootBoardPage || !rootBoardPage.type.match('board')) {

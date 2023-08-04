@@ -72,7 +72,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     allowedSourceOptions.push('linked');
     // Databases start out as linked pages. As long as they are not already linked, we can offer all options
   } else if (views.length === 0) {
-    allowedSourceOptions.push(...(['new', 'linked', 'google', 'proposals', 'typeform', 'csv'] as SourceOptions[]));
+    allowedSourceOptions.push(...(['new', 'linked', 'google_form', 'proposals', 'typeform', 'csv'] as SourceOptions[]));
+
+    // Only allow Google form to be used once this is connected
   } else if (activeSourceType === 'google_form') {
     allowedSourceOptions.push('google_form');
   } else if (!linkedSourceId && activeSourceType !== 'proposals') {
