@@ -168,6 +168,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
+      canEditOptions={false} // TODO: allow editing options
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen
