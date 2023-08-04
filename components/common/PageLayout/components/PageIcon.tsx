@@ -21,7 +21,7 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
   font-size: 22px;
 `;
 
-const StyledPageIcon = styled(EmojiIcon)`
+export const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   z-index: 0;
   width: 24px;
@@ -38,7 +38,7 @@ const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-const StyledLinkIcon = styled(ArrowOutwardIcon)`
+export const StyledLinkIcon = styled(ArrowOutwardIcon)`
   position: absolute;
   bottom: 2px;
   right: -1px;
@@ -49,11 +49,11 @@ const StyledLinkIcon = styled(ArrowOutwardIcon)`
   paint-order: stroke;
 `;
 
-function LinkedIcon({ children }: { children: ReactNode }) {
+export function LinkedIcon({ children }: { children: ReactNode }) {
   return (
     <Box display='flex' alignItems='center' justifyContent='center'>
       {children}
-      <StyledLinkIcon />
+      <StyledLinkIcon className='styled-link-icon' />
     </Box>
   );
 }
@@ -76,7 +76,6 @@ export function NoAccessPageIcon() {
     />
   );
 }
-
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
   let iconComponent: ReactNode = icon;
   if (!icon) {

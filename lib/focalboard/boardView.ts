@@ -1,11 +1,12 @@
 import { upperFirst } from 'lodash';
 
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
-import type { GoogleFormSourceData, DataSourceType } from './board';
+import type { GoogleFormSourceData, DataSourceType, Board, IPropertyTemplate } from './board';
 
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };
@@ -69,6 +70,20 @@ function createBoardView(block?: Block): BoardView {
     type: 'view',
     fields
   };
+}
+
+export function createTableView({ board, activeView }: { board: Board; activeView?: BoardView }) {
+  const view = createBoardView(activeView);
+  view.title = '';
+  view.fields.viewType = 'table';
+  view.parentId = board.id;
+  view.rootId = board.rootId;
+  view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
+  view.fields.columnWidths = {};
+  view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
+  view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+
+  return view;
 }
 
 export function formatViewTitle(view: BoardView) {

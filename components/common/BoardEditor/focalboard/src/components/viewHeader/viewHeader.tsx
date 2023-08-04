@@ -49,7 +49,7 @@ type Props = {
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
-  toggleViewOptions: (enable?: boolean) => void;
+  toggleViewOptions: (open?: boolean) => void;
 };
 
 function ViewHeader(props: Props) {
@@ -117,13 +117,12 @@ function ViewHeader(props: Props) {
 
       {!props.readOnly && views.length <= maxTabsShown && (
         <Box className='view-actions' pt='4px'>
-          ADD_VIEW
           <AddViewMenu
             board={viewsBoard}
             activeView={activeView}
             views={views}
             showView={showView}
-            onClickIcon={onClickNewView}
+            onClick={onClickNewView}
           />
         </Box>
       )}
