@@ -60,7 +60,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeSourceType = rootBoard?.fields.sourceType ?? activeView?.fields.sourceType;
 
   const [sourceType, setSourceType] = useState<DataSourceType | undefined>(
-    rootIsLinkedBoard ? 'board_page' : undefined
+    activeSourceType === 'google_form' ? 'google_form' : rootIsLinkedBoard ? 'board_page' : undefined
   );
   const [formStep, setStep] = useState<FormStep>(
     (rootIsLinkedBoard && views.length > 0) || activeSourceType === 'google_form' ? 'configure_source' : 'select_source'

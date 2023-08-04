@@ -153,6 +153,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       <>
         <div className='focalboard-body full-page'>
           <CenterPanel
+            currentRootPageId={page.id}
             readOnly={Boolean(readOnlyBoard)}
             readOnlySourceData={readOnlySourceData}
             board={board}

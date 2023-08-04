@@ -1,6 +1,7 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Collapse, Stack, Typography, useTheme } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect } from 'react';
 
 import { Button } from 'components/common/Button';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
@@ -23,6 +24,11 @@ type Props = {
 export function CreateLinkedView(props: Props) {
   const sourcePopup = usePopupState({ variant: 'popover', popupId: 'select-source' });
   const isSmallScreen = useSmallScreen();
+
+  useEffect(() => {
+    sourcePopup.open();
+  }, []);
+
   return (
     <Box display='flex'>
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>

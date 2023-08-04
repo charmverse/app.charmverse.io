@@ -21,11 +21,20 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
+  if (boardId && spaceId) {
+    await prisma.block.findFirstOrThrow({
+      where: {
+        id: boardId,
+        spaceId
+      }
+    });
+  }
+
   const database = await setDatabaseProposalProperties({
     databaseId: boardId
   });
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
-  if (database.fields.sourceType === 'proposals') {
+  if (database.fields.sourceType !== 'proposals') {
     throw new InvalidStateError('Board does not have a proposals view');
   }
 

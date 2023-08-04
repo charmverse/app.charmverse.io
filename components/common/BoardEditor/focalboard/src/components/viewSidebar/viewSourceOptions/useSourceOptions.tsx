@@ -134,32 +134,28 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       });
     }
   }
-  function onSelectSourceGoogleForm(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
-    // const googleBoard = boards[fields.linkedSourceId];
-    // const board = {
-    //   // use parentBoard props like id and rootId by default
-    //   ...board,
-    //   // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
-    //   fields: sourceBoard?.fields || props.parentBoard.fields
-    // };
-    // const newView = createTableView({ board, activeView: props.view, views: props.views });
-    // newView.fields.sourceData = fields.sourceData;
-    // newView.fields.sourceType = fields.sourceType;
-    // newView.fields.linkedSourceId = fields.linkedSourceId;
-    // await mutator.updateBlock(newView, props.view, 'change view source');
+  async function onSelectSourceGoogleForm(fields: Pick<BoardViewFields, 'sourceData' | 'sourceType'>) {
+    const newView = createTableView({ board: rootBoard, activeView });
+    newView.fields.sourceData = fields.sourceData;
+    newView.fields.sourceType = fields.sourceType;
+
+    if (activeView) {
+      await mutator.updateBlock(newView, activeView, 'change view source');
+    } else {
+      await mutator.insertBlock(newView, 'create form response');
+    }
   }
 
   async function onCreateDatabase({ sourceType }: { sourceType: Exclude<DataSourceType, 'google_form'> }) {
     if (!rootBoardPage || !rootBoardPage.type.match('board')) {
       throw new Error('No board page type exists');
     }
-    await mutator.updateBlock(
-      { ...rootBoard, fields: { ...rootBoard.fields, sourceType } as Partial<BoardFields> },
-      rootBoard,
-      'Update board datasource'
-    );
+
+    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType } };
+
+    await mutator.updateBlock(boardBlockUpdate, rootBoard, 'Update board datasource');
     const { view } = await createNewDataSource({
-      board: rootBoard,
+      board: boardBlockUpdate,
       updatePage,
       currentPageType: rootBoardPage.type
     });

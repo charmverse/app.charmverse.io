@@ -62,6 +62,7 @@ type Props = WrappedComponentProps &
   // eslint-disable-next-line no-use-before-define
   PropsFromRedux & {
     board: Board;
+    currentRootPageId: string;
     embeddedBoardPath?: string;
     // cards: Card[]
     activeView?: BoardView;
@@ -84,7 +85,7 @@ type Props = WrappedComponentProps &
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  showSettings: 'create-linked-view' | 'view-options' | null;
+  showSettings: 'view-options' | null;
 };
 
 function CenterPanel(props: Props) {
@@ -388,7 +389,7 @@ function CenterPanel(props: Props) {
     showView('');
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
-      setState({ ...state, showSettings: 'create-linked-view' });
+      setState({ ...state, showSettings: 'view-options' });
     });
   }
 
@@ -424,8 +425,7 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const isLoadingSourceData =
-    !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
+  const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
 
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
@@ -483,6 +483,7 @@ function CenterPanel(props: Props) {
           )}
           {(activePage || activeBoard) && (
             <ViewHeader
+              currentRootPageId={props.currentRootPageId}
               onDeleteView={props.onDeleteView}
               maxTabsShown={props.maxTabsShown}
               disableUpdatingUrl={props.disableUpdatingUrl}

@@ -31,12 +31,6 @@ interface Props {
 
 function ViewSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialSidebarState);
-
-  const { trigger: updateProposalSource } = useSWRMutation(
-    `/api/pages/${props.pageId}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
-  );
-
   function goToSidebarHome() {
     setSidebarView('view-options');
   }
@@ -47,12 +41,6 @@ function ViewSidebar(props: Props) {
       setSidebarView(initialSidebarState);
     }
   }, [props.isOpen]);
-
-  useEffect(() => {
-    if (props.pageId && props.board?.fields.sourceType === 'proposals' && props.view?.parentId === props.pageId) {
-      updateProposalSource({ pageId: props.pageId });
-    }
-  }, [props.pageId, props.view?.parentId, props.board?.fields.sourceType]);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>

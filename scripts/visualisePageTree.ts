@@ -24,10 +24,10 @@ type BlockWithChildren = Block & {children?: BlockWithChildren[], page?: Pick<Pa
 
 type PageInfo = Pick<Page, 'id' | 'title' | 'type'>
 
-async function loadData({pageTitles}: {pageTitles?: string[]}): Promise<{blocks: BlockWithChildren[], pageInfo: Record<string, PageInfo>}> {
+async function loadData(): Promise<{blocks: BlockWithChildren[], pageInfo: Record<string, PageInfo>}> {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
-      domain: 'magic-paperhands-jackal'
+      domain: 'comparable-doxxed-dragon'
     },
     select: {
       id: true
@@ -112,7 +112,7 @@ function drawTree(node: BlockWithChildren, draw: Svg, x: number = 0, y: number =
 // Main async function
 async function main({pageTitles}: {pageTitles?: string[]}) {
   // Load the data
-  const {blocks, pageInfo} = await loadData({pageTitles});
+  const {blocks, pageInfo} = await loadData();
 
   // Create the tree from the data
   const tree = createTree(blocks, undefined, pageInfo, pageTitles);
@@ -175,4 +175,4 @@ async function main({pageTitles}: {pageTitles?: string[]}) {
   await fs.writeFile('tree-new.html', htmlContent);
 }
 
-main({pageTitles: ['Linked', 'Proposals DB']}).catch(err => console.error(err));
+main({pageTitles: undefined}).catch(err => console.error(err));

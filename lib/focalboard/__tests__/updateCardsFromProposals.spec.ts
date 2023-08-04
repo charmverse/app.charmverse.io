@@ -513,25 +513,16 @@ describe('updateCardsFromProposals()', () => {
     expect(deletedCard).toBeFalsy();
   });
 
-  it('should not update cards if none of the view is connected to a proposal source', async () => {
-    const views = await prisma.block.findMany({
-      where: {
-        type: 'view',
-        parentId: board.id
-      }
+  it('should not update cards if the database does not have proposals as a source', async () => {
+    const database = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      viewDataSource: 'board_page',
+      views: 2
     });
 
-    for (const view of views) {
-      await prisma.block.update({
-        where: {
-          id: view.id
-        },
-        data: { ...view, fields: { ...(view as unknown as BoardView).fields, sourceType: undefined } }
-      });
-    }
-
     await expect(
-      updateCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id })
+      updateCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
 

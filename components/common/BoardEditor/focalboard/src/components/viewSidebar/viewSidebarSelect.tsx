@@ -3,21 +3,12 @@ import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import type { IconProps } from '@mui/material';
 import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
-import type { OverridableComponent } from '@mui/material/OverridableComponent';
-import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { capitalize } from 'lodash';
 import { FcGoogle } from 'react-icons/fc';
-import type { IconType } from 'react-icons/lib';
 import { RiFolder2Line } from 'react-icons/ri';
 
-import {
-  LinkedIcon,
-  PageIcon,
-  StyledDatabaseIcon,
-  StyledPageIcon
-} from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -37,7 +28,7 @@ function MenuRow({
   icon: JSX.Element;
   title: string;
   value?: string;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
   return (
     <MenuItem dense onClick={onClick}>
@@ -58,7 +49,8 @@ function MenuRow({
       >
         {value}
       </Typography>
-      <ArrowRightIcon color='secondary' />
+      {/** Necessary to ensure an item without an onClick action is not unaligned */}
+      {onClick ? <ArrowRightIcon color='secondary' /> : <div style={{ paddingRight: '15px' }} />}
     </MenuItem>
   );
 }
@@ -143,7 +135,7 @@ export function ViewSidebarSelect({ setSidebarView, closeSidebar, view, board, g
       )}
 
       <MenuRow
-        onClick={() => setSidebarView('source')}
+        onClick={sourceIconType === 'proposals' ? undefined : () => setSidebarView('source')}
         icon={<SourceIcon sourceType={sourceIconType} />}
         title='Source'
         value={sourceTitle}
