@@ -118,7 +118,7 @@ export function UserSelect({
         onChange(newMemberIds);
       }
     },
-    [readOnly]
+    [readOnly, onChange]
   );
 
   const onClickToEdit = useCallback(() => {

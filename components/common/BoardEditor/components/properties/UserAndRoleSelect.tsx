@@ -236,14 +236,21 @@ export function UserAndRoleSelect({
         noOptionsText='No more options available'
         onChange={(e, value) => onChange(value)}
         onClose={() => setIsOpen(false)}
-        open
+        openOnFocus
         options={options}
         renderInput={(params) => (
           <TextField
             {...params}
+            autoFocus
             size='small'
             value={applicableValues}
-            placeholder={isFreeSpace ? 'Search for a person...' : 'Search for a person or role...'}
+            placeholder={
+              populatedValue.length === 0
+                ? isFreeSpace
+                  ? 'Search for a person...'
+                  : 'Search for a person or role...'
+                : ''
+            }
             InputProps={{
               ...params.InputProps,
               disableUnderline: true

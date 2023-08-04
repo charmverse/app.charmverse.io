@@ -7,7 +7,5 @@ type Props = {
 };
 
 export function AuthorsSelect({ readOnly, onChange, value }: Props) {
-  return (
-    <UserSelect memberIds={value} readOnly={readOnly} onChange={onChange} wrapColumn showEmptyPlaceholder={true} />
-  );
+  return <UserSelect memberIds={value} readOnly={readOnly} onChange={onChange} wrapColumn showEmptyPlaceholder />;
 }
