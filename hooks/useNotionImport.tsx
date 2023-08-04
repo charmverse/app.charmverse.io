@@ -102,12 +102,7 @@ export function NotionProvider({ children }: Props) {
         setNotionState({
           loading: false
         });
-        if (err.status === 504) {
-          showMessage(
-            'It can take up to an hour to import large Notion spaces. Your data will appear on the left navigation when the import is completed.',
-            'warning'
-          );
-        } else {
+        if (err.status !== 504) {
           showMessage(
             notionError || err.message || err.error || 'Something went wrong with your notion import. Please try again',
             'error'
