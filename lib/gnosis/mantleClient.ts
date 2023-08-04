@@ -75,7 +75,7 @@ interface SafeTransaction {
   safeAddress: string;
   txId: string;
   executedAt: number;
-  txStatus: 'SUCCESS' | 'FAILED' | 'AWAITING_EXECUTION';
+  txStatus: 'SUCCESS' | 'CANCELLED' | 'AWAITING_EXECUTION';
   txInfo: SafeTransactionInfo;
   txData: {
     hexData: null;
@@ -250,7 +250,7 @@ export async function getAllTransactions({
     }
   );
 
-  const previousTransactions = getTransactionsHistoryResults.filter(
+  const executedTransactions = getTransactionsHistoryResults.filter(
     (result) => result.type === 'TRANSACTION'
   ) as TransactionResult[];
 
@@ -258,7 +258,7 @@ export async function getAllTransactions({
     return queuedTransactions.filter((transaction) => transaction.transaction.txInfo.type === 'Transfer');
   }
 
-  return [...queuedTransactions, ...previousTransactions].filter(
+  return [...queuedTransactions, ...executedTransactions].filter(
     (transaction) =>
       transaction.transaction.txStatus !== 'AWAITING_EXECUTION' && transaction.transaction.txInfo.type === 'Transfer'
   );
