@@ -118,7 +118,6 @@ export function NotionProvider({ children }: Props) {
     failedImports
   }: NotionImportCompleted['payload']) {
     setAutoHideDuration(null);
-    // Only show this message if the import was not triggered by the user
     if (totalImportedPages === totalPages && failedImports.length === 0) {
       showMessage('Notion workspace successfully imported', 'success');
       setNotionState({
