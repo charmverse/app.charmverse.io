@@ -5,7 +5,7 @@ import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
 import { RiGoogleFill } from 'react-icons/ri';
 import { SiTypeform } from 'react-icons/si';
@@ -40,6 +40,7 @@ type ViewSourceOptionsProps = DatabaseSourceProps &
     pageId?: string;
     page?: PageMeta;
     board?: Board;
+    sourceOptions: ReactNode[];
   };
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {

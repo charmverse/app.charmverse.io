@@ -587,32 +587,35 @@ function CenterPanel(props: Props) {
             />
           )}
           {(activePage || activeBoard) && (
-            <ViewHeader
-              onDeleteView={props.onDeleteView}
-              maxTabsShown={props.maxTabsShown}
-              disableUpdatingUrl={props.disableUpdatingUrl}
-              showView={props.showView}
-              onClickNewView={
-                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? openSelectSource
-                  : undefined
-              }
-              activeBoard={activeBoard}
-              viewsBoard={board}
-              activeView={props.activeView}
-              toggleViewOptions={toggleViewOptions}
-              cards={cards}
-              views={views}
-              dateDisplayProperty={dateDisplayProperty}
-              addCard={() => addCard('', true)}
-              showCard={showCard}
-              // addCardFromTemplate={addCardFromTemplate}
-              addCardTemplate={() => addCard('', true, {}, false, true)}
-              editCardTemplate={editCardTemplate}
-              readOnly={props.readOnly}
-              readOnlySourceData={props.readOnlySourceData}
-              embeddedBoardPath={props.embeddedBoardPath}
-            />
+            <>
+              VIEW_HEADER
+              <ViewHeader
+                onDeleteView={props.onDeleteView}
+                maxTabsShown={props.maxTabsShown}
+                disableUpdatingUrl={props.disableUpdatingUrl}
+                showView={props.showView}
+                onClickNewView={
+                  boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                    ? openSelectSource
+                    : undefined
+                }
+                activeBoard={activeBoard}
+                viewsBoard={board}
+                activeView={props.activeView}
+                toggleViewOptions={toggleViewOptions}
+                cards={cards}
+                views={views}
+                dateDisplayProperty={dateDisplayProperty}
+                addCard={() => addCard('', true)}
+                showCard={showCard}
+                // addCardFromTemplate={addCardFromTemplate}
+                addCardTemplate={() => addCard('', true, {}, false, true)}
+                editCardTemplate={editCardTemplate}
+                readOnly={props.readOnly}
+                readOnlySourceData={props.readOnlySourceData}
+                embeddedBoardPath={props.embeddedBoardPath}
+              />
+            </>
           )}
         </div>
 
@@ -660,23 +663,26 @@ function CenterPanel(props: Props) {
                     }`}
                     sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
                   >
-                    {activePage?.title || 'Untitled'}
+                    {activePage?.title || 'Untitled'} DATA
                   </Button>
                 )}
               {!activeView &&
                 (views.length === 0 || isLinkedDatabase) &&
                 state.showSettings === 'create-linked-view' && (
-                  <CreateLinkedView
-                    views={views}
-                    page={props.page}
-                    board={board}
-                    readOnly={props.readOnly}
-                    onSelect={selectViewSource}
-                    // if it links to deleted db page then the board can't be inline_board type
-                    onCreateDatabase={views.length === 0 ? createDatabase : undefined}
-                    onCsvImport={onCsvImport}
-                    pageId={props.page?.id}
-                  />
+                  <>
+                    DATA
+                    <CreateLinkedView
+                      views={views}
+                      page={props.page}
+                      board={board}
+                      readOnly={props.readOnly}
+                      onSelect={selectViewSource}
+                      // if it links to deleted db page then the board can't be inline_board type
+                      onCreateDatabase={views.length === 0 ? createDatabase : undefined}
+                      onCsvImport={onCsvImport}
+                      pageId={props.page?.id}
+                    />
+                  </>
                 )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
                 <Kanban

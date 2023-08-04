@@ -38,6 +38,9 @@ import mutator from '../../mutator';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
+import type { SidebarView } from './viewSidebarSelect';
+import { ViewSidebarSelect, initialSidebarState } from './viewSidebarSelect';
+import { LinkCharmVerseDatabase } from './viewSourceOptions/components/LinkCharmVerseDatabase';
 import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
@@ -67,43 +70,17 @@ export const StyledSidebar = styled.div`
     width: 275px;
   }
 `;
-
-type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
-
-const initialState: SidebarView = 'view-options';
-
 function ViewSidebar(props: Props) {
-  const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
+  const [sidebarView, setSidebarView] = useState<SidebarView>(initialSidebarState);
   const { pages } = usePages();
-
-  const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
-  const currentGroup = props.board?.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
-  const currentLayout = props.view.fields.viewType;
-  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
-  const currentProperties = visiblePropertyIds.filter((id) =>
-    props.board?.fields.cardProperties.some((c) => c.id === id)
-  ).length;
 
   const { trigger: updateProposalSource } = useSWRMutation(
     `/api/pages/${props.pageId}/proposal-source`,
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
   );
 
-  let SourceIcon: IconType | OverridableComponent<SvgIconTypeMap<object, 'svg'>> = RiFolder2Line;
-  let sourceTitle = 'None';
-  const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
-  if (sourcePage) {
-    sourceTitle = sourcePage.title;
-  } else if (props.view.fields.sourceType === 'google_form') {
-    sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
-    SourceIcon = FcGoogle;
-  } else if (props.board?.fields.sourceType === 'proposals') {
-    sourceTitle = 'Proposals';
-    SourceIcon = TaskOutlinedIcon;
-  }
-
-  function goBack() {
-    setSidebarView(initialState);
+  function goToSidebarHome() {
+    setSidebarView('view-options');
   }
 
   async function selectViewSource(
@@ -129,7 +106,7 @@ function ViewSidebar(props: Props) {
   useEffect(() => {
     // reset state on close
     if (!props.isOpen) {
-      setSidebarView(initialState);
+      setSidebarView(initialSidebarState);
     }
   }, [props.isOpen]);
 
@@ -139,9 +116,9 @@ function ViewSidebar(props: Props) {
     }
   }, [props.pageId, props.view.parentId, props.board?.fields.sourceType]);
 
-  const isLinkedPage = String(props.page?.type).match('linked');
+  const isLinkedPage = !!String(props.page?.type).match('linked');
 
-  const allowSourceSelection =
+  const showSourceSelectionOption =
     props.views.length === 0 ||
     isLinkedPage ||
     props.board?.fields?.sourceType === 'google_form' ||
@@ -155,54 +132,32 @@ function ViewSidebar(props: Props) {
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
         <StyledSidebar>
+          <SidebarHeader title='View options' closeSidebar={props.closeSidebar} />
+
           {sidebarView === 'view-options' && (
-            <>
-              <SidebarHeader title='View options' closeSidebar={props.closeSidebar} />
-              <MenuRow
-                onClick={() => setSidebarView('layout')}
-                icon={<PreviewIcon color='secondary' />}
-                title='Layout'
-                value={capitalize(currentLayout)}
-              />
-              <MenuRow
-                onClick={() => setSidebarView('card-properties')}
-                icon={<FormatListBulletedIcon color='secondary' />}
-                title='Properties'
-                value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
-              />
-              {withGroupBy && (
-                <MenuRow
-                  onClick={() => setSidebarView('group-by')}
-                  icon={<GroupIcon color='secondary' />}
-                  title='Group'
-                  value={currentGroup ?? 'None'}
-                />
-              )}
-              {props && allowSourceSelection && (
-                <MenuRow
-                  onClick={() => setSidebarView('source')}
-                  icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
-                  title='Source'
-                  value={sourceTitle}
-                />
-              )}
-            </>
+            <ViewSidebarSelect
+              {...props}
+              sidebarView={sidebarView}
+              setSidebarView={setSidebarView}
+              showSourceSelectionOption={showSourceSelectionOption}
+            />
           )}
+
           {sidebarView === 'layout' && (
             <>
-              <SidebarHeader goBack={goBack} title='Layout' closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goToSidebarHome} title='Layout' closeSidebar={props.closeSidebar} />
               <ViewLayoutOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'card-properties' && (
             <>
-              <SidebarHeader goBack={goBack} title='Properties' closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goToSidebarHome} title='Properties' closeSidebar={props.closeSidebar} />
               <ViewPropertyOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
             </>
           )}
           {sidebarView === 'group-by' && (
             <>
-              <SidebarHeader goBack={goBack} title='Group by' closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goToSidebarHome} title='Group by' closeSidebar={props.closeSidebar} />
               <GroupOptions
                 properties={props.board?.fields.cardProperties || []}
                 view={props.view}
@@ -218,7 +173,7 @@ function ViewSidebar(props: Props) {
               title='Data source'
               view={props.view}
               // We don't want to allow going back if this board is locked to charmverse databases
-              goBack={goBack}
+              goBack={goToSidebarHome}
               onSelect={selectViewSource}
               closeSidebar={props.closeSidebar}
               pageId={props.pageId}
@@ -227,41 +182,6 @@ function ViewSidebar(props: Props) {
         </StyledSidebar>
       </Collapse>
     </ClickAwayListener>
-  );
-}
-
-function MenuRow({
-  icon,
-  title,
-  value,
-  onClick
-}: {
-  icon: JSX.Element;
-  title: string;
-  value?: string;
-  onClick: () => void;
-}) {
-  return (
-    <MenuItem dense onClick={onClick}>
-      <ListItemIcon>{icon}</ListItemIcon>
-      <ListItemText>{title}</ListItemText>
-      <Typography
-        component='div'
-        color='secondary'
-        variant='body2'
-        sx={{
-          flexGrow: 1,
-          maxWidth: '45%',
-          textAlign: 'right',
-          whitespace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      >
-        {value}
-      </Typography>
-      <ArrowRightIcon color='secondary' />
-    </MenuItem>
   );
 }
 

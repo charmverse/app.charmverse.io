@@ -234,6 +234,7 @@ function AddViewMenu(props: AddViewProps) {
       props.onClickIcon();
       closePopup();
     } else {
+      console.log('No onclick');
       popupState.open(e);
     }
   }

@@ -117,6 +117,7 @@ function ViewHeader(props: Props) {
 
       {!props.readOnly && views.length <= maxTabsShown && (
         <Box className='view-actions' pt='4px'>
+          ADD_VIEW
           <AddViewMenu
             board={viewsBoard}
             activeView={activeView}
