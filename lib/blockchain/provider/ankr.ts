@@ -55,6 +55,9 @@ export async function getNFTs({
   address: string;
   walletId: string;
 }): Promise<NFTData[]> {
+  if (!process.env.ANKR_API_ID) {
+    return [];
+  }
   const provider = new AnkrProvider(advancedAPIEndpoint);
   if (chainId === 5000) {
     // TODO: find a provider that indexes the Mantle blockchain for NFTs
@@ -87,6 +90,10 @@ type GetNFTInput = {
 };
 
 export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
+  if (!process.env.ANKR_API_ID) {
+    log.warn('Ankr API Key is missing to retrive NFT');
+    return null;
+  }
   if (rpcApis.includes(chainId)) {
     return getTokenInfoOnMantle({ address, chainId, tokenId });
   }
