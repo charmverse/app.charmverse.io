@@ -17,6 +17,7 @@ type SelectProps = {
   options?: SelectOptionType[];
   disabled?: boolean;
   canEditOptions?: boolean;
+  noOptionsText?: string;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
@@ -48,6 +49,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       placeholder,
       className,
       forcePopupIcon = 'auto',
+      noOptionsText,
       ...inputProps
     },
     ref
@@ -145,7 +147,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               <Chip {...getTagProps({ index })} size='small' label={option.name} color={option.color} />
             ))
           }
-          noOptionsText='No options available'
+          noOptionsText={noOptionsText || 'No options available'}
           renderInput={(params) => (
             <TextField
               inputRef={inputRef}

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, Box, Stack, Typography } from '@mui/material';
+import { IconButton, Box, Stack } from '@mui/material';
 import { useCallback, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -9,7 +9,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { isTruthy } from 'lib/utilities/types';
 
-import { SelectPreviewContainer } from '../SelectProperty/SelectProperty';
+import { EmptyPlaceholder } from './EmptyPlaceholder';
+import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
 type Props = {
   memberIds: string[];
@@ -47,18 +48,8 @@ const StyledUserPropertyContainer = styled(Box, {
 
   // dont let the input extend over neighbor columns in table mode when it is expanded
   overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
-
-  ${(props) =>
-    props.displayType !== 'table'
-      ? `
-        // & .MuiInputBase-root,
-        // & input.MuiInputBase-input {
-        //   /** this overflows to the next line on smaller width */
-        //   position: absolute;
-        // }
-      `
-      : ''}
 `;
+
 function MembersDisplay({
   memberIds,
   readOnly,
@@ -111,8 +102,8 @@ function MembersDisplay({
   );
 }
 
-export function UserProperty({
-  displayType,
+export function UserSelect({
+  displayType = 'details',
   memberIds,
   onChange,
   readOnly,
@@ -127,7 +118,7 @@ export function UserProperty({
         onChange(newMemberIds);
       }
     },
-    [readOnly]
+    [readOnly, onChange]
   );
 
   const onClickToEdit = useCallback(() => {
@@ -139,25 +130,24 @@ export function UserProperty({
   if (!isOpen) {
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
-        {showEmptyPlaceholder && memberIds.length === 0 ? (
-          <Typography component='span' variant='subtitle2' color='secondary'>
-            Empty
-          </Typography>
-        ) : (
-          <MembersDisplay
-            wrapColumn={wrapColumn ?? false}
-            readOnly={true}
-            memberIds={memberIds}
-            setMemberIds={_onChange}
-          />
-        )}
+        <Stack gap={0.5}>
+          {memberIds.length === 0 ? (
+            showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
+          ) : (
+            <MembersDisplay
+              wrapColumn={wrapColumn ?? false}
+              readOnly={true}
+              memberIds={memberIds}
+              setMemberIds={_onChange}
+            />
+          )}
+        </Stack>
       </SelectPreviewContainer>
     );
   }
   return (
     <StyledUserPropertyContainer displayType={displayType}>
       <InputSearchMemberMultiple
-        // sx={{ '& .MuiAutocomplete-paper': { margin: 0, marginTop: '-20px' } }}
         disableClearable
         clearOnBlur
         open
@@ -169,7 +159,7 @@ export function UserProperty({
         onChange={_onChange}
         getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
         readOnly={readOnly}
-        placeholder={memberIds.length === 0 ? 'Search for an option...' : ''}
+        placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
         inputVariant='standard'
         forcePopupIcon={false}
         renderTags={() => (

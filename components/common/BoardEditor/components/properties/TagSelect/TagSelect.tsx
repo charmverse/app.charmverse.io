@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
-} from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/mappers';
+} from 'components/common/BoardEditor/components/properties/TagSelect/mappers';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -16,17 +16,18 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
   isHidden?: boolean;
+  readOnly?: boolean;
 };
 export const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden'
+  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly'
 })<ContainerProps>`
-  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-
-  justify-content: center;
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  transition: background-color 0.2s ease-in-out;
-
+  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+  width: 100%;
+  height: 100%;
+  justify-content: center;
   padding: ${({ theme }) => theme.spacing(0.25, 0)};
+  transition: background-color 0.2s ease-in-out;
 
   ${({ displayType, theme }) => {
     // Styles depending on a view type
@@ -42,24 +43,21 @@ export const SelectPreviewContainer = styled(Stack, {
     return '';
   }}
 
-  // disable hover UX on ios which converts first click to a hover event
-  @media (pointer: fine) {
-    &:hover {
-      cursor: pointer;
-      background-color: ${({ theme, displayType }) =>
-        displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+  ${({ readOnly, theme, displayType }) =>
+    !readOnly &&
+    `
+    // disable hover UX on ios which converts first click to a hover event
+    @media (pointer: fine) {
+      &:hover {
+        cursor: pointer;
+        background-color: ${displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+      }
     }
-  }
-
-  div {
-    pointer-events: none;
-  }
-
-  width: 100%;
-  height: 100%;
+    `}
 `;
 
 const StyledSelect = styled(SelectField)<ContainerProps>`
+  flex-grow: 1;
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
@@ -73,14 +71,15 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
         : ''}
   }
 
-  .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
-    padding: 1px;
+  .MuiInputBase-root.MuiInputBase-sizeSmall {
+    padding: 4px;
   }
 `;
 
 type Props = {
   readOnly?: boolean;
   multiselect?: boolean;
+  noOptionsText?: string;
   options: IPropertyOption[];
   propertyValue: string | string[];
   displayType?: PropertyValueDisplayType;
@@ -91,7 +90,7 @@ type Props = {
   wrapColumn?: boolean;
 };
 
-export function SelectProperty({
+export function TagSelect({
   readOnly,
   options,
   propertyValue,
@@ -100,7 +99,8 @@ export function SelectProperty({
   onUpdateOption,
   onDeleteOption,
   onCreateOption,
-  displayType,
+  displayType = 'details',
+  noOptionsText,
   wrapColumn
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
@@ -150,23 +150,17 @@ export function SelectProperty({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
-
   if (!isOpened) {
     return (
-      <SelectPreviewContainer onClick={onEdit} displayType={displayType}>
+      <SelectPreviewContainer onClick={onEdit} displayType={displayType} readOnly={readOnly}>
         <SelectPreview
+          readOnly={readOnly}
           sx={{ height: '100%' }}
           wrapColumn={wrapColumn}
           value={selectValue}
           options={selectOptions}
           size='small'
-          emptyComponent={
-            displayType === 'details' && (
-              <Typography component='span' variant='subtitle2' color='secondary'>
-                Empty
-              </Typography>
-            )
-          }
+          showEmpty={displayType === 'details'}
         />
       </SelectPreviewContainer>
     );
@@ -174,7 +168,9 @@ export function SelectProperty({
 
   return (
     <StyledSelect
+      canEditOptions={false} // TODO: allow editing options
       placeholder='Search for an option...'
+      noOptionsText={noOptionsText}
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}

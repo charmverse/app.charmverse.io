@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -97,11 +98,7 @@ function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {readOnly && (
-        <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>{property.name}</Button>
-        </div>
-      )}
+      {readOnly && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
       {!readOnly && (
         <Box>
           <PropertyNameContainer
