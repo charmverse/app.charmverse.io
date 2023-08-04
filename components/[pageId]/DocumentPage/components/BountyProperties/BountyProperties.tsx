@@ -566,6 +566,7 @@ export default function BountyProperties(props: {
           <UserAndRoleSelect
             readOnly={readOnly}
             value={bountyPermissions?.reviewer ?? []}
+            variant='outlined'
             onChange={async (options) => {
               const roles = options.filter((option) => option.group === 'role');
               const members = options.filter((option) => option.group === 'user');

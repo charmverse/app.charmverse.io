@@ -128,6 +128,7 @@ type Props = {
   readOnly?: boolean;
   showEmptyPlaceholder?: boolean;
   value: GroupedOption[];
+  variant?: 'outlined' | 'standard';
 };
 
 export function UserAndRoleSelect({
@@ -136,6 +137,7 @@ export function UserAndRoleSelect({
   proposalId,
   readOnly,
   showEmptyPlaceholder = true,
+  variant = 'standard',
   value: inputValue
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
@@ -196,7 +198,9 @@ export function UserAndRoleSelect({
   function removeReviewer(idToRemove: string) {
     onChange(populatedValue.filter(({ id }) => id !== idToRemove));
   }
-  if (!isOpen) {
+
+  // TODO: maybe we don't need a separate component for un-open state?
+  if (variant === 'standard' && !isOpen) {
     return (
       <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
         <Stack gap={0.5}>
@@ -241,7 +245,7 @@ export function UserAndRoleSelect({
         renderInput={(params) => (
           <TextField
             {...params}
-            autoFocus
+            autoFocus={variant === 'standard'}
             size='small'
             value={applicableValues}
             placeholder={
@@ -253,9 +257,9 @@ export function UserAndRoleSelect({
             }
             InputProps={{
               ...params.InputProps,
-              disableUnderline: true
+              ...(variant === 'standard' && { disableUnderline: true })
             }}
-            variant='standard'
+            variant={variant}
           />
         )}
         renderOption={(_props, option) => {
