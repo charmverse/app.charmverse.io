@@ -110,7 +110,6 @@ export function useMultiBountyPayment({
       await Promise.all(
         result.transactions.map(async (transaction) => {
           await charmClient.bounties.recordTransaction({
-            safeAddress: result.safeAddress,
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
             safeTxHash: result.txHash,

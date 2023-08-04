@@ -29,25 +29,54 @@ type MantleMultisigSafe = {
   messagesTag: string;
 };
 
+interface SafeTransactionTransferInfo {
+  type: 'Transfer';
+  sender: {
+    value: string;
+  };
+  recipient: {
+    value: string;
+  };
+  direction: 'OUTGOING' | 'INCOMING';
+  transferInfo: {
+    type: 'NATIVE_COIN';
+    value: string;
+  };
+}
+
+interface SafeTransactionCustomInfo {
+  type: 'Custom';
+  to: {
+    value: string;
+  };
+  dataSize: string;
+  value: string;
+  methodName: null;
+  isCancellation: boolean;
+}
+
+interface SafeTransactionCreationInfo {
+  type: 'Creation';
+  creator: {
+    value: string;
+  };
+  transactionHash: string;
+  implementation: {
+    value: string;
+  };
+  factory: {
+    value: string;
+  };
+}
+
+type SafeTransactionInfo = SafeTransactionTransferInfo | SafeTransactionCreationInfo | SafeTransactionCustomInfo;
+
 interface SafeTransaction {
   safeAddress: string;
   txId: string;
   executedAt: number;
   txStatus: 'SUCCESS' | 'FAILED' | 'AWAITING_EXECUTION';
-  txInfo: {
-    type: string;
-    sender: {
-      value: string;
-    };
-    recipient: {
-      value: string;
-    };
-    direction: string;
-    transferInfo: {
-      type: string;
-      value: string;
-    };
-  };
+  txInfo: SafeTransactionInfo;
   txData: {
     hexData: null;
     dataDecoded: null;
@@ -86,6 +115,41 @@ interface SafeTransaction {
     trusted: boolean;
   };
   txHash: string;
+}
+
+interface LabelResult {
+  type: 'LABEL';
+  label: string;
+}
+
+interface DateLabelResult {
+  timestamp: number;
+  type: 'DATE_LABEL';
+}
+
+interface TransactionResult {
+  type: 'TRANSACTION';
+  transaction: {
+    id: string;
+    timestamp: number;
+    txStatus: SafeTransaction['txStatus'];
+    txInfo: SafeTransactionInfo;
+    executionInfo?: {
+      type: string;
+      nonce: number;
+      confirmationsRequired: number;
+      confirmationsSubmitted: number;
+    };
+  };
+  conflictType: 'None';
+}
+
+type GetTransactionsData = LabelResult | TransactionResult | DateLabelResult;
+
+interface GetTransactionsApiResponse {
+  next: null;
+  previous: null;
+  results: GetTransactionsData[];
 }
 
 export function getSafesByOwner({
@@ -146,17 +210,10 @@ export function proposeTransaction({
   );
 }
 
-export function getTransaction({
-  safeAddress,
-  safeTxHash,
-  chainId
-}: {
-  safeAddress: string;
-  chainId: number;
-  safeTxHash: string;
-}) {
+export function getTransaction({ safeTxHash, chainId }: { chainId: number; safeTxHash: string }) {
   return http.GET<SafeTransaction>(
-    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/multisig_${safeAddress}_${safeTxHash}`,
+    // 1 indicates the safeAddress, it works for now but it's not ideal
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/multisig_1_${safeTxHash}`,
     undefined,
     {
       credentials: 'omit'
@@ -164,22 +221,45 @@ export function getTransaction({
   );
 }
 
-// export function getAllTransactions({}: {
-//   safeAddress: string;
-// }) {
-//   const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
+export async function getAllTransactions({
+  safeAddress,
+  chainId,
+  executed
+}: {
+  chainId: number;
+  safeAddress: string;
+  executed?: boolean;
+}) {
+  const { results: getTransactionsQueuedResults } = await http.GET<GetTransactionsApiResponse>(
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/safes/${safeAddress}/transactions/queued`,
+    undefined,
+    {
+      credentials: 'omit'
+    }
+  );
 
-//   const trusted = options?.trusted?.toString() || 'true'
-//   url.searchParams.set('trusted', trusted)
+  const queuedTransactions = getTransactionsQueuedResults.filter(
+    (result) => result.type === 'TRANSACTION'
+  ) as TransactionResult[];
 
-//   const queued = options?.queued?.toString() || 'true'
-//   url.searchParams.set('queued', queued)
+  const { results: getTransactionsHistoryResults } = await http.GET<GetTransactionsApiResponse>(
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/safes/${safeAddress}/transactions/history`,
+    undefined,
+    {
+      credentials: 'omit'
+    }
+  );
 
-//   const executed = options?.executed?.toString() || 'false'
-//   url.searchParams.set('executed', executed)
+  const previousTransactions = getTransactionsHistoryResults.filter(
+    (result) => result.type === 'TRANSACTION'
+  ) as TransactionResult[];
 
-//   return sendRequest({
-//     url: url.toString(),
-//     method: HttpMethod.Get
-//   })
-// }
+  if (!executed) {
+    return queuedTransactions.filter((transaction) => transaction.transaction.txInfo.type === 'Transfer');
+  }
+
+  return [...queuedTransactions, ...previousTransactions].filter(
+    (transaction) =>
+      transaction.transaction.txStatus !== 'AWAITING_EXECUTION' && transaction.transaction.txInfo.type === 'Transfer'
+  );
+}

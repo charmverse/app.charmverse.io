@@ -6,7 +6,7 @@ import { BigNumber } from 'ethers';
 
 import { getGnosisService } from 'lib/gnosis/gnosis';
 
-import { getTransaction } from './mantleClient';
+import { getAllTransactions, getTransaction } from './mantleClient';
 
 export type SafeTxStatusDetails = {
   status: ApplicationStatus;
@@ -16,26 +16,19 @@ export type SafeTxStatusDetails = {
 
 export async function getSafeTxStatus({
   safeTxHash,
-  chainId,
-  safeAddress
+  chainId
 }: {
-  safeAddress?: string;
   safeTxHash: string;
   chainId: number;
 }): Promise<SafeTxStatusDetails | null> {
-  const provider = new AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY);
-  const safeService = getGnosisService({ signer: provider, chainId });
-  if (!safeService) {
-    return null;
-  }
   try {
-    if ((chainId === 5000 || chainId === 5001) && safeAddress) {
+    if (chainId === 5000 || chainId === 5001) {
       const safeTx = await getTransaction({
         chainId,
-        safeAddress,
         safeTxHash
       });
 
+      const safeAddress = safeTx.safeAddress;
       const { txStatus, txHash, txData, detailedExecutionInfo } = safeTx;
 
       if (txStatus === 'SUCCESS') {
@@ -45,18 +38,34 @@ export async function getSafeTxStatus({
         return { status, chainTxHash: txHash, safeTxHash };
       }
 
-      // // check if tx was replaced with other tx with the same nonce
-      // const executedTxs = await getAllTransactions({safeAddress: txData.});
-      // const replacedTx = executedTxs.results.find((tx) => 'nonce' in tx && tx.nonce === detailedExecutionInfo.nonce);
+      const executedTxs = await getAllTransactions({ safeAddress, chainId, executed: true });
+      // execution info is missing for cancelled txs
+      const replacedTx = executedTxs.find((tx) => tx.transaction.executionInfo?.nonce === detailedExecutionInfo.nonce);
 
-      // // orginal tx was replaced with other tx
-      // if (replacedTx) {
-      //   const replacedChainTxHash = 'transactionHash' in replacedTx ? replacedTx.transactionHash : undefined;
-      //   return { status: ApplicationStatus.cancelled, chainTxHash: replacedChainTxHash, safeTxHash };
-      // }
+      if (replacedTx) {
+        // transaction id format multisig_safeaddress_safetxhash
+        const replacedSafeTxHash = replacedTx.transaction.id.split('_')[2];
+        if (replacedSafeTxHash) {
+          const replacedSafeTx = await getTransaction({
+            chainId,
+            safeTxHash: replacedSafeTxHash
+          });
+
+          if (replacedSafeTx) {
+            const replacedChainTxHash = replacedSafeTx.txHash;
+            return { status: ApplicationStatus.cancelled, chainTxHash: replacedChainTxHash, safeTxHash };
+          }
+        }
+      }
 
       return { status: ApplicationStatus.processing, chainTxHash: txHash, safeTxHash };
     } else {
+      const provider = new AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY);
+      const safeService = getGnosisService({ signer: provider, chainId });
+      if (!safeService) {
+        return null;
+      }
+
       const safeTx = (await safeService.getTransaction(safeTxHash)) as SafeMultisigTransactionResponse;
 
       const { isExecuted, isSuccessful, transactionHash: chainTxHash, nonce } = safeTx;
