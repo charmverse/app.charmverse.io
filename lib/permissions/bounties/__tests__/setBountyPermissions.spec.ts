@@ -192,7 +192,7 @@ describe('setBountyPermissions', () => {
       permissionsToAssign: {
         reviewer: [
           {
-            group: 'space',
+            group: 'role',
             id: space.id
           }
         ]
@@ -203,7 +203,7 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.reviewer.some((p) => p.group === 'space' && p.id === space.id)).toBe(true);
+    expect(queryResult.reviewer.some((p) => p.group === 'role' && p.id === space.id)).toBe(true);
   });
 
   it('should fail if the bounty does not exist', async () => {

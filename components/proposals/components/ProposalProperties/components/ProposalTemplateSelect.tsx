@@ -15,6 +15,7 @@ type Props = {
 export function ProposalTemplateSelect({ disabled, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
+    color: 'gray',
     value: fancyTrim(option.title || 'Untitled', maxTitleLength)
   }));
 

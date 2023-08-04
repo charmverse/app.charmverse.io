@@ -13,15 +13,9 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useRoles } from 'hooks/useRoles';
-import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
-import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
@@ -81,9 +75,6 @@ export function ProposalProperties({
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { members } = useMembers();
-  const { roles = [] } = useRoles();
-  const { user } = useUser();
   const { data: proposalTemplates = [] } = useSWR(
     () => (currentSpace ? `proposals-templates/${currentSpace.id}` : null),
     () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: currentSpace!.id })
@@ -97,7 +88,6 @@ export function ProposalProperties({
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
-  const isProposalAuthor = user && proposalAuthorIds.some((authorId) => authorId === user.id);
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
 
@@ -119,45 +109,6 @@ export function ProposalProperties({
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
     : null;
-
-  const isProposalReviewer =
-    user &&
-    proposalReviewers.some((reviewer) => {
-      if (reviewer.group === 'user') {
-        return reviewer.id === user.id;
-      }
-      return user.spaceRoles.some((spaceRole) =>
-        spaceRole.spaceRoleToRole.some(({ roleId }) => roleId === reviewer.id)
-      );
-    });
-
-  const reviewerOptionsRecord: Record<
-    string,
-    ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)
-  > = {};
-
-  const currentUserGroups: ProposalUserGroup[] = [];
-  if (isProposalAuthor) {
-    currentUserGroups.push('author');
-  }
-
-  if (isProposalReviewer) {
-    currentUserGroups.push('reviewer');
-  }
-
-  members.forEach((member) => {
-    reviewerOptionsRecord[member.id] = {
-      ...member,
-      group: 'user'
-    };
-  });
-
-  (roles ?? []).forEach((role) => {
-    reviewerOptionsRecord[role.id] = {
-      ...role,
-      group: 'role'
-    };
-  });
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
@@ -340,19 +291,13 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
-                disabled={readOnly}
                 readOnly={readOnly || canUpdateProposalProperties === false}
-                value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
-                disableCloseOnSelect
-                excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
-                onChange={async (e, options) => {
+                value={proposalReviewers}
+                onChange={async (options) => {
                   setProposalFormInputs({
                     ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
-                }}
-                sx={{
-                  width: '100%'
                 }}
               />
             </Box>

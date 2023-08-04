@@ -18,10 +18,6 @@ const StyledAutocomplete = styled(Autocomplete)`
   min-width: 150px;
 ` as typeof Autocomplete;
 
-const StyledPopper = styled(Popover)`
-  min-width: 300px;
-`;
-
 function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {
     return members.filter((member) => {
