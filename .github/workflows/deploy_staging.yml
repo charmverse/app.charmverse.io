@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: cloudwatch-alarm-env-health
+  SELECTED_PERMISSION_API_TAG:
 
 jobs:
   deploy:
@@ -69,9 +69,12 @@ jobs:
             sed -i 's/production/staging/g' $conf_file
           done
 
-          for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
-            sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
-          done
+          # below commented out since, instaging, removing cloudwatch alerts is more preferable
+          # for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
+          #   sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
+          # done
+
+          rm .ebextensions*/06_cloudwatch_alarm.config
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
