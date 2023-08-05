@@ -98,7 +98,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 5
+      max-parallel: 7
       fail-fast: false
       matrix:
         include:
@@ -259,6 +259,11 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+      - name: Use datadog ci package to upload js maps
+        run: |
+          npm install @datadog/datadog-ci
+
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
