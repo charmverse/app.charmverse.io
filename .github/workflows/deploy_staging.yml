@@ -70,7 +70,7 @@ jobs:
           done
 
           for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
-            sed -i 's/Production-Alerts/stg-beanstalk-alerts/g' $conf_file
+            sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
           done
 
       - name: Set the docker compose env variables
