@@ -1,11 +1,12 @@
 import type { ReactElement } from 'react';
 
 import Header from './components/Header';
+import type { PageWrapperOptions } from './components/PageWrapper';
 import PageWrapper from './components/PageWrapper';
 
-export default function getLayout(page: ReactElement) {
+export default function getLayout(page: ReactElement, options: PageWrapperOptions = {}) {
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor={options.bgcolor}>
       <Header />
       {page}
     </PageWrapper>
