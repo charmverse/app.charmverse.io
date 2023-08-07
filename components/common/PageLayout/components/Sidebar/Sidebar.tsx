@@ -185,12 +185,12 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             <PageNavigation isFavorites rootPageIds={favoritePageIds} />
           </Box>
         )}
-        <WorkspaceLabel>
+        <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
-              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+              <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
             </div>
           )}
         </WorkspaceLabel>

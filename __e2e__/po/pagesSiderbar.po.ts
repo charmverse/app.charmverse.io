@@ -2,20 +2,20 @@ import type { Locator, Page } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
-export class GlobalPage {
-  readonly page: Page;
+import { GlobalPage } from './global.po';
 
-  readonly dialog: Locator;
+export class PagesSidebarPage extends GlobalPage {
+  readonly pagesSidebar: Locator;
 
-  readonly openAsPageButton: Locator;
+  readonly pagesSidebarAddPageButton: Locator;
 
-  readonly databasePage: Locator;
+  readonly pagesSidebarSelectAddDatabaseButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-    this.dialog = page.locator('data-test=dialog');
-    this.openAsPageButton = page.locator('data-test=open-as-page');
-    this.databasePage = this.page.locator('data-test=database-page');
+    super(page);
+    this.pagesSidebar = page.locator('data-test=page-sidebar-header');
+    this.pagesSidebarAddPageButton = this.pagesSidebar.locator('data-test=add-page');
+    this.pagesSidebarSelectAddDatabaseButton = this.page.locator('data-test=menu-add-database');
   }
 
   async goToHomePage(domain?: string) {
