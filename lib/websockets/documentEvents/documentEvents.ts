@@ -54,7 +54,7 @@ type DocumentRoom = {
   node: Node;
 };
 
-const docRooms = new Map<string | undefined, DocumentRoom>();
+export const docRooms = new Map<string | undefined, DocumentRoom>();
 
 export class DocumentEventHandler {
   id: string;
@@ -143,6 +143,7 @@ export class DocumentEventHandler {
 
   async onMessage(message: WrappedSocketMessage<ClientMessage>) {
     const logData = this.getSessionMeta();
+
     // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
