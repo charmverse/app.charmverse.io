@@ -49,17 +49,13 @@ export async function getSafeTxStatus({
       if (replacedTx) {
         // transaction id format multisig_safeaddress_safetxhash
         const replacedSafeTxHash = replacedTx.transaction.id.split('_')[2];
-        if (replacedSafeTxHash) {
-          const replacedSafeTx = await getTransaction({
-            chainId,
-            safeTxHash: replacedSafeTxHash
-          });
+        const replacedSafeTx = await getTransaction({
+          chainId,
+          safeTxHash: replacedSafeTxHash
+        });
 
-          if (replacedSafeTx) {
-            const replacedChainTxHash = replacedSafeTx.txHash;
-            return { status: ApplicationStatus.cancelled, chainTxHash: replacedChainTxHash, safeTxHash };
-          }
-        }
+        const replacedChainTxHash = replacedSafeTx.txHash;
+        return { status: ApplicationStatus.cancelled, chainTxHash: replacedChainTxHash, safeTxHash };
       }
 
       return { status: ApplicationStatus.processing, chainTxHash: txHash, safeTxHash };
