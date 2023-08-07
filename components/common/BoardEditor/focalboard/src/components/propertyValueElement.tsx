@@ -105,6 +105,7 @@ function PropertyValueElement(props: Props) {
   ) {
     propertyValueElement = (
       <TagSelect
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
