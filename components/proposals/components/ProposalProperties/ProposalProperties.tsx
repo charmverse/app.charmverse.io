@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { Page, Proposal, ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, Proposal, ProposalStatus, ProposalEvaluationType } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
@@ -10,6 +10,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -19,8 +20,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
-import { AuthorsSelect } from './components/AuthorsSelect';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
+import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
+import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaInput';
+import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteriaInput';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
@@ -34,6 +37,8 @@ export type ProposalFormInputs = {
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalTemplateId?: string | null;
+  evaluationType: ProposalEvaluationType;
+  rubricCriteria: RangeProposalCriteria[];
 };
 
 interface ProposalPropertiesProps {
@@ -274,32 +279,55 @@ export function ProposalProperties({
             >
               <PropertyLabel readOnly>Author</PropertyLabel>
               <Box display='flex' flex={1}>
-                <AuthorsSelect
+                <UserSelect
+                  memberIds={proposalAuthorIds}
                   readOnly={readOnly || canUpdateProposalProperties === false}
-                  value={proposalAuthorIds}
                   onChange={(authors) => {
                     setProposalFormInputs({
                       ...proposalFormInputs,
                       authors
                     });
                   }}
+                  wrapColumn
+                  showEmptyPlaceholder
                 />
               </Box>
             </div>
           </Box>
+          {/* Select reviewers */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 readOnly={readOnly || canUpdateProposalProperties === false}
                 value={proposalReviewers}
-                onChange={async (options) => {
+                onChange={(options) => {
                   setProposalFormInputs({
                     ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
                 }}
               />
+            </Box>
+          </Box>
+          {/* Select valuation type */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <Box display='flex' flex={1} flexDirection='column'>
+                <ProposalEvaluationTypeSelect
+                  value={proposalFormInputs.evaluationType}
+                  onChange={(evaluationType) => {
+                    setProposalFormInputs({
+                      ...proposalFormInputs,
+                      evaluationType
+                    });
+                  }}
+                />
+                {proposalFormInputs.evaluationType === 'rubric' && (
+                  <ProposalRubricCriteriaInput value={proposalFormInputs.rubricCriteria} onChange={() => {}} />
+                )}
+              </Box>
             </Box>
           </Box>
         </Collapse>
