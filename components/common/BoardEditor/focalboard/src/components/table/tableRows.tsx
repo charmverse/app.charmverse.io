@@ -52,8 +52,9 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card }) => (
+      {cardPages.map(({ page, card }, index) => (
         <TableRow
+          data-test={`database-table-row-${index}`}
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}

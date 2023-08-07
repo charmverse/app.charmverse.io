@@ -129,7 +129,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               Typeform
             </SourceType>
             {onCreate && (
-              <SourceType onClick={onCreate}>
+              <SourceType data-test='source-new-database' onClick={onCreate}>
                 <AddCircleIcon style={{ fontSize: 24 }} />
                 New database
               </SourceType>

@@ -1,18 +1,23 @@
-import type { Page, User } from '@charmverse/core/prisma';
+import type { User } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
+import { DatabasePage } from '__e2e__/po/databasePage.po';
+import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
 import { loginBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
   pagesSidebar: PagesSidebarPage;
-  databasePage: null;
+  document: DocumentPage;
+  databasePage: DatabasePage;
 };
 
 const test = base.extend<Fixtures>({
-  pagesSidebar: ({ page }, use) => use(new PagesSidebarPage(page))
+  pagesSidebar: ({ page }, use) => use(new PagesSidebarPage(page)),
+  document: ({ page }, use) => use(new DocumentPage(page)),
+  databasePage: ({ page }, use) => use(new DatabasePage(page))
 });
 
 // Will be set by the first test
@@ -30,7 +35,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Edit database select properties', async () => {
-  test('create a board', async ({ page, pagesSidebar }) => {
+  test('create a board', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
@@ -39,6 +44,7 @@ test.describe.serial('Edit database select properties', async () => {
 
     await pagesSidebar.goToHomePage(space.domain);
 
+    // Add the database page from the sidebar
     await expect(pagesSidebar.pagesSidebar).toBeVisible();
 
     await pagesSidebar.pagesSidebar.hover();
@@ -49,28 +55,52 @@ test.describe.serial('Edit database select properties', async () => {
 
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
+    await expect(pagesSidebar.databasePage).toBeVisible();
     await page.pause();
 
-    await expect(pagesSidebar.databasePage).toBeVisible();
+    // Initialise the new database
+    await expect(databasePage.selectNewDatabaseAsSource).toBeVisible();
 
-    databasePagePath = page.url();
+    await databasePage.selectNewDatabaseAsSource.click();
+
+    await expect(databasePage.addTablePropButton).toBeVisible();
+
+    const pageUrl = page.url();
+    databasePagePath = pageUrl.split('/')[pageUrl.length - 1];
   });
 
-  // test('edit a board', async ({ page, globalPage }) => {
-  //   // Arrange ------------------
-  //   await loginBrowserUser({
-  //     browserPage: page,
-  //     userId: spaceUser.id
-  //   });
+  test('edit a board', async ({ page, document, databasePage }) => {
+    // Arrange ------------------
+    await loginBrowserUser({
+      browserPage: page,
+      userId: spaceUser.id
+    });
 
-  //   await expect(globalPage.pagesSidebar).toBeVisible();
+    await document.goToPage({
+      domain: space.domain,
+      path: databasePagePath
+    });
 
-  //   await globalPage.pagesSidebar.click();
+    await expect(databasePage.databasePage).toBeVisible();
 
-  //   await expect(globalPage.pagesSidebarSelectAddDatabaseButton).toBeVisible();
+    // Add select property
+    await expect(databasePage.addTablePropButton).toBeVisible();
 
-  //   await globalPage.pagesSidebarSelectAddDatabaseButton.click();
+    databasePage.addTablePropButton.click();
 
-  //   await expect(globalPage.databasePage).toBeVisible();
-  // });
+    const selectPropertyType = databasePage.getPropertyTypeOptionLocator('select');
+
+    expect(selectPropertyType).toBeVisible();
+
+    await selectPropertyType.click();
+
+    // Create new card and close it
+    await databasePage.addCardFromTableButton.click();
+
+    await expect(databasePage.closeModal).toBeVisible();
+
+    await databasePage.closeModal.click();
+
+    // Edit the card
+  });
 });

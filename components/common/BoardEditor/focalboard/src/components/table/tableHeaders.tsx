@@ -184,6 +184,7 @@ function TableHeaders(props: Props): JSX.Element {
         }
         return (
           <TableHeader
+            data-test={`table-property-${template.type}`}
             type={template.type}
             name={template.name}
             sorted={sorted}
@@ -205,7 +206,7 @@ function TableHeaders(props: Props): JSX.Element {
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
         {!props.readOnly && !props.readOnlySourceData && (
           <>
-            <Button {...bindTrigger(addPropertyPopupState)}>
+            <Button data-test='add-table-prop' {...bindTrigger(addPropertyPopupState)}>
               <AddIcon fontSize='small' />
             </Button>
             {isSmallScreen ? (
