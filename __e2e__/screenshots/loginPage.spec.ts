@@ -16,8 +16,9 @@ const test = base.extend<Fixtures>({
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage))
 });
+test('login page layout', async ({ loginPage }, testInfo) => {
+  testInfo.snapshotSuffix = '';
 
-test('login page layout', async ({ loginPage }) => {
   await loginPage.goto();
   await loginPage.page.waitForLoadState('networkidle');
   await loginPage.waitForContent();
