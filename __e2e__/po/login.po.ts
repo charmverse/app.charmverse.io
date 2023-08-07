@@ -22,6 +22,8 @@ export class LoginPage {
 
   readonly workspaceFormSubmit: Locator;
 
+  readonly pageContent: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.universalConnectButton = page.locator('data-test=universal-connect-button');
@@ -31,6 +33,7 @@ export class LoginPage {
     this.selectNewWorkspaceButton = page.locator('data-test=goto-create-workspace');
     this.workspaceFormDomainInput = page.locator('data-test=workspace-domain-input');
     this.workspaceFormSubmit = page.locator('data-test=create-workspace');
+    this.pageContent = page.locator('data-test=login-page-content');
   }
 
   async goto() {
@@ -42,6 +45,10 @@ export class LoginPage {
 
   async waitForURL() {
     await this.page.waitForURL('**/');
+  }
+
+  async waitForContent() {
+    await this.pageContent.waitFor();
   }
 
   // retrieve the Discord URL when clicking 'connect discord' button

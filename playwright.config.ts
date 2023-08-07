@@ -45,12 +45,22 @@ const config: PlaywrightTestConfig = {
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'e2e',
       use: {
         ...devices['Desktop Chrome']
-      }
+      },
+      testIgnore: 'screenshots/*'
+    },
+    {
+      name: 'screenshots',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          ignoreDefaultArgs: ['--hide-scrollbars']
+        }
+      },
+      testMatch: 'screenshots/*.spec.ts'
     }
-
     /* Only test Chrome for now
     {
       name: 'firefox',

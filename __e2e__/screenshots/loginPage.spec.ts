@@ -1,0 +1,34 @@
+import type { Page } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
+
+import { LoginPage } from '../po/login.po';
+import { createUserAndSpace } from '../utils/mocks';
+import { mockWeb3 } from '../utils/web3';
+
+type Fixtures = {
+  sandboxPage: Page;
+  loginPage: LoginPage;
+};
+
+const test = base.extend<Fixtures>({
+  sandboxPage: async ({ browser: _browser }, use) => {
+    const sandbox = await _browser.newContext();
+    const page = await sandbox.newPage();
+    await use(page);
+  },
+  loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage))
+});
+
+test('login page layout', async ({ loginPage }) => {
+  await loginPage.goto();
+  await loginPage.waitForContent();
+  await loginPage.page.waitForTimeout(500);
+
+  await expect(loginPage.page).toHaveScreenshot();
+
+  await loginPage.universalConnectButton.click();
+  await loginPage.page.waitForLoadState('networkidle');
+  await loginPage.page.waitForTimeout(500);
+
+  await expect(loginPage.page).toHaveScreenshot();
+});
