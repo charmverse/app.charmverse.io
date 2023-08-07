@@ -82,7 +82,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       open: settingsModalState.isOpen,
       activePath,
       onClick,
-      onClose: subscriptionEnded ? () => {} : onClose,
+      onClose,
       openUpgradeSubscription
     }),
     [activePath, settingsModalState.isOpen]
