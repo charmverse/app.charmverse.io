@@ -2,8 +2,6 @@ import type { Page } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
-import { createUserAndSpace } from '../utils/mocks';
-import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
   sandboxPage: Page;
@@ -21,6 +19,7 @@ const test = base.extend<Fixtures>({
 
 test('login page layout', async ({ loginPage }) => {
   await loginPage.goto();
+  await loginPage.page.waitForLoadState('networkidle');
   await loginPage.waitForContent();
   await loginPage.page.waitForTimeout(500);
 
