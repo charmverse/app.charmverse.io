@@ -5,11 +5,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import { relay } from '../relay';
@@ -398,9 +400,10 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
+    const session = this.getSession();
     const logMeta = {
       socketId: this.id,
-      userId: this.getSession().user.id,
+      userId: session.user.id,
       pageId: room.doc.id,
       spaceId: room.doc.spaceId,
       v: clientV,
@@ -415,6 +418,26 @@ export class DocumentEventHandler {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
+
+        // Go through the diffs and see if any of them are for deleting a page. If so, we need to archive the page and all of its children and then broadcast the change.
+        for (const ds of message.ds) {
+          if (ds.stepType === 'replace') {
+            const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
+            if (node && node.type === 'page') {
+              const pageId = node.attrs?.id;
+
+              const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'archive');
+
+              relay.broadcast(
+                {
+                  type: 'pages_deleted',
+                  payload: modifiedChildPageIds.map((id) => ({ id }))
+                },
+                room.doc.spaceId
+              );
+            }
+          }
+        }
 
         try {
           const updatedNode = applyStepsToNode(message.ds, room.node);
@@ -637,7 +660,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id, spaceId: room.doc.spaceId });
+    log.debug('Saving document to db', { pageId: room.doc.id, spaceId: room.doc.spaceId });
 
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed
