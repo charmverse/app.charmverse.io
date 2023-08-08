@@ -335,6 +335,7 @@ export function ProposalProperties({
                 <PropertyLabel readOnly>Criteria</PropertyLabel>
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
+                    readOnly={readOnly || canUpdateProposalProperties === false}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={(rubricCriteria) => {
                       setProposalFormInputs({

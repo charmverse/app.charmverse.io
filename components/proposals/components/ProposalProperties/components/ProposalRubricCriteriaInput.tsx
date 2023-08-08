@@ -16,6 +16,7 @@ export type RangeProposalCriteria = {
 };
 
 type Props = {
+  readOnly?: boolean;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
 };
@@ -35,10 +36,13 @@ const CriteriaRow = styled(Box)`
   }
 `;
 
-export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
+export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   function addCriteria() {
+    if (readOnly) {
+      return;
+    }
     const lastCriteria = criteriaList[criteriaList.length - 1]?.parameters;
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
@@ -53,12 +57,18 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
   }
 
   function deleteCriteria(id: string) {
+    if (readOnly) {
+      return;
+    }
     const updatedList = criteriaList.filter((c) => c.id !== id);
     setCriteriaList(updatedList);
     onChange(criteriaList);
   }
 
   function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
+    if (readOnly) {
+      return;
+    }
     const criteria = criteriaList.find((c) => c.id === id);
     if (criteria) {
       Object.assign(criteria, updates);
@@ -109,18 +119,20 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
           <TextInput
             displayType='details'
             fullWidth={false}
-            placeholderText='Title...'
-            value={criteria.title}
             onChange={(title) => setCriteriaProperty(criteria.id, { title })}
+            placeholderText='Title...'
+            readOnly={readOnly}
+            value={criteria.title}
           />
           <TextInput
-            multiline
-            placeholderText='Add a description...'
             displayType='details'
             fullWidth={false}
-            value={criteria.description ?? ''}
+            multiline
             onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+            placeholderText='Add a description...'
+            readOnly={readOnly}
             sx={{ flexGrow: 1 }}
+            value={criteria.description ?? ''}
           />
           <Box display='flex' gap={1} alignItems='flex-start'>
             {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
@@ -131,17 +143,18 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                 <div>
                   <TextInput
                     displayType='details'
-                    value={criteria.parameters.min?.toString() || ''}
+                    inputProps={{
+                      'data-criteria': criteria.id,
+                      'data-parameter-type': 'min'
+                    }}
                     onChange={(min) => {
                       setCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, min: getNumberFromString(min) }
                       });
                     }}
-                    inputProps={{
-                      'data-criteria': criteria.id,
-                      'data-parameter-type': 'min'
-                    }}
+                    readOnly={readOnly}
                     sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
+                    value={criteria.parameters.min?.toString() || ''}
                   />
                   <Typography
                     align='center'
@@ -158,7 +171,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                 <div>
                   <TextInput
                     displayType='details'
-                    value={criteria.parameters.max?.toString() || ''}
+                    // store props on DOM for keyboard events
                     inputProps={{
                       'data-criteria': criteria.id,
                       'data-parameter-type': 'max'
@@ -168,7 +181,9 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                         parameters: { ...criteria.parameters, max: getNumberFromString(max) }
                       });
                     }}
+                    readOnly={readOnly}
                     sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
+                    value={criteria.parameters.max?.toString() || ''}
                   />
                   <Typography
                     align='center'
@@ -183,18 +198,22 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
               </Grid>
             </Grid>
           </Box>
-          <div className='show-on-hover delete-icon'>
-            <Tooltip title='Delete'>
-              <IconButton size='small' onClick={() => deleteCriteria(criteria.id)}>
-                <DeleteIcon color='secondary' fontSize='small' />
-              </IconButton>
-            </Tooltip>
-          </div>
+          {!readOnly && (
+            <div className='show-on-hover delete-icon'>
+              <Tooltip title='Delete'>
+                <IconButton size='small' onClick={() => deleteCriteria(criteria.id)}>
+                  <DeleteIcon color='secondary' fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            </div>
+          )}
         </CriteriaRow>
       ))}
-      <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
-        + Add a criteria
-      </AddAPropertyButton>
+      {!readOnly && (
+        <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
+          + Add a criteria
+        </AddAPropertyButton>
+      )}
     </>
   );
 }
