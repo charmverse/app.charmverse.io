@@ -34,6 +34,17 @@ const CriteriaRow = styled(Box)`
       background-color: var(--mui-action-hover);
     }
   }
+  .to-pseudo-element {
+    position: relative;
+  }
+  .to-pseudo-element::before {
+    content: '-';
+    left: -8px;
+    top: 4px;
+    position: absolute;
+    font-size: 16px;
+    color: var(--secondary-text);
+  }
 `;
 
 export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props) {
@@ -168,7 +179,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
                 </div>
               </Grid>
               <Grid xs item>
-                <div>
+                <div className='to-pseudo-element'>
                   <TextInput
                     displayType='details'
                     // store props on DOM for keyboard events
