@@ -8,12 +8,15 @@ import { ProposalPage as ProposalPageComponent } from 'components/proposals/comp
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
+import { MembersProvider } from 'hooks/useMembers';
 import { createMockSpace } from 'testing/mocks/space';
 
 export default {
   title: 'common/Proposals',
   component: ProposalPage
 };
+
+const space = createMockSpace();
 
 const reduxStore = mockStateStore([], {
   boards: {
@@ -25,11 +28,16 @@ function Context({ children }: { children: ReactNode }) {
   const spaceContext = useRef<ICurrentSpaceContext>({
     isLoading: false,
     refreshCurrentSpace: () => {},
-    space: createMockSpace()
+    space
   });
+  // useEffect(() => {
+  //   cache.set(`proposals/${space.id}/categories`, categories);
+  // }, []);
   return (
     <CurrentSpaceContext.Provider value={spaceContext.current}>
-      <Provider store={reduxStore}>{children}</Provider>
+      <MembersProvider>
+        <Provider store={reduxStore}>{children}</Provider>
+      </MembersProvider>
     </CurrentSpaceContext.Provider>
   );
 }

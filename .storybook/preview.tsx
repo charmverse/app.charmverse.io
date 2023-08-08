@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react';
 import React from 'react';
 import '../theme/styles.scss';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
+import { initialize, mswLoader } from 'msw-storybook-addon';
 
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -81,6 +82,11 @@ import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css'
 import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
+import { handlers } from './lib/mocks';
+
+// Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
+initialize();
+
 const preview: Preview = {
   parameters: {
     backgrounds: {
@@ -96,8 +102,11 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
-    }
-  }
+    },
+    msw: { handlers }
+  },
+  // Provide the MSW addon loader globally
+  loaders: [mswLoader]
 };
 
 export default preview;

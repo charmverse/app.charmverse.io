@@ -10,13 +10,13 @@ const config: StorybookConfig = {
     autodocs: 'tag'
   },
   staticDirs: [
+    '../public',
     {
       from: '../theme/fonts.ts',
       to: 'theme/fonts.ts'
     }
   ],
   webpackFinal: (config) => {
-    console.log('override');
     // Add fallbacks for node.js libraries
     let loaders = config.resolve;
     if (loaders) {
