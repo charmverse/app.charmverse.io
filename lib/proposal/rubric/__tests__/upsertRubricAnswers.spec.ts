@@ -43,7 +43,7 @@ describe('upsertRubricAnswers', () => {
     const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
     const answers = await upsertRubricAnswers({
-      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 } }],
+      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'my opinion' }],
       userId: evaluator.id,
       proposalId: proposal.id
     });
@@ -52,6 +52,7 @@ describe('upsertRubricAnswers', () => {
       proposalId: proposal.id,
       rubricCriteriaId: scoreCriteria.id,
       userId: evaluator.id,
+      comment: 'my opinion',
       response: {
         score: 7
       }
@@ -62,13 +63,26 @@ describe('upsertRubricAnswers', () => {
     const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
     const firstSet = await upsertRubricAnswers({
-      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 } }],
+      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
       userId: evaluator.id,
       proposalId: proposal.id
     });
 
     expect(firstSet).toHaveLength(1);
+    expect(firstSet[0].response.score).toEqual(7);
     expect(firstSet[0].rubricCriteriaId).toEqual(scoreCriteria.id);
+    expect(firstSet[0].comment).toEqual('first');
+
+    const firstSetUpdated = await upsertRubricAnswers({
+      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 6 }, comment: 'second' }],
+      userId: evaluator.id,
+      proposalId: proposal.id
+    });
+
+    expect(firstSetUpdated).toHaveLength(1);
+    expect(firstSetUpdated[0].response.score).toEqual(6);
+    expect(firstSetUpdated[0].rubricCriteriaId).toEqual(scoreCriteria.id);
+    expect(firstSetUpdated[0].comment).toEqual('second');
 
     const secondSet = await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: vibeCriteria.id, response: { score: 7 } }],

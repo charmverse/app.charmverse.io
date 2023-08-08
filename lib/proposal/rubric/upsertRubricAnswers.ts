@@ -11,7 +11,7 @@ import type {
 type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Pick<
   ProposalRubricCriteriaAnswerWithTypedResponse<T>,
   'rubricCriteriaId' | 'response'
->;
+> & { comment?: string };
 export type RubricAnswerUpsert = {
   userId: string;
   proposalId: string;
@@ -69,11 +69,13 @@ export async function upsertRubricAnswers({
         create: {
           response: a.response,
           userId,
+          comment: a.comment,
           proposal: { connect: { id: proposalId } },
           rubricCriteria: { connect: { id: a.rubricCriteriaId } }
         },
         update: {
-          response: a.response
+          response: a.response,
+          comment: a.comment
         }
       })
     )

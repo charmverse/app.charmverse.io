@@ -47,7 +47,7 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
     const reviewerCookie = await loginUser(reviewer.id);
 
     const answerContent: Pick<RubricAnswerUpsert, 'answers'> = {
-      answers: [{ rubricCriteriaId: rubricCriteria.id, response: { score: 5 } }]
+      answers: [{ rubricCriteriaId: rubricCriteria.id, response: { score: 5 }, comment: 'opinion' }]
     };
 
     const updated = (
@@ -63,7 +63,8 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
     expect(updated[0]).toMatchObject<ProposalRubricCriteriaAnswerWithTypedResponse>({
       ...answerContent.answers[0],
       userId: reviewer.id,
-      proposalId: proposal.id
+      proposalId: proposal.id,
+      comment: 'opinion'
     });
   });
 
