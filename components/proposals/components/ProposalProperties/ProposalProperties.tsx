@@ -314,22 +314,29 @@ export function ProposalProperties({
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
-              <Box display='flex' flex={1} flexDirection='column'>
-                <ProposalEvaluationTypeSelect
-                  value={proposalFormInputs.evaluationType}
-                  onChange={(evaluationType) => {
-                    setProposalFormInputs({
-                      ...proposalFormInputs,
-                      evaluationType
-                    });
-                  }}
-                />
-                {proposalFormInputs.evaluationType === 'rubric' && (
-                  <ProposalRubricCriteriaInput value={proposalFormInputs.rubricCriteria} onChange={() => {}} />
-                )}
-              </Box>
+              <ProposalEvaluationTypeSelect
+                value={proposalFormInputs.evaluationType}
+                onChange={(evaluationType) => {
+                  setProposalFormInputs({
+                    ...proposalFormInputs,
+                    evaluationType
+                  });
+                }}
+              />
             </Box>
           </Box>
+          {/* Select rubric criteria */}
+
+          {proposalFormInputs.evaluationType === 'rubric' && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly>Criteria</PropertyLabel>
+                <Box display='flex' flex={1} flexDirection='column'>
+                  <ProposalRubricCriteriaInput value={proposalFormInputs.rubricCriteria} onChange={() => {}} />
+                </Box>
+              </Box>
+            </Box>
+          )}
         </Collapse>
 
         <ConfirmDeleteModal

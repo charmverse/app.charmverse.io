@@ -62,12 +62,13 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
 
   return (
     <>
-      <Box p={1} pb={0}>
+      <Box pl={1} pt={1}>
         {criteriaList.map((criteria) => (
-          <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={2} mb={1}>
+          <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={2}>
             <TextInput
               displayType='details'
               fullWidth={false}
+              placeholderText='Title...'
               value={criteria.title}
               onChange={(title) => updateCriteria(criteria.id, { title })}
               sx={{ fontSize: 14 }}
@@ -85,20 +86,24 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
               {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
                   Range:
                 </FormLabel> */}
-              <Grid container spacing={1} width={80}>
+              <Grid container width={70}>
                 <Grid xs item>
-                  <TextInput
-                    displayType='details'
-                    value={criteria.parameters.min.toString()}
-                    onChange={(min) => {
-                      if (min) {
-                        updateCriteria(criteria.id, { parameters: { ...criteria.parameters, min: parseInt(min, 10) } });
-                      }
-                    }}
-                  />
-                  <Typography className='range-label' color='secondary' variant='caption'>
-                    min
-                  </Typography>
+                  <div>
+                    <TextInput
+                      displayType='details'
+                      value={criteria.parameters.min.toString()}
+                      onChange={(min) => {
+                        if (min) {
+                          updateCriteria(criteria.id, {
+                            parameters: { ...criteria.parameters, min: parseInt(min, 10) }
+                          });
+                        }
+                      }}
+                    />
+                    <Typography component='div' className='range-label' color='secondary' variant='caption'>
+                      min
+                    </Typography>
+                  </div>
                 </Grid>
                 <Grid xs item>
                   -
@@ -115,7 +120,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                       }
                     }}
                   />
-                  <Typography className='range-label' color='secondary' variant='caption'>
+                  <Typography component='div' className='range-label' color='secondary' variant='caption'>
                     max
                   </Typography>
                 </Grid>
@@ -124,7 +129,9 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
           </CriteriaRow>
         ))}
       </Box>
-      <AddAPropertyButton onClick={addCriteria}>+ Add a criteria</AddAPropertyButton>
+      <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
+        + Add a criteria
+      </AddAPropertyButton>
     </>
   );
 }
