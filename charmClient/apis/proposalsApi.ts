@@ -15,6 +15,7 @@ import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposa
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
@@ -26,12 +27,12 @@ export class ProposalsApi {
     );
   }
 
-  upsertRubricCriteriaAnswer({ proposalId }: { proposalId: string }) {
-    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`);
+  upsertRubricCriteriaAnswer({ proposalId, answers }: Omit<RubricAnswerUpsert, 'userId'>) {
+    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answer`, { answers });
   }
 
-  deleteRubricCriteriaAnswer({ proposalId }: { proposalId: string }) {
-    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`);
+  deleteRubricCriteriaAnswer({ proposalId, rubricCriteriaId }: { proposalId: string; rubricCriteriaId: string }) {
+    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`, { rubricCriteriaId });
   }
 
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
@@ -39,7 +40,7 @@ export class ProposalsApi {
   }
 
   updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
-    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
+    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
   }
 
   getProposal(proposalId: string) {
