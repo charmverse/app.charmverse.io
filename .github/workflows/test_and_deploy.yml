@@ -83,6 +83,33 @@ jobs:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: ${{matrix.test_command}}
 
+  ChromaticTest:
+    name: Chromatic Test
+    runs-on: ubuntu-latest
+    needs: build-test-env
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+        with: 
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
+
+      - name: Run Chromatic CI
+        env: 
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: |
+          npm run chromatic:ci
+
   integration-test:
     name: Tests
     runs-on: ubuntu-latest
