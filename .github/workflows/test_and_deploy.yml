@@ -63,7 +63,9 @@ jobs:
           - test_name: 'Chromatic deploy and tests'
             test_command: 'npm run chromatic:ci'
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
