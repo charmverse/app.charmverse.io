@@ -9,7 +9,7 @@ import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { ProposalNotFoundError } from './errors';
-import type { ProposalWithUsers } from './interface';
+import type { ProposalWithUsersAndRubric } from './interface';
 
 export async function updateProposalStatus({
   proposalId,
@@ -20,7 +20,7 @@ export async function updateProposalStatus({
   newStatus: ProposalStatus;
   proposalId: string;
 }): Promise<{
-  proposal: ProposalWithUsers;
+  proposal: ProposalWithUsersAndRubric;
   workspaceEvent: WorkspaceEvent;
 }> {
   if (!newStatus || !ProposalStatus[newStatus]) {
@@ -112,13 +112,15 @@ export async function updateProposalStatus({
       include: {
         authors: true,
         reviewers: true,
-        category: true
+        category: true,
+        rubricAnswers: true,
+        rubricCriteria: true
       }
     });
 
     return {
       workspaceEvent: createdWorkspaceEvent,
-      proposal: updatedProposal
+      proposal: updatedProposal as ProposalWithUsersAndRubric
     };
   });
 }
