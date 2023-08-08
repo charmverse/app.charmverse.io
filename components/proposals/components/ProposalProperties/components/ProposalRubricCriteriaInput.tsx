@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Box, Grid, Typography } from '@mui/material';
+import { CloseOutlined as DeleteIcon } from '@mui/icons-material';
+import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -20,13 +21,16 @@ type Props = {
 };
 
 const CriteriaRow = styled(Box)`
-  .range-label {
+  .show-on-hover {
     opacity: 0;
     transform: opacity 0.2s ease-in-out;
   }
   &:hover {
-    .range-label {
+    .show-on-hover {
       opacity: 1;
+    }
+    .octo-propertyvalue:not(.readonly) {
+      background-color: var(--mui-action-hover);
     }
   }
 `;
@@ -44,6 +48,12 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
       parameters
     };
     const updatedList = [...criteriaList, newCriteria];
+    setCriteriaList(updatedList);
+    onChange(criteriaList);
+  }
+
+  function deleteCriteria(id: string) {
+    const updatedList = criteriaList.filter((c) => c.id !== id);
     setCriteriaList(updatedList);
     onChange(criteriaList);
   }
@@ -92,90 +102,94 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
 
   return (
     <>
-      <Box pl={1} pt={1}>
-        {criteriaList.map((criteria) => (
-          <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={2}>
-            <TextInput
-              displayType='details'
-              fullWidth={false}
-              placeholderText='Title...'
-              value={criteria.title}
-              onChange={(title) => setCriteriaProperty(criteria.id, { title })}
-            />
-            <TextInput
-              multiline
-              placeholderText='Add a description...'
-              displayType='details'
-              fullWidth={false}
-              value={criteria.description ?? ''}
-              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-              sx={{ flexGrow: 1 }}
-            />
-            <Box display='flex' gap={1} alignItems='flex-start'>
-              {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
+      {criteriaList.map((criteria) => (
+        <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={1} mb={1}>
+          <TextInput
+            displayType='details'
+            fullWidth={false}
+            placeholderText='Title...'
+            value={criteria.title}
+            onChange={(title) => setCriteriaProperty(criteria.id, { title })}
+          />
+          <TextInput
+            multiline
+            placeholderText='Add a description...'
+            displayType='details'
+            fullWidth={false}
+            value={criteria.description ?? ''}
+            onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+            sx={{ flexGrow: 1 }}
+          />
+          <Box display='flex' gap={1} alignItems='flex-start'>
+            {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
                   Range:
                 </FormLabel> */}
-              <Grid container width={70}>
-                <Grid xs item>
-                  <div>
-                    <TextInput
-                      displayType='details'
-                      value={criteria.parameters.min?.toString() || ''}
-                      onChange={(min) => {
-                        const minInt = parseInt(min, 10);
-                        setCriteriaProperty(criteria.id, {
-                          parameters: { ...criteria.parameters, min: getNumberFromString(min) }
-                        });
-                      }}
-                      inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'min'
-                      }}
-                      sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
-                    />
-                    <Typography
-                      align='center'
-                      component='div'
-                      className='range-label'
-                      color='secondary'
-                      variant='caption'
-                    >
-                      min
-                    </Typography>
-                  </div>
-                </Grid>
-                <Grid xs item>
-                  <div>
-                    <TextInput
-                      displayType='details'
-                      value={criteria.parameters.max?.toString() || ''}
-                      inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'max'
-                      }}
-                      onChange={(max) => {
-                        setCriteriaProperty(criteria.id, {
-                          parameters: { ...criteria.parameters, max: getNumberFromString(max) }
-                        });
-                      }}
-                      sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
-                    />
-                    <Typography
-                      align='center'
-                      component='div'
-                      className='range-label'
-                      color='secondary'
-                      variant='caption'
-                    >
-                      max
-                    </Typography>
-                  </div>
-                </Grid>
+            <Grid container width={80} spacing={1}>
+              <Grid xs item>
+                <div>
+                  <TextInput
+                    displayType='details'
+                    value={criteria.parameters.min?.toString() || ''}
+                    onChange={(min) => {
+                      setCriteriaProperty(criteria.id, {
+                        parameters: { ...criteria.parameters, min: getNumberFromString(min) }
+                      });
+                    }}
+                    inputProps={{
+                      'data-criteria': criteria.id,
+                      'data-parameter-type': 'min'
+                    }}
+                    sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
+                  />
+                  <Typography
+                    align='center'
+                    component='div'
+                    className='show-on-hover'
+                    color='secondary'
+                    variant='caption'
+                  >
+                    min
+                  </Typography>
+                </div>
               </Grid>
-            </Box>
-          </CriteriaRow>
-        ))}
-      </Box>
+              <Grid xs item>
+                <div>
+                  <TextInput
+                    displayType='details'
+                    value={criteria.parameters.max?.toString() || ''}
+                    inputProps={{
+                      'data-criteria': criteria.id,
+                      'data-parameter-type': 'max'
+                    }}
+                    onChange={(max) => {
+                      setCriteriaProperty(criteria.id, {
+                        parameters: { ...criteria.parameters, max: getNumberFromString(max) }
+                      });
+                    }}
+                    sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
+                  />
+                  <Typography
+                    align='center'
+                    component='div'
+                    className='show-on-hover'
+                    color='secondary'
+                    variant='caption'
+                  >
+                    max
+                  </Typography>
+                </div>
+              </Grid>
+            </Grid>
+          </Box>
+          <div className='show-on-hover delete-icon'>
+            <Tooltip title='Delete'>
+              <IconButton size='small' onClick={() => deleteCriteria(criteria.id)}>
+                <DeleteIcon color='secondary' fontSize='small' />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </CriteriaRow>
+      ))}
       <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
         + Add a criteria
       </AddAPropertyButton>

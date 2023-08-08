@@ -24,6 +24,9 @@ const StyledInput = styled(InputBase)`
   }
   padding: 0; // disable padding added for multi-line input
   border: 0px;
+  .octo-propertyvalue:not(.readonly) {
+    cursor: text !important;
+  }
 `;
 
 function Editable(
