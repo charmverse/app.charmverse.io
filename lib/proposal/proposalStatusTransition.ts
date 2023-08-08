@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 
 export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
   draft: ['discussion'],
@@ -12,6 +12,14 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
 };
 
 export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
+
+export function getProposalStatuses(evaluationType: ProposalEvaluationType = 'vote'): ProposalStatus[] {
+  if (evaluationType === 'rubric') {
+    return ['draft', 'discussion', 'evaluation_active', 'evaluation_closed'];
+  } else {
+    return ['draft', 'discussion', 'review', 'reviewed', 'vote_active', 'vote_closed'];
+  }
+}
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   draft: 'Draft',

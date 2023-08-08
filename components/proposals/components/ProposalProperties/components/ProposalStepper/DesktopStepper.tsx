@@ -6,7 +6,8 @@ import { Fragment } from 'react';
 import {
   proposalStatusDetails,
   PROPOSAL_STATUSES,
-  PROPOSAL_STATUS_LABELS
+  PROPOSAL_STATUS_LABELS,
+  getProposalStatuses
 } from 'lib/proposal/proposalStatusTransition';
 
 import type { StepperProps } from './interfaces';
@@ -18,7 +19,8 @@ export function DesktopStepper({
   proposalStatus,
   updateProposalStatus,
   proposalFlowPermissions,
-  archived
+  archived,
+  evaluationType
 }: StepperProps) {
   const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
 
@@ -39,7 +41,7 @@ export function DesktopStepper({
         md: 'flex'
       }}
     >
-      {PROPOSAL_STATUSES.map((status, statusIndex) => {
+      {getProposalStatuses(evaluationType).map((status, statusIndex) => {
         return (
           <Fragment key={status}>
             <Grid item xs display='flex' position='relative' alignItems='center' justifyContent='center'>
