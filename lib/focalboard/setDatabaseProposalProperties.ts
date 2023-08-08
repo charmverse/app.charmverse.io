@@ -42,7 +42,9 @@ const proposalStatusBoardColors: Record<
   review: 'propColorYellow',
   reviewed: 'propColorPurple',
   vote_active: 'propColorPink',
-  vote_closed: 'propColorRed'
+  vote_closed: 'propColorRed',
+  evaluation_active: 'propColorRed',
+  evaluation_closed: 'propColorPink'
 };
 
 export async function generateUpdatedProposalCategoryProperty({
