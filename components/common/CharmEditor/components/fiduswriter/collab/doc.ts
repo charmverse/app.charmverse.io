@@ -229,8 +229,8 @@ export class ModCollabDoc {
 
   receiveDiff(data: ClientDiffMessage, serverFix = false) {
     this.mod.editor.docInfo.version += 1;
-    if (data.ds && data.cid) {
-      // document steps
+    // data.cid is for server generated diff events, that was triggered by another action
+    if ((data.ds && data.cid) || data.cid === -1) {
       this.applyDiffs(data.ds, data.cid);
     }
 
