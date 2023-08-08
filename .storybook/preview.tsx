@@ -82,10 +82,13 @@ import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css'
 import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
-import { handlers } from './lib/mocks';
+import { handlers } from './lib/mockApi';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
-initialize();
+initialize({
+  // bypass unhandled requests (next.js hot-reloading as an example)
+  onUnhandledRequest: 'bypass'
+});
 
 const preview: Preview = {
   parameters: {

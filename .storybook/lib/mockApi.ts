@@ -1,4 +1,5 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { Member } from '../../lib/members/interfaces';
 import { rest } from 'msw';
 import { generateDefaultProposalCategoriesInput } from '../../lib/proposal/generateDefaultProposalCategoriesInput';
@@ -6,7 +7,6 @@ import { createMockUser } from '../../testing/mocks/user';
 import { createMockSpace } from '../../testing/mocks/space';
 import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { SpacePermissionFlags } from '../../lib/permissions/spaces';
-import type { ProposalWithUsers } from '../../lib/proposal/interface';
 import { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon

@@ -5,16 +5,16 @@ import React, { forwardRef, useRef } from 'react';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
 
-import type { EditableProps, Focusable } from './editable';
-import { useEditable } from './editable';
+import type { EditableProps, Focusable } from '../../focalboard/src/widgets/editable';
+import { useEditable } from '../../focalboard/src/widgets/editable';
 
 export type TextInputProps = EditableProps & {
-  className?: string;
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
   fullWidth?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
+  inputProps?: any;
   sx?: any;
 };
 
@@ -27,9 +27,10 @@ const StyledInput = styled(InputBase)`
 `;
 
 function Editable(
-  { multiline, columnRef, wrapColumn, displayType, fullWidth = true, sx, ..._props }: TextInputProps,
+  { multiline, columnRef, wrapColumn, displayType, fullWidth = true, sx, inputProps = {}, ..._props }: TextInputProps,
   ref: React.Ref<Focusable>
 ): JSX.Element {
+  _props.className = 'octo-propertyvalue';
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
   const memoizedHeight = React.useMemo(() => {
@@ -44,6 +45,7 @@ function Editable(
     return (
       <StyledInput
         inputProps={{
+          ...inputProps,
           className
         }}
         fullWidth={fullWidth}
@@ -75,6 +77,7 @@ function Editable(
       popupContent={
         <StyledInput
           inputProps={{
+            ...inputProps,
             className
           }}
           fullWidth={fullWidth}
@@ -88,6 +91,7 @@ function Editable(
     >
       <StyledInput
         inputProps={{
+          ...inputProps,
           className
         }}
         fullWidth={fullWidth}
