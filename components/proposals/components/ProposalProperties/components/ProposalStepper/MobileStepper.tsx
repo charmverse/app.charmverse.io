@@ -4,8 +4,8 @@ import { Box, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import {
   proposalStatusDetails,
-  PROPOSAL_STATUSES,
-  PROPOSAL_STATUS_LABELS
+  PROPOSAL_STATUS_LABELS,
+  getProposalStatuses
 } from 'lib/proposal/proposalStatusTransition';
 
 import type { StepperProps } from './interfaces';
@@ -15,7 +15,8 @@ export function MobileStepper({
   proposalStatus,
   updateProposalStatus,
   proposalFlowPermissions,
-  archived
+  archived,
+  evaluationType
 }: StepperProps) {
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
@@ -50,7 +51,7 @@ export function MobileStepper({
                   return <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>;
                 }}
               >
-                {PROPOSAL_STATUSES.map((status) => {
+                {getProposalStatuses(evaluationType).map((status) => {
                   return (
                     <MenuItem
                       key={status}

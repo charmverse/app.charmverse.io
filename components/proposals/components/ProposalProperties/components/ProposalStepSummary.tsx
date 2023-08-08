@@ -1,11 +1,11 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Button, Stack, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import {
   proposalStatusDetails,
   PROPOSAL_STATUSES,
