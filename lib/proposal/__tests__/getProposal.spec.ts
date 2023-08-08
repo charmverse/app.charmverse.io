@@ -47,7 +47,9 @@ describe('getProposal', () => {
           spaceId: space.id,
           status: proposal.status,
           archived: expect.any(Boolean),
-          evaluationType: 'vote'
+          evaluationType: 'vote',
+          rubricAnswers: [],
+          rubricCriteria: []
         }
       })
     );

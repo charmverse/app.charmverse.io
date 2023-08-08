@@ -1,12 +1,4 @@
-import type {
-  Page,
-  PageComment,
-  Proposal,
-  ProposalAuthor,
-  ProposalReviewer,
-  ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer
-} from '@charmverse/core/prisma';
+import type { Page, PageComment, Proposal, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';

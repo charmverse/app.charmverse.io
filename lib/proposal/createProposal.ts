@@ -126,12 +126,16 @@ export async function createProposal({
   ]);
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  if (rubricCriteria) {
-    await upsertRubricCriteria({
-      proposalId: proposal.id,
-      rubricCriteria
-    });
-  }
+  const upsertedCriteria = rubricCriteria
+    ? await upsertRubricCriteria({
+        proposalId: proposal.id,
+        rubricCriteria
+      })
+    : [];
 
-  return { page: page as PageWithPermissions, proposal, workspaceEvent };
+  return {
+    page: page as PageWithPermissions,
+    proposal: { ...proposal, rubricCriteria: upsertedCriteria, rubricAnswers: [] },
+    workspaceEvent
+  };
 }

@@ -1,5 +1,6 @@
 import crypto, { randomUUID } from 'node:crypto';
 
+import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApplicationStatus,
@@ -34,7 +35,7 @@ import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';

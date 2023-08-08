@@ -1,7 +1,6 @@
 import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
