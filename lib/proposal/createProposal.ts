@@ -1,7 +1,7 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type { WorkspaceEvent } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -25,7 +25,7 @@ export type CreateProposalInput = {
   authors?: string[];
   userId: string;
   spaceId: string;
-  evaluatio
+  evaluationType?: ProposalEvaluationType;
 };
 
 export type CreatedProposal = {
