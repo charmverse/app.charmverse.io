@@ -19,7 +19,9 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
   review: <ReviewsOutlinedIcon />,
   reviewed: <CheckOutlinedIcon />,
   vote_active: <HowToVoteOutlinedIcon />,
-  vote_closed: <BarChartOutlinedIcon />
+  vote_closed: <BarChartOutlinedIcon />,
+  evaluation_active: <HowToVoteOutlinedIcon />,
+  evaluation_closed: <BarChartOutlinedIcon />
 };
 
 export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
@@ -28,7 +30,9 @@ export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
   review: 'yellow',
   reviewed: 'purple',
   vote_active: 'pink',
-  vote_closed: 'red'
+  vote_closed: 'red',
+  evaluation_active: 'pink',
+  evaluation_closed: 'red'
 };
 
 const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
