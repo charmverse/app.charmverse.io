@@ -1,10 +1,9 @@
 import styled from '@emotion/styled';
-import { Box, FormControlLabel, FormLabel, FormGroup, Grid, Select, TextField, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TextInput } from 'components/common/BoardEditor/focalboard/src/widgets/TextInput';
 
 export type RangeProposalCriteria = {
