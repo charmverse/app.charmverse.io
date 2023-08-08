@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: testing-with-real-payload
+  SELECTED_PERMISSION_API_TAG:
 
 jobs:
   deploy:
