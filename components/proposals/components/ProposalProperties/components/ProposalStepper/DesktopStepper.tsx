@@ -24,7 +24,8 @@ export function DesktopStepper({
   archived,
   evaluationType
 }: StepperProps) {
-  const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
+  const statuses = getProposalStatuses(evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
 
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
@@ -35,6 +36,7 @@ export function DesktopStepper({
       }
     }
   }
+
   return (
     <Grid
       container
@@ -43,7 +45,7 @@ export function DesktopStepper({
         md: 'flex'
       }}
     >
-      {getProposalStatuses(evaluationType).map((status, statusIndex) => {
+      {statuses.map((status, statusIndex) => {
         return (
           <Fragment key={status}>
             <Grid item xs display='flex' position='relative' alignItems='center' justifyContent='center'>
