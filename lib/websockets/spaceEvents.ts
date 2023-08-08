@@ -54,15 +54,13 @@ export class SpaceEventHandler {
         log.error('Error subscribing user to space events', { error });
         this.sendError('Error subscribing to space');
       }
-    } else if ((message.type === 'page_deleted' || message.type === 'page_restored') && this.userId) {
+    } else if (message.type === 'page_deleted' && this.userId) {
       try {
         const pageId = message.payload.id;
-        const { documentRoom, participant, parentId, spaceId, content } = await getPageDetails({
+        const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
           id: pageId,
           userId: this.userId
         });
-
-        const position: null | number = null;
 
         if (documentRoom && participant && position !== null) {
           // TODO: Should this be handleDiff or handleMessage?
@@ -110,13 +108,15 @@ export class SpaceEventHandler {
       const pageId = message.payload.id;
 
       try {
-        const { pageNode, documentRoom, participant } = await getPageDetails({ id: pageId, userId: this.userId });
+        const { pageNode, documentRoom, participant, parentId, content, spaceId } = await getPageDetails({
+          id: pageId,
+          userId: this.userId
+        });
 
         // get the last position of the page node prosemirror node
         const lastChild = pageNode.lastChild;
-        const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : null;
-
-        if (documentRoom && participant && lastChildPos !== null) {
+        const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
+        if (documentRoom && participant) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -148,9 +148,18 @@ export class SpaceEventHandler {
               cid: -1
             },
             {
-              restorePage: true
+              restorePage: true,
+              skipSendingToActor: false
             }
           );
+        } else if (parentId) {
+          await applyNestedPageRestoreDiffAndSaveDocument({
+            restoredPageId: message.payload.id,
+            content,
+            userId: this.userId,
+            parentId,
+            spaceId
+          });
         }
       } catch (error) {
         const errorMessage = 'Error restoring a page from archive state';
@@ -167,6 +176,68 @@ export class SpaceEventHandler {
   sendError(message: string) {
     this.socket.emit(this.socketEvent, { type: 'error', message });
   }
+}
+
+async function applyNestedPageRestoreDiffAndSaveDocument({
+  restoredPageId,
+  content,
+  userId,
+  parentId,
+  spaceId
+}: {
+  restoredPageId: string;
+  content: PageContent;
+  userId: string;
+  parentId: string;
+  spaceId: string;
+}) {
+  const pageNode = getNodeFromJson(content);
+  const lastChild = pageNode.lastChild;
+  const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
+
+  const updatedNode = applyStepsToNode(
+    [
+      {
+        stepType: 'replace',
+        from: lastChildPos,
+        to: lastChildPos + 2,
+        slice: {
+          content: [
+            {
+              type: 'page',
+              attrs: {
+                id: restoredPageId,
+                type: null,
+                path: null,
+                track: []
+              }
+            }
+          ]
+        }
+      }
+    ],
+    pageNode
+  );
+
+  await prisma.page.update({
+    where: { id: parentId },
+    data: {
+      content: updatedNode.toJSON(),
+      contentText: updatedNode.textContent,
+      hasContent: updatedNode.textContent.length > 0,
+      updatedAt: new Date(),
+      updatedBy: userId
+    }
+  });
+
+  const modifiedChildPageIds = await modifyChildPages(restoredPageId, userId, 'restore');
+  relay.broadcast(
+    {
+      type: 'pages_restored',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
+    },
+    spaceId
+  );
 }
 
 async function applyNestedPageReplaceDiffAndSaveDocument({
