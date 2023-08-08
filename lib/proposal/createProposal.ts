@@ -25,6 +25,7 @@ export type CreateProposalInput = {
   authors?: string[];
   userId: string;
   spaceId: string;
+  evaluatio
 };
 
 export type CreatedProposal = {
