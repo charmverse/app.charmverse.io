@@ -119,5 +119,68 @@ describe('upsertRubricCriteria', () => {
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
 
-  it('should throw an error if some rubrics belong to a different proposal', () => {});
+  it('should throw an error if min and max parameters are invalid', async () => {
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: proposalCategory.id
+    });
+
+    // Missing property
+    await expect(
+      upsertRubricCriteria({
+        proposalId: proposal.id,
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: null as any } }]
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+
+    // Equal values
+    await expect(
+      upsertRubricCriteria({
+        proposalId: proposal.id,
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 5 } }]
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+
+    // Min higher than max
+    await expect(
+      upsertRubricCriteria({
+        proposalId: proposal.id,
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 1, min: 5 } }]
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should create a new rubric property if the ID of the rubric corresponds to a rubric on a different proposal', async () => {
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: proposalCategory.id
+    });
+
+    const proposalRubric = await upsertRubricCriteria({
+      proposalId: proposal.id,
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }]
+    });
+
+    const secondProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: proposalCategory.id
+    });
+
+    const secondProposalRubric = await upsertRubricCriteria({
+      proposalId: secondProposal.id,
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }]
+    });
+
+    const secondProposalRubricAfterUpsert = await upsertRubricCriteria({
+      proposalId: secondProposal.id,
+      rubricCriteria: [proposalRubric[0], secondProposalRubric[0]]
+    });
+
+    expect(secondProposalRubricAfterUpsert).toHaveLength(2);
+    expect(secondProposalRubricAfterUpsert.some((criteria) => criteria.id === secondProposalRubric[0].id)).toBe(true);
+    expect(secondProposalRubricAfterUpsert.every((criteria) => criteria.id !== proposalRubric[0].id)).toBe(true);
+  });
 });
