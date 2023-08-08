@@ -219,6 +219,7 @@ export function ProposalProperties({
                 proposalStatus={proposalStatus}
                 openVoteModal={openVoteModal}
                 updateProposalStatus={updateProposalStatus}
+                evaluationType={proposalFormInputs.evaluationType}
               />
             </Grid>
           )}

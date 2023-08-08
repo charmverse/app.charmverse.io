@@ -14,6 +14,8 @@ import type { StepperProps } from './interfaces';
 import { stepperSize } from './interfaces';
 import { StepperIcon } from './StepperIcon';
 
+const lastStatuses = ['vote_closed', 'evaluation_closed'];
+
 export function DesktopStepper({
   openVoteModal,
   proposalStatus,
@@ -70,7 +72,7 @@ export function DesktopStepper({
                 </Typography>
               </Stack>
             </Grid>
-            {statusIndex !== PROPOSAL_STATUSES.length - 1 && (
+            {!lastStatuses.includes(status) && (
               <Grid item xs>
                 <Divider
                   sx={{
