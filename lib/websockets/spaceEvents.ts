@@ -12,6 +12,8 @@ import { docRooms } from './documentEvents/documentEvents';
 export class SpaceEventHandler {
   socketEvent = 'message';
 
+  userId: string | null = null;
+
   constructor(private socket: Socket) {
     this.socket = socket;
   }
@@ -35,6 +37,7 @@ export class SpaceEventHandler {
           password: authSecret
         });
         if (typeof decryptedUserId === 'string') {
+          this.userId = decryptedUserId;
           relay.registerWorkspaceSubscriber({
             userId: decryptedUserId,
             socket: this.socket,
@@ -45,22 +48,17 @@ export class SpaceEventHandler {
         log.error('Error subscribing user to space events', { error });
         this.sendError('Error subscribing to space');
       }
-    } else if (message.type === 'page_deleted') {
+    } else if (message.type === 'page_deleted' && this.userId) {
       try {
-        const pageWithSpaceId = await prisma.page.findUnique({
+        const pageWithSpaceId = await prisma.page.findUniqueOrThrow({
           where: {
-            id: message.payload.pageId
+            id: message.payload.id
           },
           select: {
             spaceId: true,
             parentId: true
           }
         });
-
-        if (!pageWithSpaceId) {
-          this.sendError('Page not found');
-          return;
-        }
 
         const parentId = pageWithSpaceId.parentId;
 
@@ -69,48 +67,57 @@ export class SpaceEventHandler {
         if (documentRoom) {
           const participant = Array.from(documentRoom.participants.values()).find(
             // Send the userId using payload for now
-            (_participant) => _participant.getSessionMeta().userId === message.payload.userId
+            (_participant) => _participant.getSessionMeta().userId === this.userId
           );
           if (participant) {
             // Go through all the node of the document and find the position of the node of type: 'page'
-            // write the code for it
             let position: null | number = null;
 
             documentRoom.node.forEach((node, nodePos) => {
-              if (node.type.name === 'page' && node.attrs.id === message.payload.pageId) {
+              if (node.type.name === 'page' && node.attrs.id === message.payload.id) {
                 position = nodePos;
                 return false;
               }
             });
 
-            if (position) {
+            if (position !== null) {
               // TODO: Should this be handleDiff or handleMessage?
-              await participant.handleDiff({
-                type: 'diff',
-                ds: [
-                  {
-                    stepType: 'replace',
-                    from: position,
-                    to: position + 1
-                  }
-                ],
-                // TODO: How to get the correct c, s and v values?
-                doc: documentRoom.doc.content,
-                c: participant.messages.client,
-                s: participant.messages.server,
-                rid: 0,
-                v: documentRoom.doc.version
-              });
+              await participant.handleDiff(
+                {
+                  type: 'diff',
+                  ds: [
+                    {
+                      stepType: 'replace',
+                      from: position,
+                      to: position + 1
+                    }
+                  ],
+                  // TODO: How to get the correct c, s and v values?
+                  doc: documentRoom.doc.content,
+                  c: participant.messages.client,
+                  s: participant.messages.server,
+                  rid: 0,
+                  v: documentRoom.doc.version
+                },
+                false
+              );
             }
           } else if (documentRoom.participants.size !== 0) {
             // Handle the case where the user is not present in the document but other users are present
           } else {
             // Handle the case when the document is not open by any user
           }
+        } else {
+          // Handle the case when the document is not open by any user
         }
       } catch (error) {
-        log.error('Error deleting page', { error });
-        this.sendError('Error deleting page');
+        const errorMessage = 'Error deleting a page after link was deleted from its parent page';
+        log.error(errorMessage, {
+          error,
+          pageId: message.payload.id,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
       }
     }
   }

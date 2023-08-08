@@ -401,33 +401,21 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
   const page = pages[pageId];
-  const { user } = useUser();
-  const { sendMessage } = useWebSocketClient();
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
 
-    if (user) {
-      sendMessage({
-        payload: {
-          pageId,
-          userId: user.id
-        },
-        type: 'page_deleted'
-      });
+    const board = boards.find((b) => b.id === page?.id);
+    const newPage = await deletePage({
+      board,
+      pageId
+    });
+
+    if (!currentPage && newPage) {
+      // If we are in a page that doesn't exist, redirect user to the created page
+      router.push(`/${router.query.domain}/${newPage.id}`);
     }
-
-    // const board = boards.find((b) => b.id === page?.id);
-    // const newPage = await deletePage({
-    //   board,
-    //   pageId
-    // });
-
-    // if (!currentPage && newPage) {
-    //   // If we are in a page that doesn't exist, redirect user to the created page
-    //   router.push(`/${router.query.domain}/${newPage.id}`);
-    // }
   }
 
   return (

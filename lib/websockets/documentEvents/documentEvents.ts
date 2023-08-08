@@ -397,7 +397,8 @@ export class DocumentEventHandler {
     return diff;
   }
 
-  async handleDiff(message: WrappedSocketMessage<ClientDiffMessage>) {
+  // skipSendingToActor is used when we want to send the diff to all other participants, but not the actor
+  async handleDiff(message: WrappedSocketMessage<ClientDiffMessage>, skipSendingToActor = true) {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
@@ -415,27 +416,21 @@ export class DocumentEventHandler {
       serverS: this.messages.server
     };
     log.debug('Handling change event', logMeta);
+    const deletedPageIds: string[] = [];
+
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
-
-        // Go through the diffs and see if any of them are for deleting a page. If so, we need to archive the page and all of its children and then broadcast the change.
+        // Go through the diffs and see if any of them are for deleting a page.
         for (const ds of message.ds) {
           if (ds.stepType === 'replace') {
             const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
             if (node && node.type === 'page') {
               const pageId = node.attrs?.id;
-
-              const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'archive');
-
-              relay.broadcast(
-                {
-                  type: 'pages_deleted',
-                  payload: modifiedChildPageIds.map((id) => ({ id }))
-                },
-                room.doc.spaceId
-              );
+              if (pageId) {
+                deletedPageIds.push(pageId);
+              }
             }
           }
         }
@@ -462,8 +457,20 @@ export class DocumentEventHandler {
         if (room.doc.version % this.docSaveInterval === 0) {
           await this.saveDocument();
         }
+
+        for (const pageId of deletedPageIds) {
+          const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'archive');
+          relay.broadcast(
+            {
+              type: 'pages_deleted',
+              payload: modifiedChildPageIds.map((id) => ({ id }))
+            },
+            room.doc.spaceId
+          );
+        }
+
         this.confirmDiff(message.rid);
-        this.sendUpdatesToOthers(message);
+        this.sendUpdatesToOthers(message, skipSendingToActor);
       } catch (error) {
         log.error('Error when saving changes to the db', { error, ...logMeta });
         this.sendError('There was an error saving your changes! Please refresh and try again.');
@@ -609,15 +616,27 @@ export class DocumentEventHandler {
     }
   }
 
-  sendUpdatesToOthers(message: ClientMessage | ServerMessage) {
-    this.sendUpdates({ message, senderId: this.id });
+  sendUpdatesToOthers(message: ClientMessage | ServerMessage, skipSendingToActor = true) {
+    this.sendUpdates({ message, senderId: this.id, skipSendingToActor });
   }
 
-  sendUpdates({ message, senderId }: { message: ClientMessage | ServerMessage; senderId?: string }) {
+  sendUpdates({
+    message,
+    senderId,
+    skipSendingToActor = true
+  }: {
+    message: ClientMessage | ServerMessage;
+    senderId?: string;
+    skipSendingToActor?: boolean;
+  }) {
     // log.debug(`Broadcasting message "${message.type}" to room`, { pageId: this.getSession().documentId });
     const room = this.getDocumentRoomOrThrow();
     for (const [, participant] of room.participants) {
-      if (participant.id !== senderId) {
+      if (skipSendingToActor) {
+        if (participant.id !== senderId) {
+          participant.sendMessage(message);
+        }
+      } else {
         participant.sendMessage(message);
       }
     }

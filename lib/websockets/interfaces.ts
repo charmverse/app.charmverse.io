@@ -104,10 +104,7 @@ type SubscribeToWorkspace = {
 
 type PageDeleted = {
   type: 'page_deleted';
-  payload: {
-    pageId: string;
-    userId: string;
-  };
+  payload: Resource;
 };
 
 type SpaceSubscriptionUpdated = {

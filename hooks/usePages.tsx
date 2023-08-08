@@ -51,7 +51,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
-  const { subscribe } = useWebSocketClient();
+  const { sendMessage, subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(
     () => getPagesListCacheKey(currentSpace?.id),
@@ -95,48 +95,59 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board')
     ).length;
 
+    const pageType = page?.type;
+
     if (page && user && currentSpace) {
-      const { pageIds } = await charmClient.archivePage(page.id);
-      let newPage: null | PageMeta = null;
-      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
-        newPage = await charmClient.createPage(
-          untitledPage({
-            userId: user.id,
-            spaceId: currentSpace.id
-          })
-        );
-      }
-
-      // Delete the page associated with the card
-      if (board) {
-        mutator.deleteBlock(
-          board,
-          'Delete board',
-          async () => {
-            // success
-          },
-          async () => {
-            // error
-          }
-        );
-      }
-
-      _setPages((_pages) => {
-        pageIds.forEach((_pageId) => {
-          _pages[_pageId] = {
-            ..._pages[_pageId],
-            deletedBy: user.id,
-            deletedAt: new Date()
-          } as PageMeta;
-        });
-        // If a new page was created add that to state
-        if (newPage) {
-          _pages[newPage.id] = newPage;
+      if (pageType !== 'page') {
+        const { pageIds } = await charmClient.archivePage(page.id);
+        let newPage: null | PageMeta = null;
+        if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
+          newPage = await charmClient.createPage(
+            untitledPage({
+              userId: user.id,
+              spaceId: currentSpace.id
+            })
+          );
         }
-        return { ..._pages };
-      });
 
-      return newPage;
+        // Delete the page associated with the card
+        if (board) {
+          mutator.deleteBlock(
+            board,
+            'Delete board',
+            async () => {
+              // success
+            },
+            async () => {
+              // error
+            }
+          );
+        }
+
+        _setPages((_pages) => {
+          pageIds.forEach((_pageId) => {
+            _pages[_pageId] = {
+              ..._pages[_pageId],
+              deletedBy: user.id,
+              deletedAt: new Date()
+            } as PageMeta;
+          });
+          // If a new page was created add that to state
+          if (newPage) {
+            _pages[newPage.id] = newPage;
+          }
+          return { ..._pages };
+        });
+
+        return newPage;
+      } else {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_deleted'
+        });
+      }
     }
   }
 
