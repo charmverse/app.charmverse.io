@@ -61,7 +61,9 @@
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "update-core": "npm install github:charmverse/core#main"
+    "build-storybook": "npm run build:storybook",
+    "update-core": "npm install github:charmverse/core#main",
+    "chromatic": "npx chromatic"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -318,6 +320,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "aws-cdk-lib": "^2.78.0",
+    "chromatic": "^6.21.0",
     "cross-env": "^7.0.3",
     "esbuild": "^0.16.17",
     "esbuild-node-externals": "^1.7.0",
@@ -353,5 +356,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "$typescript"
-  }
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "charmverse.io@0.0.0"
 }
