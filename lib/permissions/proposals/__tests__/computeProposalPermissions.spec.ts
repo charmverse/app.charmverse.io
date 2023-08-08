@@ -57,7 +57,8 @@ describe('computeProposalPermissions', () => {
       vote: false,
       make_public: false,
       archive: true,
-      unarchive: true
+      unarchive: true,
+      evaluate: false
     });
   });
 
@@ -85,6 +86,43 @@ describe('computeProposalPermissions', () => {
       view: true,
       comment: true,
       review: true,
+      delete: false,
+      create_vote: false,
+      edit: false,
+      vote: false,
+      make_public: false,
+      archive: false,
+      unarchive: false,
+      evaluate: false
+    });
+  });
+
+  it('should allow the reviewer to view, comment, evaluate the proposal when it is in evaluation_active stage', async () => {
+    const testedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      categoryId: proposalCategory.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      evaluationType: 'rubric',
+      proposalStatus: 'evaluation_active',
+      reviewers: [
+        {
+          id: proposalReviewer.id,
+          group: 'user'
+        }
+      ]
+    });
+
+    const permissions = await computeProposalPermissions({
+      resourceId: testedProposal.id,
+      userId: proposalReviewer.id
+    });
+
+    expect(permissions).toMatchObject<ProposalPermissionFlags>({
+      view: true,
+      comment: true,
+      evaluate: true,
+      review: false,
       delete: false,
       create_vote: false,
       edit: false,
@@ -164,7 +202,8 @@ describe('computeProposalPermissions', () => {
       vote: false,
       make_public: false,
       archive: false,
-      unarchive: false
+      unarchive: false,
+      evaluate: false
     });
 
     const nonDraftStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed', 'vote_active', 'vote_closed'];
@@ -186,7 +225,8 @@ describe('computeProposalPermissions', () => {
         vote: false,
         make_public: false,
         archive: false,
-        unarchive: false
+        unarchive: false,
+        evaluate: false
       });
     }
   });
