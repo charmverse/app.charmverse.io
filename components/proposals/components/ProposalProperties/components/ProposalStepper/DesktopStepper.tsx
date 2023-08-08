@@ -5,7 +5,6 @@ import { Fragment } from 'react';
 
 import {
   proposalStatusDetails,
-  PROPOSAL_STATUSES,
   PROPOSAL_STATUS_LABELS,
   getProposalStatuses
 } from 'lib/proposal/proposalStatusTransition';
