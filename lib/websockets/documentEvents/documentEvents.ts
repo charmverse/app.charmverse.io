@@ -398,7 +398,10 @@ export class DocumentEventHandler {
   }
 
   // skipSendingToActor is used when we want to send the diff to all other participants, but not the actor
-  async handleDiff(message: WrappedSocketMessage<ClientDiffMessage>, skipSendingToActor = true) {
+  async handleDiff(
+    message: WrappedSocketMessage<ClientDiffMessage>,
+    { skipSendingToActor }: { skipSendingToActor?: boolean } = { skipSendingToActor: true }
+  ) {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;

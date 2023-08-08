@@ -3,6 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from 'lib/prosemirror/constants';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
@@ -50,25 +55,39 @@ export class SpaceEventHandler {
       }
     } else if (message.type === 'page_deleted' && this.userId) {
       try {
-        const pageWithSpaceId = await prisma.page.findUniqueOrThrow({
+        const page = await prisma.page.findUniqueOrThrow({
           where: {
             id: message.payload.id
           },
           select: {
-            spaceId: true,
             parentId: true
           }
         });
 
-        const parentId = pageWithSpaceId.parentId;
+        const parentPage = page.parentId
+          ? await prisma.page.findUniqueOrThrow({
+              where: {
+                id: page.parentId
+              },
+              select: {
+                content: true
+              }
+            })
+          : null;
 
+        const { parentId } = page;
+        const content = (parentPage?.content ?? emptyDocument) as PageContent;
         const documentRoom = parentId ? docRooms.get(parentId) : null;
 
         if (documentRoom) {
-          const participant = Array.from(documentRoom.participants.values()).find(
-            // Send the userId using payload for now
-            (_participant) => _participant.getSessionMeta().userId === this.userId
-          );
+          const participants = Array.from(documentRoom.participants.values());
+          // Use the first participant if the user who triggered space event is not in the document
+          const participant =
+            participants.find(
+              // Send the userId using payload for now
+              (_participant) => _participant.getSessionMeta().userId === this.userId
+            ) ?? participants[0];
+
           if (participant) {
             // Go through all the node of the document and find the position of the node of type: 'page'
             let position: null | number = null;
@@ -92,26 +111,33 @@ export class SpaceEventHandler {
                       to: position + 1
                     }
                   ],
-                  // TODO: How to get the correct c, s and v values?
                   doc: documentRoom.doc.content,
+                  // TODO: How to get the correct c, s and v values?
                   c: participant.messages.client,
                   s: participant.messages.server,
+                  v: documentRoom.doc.version,
                   // TODO: How to get the correct rid and cid values?
                   rid: 0,
-                  // cid: -1 indicates that use the cid from the
-                  cid: -1,
-                  v: documentRoom.doc.version
+                  cid: -1
                 },
-                false
+                { skipSendingToActor: false }
               );
             }
-          } else if (documentRoom.participants.size !== 0) {
-            // Handle the case where the user is not present in the document but other users are present
-          } else {
-            // Handle the case when the document is not open by any user
+          } else if (parentId) {
+            await applyNestedPageReplaceDiffAndSaveDocument({
+              deletedPageId: message.payload.id,
+              content,
+              parentId,
+              userId: this.userId
+            });
           }
-        } else {
-          // Handle the case when the document is not open by any user
+        } else if (parentId) {
+          await applyNestedPageReplaceDiffAndSaveDocument({
+            deletedPageId: message.payload.id,
+            content,
+            parentId,
+            userId: this.userId
+          });
         }
       } catch (error) {
         const errorMessage = 'Error deleting a page after link was deleted from its parent page';
@@ -128,4 +154,64 @@ export class SpaceEventHandler {
   sendError(message: string) {
     this.socket.emit(this.socketEvent, { type: 'error', message });
   }
+}
+
+async function applyNestedPageReplaceDiffAndSaveDocument({
+  deletedPageId,
+  content,
+  userId,
+  parentId
+}: {
+  deletedPageId: string;
+  content: PageContent;
+  userId: string;
+  parentId: string;
+}) {
+  const pageNode = getNodeFromJson(content);
+  let position: null | number = null;
+
+  pageNode.forEach((node, nodePos) => {
+    if (node.type.name === 'page' && node.attrs.id === deletedPageId) {
+      position = nodePos;
+      return false;
+    }
+  });
+
+  if (position === null) {
+    return;
+  }
+
+  const updatedNode = applyStepsToNode(
+    [
+      {
+        from: position,
+        to: position + 1,
+        stepType: 'replace'
+      }
+    ],
+    pageNode
+  );
+
+  const { spaceId } = await prisma.page.update({
+    where: { id: parentId },
+    data: {
+      content: updatedNode.toJSON(),
+      contentText: updatedNode.textContent,
+      hasContent: updatedNode.textContent.length > 0,
+      updatedAt: new Date(),
+      updatedBy: userId
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
+  const modifiedChildPageIds = await modifyChildPages(deletedPageId, userId, 'archive');
+  relay.broadcast(
+    {
+      type: 'pages_deleted',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
+    },
+    spaceId
+  );
 }
