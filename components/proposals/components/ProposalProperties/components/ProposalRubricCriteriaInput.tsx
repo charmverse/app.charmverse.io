@@ -44,7 +44,9 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
       type: 'range',
       parameters
     };
-    setCriteriaList([...criteriaList, newCriteria]);
+    const updatedList = [...criteriaList, newCriteria];
+    setCriteriaList(updatedList);
+    onChange(criteriaList);
   }
 
   function updateCriteria(id: string, updates: Partial<RangeProposalCriteria>) {
@@ -52,6 +54,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
     if (criteria) {
       Object.assign(criteria, updates);
       setCriteriaList([...criteriaList]);
+      onChange(criteriaList);
     }
   }
 
