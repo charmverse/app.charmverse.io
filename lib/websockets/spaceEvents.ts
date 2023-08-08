@@ -60,7 +60,8 @@ export class SpaceEventHandler {
             id: message.payload.id
           },
           select: {
-            parentId: true
+            parentId: true,
+            spaceId: true
           }
         });
 
@@ -75,7 +76,7 @@ export class SpaceEventHandler {
             })
           : null;
 
-        const { parentId } = page;
+        const { parentId, spaceId } = page;
         const content = (parentPage?.content ?? emptyDocument) as PageContent;
         const documentRoom = parentId ? docRooms.get(parentId) : null;
 
@@ -128,7 +129,8 @@ export class SpaceEventHandler {
               deletedPageId: message.payload.id,
               content,
               parentId,
-              userId: this.userId
+              userId: this.userId,
+              spaceId
             });
           }
         } else if (parentId) {
@@ -136,7 +138,8 @@ export class SpaceEventHandler {
             deletedPageId: message.payload.id,
             content,
             parentId,
-            userId: this.userId
+            userId: this.userId,
+            spaceId
           });
         }
       } catch (error) {
@@ -160,12 +163,14 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
   deletedPageId,
   content,
   userId,
-  parentId
+  parentId,
+  spaceId
 }: {
   deletedPageId: string;
   content: PageContent;
   userId: string;
   parentId: string;
+  spaceId: string;
 }) {
   const pageNode = getNodeFromJson(content);
   let position: null | number = null;
@@ -177,34 +182,29 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
     }
   });
 
-  if (position === null) {
-    return;
-  }
+  if (position !== null) {
+    const updatedNode = applyStepsToNode(
+      [
+        {
+          from: position,
+          to: position + 1,
+          stepType: 'replace'
+        }
+      ],
+      pageNode
+    );
 
-  const updatedNode = applyStepsToNode(
-    [
-      {
-        from: position,
-        to: position + 1,
-        stepType: 'replace'
+    await prisma.page.update({
+      where: { id: parentId },
+      data: {
+        content: updatedNode.toJSON(),
+        contentText: updatedNode.textContent,
+        hasContent: updatedNode.textContent.length > 0,
+        updatedAt: new Date(),
+        updatedBy: userId
       }
-    ],
-    pageNode
-  );
-
-  const { spaceId } = await prisma.page.update({
-    where: { id: parentId },
-    data: {
-      content: updatedNode.toJSON(),
-      contentText: updatedNode.textContent,
-      hasContent: updatedNode.textContent.length > 0,
-      updatedAt: new Date(),
-      updatedBy: userId
-    },
-    select: {
-      spaceId: true
-    }
-  });
+    });
+  }
 
   const modifiedChildPageIds = await modifyChildPages(deletedPageId, userId, 'archive');
   relay.broadcast(
