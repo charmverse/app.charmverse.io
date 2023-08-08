@@ -29,8 +29,6 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
-import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 

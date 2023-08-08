@@ -96,7 +96,10 @@ export class SpaceEventHandler {
                   doc: documentRoom.doc.content,
                   c: participant.messages.client,
                   s: participant.messages.server,
+                  // TODO: How to get the correct rid and cid values?
                   rid: 0,
+                  // cid: -1 indicates that use the cid from the
+                  cid: -1,
                   v: documentRoom.doc.version
                 },
                 false
