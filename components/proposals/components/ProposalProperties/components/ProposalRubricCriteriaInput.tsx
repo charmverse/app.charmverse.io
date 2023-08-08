@@ -49,7 +49,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
     };
     const updatedList = [...criteriaList, newCriteria];
     setCriteriaList(updatedList);
-    onChange(criteriaList);
+    // onChange(criteriaList); - no need to update the backend immediately something is entered?
   }
 
   function deleteCriteria(id: string) {
@@ -63,7 +63,9 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
     if (criteria) {
       Object.assign(criteria, updates);
       setCriteriaList([...criteriaList]);
-      onChange(criteriaList);
+      if (criteriaList.every(isValidCriteria)) {
+        onChange(criteriaList);
+      }
     }
   }
 
@@ -124,7 +126,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
             {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
                   Range:
                 </FormLabel> */}
-            <Grid container width={80} spacing={1}>
+            <Grid container width={90} spacing={1}>
               <Grid xs item>
                 <div>
                   <TextInput
@@ -139,7 +141,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                       'data-criteria': criteria.id,
                       'data-parameter-type': 'min'
                     }}
-                    sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
+                    sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
                   />
                   <Typography
                     align='center'
@@ -166,7 +168,7 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
                         parameters: { ...criteria.parameters, max: getNumberFromString(max) }
                       });
                     }}
-                    sx={{ input: { textAlign: 'center', minWidth: '2em !important' } }}
+                    sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
                   />
                   <Typography
                     align='center'
@@ -200,4 +202,21 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
 function getNumberFromString(strValue: string): number | null {
   const parsedString = parseInt(strValue, 10);
   return parsedString || parsedString === 0 ? parsedString : null;
+}
+
+function isValidCriteria(criteria: RangeProposalCriteria) {
+  if (criteria.type === 'range') {
+    if (
+      (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+      (!criteria.parameters.max && criteria.parameters.max !== 0)
+    ) {
+      // Range values are invalid
+      return false;
+    }
+    if (criteria.parameters.min >= criteria.parameters.max) {
+      // Minimum must be less than Maximum
+      return false;
+    }
+  }
+  return true;
 }

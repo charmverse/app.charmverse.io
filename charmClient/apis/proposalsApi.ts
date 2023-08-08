@@ -52,7 +52,7 @@ export class ProposalsApi {
   }
 
   getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
-    return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
+    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
   getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {

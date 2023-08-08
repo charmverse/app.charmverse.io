@@ -17,9 +17,25 @@ handler
       resourceIdType: 'space'
     })
   )
-  .post(getProposals);
+  .get(getProposals)
+  // leaving this here until clients are updated - Aug 8, 2023
+  .post(deprecatedGetProposals);
 
 async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
+  const categoryIds = req.query.categoryIds;
+  const userId = req.session.user?.id;
+  const spaceId = req.query.id as string;
+
+  const proposals = await req.basePermissionsClient.proposals.getAccessibleProposals({
+    categoryIds,
+    spaceId,
+    userId
+  });
+
+  return res.status(200).json(proposals);
+}
+
+async function deprecatedGetProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
   const body = req.body as Pick<ListProposalsRequest, 'categoryIds'>;
   const userId = req.session.user?.id;
   const spaceId = req.query.id as string;

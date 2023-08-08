@@ -316,6 +316,7 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
+                disabled={readOnly || !isNewProposal}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
@@ -333,7 +334,15 @@ export function ProposalProperties({
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Criteria</PropertyLabel>
                 <Box display='flex' flex={1} flexDirection='column'>
-                  <ProposalRubricCriteriaInput value={proposalFormInputs.rubricCriteria} onChange={() => {}} />
+                  <ProposalRubricCriteriaInput
+                    value={proposalFormInputs.rubricCriteria}
+                    onChange={(rubricCriteria) => {
+                      setProposalFormInputs({
+                        ...proposalFormInputs,
+                        rubricCriteria
+                      });
+                    }}
+                  />
                 </Box>
               </Box>
             </Box>

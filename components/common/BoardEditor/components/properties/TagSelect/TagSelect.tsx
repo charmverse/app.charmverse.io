@@ -71,8 +71,20 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
         : ''}
   }
 
+  // override styles from focalboard
+  .MuiInputBase-input {
+    background: transparent;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
   .MuiInputBase-root.MuiInputBase-sizeSmall {
     padding: 4px;
+  }
+
+  // hide blue outline around focused input
+  .MuiOutlinedInput-notchedOutline {
+    border: 0 none !important;
   }
 `;
 

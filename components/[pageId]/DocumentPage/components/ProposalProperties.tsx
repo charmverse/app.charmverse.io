@@ -45,7 +45,7 @@ export function ProposalProperties({
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
-    rubricCriteria: [],
+    rubricCriteria: proposal?.rubricCriteria ?? [],
     reviewers:
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
