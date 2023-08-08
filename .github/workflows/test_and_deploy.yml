@@ -116,6 +116,8 @@ jobs:
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
             test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci'
+          - test_name: 'Chromatic deploy and tests'
+            test_command: 'npm run chromatic:ci'
     steps:
       - uses: actions/checkout@v3
 
@@ -219,6 +221,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
