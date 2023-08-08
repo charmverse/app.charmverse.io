@@ -12,6 +12,7 @@ import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
+import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import { docRooms } from './documentEvents/documentEvents';
 
 export class SpaceEventHandler {
@@ -53,87 +54,41 @@ export class SpaceEventHandler {
         log.error('Error subscribing user to space events', { error });
         this.sendError('Error subscribing to space');
       }
-    } else if (message.type === 'page_deleted' && this.userId) {
+    } else if ((message.type === 'page_deleted' || message.type === 'page_restored') && this.userId) {
       try {
-        const page = await prisma.page.findUniqueOrThrow({
-          where: {
-            id: message.payload.id
-          },
-          select: {
-            parentId: true,
-            spaceId: true
-          }
+        const pageId = message.payload.id;
+        const { documentRoom, participant, parentId, spaceId, content } = await getPageDetails({
+          id: pageId,
+          userId: this.userId
         });
 
-        const parentPage = page.parentId
-          ? await prisma.page.findUniqueOrThrow({
-              where: {
-                id: page.parentId
-              },
-              select: {
-                content: true
-              }
-            })
-          : null;
+        const position: null | number = null;
 
-        const { parentId, spaceId } = page;
-        const content = (parentPage?.content ?? emptyDocument) as PageContent;
-        const documentRoom = parentId ? docRooms.get(parentId) : null;
-
-        if (documentRoom) {
-          const participants = Array.from(documentRoom.participants.values());
-          // Use the first participant if the user who triggered space event is not in the document
-          const participant =
-            participants.find(
-              // Send the userId using payload for now
-              (_participant) => _participant.getSessionMeta().userId === this.userId
-            ) ?? participants[0];
-
-          if (participant) {
-            // Go through all the node of the document and find the position of the node of type: 'page'
-            let position: null | number = null;
-
-            documentRoom.node.forEach((node, nodePos) => {
-              if (node.type.name === 'page' && node.attrs.id === message.payload.id) {
-                position = nodePos;
-                return false;
-              }
-            });
-
-            if (position !== null) {
-              // TODO: Should this be handleDiff or handleMessage?
-              await participant.handleDiff(
+        if (documentRoom && participant && position !== null) {
+          // TODO: Should this be handleDiff or handleMessage?
+          await participant.handleDiff(
+            {
+              type: 'diff',
+              ds: [
                 {
-                  type: 'diff',
-                  ds: [
-                    {
-                      stepType: 'replace',
-                      from: position,
-                      to: position + 1
-                    }
-                  ],
-                  doc: documentRoom.doc.content,
-                  // TODO: How to get the correct c, s and v values?
-                  c: participant.messages.client,
-                  s: participant.messages.server,
-                  v: documentRoom.doc.version,
-                  // TODO: How to get the correct rid and cid values?
-                  rid: 0,
-                  cid: -1
-                },
-                { skipSendingToActor: false }
-              );
-            }
-          } else if (parentId) {
-            await applyNestedPageReplaceDiffAndSaveDocument({
-              deletedPageId: message.payload.id,
-              content,
-              parentId,
-              userId: this.userId,
-              spaceId
-            });
-          }
+                  stepType: 'replace',
+                  from: position,
+                  to: position + 1
+                }
+              ],
+              doc: documentRoom.doc.content,
+              // TODO: How to get the correct c, s and v values?
+              c: participant.messages.client,
+              s: participant.messages.server,
+              v: documentRoom.doc.version,
+              // TODO: How to get the correct rid and cid values?
+              rid: 0,
+              cid: -1
+            },
+            { skipSendingToActor: false }
+          );
         } else if (parentId) {
+          // If the user is not in the document or the position of the page node is not found (present in sidebar)
           await applyNestedPageReplaceDiffAndSaveDocument({
             deletedPageId: message.payload.id,
             content,
@@ -153,45 +108,15 @@ export class SpaceEventHandler {
       }
     } else if (message.type === 'page_restored' && this.userId) {
       const pageId = message.payload.id;
-      const page = await prisma.page.findUniqueOrThrow({
-        where: {
-          id: pageId
-        },
-        select: {
-          parentId: true,
-          spaceId: true
-        }
-      });
 
-      const parentPage = page.parentId
-        ? await prisma.page.findUniqueOrThrow({
-            where: {
-              id: page.parentId
-            },
-            select: {
-              content: true
-            }
-          })
-        : null;
+      try {
+        const { pageNode, documentRoom, participant } = await getPageDetails({ id: pageId, userId: this.userId });
 
-      const { parentId, spaceId } = page;
-      const content = (parentPage?.content ?? emptyDocument) as PageContent;
-      const documentRoom = parentId ? docRooms.get(parentId) : null;
-      const pageNode = getNodeFromJson(content);
-      const lastChild = pageNode.lastChild;
-      const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
+        // get the last position of the page node prosemirror node
+        const lastChild = pageNode.lastChild;
+        const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : null;
 
-      // get the last position of the page node prosemirror node
-      if (documentRoom) {
-        const participants = Array.from(documentRoom.participants.values());
-        // Use the first participant if the user who triggered space event is not in the document
-        const participant =
-          participants.find(
-            // Send the userId using payload for now
-            (_participant) => _participant.getSessionMeta().userId === this.userId
-          ) ?? participants[0];
-
-        if (participant) {
+        if (documentRoom && participant && lastChildPos !== null) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -227,6 +152,14 @@ export class SpaceEventHandler {
             }
           );
         }
+      } catch (error) {
+        const errorMessage = 'Error restoring a page from archive state';
+        log.error(errorMessage, {
+          error,
+          pageId: message.payload.id,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
       }
     }
   }
@@ -291,4 +224,63 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
     },
     spaceId
   );
+}
+
+async function getPageDetails({ id, userId }: { userId: string; id: string }) {
+  const page = await prisma.page.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      parentId: true,
+      spaceId: true
+    }
+  });
+
+  const parentPage = page.parentId
+    ? await prisma.page.findUniqueOrThrow({
+        where: {
+          id: page.parentId
+        },
+        select: {
+          content: true
+        }
+      })
+    : null;
+
+  const { parentId, spaceId } = page;
+  const content = (parentPage?.content ?? emptyDocument) as PageContent;
+  const documentRoom = parentId ? docRooms.get(parentId) : null;
+  let participant: DocumentEventHandler | null = null;
+  let position: null | number = null;
+
+  const pageNode = getNodeFromJson(content);
+
+  // get the last position of the page node prosemirror node
+  if (documentRoom) {
+    const participants = Array.from(documentRoom.participants.values());
+    // Use the first participant if the user who triggered space event is not one of the participants
+    participant =
+      participants.find(
+        // Send the userId using payload for now
+        (_participant) => _participant.getSessionMeta().userId === userId
+      ) ?? participants[0];
+
+    documentRoom.node.forEach((node, nodePos) => {
+      if (node.type.name === 'page' && node.attrs.id === id) {
+        position = nodePos;
+        return false;
+      }
+    });
+  }
+
+  return {
+    pageNode,
+    documentRoom,
+    participant,
+    spaceId,
+    parentId,
+    position,
+    content
+  };
 }
