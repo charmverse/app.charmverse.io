@@ -151,6 +151,83 @@ export class SpaceEventHandler {
         });
         this.sendError(errorMessage);
       }
+    } else if (message.type === 'page_restored' && this.userId) {
+      const pageId = message.payload.id;
+      const page = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: pageId
+        },
+        select: {
+          parentId: true,
+          spaceId: true
+        }
+      });
+
+      const parentPage = page.parentId
+        ? await prisma.page.findUniqueOrThrow({
+            where: {
+              id: page.parentId
+            },
+            select: {
+              content: true
+            }
+          })
+        : null;
+
+      const { parentId, spaceId } = page;
+      const content = (parentPage?.content ?? emptyDocument) as PageContent;
+      const documentRoom = parentId ? docRooms.get(parentId) : null;
+      const pageNode = getNodeFromJson(content);
+      const lastChild = pageNode.lastChild;
+      const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
+
+      // get the last position of the page node prosemirror node
+      if (documentRoom) {
+        const participants = Array.from(documentRoom.participants.values());
+        // Use the first participant if the user who triggered space event is not in the document
+        const participant =
+          participants.find(
+            // Send the userId using payload for now
+            (_participant) => _participant.getSessionMeta().userId === this.userId
+          ) ?? participants[0];
+
+        if (participant) {
+          await participant.handleDiff(
+            {
+              type: 'diff',
+              ds: [
+                {
+                  stepType: 'replace',
+                  from: lastChildPos,
+                  to: lastChildPos + 2,
+                  slice: {
+                    content: [
+                      {
+                        type: 'page',
+                        attrs: {
+                          id: pageId,
+                          type: null,
+                          path: null,
+                          track: []
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              doc: documentRoom.doc.content,
+              c: participant.messages.client,
+              s: participant.messages.server,
+              v: documentRoom.doc.version,
+              rid: 0,
+              cid: -1
+            },
+            {
+              restorePage: true
+            }
+          );
+        }
+      }
     }
   }
 

@@ -89,6 +89,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
+
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
@@ -98,7 +99,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     const pageType = page?.type;
 
     if (page && user && currentSpace) {
-      if (pageType !== 'page') {
+      if (pageType !== 'page' && pageType !== 'board') {
         const { pageIds } = await charmClient.archivePage(page.id);
         let newPage: null | PageMeta = null;
         if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {

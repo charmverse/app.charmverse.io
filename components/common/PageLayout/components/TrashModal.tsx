@@ -16,7 +16,7 @@ import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
@@ -28,8 +28,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PageIcon } from './PageIcon';
 
@@ -88,8 +90,9 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { showMessage } = useSnackbar();
+  const { subscribe, sendMessage } = useWebSocketClient();
 
-  const { data: archivedPages, mutate: setArchivedPages } = useSWR<PagesMap>(
+  const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
     () => {
       return charmClient.pages.getArchivedPages(space?.id as string).then((deletablePages) => {
@@ -101,23 +104,59 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     }
   );
 
+  const handlePagesRestoredEvent = (restoredPageIds: WebSocketPayload<'pages_restored'>) => {
+    setArchivedPages((_archivedPages) => {
+      if (!_archivedPages) {
+        return {};
+      }
+      restoredPageIds.forEach(({ id }) => {
+        if (_archivedPages[id]) {
+          delete _archivedPages[id];
+        }
+      });
+      return { ..._archivedPages };
+    });
+    // Refetch pages after restoration
+    if (space) {
+      mutate(`pages/${space.id}`);
+      dispatch(initialLoad({ spaceId: space.id }));
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribePublishListener = subscribe('pages_restored', handlePagesRestoredEvent);
+    return () => {
+      unsubscribePublishListener();
+    };
+  }, [space?.id]);
+
   async function restorePage(pageId: string) {
     if (space) {
-      const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
-      setArchivedPages((_archivedPages) => {
-        if (!_archivedPages) {
-          return {};
-        }
-        restoredPageIds.forEach((restoredPageId) => {
-          if (_archivedPages[restoredPageId]) {
-            delete _archivedPages[restoredPageId];
-          }
+      const restoredPage = archivedPages[pageId];
+      if (restoredPage?.type === 'page') {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_restored'
         });
-        return { ..._archivedPages };
-      });
+      } else {
+        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        setArchivedPages((_archivedPages) => {
+          if (!_archivedPages) {
+            return {};
+          }
+          restoredPageIds.forEach((restoredPageId) => {
+            if (_archivedPages[restoredPageId]) {
+              delete _archivedPages[restoredPageId];
+            }
+          });
+          return { ..._archivedPages };
+        });
 
-      await mutate(`pages/${space.id}`);
-      dispatch(initialLoad({ spaceId: space.id }));
+        await mutate(`pages/${space.id}`);
+        dispatch(initialLoad({ spaceId: space.id }));
+      }
     }
   }
 
@@ -164,7 +203,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
         setIsMutating(false);
       }
     },
-    [isMutating]
+    [isMutating, archivedPages]
   );
 
   const onDeletePage = useCallback(

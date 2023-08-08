@@ -400,7 +400,9 @@ export class DocumentEventHandler {
   // skipSendingToActor is used when we want to send the diff to all other participants, but not the actor
   async handleDiff(
     message: WrappedSocketMessage<ClientDiffMessage>,
-    { skipSendingToActor }: { skipSendingToActor?: boolean } = { skipSendingToActor: true }
+    { skipSendingToActor, restorePage = false }: { skipSendingToActor?: boolean; restorePage?: boolean } = {
+      skipSendingToActor: true
+    }
   ) {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
@@ -420,6 +422,7 @@ export class DocumentEventHandler {
     };
     log.debug('Handling change event', logMeta);
     const deletedPageIds: string[] = [];
+    const restoredPageIds: string[] = [];
 
     if (clientV === serverV) {
       if (message.ds) {
@@ -428,11 +431,19 @@ export class DocumentEventHandler {
         // Go through the diffs and see if any of them are for deleting a page.
         for (const ds of message.ds) {
           if (ds.stepType === 'replace') {
-            const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
-            if (node && node.type === 'page') {
-              const pageId = node.attrs?.id;
-              if (pageId) {
-                deletedPageIds.push(pageId);
+            if (restorePage && ds.slice?.content) {
+              ds.slice.content.forEach((node) => {
+                if (node.type === 'page') {
+                  restoredPageIds.push(node.attrs?.id);
+                }
+              });
+            } else {
+              const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
+              if (node && node.type === 'page') {
+                const pageId = node.attrs?.id;
+                if (pageId) {
+                  deletedPageIds.push(pageId);
+                }
               }
             }
           }
@@ -466,6 +477,17 @@ export class DocumentEventHandler {
           relay.broadcast(
             {
               type: 'pages_deleted',
+              payload: modifiedChildPageIds.map((id) => ({ id }))
+            },
+            room.doc.spaceId
+          );
+        }
+
+        for (const pageId of restoredPageIds) {
+          const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'restore');
+          relay.broadcast(
+            {
+              type: 'pages_restored',
               payload: modifiedChildPageIds.map((id) => ({ id }))
             },
             room.doc.spaceId

@@ -107,6 +107,11 @@ type PageDeleted = {
   payload: Resource;
 };
 
+type PageRestored = {
+  type: 'page_restored';
+  payload: Resource;
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -132,7 +137,12 @@ type ThreadsUpdated = {
   };
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted;
+type PagesRestored = {
+  type: 'pages_restored';
+  payload: Resource[];
+};
+
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored;
 
 export type ServerMessage =
   | BlocksUpdated
@@ -150,7 +160,8 @@ export type ServerMessage =
   | PostDeleted
   | ThreadsUpdated
   | SpaceSubscriptionUpdated
-  | NotionImportCompleted;
+  | NotionImportCompleted
+  | PagesRestored;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
