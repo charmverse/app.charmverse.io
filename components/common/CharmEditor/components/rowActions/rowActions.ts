@@ -1,6 +1,7 @@
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
@@ -269,4 +270,65 @@ function blockPosAtCoords(view: EditorView, coords: { left: number; top: number 
     }
   }
   return null;
+}
+
+export function getNodeForRowPosition({
+  rowPosition,
+  rowNodeOffset,
+  view
+}: {
+  rowPosition?: number;
+  rowNodeOffset?: number;
+  view: EditorView;
+}) {
+  if (rowPosition === undefined) {
+    return null;
+  }
+
+  // calculate the node at the mouse position. do it on click in case the content has changed
+  let topPos = view.state.doc.resolve(rowPosition);
+  while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
+    const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
+    topPos = view.state.doc.resolve(parentOffset);
+  }
+
+  // console.log('Position of row', topPos, { node: topPos.node() });
+
+  let pmNode = topPos.node();
+  // handle top-level children, where pmNode === doc
+  if (rowNodeOffset && rowNodeOffset > 0) {
+    const child = pmNode.maybeChild(rowNodeOffset);
+    pmNode = child || pmNode;
+  }
+
+  const nodeStart = topPos.pos;
+  const firstChild = pmNode.type.name === 'doc' ? pmNode.firstChild : null;
+  const nodeSize =
+    pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : firstChild?.content.size ?? pmNode.content.size;
+  // nodeSize includes the start and end tokens, so we need to subtract 1
+  // for images, nodeSize is 0
+  let nodeEnd = nodeStart + (nodeSize > 0 ? nodeSize - 1 : 0);
+  if (nodeEnd === nodeStart) {
+    nodeEnd = nodeStart + 1;
+  }
+
+  // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
+  if (nodeEnd > view.state.doc.content.size) {
+    nodeEnd = view.state.doc.content.size;
+  }
+
+  log.debug('Row meta', {
+    child: firstChild?.content.size,
+    nodeStart,
+    topPos: topPos.pos,
+    pmNode,
+    nodeEnd,
+    nodeSize
+  });
+
+  return {
+    node: pmNode,
+    nodeEnd,
+    nodeStart
+  };
 }
