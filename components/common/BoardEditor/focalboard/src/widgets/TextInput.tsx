@@ -12,12 +12,13 @@ export type TextInputProps = EditableProps & {
   className?: string;
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
+  fullWidth?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
+  sx?: any;
 };
 
 const StyledInput = styled(InputBase)`
-  width: 100%;
   .MuiInputBase-input {
     box-sizing: border-box;
   }
@@ -26,12 +27,11 @@ const StyledInput = styled(InputBase)`
 `;
 
 function Editable(
-  { multiline, columnRef, wrapColumn, displayType, ..._props }: TextInputProps,
+  { multiline, columnRef, wrapColumn, displayType, fullWidth = true, sx, ..._props }: TextInputProps,
   ref: React.Ref<Focusable>
 ): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const { className, ...props } = useEditable(_props, ref, elementRef);
-
   const memoizedHeight = React.useMemo(() => {
     if (wrapColumn && columnRef?.current) {
       return `${columnRef?.current?.clientHeight}px`;
@@ -46,8 +46,9 @@ function Editable(
         inputProps={{
           className
         }}
+        fullWidth={fullWidth}
+        sx={sx}
         {...props}
-        fullWidth
         multiline={multiline}
       />
     );
@@ -76,6 +77,8 @@ function Editable(
           inputProps={{
             className
           }}
+          fullWidth={fullWidth}
+          sx={sx}
           {...props}
           inputRef={(input) => input && input.focus()}
           onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
@@ -87,8 +90,8 @@ function Editable(
         inputProps={{
           className
         }}
+        fullWidth={fullWidth}
         {...props}
-        fullWidth
         multiline={multiline}
       />
     </PopperPopup>

@@ -1,8 +1,11 @@
-import { Box, Grid, Select, TextField, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, FormControlLabel, FormLabel, FormGroup, Grid, Select, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
+import { TextInput } from 'components/common/BoardEditor/focalboard/src/widgets/TextInput';
 
 export type RangeProposalCriteria = {
   id: string;
@@ -17,11 +20,23 @@ type Props = {
   onChange: (criteria: RangeProposalCriteria[]) => void;
 };
 
+const CriteriaRow = styled(Box)`
+  .range-label {
+    opacity: 0;
+    transform: opacity 0.2s ease-in-out;
+  }
+  &:hover {
+    .range-label {
+      opacity: 1;
+    }
+  }
+`;
+
 export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
-  const [criteria, setCriteria] = useState<RangeProposalCriteria[]>([]);
+  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   function addCriteria() {
-    const lastCriteria = criteria[criteria.length - 1]?.parameters;
+    const lastCriteria = criteriaList[criteriaList.length - 1]?.parameters;
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
@@ -29,47 +44,87 @@ export function ProposalRubricCriteriaInput({ value, onChange }: Props) {
       type: 'range',
       parameters
     };
-    setCriteria([...criteria, newCriteria]);
+    setCriteriaList([...criteriaList, newCriteria]);
+  }
+
+  function updateCriteria(id: string, updates: Partial<RangeProposalCriteria>) {
+    const criteria = criteriaList.find((c) => c.id === id);
+    if (criteria) {
+      Object.assign(criteria, updates);
+      setCriteriaList([...criteriaList]);
+    }
   }
 
   useEffect(() => {
-    setCriteria(value);
+    // console.log('set criteria since value changed', value);
+    setCriteriaList(value);
   }, [value]);
 
   return (
-    <Box p={1}>
-      <Typography variant='subtitle1' sx={{ mb: 1 }}>
-        Properties
-      </Typography>
-      {criteria.map((question) => (
-        <Grid key={question.id} container>
-          <Grid item xs={12} md={9}>
-            <Grid item container>
-              <Grid xs item>
-                Title:
+    <>
+      <Box p={1} pb={0}>
+        {criteriaList.map((criteria) => (
+          <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={2} mb={1}>
+            <TextInput
+              displayType='details'
+              fullWidth={false}
+              value={criteria.title}
+              onChange={(title) => updateCriteria(criteria.id, { title })}
+              sx={{ fontSize: 14 }}
+            />
+            <TextInput
+              multiline
+              placeholderText='Add a description...'
+              displayType='details'
+              fullWidth={false}
+              value={criteria.description ?? ''}
+              onChange={(description) => updateCriteria(criteria.id, { description })}
+              sx={{ fontSize: 14, flexGrow: 1 }}
+            />
+            <Box display='flex' gap={1} alignItems='flex-start'>
+              {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
+                  Range:
+                </FormLabel> */}
+              <Grid container spacing={1} width={80}>
+                <Grid xs item>
+                  <TextInput
+                    displayType='details'
+                    value={criteria.parameters.min.toString()}
+                    onChange={(min) => {
+                      if (min) {
+                        updateCriteria(criteria.id, { parameters: { ...criteria.parameters, min: parseInt(min, 10) } });
+                      }
+                    }}
+                  />
+                  <Typography className='range-label' color='secondary' variant='caption'>
+                    min
+                  </Typography>
+                </Grid>
+                <Grid xs item>
+                  -
+                </Grid>
+                <Grid xs item>
+                  <TextInput
+                    displayType='details'
+                    value={criteria.parameters.max.toString()}
+                    onChange={(max) => {
+                      if (max) {
+                        updateCriteria(criteria.id, {
+                          parameters: { ...criteria.parameters, max: parseInt(max, 10) }
+                        });
+                      }
+                    }}
+                  />
+                  <Typography className='range-label' color='secondary' variant='caption'>
+                    max
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid xs item flexGrow={1}>
-                {question.title}
-              </Grid>
-            </Grid>
-            <Grid item container>
-              <Grid xs item>
-                Description:
-              </Grid>
-              <Grid xs item flexGrow={1}>
-                {question.description}
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Grid item container>
-              <Grid item>{question.parameters.min}</Grid>
-              <Grid item>{question.parameters.max}</Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      ))}
+            </Box>
+          </CriteriaRow>
+        ))}
+      </Box>
       <AddAPropertyButton onClick={addCriteria}>+ Add a criteria</AddAPropertyButton>
-    </Box>
+    </>
   );
 }
