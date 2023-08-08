@@ -1,24 +1,27 @@
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export default function PageDeleteBanner({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
   const { space } = useCurrentSpace();
   const router = useRouter();
   const { pages } = usePages();
+  const { sendMessage } = useWebSocketClient();
 
   async function restorePage() {
-    if (space) {
-      await charmClient.restorePage(pageId);
-      await mutate(`pages/${space.id}`);
-    }
+    sendMessage({
+      payload: {
+        id: pageId
+      },
+      type: 'page_restored'
+    });
   }
 
   async function deletePage() {
