@@ -46,6 +46,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
+  productionBrowserSourceMaps: true,
   async generateBuildId() {
     return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
   },
