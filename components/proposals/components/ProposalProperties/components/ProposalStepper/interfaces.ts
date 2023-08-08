@@ -1,7 +1,6 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
-
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 export type StepperProps = {
   proposalStatus?: ProposalWithUsers['status'];

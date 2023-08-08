@@ -1,13 +1,14 @@
 import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
@@ -60,7 +61,7 @@ export type PageDetails = {
   spaceId: string;
 };
 
-export type PageWithProposal = Page & { proposal: ProposalWithUsers | null };
+export type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
 
 export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, P | undefined>;
 

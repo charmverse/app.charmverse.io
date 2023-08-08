@@ -1,10 +1,11 @@
+import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ProposalCategoryWithPermissions,
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { Page, ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { PageWithProposal } from 'lib/pages';
@@ -12,10 +13,27 @@ import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
-import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
+import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
+  upsertRubricCriteria(update: RubricCriteriaUpsert) {
+    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(
+      `/api/proposals/${update.proposalId}/rubric-criteria`,
+      update.rubricCriteria
+    );
+  }
+
+  upsertRubricCriteriaAnswer({ proposalId }: { proposalId: string }) {
+    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`);
+  }
+
+  deleteRubricCriteriaAnswer({ proposalId }: { proposalId: string }) {
+    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`);
+  }
+
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
@@ -25,7 +43,7 @@ export class ProposalsApi {
   }
 
   getProposal(proposalId: string) {
-    return http.GET<ProposalWithUsers>(`/api/proposals/${proposalId}`);
+    return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
   }
 
   updateStatus(proposalId: string, newStatus: ProposalStatus) {

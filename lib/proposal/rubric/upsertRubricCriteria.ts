@@ -12,7 +12,7 @@ export type RubricDataInput<T extends ProposalRubricCriteriaType = ProposalRubri
 > &
   ProposalRubricCriteriaParams<T> &
   Partial<Pick<ProposalRubricCriteria, 'description' | 'id'>>;
-type RubricUpsert = {
+export type RubricCriteriaUpsert = {
   proposalId: string;
   rubricCriteria: RubricDataInput[];
 };
@@ -20,7 +20,7 @@ type RubricUpsert = {
 export async function upsertRubricCriteria({
   proposalId,
   rubricCriteria
-}: RubricUpsert): Promise<ProposalRubricCriteriaWithTypedParams[]> {
+}: RubricCriteriaUpsert): Promise<ProposalRubricCriteriaWithTypedParams[]> {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!rubricCriteria || !Array.isArray(rubricCriteria)) {
@@ -69,9 +69,10 @@ export async function upsertRubricCriteria({
     }
 
     // Update existing rubrics
-    const updates = await Promise.all(
+    await Promise.all(
       rubricCriteria.map((rubric) => {
-        const rubricCriteriaId = rubric.id ?? uuid();
+        // Don't use the ID if this is not already a criteria for this proposal
+        const rubricCriteriaId = rubric.id && existingCriteria.some((c) => c.id === rubric.id) ? rubric.id : uuid();
         return tx.proposalRubricCriteria.upsert({
           where: {
             id: rubricCriteriaId

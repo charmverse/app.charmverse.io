@@ -4,9 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getProposal } from 'lib/proposal/getProposal';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -20,7 +21,7 @@ handler
   .put(updateProposalController)
   .get(getProposalController);
 
-async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user?.id;
 
@@ -29,6 +30,8 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
+      rubricAnswers: true,
+      rubricCriteria: true,
       authors: true,
       reviewers: true,
       category: true
@@ -47,10 +50,10 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     throw new NotFoundError();
   }
 
-  return res.status(200).json(proposal);
+  return res.status(200).json(proposal as ProposalWithUsersAndRubric);
 }
 
-async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
+async function updateProposalController(req: NextApiRequest, res: NextApiResponse<PageWithProposal>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -63,6 +66,8 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     include: {
       authors: true,
       reviewers: true,
+      rubricAnswers: true,
+      rubricCriteria: true,
       page: {
         select: {
           type: true

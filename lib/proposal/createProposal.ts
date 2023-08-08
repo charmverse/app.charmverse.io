@@ -13,6 +13,8 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import { getPagePath } from '../pages';
 
+import type { RubricDataInput } from './rubric/upsertRubricCriteria';
+import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
 type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
@@ -26,6 +28,7 @@ export type CreateProposalInput = {
   userId: string;
   spaceId: string;
   evaluationType?: ProposalEvaluationType;
+  rubricCriteria?: RubricDataInput[];
 };
 
 export type CreatedProposal = {
@@ -40,7 +43,9 @@ export async function createProposal({
   categoryId,
   pageProps,
   authors,
-  reviewers
+  reviewers,
+  evaluationType,
+  rubricCriteria
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -70,6 +75,7 @@ export async function createProposal({
         space: { connect: { id: spaceId } },
         status: proposalStatus,
         category: { connect: { id: categoryId } },
+        evaluationType,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))
@@ -119,6 +125,13 @@ export async function createProposal({
     })
   ]);
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
+
+  if (rubricCriteria) {
+    await upsertRubricCriteria({
+      proposalId: proposal.id,
+      rubricCriteria
+    });
+  }
 
   return { page: page as PageWithPermissions, proposal, workspaceEvent };
 }
