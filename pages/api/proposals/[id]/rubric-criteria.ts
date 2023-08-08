@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -11,6 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .use(requireUser)
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .put(upsertProposalCriteriaController);
 
@@ -22,7 +23,8 @@ async function upsertProposalCriteriaController(
   const userId = req.session.user.id;
 
   const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
-    resourceId: proposalId
+    resourceId: proposalId,
+    userId
   });
 
   if (!permissions.edit) {
