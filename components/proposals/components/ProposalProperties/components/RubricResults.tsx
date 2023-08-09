@@ -1,7 +1,20 @@
 import type { ProposalRubricCriteria } from '@charmverse/core/prisma-client';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { Check } from '@mui/icons-material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Menu,
+  MenuItem,
+  ListItemIcon
+} from '@mui/material';
 import { useState } from 'react';
 
+import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
@@ -17,10 +30,15 @@ type Props = {
 type CriteriaSummaryType = 'sum' | 'average';
 
 export function RubricResults({ criteriaList = [], answers = [], reviewers = [] }: Props) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
   const { criteriaSummary, reviewersResults } = aggregateResults({ criteria: criteriaList, answers, reviewers });
-
   const { getMemberById } = useMembers();
+
+  const selectSummaryType = (type: CriteriaSummaryType) => {
+    setCriteriaSummaryType(type);
+    setAnchorEl(null);
+  };
 
   return (
     <TableContainer sx={{ maxHeight: '500px' }}>
@@ -71,7 +89,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
             </TableRow>
           ))}
 
-          <TableRow>
+          <TableRow sx={{ 'td, th': { borderBottom: 0 } }}>
             <TableCell
               component='th'
               sx={{
@@ -83,7 +101,31 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
                 borderRight: '1px solid var(--input-border)'
               }}
             >
-              Average
+              <Button
+                endIcon={<KeyboardArrowDownIcon />}
+                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                  setAnchorEl(event.currentTarget);
+                }}
+                variant='text'
+                color='inherit'
+              >
+                {criteriaSummaryType === 'average' ? 'Average' : 'Sum'}
+              </Button>
+
+              <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
+                <MenuItem onClick={() => selectSummaryType('average')} sx={{ alignContent: 'space-between', gap: 1 }}>
+                  <span>Average</span>
+                  <ListItemIcon sx={{ visibility: criteriaSummaryType === 'average' ? 'visible' : 'hidden' }}>
+                    <Check />
+                  </ListItemIcon>
+                </MenuItem>
+                <MenuItem onClick={() => selectSummaryType('sum')} sx={{ alignContent: 'space-between', gap: 1 }}>
+                  <span>Sum</span>
+                  <ListItemIcon sx={{ visibility: criteriaSummaryType === 'sum' ? 'visible' : 'hidden' }}>
+                    <Check />
+                  </ListItemIcon>
+                </MenuItem>
+              </Menu>
             </TableCell>
 
             {criteriaList.map((c) => (
