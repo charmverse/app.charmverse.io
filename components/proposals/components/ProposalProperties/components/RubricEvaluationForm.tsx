@@ -47,25 +47,9 @@ const StyledRating = styled(Rating)`
 `;
 
 export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit }: Props) {
-  const mappedAnswers = criteriaList
-    .map((criteria) => {
-      const answer = answers?.find((a) => a.rubricCriteriaId === criteria.id);
-      return answer;
-      // if (answer) {
-      //   const muiRating =
-      //     typeof (answer.response as any)?.score === 'number'
-      //       ? convertActualToMUIRating((answer.response as any).score, (criteria.parameters as any).min)
-      //       : undefined;
-      //   return {
-      //     ...answer,
-      //     response: {
-      //       score: muiRating
-      //     }
-      //   };
-      // }
-      // return null;
-    })
-    .filter(isTruthy);
+  const mappedAnswers = criteriaList.map(
+    (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
+  );
 
   const {
     control,

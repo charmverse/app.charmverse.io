@@ -189,6 +189,13 @@ export function ProposalProperties({
 
   function onSubmitEvaluation(results: EvaluationFormValues) {
     // console.log('submit form', results);
+    if (proposalId) {
+      charmClient.proposals.upsertRubricCriteriaAnswer({
+        proposalId,
+        // @ts-ignore -  TODO: make answer types match
+        answers: results.answers
+      });
+    }
   }
 
   useEffect(() => {
@@ -200,6 +207,9 @@ export function ProposalProperties({
   }, [detailsExpanded, proposalStatus]);
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
+    if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
+      return [];
+    }
     const tabs = [
       canAnswerRubric &&
         ([
