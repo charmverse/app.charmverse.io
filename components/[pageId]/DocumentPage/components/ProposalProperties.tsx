@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
@@ -42,6 +42,7 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
+  const canViewRubricAnswers = proposal?.authors.some((author) => author.userId === user?.id) || isAdmin;
 
   const proposalFormInputs: ProposalFormInputs = {
     categoryId: proposal?.categoryId,
@@ -95,6 +96,8 @@ export function ProposalProperties({
       updateProposalStatus={updateProposalStatus}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
+      canAnswerRubric={proposalPermissions?.evaluate}
+      canViewRubricAnswers={canViewRubricAnswers}
     />
   );
 }

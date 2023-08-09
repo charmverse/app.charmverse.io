@@ -12,12 +12,14 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
@@ -47,6 +49,8 @@ export type ProposalFormInputs = {
 interface ProposalPropertiesProps {
   archived?: boolean;
   canUpdateProposalProperties?: boolean;
+  canAnswerRubric?: boolean;
+  canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
   isTemplate: boolean;
   pageId?: string;
@@ -66,6 +70,8 @@ interface ProposalPropertiesProps {
 export function ProposalProperties({
   archived,
   canUpdateProposalProperties,
+  canAnswerRubric,
+  canViewRubricAnswers,
   disabledCategoryInput,
   isTemplate,
   proposalFormInputs,
@@ -184,6 +190,24 @@ export function ProposalProperties({
 
     prevStatusRef.current = proposalStatus || '';
   }, [detailsExpanded, proposalStatus]);
+
+  const evaluationTabs = useMemo<TabConfig[]>(() => {
+    const tabs = [
+      canAnswerRubric &&
+        ([
+          'Evaluate',
+          <RubricEvaluationForm
+            key='evaluate'
+            answers={myRubricAnswers}
+            criteriaList={rubricCriteria}
+            onSubmit={onSubmitEvaluation}
+          />
+        ] as TabConfig),
+      canViewRubricAnswers && (['Results', <Box key='results'>Results go here</Box>] as TabConfig)
+    ].filter(isTruthy);
+    return tabs;
+  }, [canAnswerRubric, canViewRubricAnswers, myRubricAnswers]);
+
   return (
     <Box
       className='CardDetail content'
@@ -207,6 +231,7 @@ export function ProposalProperties({
                 proposalStatus={proposalStatus}
                 openVoteModal={openVoteModal}
                 updateProposalStatus={updateProposalStatus}
+                evaluationType={proposalFormInputs.evaluationType}
               />
             </Grid>
 
@@ -371,22 +396,9 @@ export function ProposalProperties({
           }}
         />
 
-        {proposalFlowFlags?.reviewed && (
+        {canAnswerRubric && (
           <Card variant='outlined' sx={{ my: 2 }}>
-            <MultiTabs
-              tabs={[
-                [
-                  'Evaluate',
-                  <RubricEvaluationForm
-                    key='evaluate'
-                    answers={myRubricAnswers}
-                    criteriaList={rubricCriteria}
-                    onSubmit={onSubmitEvaluation}
-                  />
-                ],
-                ['Results', <Box key='results'>Results go here</Box>]
-              ]}
-            />
+            <MultiTabs tabs={evaluationTabs} />
           </Card>
         )}
 

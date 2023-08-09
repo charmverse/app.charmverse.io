@@ -58,7 +58,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
-      title: 'New question',
+      title: '',
       type: 'range',
       parameters
     };
