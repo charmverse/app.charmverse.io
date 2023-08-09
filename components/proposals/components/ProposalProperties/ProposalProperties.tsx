@@ -379,7 +379,7 @@ export function ProposalProperties({
             </Box>
           </Box>
           {/* Select valuation type */}
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+          {/* <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
@@ -393,7 +393,7 @@ export function ProposalProperties({
                 }}
               />
             </Box>
-          </Box>
+          </Box> */}
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
