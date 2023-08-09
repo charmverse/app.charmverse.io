@@ -1,6 +1,7 @@
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { StyledBanner } from 'components/common/Banners/Banner';

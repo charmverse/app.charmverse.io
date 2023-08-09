@@ -63,7 +63,7 @@ export class SpaceEventHandler {
           userId: this.userId
         });
 
-        if (documentRoom && participant && position !== null) {
+        if (documentRoom && participant && parentId && position !== null) {
           // TODO: Should this be handleDiff or handleMessage?
           await participant.handleDiff(
             {
@@ -86,7 +86,7 @@ export class SpaceEventHandler {
             },
             { skipSendingToActor: false }
           );
-        } else if (parentId) {
+        } else {
           // If the user is not in the document or the position of the page node is not found (present in sidebar)
           await applyNestedPageReplaceDiffAndSaveDocument({
             deletedPageId: message.payload.id,
@@ -117,7 +117,7 @@ export class SpaceEventHandler {
         // Get the position from the NodeRange object
         const lastValidPos = pageNode.content.size;
 
-        if (documentRoom && participant) {
+        if (parentId && documentRoom && participant) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -134,7 +134,7 @@ export class SpaceEventHandler {
               skipSendingToActor: false
             }
           );
-        } else if (parentId) {
+        } else {
           await applyNestedPageRestoreDiffAndSaveDocument({
             restoredPageId: message.payload.id,
             content,
@@ -210,26 +210,28 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
   restoredPageId: string;
   content: PageContent;
   userId: string;
-  parentId: string;
+  parentId?: string | null;
   spaceId: string;
 }) {
-  const pageNode = getNodeFromJson(content);
-  const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
-  const updatedNode = applyStepsToNode(
-    generateInsertNestedPageDiffs({ pageId: restoredPageId, pos: lastValidPos }),
-    pageNode
-  );
+  if (parentId) {
+    const pageNode = getNodeFromJson(content);
+    const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
+    const updatedNode = applyStepsToNode(
+      generateInsertNestedPageDiffs({ pageId: restoredPageId, pos: lastValidPos }),
+      pageNode
+    );
 
-  await prisma.page.update({
-    where: { id: parentId },
-    data: {
-      content: updatedNode.toJSON(),
-      contentText: updatedNode.textContent,
-      hasContent: updatedNode.textContent.length > 0,
-      updatedAt: new Date(),
-      updatedBy: userId
-    }
-  });
+    await prisma.page.update({
+      where: { id: parentId },
+      data: {
+        content: updatedNode.toJSON(),
+        contentText: updatedNode.textContent,
+        hasContent: updatedNode.textContent.length > 0,
+        updatedAt: new Date(),
+        updatedBy: userId
+      }
+    });
+  }
 
   const modifiedChildPageIds = await modifyChildPages(restoredPageId, userId, 'restore');
   relay.broadcast(
@@ -251,41 +253,42 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
   deletedPageId: string;
   content: PageContent;
   userId: string;
-  parentId: string;
+  parentId?: string | null;
   spaceId: string;
 }) {
-  const pageNode = getNodeFromJson(content);
-  let position: null | number = null;
-
-  pageNode.forEach((node, nodePos) => {
-    if (node.type.name === 'page' && node.attrs.id === deletedPageId) {
-      position = nodePos;
-      return false;
-    }
-  });
-
-  if (position !== null) {
-    const updatedNode = applyStepsToNode(
-      [
-        {
-          from: position,
-          to: position + 1,
-          stepType: 'replace'
-        }
-      ],
-      pageNode
-    );
-
-    await prisma.page.update({
-      where: { id: parentId },
-      data: {
-        content: updatedNode.toJSON(),
-        contentText: updatedNode.textContent,
-        hasContent: updatedNode.textContent.length > 0,
-        updatedAt: new Date(),
-        updatedBy: userId
+  if (parentId) {
+    const pageNode = getNodeFromJson(content);
+    let position: null | number = null;
+    pageNode.forEach((node, nodePos) => {
+      if (node.type.name === 'page' && node.attrs.id === deletedPageId) {
+        position = nodePos;
+        return false;
       }
     });
+
+    if (position !== null && parentId) {
+      const updatedNode = applyStepsToNode(
+        [
+          {
+            from: position,
+            to: position + 1,
+            stepType: 'replace'
+          }
+        ],
+        pageNode
+      );
+
+      await prisma.page.update({
+        where: { id: parentId },
+        data: {
+          content: updatedNode.toJSON(),
+          contentText: updatedNode.textContent,
+          hasContent: updatedNode.textContent.length > 0,
+          updatedAt: new Date(),
+          updatedBy: userId
+        }
+      });
+    }
   }
 
   const modifiedChildPageIds = await modifyChildPages(deletedPageId, userId, 'archive');
