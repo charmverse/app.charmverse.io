@@ -21,10 +21,7 @@ export function useSpaceSubscription() {
   } = useSWR(
     !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/subscription` : null,
     () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false
-    }
+    { shouldRetryOnError: false }
   );
 
   const freeTrialEnds = useMemo(
