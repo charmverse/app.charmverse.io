@@ -60,8 +60,12 @@ jobs:
         include:
           - test_name: 'Type check and lint'
             test_command: 'npm run typecheck && npm run lint'
+          - test_name: 'Chromatic deploy and tests'
+            test_command: 'npm run chromatic:ci'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -75,6 +79,8 @@ jobs:
           NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
+        env: 
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: ${{matrix.test_command}}
 
   integration-test:
@@ -98,7 +104,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 7
+      max-parallel: 8
       fail-fast: false
       matrix:
         include:
@@ -116,8 +122,7 @@ jobs:
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
             test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci'
-          - test_name: 'Chromatic deploy and tests'
-            test_command: 'npm run chromatic:ci'
+
     steps:
       - uses: actions/checkout@v3
 
@@ -221,7 +226,6 @@ jobs:
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -262,6 +266,11 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
