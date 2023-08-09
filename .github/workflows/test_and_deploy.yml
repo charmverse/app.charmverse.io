@@ -93,13 +93,7 @@ jobs:
         with: 
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
-      - name: Restore app from cache
-        uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
-
-      - name: Publish to Chromatic
+      - name: Publish to Chromatic after ci
         continue-on-error: true
         uses: chromaui/action@v1
         with:
@@ -108,7 +102,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Publish to Chromatic
+      - name: Publish to Chromatic after install
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
