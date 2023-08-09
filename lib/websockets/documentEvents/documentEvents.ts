@@ -437,7 +437,8 @@ export class DocumentEventHandler {
                   restoredPageIds.push(node.attrs?.id);
                 }
               });
-            } else {
+            } else if (ds.from + 1 === ds.to) {
+              // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (node && node.type === 'page') {
                 const pageId = node.attrs?.id;
@@ -445,6 +446,17 @@ export class DocumentEventHandler {
                   deletedPageIds.push(pageId);
                 }
               }
+            } else {
+              // deleted using multi line selection
+              room.node.nodesBetween(ds.from, ds.to, (_node) => {
+                const jsonNode = _node.toJSON() as PageContent;
+                if (jsonNode && jsonNode.type === 'page') {
+                  const pageId = jsonNode.attrs?.id;
+                  if (pageId) {
+                    deletedPageIds.push(pageId);
+                  }
+                }
+              });
             }
           }
         }
