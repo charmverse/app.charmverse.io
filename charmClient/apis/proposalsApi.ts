@@ -63,6 +63,10 @@ export class ProposalsApi {
     return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
+  getProposalIdsEvaluatedByUser(spaceId: string) {
+    return http.GET<string[]>(`/api/spaces/${spaceId}/proposals-evaluated-by-user`);
+  }
+
   archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
     return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }
