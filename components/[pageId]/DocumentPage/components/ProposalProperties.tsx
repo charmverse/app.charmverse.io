@@ -9,6 +9,7 @@ import { useProposalDetails } from 'components/proposals/hooks/useProposalDetail
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -31,6 +32,7 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
+  const { user } = useUser();
 
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
@@ -86,6 +88,9 @@ export function ProposalProperties({
       proposalId={proposal?.id}
       pageId={pageId}
       readOnly={readOnly}
+      rubricAnswers={proposal?.rubricAnswers}
+      rubricCriteria={proposal?.rubricCriteria}
+      userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
       proposalFormInputs={proposalFormInputs}

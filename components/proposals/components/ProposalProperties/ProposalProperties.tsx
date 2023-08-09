@@ -3,7 +3,7 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Proposal, ProposalStatus, ProposalEvaluationType } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -12,6 +12,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import MultiTabs from 'components/common/MultiTabs';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -27,6 +28,8 @@ import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteria
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
+import type { FormInput as EvaluationFormValues } from './components/RubricEvaluationForm';
+import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
 export type ProposalFormInputs = {
   title?: string; // title is saved to the same state that's used in ProposalPage
@@ -52,8 +55,11 @@ interface ProposalPropertiesProps {
   proposalFormInputs: ProposalFormInputs;
   proposalStatus?: ProposalStatus;
   readOnly?: boolean;
+  rubricAnswers?: any[];
+  rubricCriteria?: any[];
   setProposalFormInputs: (values: ProposalFormInputs) => void;
   snapshotProposalId?: string | null;
+  userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
 }
 
@@ -68,12 +74,14 @@ export function ProposalProperties({
   proposalFlowFlags,
   proposalStatus,
   readOnly,
+  rubricAnswers = [],
+  rubricCriteria = [],
   setProposalFormInputs,
   snapshotProposalId,
+  userId,
   updateProposalStatus
 }: ProposalPropertiesProps) {
   const { categories } = useProposalCategories();
-
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const { space: currentSpace } = useCurrentSpace();
@@ -95,6 +103,7 @@ export function ProposalProperties({
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
+  const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
 
   const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
@@ -162,6 +171,10 @@ export function ProposalProperties({
 
   function openVoteModal() {
     setIsVoteModalOpen(true);
+  }
+
+  function onSubmitEvaluation(results: EvaluationFormValues) {
+    // console.log('submit form', results);
   }
 
   useEffect(() => {
@@ -340,10 +353,10 @@ export function ProposalProperties({
                   <ProposalRubricCriteriaInput
                     readOnly={readOnly || canUpdateProposalProperties === false}
                     value={proposalFormInputs.rubricCriteria}
-                    onChange={(rubricCriteria) => {
+                    onChange={(criteriaList) => {
                       setProposalFormInputs({
                         ...proposalFormInputs,
-                        rubricCriteria
+                        rubricCriteria: criteriaList
                       });
                     }}
                   />
@@ -352,6 +365,30 @@ export function ProposalProperties({
             </Box>
           )}
         </Collapse>
+        <Divider
+          sx={{
+            my: 2
+          }}
+        />
+
+        {proposalFlowFlags?.reviewed && (
+          <Card variant='outlined' sx={{ my: 2 }}>
+            <MultiTabs
+              tabs={[
+                [
+                  'Evaluate',
+                  <RubricEvaluationForm
+                    key='evaluate'
+                    answers={myRubricAnswers}
+                    criteriaList={rubricCriteria}
+                    onSubmit={onSubmitEvaluation}
+                  />
+                ],
+                ['Results', <Box key='results'>Results</Box>]
+              ]}
+            />
+          </Card>
+        )}
 
         <ConfirmDeleteModal
           onClose={() => {
@@ -368,11 +405,6 @@ export function ProposalProperties({
               applyTemplate(templatePage);
             }
             setSelectedProposalTemplateId(null);
-          }}
-        />
-        <Divider
-          sx={{
-            my: 2
           }}
         />
         <CreateVoteModal
