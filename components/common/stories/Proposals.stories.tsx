@@ -17,6 +17,8 @@ import { createMockProposal } from 'testing/mocks/proposal';
 import { createMockSpace } from 'testing/mocks/space';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
+import { members, proposalCategories } from '../../../.storybook/lib/mockData';
+
 export default {
   title: 'common/Proposals',
   component: ProposalPageComponent
@@ -137,29 +139,43 @@ ProposalInEvaluation.parameters = {
       }),
       proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
         const proposal = createMockProposal({
+          authors: [{ proposalId: '', userId: members[0].id }],
+          reviewers: [{ id: '', proposalId: '', roleId: null, userId: members[1].id }],
+          categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
           status: 'evaluation_active',
           rubricCriteria: [
             {
               id: '1',
               proposalId: '1',
-              title: 'Spelling and grammar',
-              description: 'Has correct punctuation',
+              title: 'Developer Presence',
+              description: 'Makes their point clearly',
               type: 'range',
               parameters: {
                 min: 0,
-                max: 1
+                max: 2
               }
             },
             {
               id: '2',
               proposalId: '1',
-              title: 'Five stars',
+              title: 'Developer Draw',
               description: null,
               type: 'range',
               parameters: {
-                min: 1,
-                max: 5
+                min: 0,
+                max: 3
+              }
+            },
+            {
+              id: '2',
+              proposalId: '1',
+              title: 'Developer Commitment',
+              description: null,
+              type: 'range',
+              parameters: {
+                min: 0,
+                max: 4
               }
             }
           ]

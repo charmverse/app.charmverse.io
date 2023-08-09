@@ -229,7 +229,7 @@ export function ProposalProperties({
         )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
           {!isTemplate && (
-            <Box mt={2} mb={1}>
+            <Box mt={2} mb={2}>
               {/* <Box mb={1}>
                 <PropertyLabel readOnly>Status</PropertyLabel>
               </Box> */}
@@ -384,7 +384,7 @@ export function ProposalProperties({
                     onSubmit={onSubmitEvaluation}
                   />
                 ],
-                ['Results', <Box key='results'>Results</Box>]
+                ['Results', <Box key='results'>Results go here</Box>]
               ]}
             />
           </Card>
