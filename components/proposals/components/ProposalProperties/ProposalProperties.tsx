@@ -348,7 +348,7 @@ export function ProposalProperties({
           {proposalFormInputs.evaluationType === 'rubric' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>Criteria</PropertyLabel>
+                <PropertyLabel readOnly>&nbsp;</PropertyLabel>
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnly || canUpdateProposalProperties === false}
