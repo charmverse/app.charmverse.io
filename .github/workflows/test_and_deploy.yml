@@ -51,18 +51,6 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
-  chromatic-deployment:
-    name: Deploy chromatic
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Install dependencies
-        run: npm install
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -74,8 +62,12 @@ jobs:
         include:
           - test_name: 'Type check and lint'
             test_command: 'npm run typecheck && npm run lint'
+          - test_name: 'Run Chromatic Test'
+            test_command: 'npm run chromatic:ci'
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -92,34 +84,6 @@ jobs:
         env: 
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: ${{matrix.test_command}}
-
-  ChromaticTest:
-    name: Chromatic Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
-        with: 
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-
-      - name: Publish to Chromatic after ci
-        continue-on-error: true
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
-      - name: Install dependencies
-        run: |
-          rm -fr node_modules
-          npm install
-
-      - name: Publish to Chromatic after install
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
 
   integration-test:
     name: Tests
