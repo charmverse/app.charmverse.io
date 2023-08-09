@@ -17,11 +17,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import { memo, useMemo, useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -86,7 +84,6 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
   const { mutatePagesRemove, pages, getPageByPath } = usePages();
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
@@ -105,31 +102,12 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
   async function restorePage(pageId: string) {
     if (space) {
-      const restoredPage = archivedPages[pageId];
-      if (restoredPage?.type === 'page') {
-        sendMessage({
-          payload: {
-            id: pageId
-          },
-          type: 'page_restored'
-        });
-      } else {
-        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
-        setArchivedPages((_archivedPages) => {
-          if (!_archivedPages) {
-            return {};
-          }
-          restoredPageIds.forEach((restoredPageId) => {
-            if (_archivedPages[restoredPageId]) {
-              delete _archivedPages[restoredPageId];
-            }
-          });
-          return { ..._archivedPages };
-        });
-
-        await mutate(`pages/${space.id}`);
-        dispatch(initialLoad({ spaceId: space.id }));
-      }
+      sendMessage({
+        payload: {
+          id: pageId
+        },
+        type: 'page_restored'
+      });
     }
   }
 

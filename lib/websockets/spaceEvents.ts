@@ -113,9 +113,9 @@ export class SpaceEventHandler {
           userId: this.userId
         });
 
-        // get the last position of the page node prosemirror node
-        const lastChild = pageNode.lastChild;
-        const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
+        // Get the position from the NodeRange object
+        const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
+
         if (documentRoom && participant) {
           await participant.handleDiff(
             {
@@ -123,8 +123,8 @@ export class SpaceEventHandler {
               ds: [
                 {
                   stepType: 'replace',
-                  from: lastChildPos,
-                  to: lastChildPos + 2,
+                  from: lastValidPos,
+                  to: lastValidPos + 2,
                   slice: {
                     content: [
                       {
@@ -192,15 +192,13 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
   spaceId: string;
 }) {
   const pageNode = getNodeFromJson(content);
-  const lastChild = pageNode.lastChild;
-  const lastChildPos = lastChild ? pageNode.content.size - lastChild.nodeSize : 0;
-
+  const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
   const updatedNode = applyStepsToNode(
     [
       {
         stepType: 'replace',
-        from: lastChildPos,
-        to: lastChildPos + 2,
+        from: lastValidPos,
+        to: lastValidPos + 2,
         slice: {
           content: [
             {

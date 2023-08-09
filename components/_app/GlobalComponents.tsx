@@ -28,6 +28,7 @@ export function GlobalComponents() {
     if (currentSpace) {
       mutate(`pages/${currentSpace.id}`);
       dispatch(initialLoad({ spaceId: currentSpace.id }));
+      mutate(`archived-pages-${currentSpace.id}`);
     }
   };
 
