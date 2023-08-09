@@ -431,7 +431,7 @@ export class DocumentEventHandler {
         // Go through the diffs and see if any of them are for deleting a page.
         for (const ds of message.ds) {
           if (ds.stepType === 'replace') {
-            if (restorePage && ds.slice?.content) {
+            if (ds.slice?.content) {
               ds.slice.content.forEach((node) => {
                 if (node.type === 'page') {
                   restoredPageIds.push(node.attrs?.id);
@@ -483,15 +483,17 @@ export class DocumentEventHandler {
           );
         }
 
-        for (const pageId of restoredPageIds) {
-          const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'restore');
-          relay.broadcast(
-            {
-              type: 'pages_restored',
-              payload: modifiedChildPageIds.map((id) => ({ id }))
-            },
-            room.doc.spaceId
-          );
+        if (restorePage) {
+          for (const pageId of restoredPageIds) {
+            const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'restore');
+            relay.broadcast(
+              {
+                type: 'pages_restored',
+                payload: modifiedChildPageIds.map((id) => ({ id }))
+              },
+              room.doc.spaceId
+            );
+          }
         }
 
         this.confirmDiff(message.rid);
