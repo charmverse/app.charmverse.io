@@ -1,11 +1,10 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -13,6 +12,7 @@ import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useProposalDialog } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
@@ -22,31 +22,18 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   const router = useRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { showProposal } = useProposalDialog();
-  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
-  const { mutatePagesRemove, mutatePage, pages } = usePages();
+  const { mutatePage } = usePages();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { createProposal } = useProposalDialog();
-  const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
+  const { proposalTemplatePages, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
 
-  useEffect(() => {
-    if (pages) {
-      setProposalTemplates(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
-    }
-  }, [pages]);
-
-  const canCreateProposal = getCategoriesWithCreatePermission().length > 0;
-
-  async function deleteProposalTemplate(templateId: string) {
-    await charmClient.deletePage(templateId);
-    setProposalTemplates(proposalTemplates.filter((p) => p.id !== templateId));
-
-    mutatePagesRemove([templateId]);
-  }
+  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
 
   async function createProposalFromTemplate(templateId: string) {
     if (currentSpace) {
@@ -108,6 +95,8 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
         </Box>
       </Tooltip>
       <TemplatesMenu
+        isLoading={isLoadingTemplates}
+        pages={proposalTemplatePages}
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
         editTemplate={(pageId) => {
@@ -120,7 +109,6 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
           });
         }}
         deleteTemplate={deleteProposalTemplate}
-        pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'
         popupState={popupState}
