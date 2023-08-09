@@ -5,26 +5,28 @@ import { relay } from 'lib/websockets/relay';
 
 import { modifyChildPages } from './modifyChildPages';
 
-export async function archivePage({
+export async function archivePages({
   archive,
-  pageId,
+  pageIds,
   userId,
   spaceId
 }: {
   archive: boolean;
-  pageId: string;
+  pageIds: string[];
   userId: string;
   spaceId: string;
 }) {
-  const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
-  trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
+  const modifiedChildPageIds: string[] = [];
 
-  log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
-    pageId,
-    pageIds: modifiedChildPageIds,
-    spaceId,
-    userId
-  });
+  for (const pageId of pageIds) {
+    modifiedChildPageIds.push(...(await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore')));
+    trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
+    log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
+      pageIds: modifiedChildPageIds,
+      spaceId,
+      userId
+    });
+  }
 
   const deletedAt = archive ? new Date() : null;
   const deletedBy = archive ? userId : null;

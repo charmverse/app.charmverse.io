@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import { archivePage } from 'lib/pages/archivePage';
+import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -434,7 +434,11 @@ export class DocumentEventHandler {
             if (ds.slice?.content) {
               ds.slice.content.forEach((node) => {
                 if (node.type === 'page') {
-                  restoredPageIds.push(node.attrs?.id);
+                  // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
+                  // Otherwise the page was created by the user manually
+                  if (ds.from === ds.to || restorePage) {
+                    restoredPageIds.push(node.attrs?.id);
+                  }
                 }
               });
             } else if (ds.from + 1 === ds.to) {
@@ -483,25 +487,22 @@ export class DocumentEventHandler {
         if (room.doc.version % this.docSaveInterval === 0) {
           await this.saveDocument();
         }
-
-        for (const pageId of deletedPageIds) {
-          await archivePage({
-            pageId,
+        if (deletedPageIds.length) {
+          await archivePages({
+            pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
             archive: true
           });
         }
 
-        if (restorePage) {
-          for (const pageId of restoredPageIds) {
-            await archivePage({
-              pageId,
-              userId: session.user.id,
-              spaceId: room.doc.spaceId,
-              archive: false
-            });
-          }
+        if (restoredPageIds.length) {
+          await archivePages({
+            pageIds: restoredPageIds,
+            userId: session.user.id,
+            spaceId: room.doc.spaceId,
+            archive: false
+          });
         }
 
         this.confirmDiff(message.rid);

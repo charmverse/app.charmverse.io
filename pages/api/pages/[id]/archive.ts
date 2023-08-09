@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
-import { archivePage } from 'lib/pages/archivePage';
+import { archivePages } from 'lib/pages/archivePages';
 import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -50,9 +50,9 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const { modifiedChildPageIds } = await archivePage({
+  const { modifiedChildPageIds } = await archivePages({
     archive,
-    pageId,
+    pageIds: [pageId],
     userId,
     spaceId: pageSpaceId.spaceId
   });

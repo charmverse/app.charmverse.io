@@ -3,8 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { archivePage } from 'lib/pages/archivePage';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { archivePages } from 'lib/pages/archivePages';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -234,8 +233,8 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
     });
   }
 
-  await archivePage({
-    pageId: restoredPageId,
+  await archivePages({
+    pageIds: [restoredPageId],
     userId,
     spaceId,
     archive: false
@@ -290,8 +289,8 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
     }
   }
 
-  await archivePage({
-    pageId: deletedPageId,
+  await archivePages({
+    pageIds: [deletedPageId],
     userId,
     spaceId,
     archive: false
