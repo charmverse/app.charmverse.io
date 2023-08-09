@@ -130,6 +130,7 @@ export class SpaceEventHandler {
               cid: -1
             },
             {
+              // This is to indicate that it was triggered by a page_restored event
               restorePage: true,
               skipSendingToActor: false
             }

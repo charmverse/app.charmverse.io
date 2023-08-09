@@ -112,6 +112,11 @@ type PageRestored = {
   payload: Resource;
 };
 
+type PageCreated = {
+  type: 'page_created';
+  payload: Partial<Page>;
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -142,7 +147,7 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored;
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated;
 
 export type ServerMessage =
   | BlocksUpdated
