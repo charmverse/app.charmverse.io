@@ -123,7 +123,7 @@ function CriteriaInput({
           highlightSelectedOnly
         />
       </Box>
-      <TextField placeholder='Leave a comment' {...register(`answers.${index}.comment`)}></TextField>
+      <TextField multiline placeholder='Leave a comment' {...register(`answers.${index}.comment`)}></TextField>
     </FormGroup>
   );
 }

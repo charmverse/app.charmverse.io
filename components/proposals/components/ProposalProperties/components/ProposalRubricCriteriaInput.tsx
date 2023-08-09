@@ -128,23 +128,24 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
       {criteriaList.map((criteria) => (
         <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={1} mb={1}>
           <TextInput
+            inputProps={{ autoFocus: true }}
             displayType='details'
             fullWidth={false}
             onChange={(title) => setCriteriaProperty(criteria.id, { title })}
-            placeholderText='Title...'
+            placeholderText='Add a label...'
             readOnly={readOnly}
             value={criteria.title}
           />
-          <TextInput
-            displayType='details'
-            fullWidth={false}
-            multiline
-            onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-            placeholderText='Add a description...'
-            readOnly={readOnly}
-            sx={{ flexGrow: 1 }}
-            value={criteria.description ?? ''}
-          />
+          <Box maxHeight='3em'>
+            <TextInput
+              multiline={false}
+              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+              placeholderText='Add a description...'
+              readOnly={readOnly}
+              sx={{ flexGrow: 1, width: '100%' }}
+              value={criteria.description ?? ''}
+            />
+          </Box>
           <Box display='flex' gap={1} alignItems='flex-start'>
             {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
                   Range:
