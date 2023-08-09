@@ -51,6 +51,11 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -84,6 +89,7 @@ jobs:
         env: 
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: ${{matrix.test_command}}
+
 
   integration-test:
     name: Tests
