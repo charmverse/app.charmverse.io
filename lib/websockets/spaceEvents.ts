@@ -14,6 +14,7 @@ import { relay } from 'lib/websockets/relay';
 
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import { docRooms } from './documentEvents/documentEvents';
+import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -114,32 +115,13 @@ export class SpaceEventHandler {
         });
 
         // Get the position from the NodeRange object
-        const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
+        const lastValidPos = pageNode.content.size;
 
         if (documentRoom && participant) {
           await participant.handleDiff(
             {
               type: 'diff',
-              ds: [
-                {
-                  stepType: 'replace',
-                  from: lastValidPos,
-                  to: lastValidPos + 2,
-                  slice: {
-                    content: [
-                      {
-                        type: 'page',
-                        attrs: {
-                          id: pageId,
-                          type: null,
-                          path: null,
-                          track: []
-                        }
-                      }
-                    ]
-                  }
-                }
-              ],
+              ds: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos }),
               doc: documentRoom.doc.content,
               c: participant.messages.client,
               s: participant.messages.server,
@@ -178,6 +160,46 @@ export class SpaceEventHandler {
   }
 }
 
+function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: number }): ProsemirrorJSONStep[] {
+  return [
+    {
+      stepType: 'replace',
+      from: pos,
+      to: pos,
+      slice: {
+        content: [
+          {
+            type: 'paragraph',
+            content: [],
+            attrs: {
+              path: null,
+              track: []
+            }
+          }
+        ]
+      }
+    },
+    {
+      stepType: 'replace',
+      from: pos,
+      to: pos,
+      slice: {
+        content: [
+          {
+            type: 'page',
+            attrs: {
+              id: pageId,
+              type: null,
+              path: null,
+              track: []
+            }
+          }
+        ]
+      }
+    }
+  ];
+}
+
 async function applyNestedPageRestoreDiffAndSaveDocument({
   restoredPageId,
   content,
@@ -194,26 +216,7 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
   const pageNode = getNodeFromJson(content);
   const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
   const updatedNode = applyStepsToNode(
-    [
-      {
-        stepType: 'replace',
-        from: lastValidPos,
-        to: lastValidPos + 2,
-        slice: {
-          content: [
-            {
-              type: 'page',
-              attrs: {
-                id: restoredPageId,
-                type: null,
-                path: null,
-                track: []
-              }
-            }
-          ]
-        }
-      }
-    ],
+    generateInsertNestedPageDiffs({ pageId: restoredPageId, pos: lastValidPos }),
     pageNode
   );
 
