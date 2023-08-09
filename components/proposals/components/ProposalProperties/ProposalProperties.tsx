@@ -76,6 +76,9 @@ interface ProposalPropertiesProps {
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
 }
 
+// set to true to work with rubrics
+const showRubricFeature = false;
+
 export function ProposalProperties({
   archived,
   canUpdateProposalProperties,
@@ -379,21 +382,23 @@ export function ProposalProperties({
             </Box>
           </Box>
           {/* Select valuation type */}
-          {/* <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Type</PropertyLabel>
-              <ProposalEvaluationTypeSelect
-                disabled={readOnly || (!isNewProposal && !isTemplate)}
-                value={proposalFormInputs.evaluationType}
-                onChange={(evaluationType) => {
-                  setProposalFormInputs({
-                    ...proposalFormInputs,
-                    evaluationType
-                  });
-                }}
-              />
+          {showRubricFeature && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly>Type</PropertyLabel>
+                <ProposalEvaluationTypeSelect
+                  disabled={readOnly || (!isNewProposal && !isTemplate)}
+                  value={proposalFormInputs.evaluationType}
+                  onChange={(evaluationType) => {
+                    setProposalFormInputs({
+                      ...proposalFormInputs,
+                      evaluationType
+                    });
+                  }}
+                />
+              </Box>
             </Box>
-          </Box> */}
+          )}
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
