@@ -1,8 +1,4 @@
-import type {
-  ProposalPermissionFlags,
-  ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags
-} from '@charmverse/core/permissions';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 import { generateDefaultProposalCategoriesInput } from '../../lib/proposal/generateDefaultProposalCategoriesInput';
@@ -27,6 +23,16 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
   'space-id'
 ).map((cat) => ({
+  id: 'some-id',
+  permissions: {
+    manage_permissions: true,
+    edit: true,
+    delete: true,
+    create_proposal: true,
+    view_category: true,
+    comment_proposals: true,
+    vote_proposals: true
+  },
   ...cat
 }));
 
