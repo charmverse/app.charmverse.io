@@ -1,7 +1,7 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Avatar, Box, FormGroup, TextField, Rating, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray } from 'react-hook-form';
 
@@ -52,7 +52,7 @@ export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit
     control,
     register,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors, isValid }
   } = useForm<FormInput>({
     // mode: 'onChange',
@@ -62,6 +62,10 @@ export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit
     // resolver: yupResolver(schema(hasCustomReward))
   });
   const { fields } = useFieldArray({ control, name: 'answers' });
+
+  useEffect(() => {
+    reset({ answers: criteriaInputs });
+  }, [criteriaInputs.length]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box>

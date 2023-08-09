@@ -60,7 +60,7 @@ const proposalHandlers = {
     };
     return res(ctx.json(permissions));
   }),
-  proposalPermissions: rest.get(`/api/permissions/proposals/compute-proposal-permissions`, (req, res, ctx) => {
+  proposalPermissions: rest.post(`/api/permissions/proposals/compute-proposal-permissions`, (req, res, ctx) => {
     const permissions: ProposalPermissionFlags = {
       edit: true,
       view: true,

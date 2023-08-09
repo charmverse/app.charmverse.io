@@ -1,4 +1,3 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
@@ -12,6 +11,7 @@ import type { ProposalFormInputs } from 'components/proposals/components/Proposa
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { createMockSpace } from 'testing/mocks/space';
@@ -124,105 +124,102 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
-      proposalFlowFlags: rest.get(`/api/proposals/:pageId/compute-flow-flags`, (req, res, ctx) => {
-        const permissions: ProposalFlowPermissionFlags = {
-          draft: false,
-          discussion: false,
-          review: false,
-          reviewed: true,
-          vote_active: false,
-          vote_closed: false,
-          evaluation_active: false,
-          evaluation_closed: false
-        };
-        return res(ctx.json(permissions));
-      }),
       proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
+        const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
+          {
+            id: '1',
+            proposalId: '1',
+            title: 'Developer Presence',
+            description: 'Makes their point clearly',
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 2
+            }
+          },
+          {
+            id: '2',
+            proposalId: '1',
+            title: 'Developer Draw',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 3
+            }
+          },
+          {
+            id: '3',
+            proposalId: '1',
+            title: 'Developer Commitment',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 4
+            }
+          },
+          {
+            id: '4',
+            proposalId: '1',
+            title: 'Developer activity',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 4
+            }
+          },
+          {
+            id: '5',
+            proposalId: '1',
+            title: 'Community engagement',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 4
+            }
+          },
+          {
+            id: '6',
+            proposalId: '1',
+            title: 'Twitter activity',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 4
+            }
+          },
+          {
+            id: '7',
+            proposalId: '1',
+            title: 'Github activity',
+            description: null,
+            type: 'range',
+            parameters: {
+              min: 0,
+              max: 4
+            }
+          }
+        ];
+        const rubricAnswers: ProposalWithUsersAndRubric['rubricAnswers'] = rubricCriteria.map((criteria) => ({
+          rubricCriteriaId: criteria.id,
+          proposalId: criteria.proposalId,
+          criteriaId: criteria.id,
+          userId: '',
+          comment: 'Nice job',
+          response: { score: 3 }
+        }));
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
           reviewers: [{ id: '', proposalId: '', roleId: null, userId: members[1].id }],
           categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
           status: 'evaluation_active',
-          rubricCriteria: [
-            {
-              id: '1',
-              proposalId: '1',
-              title: 'Developer Presence',
-              description: 'Makes their point clearly',
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 2
-              }
-            },
-            {
-              id: '2',
-              proposalId: '1',
-              title: 'Developer Draw',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 3
-              }
-            },
-            {
-              id: '3',
-              proposalId: '1',
-              title: 'Developer Commitment',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 4
-              }
-            },
-            {
-              id: '4',
-              proposalId: '1',
-              title: 'Developer activity',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 4
-              }
-            },
-            {
-              id: '5',
-              proposalId: '1',
-              title: 'Community engagement',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 4
-              }
-            },
-            {
-              id: '6',
-              proposalId: '1',
-              title: 'Twitter activity',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 4
-              }
-            },
-            {
-              id: '7',
-              proposalId: '1',
-              title: 'Github activity',
-              description: null,
-              type: 'range',
-              parameters: {
-                min: 0,
-                max: 4
-              }
-            }
-          ]
+          rubricCriteria,
+          rubricAnswers
         });
         return res(ctx.json(proposal));
       })

@@ -78,7 +78,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
                   borderRight: '1px solid var(--input-border)'
                 }}
               >
-                <UserDisplay user={getMemberById(r.id)} showMiniProfile />
+                <UserDisplay avatarSize='small' user={getMemberById(r.id)} showMiniProfile />
               </TableCell>
 
               {criteriaList.map((c) => (

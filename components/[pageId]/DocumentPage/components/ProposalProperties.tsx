@@ -42,7 +42,8 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
-  const canViewRubricAnswers = proposal?.authors.some((author) => author.userId === user?.id) || isAdmin;
+  const canAnswerRubric = proposalPermissions?.evaluate;
+  const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
 
   const proposalFormInputs: ProposalFormInputs = {
     categoryId: proposal?.categoryId,
@@ -96,7 +97,7 @@ export function ProposalProperties({
       updateProposalStatus={updateProposalStatus}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
-      canAnswerRubric={proposalPermissions?.evaluate}
+      canAnswerRubric={canAnswerRubric}
       canViewRubricAnswers={canViewRubricAnswers}
     />
   );

@@ -17,6 +17,7 @@ import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
@@ -89,7 +90,7 @@ export function ProposalProperties({
   proposalStatus,
   readOnly,
   rubricAnswers = [],
-  rubricCriteria = [],
+  rubricCriteria,
   setProposalFormInputs,
   snapshotProposalId,
   userId,
@@ -204,27 +205,25 @@ export function ProposalProperties({
       canAnswerRubric &&
         ([
           'Evaluate',
-          <RubricEvaluationForm
-            key='evaluate'
-            answers={myRubricAnswers}
-            criteriaList={rubricCriteria}
-            onSubmit={onSubmitEvaluation}
-          />
+          <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
+            <RubricEvaluationForm
+              answers={myRubricAnswers}
+              criteriaList={rubricCriteria!}
+              onSubmit={onSubmitEvaluation}
+            />
+          </LoadingComponent>
         ] as TabConfig),
       canViewRubricAnswers &&
         ([
           'Results',
-          <RubricResults
-            key='results'
-            answers={rubricAnswers}
-            criteriaList={rubricCriteria}
-            reviewers={proposalReviewers}
-          />,
+          <LoadingComponent key='results' isLoading={!rubricCriteria}>
+            <RubricResults answers={rubricAnswers} criteriaList={rubricCriteria || []} reviewers={proposalReviewers} />
+          </LoadingComponent>,
           { sx: { p: 0 } }
         ] as TabConfig)
     ].filter(isTruthy);
     return tabs;
-  }, [canAnswerRubric, canViewRubricAnswers, myRubricAnswers]);
+  }, [canAnswerRubric, canViewRubricAnswers, myRubricAnswers, rubricCriteria]);
 
   return (
     <Box
@@ -414,7 +413,7 @@ export function ProposalProperties({
           }}
         />
 
-        {canAnswerRubric && (
+        {evaluationTabs.length > 0 && (
           <Card variant='outlined' sx={{ my: 2 }}>
             <MultiTabs tabs={evaluationTabs} />
           </Card>
