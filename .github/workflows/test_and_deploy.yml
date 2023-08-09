@@ -100,9 +100,19 @@ jobs:
           NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Publish to Chromatic
+        continue-on-error: true
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
 
   integration-test:
     name: Tests
