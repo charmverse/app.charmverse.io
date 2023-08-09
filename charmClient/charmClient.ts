@@ -141,10 +141,6 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
-  getUserByPath(path: string) {
-    return http.GET<PublicUser>(`/api/public/profile/${path}`);
-  }
-
   createUser({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
       address,
@@ -154,10 +150,6 @@ class CharmClient {
 
   updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
-  }
-
-  checkPublicProfilePath(path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails() {

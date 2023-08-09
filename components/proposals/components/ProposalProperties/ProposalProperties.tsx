@@ -11,7 +11,6 @@ import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -22,8 +21,8 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -99,17 +98,15 @@ export function ProposalProperties({
   userId,
   updateProposalStatus
 }: ProposalPropertiesProps) {
-  const { categories } = useProposalCategories();
+  const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
+
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
-  const { space: currentSpace } = useCurrentSpace();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { data: proposalTemplates = [] } = useSWR(
-    () => (currentSpace ? `proposals-templates/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: currentSpace!.id })
-  );
+
+  const { proposalTemplates } = useProposalTemplates();
 
   const proposalTemplatePages = useMemo(() => {
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
@@ -122,7 +119,8 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
-  const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
+
+  const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
   }, {} as Record<string, Proposal & { page: Page }>);
@@ -160,7 +158,7 @@ export function ProposalProperties({
   function applyTemplate(templatePage: PageMeta) {
     if (templatePage && templatePage.proposalId) {
       // Fetch the proposal page to get its content
-      const proposalTemplate = proposalTemplates.find(
+      const proposalTemplate = proposalTemplates?.find(
         (_proposalTemplate) => _proposalTemplate.page.id === templatePage.id
       );
       if (proposalTemplate) {
@@ -304,7 +302,7 @@ export function ProposalProperties({
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
                   disabled={disabledCategoryInput}
-                  options={categories || []}
+                  options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
                 />

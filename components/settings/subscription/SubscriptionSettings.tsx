@@ -30,11 +30,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
-  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>('pending-payment', false);
+  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>(`pending-payment-${space.id}`, false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription`,
+    `/api/spaces/${space.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateProSubscriptionRequest } }>) =>
       charmClient.subscription.createSubscription(arg.spaceId, arg.payload),
     {
@@ -62,10 +62,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription?.id) {
+    if (pendingPayment && spaceSubscription?.id && spaceSubscription?.status === 'active') {
       setPendingPayment(false);
     }
-  }, [spaceSubscription?.id, pendingPayment]);
+  }, [spaceSubscription?.id, spaceSubscription?.status, pendingPayment]);
 
   async function handleShowCheckoutForm() {
     if (minimumBlockQuota > blockQuota) {

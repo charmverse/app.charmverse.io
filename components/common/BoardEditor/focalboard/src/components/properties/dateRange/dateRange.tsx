@@ -156,11 +156,16 @@ function DateRange(props: Props): JSX.Element {
 
   return (
     <div style={{ width: '100%' }}>
-      <div className='octo-propertyvalue' data-testid='select-non-editable' {...bindTrigger(popupState)}>
-        {displayValue ? (
+      <div
+        className='octo-propertyvalue'
+        data-testid='select-non-editable'
+        {...bindTrigger(popupState)}
+        style={{ minHeight: '20px', minWidth: '25px' }}
+      >
+        {displayValue || (!displayValue && !showEmptyPlaceholder) ? (
           <span style={{ whiteSpace: props.wrapColumn ? 'break-spaces' : undefined }}>{displayValue}</span>
         ) : (
-          showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
+          <EmptyPlaceholder>Empty</EmptyPlaceholder>
         )}
       </div>
       <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>

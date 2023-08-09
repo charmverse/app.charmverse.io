@@ -43,17 +43,14 @@ export function useProposalCategories() {
     });
   }
 
-  function getCategoriesWithCreatePermission() {
-    return (categories ?? [])?.filter((c) => c.permissions.create_proposal);
-  }
+  const proposalCategoriesWithCreatePermission = (categories ?? [])?.filter((c) => c.permissions.create_proposal);
 
   function getDefaultCreateCategory() {
-    const creatableCategories = getCategoriesWithCreatePermission();
-    const firstDefault = creatableCategories.find((c) => c.title === 'General');
+    const firstDefault = proposalCategoriesWithCreatePermission.find((c) => c.title === 'General');
     if (firstDefault) {
       return firstDefault;
     }
-    return creatableCategories[0];
+    return proposalCategoriesWithCreatePermission[0];
   }
 
   return {
@@ -62,7 +59,7 @@ export function useProposalCategories() {
     addCategory,
     deleteCategory,
     mutateCategory,
-    getCategoriesWithCreatePermission,
+    proposalCategoriesWithCreatePermission,
     getDefaultCreateCategory
   };
 }

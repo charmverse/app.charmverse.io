@@ -11,7 +11,6 @@ import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
-import AggregatedData from './components/AggregatedData';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import { UserDetailsFormWithSave } from './components/UserDetails/UserDetailsForm';
@@ -19,24 +18,19 @@ import { UserDetailsReadonly } from './components/UserDetails/UserDetailsReadonl
 import { isPublicUser } from './components/UserDetails/utils';
 import { UserSpacesList } from './components/UserSpacesList/UserSpacesList';
 
-export function PublicProfile(props: {
-  user: Member | PublicUser | LoggedInUser;
-  readOnly?: boolean;
-  hideAggregateData?: boolean;
-}) {
+export function PublicProfile(props: { user: Member | PublicUser | LoggedInUser; readOnly?: boolean }) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
 
   const {
     data,
     mutate,
+    isLoading: isAggregatedDataLoading,
     isValidating: isAggregatedDataValidating
-  } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
-    return charmClient.getAggregatedData(user.id);
-  });
+  } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => charmClient.getAggregatedData(user.id));
   const isPublic = isPublicUser(user, currentUser);
 
-  const isLoading = !data || isAggregatedDataValidating;
+  const isLoading = isAggregatedDataLoading || isAggregatedDataValidating || !data;
 
   async function toggleCommunityVisibility(community: CommunityDetails) {
     if (currentUser) {
@@ -82,16 +76,6 @@ export function PublicProfile(props: {
   return (
     <Stack spacing={2}>
       {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user as LoggedInUser} />}
-
-      {readOnly && !props.hideAggregateData && (
-        <AggregatedData
-          totalBounties={data?.bounties}
-          totalCommunities={data ? communities.length : undefined}
-          totalProposals={data?.totalProposals}
-          totalVotes={data?.totalVotes}
-        />
-      )}
-
       <MultiTabs
         tabs={[
           ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />],
