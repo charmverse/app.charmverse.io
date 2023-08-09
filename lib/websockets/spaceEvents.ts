@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { archivePage } from 'lib/pages/archivePage';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -233,14 +234,12 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
     });
   }
 
-  const modifiedChildPageIds = await modifyChildPages(restoredPageId, userId, 'restore');
-  relay.broadcast(
-    {
-      type: 'pages_restored',
-      payload: modifiedChildPageIds.map((id) => ({ id }))
-    },
-    spaceId
-  );
+  await archivePage({
+    pageId: restoredPageId,
+    userId,
+    spaceId,
+    archive: false
+  });
 }
 
 async function applyNestedPageReplaceDiffAndSaveDocument({
@@ -291,14 +290,12 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
     }
   }
 
-  const modifiedChildPageIds = await modifyChildPages(deletedPageId, userId, 'archive');
-  relay.broadcast(
-    {
-      type: 'pages_deleted',
-      payload: modifiedChildPageIds.map((id) => ({ id }))
-    },
-    spaceId
-  );
+  await archivePage({
+    pageId: deletedPageId,
+    userId,
+    spaceId,
+    archive: false
+  });
 }
 
 async function getPageDetails({ id, userId }: { userId: string; id: string }) {

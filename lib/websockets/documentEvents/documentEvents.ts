@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { archivePage } from 'lib/pages/archivePage';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -17,16 +17,16 @@ import type { AuthenticatedSocketData } from '../authentication';
 import { relay } from '../relay';
 
 import type {
-  Participant,
-  ProsemirrorJSONStep,
-  WrappedSocketMessage,
-  ClientMessage,
-  ServerDocDataMessage,
   ClientCheckVersionMessage,
   ClientDiffMessage,
+  ClientMessage,
   ClientSelectionMessage,
+  Participant,
+  PatchError,
+  ProsemirrorJSONStep,
+  ServerDocDataMessage,
   ServerMessage,
-  PatchError
+  WrappedSocketMessage
 } from './interfaces';
 
 const log = getLogger('ws-docs');
@@ -473,26 +473,22 @@ export class DocumentEventHandler {
         }
 
         for (const pageId of deletedPageIds) {
-          const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'archive');
-          relay.broadcast(
-            {
-              type: 'pages_deleted',
-              payload: modifiedChildPageIds.map((id) => ({ id }))
-            },
-            room.doc.spaceId
-          );
+          await archivePage({
+            pageId,
+            userId: session.user.id,
+            spaceId: room.doc.spaceId,
+            archive: true
+          });
         }
 
         if (restorePage) {
           for (const pageId of restoredPageIds) {
-            const modifiedChildPageIds = await modifyChildPages(pageId, session.user.id, 'restore');
-            relay.broadcast(
-              {
-                type: 'pages_restored',
-                payload: modifiedChildPageIds.map((id) => ({ id }))
-              },
-              room.doc.spaceId
-            );
+            await archivePage({
+              pageId,
+              userId: session.user.id,
+              spaceId: room.doc.spaceId,
+              archive: false
+            });
           }
         }
 
