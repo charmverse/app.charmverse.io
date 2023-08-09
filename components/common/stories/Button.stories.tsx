@@ -22,7 +22,7 @@ export function Primary() {
           <Button color='primary' variant='contained'>
             Contained
           </Button>
-          <Button color='success' variant='contained'>
+          <Button color='warning' variant='contained'>
             Contained
           </Button>
           <Button color='error' variant='contained'>
