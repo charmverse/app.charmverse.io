@@ -1,6 +1,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { Page, Proposal, ProposalStatus, ProposalEvaluationType } from '@charmverse/core/prisma';
+import type {
+  Page,
+  Proposal,
+  ProposalStatus,
+  ProposalEvaluationType,
+  ProposalRubricCriteria
+} from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
@@ -14,10 +20,12 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
+import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -59,8 +67,8 @@ interface ProposalPropertiesProps {
   proposalFormInputs: ProposalFormInputs;
   proposalStatus?: ProposalStatus;
   readOnly?: boolean;
-  rubricAnswers?: any[];
-  rubricCriteria?: any[];
+  rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: ProposalFormInputs) => void;
   snapshotProposalId?: string | null;
   userId?: string;
@@ -203,7 +211,17 @@ export function ProposalProperties({
             onSubmit={onSubmitEvaluation}
           />
         ] as TabConfig),
-      canViewRubricAnswers && (['Results', <Box key='results'>Results go here</Box>] as TabConfig)
+      canViewRubricAnswers &&
+        ([
+          'Results',
+          <RubricResults
+            key='results'
+            answers={rubricAnswers}
+            criteriaList={rubricCriteria}
+            reviewers={proposalReviewers}
+          />,
+          { sx: { p: 0 } }
+        ] as TabConfig)
     ].filter(isTruthy);
     return tabs;
   }, [canAnswerRubric, canViewRubricAnswers, myRubricAnswers]);

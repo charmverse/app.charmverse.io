@@ -168,9 +168,53 @@ ProposalInEvaluation.parameters = {
               }
             },
             {
-              id: '2',
+              id: '3',
               proposalId: '1',
               title: 'Developer Commitment',
+              description: null,
+              type: 'range',
+              parameters: {
+                min: 0,
+                max: 4
+              }
+            },
+            {
+              id: '4',
+              proposalId: '1',
+              title: 'Developer activity',
+              description: null,
+              type: 'range',
+              parameters: {
+                min: 0,
+                max: 4
+              }
+            },
+            {
+              id: '5',
+              proposalId: '1',
+              title: 'Community engagement',
+              description: null,
+              type: 'range',
+              parameters: {
+                min: 0,
+                max: 4
+              }
+            },
+            {
+              id: '6',
+              proposalId: '1',
+              title: 'Twitter activity',
+              description: null,
+              type: 'range',
+              parameters: {
+                min: 0,
+                max: 4
+              }
+            },
+            {
+              id: '7',
+              proposalId: '1',
+              title: 'Github activity',
               description: null,
               type: 'range',
               parameters: {
