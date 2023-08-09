@@ -21,7 +21,7 @@ type Props = {
   onChange: (criteria: RangeProposalCriteria[]) => void;
 };
 
-const CriteriaRow = styled(Box)`
+export const CriteriaRow = styled(Box)`
   .show-on-hover {
     opacity: 0;
     transform: opacity 0.2s ease-in-out;
@@ -147,26 +147,22 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
             />
           </Box>
           <Box display='flex' gap={1} alignItems='flex-start'>
-            {/* <FormLabel color='secondary' sx={{ fontSize: 12, pt: 0.5 }}>
-                  Range:
-                </FormLabel> */}
             <Grid container width={90} spacing={1}>
               <Grid xs item>
                 <div>
-                  <TextInput
-                    displayType='details'
+                  <IntegerInput
+                    // store props on DOM for keyboard events
                     inputProps={{
                       'data-criteria': criteria.id,
                       'data-parameter-type': 'min'
                     }}
                     onChange={(min) => {
                       setCriteriaProperty(criteria.id, {
-                        parameters: { ...criteria.parameters, min: getNumberFromString(min) }
+                        parameters: { ...criteria.parameters, min }
                       });
                     }}
                     readOnly={readOnly}
-                    sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
-                    value={criteria.parameters.min?.toString() || ''}
+                    value={criteria.parameters.min}
                   />
                   <Typography
                     align='center'
@@ -181,8 +177,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
               </Grid>
               <Grid xs item>
                 <div className='to-pseudo-element'>
-                  <TextInput
-                    displayType='details'
+                  <IntegerInput
                     // store props on DOM for keyboard events
                     inputProps={{
                       'data-criteria': criteria.id,
@@ -190,12 +185,11 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
                     }}
                     onChange={(max) => {
                       setCriteriaProperty(criteria.id, {
-                        parameters: { ...criteria.parameters, max: getNumberFromString(max) }
+                        parameters: { ...criteria.parameters, max }
                       });
                     }}
                     readOnly={readOnly}
-                    sx={{ input: { textAlign: 'center', minWidth: '2.5em !important' } }}
-                    value={criteria.parameters.max?.toString() || ''}
+                    value={criteria.parameters.max}
                   />
                   <Typography
                     align='center'
@@ -229,12 +223,37 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
     </>
   );
 }
+export function IntegerInput({
+  value,
+  onChange,
+  readOnly,
+  inputProps,
+  maxWidth
+}: {
+  value?: number | string | null;
+  onChange: (num: number | null) => void;
+  readOnly?: boolean;
+  inputProps?: any;
+  maxWidth?: number;
+}) {
+  return (
+    <TextInput
+      displayType='details'
+      fullWidth={!maxWidth}
+      // store props on DOM for keyboard events
+      inputProps={inputProps}
+      onChange={(newValue) => onChange(getNumberFromString(newValue))}
+      readOnly={readOnly}
+      sx={{ input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth } }}
+      value={value?.toString() || ''}
+    />
+  );
+}
 
 function getNumberFromString(strValue: string): number | null {
   const parsedString = parseInt(strValue, 10);
   return parsedString || parsedString === 0 ? parsedString : null;
 }
-
 function isValidCriteria(criteria: RangeProposalCriteria) {
   if (criteria.type === 'range') {
     if (

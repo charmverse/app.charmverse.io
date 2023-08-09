@@ -1,18 +1,21 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Avatar, Box, FormGroup, TextField, Rating, Typography } from '@mui/material';
+import { Box, FormGroup, FormLabel, TextField, Rating, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
+import { isTruthy } from 'lib/utilities/types';
+
+import { IntegerInput, CriteriaRow } from './ProposalRubricCriteriaInput';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
-  onSubmit: (values: FormInput) => void;
+  onSubmit: (answers: FormInput) => void;
 };
 
 const StyledIcon = styled.div`
@@ -44,10 +47,26 @@ const StyledRating = styled(Rating)`
 `;
 
 export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit }: Props) {
-  const criteriaInputs = criteriaList.map((criteria) => ({
-    ...criteria,
-    answer: answers?.find((answer) => answer.rubricCriteriaId === criteria.id)
-  }));
+  const mappedAnswers = criteriaList
+    .map((criteria) => {
+      const answer = answers?.find((a) => a.rubricCriteriaId === criteria.id);
+      return answer;
+      // if (answer) {
+      //   const muiRating =
+      //     typeof (answer.response as any)?.score === 'number'
+      //       ? convertActualToMUIRating((answer.response as any).score, (criteria.parameters as any).min)
+      //       : undefined;
+      //   return {
+      //     ...answer,
+      //     response: {
+      //       score: muiRating
+      //     }
+      //   };
+      // }
+      // return null;
+    })
+    .filter(isTruthy);
+
   const {
     control,
     register,
@@ -57,24 +76,27 @@ export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
-      answers: criteriaInputs
+      answers: mappedAnswers
     }
     // resolver: yupResolver(schema(hasCustomReward))
   });
   const { fields } = useFieldArray({ control, name: 'answers' });
 
   useEffect(() => {
-    reset({ answers: criteriaInputs });
-  }, [criteriaInputs.length]);
+    // update the form values when the criteria list loads
+    reset({ answers: mappedAnswers });
+  }, [mappedAnswers.length]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box>
         {fields.map((field, index) => (
           <CriteriaInput
             key={field.id}
-            criteria={criteriaInputs[index]}
+            criteria={criteriaList[index]}
             field={field}
             index={index}
+            control={control}
             register={register}
           />
         ))}
@@ -88,46 +110,90 @@ function CriteriaInput({
   criteria,
   field,
   index,
+  control,
   register
 }: {
   criteria: ProposalRubricCriteria;
   field: FieldArrayWithId<FormInput, 'answers', 'id'>;
   index: number;
+  control: any;
   register: UseFormRegister<FormInput>;
 }) {
   const parameters = criteria.parameters as { min: number; max: number };
-  const rangeLength = parameters.max - parameters.min;
-  const minOffset = 1 - parameters.min; // Ratings component value always starts at 1
+  const rangeLength = parameters.max - parameters.min + 1; // add one since the max is included
   const IconContainerComponent = useMemo(
     () =>
       // eslint-disable-next-line react/no-unstable-nested-components
       function NumberIcon({ value, ...other }: { value: number }) {
         return (
           <Box {...other} mx={0.5}>
-            <StyledIcon className='icon'>{value - minOffset}</StyledIcon>
+            <StyledIcon className='icon'>{convertMUIRatingToActual(value, parameters.min)}</StyledIcon>
           </Box>
         );
       },
-    [minOffset]
+    [parameters.min]
   );
+  const muiMax = convertActualToMUIRating(parameters.max, parameters.min);
+  const useRatingsInput = rangeLength < 8;
   return (
-    <FormGroup key={field.id} sx={{ mb: 2, display: 'flex', gap: 1 }}>
-      <Box display='flex' justifyContent='space-between'>
-        <div>
-          <Typography variant='subtitle1'>
-            {criteria.title} ({(criteria.parameters as any).min}&ndash;
-            {(criteria.parameters as any).max})
-          </Typography>
-          {criteria.description && <Typography variant='body2'>{criteria.description}</Typography>}
-        </div>
-        <StyledRating
-          {...register(`answers.${index}.response.score`)}
-          IconContainerComponent={IconContainerComponent}
-          max={(criteria.parameters as any).max + minOffset}
-          highlightSelectedOnly
-        />
-      </Box>
-      <TextField multiline placeholder='Leave a comment' {...register(`answers.${index}.comment`)}></TextField>
-    </FormGroup>
+    <CriteriaRow key={field.id} mb={2}>
+      <FormGroup sx={{ display: 'flex', gap: 1 }}>
+        <Box display='flex' justifyContent='space-between'>
+          <div>
+            <Typography variant='subtitle1'>
+              {criteria.title} ({parameters.min}&ndash; {parameters.max})
+            </Typography>
+            {criteria.description && <Typography variant='body2'>{criteria.description}</Typography>}
+          </div>
+          <Controller
+            render={({ field: _field }) =>
+              useRatingsInput ? (
+                <StyledRating
+                  value={
+                    typeof _field.value === 'number' ? convertActualToMUIRating(_field.value, parameters.min) : null
+                  }
+                  IconContainerComponent={IconContainerComponent}
+                  max={muiMax}
+                  highlightSelectedOnly
+                  onChange={(e, num) => {
+                    _field.onChange(typeof num === 'number' ? convertMUIRatingToActual(num, parameters.min) : null);
+                  }}
+                />
+              ) : (
+                <FormGroup row sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                  <FormLabel>Your score:</FormLabel>
+                  <IntegerInput
+                    inputProps={{
+                      'data-criteria': criteria.id,
+                      placeholder: 'N/A'
+                    }}
+                    onChange={(score) => {
+                      _field.onChange(score);
+                    }}
+                    maxWidth={50}
+                    value={_field.value}
+                  />
+                </FormGroup>
+              )
+            }
+            control={control}
+            name={`answers.${index}.response.score`}
+            defaultValue={(field.response as any)?.score}
+          />
+        </Box>
+        <TextField multiline placeholder='Leave a comment' {...register(`answers.${index}.comment`)}></TextField>
+      </FormGroup>
+    </CriteriaRow>
   );
+}
+
+// Ratings component value always starts at 1, so subtract the difference between the min value and 1
+function convertMUIRatingToActual(value: number, min: number) {
+  const minOffset = 1 - min;
+  return value - minOffset;
+}
+
+function convertActualToMUIRating(value: number, min: number) {
+  const minOffset = 1 - min;
+  return value + minOffset;
 }

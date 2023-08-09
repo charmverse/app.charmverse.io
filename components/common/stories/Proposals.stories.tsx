@@ -11,13 +11,14 @@ import type { ProposalFormInputs } from 'components/proposals/components/Proposa
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
+import { UserProvider } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { createMockSpace } from 'testing/mocks/space';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories } from '../../../.storybook/lib/mockData';
+import { members, proposalCategories, userProfile } from '../../../.storybook/lib/mockData';
 
 export default {
   title: 'common/Proposals',
@@ -36,20 +37,20 @@ const reduxStore = mockStateStore([], {
 });
 
 function Context({ children }: { children: ReactNode }) {
+  // mock the current space since it usually relies on the URL
   const spaceContext = useRef<ICurrentSpaceContext>({
     isLoading: false,
     refreshCurrentSpace: () => {},
     space
   });
-  // useEffect(() => {
-  //   cache.set(`proposals/${space.id}/categories`, categories);
-  // }, []);
   return (
-    <CurrentSpaceContext.Provider value={spaceContext.current}>
-      <MembersProvider>
-        <Provider store={reduxStore}>{children}</Provider>
-      </MembersProvider>
-    </CurrentSpaceContext.Provider>
+    <UserProvider>
+      <CurrentSpaceContext.Provider value={spaceContext.current}>
+        <MembersProvider>
+          <Provider store={reduxStore}>{children}</Provider>
+        </MembersProvider>
+      </CurrentSpaceContext.Provider>
+    </UserProvider>
   );
 }
 
@@ -145,7 +146,7 @@ ProposalInEvaluation.parameters = {
             type: 'range',
             parameters: {
               min: 0,
-              max: 3
+              max: 10
             }
           },
           {
@@ -208,13 +209,16 @@ ProposalInEvaluation.parameters = {
           rubricCriteriaId: criteria.id,
           proposalId: criteria.proposalId,
           criteriaId: criteria.id,
-          userId: '',
+          userId: userProfile.id,
           comment: 'Nice job',
-          response: { score: 3 }
+          response: { score: criteria.parameters.max - 1 }
         }));
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
-          reviewers: [{ id: '', proposalId: '', roleId: null, userId: members[1].id }],
+          reviewers: [
+            { id: '1', proposalId: '', roleId: null, userId: userProfile.id },
+            { id: '2', proposalId: '', roleId: null, userId: members[0].id }
+          ],
           categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
           status: 'evaluation_active',

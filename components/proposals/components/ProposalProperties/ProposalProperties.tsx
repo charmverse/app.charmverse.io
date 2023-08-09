@@ -119,7 +119,6 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
-
   const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
