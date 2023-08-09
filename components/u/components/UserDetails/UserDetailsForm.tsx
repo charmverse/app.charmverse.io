@@ -1,15 +1,13 @@
 import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
@@ -17,7 +15,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import Link from 'components/common/Link';
 import { useIdentityTypes } from 'components/settings/account/components/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
@@ -33,7 +30,6 @@ import IdentityModal from '../IdentityModal';
 import { SocialInputs } from '../SocialInputs';
 import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
 import UserDescription from '../UserDescription';
-import UserPathModal from '../UserPathModal';
 
 import { useUpdateProfileAvatar } from './hooks/useUpdateProfileAvatar';
 import { useUserDetails } from './hooks/useUserDetails';
@@ -70,18 +66,10 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
 
   const identityTypes = useIdentityTypes();
 
-  const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
-
-  const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
   const { saveUser } = useUserDetails();
-
-  const onLinkCopy = () => {
-    setIsPersonalLinkCopied(true);
-    setTimeout(() => setIsPersonalLinkCopied(false), 1000);
-  };
 
   const setDescription = async (description: string) => {
     onChange({ description });
@@ -96,10 +84,6 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   };
 
   const disabled = isLoading;
-
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path;
-  const userLink = `${hostname}/u/${userPath}`;
 
   return (
     <>
@@ -124,25 +108,6 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
             </Typography>
           </EditIconContainer>
         </Grid>
-        <Grid item width='100%'>
-          <EditIconContainer onClick={userPathModalState.open}>
-            <Typography noWrap>
-              {hostname}/u/
-              <Link external href={userLink} target='_blank'>
-                {userPath}
-              </Link>
-            </Typography>
-            <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
-              <Box sx={{ display: 'grid' }}>
-                <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
-                  <IconButton>
-                    <ContentCopyIcon fontSize='small' />
-                  </IconButton>
-                </CopyToClipboard>
-              </Box>
-            </Tooltip>
-          </EditIconContainer>
-        </Grid>
         <Grid item>
           <UserDescription currentDescription={userDetails?.description} save={setDescription} readOnly={disabled} />
         </Grid>
@@ -159,15 +124,6 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
         }}
         identityTypes={identityTypes}
         identityType={(user?.identityType || 'Wallet') as IdentityType}
-      />
-      <UserPathModal
-        isOpen={userPathModalState.isOpen}
-        close={userPathModalState.close}
-        save={(path: string) => {
-          saveUser({ path });
-          userPathModalState.close();
-        }}
-        currentValue={user.path}
       />
     </>
   );
