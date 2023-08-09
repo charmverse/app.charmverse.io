@@ -90,7 +90,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 
 type Props = {
   readOnly?: boolean;
-  canEditOptions?: boolean;
+  canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
   noOptionsText?: string;
   options: IPropertyOption[];
@@ -105,7 +105,7 @@ type Props = {
 
 export function TagSelect({
   readOnly,
-  canEditOptions,
+  canEditOptions = false,
   options,
   propertyValue,
   multiselect = false,
@@ -182,7 +182,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      canEditOptions={canEditOptions} // TODO: allow editing options
+      canEditOptions={canEditOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen

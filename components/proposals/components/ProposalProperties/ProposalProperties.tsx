@@ -177,6 +177,9 @@ export function ProposalProperties({
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
+        },
+        '.octo-propertyname .Button': {
+          paddingLeft: 0
         }
       }}
       mt={2}
@@ -213,7 +216,10 @@ export function ProposalProperties({
         )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
           {!isTemplate && (
-            <Grid container mb={2} mt={2}>
+            <Box mt={2} mb={1}>
+              {/* <Box mb={1}>
+                <PropertyLabel readOnly>Status</PropertyLabel>
+              </Box> */}
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
@@ -221,11 +227,8 @@ export function ProposalProperties({
                 updateProposalStatus={updateProposalStatus}
                 evaluationType={proposalFormInputs.evaluationType}
               />
-            </Grid>
+            </Box>
           )}
-          <Grid container mb={1}>
-            <Typography variant='subtitle1'>Properties</Typography>
-          </Grid>
 
           {/* Select a category */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
