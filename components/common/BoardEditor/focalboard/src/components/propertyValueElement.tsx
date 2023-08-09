@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -8,8 +9,9 @@ import { EmptyPlaceholder } from 'components/common/BoardEditor/components/prope
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
@@ -31,6 +33,7 @@ type Props = {
   board: Board;
   readOnly: boolean;
   card: Card;
+  cardPage?: PageMeta;
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
@@ -41,11 +44,29 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
 };
 
+/**
+ * Hide these values if user is not an evalutor for the proposal
+ */
+const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
+  'proposalEvaluationAverage',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal'
+];
+
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
+  const { card, cardPage, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } =
+    props;
+
+  const { proposalIdsWhereUserIsEvaluator } = useProposalsWhereUserIsEvaluator({
+    spaceId:
+      !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
+        ? board.spaceId
+        : undefined
+  });
+
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
@@ -130,7 +151,7 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.type === 'person') {
+  } else if (propertyTemplate.type === 'person' || propertyTemplate.type === 'proposalEvaluatedBy') {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
@@ -226,6 +247,13 @@ function PropertyValueElement(props: Props) {
     return null;
   }
 
+  // Explicitly hide the value for this proposal
+  if (
+    hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any) &&
+    (!cardPage || !proposalIdsWhereUserIsEvaluator[(cardPage as any).syncWithPageId])
+  ) {
+    return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
+  }
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
