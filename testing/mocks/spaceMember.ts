@@ -2,8 +2,7 @@ import type { Member } from 'lib/members/interfaces';
 
 import { createMockUser } from './user';
 
-export function createMockSpaceMember(): Member {
-  const user = createMockUser();
+export function createMockSpaceMember(user = createMockUser()): Member {
   return {
     ...user,
     avatarTokenId: user.avatarTokenId ?? undefined,

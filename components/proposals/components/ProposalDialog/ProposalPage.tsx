@@ -182,6 +182,12 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
                     setProposalFormInputs={setFormInputs}
+                    onChangeRubricCriteria={(rubricCriteria) => {
+                      setFormInputs({
+                        ...formInputs,
+                        rubricCriteria
+                      });
+                    }}
                   />
                 </div>
               </div>

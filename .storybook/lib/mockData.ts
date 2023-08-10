@@ -8,8 +8,9 @@ import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { Member } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
 
-export const userProfile = createMockUser();
 export const spaces = [createMockSpace()];
+export const userProfile = createMockUser();
+export const userMemberProfile: Member = createMockSpaceMember(userProfile);
 export const members: Member[] = [
   createMockSpaceMember(),
   createMockSpaceMember(),

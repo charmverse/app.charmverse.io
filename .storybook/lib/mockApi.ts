@@ -2,13 +2,22 @@ import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@char
 import { rest } from 'msw';
 import type { SpacePermissionFlags } from '../../lib/permissions/spaces';
 
-import { spaces, members, spaceRoles, proposalCategories, proposalTemplates, userProfile, userTasks } from './mockData';
+import {
+  spaces,
+  members,
+  spaceRoles,
+  proposalCategories,
+  proposalTemplates,
+  userProfile,
+  userMemberProfile,
+  userTasks
+} from './mockData';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
 
 const spaceHandlers = {
   spaceMembers: rest.get(`/api/spaces/:spaceId/members`, (req, res, ctx) => {
-    return res(ctx.json(members));
+    return res(ctx.json([userMemberProfile, ...members]));
   }),
   spacePermissions: rest.get(`/api/permissions/space/:spaceId/compute`, (req, res, ctx) => {
     const permissions: SpacePermissionFlags = {

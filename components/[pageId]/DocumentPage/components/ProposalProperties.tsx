@@ -1,5 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { debounce } from 'lodash';
+import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
@@ -81,6 +83,15 @@ export function ProposalProperties({
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
+  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+    if (proposal) {
+      // @ts-ignore TODO: unify types for rubricCriteria
+      await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
+    }
+  }
+
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
+
   return (
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
@@ -104,6 +115,7 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
+      onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
       canAnswerRubric={canAnswerRubric}
