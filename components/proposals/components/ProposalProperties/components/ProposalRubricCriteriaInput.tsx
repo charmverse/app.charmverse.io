@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { CloseOutlined as DeleteIcon } from '@mui/icons-material';
 import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 
 export type RangeProposalCriteria = {
   id: string;
@@ -22,6 +23,7 @@ type Props = {
   proposalStatus?: ProposalStatus;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
+  answers: ProposalRubricCriteriaAnswer[];
 };
 
 export const CriteriaRow = styled(Box)`
@@ -50,11 +52,10 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposalStatus }: Props) {
+export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposalStatus, answers }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
-
   function addCriteria() {
     if (readOnly) {
       return;
@@ -63,6 +64,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
+      description: '',
       title: '',
       type: 'range',
       parameters
@@ -73,7 +75,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
   }
 
   function deleteCriteria(id: string) {
-    if (readOnly) {
+    if (readOnly || !id) {
       return;
     }
     setRubricCriteriaIdToDelete(null);
@@ -91,7 +93,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
     if (criteria) {
       Object.assign(criteria, updates);
       setCriteriaList([...criteriaList]);
-      if (criteriaList.every(isValidCriteria)) {
+      if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
         onChange(criteriaList);
       }
     }
@@ -141,94 +143,101 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
   return (
     <>
       {criteriaList.map((criteria) => (
-        <CriteriaRow key={criteria.id} display='flex' alignItems='flex-start' gap={1} mb={1}>
-          <TextInput
-            inputProps={{ autoFocus: true }}
-            displayType='details'
-            fullWidth={false}
-            onChange={(title) => setCriteriaProperty(criteria.id, { title })}
-            placeholderText='Add a label...'
-            readOnly={readOnly}
-            value={criteria.title}
-          />
-          <Box maxHeight='3em'>
+        <Box key={criteria.id} display='flex' flexDirection='column'>
+          <CriteriaRow display='flex' alignItems='flex-start' gap={1} mb={1}>
             <TextInput
-              multiline={false}
-              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-              placeholderText='Add a description...'
+              inputProps={{ autoFocus: true }}
+              displayType='details'
+              fullWidth={false}
+              onChange={(title) => setCriteriaProperty(criteria.id, { title })}
+              placeholderText='Add a label...'
               readOnly={readOnly}
-              sx={{ flexGrow: 1, width: '100%' }}
-              value={criteria.description ?? ''}
+              value={criteria.title}
             />
-          </Box>
-          <Box display='flex' gap={1} alignItems='flex-start'>
-            <Grid container width={90} spacing={1}>
-              <Grid xs item>
-                <div>
-                  <IntegerInput
-                    // store props on DOM for keyboard events
-                    inputProps={{
-                      'data-criteria': criteria.id,
-                      'data-parameter-type': 'min'
-                    }}
-                    onChange={(min) => {
-                      setCriteriaProperty(criteria.id, {
-                        parameters: { ...criteria.parameters, min }
-                      });
-                    }}
-                    readOnly={readOnly}
-                    value={criteria.parameters.min}
-                  />
-                  <Typography
-                    align='center'
-                    component='div'
-                    className='show-on-hover'
-                    color='secondary'
-                    variant='caption'
-                  >
-                    min
-                  </Typography>
-                </div>
+            <Box maxHeight='3em'>
+              <TextInput
+                multiline={false}
+                onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+                placeholderText='Add a description...'
+                readOnly={readOnly}
+                sx={{ flexGrow: 1, width: '100%' }}
+                value={criteria.description ?? ''}
+              />
+            </Box>
+            <Box display='flex' gap={1} alignItems='flex-start'>
+              <Grid container width={90} spacing={1}>
+                <Grid xs item>
+                  <div>
+                    <IntegerInput
+                      // store props on DOM for keyboard events
+                      inputProps={{
+                        'data-criteria': criteria.id,
+                        'data-parameter-type': 'min'
+                      }}
+                      onChange={(min) => {
+                        if (min !== null) {
+                          setCriteriaProperty(criteria.id, {
+                            parameters: { ...criteria.parameters, min }
+                          });
+                        }
+                      }}
+                      readOnly={readOnly}
+                      value={criteria.parameters.min}
+                    />
+                    <Typography
+                      align='center'
+                      component='div'
+                      className='show-on-hover'
+                      color='secondary'
+                      variant='caption'
+                    >
+                      min
+                    </Typography>
+                  </div>
+                </Grid>
+                <Grid xs item>
+                  <div className='to-pseudo-element'>
+                    <IntegerInput
+                      // store props on DOM for keyboard events
+                      inputProps={{
+                        'data-criteria': criteria.id,
+                        'data-parameter-type': 'max',
+                        min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
+                      }}
+                      onChange={(max) => {
+                        if (max !== null) {
+                          setCriteriaProperty(criteria.id, {
+                            parameters: { ...criteria.parameters, max }
+                          });
+                        }
+                      }}
+                      readOnly={readOnly}
+                      value={criteria.parameters.max}
+                    />
+                    <Typography
+                      align='center'
+                      component='div'
+                      className='show-on-hover'
+                      variant='caption'
+                      color='secondary'
+                    >
+                      max
+                    </Typography>
+                  </div>
+                </Grid>
               </Grid>
-              <Grid xs item>
-                <div className='to-pseudo-element'>
-                  <IntegerInput
-                    // store props on DOM for keyboard events
-                    inputProps={{
-                      'data-criteria': criteria.id,
-                      'data-parameter-type': 'max'
-                    }}
-                    onChange={(max) => {
-                      setCriteriaProperty(criteria.id, {
-                        parameters: { ...criteria.parameters, max }
-                      });
-                    }}
-                    readOnly={readOnly}
-                    value={criteria.parameters.max}
-                  />
-                  <Typography
-                    align='center'
-                    component='div'
-                    className='show-on-hover'
-                    color='secondary'
-                    variant='caption'
-                  >
-                    max
-                  </Typography>
-                </div>
-              </Grid>
-            </Grid>
-          </Box>
-          {!readOnly && (
-            <div className='show-on-hover delete-icon'>
-              <Tooltip title='Delete'>
-                <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
-                  <DeleteIcon color='secondary' fontSize='small' />
-                </IconButton>
-              </Tooltip>
-            </div>
-          )}
-        </CriteriaRow>
+            </Box>
+            {!readOnly && (
+              <div className='show-on-hover delete-icon'>
+                <Tooltip title='Delete'>
+                  <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
+                    <DeleteIcon color='secondary' fontSize='small' />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            )}
+          </CriteriaRow>
+        </Box>
       ))}
       {!readOnly && (
         <ConfirmDeleteModal
@@ -271,7 +280,9 @@ export function IntegerInput({
       inputProps={inputProps}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
-      sx={{ input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth } }}
+      sx={{
+        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth }
+      }}
       value={value?.toString() || ''}
     />
   );
@@ -281,19 +292,34 @@ function getNumberFromString(strValue: string): number | null {
   const parsedString = parseInt(strValue, 10);
   return parsedString || parsedString === 0 ? parsedString : null;
 }
-function isValidCriteria(criteria: RangeProposalCriteria) {
-  if (criteria.type === 'range') {
+function isValidCriteria(criteria: RangeProposalCriteria, rubricAnswers: ProposalRubricCriteriaAnswer[]) {
+  const min = criteria.parameters.min;
+  const max = criteria.parameters.max;
+  for (const answer of rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[]) {
     if (
-      (!criteria.parameters.min && criteria.parameters.min !== 0) ||
-      (!criteria.parameters.max && criteria.parameters.max !== 0)
+      (answer.rubricCriteriaId === criteria.id && typeof min === 'number' && answer.response.score < min) ||
+      (typeof max === 'number' && answer.response.score > max)
     ) {
-      // Range values are invalid
-      return false;
-    }
-    if (criteria.parameters.min >= criteria.parameters.max) {
-      // Minimum must be less than Maximum
       return false;
     }
   }
-  return true;
+
+  const criteriaAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
+
+  if (criteriaAnswers.length === 0) {
+    if (criteria.type === 'range') {
+      if (
+        (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+        (!criteria.parameters.max && criteria.parameters.max !== 0)
+      ) {
+        // Range values are invalid
+        return false;
+      }
+      if (criteria.parameters.min >= criteria.parameters.max) {
+        // Minimum must be less than Maximum
+        return false;
+      }
+    }
+    return true;
+  }
 }
