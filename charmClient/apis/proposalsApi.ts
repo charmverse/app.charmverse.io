@@ -1,4 +1,3 @@
-import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ProposalCategoryWithPermissions,
@@ -6,6 +5,7 @@ import type {
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
 import type { Page, ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { PageWithProposal } from 'lib/pages';

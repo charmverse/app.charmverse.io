@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/dist/cjs/errors';
-import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
+import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
