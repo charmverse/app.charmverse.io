@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -28,6 +29,7 @@ import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
   board: Board;
+  cardPage?: PageMeta;
   card: Card;
   cards: Card[];
   activeView?: BoardView;
@@ -67,8 +69,10 @@ function CardDetailProperty({
   pageUpdatedBy,
   pageUpdatedAt,
   deleteDisabledMessage,
-  onDrop
+  onDrop,
+  cardPage
 }: {
+  cardPage?: PageMeta;
   readOnly: boolean;
   property: IPropertyTemplate;
   card: Card;
@@ -127,6 +131,7 @@ function CardDetailProperty({
       )}
       <PropertyValueElement
         readOnly={readOnly}
+        cardPage={cardPage}
         card={card}
         board={board}
         updatedAt={pageUpdatedAt}
@@ -140,7 +145,7 @@ function CardDetailProperty({
 }
 
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
+  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, cardPage } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -352,6 +357,7 @@ function CardDetailProperties(props: Props) {
       {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
+            cardPage={cardPage}
             onDrop={onDrop}
             key={propertyTemplate.id}
             board={board}

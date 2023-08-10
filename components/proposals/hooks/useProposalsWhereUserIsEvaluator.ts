@@ -9,13 +9,21 @@ export function useProposalsWhereUserIsEvaluator({ spaceId }: { spaceId?: string
   );
 
   const proposalsEvaluatedByUserMapped = useMemo(() => {
-    return (proposalIdsEvaluatedByUser ?? []).reduce((acc, val) => {
+    return (proposalIdsEvaluatedByUser?.userIsEvaluator ?? []).reduce((acc, val) => {
+      acc[val] = val;
+      return acc;
+    }, {} as Record<string, string>);
+  }, [proposalIdsEvaluatedByUser]);
+
+  const proposalsNotEvaluatedByUserMapped = useMemo(() => {
+    return (proposalIdsEvaluatedByUser?.userIsNotEvaluator ?? []).reduce((acc, val) => {
       acc[val] = val;
       return acc;
     }, {} as Record<string, string>);
   }, [proposalIdsEvaluatedByUser]);
 
   return {
-    proposalIdsWhereUserIsEvaluator: proposalsEvaluatedByUserMapped
+    rubricProposalIdsWhereUserIsEvaluator: proposalsEvaluatedByUserMapped,
+    rubricProposalIdsWhereUserIsNotEvaluator: proposalsNotEvaluatedByUserMapped
   };
 }

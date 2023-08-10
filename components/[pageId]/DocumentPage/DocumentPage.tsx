@@ -283,6 +283,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       {card && board && (
                         <>
                           <CardDetailProperties
+                            cardPage={page}
                             board={board}
                             card={card}
                             cards={cards}

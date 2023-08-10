@@ -4,6 +4,11 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
+export type RubricProposalsUserInfo = {
+  userIsEvaluator: string[];
+  userIsNotEvaluator: string[];
+};
+
 /**
  * Get all proposals where user is an evaluator and evaluationType is Rubric
  */
@@ -13,7 +18,7 @@ export async function getProposalIdsEvaluatedByUser({
 }: {
   userId: string;
   spaceId: string;
-}): Promise<string[]> {
+}): Promise<RubricProposalsUserInfo> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Valid spaceId is required`);
   }
@@ -21,7 +26,7 @@ export async function getProposalIdsEvaluatedByUser({
   const { spaceRole } = await hasAccessToSpace({ spaceId, userId });
 
   if (!spaceRole || spaceRole.isGuest) {
-    return [];
+    return { userIsEvaluator: [], userIsNotEvaluator: [] };
   }
 
   const isFreeSpace = await prisma.space.findUnique({
@@ -33,7 +38,7 @@ export async function getProposalIdsEvaluatedByUser({
     }
   });
 
-  return prisma.proposal
+  const proposalsWhereUserIsEvaluator = await prisma.proposal
     .findMany({
       where: isFreeSpace
         ? {
@@ -75,6 +80,21 @@ export async function getProposalIdsEvaluatedByUser({
     })
     .then((data) => data.map((proposal) => proposal.id));
 
-  // const hasAcce;
-  // return prisma;
+  const proposalsWhereUserIsNotEvaluator = await prisma.proposal.findMany({
+    where: {
+      spaceId,
+      evaluationType: 'rubric',
+      id: {
+        notIn: proposalsWhereUserIsEvaluator
+      }
+    },
+    select: {
+      id: true
+    }
+  });
+
+  return {
+    userIsEvaluator: proposalsWhereUserIsEvaluator,
+    userIsNotEvaluator: proposalsWhereUserIsNotEvaluator.map((p) => p.id)
+  };
 }

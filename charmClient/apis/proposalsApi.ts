@@ -13,6 +13,7 @@ import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
+import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
@@ -63,7 +64,7 @@ export class ProposalsApi {
   }
 
   getProposalIdsEvaluatedByUser(spaceId: string) {
-    return http.GET<string[]>(`/api/spaces/${spaceId}/proposals-evaluated-by-user`);
+    return http.GET<RubricProposalsUserInfo>(`/api/spaces/${spaceId}/proposals-evaluated-by-user`);
   }
 
   archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {

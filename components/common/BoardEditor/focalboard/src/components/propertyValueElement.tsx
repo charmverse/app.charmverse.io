@@ -60,12 +60,13 @@ function PropertyValueElement(props: Props) {
   const { card, cardPage, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } =
     props;
 
-  const { proposalIdsWhereUserIsEvaluator } = useProposalsWhereUserIsEvaluator({
-    spaceId:
-      !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
-        ? board.spaceId
-        : undefined
-  });
+  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
+    useProposalsWhereUserIsEvaluator({
+      spaceId:
+        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
+          ? board.spaceId
+          : undefined
+    });
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -250,7 +251,7 @@ function PropertyValueElement(props: Props) {
   // Explicitly hide the value for this proposal
   if (
     hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any) &&
-    (!cardPage || !proposalIdsWhereUserIsEvaluator[(cardPage as any).syncWithPageId])
+    (!cardPage || !!rubricProposalIdsWhereUserIsNotEvaluator[(cardPage as any).syncWithPageId])
   ) {
     return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
   }
