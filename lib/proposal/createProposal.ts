@@ -17,7 +17,7 @@ import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
-type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
+type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId'>>;
 
 export type CreateProposalInput = {
   pageId?: string;
@@ -104,6 +104,7 @@ export async function createProposal({
         proposalId,
         contentText: pageProps?.contentText ?? '',
         path: getPagePath(),
+        sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',
         updatedBy: userId,
         createdBy: userId,
