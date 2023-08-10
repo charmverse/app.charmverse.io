@@ -93,15 +93,14 @@ export function SetupCustomDomain({ space }: { space: Space }) {
     <Stack mt={3}>
       <Stack direction='row' gap={1}>
         <FieldLabel>Custom space URL domain</FieldLabel>
-        <Stack mt={-0.1}>
+        <Stack>
           <UpgradeChip upgradeContext='custom_domain' />
         </Stack>
       </Stack>
-      <Typography variant='caption' color='text.secondary' mb={1}>
+      <Typography variant='caption' color='text.secondary' mb={2}>
         Add a custom domain you own to access your app thorugh it. You will be prompted with further instructions after
         saving.
       </Typography>
-
       <UpgradeWrapper upgradeContext='custom_domain'>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack direction='row' alignItems='start' spacing={1}>

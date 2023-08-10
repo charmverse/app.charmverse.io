@@ -39,7 +39,8 @@ import TrashModal from '../TrashModal';
 
 import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
-import { STATIC_PAGES } from './utils/staticPages';
+import type { FeatureJson } from './utils/staticPages';
+import { STATIC_PAGES_RECORD } from './utils/staticPages';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -281,28 +282,31 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                     />
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
-                  {STATIC_PAGES.map((page) => {
-                    if (
-                      !space.hiddenFeatures.includes(page.feature) &&
-                      (showMemberFeatures ||
-                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                        (page.path === 'forum' && categories.length > 0))
-                    ) {
-                      return (
-                        <SidebarLink
-                          key={page.path}
-                          href={`/${space.domain}/${page.path}`}
-                          active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                          icon={<PageIcon icon={null} pageType={page.path} />}
-                          label={page.title}
-                          onClick={navAction}
-                          data-test={`sidebar-link-${page.path}`}
-                        />
-                      );
-                    }
+                  {(space.features as FeatureJson[])
+                    .filter((mp) => !mp.isHidden)
+                    .map(({ id }) => {
+                      const page = STATIC_PAGES_RECORD[id];
+                      if (
+                        page &&
+                        (showMemberFeatures ||
+                          // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                          (page.path === 'forum' && categories.length > 0))
+                      ) {
+                        return (
+                          <SidebarLink
+                            key={page.path}
+                            href={`/${space.domain}/${page.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${page.path}`)}
+                            icon={<PageIcon icon={null} pageType={page.path} />}
+                            label={page.title}
+                            onClick={navAction}
+                            data-test={`sidebar-link-${page.path}`}
+                          />
+                        );
+                      }
 
-                    return null;
-                  })}
+                      return null;
+                    })}
                 </>
               )}
             </Box>
