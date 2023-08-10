@@ -3,13 +3,21 @@ import { mean, sum } from 'lodash';
 
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 
-type Reviewer = { id: string };
+/**
+ * null if no answers available
+ */
+export type NumericResults = { sum: number | null; average: number | null };
 
-export type ReviewerResults = {
+export type ReviewerResults = NumericResults & {
   id: string;
   answersMap: Record<string, { score: number | undefined; comment: string | null }>;
-  average: number | null;
-  sum: number | null; // null if there is no answer
+};
+
+/**
+ * A map of results by userId
+ */
+export type AggregateResults = {
+  reviewerResults: Record<string, ReviewerResults>;
 };
 
 export function aggregateResults({
