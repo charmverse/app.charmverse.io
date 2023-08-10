@@ -220,7 +220,7 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
 }) {
   if (parentId) {
     const pageNode = getNodeFromJson(content);
-    const lastValidPos = pageNode.content.size - (pageNode.lastChild?.nodeSize ?? 0);
+    const lastValidPos = pageNode.content.size;
     const updatedNode = applyStepsToNode(
       generateInsertNestedPageDiffs({ pageId: restoredPageId, pos: lastValidPos }),
       pageNode
