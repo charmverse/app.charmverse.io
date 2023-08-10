@@ -142,7 +142,7 @@ const KanbanCard = React.memo((props: Props) => {
               board={board}
               readOnly={true}
               card={card}
-              cardPage={cardPage}
+              syncWithPageId={cardPage?.syncWithPageId}
               updatedAt={cardPage?.updatedAt.toString() || ''}
               updatedBy={cardPage?.updatedBy || ''}
               propertyTemplate={template}

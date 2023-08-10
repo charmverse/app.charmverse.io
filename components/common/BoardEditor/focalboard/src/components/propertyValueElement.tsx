@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -33,7 +32,7 @@ type Props = {
   board: Board;
   readOnly: boolean;
   card: Card;
-  cardPage?: PageMeta;
+  syncWithPageId?: string | null;
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
@@ -57,8 +56,17 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-  const { card, cardPage, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } =
-    props;
+  const {
+    card,
+    syncWithPageId,
+    propertyTemplate,
+    readOnly,
+    showEmptyPlaceholder,
+    board,
+    updatedBy,
+    updatedAt,
+    displayType
+  } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
     useProposalsWhereUserIsEvaluator({
@@ -157,7 +165,11 @@ function PropertyValueElement(props: Props) {
       <UserSelect
         displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        readOnly={
+          readOnly ||
+          (displayType !== 'details' && displayType !== 'table') ||
+          propertyTemplate.type === 'proposalEvaluatedBy'
+        }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -249,11 +261,14 @@ function PropertyValueElement(props: Props) {
   }
 
   // Explicitly hide the value for this proposal
-  if (
-    hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any) &&
-    (!cardPage || !!rubricProposalIdsWhereUserIsNotEvaluator[(cardPage as any).syncWithPageId])
-  ) {
-    return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
+  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
+    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId]) {
+      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
+    } else if (syncWithPageId && !!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId]) {
+      return propertyValueElement;
+    } else {
+      return null;
+    }
   }
   if (props.showTooltip) {
     return (

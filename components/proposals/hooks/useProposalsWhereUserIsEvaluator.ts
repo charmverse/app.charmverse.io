@@ -4,8 +4,9 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 
 export function useProposalsWhereUserIsEvaluator({ spaceId }: { spaceId?: string }) {
-  const { data: proposalIdsEvaluatedByUser } = useSWR(spaceId ? `proposals/${spaceId}` : null, () =>
-    charmClient.proposals.getProposalIdsEvaluatedByUser(spaceId as string)
+  const { data: proposalIdsEvaluatedByUser } = useSWR(
+    spaceId ? `spaces/${spaceId}/proposals-evaluated-by-user` : null,
+    () => charmClient.proposals.getProposalIdsEvaluatedByUser(spaceId as string)
   );
 
   const proposalsEvaluatedByUserMapped = useMemo(() => {

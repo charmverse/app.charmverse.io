@@ -203,7 +203,7 @@ function TableRow(props: Props) {
             )}
             <PropertyValueElement
               readOnly={props.readOnly}
-              cardPage={cardPage}
+              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               board={board}
               showEmptyPlaceholder={false}

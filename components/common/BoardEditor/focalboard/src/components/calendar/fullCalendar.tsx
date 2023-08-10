@@ -154,7 +154,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
           return (
             <PropertyValueElement
               board={board}
-              cardPage={page}
+              syncWithPageId={page?.syncWithPageId}
               key={template.id}
               readOnly={true}
               card={card}

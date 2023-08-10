@@ -29,7 +29,7 @@ import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
   board: Board;
-  cardPage?: PageMeta;
+  syncWithPageId?: string | null;
   card: Card;
   cards: Card[];
   activeView?: BoardView;
@@ -70,9 +70,9 @@ function CardDetailProperty({
   pageUpdatedAt,
   deleteDisabledMessage,
   onDrop,
-  cardPage
+  syncWithPageId
 }: {
-  cardPage?: PageMeta;
+  syncWithPageId?: string | null;
   readOnly: boolean;
   property: IPropertyTemplate;
   card: Card;
@@ -131,7 +131,7 @@ function CardDetailProperty({
       )}
       <PropertyValueElement
         readOnly={readOnly}
-        cardPage={cardPage}
+        syncWithPageId={syncWithPageId}
         card={card}
         board={board}
         updatedAt={pageUpdatedAt}
@@ -145,7 +145,7 @@ function CardDetailProperty({
 }
 
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, cardPage } = props;
+  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, syncWithPageId } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -357,7 +357,7 @@ function CardDetailProperties(props: Props) {
       {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
-            cardPage={cardPage}
+            syncWithPageId={syncWithPageId}
             onDrop={onDrop}
             key={propertyTemplate.id}
             board={board}
