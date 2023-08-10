@@ -28,11 +28,11 @@ export class ProposalsApi {
   }
 
   upsertRubricCriteriaAnswer({ proposalId, answers }: Omit<RubricAnswerUpsert, 'userId'>) {
-    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answer`, { answers });
+    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answers`, { answers });
   }
 
   deleteRubricCriteriaAnswer({ proposalId, rubricCriteriaId }: { proposalId: string; rubricCriteriaId: string }) {
-    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`, { rubricCriteriaId });
+    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answers`, { rubricCriteriaId });
   }
 
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
@@ -52,7 +52,7 @@ export class ProposalsApi {
   }
 
   getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
-    return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
+    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
   getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {

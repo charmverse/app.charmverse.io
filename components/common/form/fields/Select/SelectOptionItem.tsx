@@ -10,7 +10,6 @@ type Props = {
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
   onToggleOptionEdit?: (isOpened: boolean) => void;
-  isEditable?: boolean;
 };
 
 export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {

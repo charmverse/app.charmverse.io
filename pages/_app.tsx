@@ -27,6 +27,7 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
@@ -234,25 +235,27 @@ function DataProviders({ children }: { children: ReactNode }) {
             <Web3ConnectionManager>
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <PostCategoriesProvider>
-                    <IsSpaceMemberProvider>
-                      <WebSocketClientProvider>
-                        <MembersProvider>
-                          <BountiesProvider>
-                            <PaymentMethodsProvider>
-                              <PagesProvider>
-                                <MemberPropertiesProvider>
-                                  <UserProfileProvider>
-                                    <PageTitleProvider>{children}</PageTitleProvider>
-                                  </UserProfileProvider>
-                                </MemberPropertiesProvider>
-                              </PagesProvider>
-                            </PaymentMethodsProvider>
-                          </BountiesProvider>
-                        </MembersProvider>
-                      </WebSocketClientProvider>
-                    </IsSpaceMemberProvider>
-                  </PostCategoriesProvider>
+                  <CurrentSpaceProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <PaymentMethodsProvider>
+                                <PagesProvider>
+                                  <MemberPropertiesProvider>
+                                    <UserProfileProvider>
+                                      <PageTitleProvider>{children}</PageTitleProvider>
+                                    </UserProfileProvider>
+                                  </MemberPropertiesProvider>
+                                </PagesProvider>
+                              </PaymentMethodsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
+                  </CurrentSpaceProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
