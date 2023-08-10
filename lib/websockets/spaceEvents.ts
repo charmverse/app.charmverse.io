@@ -12,8 +12,8 @@ import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
+import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
-import { docRooms } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 
 export class SpaceEventHandler {
@@ -21,8 +21,11 @@ export class SpaceEventHandler {
 
   userId: string | null = null;
 
-  constructor(private socket: Socket) {
+  docRooms: Map<string | undefined, DocumentRoom> = new Map();
+
+  constructor(private socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
     this.socket = socket;
+    this.docRooms = docRooms;
   }
 
   init() {
@@ -60,11 +63,11 @@ export class SpaceEventHandler {
         const pageId = message.payload.id;
         const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
           id: pageId,
-          userId: this.userId
+          userId: this.userId,
+          docRooms: this.docRooms
         });
 
-        if (documentRoom && participant && parentId && position !== null) {
-          // TODO: Should this be handleDiff or handleMessage?
+        if (documentRoom && participant && position !== null) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -111,7 +114,8 @@ export class SpaceEventHandler {
       try {
         const { pageNode, documentRoom, participant, parentId, content, spaceId } = await getPageDetails({
           id: pageId,
-          userId: this.userId
+          userId: this.userId,
+          docRooms: this.docRooms
         });
 
         // Get the position from the NodeRange object
@@ -298,7 +302,15 @@ async function applyNestedPageReplaceDiffAndSaveDocument({
   });
 }
 
-async function getPageDetails({ id, userId }: { userId: string; id: string }) {
+async function getPageDetails({
+  id,
+  userId,
+  docRooms
+}: {
+  docRooms: Map<string | undefined, DocumentRoom>;
+  userId: string;
+  id: string;
+}) {
   const page = await prisma.page.findUniqueOrThrow({
     where: {
       id

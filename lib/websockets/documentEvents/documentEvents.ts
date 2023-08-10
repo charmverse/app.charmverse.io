@@ -1,4 +1,3 @@
-import type { Node } from '@bangle.dev/pm';
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -16,6 +15,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { AuthenticatedSocketData } from '../authentication';
 import { relay } from '../relay';
 
+import type { DocumentRoom } from './docRooms';
 import type {
   ClientCheckVersionMessage,
   ClientDiffMessage,
@@ -37,25 +37,6 @@ type SocketSessionData = AuthenticatedSocketData & {
   permissions: Partial<PagePermissionFlags>;
 };
 
-type DocumentRoom = {
-  // eslint-disable-next-line no-use-before-define
-  participants: Map<string, DocumentEventHandler>;
-  doc: {
-    id: string;
-    spaceId: string;
-    version: number;
-    content: any;
-    type: string;
-    galleryImage: string | null;
-    hasContent: boolean;
-    diffs: ClientDiffMessage[];
-  };
-  lastSavedVersion?: number;
-  node: Node;
-};
-
-export const docRooms = new Map<string | undefined, DocumentRoom>();
-
 export class DocumentEventHandler {
   id: string;
 
@@ -73,6 +54,8 @@ export class DocumentEventHandler {
     lastTen: []
   };
 
+  docRooms: Map<string | undefined, DocumentRoom> = new Map();
+
   // store session data on the socket from socket-io
   getSession() {
     return this.socket.data as SocketSessionData;
@@ -80,7 +63,7 @@ export class DocumentEventHandler {
 
   getSessionMeta() {
     const session = this.getSession();
-    const docRoom = docRooms.get(session.documentId);
+    const docRoom = this.docRooms.get(session.documentId);
     return {
       socketId: this.id,
       userId: session.user?.id,
@@ -98,7 +81,7 @@ export class DocumentEventHandler {
 
   getDocumentRoom() {
     const docId = this.getSession().documentId;
-    return docRooms.get(docId);
+    return this.docRooms.get(docId);
   }
 
   getDocumentRoomOrThrow() {
@@ -109,10 +92,10 @@ export class DocumentEventHandler {
     return room;
   }
 
-  constructor(socket: Socket) {
+  constructor(socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
     this.id = socket.id;
     this.socket = socket;
-
+    this.docRooms = docRooms;
     // set up socket data
     // this.socket.data.user is set by the authentication middleware
     this.socket.data.permissions = {}; // set empty permissions
@@ -219,7 +202,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    if (!docRooms.has(session.documentId)) {
+    if (!this.docRooms.has(session.documentId)) {
       log.error('Ignoring message from closed document - this is unusual', {
         socketId: this.id,
         message,
@@ -281,7 +264,7 @@ export class DocumentEventHandler {
 
       this.setSession({ documentId: pageId, permissions });
 
-      const docRoom = docRooms.get(pageId);
+      const docRoom = this.docRooms.get(pageId);
       if (docRoom && docRoom.participants.size > 0) {
         log.debug('Join existing document room', {
           pageId,
@@ -318,7 +301,7 @@ export class DocumentEventHandler {
           node: getNodeFromJson(content),
           participants
         };
-        docRooms.set(pageId, room);
+        this.docRooms.set(pageId, room);
       }
 
       this.sendMessage({ type: 'subscribed' });
@@ -329,7 +312,7 @@ export class DocumentEventHandler {
           socketId: this.id,
           pageId,
           userId,
-          pageVersion: docRooms.get(pageId)?.doc.version
+          pageVersion: this.docRooms.get(pageId)?.doc.version
         });
       }
       this.handleParticipantUpdate();
@@ -431,14 +414,12 @@ export class DocumentEventHandler {
         // Go through the diffs and see if any of them are for deleting a page.
         for (const ds of message.ds) {
           if (ds.stepType === 'replace') {
-            if (ds.slice?.content) {
+            // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
+            // Otherwise the page was created by the user manually
+            if (ds.slice?.content && (ds.from === ds.to || restorePage)) {
               ds.slice.content.forEach((node) => {
                 if (node.type === 'page') {
-                  // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
-                  // Otherwise the page was created by the user manually
-                  if (ds.from === ds.to || restorePage) {
-                    restoredPageIds.push(node.attrs?.id);
-                  }
+                  restoredPageIds.push(node.attrs?.id);
                 }
               });
             } else if (ds.from + 1 === ds.to) {
@@ -487,6 +468,7 @@ export class DocumentEventHandler {
         if (room.doc.version % this.docSaveInterval === 0) {
           await this.saveDocument();
         }
+
         if (deletedPageIds.length) {
           await archivePages({
             pageIds: deletedPageIds,
@@ -686,7 +668,7 @@ export class DocumentEventHandler {
         // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
         setTimeout(() => {
           if (room.participants.size === 0) {
-            docRooms.delete(room.doc.id);
+            this.docRooms.delete(room.doc.id);
           }
         }, 100);
       } else {
