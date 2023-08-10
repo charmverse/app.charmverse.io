@@ -1,5 +1,5 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip';
 
 import {
   proposalStatusDetails,
-  PROPOSAL_STATUSES,
+  getProposalStatuses,
   PROPOSAL_STATUS_LABELS
 } from 'lib/proposal/proposalStatusTransition';
 
@@ -18,6 +18,7 @@ type Props = {
   openVoteModal?: () => void;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   archived?: boolean | null;
+  evaluationType?: ProposalEvaluationType;
 };
 
 export function ProposalStepSummary({
@@ -25,11 +26,13 @@ export function ProposalStepSummary({
   proposalFlowFlags,
   openVoteModal,
   updateProposalStatus,
-  archived
+  archived,
+  evaluationType
 }: Props) {
-  const currentStatusIndex = proposalStatus ? PROPOSAL_STATUSES.indexOf(proposalStatus) : -1;
-  const nextStatus = PROPOSAL_STATUSES[currentStatusIndex + 1];
-  const previousStatus = PROPOSAL_STATUSES[currentStatusIndex - 1];
+  const statuses = getProposalStatuses(evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
+  const nextStatus = statuses[currentStatusIndex + 1];
+  const previousStatus = statuses[currentStatusIndex - 1];
 
   const showActions =
     (nextStatus && proposalFlowFlags?.[nextStatus]) || (previousStatus && proposalFlowFlags?.[previousStatus]);

@@ -202,7 +202,7 @@ export function UserAndRoleSelect({
   // TODO: maybe we don't need a separate component for un-open state?
   if (variant === 'standard' && !isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
+      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
         <Stack gap={0.5}>
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>

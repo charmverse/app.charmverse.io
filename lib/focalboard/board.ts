@@ -52,8 +52,8 @@ export const propertyTypesList: PropertyType[] = [
   ...proposalPropertyTypesList
 ];
 
-interface IPropertyOption {
-  id: string;
+interface IPropertyOption<T = string> {
+  id: T;
   value: string;
   color: string;
 }

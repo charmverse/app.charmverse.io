@@ -27,13 +27,15 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
   const router = useRouter();
   const { user } = useUser();
   const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
-    title: '',
+    authors: user ? [user.id] : [],
+    categoryId: null,
     content: null,
     contentText: '',
-    categoryId: null,
-    authors: user ? [user.id] : [],
+    evaluationType: 'vote',
+    proposalTemplateId: null,
     reviewers: [],
-    proposalTemplateId: null
+    rubricCriteria: [],
+    title: ''
   });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -49,13 +51,15 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
   function close() {
     onClose();
     setFormInputs({
-      title: '',
+      authors: [],
+      categoryId: null,
       content: null,
       contentText: '',
-      categoryId: null,
-      authors: [],
+      evaluationType: 'vote',
+      proposalTemplateId: null,
       reviewers: [],
-      proposalTemplateId: null
+      rubricCriteria: [],
+      title: ''
     });
     setContentUpdated(false);
     setShowConfirmDialog(false);

@@ -20,27 +20,26 @@ import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCrite
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  upsertRubricCriteria(update: RubricCriteriaUpsert) {
-    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(
-      `/api/proposals/${update.proposalId}/rubric-criteria`,
-      update.rubricCriteria
-    );
+  upsertRubricCriteria({ proposalId, rubricCriteria }: RubricCriteriaUpsert) {
+    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(`/api/proposals/${proposalId}/rubric-criteria`, {
+      rubricCriteria
+    });
   }
 
   upsertRubricCriteriaAnswer({ proposalId, answers }: Omit<RubricAnswerUpsert, 'userId'>) {
-    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answer`, { answers });
+    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answers`, { answers });
   }
 
   deleteRubricCriteriaAnswer({ proposalId, rubricCriteriaId }: { proposalId: string; rubricCriteriaId: string }) {
-    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answer`, { rubricCriteriaId });
+    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answers`, { rubricCriteriaId });
   }
 
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
-  updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
-    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
+  updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
+    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, rest);
   }
 
   getProposal(proposalId: string) {
@@ -52,7 +51,7 @@ export class ProposalsApi {
   }
 
   getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
-    return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
+    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
   }
 
   getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
