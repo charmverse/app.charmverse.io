@@ -4,6 +4,7 @@ import { Menu, MenuItem } from '@mui/material';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/legacy/image';
+import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
@@ -21,6 +22,7 @@ const HeaderBox = styled.div`
 `;
 
 export function Header() {
+  const router = useRouter();
   const theme = useTheme();
   const logo = theme.palette.mode === 'dark' ? whiteLogoImage : darkLogoImage;
   return (
@@ -33,12 +35,13 @@ export function Header() {
 
 function UserMenu() {
   const { user, logoutUser } = useUser();
+  const router = useRouter();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
 
   async function logout() {
     await logoutUser();
     // for some reason the token gate doesn't update when the user logs out
-    window.location.reload();
+    router.push('/');
   }
   return (
     <div>
