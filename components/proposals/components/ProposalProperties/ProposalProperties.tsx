@@ -59,7 +59,6 @@ interface ProposalPropertiesProps {
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
-  isTemplate: boolean;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -72,6 +71,7 @@ interface ProposalPropertiesProps {
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: ProposalFormInputs) => void;
+  showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
@@ -85,7 +85,6 @@ export function ProposalProperties({
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
-  isTemplate,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -98,6 +97,7 @@ export function ProposalProperties({
   rubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
+  showStatus,
   snapshotProposalId,
   userId,
   updateProposalStatus
@@ -253,7 +253,7 @@ export function ProposalProperties({
       mt={2}
     >
       <div className='octo-propertylist'>
-        {!isTemplate && (
+        {showStatus && (
           <>
             <Grid container mb={2}>
               <ProposalStepSummary
@@ -284,7 +284,7 @@ export function ProposalProperties({
           </>
         )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-          {!isTemplate && (
+          {showStatus && (
             <Box mt={2} mb={2}>
               {/* <Box mb={1}>
                 <PropertyLabel readOnly>Status</PropertyLabel>
@@ -315,7 +315,7 @@ export function ProposalProperties({
           </Box>
 
           {/* Select a template */}
-          {!isTemplate && isNewProposal && (
+          {isNewProposal && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Template</PropertyLabel>

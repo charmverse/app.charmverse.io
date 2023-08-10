@@ -85,7 +85,6 @@ export function ProposalProperties({
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit}
-      isTemplate={isTemplate}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
@@ -101,6 +100,7 @@ export function ProposalProperties({
       readOnlyReviewers={readOnlyProperties || isFromTemplateSource}
       rubricAnswers={proposal?.rubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
+      showStatus={!isTemplate}
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
