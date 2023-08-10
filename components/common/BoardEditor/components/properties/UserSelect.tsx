@@ -163,7 +163,7 @@ export function UserSelect({
         inputVariant='standard'
         forcePopupIcon={false}
         renderTags={() => (
-          <MembersDisplay wrapColumn={true} readOnly={readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+          <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
         )}
       />
     </StyledUserPropertyContainer>

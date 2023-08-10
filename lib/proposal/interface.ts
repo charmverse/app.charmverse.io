@@ -33,7 +33,7 @@ export type ProposalRubricData = {
 };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData & { page: { sourceTemplateId: string | null } | null };
+  ProposalRubricData & { page?: { sourceTemplateId: string | null } | null };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };
