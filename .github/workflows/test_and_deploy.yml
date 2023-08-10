@@ -267,7 +267,7 @@ jobs:
           datadog-ci sourcemaps upload /path/to/dist  \
             --service=webapp                          \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
-            --minified-path-prefix=app.charmverse.io/_next/static
+            --minified-path-prefix=/_next/static
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
