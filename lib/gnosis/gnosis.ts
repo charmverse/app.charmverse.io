@@ -56,11 +56,6 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
     return [];
   }
 
-  const safeService = getGnosisService({ signer, serviceUrl });
-  if (!safeService) {
-    return [];
-  }
-
   const checksumAddress = getAddress(address); // convert to checksum address
   if (chainId === 5001 || chainId === 5000) {
     const { safes } = await getSafesByOwner({ serviceUrl, chainId, address: checksumAddress });
@@ -81,6 +76,10 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
       })
     );
   } else {
+    const safeService = getGnosisService({ signer, serviceUrl });
+    if (!safeService) {
+      return [];
+    }
     return safeService.getSafesByOwner(checksumAddress).then((r) =>
       Promise.all(
         r.safes.map((safeAddr) => {
