@@ -67,7 +67,7 @@ export class SpaceEventHandler {
           docRooms: this.docRooms
         });
 
-        if (documentRoom && participant && position !== null) {
+        if (parentId && documentRoom && participant && position !== null) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -91,12 +91,22 @@ export class SpaceEventHandler {
           );
         } else {
           // If the user is not in the document or the position of the page node is not found (present in sidebar)
-          await applyNestedPageReplaceDiffAndSaveDocument({
-            deletedPageId: message.payload.id,
+          await applyDiffAndSaveDocument({
+            pageId: message.payload.id,
             content,
             parentId,
             userId: this.userId,
-            spaceId
+            spaceId,
+            diffs: position
+              ? [
+                  {
+                    from: position,
+                    to: position + 1,
+                    stepType: 'replace'
+                  }
+                ]
+              : [],
+            archive: true
           });
         }
       } catch (error) {
@@ -112,7 +122,7 @@ export class SpaceEventHandler {
       const pageId = message.payload.id;
 
       try {
-        const { pageNode, documentRoom, participant, parentId, content, spaceId } = await getPageDetails({
+        const { pageNode, documentRoom, participant, position, parentId, content, spaceId } = await getPageDetails({
           id: pageId,
           userId: this.userId,
           docRooms: this.docRooms
@@ -121,7 +131,7 @@ export class SpaceEventHandler {
         // Get the position from the NodeRange object
         const lastValidPos = pageNode.content.size;
 
-        if (parentId && documentRoom && participant) {
+        if (parentId && documentRoom && participant && position === null) {
           await participant.handleDiff(
             {
               type: 'diff',
@@ -140,12 +150,14 @@ export class SpaceEventHandler {
             }
           );
         } else {
-          await applyNestedPageRestoreDiffAndSaveDocument({
-            restoredPageId: message.payload.id,
+          await applyDiffAndSaveDocument({
+            pageId: message.payload.id,
             content,
             userId: this.userId,
             parentId,
-            spaceId
+            spaceId,
+            diffs: position !== null ? [] : generateInsertNestedPageDiffs({ pageId, pos: lastValidPos }),
+            archive: false
           });
         }
       } catch (error) {
@@ -205,26 +217,27 @@ function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: n
   ];
 }
 
-async function applyNestedPageRestoreDiffAndSaveDocument({
-  restoredPageId,
+async function applyDiffAndSaveDocument({
+  pageId,
   content,
   userId,
   parentId,
-  spaceId
+  spaceId,
+  archive,
+  diffs
 }: {
-  restoredPageId: string;
+  pageId: string;
   content: PageContent;
   userId: string;
   parentId?: string | null;
   spaceId: string;
+  archive: boolean;
+  diffs: ProsemirrorJSONStep[];
 }) {
-  if (parentId) {
+  if (parentId && diffs.length) {
     const pageNode = getNodeFromJson(content);
-    const lastValidPos = pageNode.content.size;
-    const updatedNode = applyStepsToNode(
-      generateInsertNestedPageDiffs({ pageId: restoredPageId, pos: lastValidPos }),
-      pageNode
-    );
+
+    const updatedNode = applyStepsToNode(diffs, pageNode);
 
     await prisma.page.update({
       where: { id: parentId },
@@ -239,66 +252,10 @@ async function applyNestedPageRestoreDiffAndSaveDocument({
   }
 
   await archivePages({
-    pageIds: [restoredPageId],
+    pageIds: [pageId],
     userId,
     spaceId,
-    archive: false
-  });
-}
-
-async function applyNestedPageReplaceDiffAndSaveDocument({
-  deletedPageId,
-  content,
-  userId,
-  parentId,
-  spaceId
-}: {
-  deletedPageId: string;
-  content: PageContent;
-  userId: string;
-  parentId?: string | null;
-  spaceId: string;
-}) {
-  if (parentId) {
-    const pageNode = getNodeFromJson(content);
-    let position: null | number = null;
-    pageNode.forEach((node, nodePos) => {
-      if (node.type.name === 'page' && node.attrs.id === deletedPageId) {
-        position = nodePos;
-        return false;
-      }
-    });
-
-    if (position !== null && parentId) {
-      const updatedNode = applyStepsToNode(
-        [
-          {
-            from: position,
-            to: position + 1,
-            stepType: 'replace'
-          }
-        ],
-        pageNode
-      );
-
-      await prisma.page.update({
-        where: { id: parentId },
-        data: {
-          content: updatedNode.toJSON(),
-          contentText: updatedNode.textContent,
-          hasContent: updatedNode.textContent.length > 0,
-          updatedAt: new Date(),
-          updatedBy: userId
-        }
-      });
-    }
-  }
-
-  await archivePages({
-    pageIds: [deletedPageId],
-    userId,
-    spaceId,
-    archive: false
+    archive
   });
 }
 
@@ -333,10 +290,13 @@ async function getPageDetails({
     : null;
 
   const { parentId, spaceId } = page;
-  const content = (parentPage?.content ?? emptyDocument) as PageContent;
   const documentRoom = parentId ? docRooms.get(parentId) : null;
-  let participant: DocumentEventHandler | null = null;
+  const content: PageContent =
+    documentRoom && documentRoom.participants.size !== 0
+      ? documentRoom.node.toJSON()
+      : parentPage?.content ?? emptyDocument;
   let position: null | number = null;
+  let participant: DocumentEventHandler | null = null;
 
   const pageNode = getNodeFromJson(content);
 
@@ -349,14 +309,14 @@ async function getPageDetails({
         // Send the userId using payload for now
         (_participant) => _participant.getSessionMeta().userId === userId
       ) ?? participants[0];
-
-    documentRoom.node.forEach((node, nodePos) => {
-      if (node.type.name === 'page' && node.attrs.id === id) {
-        position = nodePos;
-        return false;
-      }
-    });
   }
+
+  pageNode.forEach((node, nodePos) => {
+    if (node.type.name === 'page' && node.attrs.id === id) {
+      position = nodePos;
+      return false;
+    }
+  });
 
   return {
     pageNode,

@@ -79,7 +79,7 @@ async function socketSetup({
 }
 
 describe('page_delete event handler', () => {
-  it(`Delete linked pages from page content when parent document is being viewed`, async () => {
+  it(`Archive nested pages and remove it from parent document's content when it have the nested page in its content and it is being viewed`, async () => {
     const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
       addParticipants: true,
       content: (_childPageId) => ({
@@ -109,6 +109,15 @@ describe('page_delete event handler', () => {
       }
     });
 
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
     expect(parentPageWithContent.content).toStrictEqual({
       type: 'doc',
       content: [
@@ -128,9 +137,11 @@ describe('page_delete event handler', () => {
         }
       ]
     });
+
+    expect(childPage.deletedAt).toBeTruthy();
   });
 
-  it(`Delete linked pages from page content when parent document is not being viewed`, async () => {
+  it(`Archive nested pages and remove it from parent document's content when it have the nested page in its content and it is not being viewed`, async () => {
     const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
       addParticipants: false,
       content: (_childPageId) => ({
@@ -161,6 +172,15 @@ describe('page_delete event handler', () => {
       }
     });
 
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
     expect(parentPageWithContent.content).toStrictEqual({
       type: 'doc',
       content: [
@@ -180,11 +200,95 @@ describe('page_delete event handler', () => {
         }
       ]
     });
+
+    expect(childPage.deletedAt).toBeTruthy();
+  });
+
+  const parentPageContent: PageContent = {
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+    ]
+  };
+
+  it(`Only archive nested pages when parent document doesn't have the nested page in its content and it is being viewed`, async () => {
+    const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
+      addParticipants: true,
+      content: () => parentPageContent
+    });
+    const message: ClientMessage = {
+      type: 'page_deleted',
+      payload: {
+        id: childPageId
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toStrictEqual(parentPageContent);
+
+    expect(childPage.deletedAt).toBeTruthy();
+  });
+
+  it(`Only archive nested pages when parent document doesn't have the nested page in its content and it is not being viewed`, async () => {
+    const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
+      addParticipants: false,
+      content: () => parentPageContent
+    });
+    const message: ClientMessage = {
+      type: 'page_deleted',
+      payload: {
+        id: childPageId
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toStrictEqual(parentPageContent);
+
+    expect(childPage.deletedAt).toBeTruthy();
   });
 });
 
 describe('page_restored event handler', () => {
-  it(`Add linked pages to page content when parent document is being viewed`, async () => {
+  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed`, async () => {
     const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
       addParticipants: false,
       content: () => ({
@@ -211,6 +315,15 @@ describe('page_restored event handler', () => {
       },
       select: {
         content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
       }
     });
 
@@ -248,9 +361,11 @@ describe('page_restored event handler', () => {
         }
       ]
     });
+
+    expect(childPage.deletedAt).toBeFalsy();
   });
 
-  it(`Add linked pages to page content when parent document is not being viewed`, async () => {
+  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed`, async () => {
     const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
       addParticipants: false,
       content: () => ({
@@ -277,6 +392,15 @@ describe('page_restored event handler', () => {
       },
       select: {
         content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
       }
     });
 
@@ -314,5 +438,131 @@ describe('page_restored event handler', () => {
         }
       ]
     });
+
+    expect(childPage.deletedAt).toBeFalsy();
+  });
+
+  it(`Only restore nested pages when parent document has the nested page in its content and it is being viewed`, async () => {
+    const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
+      addParticipants: true,
+      content: (_childPageId) => ({
+        type: 'doc',
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+          {
+            type: 'page',
+            attrs: {
+              id: _childPageId
+            }
+          },
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+        ]
+      })
+    });
+
+    const message: ClientMessage = {
+      type: 'page_restored',
+      payload: {
+        id: childPageId
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toStrictEqual({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+        {
+          type: 'page',
+          attrs: {
+            id: childPageId
+          }
+        },
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+      ]
+    });
+
+    expect(childPage.deletedAt).toBeFalsy();
+  });
+
+  it(`Only restore nested page when parent document has the nested page in its content and its not being viewed`, async () => {
+    const { childPageId, spaceEventHandler, parentPage } = await socketSetup({
+      addParticipants: false,
+      content: (_childPageId) => ({
+        type: 'doc',
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+          {
+            type: 'page',
+            attrs: {
+              id: _childPageId
+            }
+          },
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+        ]
+      })
+    });
+
+    const message: ClientMessage = {
+      type: 'page_restored',
+      payload: {
+        id: childPageId
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toStrictEqual({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+        {
+          type: 'page',
+          attrs: {
+            id: childPageId
+          }
+        },
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+      ]
+    });
+
+    expect(childPage.deletedAt).toBeFalsy();
   });
 });
