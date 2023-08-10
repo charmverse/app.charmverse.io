@@ -262,6 +262,8 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install @datadog/datadog-ci
           npx datadog-ci sourcemaps upload /path/to/dist  \

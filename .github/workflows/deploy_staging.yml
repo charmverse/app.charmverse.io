@@ -185,6 +185,8 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install @datadog/datadog-ci
           npx datadog-ci sourcemaps upload /path/to/dist  \
