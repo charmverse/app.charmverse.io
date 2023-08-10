@@ -155,7 +155,7 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
