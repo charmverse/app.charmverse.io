@@ -75,6 +75,7 @@ type ProposalPropertiesProps = {
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
+  title: string;
 };
 
 export function ProposalProperties({
@@ -96,7 +97,8 @@ export function ProposalProperties({
   setProposalFormInputs,
   snapshotProposalId,
   userId,
-  updateProposalStatus
+  updateProposalStatus,
+  title
 }: ProposalPropertiesProps) {
   const showRubricFeature = useIsCharmverseSpace();
 
@@ -229,7 +231,12 @@ export function ProposalProperties({
         ([
           'Results',
           <LoadingComponent key='results' isLoading={!rubricCriteria}>
-            <RubricResults answers={rubricAnswers} criteriaList={rubricCriteria || []} reviewers={proposalReviewers} />
+            <RubricResults
+              answers={rubricAnswers}
+              criteriaList={rubricCriteria || []}
+              reviewers={proposalReviewers}
+              title={title}
+            />
           </LoadingComponent>,
           { sx: { p: 0 } }
         ] as TabConfig)

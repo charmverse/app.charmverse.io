@@ -21,6 +21,7 @@ interface ProposalPropertiesProps {
   isTemplate: boolean;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
+  title?: string;
 }
 
 export function ProposalProperties({
@@ -30,7 +31,8 @@ export function ProposalProperties({
   proposalId,
   snapshotProposalId,
   readOnly,
-  isTemplate
+  isTemplate,
+  title
 }: ProposalPropertiesProps) {
   const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
@@ -111,6 +113,7 @@ export function ProposalProperties({
       setProposalFormInputs={onChangeProperties}
       canAnswerRubric={canAnswerRubric}
       canViewRubricAnswers={canViewRubricAnswers}
+      title={title || ''}
     />
   );
 }

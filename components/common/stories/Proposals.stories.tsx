@@ -219,7 +219,7 @@ ProposalInEvaluation.parameters = {
             proposalId: criteria.proposalId,
             criteriaId: criteria.id,
             userId: members[1].id,
-            comment: 'Needs work',
+            comment: 'Needs work and probably some more details',
             response: { score: criteria.parameters.min + 1 }
           }))
         ];
@@ -228,7 +228,7 @@ ProposalInEvaluation.parameters = {
           reviewers: [
             { id: '1', proposalId: '', roleId: null, userId: userProfile.id },
             { id: '2', proposalId: '', roleId: null, userId: members[0].id },
-            { id: '2', proposalId: '', roleId: null, userId: members[1].id }
+            { id: '3', proposalId: '', roleId: null, userId: members[1].id }
           ],
           categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
