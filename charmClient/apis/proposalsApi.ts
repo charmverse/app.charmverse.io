@@ -20,11 +20,10 @@ import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCrite
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  upsertRubricCriteria(update: RubricCriteriaUpsert) {
-    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(
-      `/api/proposals/${update.proposalId}/rubric-criteria`,
-      update.rubricCriteria
-    );
+  upsertRubricCriteria({ proposalId, rubricCriteria }: RubricCriteriaUpsert) {
+    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(`/api/proposals/${proposalId}/rubric-criteria`, {
+      rubricCriteria
+    });
   }
 
   upsertRubricCriteriaAnswer({ proposalId, answers }: Omit<RubricAnswerUpsert, 'userId'>) {
@@ -39,8 +38,8 @@ export class ProposalsApi {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
-  updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
-    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
+  updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
+    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, rest);
   }
 
   getProposal(proposalId: string) {
