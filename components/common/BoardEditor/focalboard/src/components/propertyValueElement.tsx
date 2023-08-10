@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
+import type { PageMeta } from '@charmverse/core/pages';
 import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
