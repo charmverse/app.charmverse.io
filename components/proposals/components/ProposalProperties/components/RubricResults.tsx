@@ -12,7 +12,7 @@ import {
   MenuItem,
   ListItemIcon
 } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
@@ -34,8 +34,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
   const { criteriaSummary, reviewersResults, allScores } = aggregateResults({
     criteria: criteriaList,
-    answers,
-    reviewers
+    answers
   });
   const { getMemberById } = useMembers();
 
@@ -45,6 +44,19 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
     setCriteriaSummaryType(type);
     setAnchorEl(null);
   };
+
+  // Also include reviewers that haven't answered yet
+  const listWithAllReviewers = useMemo(() => {
+    const answerList = Object.values(reviewersResults);
+
+    // Also add in reviewers that have not responded yet
+    for (const reviewer of reviewers) {
+      if (!reviewersResults[reviewer.id]) {
+        answerList.push({ id: reviewer.id, answersMap: {}, average: null, sum: null });
+      }
+    }
+    return answerList;
+  }, [criteriaList, answers, reviewers]);
 
   return (
     <TableContainer sx={{ maxHeight: '500px' }}>
@@ -72,7 +84,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
           </TableRow>
         </TableHead>
         <TableBody>
-          {reviewersResults.map((r) => (
+          {listWithAllReviewers.map((r) => (
             <TableRow key={r.id}>
               <TableCell
                 component='th'
