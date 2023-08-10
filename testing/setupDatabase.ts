@@ -1,6 +1,5 @@
 import crypto, { randomUUID } from 'node:crypto';
 
-import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApplicationStatus,

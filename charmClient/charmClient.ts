@@ -16,7 +16,6 @@ import type {
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe,
   UserWallet
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
@@ -48,6 +47,7 @@ import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { GnosisSafeApi } from './apis/gnosisSafeApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
@@ -120,6 +120,8 @@ class CharmClient {
   tokenGates = new TokenGatesApi();
 
   subscription = new SubscriptionApi();
+
+  gnosisSafe = new GnosisSafeApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
@@ -214,22 +216,6 @@ class CharmClient {
 
   updateFavoritePages(favorites: Omit<FavoritePage, 'userId'>[]) {
     return http.PUT<FavoritePage[]>('/api/profile/favorites', favorites);
-  }
-
-  setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
-    return http.POST('/api/profile/gnosis-safes', wallets);
-  }
-
-  getMyGnosisSafes(): Promise<UserGnosisSafe[]> {
-    return http.GET('/api/profile/gnosis-safes');
-  }
-
-  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
-    return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
-  }
-
-  deleteMyGnosisSafe(walletId: string) {
-    return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
   }
 
   getPublicPage(pageIdOrPath: string) {

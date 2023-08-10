@@ -46,8 +46,8 @@ function BaseComponent({
       gap={1}
       {...props}
       sx={{
-        ...(props.sx ?? {}),
-        cursor: props.onClick ? 'pointer' : 'initial'
+        cursor: props.onClick ? 'pointer' : 'initial',
+        ...(props.sx ?? {})
       }}
     >
       {props.avatarIcon ? (

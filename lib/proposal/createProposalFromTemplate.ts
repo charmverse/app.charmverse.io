@@ -31,7 +31,8 @@ export async function createProposalFromTemplate({
     pageProps: {
       title,
       contentText: proposalTemplate.contentText ?? '',
-      content: proposalTemplate.content as Prisma.JsonValue
+      content: proposalTemplate.content as Prisma.JsonValue,
+      sourceTemplateId: templateId
     },
     evaluationType: proposalTemplate.proposal.evaluationType,
     userId: createdBy,

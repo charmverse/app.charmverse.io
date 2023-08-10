@@ -15,7 +15,7 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { MiniOpenButton } from 'components/common/MiniOpenButton';
@@ -43,19 +43,13 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
   const { criteriaSummary, reviewersResults, allScores } = aggregateResults({
     criteria: criteriaList,
-    answers,
-    reviewers
+    answers
   });
 
   const { getMemberById } = useMembers();
 
   const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
   const summaryTypeLabel = criteriaSummaryType === 'average' ? 'Average' : 'Sum';
-
-  const getReviewerResults = (id: string | null) => {
-    if (!id) return;
-    return reviewersResults.find((r) => r.id === id);
-  };
 
   useLayoutEffect(() => {
     if (userContainerRef.current) {
@@ -67,6 +61,19 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
     setCriteriaSummaryType(type);
     setAnchorEl(null);
   };
+
+  // Also include reviewers that haven't answered yet
+  const listWithAllReviewers = useMemo(() => {
+    const answerList = Object.values(reviewersResults);
+
+    // Also add in reviewers that have not responded yet
+    for (const reviewer of reviewers) {
+      if (!reviewersResults[reviewer.id]) {
+        answerList.push({ id: reviewer.id, answersMap: {}, average: null, sum: null });
+      }
+    }
+    return answerList;
+  }, [criteriaList, answers, reviewers]);
 
   return (
     <TableContainer sx={{ maxHeight: '500px' }}>
@@ -96,7 +103,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
           </TableRow>
         </TableHead>
         <TableBody>
-          {reviewersResults.map((r) => (
+          {listWithAllReviewers.map((r) => (
             <TableRow
               onClick={() => setDetailsUserId(r.id)}
               key={r.id}
@@ -191,7 +198,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
         onClose={() => setDetailsUserId(null)}
         title={title}
         reviewerId={detailsUserId}
-        reviewerResults={getReviewerResults(detailsUserId)}
+        reviewerResults={detailsUserId ? reviewersResults[detailsUserId] : undefined}
         criteriaList={criteriaList}
       />
     </TableContainer>
