@@ -129,7 +129,7 @@ export function UserSelect({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
+      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
         <Stack gap={0.5}>
           {memberIds.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>

@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
@@ -9,6 +9,7 @@ import { useProposalDetails } from 'components/proposals/hooks/useProposalDetail
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -31,6 +32,7 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
+  const { user } = useUser();
 
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
@@ -40,10 +42,14 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
+  const canAnswerRubric = proposalPermissions?.evaluate;
+  const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
 
   const proposalFormInputs: ProposalFormInputs = {
     categoryId: proposal?.categoryId,
+    evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
+    rubricCriteria: proposal?.rubricCriteria ?? [],
     reviewers:
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
@@ -84,10 +90,15 @@ export function ProposalProperties({
       proposalId={proposal?.id}
       pageId={pageId}
       readOnly={readOnly}
+      rubricAnswers={proposal?.rubricAnswers}
+      rubricCriteria={proposal?.rubricCriteria}
+      userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
+      canAnswerRubric={canAnswerRubric}
+      canViewRubricAnswers={canViewRubricAnswers}
     />
   );
 }
