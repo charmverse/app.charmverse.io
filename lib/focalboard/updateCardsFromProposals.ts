@@ -1,4 +1,4 @@
-import type { Block, Page } from '@charmverse/core/prisma-client';
+import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -6,11 +6,18 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
+import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
+import type {
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  ProposalRubricCriteriaWithTypedParams
+} from 'lib/proposal/rubric/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
+import type { Card } from './card';
+import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 
 export async function updateCardsFromProposals({
@@ -111,6 +118,43 @@ export async function updateCardsFromProposals({
   const updatedBlocks: Block[] = [];
   const newCards: { page: Page; block: Block }[] = [];
 
+  const mappedPageIds = pageProposals.map((p) => p.id);
+
+  const [rubricCriteria, rubricAnswers] = await Promise.all([
+    prisma.proposalRubricCriteria.findMany({
+      where: {
+        proposalId: {
+          in: mappedPageIds
+        }
+      }
+    }),
+    prisma.proposalRubricCriteriaAnswer.findMany({
+      where: {
+        proposalId: {
+          in: mappedPageIds
+        }
+      }
+    })
+  ]);
+
+  const mappedRubricCriteriaByProposal = rubricCriteria.reduce((acc, val) => {
+    if (!acc[val.proposalId]) {
+      acc[val.proposalId] = [];
+    }
+
+    acc[val.proposalId].push(val);
+    return acc;
+  }, {} as Record<string, ProposalRubricCriteria[]>);
+
+  const mappedRubricAnswersByProposal = rubricAnswers.reduce((acc, val) => {
+    if (!acc[val.proposalId]) {
+      acc[val.proposalId] = [];
+    }
+
+    acc[val.proposalId].push(val);
+    return acc;
+  }, {} as Record<string, ProposalRubricCriteriaAnswer[]>);
+
   for (const pageWithProposal of pageProposals) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
 
@@ -124,6 +168,8 @@ export async function updateCardsFromProposals({
         (opt) => opt.value === 'archived'
       )?.id;
       if (
+        // For now, always recalculate rubrics. We can optimise further later
+        pageWithProposal.proposal?.evaluationType === 'rubric' ||
         card.title !== pageWithProposal.title ||
         card.hasContent !== pageWithProposal.hasContent ||
         card.content?.toString() !== pageWithProposal.content?.toString() ||
@@ -149,8 +195,28 @@ export async function updateCardsFromProposals({
               )?.id ?? ''
         };
 
+        let newCardBlockFields = {
+          ...(card.block.fields as any),
+          properties: newProps
+        };
+
+        if (pageWithProposal.proposal?.evaluationType) {
+          const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
+          const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
+
+          const updatedCardShape = generateResyncedProposalEvaluationForCard({
+            proposalEvaluationType: pageWithProposal.proposal.evaluationType,
+            cardProps: card.block as any as Card,
+            databaseProperties: databaseProposalProps,
+            rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
+            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+          });
+
+          newCardBlockFields = updatedCardShape.fields;
+        }
+
         const { updatedCardPage, updatedCardBlock } = await prisma.$transaction(async (tx) => {
-          const updatedPage = await prisma.page.update({
+          const updatedPage = await tx.page.update({
             where: {
               id: card.id
             },
@@ -165,15 +231,12 @@ export async function updateCardsFromProposals({
             }
           });
 
-          const updatedBlock = await prisma.block.update({
+          const updatedBlock = await tx.block.update({
             where: {
               id: updatedPage.id
             },
             data: {
-              fields: {
-                ...(card.block.fields as any),
-                properties: newProps
-              } as any
+              fields: newCardBlockFields
             }
           });
 
@@ -185,7 +248,7 @@ export async function updateCardsFromProposals({
 
       // Don't create new cards from archived cards
     } else if (!card && !pageWithProposal.proposal?.archived) {
-      const properties: Record<string, BoardPropertyValue> = {};
+      let properties: Record<string, BoardPropertyValue> = {};
 
       if (databaseProposalProps.proposalCategory) {
         properties[databaseProposalProps.proposalCategory.id] = pageWithProposal.proposal?.categoryId ?? '';
@@ -203,6 +266,21 @@ export async function updateCardsFromProposals({
       const createdAt = pageWithProposal.workspaceEvents.find(
         (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
       )?.createdAt;
+      if (pageWithProposal.proposal?.evaluationType) {
+        const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
+        const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
+
+        const updatedCardShape = generateResyncedProposalEvaluationForCard({
+          proposalEvaluationType: pageWithProposal.proposal.evaluationType,
+          cardProps: { fields: properties },
+          databaseProperties: databaseProposalProps,
+          rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
+          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+        });
+
+        properties = updatedCardShape.fields;
+      }
+
       const _card = await createCardPage({
         title: pageWithProposal.title,
         boardId,

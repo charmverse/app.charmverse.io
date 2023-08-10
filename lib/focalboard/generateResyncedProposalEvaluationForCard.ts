@@ -1,68 +1,47 @@
-import { arrayUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
+import type {
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  ProposalRubricCriteriaWithTypedParams
+} from 'lib/proposal/rubric/interfaces';
 
 import type { Block } from './block';
 import type { Card } from './card';
 import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 
-export async function generateResyncedProposalEvaluationForCard({
-  proposalId,
-  card,
+export function generateResyncedProposalEvaluationForCard({
+  cardProps,
   proposalEvaluationType,
-  databaseProperties
+  databaseProperties,
+  rubricAnswers,
+  rubricCriteria
 }: {
-  proposalId: string;
-  card: Block;
+  cardProps: Pick<Block, 'fields'>;
   proposalEvaluationType: ProposalEvaluationType;
-  databaseProperties: ExtractedDatabaseProposalProperties;
-}): Promise<Block> {
+  databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
+  rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
+  rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+}): Pick<Block, 'fields'> {
   if (proposalEvaluationType !== 'rubric') {
-    return card;
+    return cardProps;
   }
 
-  const answers = (await prisma.proposalRubricCriteriaAnswer.findMany({
-    where: {
-      proposalId
-    }
-  })) as ProposalRubricCriteriaAnswerWithTypedResponse[];
+  const cardProperties = { ...(cardProps as Card).fields.properties };
 
-  const groupedByRubric = answers.reduce((acc, val) => {
-    if (!acc[val.rubricCriteriaId]) {
-      acc[val.rubricCriteriaId] = [];
-    }
+  const { allScores, reviewersResults } = aggregateResults({
+    answers: rubricAnswers,
+    criteria: rubricCriteria
+  });
 
-    acc[val.rubricCriteriaId].push(val);
-
-    return acc;
-  }, {} as Record<string, ProposalRubricCriteriaAnswerWithTypedResponse[]>);
-
-  const cardProperties = { ...(card as Card).fields.properties };
-
-  const rubricCriteria = Object.entries(groupedByRubric);
-
-  let total: number = 0;
-
-  for (const [questionId, rubricAnswers] of rubricCriteria) {
-    const subtotal = rubricAnswers.reduce(
-      (acc, answer) => acc + (!Number.isNaN(parseInt(answer.response.score as any)) ? answer.response.score : 0),
-      0
-    );
-    total += subtotal;
-  }
-
-  const average = total / answers.length;
-
-  const uniqueReviewers = arrayUtils.uniqueValues(answers.map((a) => a.userId));
+  const uniqueReviewers = Object.keys(reviewersResults);
 
   if (databaseProperties.proposalEvaluationAverage) {
-    cardProperties[databaseProperties.proposalEvaluationAverage.id] = average;
+    cardProperties[databaseProperties.proposalEvaluationAverage.id] = allScores.average ?? '';
   }
 
   if (databaseProperties.proposalEvaluationTotal) {
-    cardProperties[databaseProperties.proposalEvaluationTotal.id] = total;
+    cardProperties[databaseProperties.proposalEvaluationTotal.id] = allScores.sum ?? '';
   }
 
   if (databaseProperties.proposalEvaluatedBy) {
@@ -70,9 +49,8 @@ export async function generateResyncedProposalEvaluationForCard({
   }
 
   return {
-    ...card,
     fields: {
-      ...card.fields,
+      ...cardProps.fields,
       properties: cardProperties
     }
   };
