@@ -418,6 +418,8 @@ export function ProposalProperties({
                     readOnly={readOnlyRubricCriteria}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
+                    proposalStatus={proposalStatus}
+                    answers={rubricAnswers ?? []}
                   />
                 </Box>
               </Box>
