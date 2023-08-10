@@ -15,8 +15,9 @@ type Props = {
   proposalId: string;
 };
 
-const userFriendlyPermissionLabels: Record<ProposalCategoryPermissionLevel, string> = {
+const userFriendlyProposalPagePermissionLabels: Record<ProposalCategoryPermissionLevel, string> = {
   full_access: 'View, comment & vote',
+  create_comment: 'View & comment',
   view_comment_vote: 'View, comment & vote',
   view_comment: 'View & comment',
   view: 'View'
@@ -36,13 +37,13 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
 
   const defaultPermissionLabel = isFreeSpace
-    ? userFriendlyPermissionLabels.view_comment_vote
+    ? userFriendlyProposalPagePermissionLabels.view_comment_vote
     : // Resume normal flow of checks for a paid space
     spaceLevelPermission
-    ? userFriendlyPermissionLabels[spaceLevelPermission.permissionLevel]
+    ? userFriendlyProposalPagePermissionLabels[spaceLevelPermission.permissionLevel]
     : // When using public proposals, this also provides view permission to space members if no permission exists
     space?.publicProposals
-    ? userFriendlyPermissionLabels.view
+    ? userFriendlyProposalPagePermissionLabels.view
     : 'No access';
 
   // Only wait for permissions if this is a paid space
