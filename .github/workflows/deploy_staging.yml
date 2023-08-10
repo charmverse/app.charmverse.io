@@ -192,5 +192,5 @@ jobs:
           npx datadog-ci sourcemaps upload .next/static  \
             --service=webapp                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
-            --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}/_next/static
+            --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static
 
