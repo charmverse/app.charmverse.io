@@ -1,3 +1,4 @@
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { CloseOutlined as DeleteIcon } from '@mui/icons-material';
 import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
@@ -6,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 
 export type RangeProposalCriteria = {
   id: string;
@@ -17,6 +19,7 @@ export type RangeProposalCriteria = {
 
 type Props = {
   readOnly?: boolean;
+  proposalStatus?: ProposalStatus;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
 };
@@ -47,8 +50,10 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props) {
+export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposalStatus }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
+
+  const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
   function addCriteria() {
     if (readOnly) {
@@ -71,9 +76,11 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
     if (readOnly) {
       return;
     }
+    setRubricCriteriaIdToDelete(null);
     const updatedList = criteriaList.filter((c) => c.id !== id);
     setCriteriaList(updatedList);
-    onChange(criteriaList);
+
+    onChange(updatedList);
   }
 
   function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
@@ -122,6 +129,14 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
       window.removeEventListener('keyup', upHandler);
     };
   }, [criteriaList]);
+
+  function handleClickDelete(criteriaId: string) {
+    if (proposalStatus === 'evaluation_active') {
+      setRubricCriteriaIdToDelete(criteriaId);
+    } else {
+      deleteCriteria(criteriaId);
+    }
+  }
 
   return (
     <>
@@ -207,7 +222,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
           {!readOnly && (
             <div className='show-on-hover delete-icon'>
               <Tooltip title='Delete'>
-                <IconButton size='small' onClick={() => deleteCriteria(criteria.id)}>
+                <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
                   <DeleteIcon color='secondary' fontSize='small' />
                 </IconButton>
               </Tooltip>
@@ -215,6 +230,18 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange }: Props
           )}
         </CriteriaRow>
       ))}
+      {!readOnly && (
+        <ConfirmDeleteModal
+          title='Confirm criteria deletion'
+          open={!!rubricCriteriaIdToDelete}
+          onClose={() => setRubricCriteriaIdToDelete(null)}
+          buttonText='Delete rubric criteria'
+          onConfirm={() => {
+            deleteCriteria(rubricCriteriaIdToDelete!);
+          }}
+          question='Are you sure you want to delete this criteria? Any linked answers will also be deleted'
+        />
+      )}
       {!readOnly && (
         <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
           + Add a criteria
