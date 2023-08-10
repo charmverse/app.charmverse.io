@@ -178,7 +178,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                   <ProposalProperties
                     readOnlyRubricCriteria={isFromTemplateSource}
                     readOnlyReviewers={isFromTemplateSource}
-                    readOnlyProposalType={isFromTemplateSource}
+                    readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
                     setProposalFormInputs={setFormInputs}

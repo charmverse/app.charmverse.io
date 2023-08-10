@@ -66,7 +66,7 @@ interface ProposalPropertiesProps {
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
   readOnlyReviewers?: boolean;
-  readOnlyProposalType?: boolean;
+  readOnlyProposalEvaluationType?: boolean;
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
@@ -91,7 +91,7 @@ export function ProposalProperties({
   proposalFlowFlags,
   proposalStatus,
   readOnlyAuthors,
-  readOnlyProposalType,
+  readOnlyProposalEvaluationType,
   readOnlyReviewers,
   readOnlyRubricCriteria,
   rubricAnswers = [],
@@ -389,7 +389,7 @@ export function ProposalProperties({
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Type</PropertyLabel>
                 <ProposalEvaluationTypeSelect
-                  disabled={readOnlyProposalType}
+                  disabled={readOnlyProposalEvaluationType}
                   value={proposalFormInputs.evaluationType}
                   onChange={(evaluationType) => {
                     setProposalFormInputs({

@@ -91,7 +91,7 @@ export function ProposalProperties({
       pageId={pageId}
       readOnlyAuthors={readOnlyProperties}
       readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
-      readOnlyProposalType={
+      readOnlyProposalEvaluationType={
         readOnlyProperties ||
         // dont let users change type after status moves to Feedback, and forward
         (proposal?.status !== 'draft' && !isTemplate) ||
