@@ -9,7 +9,7 @@ import type {
 } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -23,6 +23,7 @@ import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -75,9 +76,6 @@ interface ProposalPropertiesProps {
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
 }
 
-// set to true to work with rubrics
-const showRubricFeature = false;
-
 export function ProposalProperties({
   archived,
   canUpdateProposalProperties,
@@ -98,6 +96,8 @@ export function ProposalProperties({
   userId,
   updateProposalStatus
 }: ProposalPropertiesProps) {
+  const showRubricFeature = useIsCharmverseSpace();
+
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
 
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);

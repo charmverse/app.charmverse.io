@@ -39,8 +39,8 @@ export class ProposalsApi {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
 
-  updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
-    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
+  updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
+    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, rest);
   }
 
   getProposal(proposalId: string) {
