@@ -79,11 +79,9 @@ export class SpaceEventHandler {
                 }
               ],
               doc: documentRoom.doc.content,
-              // TODO: How to get the correct c, s and v values?
               c: participant.messages.client,
               s: participant.messages.server,
               v: documentRoom.doc.version,
-              // TODO: How to get the correct rid and cid values?
               rid: 0,
               cid: -1
             },
