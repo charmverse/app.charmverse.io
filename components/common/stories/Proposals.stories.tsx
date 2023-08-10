@@ -205,19 +205,30 @@ ProposalInEvaluation.parameters = {
             }
           }
         ];
-        const rubricAnswers: ProposalWithUsersAndRubric['rubricAnswers'] = rubricCriteria.map((criteria) => ({
-          rubricCriteriaId: criteria.id,
-          proposalId: criteria.proposalId,
-          criteriaId: criteria.id,
-          userId: userProfile.id,
-          comment: 'Nice job',
-          response: { score: criteria.parameters.max - 1 }
-        }));
+        const rubricAnswers: ProposalWithUsersAndRubric['rubricAnswers'] = [
+          ...rubricCriteria.map((criteria) => ({
+            rubricCriteriaId: criteria.id,
+            proposalId: criteria.proposalId,
+            criteriaId: criteria.id,
+            userId: userProfile.id,
+            comment: 'Nice job',
+            response: { score: criteria.parameters.max - 1 }
+          })),
+          ...rubricCriteria.map((criteria) => ({
+            rubricCriteriaId: criteria.id,
+            proposalId: criteria.proposalId,
+            criteriaId: criteria.id,
+            userId: members[1].id,
+            comment: 'Needs work',
+            response: { score: criteria.parameters.min + 1 }
+          }))
+        ];
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
           reviewers: [
             { id: '1', proposalId: '', roleId: null, userId: userProfile.id },
-            { id: '2', proposalId: '', roleId: null, userId: members[0].id }
+            { id: '2', proposalId: '', roleId: null, userId: members[0].id },
+            { id: '2', proposalId: '', roleId: null, userId: members[1].id }
           ],
           categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
