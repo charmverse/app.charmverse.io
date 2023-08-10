@@ -23,7 +23,9 @@ describe('setDatabaseProposalProperties()', () => {
       spaceId: space.id
     });
   });
-  it('should create proposalStatus, proposalCategory and proposalUrl properties; the option ID for a proposal category should be its ID and the proposal status field should contain all non draft statuses as well as "archived"', async () => {
+
+  // Not using rubrics defined by not having any proposals in space with type rubric
+  it('should create only proposalStatus, proposalCategory and proposalUrl properties if the space does not use rubrics; the option ID for a proposal category should be its ID and the proposal status field should contain all non draft statuses as well as "archived"', async () => {
     const rootId = uuid();
 
     const databaseBlock = await prisma.block.create({
@@ -78,6 +80,81 @@ describe('setDatabaseProposalProperties()', () => {
     const urlProp = properties.find((p) => p.type === 'proposalUrl');
 
     expect(urlProp).toBeDefined();
+  });
+
+  it('should create proposalStatus, proposalCategory and proposalUrl, proposalEvaluatedBy, proposalEvaluationAverage, proposalEvaluationTotal properties if the space has rubric proposals; the option ID for a proposal category should be its ID and the proposal status field should contain all non draft statuses as well as "archived"', async () => {
+    const { user: spaceUser, space: spaceWithRubrics } = await testUtilsUser.generateUserAndSpace();
+
+    const rootId = uuid();
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationType: 'rubric'
+    });
+
+    const databaseBlock = await prisma.block.create({
+      data: {
+        parentId: rootId,
+        rootId,
+        id: rootId,
+        schema: -1,
+        title: 'Example',
+        type: 'board',
+        updatedBy: user.id,
+        fields: {},
+        space: { connect: { id: spaceWithRubrics.id } },
+        user: { connect: { id: spaceUser.id } }
+      }
+    });
+
+    await setDatabaseProposalProperties({
+      databaseId: rootId
+    });
+
+    const updatedBlock = await prisma.block.findUnique({
+      where: {
+        id: rootId
+      }
+    });
+
+    const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
+
+    expect(properties.length).toBe(6);
+
+    // Check category
+    const categoryProp = properties.find((p) => p.type === 'proposalCategory');
+
+    expect(categoryProp).toBeDefined();
+
+    expect(categoryProp?.options).toHaveLength(1);
+    expect(categoryProp?.options[0].id).toBe(proposal.categoryId);
+
+    // Check status
+    const statusProp = properties.find((p) => p.type === 'proposalStatus');
+
+    expect(statusProp).toBeDefined();
+
+    expect(statusProp?.options).toHaveLength(statusPropertyOptions.length);
+
+    statusPropertyOptions?.forEach((status) => {
+      const matchingProp = statusProp?.options.find((opt) => opt.value === status);
+      expect(matchingProp).toBeDefined();
+    });
+    // Check url
+    const urlProp = properties.find((p) => p.type === 'proposalUrl');
+
+    expect(urlProp).toBeDefined();
+
+    // Evaluated by
+    const evaluatedByProp = properties.find((p) => p.type === 'proposalEvaluatedBy');
+    expect(evaluatedByProp).toBeDefined();
+
+    const evaluationTotalProp = properties.find((p) => p.type === 'proposalEvaluationTotal');
+    expect(evaluationTotalProp).toBeDefined();
+
+    const evaluationAverageProp = properties.find((p) => p.type === 'proposalEvaluationAverage');
+    expect(evaluationAverageProp).toBeDefined();
   });
 
   it('should leave existing property IDs and options unchanged', async () => {

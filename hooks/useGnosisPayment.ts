@@ -64,10 +64,13 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
         safeTransactionData: {
           ...safeTransaction.data,
           // Need to convert to string because mantle doesn't support big numbers
+          // @ts-ignore
           baseGas: safeTransaction.data.baseGas.toString(),
+          // @ts-ignore
           gasPrice: safeTransaction.data.gasPrice.toString(),
           // @ts-ignore
           nonce: safeTransaction.data.nonce.toString(),
+          // @ts-ignore
           safeTxGas: safeTransaction.data.safeTxGas.toString()
         },
         txHash,
