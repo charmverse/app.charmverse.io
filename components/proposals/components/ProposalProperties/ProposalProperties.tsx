@@ -55,13 +55,14 @@ export type ProposalFormInputs = {
   rubricCriteria: RangeProposalCriteria[];
 };
 
-interface ProposalPropertiesProps {
+type ProposalPropertiesProps = {
   archived?: boolean;
   canUpdateProposalProperties?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
   isTemplate: boolean;
+  onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -74,7 +75,7 @@ interface ProposalPropertiesProps {
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
-}
+};
 
 export function ProposalProperties({
   archived,
@@ -83,6 +84,7 @@ export function ProposalProperties({
   canViewRubricAnswers,
   disabledCategoryInput,
   isTemplate,
+  onChangeRubricCriteria,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -282,9 +284,6 @@ export function ProposalProperties({
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
           {!isTemplate && (
             <Box mt={2} mb={2}>
-              {/* <Box mb={1}>
-                <PropertyLabel readOnly>Status</PropertyLabel>
-              </Box> */}
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
@@ -407,12 +406,7 @@ export function ProposalProperties({
                   <ProposalRubricCriteriaInput
                     readOnly={readOnly || canUpdateProposalProperties === false}
                     value={proposalFormInputs.rubricCriteria}
-                    onChange={(criteriaList) => {
-                      setProposalFormInputs({
-                        ...proposalFormInputs,
-                        rubricCriteria: criteriaList
-                      });
-                    }}
+                    onChange={onChangeRubricCriteria}
                   />
                 </Box>
               </Box>
