@@ -488,7 +488,7 @@ function _getFormValues(space: Space): FormValues {
 function getProfileWidgetLogo(name: MemberProfileName) {
   switch (name) {
     case 'charmverse':
-      return '/images/charmverse_logo_icon.png';
+      return '/images/logos/charmverse_black.png';
     case 'collection':
       return '/images/template_icons/nft_community_icon.svg';
     case 'ens':
