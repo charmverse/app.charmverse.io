@@ -35,7 +35,11 @@ function UserMenu() {
   const { user, logoutUser } = useUser();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
 
-  function logout() {}
+  async function logout() {
+    await logoutUser();
+    // for some reason the token gate doesn't update when the user logs out
+    window.location.reload();
+  }
   return (
     <div>
       <div>
@@ -47,7 +51,7 @@ function UserMenu() {
         )}
       </div>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
-        <MenuItem sx={{ minWidth: '100px' }} onClick={logoutUser}>
+        <MenuItem sx={{ minWidth: '100px' }} onClick={logout}>
           Log out
         </MenuItem>
       </Menu>
