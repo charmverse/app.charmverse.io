@@ -100,7 +100,8 @@ export function LoginPageView() {
         <>
           <LoginPageContent />
           <Footer />
-        </>
+        </>,
+        { bgcolor: 'default' }
       );
 }
 
