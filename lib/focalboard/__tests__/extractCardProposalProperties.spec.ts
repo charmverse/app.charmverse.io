@@ -51,9 +51,37 @@ const urlProp: IPropertyTemplate = {
   options: []
 };
 
+const evaluatedByProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluated By',
+  options: [],
+  type: 'proposalEvaluatedBy'
+};
+
+const evaluatedTotalProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluation Total',
+  options: [],
+  type: 'proposalEvaluationTotal'
+};
+
+const evaluatedAverageProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluation Average',
+  options: [],
+  type: 'proposalEvaluationAverage'
+};
+
 describe('extractCardProposalProperties', () => {
   it('should extract card proposal properties', () => {
-    const exampleProperties: IPropertyTemplate[] = [categoryProp, statusProp, urlProp];
+    const exampleProperties: IPropertyTemplate[] = [
+      categoryProp,
+      statusProp,
+      urlProp,
+      evaluatedAverageProp,
+      evaluatedTotalProp,
+      evaluatedByProp
+    ];
 
     const extractedSchema = extractDatabaseProposalProperties({
       database: { fields: { cardProperties: exampleProperties } as any }
@@ -65,14 +93,17 @@ describe('extractCardProposalProperties', () => {
           properties: {
             [categoryProp.id]: categoryProp.options[0].id,
             [statusProp.id]: statusProp.options[0].id,
-            [urlProp.id]: 'https://example.com'
+            [urlProp.id]: 'https://example.com',
+            [evaluatedTotalProp.id]: 10,
+            [evaluatedAverageProp.id]: 3,
+            [evaluatedByProp.id]: []
           }
         } as any
       },
       databaseProperties: extractedSchema
     });
 
-    expect(extractedValues).toMatchObject<ExtractedCardProposalProperties>({
+    expect(extractedValues).toMatchObject<Partial<ExtractedCardProposalProperties>>({
       cardProposalCategory: {
         propertyId: categoryProp.id,
         optionId: categoryProp.options[0].id,
@@ -86,6 +117,18 @@ describe('extractCardProposalProperties', () => {
       cardProposalUrl: {
         propertyId: urlProp.id,
         value: 'https://example.com'
+      },
+      cardEvaluatedBy: {
+        propertyId: evaluatedByProp.id,
+        value: []
+      },
+      cardEvaluationAverage: {
+        propertyId: evaluatedAverageProp.id,
+        value: 3
+      },
+      cardEvaluationTotal: {
+        propertyId: evaluatedTotalProp.id,
+        value: 10
       }
     });
   });

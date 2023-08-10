@@ -57,6 +57,18 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
       return intl.formatMessage({ id: 'PropertyType.ProposalCategory', defaultMessage: 'Proposal Category' });
     case 'proposalStatus':
       return intl.formatMessage({ id: 'PropertyType.ProposalStatus', defaultMessage: 'Proposal Status' });
+    case 'proposalEvaluationAverage':
+      return intl.formatMessage({
+        id: 'PropertyType.ProposalEvaluationAverage',
+        defaultMessage: 'Proposal Evaluation Average'
+      });
+    case 'proposalEvaluationTotal':
+      return intl.formatMessage({
+        id: 'PropertyType.ProposalEvaluationTotal',
+        defaultMessage: 'Proposal Evaluation Total'
+      });
+    case 'proposalEvaluatedBy':
+      return intl.formatMessage({ id: 'PropertyType.ProposalEvaluatedBy', defaultMessage: 'Proposal Evaluated By' });
     default: {
       Utils.assertFailure(`typeDisplayName, unhandled type: ${type}`);
       return type;

@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/dist/cjs/errors';
-import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import type { ProposalRubricCriteriaWithTypedParams } from './interfaces';
 

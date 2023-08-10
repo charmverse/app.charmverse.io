@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/cjs/prisma-client';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
