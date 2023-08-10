@@ -206,7 +206,7 @@ export async function updateCardsFromProposals({
 
           const updatedCardShape = generateResyncedProposalEvaluationForCard({
             proposalEvaluationType: pageWithProposal.proposal.evaluationType,
-            cardProps: card.block as any as Card,
+            cardProps: { fields: newCardBlockFields },
             databaseProperties: databaseProposalProps,
             rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
             rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
