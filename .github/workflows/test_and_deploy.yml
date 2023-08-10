@@ -261,17 +261,7 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install @datadog/datadog-ci
-          npx datadog-ci sourcemaps upload /path/to/dist  \
-            --service=webapp                          \
-            --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
-            --minified-path-prefix=/.next/static
-
-      - name: Deploy to Beanstalk
+      - name: Deploy webapp to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -283,6 +273,16 @@ jobs:
           deployment_package: deploy.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install @datadog/datadog-ci
+          npx datadog-ci sourcemaps upload .next/static   \
+            --service=webapp                              \
+            --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
+            --minified-path-prefix=https://app.charmverse.io/.next/static
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
