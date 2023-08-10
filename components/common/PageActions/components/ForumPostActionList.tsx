@@ -38,10 +38,9 @@ export function ForumPostActionList({
 
   const router = useRouter();
 
-  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
 
-  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
+  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
 
   const postCreator = getMemberById(post?.createdBy);
 

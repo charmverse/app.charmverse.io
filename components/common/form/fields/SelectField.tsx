@@ -144,7 +144,13 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               // eslint-disable-next-line react/jsx-key
-              <Chip {...getTagProps({ index })} size='small' label={option.name} color={option.color} />
+              <Chip
+                {...getTagProps({ index })}
+                style={{ margin: 0 }} // margin is added when dropdown is open for some reason, making the input height increase
+                size='small'
+                label={option.name}
+                color={option.color}
+              />
             ))
           }
           noOptionsText={noOptionsText || 'No options available'}

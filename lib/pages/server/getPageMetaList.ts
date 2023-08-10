@@ -37,6 +37,7 @@ export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
       updatedBy: true,
       type: true,
       convertedProposalId: true,
+      syncWithPageId: true,
       permissions: {
         select: {
           id: true,

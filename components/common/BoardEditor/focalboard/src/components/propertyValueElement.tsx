@@ -15,10 +15,10 @@ import type { Card } from 'lib/focalboard/card';
 import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../components/properties/TextInput';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
-import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -105,6 +105,7 @@ function PropertyValueElement(props: Props) {
   ) {
     propertyValueElement = (
       <TagSelect
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}

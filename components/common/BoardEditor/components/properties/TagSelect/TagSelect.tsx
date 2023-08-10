@@ -71,13 +71,26 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
         : ''}
   }
 
+  // override styles from focalboard
+  .MuiInputBase-input {
+    background: transparent;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
   .MuiInputBase-root.MuiInputBase-sizeSmall {
     padding: 4px;
+  }
+
+  // hide blue outline around focused input
+  .MuiOutlinedInput-notchedOutline {
+    border: 0 none !important;
   }
 `;
 
 type Props = {
   readOnly?: boolean;
+  canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
   noOptionsText?: string;
   options: IPropertyOption[];
@@ -92,6 +105,7 @@ type Props = {
 
 export function TagSelect({
   readOnly,
+  canEditOptions = false,
   options,
   propertyValue,
   multiselect = false,
@@ -168,7 +182,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      canEditOptions={false} // TODO: allow editing options
+      canEditOptions={canEditOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen

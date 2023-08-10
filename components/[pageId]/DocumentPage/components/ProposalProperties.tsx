@@ -1,5 +1,7 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { debounce } from 'lodash';
+import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
@@ -9,6 +11,7 @@ import { useProposalDetails } from 'components/proposals/hooks/useProposalDetail
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -31,6 +34,7 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { proposal, refreshProposal } = useProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
+  const { user } = useUser();
 
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
@@ -40,10 +44,14 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
+  const canAnswerRubric = proposalPermissions?.evaluate;
+  const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
 
   const proposalFormInputs: ProposalFormInputs = {
     categoryId: proposal?.categoryId,
+    evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
+    rubricCriteria: proposal?.rubricCriteria ?? [],
     reviewers:
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
@@ -73,6 +81,15 @@ export function ProposalProperties({
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
+  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+    if (proposal) {
+      // @ts-ignore TODO: unify types for rubricCriteria
+      await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
+    }
+  }
+
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
+
   return (
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
@@ -84,10 +101,16 @@ export function ProposalProperties({
       proposalId={proposal?.id}
       pageId={pageId}
       readOnly={readOnly}
+      rubricAnswers={proposal?.rubricAnswers}
+      rubricCriteria={proposal?.rubricCriteria}
+      userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
+      onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
+      canAnswerRubric={canAnswerRubric}
+      canViewRubricAnswers={canViewRubricAnswers}
     />
   );
 }

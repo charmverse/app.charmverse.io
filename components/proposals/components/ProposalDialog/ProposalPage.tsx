@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -35,14 +36,22 @@ type Props = {
 // Note: this component is only used before a page is saved to the DB
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+
   const { showMessage } = useSnackbar();
+
   const { showProposal } = useProposalDialog();
+
   const [_, { width: containerWidth }] = useElementSize();
+
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+
   const { mutatePage } = usePages();
+
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   usePreventReload(contentUpdated);
+
   const router = useRouter();
+
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
 
   useEffect(() => {
@@ -53,6 +62,24 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
+      // TODO: put validation inside the properties form component
+      try {
+        formInputs.rubricCriteria.forEach((criteria) => {
+          if (criteria.type === 'range') {
+            if (
+              (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+              (!criteria.parameters.max && criteria.parameters.max !== 0)
+            ) {
+              throw new Error('Range values are invalid');
+            }
+            if (criteria.parameters.min >= criteria.parameters.max) {
+              throw new Error('Minimum must be less than Maximum');
+            }
+          }
+        });
+      } catch (error) {
+        showMessage((error as Error).message, 'error');
+      }
       setIsCreatingProposal(true);
       const createdProposal = await charmClient.proposals
         .createProposal({
@@ -63,6 +90,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
             contentText: formInputs.contentText ?? '',
             title: formInputs.title
           },
+          evaluationType: formInputs.evaluationType,
+          rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
           reviewers: formInputs.reviewers,
           spaceId: currentSpace.id
         })
@@ -153,6 +182,12 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
                     setProposalFormInputs={setFormInputs}
+                    onChangeRubricCriteria={(rubricCriteria) => {
+                      setFormInputs({
+                        ...formInputs,
+                        rubricCriteria
+                      });
+                    }}
                   />
                 </div>
               </div>

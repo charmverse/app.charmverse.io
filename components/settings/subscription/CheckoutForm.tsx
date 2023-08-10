@@ -313,6 +313,13 @@ export function CheckoutForm({
               </Link>
               .
             </Typography>
+            <Typography mb={1}>
+              Paying with Safe multisig?{' '}
+              <Link href='https://www.charmverse.io/faq' external target='_blank'>
+                See FAQs, under Payments
+              </Link>
+              .
+            </Typography>
           </PaymentTabPanel>
         </Grid>
         <Grid item xs={12} sm={4}>

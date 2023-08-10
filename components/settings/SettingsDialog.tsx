@@ -129,7 +129,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={onClose}
+      onClose={subscriptionEnded ? undefined : onClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -236,34 +236,38 @@ export function SpaceSettingsDialog() {
               </TabPanel>
             ))}
         </Box>
-        {isMobile ? (
-          <Button
-            variant='text'
-            color='inherit'
-            onClick={onClose}
-            sx={{
-              position: 'absolute',
-              right: 10,
-              top: 5,
-              zIndex: 1
-            }}
-          >
-            Close
-          </Button>
-        ) : (
-          <IconButton
-            data-test='close-settings-modal'
-            aria-label='close the settings modal'
-            onClick={onClose}
-            sx={{
-              position: 'absolute',
-              right: 15,
-              top: 15,
-              zIndex: 1
-            }}
-          >
-            <CloseIcon color='secondary' fontSize='small' />
-          </IconButton>
+        {!subscriptionEnded && (
+          <Box>
+            {isMobile ? (
+              <Button
+                variant='text'
+                color='inherit'
+                onClick={onClose}
+                sx={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 5,
+                  zIndex: 1
+                }}
+              >
+                Close
+              </Button>
+            ) : (
+              <IconButton
+                data-test='close-settings-modal'
+                aria-label='close the settings modal'
+                onClick={onClose}
+                sx={{
+                  position: 'absolute',
+                  right: 15,
+                  top: 15,
+                  zIndex: 1
+                }}
+              >
+                <CloseIcon color='secondary' fontSize='small' />
+              </IconButton>
+            )}
+          </Box>
         )}
       </Box>
     </Dialog>

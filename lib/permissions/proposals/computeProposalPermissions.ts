@@ -61,7 +61,7 @@ export async function baseComputeProposalPermissions({
     });
 
     if (isReviewer) {
-      permissions.addPermissions(['view', 'comment', 'review']);
+      permissions.addPermissions(['view', 'comment', 'review', 'evaluate']);
     }
 
     // Add default space member permissions
