@@ -32,8 +32,14 @@ type CriteriaSummaryType = 'sum' | 'average';
 export function RubricResults({ criteriaList = [], answers = [], reviewers = [] }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
-  const { criteriaSummary, reviewersResults } = aggregateResults({ criteria: criteriaList, answers, reviewers });
+  const { criteriaSummary, reviewersResults, allScores } = aggregateResults({
+    criteria: criteriaList,
+    answers,
+    reviewers
+  });
   const { getMemberById } = useMembers();
+
+  const summaryTypeLabel = criteriaSummaryType === 'average' ? 'Average' : 'Sum';
 
   const selectSummaryType = (type: CriteriaSummaryType) => {
     setCriteriaSummaryType(type);
@@ -62,7 +68,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
               <TableCell key={c.id}>{c.title}</TableCell>
             ))}
 
-            <TableCell>Average</TableCell>
+            <TableCell>{summaryTypeLabel}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -85,7 +91,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
                 <TableCell key={c.id}>{r.answersMap[c.id]?.score || '-'}</TableCell>
               ))}
 
-              <TableCell>{r.average || '-'}</TableCell>
+              <TableCell>{roundNumber(r[criteriaSummaryType]) || '-'}</TableCell>
             </TableRow>
           ))}
 
@@ -109,7 +115,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
                 variant='text'
                 color='inherit'
               >
-                {criteriaSummaryType === 'average' ? 'Average' : 'Sum'}
+                {summaryTypeLabel}
               </Button>
 
               <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
@@ -129,11 +135,16 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
             </TableCell>
 
             {criteriaList.map((c) => (
-              <TableCell key={c.id}>{criteriaSummary[c.id]?.[criteriaSummaryType] || '-'}</TableCell>
+              <TableCell key={c.id}>{roundNumber(criteriaSummary[c.id]?.[criteriaSummaryType]) || '-'}</TableCell>
             ))}
+            <TableCell>{roundNumber(allScores[criteriaSummaryType]) || '-'}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
   );
+}
+
+function roundNumber(num: number | undefined | null): string | undefined {
+  return num?.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }

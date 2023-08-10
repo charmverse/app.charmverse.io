@@ -9,7 +9,7 @@ import type {
 } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -23,6 +23,7 @@ import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -54,13 +55,14 @@ export type ProposalFormInputs = {
   rubricCriteria: RangeProposalCriteria[];
 };
 
-interface ProposalPropertiesProps {
+type ProposalPropertiesProps = {
   archived?: boolean;
   canUpdateProposalProperties?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
   isTemplate: boolean;
+  onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -73,10 +75,7 @@ interface ProposalPropertiesProps {
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
-}
-
-// set to true to work with rubrics
-const showRubricFeature = false;
+};
 
 export function ProposalProperties({
   archived,
@@ -85,6 +84,7 @@ export function ProposalProperties({
   canViewRubricAnswers,
   disabledCategoryInput,
   isTemplate,
+  onChangeRubricCriteria,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -98,6 +98,8 @@ export function ProposalProperties({
   userId,
   updateProposalStatus
 }: ProposalPropertiesProps) {
+  const showRubricFeature = useIsCharmverseSpace();
+
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
 
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -282,9 +284,6 @@ export function ProposalProperties({
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
           {!isTemplate && (
             <Box mt={2} mb={2}>
-              {/* <Box mb={1}>
-                <PropertyLabel readOnly>Status</PropertyLabel>
-              </Box> */}
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
@@ -407,12 +406,7 @@ export function ProposalProperties({
                   <ProposalRubricCriteriaInput
                     readOnly={readOnly || canUpdateProposalProperties === false}
                     value={proposalFormInputs.rubricCriteria}
-                    onChange={(criteriaList) => {
-                      setProposalFormInputs({
-                        ...proposalFormInputs,
-                        rubricCriteria: criteriaList
-                      });
-                    }}
+                    onChange={onChangeRubricCriteria}
                   />
                 </Box>
               </Box>
