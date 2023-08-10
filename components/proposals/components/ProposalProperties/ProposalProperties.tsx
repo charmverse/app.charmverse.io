@@ -3,9 +3,9 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type {
   Page,
   Proposal,
-  ProposalStatus,
   ProposalEvaluationType,
-  ProposalRubricCriteria
+  ProposalRubricCriteria,
+  ProposalStatus
 } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -60,7 +60,6 @@ type ProposalPropertiesProps = {
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
-  isTemplate: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   pageId?: string;
   proposalId?: string;
@@ -85,7 +84,6 @@ export function ProposalProperties({
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
-  isTemplate,
   onChangeRubricCriteria,
   proposalFormInputs,
   pageId,
