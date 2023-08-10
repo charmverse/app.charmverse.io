@@ -4,7 +4,9 @@ import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -13,10 +15,10 @@ import type { Card } from 'lib/focalboard/card';
 import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../components/properties/TextInput';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
-import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -24,7 +26,6 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
@@ -56,7 +57,6 @@ function PropertyValueElement(props: Props) {
     : '';
   const router = useRouter();
   const domain = router.query.domain as string;
-  const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
@@ -104,7 +104,8 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalStatus'
   ) {
     propertyValueElement = (
-      <SelectProperty
+      <TagSelect
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
@@ -131,7 +132,7 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'person') {
     propertyValueElement = (
-      <UserProperty
+      <UserSelect
         displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
@@ -206,11 +207,15 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
-  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
-    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${displayValue}`, domain);
     propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
   } else if (propertyValueElement === null) {
-    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+    propertyValueElement = (
+      <div className='octo-propertyvalue'>
+        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+      </div>
+    );
   }
 
   const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);

@@ -21,7 +21,8 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
   }
 
   const spaceMember = members.find((member) => member.id === userId);
-  const showOnboardingFlow = !isLoadingMembersForSpace && !!spaceMember && spaceMember.onboarded === false;
+  const showOnboardingFlow =
+    !isLoadingMembersForSpace && !!spaceMember && !spaceMember.isGuest && spaceMember.onboarded === false;
 
   return {
     showOnboardingFlow,

@@ -10,12 +10,10 @@ type Props = {
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
   onToggleOptionEdit?: (isOpened: boolean) => void;
-  isEditable?: boolean;
 };
 
 export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {
   const readOnly = !onChange && !onDelete;
-
   return (
     <MenuItem {...menuItemProps} sx={{ display: 'flex' }}>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1} maxWidth='100%'>

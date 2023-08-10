@@ -59,7 +59,14 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+      <Box
+        display='flex'
+        flexDirection={{ xs: 'column', md: 'row' }}
+        justifyContent='space-between'
+        gap={1}
+        alignItems='center'
+        mb={2}
+      >
         <Typography color='secondary' variant='subtitle1'>
           Status: {statusText}
         </Typography>

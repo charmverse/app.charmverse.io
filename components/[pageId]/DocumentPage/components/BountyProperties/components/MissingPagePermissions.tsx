@@ -22,7 +22,7 @@ export function MissingPagePermissions({ bountyPermissions, pagePermissions, tar
   // Compare each existing assignee against page permissions
   const assigneesMissingPermissions = visibleToSpace
     ? []
-    : ((bountyPermissions[target] ?? []).filter(
+    : ((bountyPermissions[target] ?? ([] as { id: string; group: string }[])).filter(
         (bountyPermissionAssignee) =>
           bountyPermissionAssignee.group !== 'public' &&
           !pagePermissions.some((pp) => {

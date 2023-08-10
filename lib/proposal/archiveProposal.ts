@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import type { ProposalWithUsers } from './interface';
 
 export type ArchiveProposalRequest = {
   archived: boolean;

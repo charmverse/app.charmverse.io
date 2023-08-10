@@ -1,11 +1,11 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { Box, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import {
   proposalStatusDetails,
-  PROPOSAL_STATUSES,
-  PROPOSAL_STATUS_LABELS
+  PROPOSAL_STATUS_LABELS,
+  getProposalStatuses
 } from 'lib/proposal/proposalStatusTransition';
 
 import type { StepperProps } from './interfaces';
@@ -15,7 +15,8 @@ export function MobileStepper({
   proposalStatus,
   updateProposalStatus,
   proposalFlowPermissions,
-  archived
+  archived,
+  evaluationType
 }: StepperProps) {
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
@@ -36,9 +37,7 @@ export function MobileStepper({
     >
       <Box width='100%' justifyContent='space-between' gap={2} alignItems='center' my='6px'>
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Status</Button>
-          </div>
+          <PropertyLabel readOnly>Status</PropertyLabel>
           <Tooltip title={archived ? 'Archived proposals cannot be updated' : ''}>
             <Box display='flex' flex={1}>
               <Select
@@ -52,7 +51,7 @@ export function MobileStepper({
                   return <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>;
                 }}
               >
-                {PROPOSAL_STATUSES.map((status) => {
+                {getProposalStatuses(evaluationType).map((status) => {
                   return (
                     <MenuItem
                       key={status}
