@@ -9,6 +9,7 @@ import type { MultiPaymentResult } from 'components/bounties/components/MultiPay
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
 import useGnosisSafes from './useGnosisSafes';
 
@@ -55,15 +56,36 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       signerOrProvider: signer
     });
 
+    const senderAddress = utils.getAddress(account);
+
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    await safeService.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash: txHash,
-      senderAddress: utils.getAddress(account),
-      senderSignature: senderSignature.data,
-      origin
-    });
+    if (chainId === 5001 || chainId === 5000) {
+      await proposeTransaction({
+        safeTransactionData: {
+          ...safeTransaction.data,
+          // Need to convert to string because mantle doesn't support big numbers
+          baseGas: safeTransaction.data.baseGas.toString(),
+          gasPrice: safeTransaction.data.gasPrice.toString(),
+          // @ts-ignore
+          nonce: safeTransaction.data.nonce.toString(),
+          safeTxGas: safeTransaction.data.safeTxGas.toString()
+        },
+        txHash,
+        senderAddress,
+        safeAddress,
+        signature: senderSignature.data,
+        chainId
+      });
+    } else {
+      await safeService.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: txHash,
+        senderAddress,
+        senderSignature: senderSignature.data,
+        origin
+      });
+    }
     onSuccess({ safeAddress, transactions, txHash });
   }
 

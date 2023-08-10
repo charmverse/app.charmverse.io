@@ -24,7 +24,7 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
-import useImportSafes from 'hooks/useImportSafes';
+import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { shortenHex } from 'lib/utilities/strings';
@@ -44,16 +44,14 @@ export function MultiSigList() {
   const gnosisSigner = useGnosisSigner();
 
   useEffect(() => {
-    // We need this to run every time a user opens the account section in the settings modal
-    importSafes();
-  }, []);
-
-  if (!safeData) {
-    return null;
-  }
+    if (gnosisSigner) {
+      // We need this to run every time a user opens the account section in the settings modal
+      importSafes(gnosisSigner);
+    }
+  }, [gnosisSigner]);
 
   // sort the rows to prevent random order
-  const sortedSafes = safeData.sort((a, b) => (a.address < b.address ? -1 : 1));
+  const sortedSafes = safeData?.sort((a, b) => (a.address < b.address ? -1 : 1)) || [];
 
   return (
     <>
@@ -71,6 +69,7 @@ export function MultiSigList() {
       {sortedSafes.length === 0 && !gnosisSigner && (
         <Typography>Please unlock your wallet and ensure it is connected to your account.</Typography>
       )}
+      {sortedSafes.length === 0 && gnosisSigner && !isLoadingSafes && <Typography>No safes found</Typography>}
       {sortedSafes.length > 0 && (
         <Table size='small' aria-label='multisig table'>
           <TableHead>
@@ -107,7 +106,7 @@ function SafeRow({ safe, updateWallets }: { safe: UserGnosisSafe; updateWallets:
   const { trigger: updateSafeWallet, isMutating: isLoadingUpdateSafeWallet } = useSWRMutation(
     '/profile/add-wallets',
     (_url, { arg }: Readonly<{ arg: { id: string; name?: string; isHidden?: boolean } }>) =>
-      charmClient.updateMyGnosisSafe(arg),
+      charmClient.gnosisSafe.updateMyGnosisSafe(arg),
     {
       onSuccess() {
         updateWallets();
