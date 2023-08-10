@@ -1,6 +1,6 @@
 import { Box, Card, Grid, Typography } from '@mui/material';
 
-import { getLayout as getBaseLayout } from 'components/common/BaseLayout/BaseLayout';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import Image from 'components/common/Image';
 import { Container } from 'components/login/components/LoginLayout';

@@ -305,6 +305,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
+                          title={page.title}
                         />
                       )}
                       {(draftBounty || page.bountyId) && (

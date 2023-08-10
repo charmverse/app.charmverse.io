@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { getLayout as getBaseLayout } from 'components/common/BaseLayout/BaseLayout';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
