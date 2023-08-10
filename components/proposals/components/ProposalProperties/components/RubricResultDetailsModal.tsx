@@ -36,7 +36,15 @@ export function RubricResultDetailsModal({
   const member = reviewerId ? getMemberById(reviewerId) : undefined;
 
   return (
-    <Dialog open={isOpen} onClose={onClose} title={title} className='CardDetail content' scroll='paper'>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      title={title}
+      className='CardDetail content'
+      scroll='paper'
+    >
       <DialogTitle sx={{ m: 0, p: 2 }}>
         {title}
 
@@ -66,6 +74,7 @@ export function RubricResultDetailsModal({
         </Box>
         {criteriaList.map((criteria) => (
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px' key={criteria.id}>
+            <Divider sx={{ my: 1 }} />
             <Box display='flex' height='fit-content' flex={1} marginLeft='-8px'>
               <Tooltip title={criteria.title}>
                 <Box minWidth='150px'>
@@ -85,10 +94,10 @@ export function RubricResultDetailsModal({
                 <Typography variant='caption'>{reviewerResults?.answersMap[criteria.id]?.comment || '-'}</Typography>
               </Stack>
             </Box>
-            <Divider sx={{ my: 1 }} />
           </Box>
         ))}
 
+        <Divider sx={{ my: 1, borderColor: 'var(--text-primary)' }} />
         <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
           <Box display='flex' height='fit-content' flex={1} marginLeft='-8px'>
             <PropertyLabel readOnly>Average</PropertyLabel>

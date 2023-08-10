@@ -196,7 +196,7 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
       <RubricResultDetailsModal
         isOpen={!!detailsUserId}
         onClose={() => setDetailsUserId(null)}
-        title={title}
+        title={`Evaluation of "${title}"`}
         reviewerId={detailsUserId}
         reviewerResults={detailsUserId ? reviewersResults[detailsUserId] : undefined}
         criteriaList={criteriaList}
