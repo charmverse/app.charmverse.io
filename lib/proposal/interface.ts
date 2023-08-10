@@ -32,7 +32,8 @@ export type ProposalRubricData = {
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
-export type ProposalWithUsersAndRubric = ProposalWithUsers & ProposalRubricData;
+export type ProposalWithUsersAndRubric = ProposalWithUsers &
+  ProposalRubricData & { page: { sourceTemplateId: string | null } | null };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };

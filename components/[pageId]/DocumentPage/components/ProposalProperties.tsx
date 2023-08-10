@@ -1,4 +1,4 @@
-import type { PagePermissionFlags, ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
@@ -41,9 +41,11 @@ export function ProposalProperties({
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
   const isAdmin = useIsAdmin();
 
-  const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
+  // further restrict readOnly if user cannot update proposal properties specifically
+  const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const canAnswerRubric = proposalPermissions?.evaluate;
   const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
+  const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
 
   const proposalFormInputs: ProposalFormInputs = {
     categoryId: proposal?.categoryId,
@@ -82,14 +84,21 @@ export function ProposalProperties({
   return (
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
-      canUpdateProposalProperties={canUpdateProposalProperties}
       disabledCategoryInput={!proposalPermissions?.edit}
       isTemplate={isTemplate}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
       pageId={pageId}
-      readOnly={readOnly}
+      readOnlyAuthors={readOnlyProperties}
+      readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
+      readOnlyProposalType={
+        readOnlyProperties ||
+        // dont let users change type after status moves to Feedback, and forward
+        (proposal?.status !== 'draft' && !isTemplate) ||
+        isFromTemplateSource
+      }
+      readOnlyReviewers={readOnlyProperties || isFromTemplateSource}
       rubricAnswers={proposal?.rubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       userId={user?.id}

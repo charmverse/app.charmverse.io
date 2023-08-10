@@ -34,7 +34,8 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       rubricCriteria: true,
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      page: { select: { sourceTemplateId: true } }
     }
   });
 

@@ -9,7 +9,7 @@ import type {
 } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -56,7 +56,6 @@ export type ProposalFormInputs = {
 
 interface ProposalPropertiesProps {
   archived?: boolean;
-  canUpdateProposalProperties?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
@@ -66,7 +65,10 @@ interface ProposalPropertiesProps {
   proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalFormInputs: ProposalFormInputs;
   proposalStatus?: ProposalStatus;
-  readOnly?: boolean;
+  readOnlyAuthors?: boolean;
+  readOnlyReviewers?: boolean;
+  readOnlyProposalType?: boolean;
+  readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: ProposalFormInputs) => void;
@@ -80,7 +82,6 @@ const showRubricFeature = false;
 
 export function ProposalProperties({
   archived,
-  canUpdateProposalProperties,
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
@@ -90,7 +91,10 @@ export function ProposalProperties({
   proposalId,
   proposalFlowFlags,
   proposalStatus,
-  readOnly,
+  readOnlyAuthors,
+  readOnlyProposalType,
+  readOnlyReviewers,
+  readOnlyRubricCriteria,
   rubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
@@ -350,7 +354,7 @@ export function ProposalProperties({
               <Box display='flex' flex={1}>
                 <UserSelect
                   memberIds={proposalAuthorIds}
-                  readOnly={readOnly || canUpdateProposalProperties === false}
+                  readOnly={readOnlyAuthors}
                   onChange={(authors) => {
                     setProposalFormInputs({
                       ...proposalFormInputs,
@@ -368,7 +372,7 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
-                readOnly={readOnly || canUpdateProposalProperties === false}
+                readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 onChange={(options) => {
                   setProposalFormInputs({
@@ -385,7 +389,7 @@ export function ProposalProperties({
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Type</PropertyLabel>
                 <ProposalEvaluationTypeSelect
-                  disabled={readOnly || (!isNewProposal && !isTemplate)}
+                  disabled={readOnlyProposalType}
                   value={proposalFormInputs.evaluationType}
                   onChange={(evaluationType) => {
                     setProposalFormInputs({
@@ -405,7 +409,7 @@ export function ProposalProperties({
                 <PropertyLabel readOnly>&nbsp;</PropertyLabel>
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
-                    readOnly={readOnly || canUpdateProposalProperties === false}
+                    readOnly={readOnlyRubricCriteria}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={(criteriaList) => {
                       setProposalFormInputs({

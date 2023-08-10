@@ -14,7 +14,7 @@ import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
 type Props = {
   memberIds: string[];
-  readOnly: boolean;
+  readOnly?: boolean;
   onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
