@@ -3,7 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import { getLayout } from 'components/common/BaseLayout/BaseLayout';
+import { getLayout } from 'components/common/BaseLayout/getLayout';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import Link from 'components/common/Link';
 import { LoginPageContent } from 'components/login';

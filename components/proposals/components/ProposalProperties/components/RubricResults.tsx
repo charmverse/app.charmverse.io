@@ -10,12 +10,17 @@ import {
   TableBody,
   Menu,
   MenuItem,
-  ListItemIcon
+  ListItemIcon,
+  Stack,
+  Typography,
+  Box
 } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useRef, useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { MiniOpenButton } from 'components/common/MiniOpenButton';
 import UserDisplay from 'components/common/UserDisplay';
+import { RubricResultDetailsModal } from 'components/proposals/components/ProposalProperties/components/RubricResultDetailsModal';
 import { useMembers } from 'hooks/useMembers';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
@@ -25,20 +30,32 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
   reviewers: ProposalReviewerInput[];
+  title: string;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
 
-export function RubricResults({ criteriaList = [], answers = [], reviewers = [] }: Props) {
+export function RubricResults({ criteriaList = [], answers = [], reviewers = [], title }: Props) {
+  const userContainerRef = useRef<HTMLDivElement>(null);
+  const [maxColWidth, setMaxColWidth] = useState<number | undefined>(undefined);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
   const { criteriaSummary, reviewersResults, allScores } = aggregateResults({
     criteria: criteriaList,
     answers
   });
+
   const { getMemberById } = useMembers();
 
+  const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
   const summaryTypeLabel = criteriaSummaryType === 'average' ? 'Average' : 'Sum';
+
+  useLayoutEffect(() => {
+    if (userContainerRef.current) {
+      setMaxColWidth(userContainerRef.current.clientWidth + 1);
+    }
+  }, []);
 
   const selectSummaryType = (type: CriteriaSummaryType) => {
     setCriteriaSummaryType(type);
@@ -73,7 +90,9 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
                 borderRight: '1px solid var(--input-border)'
               }}
             >
-              Reviewer
+              <Stack direction='row' ref={userContainerRef} width='100%'>
+                Reviewer
+              </Stack>
             </TableCell>
 
             {criteriaList.map((c) => (
@@ -85,18 +104,38 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
         </TableHead>
         <TableBody>
           {listWithAllReviewers.map((r) => (
-            <TableRow key={r.id}>
+            <TableRow
+              onClick={() => setDetailsUserId(r.id)}
+              key={r.id}
+              hover
+              sx={{
+                '&:not(:hover)': {
+                  background: 'var(--background-default)'
+                },
+                '&:hover .popup-open-handle': {
+                  display: 'inline-flex'
+                },
+                cursor: 'pointer'
+              }}
+            >
               <TableCell
                 component='th'
                 sx={{
                   position: 'sticky',
                   left: 0,
                   zIndex: 1,
-                  background: 'var(--background-default)',
                   borderRight: '1px solid var(--input-border)'
                 }}
               >
-                <UserDisplay avatarSize='small' user={getMemberById(r.id)} showMiniProfile />
+                <Box maxWidth={maxColWidth} width={maxColWidth ? `${maxColWidth}px` : 'auto'}>
+                  <Stack direction='row' alignItems='center' gap={1}>
+                    <UserDisplay avatarSize='small' user={getMemberById(r.id)} hideName />
+                    <Typography noWrap>{getMemberById(r.id)?.username}</Typography>
+                    <Stack className='popup-open-handle' display='none'>
+                      <MiniOpenButton />
+                    </Stack>
+                  </Stack>
+                </Box>
               </TableCell>
 
               {criteriaList.map((c) => (
@@ -153,6 +192,15 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [] 
           </TableRow>
         </TableBody>
       </Table>
+
+      <RubricResultDetailsModal
+        isOpen={!!detailsUserId}
+        onClose={() => setDetailsUserId(null)}
+        title={`Evaluation of "${title}"`}
+        reviewerId={detailsUserId}
+        reviewerResults={detailsUserId ? reviewersResults[detailsUserId] : undefined}
+        criteriaList={criteriaList}
+      />
     </TableContainer>
   );
 }
