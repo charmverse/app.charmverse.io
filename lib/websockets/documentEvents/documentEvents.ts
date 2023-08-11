@@ -406,8 +406,6 @@ export class DocumentEventHandler {
     log.debug('Handling change event', logMeta);
     const deletedPageIds: string[] = [];
     const restoredPageIds: string[] = [];
-    const filteredDeletedPageIds: string[] = [];
-    const filteredRestoredPageIds: string[] = [];
 
     if (clientV === serverV) {
       if (message.ds) {
@@ -448,47 +446,6 @@ export class DocumentEventHandler {
           }
         }
 
-        const pageIdsWithoutDeletePermissions: string[] = [];
-
-        for (const pageId of [...deletedPageIds, ...restoredPageIds]) {
-          const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(
-            ({ client }) =>
-              client.pages.computePagePermissions({
-                resourceId: pageId,
-                userId: session.user.id
-              })
-          );
-
-          if (permissions.delete !== true) {
-            pageIdsWithoutDeletePermissions.push(pageId);
-          }
-        }
-
-        if (pageIdsWithoutDeletePermissions.length) {
-          message.ds = message.ds.filter((ds) => {
-            if (ds.stepType === 'replace' && ds.slice?.content) {
-              ds.slice.content = ds.slice.content.filter(
-                (node) => node.type === 'page' && !pageIdsWithoutDeletePermissions.includes(node.attrs?.id)
-              );
-              return ds.slice.content.length > 0;
-            }
-
-            return true;
-          });
-        }
-
-        deletedPageIds.forEach((pageId) => {
-          if (!pageIdsWithoutDeletePermissions.includes(pageId)) {
-            filteredDeletedPageIds.push(pageId);
-          }
-        });
-
-        restoredPageIds.forEach((pageId) => {
-          if (!pageIdsWithoutDeletePermissions.includes(pageId)) {
-            filteredRestoredPageIds.push(pageId);
-          }
-        });
-
         try {
           const updatedNode = applyStepsToNode(message.ds, room.node);
           room.node = updatedNode;
@@ -512,18 +469,18 @@ export class DocumentEventHandler {
           await this.saveDocument();
         }
 
-        if (filteredDeletedPageIds.length) {
+        if (deletedPageIds.length) {
           await archivePages({
-            pageIds: filteredDeletedPageIds,
+            pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
             archive: true
           });
         }
 
-        if (filteredRestoredPageIds.length) {
+        if (restoredPageIds.length) {
           await archivePages({
-            pageIds: filteredRestoredPageIds,
+            pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
             archive: false
