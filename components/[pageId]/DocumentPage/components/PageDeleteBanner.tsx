@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -5,24 +6,35 @@ import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { StyledBanner } from 'components/common/Banners/Banner';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
-export default function PageDeleteBanner({ pageId }: { pageId: string }) {
+export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageType; pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
   const { space } = useCurrentSpace();
   const router = useRouter();
   const { pages } = usePages();
   const { sendMessage } = useWebSocketClient();
+  const dispatch = useAppDispatch();
 
   async function restorePage() {
-    sendMessage({
-      payload: {
-        id: pageId
-      },
-      type: 'page_restored'
-    });
+    if (space) {
+      if (pageType === 'page' || pageType === 'board') {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_restored'
+        });
+      } else {
+        await charmClient.restorePage(pageId);
+        await mutate(`pages/${space.id}`);
+        dispatch(initialLoad({ spaceId: space.id }));
+      }
+    }
   }
 
   async function deletePage() {

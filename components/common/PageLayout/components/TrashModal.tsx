@@ -17,9 +17,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import { memo, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -87,6 +89,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
+  const dispatch = useAppDispatch();
 
   const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
@@ -101,13 +104,32 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   );
 
   async function restorePage(pageId: string) {
-    if (space) {
-      sendMessage({
-        payload: {
-          id: pageId
-        },
-        type: 'page_restored'
-      });
+    const page = archivedPages[pageId];
+    if (page && space) {
+      if (page.type === 'board' || page.type === 'page') {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_restored'
+        });
+      } else {
+        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        setArchivedPages((_archivedPages) => {
+          if (!_archivedPages) {
+            return {};
+          }
+          restoredPageIds.forEach((restoredPageId) => {
+            if (_archivedPages[restoredPageId]) {
+              delete _archivedPages[restoredPageId];
+            }
+          });
+          return { ..._archivedPages };
+        });
+
+        await mutate(`pages/${space.id}`);
+        dispatch(initialLoad({ spaceId: space.id }));
+      }
     }
   }
 
