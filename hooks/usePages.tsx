@@ -99,7 +99,14 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     const pageType = page?.type;
 
     if (page && user && currentSpace) {
-      if (pageType !== 'page' && pageType !== 'board') {
+      if (pageType === 'page' || pageType === 'board') {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_deleted'
+        });
+      } else {
         const { pageIds } = await charmClient.archivePage(page.id);
         let newPage: null | PageMeta = null;
         if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
@@ -141,13 +148,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         });
 
         return newPage;
-      } else {
-        sendMessage({
-          payload: {
-            id: pageId
-          },
-          type: 'page_deleted'
-        });
       }
     }
   }

@@ -406,7 +406,7 @@ export class DocumentEventHandler {
     log.debug('Handling change event', logMeta);
     const deletedPageIds: string[] = [];
     const restoredPageIds: string[] = [];
-    const staticPageIdRegex = /(members|bounties|forum|proposals)/;
+    const staticPageTypeRegex = /(member|bounty|forum|proposal)/;
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
@@ -419,11 +419,10 @@ export class DocumentEventHandler {
             // Skip over linked and static linked pages
             if (ds.slice?.content && (ds.from === ds.to || restorePage)) {
               ds.slice.content.forEach((node) => {
-                if (node.type === 'page' && node.attrs) {
-                  const pageId = node.attrs.id;
-                  const pagePath = node.attrs.path;
+                if (node && node.type === 'page' && node.attrs) {
+                  const { id: pageId, type: pageType, path: pagePath } = node.attrs.id;
                   // pagePath is null when the page is not a linked page
-                  if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
+                  if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
                     restoredPageIds.push(node.attrs?.id);
                   }
                 }
@@ -431,10 +430,9 @@ export class DocumentEventHandler {
             } else if (ds.from + 1 === ds.to) {
               // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
-              if (node && node.type === 'page') {
-                const pageId = node.attrs?.id;
-                const pagePath = node.attrs?.path;
-                if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
+              if (node && node.attrs && node.type === 'page') {
+                const { id: pageId, type: pageType, path: pagePath } = node.attrs.id;
+                if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
                   deletedPageIds.push(pageId);
                 }
               }
@@ -442,10 +440,9 @@ export class DocumentEventHandler {
               // deleted using multi line selection
               room.node.nodesBetween(ds.from, ds.to, (_node) => {
                 const jsonNode = _node.toJSON() as PageContent;
-                if (jsonNode && jsonNode.type === 'page') {
-                  const pageId = jsonNode.attrs?.id;
-                  const pagePath = jsonNode.attrs?.path;
-                  if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
+                if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
+                  const { id: pageId, type: pageType, path: pagePath } = jsonNode.attrs.id;
+                  if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
                     deletedPageIds.push(pageId);
                   }
                 }
