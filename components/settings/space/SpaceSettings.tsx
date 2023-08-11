@@ -477,7 +477,9 @@ export function SpaceSettings({ space }: { space: Space }) {
                   </Button>
                 }
               >
-                <ListItemIcon>x</ListItemIcon>
+                <ListItemIcon>
+                  <Image width={25} height={25} alt={mp.id} src={getProfileWidgetLogo(mp.id)} />
+                </ListItemIcon>
                 <ListItemText primary={capitalize(mp.id)} />
               </ListItem>
             ))}
