@@ -72,6 +72,8 @@ async function socketSetup({
   spaceEventHandler.userId = userId;
 
   return {
+    spaceId,
+    userId,
     childPageId,
     parentPage,
     spaceEventHandler

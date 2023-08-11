@@ -406,7 +406,7 @@ export class DocumentEventHandler {
     log.debug('Handling change event', logMeta);
     const deletedPageIds: string[] = [];
     const restoredPageIds: string[] = [];
-
+    const staticPageIdRegex = /(members|bounties|forum|proposals)/;
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
@@ -416,10 +416,16 @@ export class DocumentEventHandler {
           if (ds.stepType === 'replace') {
             // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
             // Otherwise the page was created by the user manually
+            // Skip over linked and static linked pages
             if (ds.slice?.content && (ds.from === ds.to || restorePage)) {
               ds.slice.content.forEach((node) => {
-                if (node.type === 'page') {
-                  restoredPageIds.push(node.attrs?.id);
+                if (node.type === 'page' && node.attrs) {
+                  const pageId = node.attrs.id;
+                  const pagePath = node.attrs.path;
+                  // pagePath is null when the page is not a linked page
+                  if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
+                    restoredPageIds.push(node.attrs?.id);
+                  }
                 }
               });
             } else if (ds.from + 1 === ds.to) {
@@ -427,7 +433,8 @@ export class DocumentEventHandler {
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (node && node.type === 'page') {
                 const pageId = node.attrs?.id;
-                if (pageId) {
+                const pagePath = node.attrs?.path;
+                if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
                   deletedPageIds.push(pageId);
                 }
               }
@@ -437,7 +444,8 @@ export class DocumentEventHandler {
                 const jsonNode = _node.toJSON() as PageContent;
                 if (jsonNode && jsonNode.type === 'page') {
                   const pageId = jsonNode.attrs?.id;
-                  if (pageId) {
+                  const pagePath = jsonNode.attrs?.path;
+                  if (pageId && !pageId.match(staticPageIdRegex) && pagePath === null) {
                     deletedPageIds.push(pageId);
                   }
                 }
