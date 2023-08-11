@@ -307,22 +307,20 @@ function isValidCriteria(criteria: RangeProposalCriteria, rubricAnswers: Proposa
     }
   }
 
-  const criteriaAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
-
-  if (criteriaAnswers.length === 0) {
-    if (criteria.type === 'range') {
-      if (
-        (!criteria.parameters.min && criteria.parameters.min !== 0) ||
-        (!criteria.parameters.max && criteria.parameters.max !== 0)
-      ) {
-        // Range values are invalid
-        return false;
-      }
-      if (criteria.parameters.min >= criteria.parameters.max) {
-        // Minimum must be less than Maximum
-        return false;
-      }
+  if (criteria.type === 'range') {
+    if (
+      (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+      (!criteria.parameters.max && criteria.parameters.max !== 0)
+    ) {
+      // Range values are invalid
+      return false;
+    }
+    if (criteria.parameters.min >= criteria.parameters.max) {
+      // Minimum must be less than Maximum
+      return false;
     }
     return true;
   }
+  // unrecognized type
+  throw new Error(`Unrecognized criteria type: ${criteria.type}`);
 }

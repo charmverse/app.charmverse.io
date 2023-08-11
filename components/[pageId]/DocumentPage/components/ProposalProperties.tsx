@@ -81,10 +81,11 @@ export function ProposalProperties({
     refreshProposal();
   }
 
-  function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
-    if (proposal) {
-      // @ts-ignore TODO: unify types for rubricCriteria
-      upsertRubricCriteria({ rubricCriteria });
+  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+    // @ts-ignore TODO: unify types for rubricCriteria
+    await upsertRubricCriteria({ rubricCriteria });
+    if (proposal?.status === 'evaluation_active') {
+      refreshProposal();
     }
   }
 
@@ -97,7 +98,7 @@ export function ProposalProperties({
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
-  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
 
   return (
     <ProposalPropertiesBase

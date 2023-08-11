@@ -205,8 +205,8 @@ export function ProposalProperties({
   }
 
   function onSubmitEvaluation() {
-    // assume 'results' is the 2nd tab, ie value: 1
     onChangeRubricCriteriaAnswer?.();
+    // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
     setRubricView(1);
   }
 

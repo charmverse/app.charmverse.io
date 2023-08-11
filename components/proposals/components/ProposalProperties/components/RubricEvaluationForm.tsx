@@ -153,9 +153,7 @@ function CriteriaInput({
       <FormGroup sx={{ display: 'flex', gap: 1 }}>
         <Box display='flex' justifyContent='space-between'>
           <div>
-            <Typography variant='subtitle1'>
-              {criteria.title} ({parameters.min}&ndash; {parameters.max})
-            </Typography>
+            <Typography variant='subtitle1'>{criteria.title}</Typography>
             {criteria.description && <Typography variant='body2'>{criteria.description}</Typography>}
           </div>
           <Controller
@@ -176,13 +174,13 @@ function CriteriaInput({
                 <Box display='flex' gap={1}>
                   <FormLabel>
                     <Typography noWrap variant='body2'>
-                      Your score:
+                      Your score ({parameters.min} &ndash; {parameters.max}):
                     </Typography>
                   </FormLabel>
                   <IntegerInput
                     inputProps={{
                       'data-criteria': criteria.id,
-                      placeholder: 'N/A'
+                      placeholder: parameters.min
                     }}
                     onChange={(score) => {
                       _field.onChange(score);
