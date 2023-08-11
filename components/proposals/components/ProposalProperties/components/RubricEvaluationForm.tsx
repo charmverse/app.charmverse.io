@@ -153,7 +153,11 @@ function CriteriaInput({
         <Box display='flex' justifyContent='space-between'>
           <div>
             <Typography variant='subtitle1'>{criteria.title}</Typography>
-            {criteria.description && <Typography variant='body2'>{criteria.description}</Typography>}
+            {criteria.description && (
+              <Typography sx={{ whiteSpace: 'pre-line' }} variant='body2'>
+                {criteria.description}
+              </Typography>
+            )}
           </div>
           <Controller
             render={({ field: _field }) =>
