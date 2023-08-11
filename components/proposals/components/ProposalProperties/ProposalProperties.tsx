@@ -23,7 +23,6 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalReviewerIds } from 'components/proposals/hooks/useProposalReviewerIds';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -105,8 +104,6 @@ export function ProposalProperties({
   updateProposalStatus,
   title
 }: ProposalPropertiesProps) {
-  const showRubricFeature = useIsCharmverseSpace();
-
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
 
   const [rubricView, setRubricView] = useState<number>(0);
@@ -394,23 +391,21 @@ export function ProposalProperties({
             </Box>
           </Box>
           {/* Select valuation type */}
-          {showRubricFeature && (
-            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>Type</PropertyLabel>
-                <ProposalEvaluationTypeSelect
-                  disabled={readOnlyProposalEvaluationType}
-                  value={proposalFormInputs.evaluationType}
-                  onChange={(evaluationType) => {
-                    setProposalFormInputs({
-                      ...proposalFormInputs,
-                      evaluationType
-                    });
-                  }}
-                />
-              </Box>
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <ProposalEvaluationTypeSelect
+                disabled={readOnlyProposalEvaluationType}
+                value={proposalFormInputs.evaluationType}
+                onChange={(evaluationType) => {
+                  setProposalFormInputs({
+                    ...proposalFormInputs,
+                    evaluationType
+                  });
+                }}
+              />
             </Box>
-          )}
+          </Box>
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
