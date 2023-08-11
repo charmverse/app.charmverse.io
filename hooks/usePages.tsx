@@ -93,7 +93,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
-      (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board')
+      (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board' || p?.type === 'card')
     ).length;
 
     const pageType = page?.type;
@@ -106,6 +106,19 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           },
           type: 'page_deleted'
         });
+
+        if (board) {
+          await mutator.deleteBlock(
+            board,
+            'Delete board',
+            async () => {
+              // success
+            },
+            async () => {
+              // error
+            }
+          );
+        }
       } else {
         const { pageIds } = await charmClient.archivePage(page.id);
         let newPage: null | PageMeta = null;
@@ -119,19 +132,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         }
 
         // Delete the page associated with the card
-        if (board) {
-          mutator.deleteBlock(
-            board,
-            'Delete board',
-            async () => {
-              // success
-            },
-            async () => {
-              // error
-            }
-          );
-        }
-
         _setPages((_pages) => {
           pageIds.forEach((_pageId) => {
             _pages[_pageId] = {

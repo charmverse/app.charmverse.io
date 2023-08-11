@@ -54,7 +54,8 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     archive,
     pageIds: [pageId],
     userId,
-    spaceId: pageSpaceId.spaceId
+    spaceId: pageSpaceId.spaceId,
+    emitPageStatusEvent: false
   });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds });

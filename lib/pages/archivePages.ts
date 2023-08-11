@@ -9,12 +9,14 @@ export async function archivePages({
   archive,
   pageIds,
   userId,
-  spaceId
+  spaceId,
+  emitPageStatusEvent = true
 }: {
   archive: boolean;
   pageIds: string[];
   userId: string;
   spaceId: string;
+  emitPageStatusEvent?: boolean;
 }) {
   const modifiedChildPageIds: string[] = [];
 
@@ -39,12 +41,15 @@ export async function archivePages({
     spaceId
   );
 
-  relay.broadcast(
-    {
-      type: archive ? 'pages_deleted' : 'pages_restored',
-      payload: modifiedChildPageIds.map((id) => ({ id }))
-    },
-    spaceId
-  );
+  if (emitPageStatusEvent) {
+    relay.broadcast(
+      {
+        type: archive ? 'pages_deleted' : 'pages_restored',
+        payload: modifiedChildPageIds.map((id) => ({ id }))
+      },
+      spaceId
+    );
+  }
+
   return { modifiedChildPageIds };
 }

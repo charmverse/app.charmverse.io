@@ -168,6 +168,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     try {
       e.preventDefault();
       setIsMutating(true);
+      await restorePage(pageId);
       // Optimistically remove the restored page from modal
       setArchivedPages((_archivedPages) => {
         if (!_archivedPages) {
@@ -178,7 +179,6 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
         }
         return { ..._archivedPages };
       });
-      await restorePage(pageId);
     } catch (err: any) {
       showMessage(err.message ?? 'Failed to restore page', 'error');
     } finally {
