@@ -98,7 +98,7 @@ class CharmClient {
 
   publicProfile = new PublicProfileApi();
 
-  proposals = ProposalsApi;
+  proposals = new ProposalsApi();
 
   roles = new RolesApi();
 

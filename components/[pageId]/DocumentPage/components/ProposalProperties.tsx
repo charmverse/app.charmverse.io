@@ -2,9 +2,9 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { debounce } from 'lodash';
 import { useCallback } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useUpsertRubricCriteria } from 'charmClient/hooks/proposals';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
@@ -48,7 +48,7 @@ export function ProposalProperties({
     !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
   );
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
-  const { trigger: upsertRubricCriteria } = charmClient.proposals.useUpsertRubricCriteria({ proposalId });
+  const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically

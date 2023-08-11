@@ -5,9 +5,8 @@ import { useEffect, useMemo } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
-import charmClient from 'charmClient';
+import { useUpsertRubricCriteriaAnswer } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { isTruthy } from 'lib/utilities/types';
 
 import { IntegerInput, CriteriaRow } from './ProposalRubricCriteriaInput';
 
@@ -57,7 +56,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
     error: answerError,
     isMutating: isSaving,
     trigger: upsertRubricCriteriaAnswer
-  } = charmClient.proposals.useUpsertRubricCriteriaAnswer({ proposalId });
+  } = useUpsertRubricCriteriaAnswer({ proposalId });
 
   const {
     control,
