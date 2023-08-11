@@ -31,7 +31,6 @@ jobs:
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
-
       - name: Calculate Build ID
         id: get_build_id
         run: |
@@ -40,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with: 
+        with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
@@ -65,7 +64,7 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
-        with: 
+        with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Restore app from cache
@@ -121,7 +120,7 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
-        with: 
+        with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
@@ -137,7 +136,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      - name: Run permissions api docker image 
+      - name: Run permissions api docker image
         id: run_permissions_api
         run: |
           docker inspect postgres
@@ -157,11 +156,11 @@ jobs:
 
           until curl localhost:3001/api/health; do
             docker ps
-            docker logs permissions-api 
+            docker logs permissions-api
             docker inspect permissions-api
             echo "permission api not up...sleeping"
             sleep 10
-          done 
+          done
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -187,7 +186,7 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with: 
+        with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -274,15 +273,15 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install @datadog/datadog-ci
-          npx datadog-ci sourcemaps upload .next/static   \
-            --service=webapp                              \
-            --release-version=${{ needs.build-test-env.outputs.build_id }}  \
-            --minified-path-prefix=https://app.charmverse.io/_next/static
+      # - name: Use datadog ci package to upload js maps
+      #   env:
+      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      #   run: |
+      #     npm install @datadog/datadog-ci
+      #     npx datadog-ci sourcemaps upload .next/static   \
+      #       --service=webapp                              \
+      #       --release-version=${{ needs.build-test-env.outputs.build_id }}  \
+      #       --minified-path-prefix=https://app.charmverse.io/_next/static
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
