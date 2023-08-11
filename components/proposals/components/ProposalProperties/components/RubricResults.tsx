@@ -2,40 +2,39 @@ import type { ProposalRubricCriteria } from '@charmverse/core/prisma-client';
 import { Check } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
+  Box,
+  ListItemIcon,
   Menu,
   MenuItem,
-  ListItemIcon,
   Stack,
-  Typography,
-  Box
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from '@mui/material';
-import { useLayoutEffect, useRef, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { MiniOpenButton } from 'components/common/MiniOpenButton';
 import UserDisplay from 'components/common/UserDisplay';
 import { RubricResultDetailsModal } from 'components/proposals/components/ProposalProperties/components/RubricResultDetailsModal';
 import { useMembers } from 'hooks/useMembers';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
-  reviewers: ProposalReviewerInput[];
+  reviewerUserIds: string[];
   title: string;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
 
-export function RubricResults({ criteriaList = [], answers = [], reviewers = [], title }: Props) {
+export function RubricResults({ criteriaList = [], answers = [], reviewerUserIds = [], title }: Props) {
   const userContainerRef = useRef<HTMLDivElement>(null);
   const [maxColWidth, setMaxColWidth] = useState<number | undefined>(undefined);
 
@@ -67,13 +66,13 @@ export function RubricResults({ criteriaList = [], answers = [], reviewers = [],
     const answerList = Object.values(reviewersResults);
 
     // Also add in reviewers that have not responded yet
-    for (const reviewer of reviewers) {
-      if (!reviewersResults[reviewer.id]) {
-        answerList.push({ id: reviewer.id, answersMap: {}, average: null, sum: null });
+    for (const reviewer of reviewerUserIds) {
+      if (!reviewersResults[reviewer]) {
+        answerList.push({ id: reviewer, answersMap: {}, average: null, sum: null });
       }
     }
     return answerList;
-  }, [criteriaList, answers, reviewers]);
+  }, [criteriaList, answers, reviewerUserIds]);
 
   return (
     <TableContainer sx={{ maxHeight: '500px' }}>

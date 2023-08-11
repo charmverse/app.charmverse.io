@@ -113,4 +113,8 @@ export class ProposalsApi {
   getReviewerPool(proposalId: string) {
     return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?resourceId=${proposalId}`);
   }
+
+  getAllReviewerUserIds(proposalId: string) {
+    return http.GET<string[]>(`/api/proposals/${proposalId}/get-user-reviewerids`);
+  }
 }
