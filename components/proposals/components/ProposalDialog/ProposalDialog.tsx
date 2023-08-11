@@ -124,7 +124,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         title='Unsaved changes'
         open={showConfirmDialog}
         buttonText='Discard'
-        secondaryButtonText='Go back'
+        secondaryButtonText='Cancel'
         question='Are you sure you want to close this proposal? You have unsaved changes'
         onConfirm={close}
       />

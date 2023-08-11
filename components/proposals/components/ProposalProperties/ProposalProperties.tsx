@@ -267,14 +267,16 @@ export function ProposalProperties({
         {showStatus && (
           <>
             <Grid container mb={2}>
-              <ProposalStepSummary
-                archived={archived}
-                proposalFlowFlags={proposalFlowFlags}
-                proposalStatus={proposalStatus}
-                openVoteModal={openVoteModal}
-                updateProposalStatus={updateProposalStatus}
-                evaluationType={proposalFormInputs.evaluationType}
-              />
+              {!isNewProposal && (
+                <ProposalStepSummary
+                  archived={archived}
+                  proposalFlowFlags={proposalFlowFlags}
+                  proposalStatus={proposalStatus}
+                  openVoteModal={openVoteModal}
+                  updateProposalStatus={updateProposalStatus}
+                  evaluationType={proposalFormInputs.evaluationType}
+                />
+              )}
             </Grid>
 
             <Stack

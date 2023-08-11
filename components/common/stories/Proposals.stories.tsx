@@ -155,7 +155,7 @@ ProposalInEvaluation.parameters = {
             id: '3',
             proposalId: '1',
             title: 'Developer Commitment',
-            description: null,
+            description: `A\nmulti-line\ndescription`,
             type: 'range',
             parameters: {
               min: 0,
