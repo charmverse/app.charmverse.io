@@ -264,13 +264,15 @@ export function IntegerInput({
   onChange,
   readOnly,
   inputProps,
-  maxWidth
+  maxWidth,
+  sx
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
   readOnly?: boolean;
   inputProps?: any;
   maxWidth?: number;
+  sx?: any;
 }) {
   return (
     <TextInput
@@ -281,7 +283,8 @@ export function IntegerInput({
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
       sx={{
-        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth }
+        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
+        ...sx
       }}
       value={value?.toString() || ''}
     />
@@ -304,22 +307,20 @@ function isValidCriteria(criteria: RangeProposalCriteria, rubricAnswers: Proposa
     }
   }
 
-  const criteriaAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
-
-  if (criteriaAnswers.length === 0) {
-    if (criteria.type === 'range') {
-      if (
-        (!criteria.parameters.min && criteria.parameters.min !== 0) ||
-        (!criteria.parameters.max && criteria.parameters.max !== 0)
-      ) {
-        // Range values are invalid
-        return false;
-      }
-      if (criteria.parameters.min >= criteria.parameters.max) {
-        // Minimum must be less than Maximum
-        return false;
-      }
+  if (criteria.type === 'range') {
+    if (
+      (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+      (!criteria.parameters.max && criteria.parameters.max !== 0)
+    ) {
+      // Range values are invalid
+      return false;
+    }
+    if (criteria.parameters.min >= criteria.parameters.max) {
+      // Minimum must be less than Maximum
+      return false;
     }
     return true;
   }
+  // unrecognized type
+  throw new Error(`Unrecognized criteria type: ${criteria.type}`);
 }

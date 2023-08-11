@@ -48,6 +48,7 @@ export function ProposalProperties({
     !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
   );
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { trigger: upsertRubricCriteria } = charmClient.proposals.useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
@@ -81,6 +82,18 @@ export function ProposalProperties({
     }
   }
 
+  async function onChangeRubricCriteriaAnswer() {
+    refreshProposal();
+  }
+
+  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+    // @ts-ignore TODO: unify types for rubricCriteria
+    await upsertRubricCriteria({ rubricCriteria });
+    if (proposal?.status === 'evaluation_active') {
+      refreshProposal();
+    }
+  }
+
   async function onChangeProperties(values: ProposalFormInputs) {
     await charmClient.proposals.updateProposal({
       proposalId,
@@ -90,14 +103,7 @@ export function ProposalProperties({
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
-  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
-    if (proposal) {
-      // @ts-ignore TODO: unify types for rubricCriteria
-      await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
-    }
-  }
-
-  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
 
   return (
     <ProposalPropertiesBase
@@ -122,6 +128,7 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
+      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
