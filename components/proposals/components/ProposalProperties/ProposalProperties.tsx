@@ -11,6 +11,7 @@ import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -115,6 +116,11 @@ export function ProposalProperties({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
 
   const { proposalTemplates } = useProposalTemplates();
+
+  const { data: reviewerUserIds } = useSWR(
+    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? `proposal-reviewers-${pageId}` : null,
+    () => charmClient.proposals.getAllReviewerUserIds(pageId as string)
+  );
 
   const proposalTemplatePages = useMemo(() => {
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
@@ -238,7 +244,7 @@ export function ProposalProperties({
             <RubricResults
               answers={rubricAnswers}
               criteriaList={rubricCriteria || []}
-              reviewers={proposalReviewers}
+              reviewerUserIds={reviewerUserIds ?? []}
               title={title}
             />
           </LoadingComponent>,
