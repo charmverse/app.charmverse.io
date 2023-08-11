@@ -32,21 +32,25 @@ test('Space settings - toggle feature visibility', async ({ spaceSettings }) => 
 
   await spaceSettings.openSettingsModal();
 
-  // Proposal visibility toggle should be on by default
+  // Proposal should be visible by default
   await expect(spaceSettings.proposalsVisibility).toBeVisible();
 
+  // Hide proposal item
   await spaceSettings.proposalsVisibilityMenu.click();
   await expect(spaceSettings.proposalsVisibilityHideAction).toBeVisible();
   await spaceSettings.proposalsVisibilityHideAction.click();
   await spaceSettings.submitSpaceUpdateButton.click();
 
-  // Proposal visibility toggle should now be off
+  // Proposal item should now be off
   await spaceSettings.proposalsVisibilityMenu.click();
   await expect(spaceSettings.proposalsVisibilityShowAction).toBeVisible();
   await spaceSettings.page.keyboard.press('Escape');
+
   await spaceSettings.closeModalButton.click();
 
   // Make sure modal is closed before evaluating the sidebar
   await expect(spaceSettings.closeModalButton).not.toBeVisible();
+
+  // Proposal link should be hidden
   await expect(spaceSettings.getSidebarLink('proposals')).not.toBeVisible();
 });

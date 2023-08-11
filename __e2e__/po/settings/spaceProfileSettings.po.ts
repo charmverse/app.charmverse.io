@@ -29,6 +29,18 @@ export class SpaceProfileSettings extends SettingsModal {
 
   readonly proposalsVisibilityShowAction: Locator;
 
+  readonly profileCharmverseItem: Locator;
+
+  readonly profileCharmverseItemMenu: Locator;
+
+  readonly profileHideAction: Locator;
+
+  readonly profileOpenAddProfilesModal: Locator;
+
+  readonly profileAddProfilesModal: Locator;
+
+  readonly profileAddCharmverseProfileButton: Locator;
+
   constructor(page: Page) {
     super(page);
     this.spaceNameInput = page.locator('data-test=space-name-input >> input');
@@ -37,7 +49,7 @@ export class SpaceProfileSettings extends SettingsModal {
     this.deleteSpaceButton = page.locator('data-test=submit-space-delete');
     this.confirmDeleteSpaceButton = page.locator('data-test=confirm-delete-button');
 
-    // Space feature visibility toggles
+    // Space features
     this.bountyVisibility = page.locator(`data-test=settings-feature-item-bounties`);
     this.forumVisibility = page.locator(`data-test=settings-feature-item-forum`);
     this.memberDirectoryVisibility = page.locator(`data-test=settings-feature-item-member_directory`);
@@ -45,6 +57,13 @@ export class SpaceProfileSettings extends SettingsModal {
     this.proposalsVisibilityMenu = page.locator(`data-test=settings-feature-item-proposals >> button`);
     this.proposalsVisibilityHideAction = page.locator(`data-test=settings-feature-option-hide`);
     this.proposalsVisibilityShowAction = page.locator(`data-test=settings-feature-option-show`);
-    this.submitSpaceUpdateButton = page.locator(`data-test=submit-space-update`);
+
+    // Space member profiles
+    this.profileCharmverseItem = page.locator(`data-test=settings-profiles-item-charmverse`);
+    this.profileCharmverseItemMenu = page.locator(`data-test=settings-profiles-item-charmverse >> button`);
+    this.profileHideAction = page.locator(`data-test=settings-profiles-option-hide`);
+    this.profileOpenAddProfilesModal = page.locator(`data-test=settings-add-profiles-button`);
+    this.profileAddProfilesModal = page.locator(`data-test=add-profiles-modal`);
+    this.profileAddCharmverseProfileButton = page.locator(`data-test=add-profile-button-charmverse`);
   }
 }

@@ -336,9 +336,11 @@ export function SpaceSettings({ space }: { space: Space }) {
                   >
                     <SettingsItem
                       sx={{ gap: 0 }}
+                      data-test={`settings-profiles-item-${mp.id}`}
                       actions={[
                         <MenuItem
                           key={mp.id}
+                          data-test='settings-profiles-option-hide'
                           onClick={() => {
                             setMemberProfiles((prevState) => {
                               const newState = [...prevState];
@@ -363,7 +365,12 @@ export function SpaceSettings({ space }: { space: Space }) {
                 ))}
             </Stack>
             {isAdmin && memberProfiles.filter((mp) => mp.isHidden).length > 0 && (
-              <Button sx={{ flexGrow: 0 }} {...bindTrigger(memberProfilesPopupState)} variant='text'>
+              <Button
+                sx={{ flexGrow: 0 }}
+                {...bindTrigger(memberProfilesPopupState)}
+                variant='text'
+                data-test='settings-add-profiles-button'
+              >
                 + Add more profiles
               </Button>
             )}
@@ -443,6 +450,7 @@ export function SpaceSettings({ space }: { space: Space }) {
         open={memberProfilesPopupState.isOpen}
         onClose={memberProfilesPopupState.close}
         title='Add more member profiles'
+        data-test='add-profiles-modal'
       >
         <List>
           {memberProfiles
@@ -452,6 +460,7 @@ export function SpaceSettings({ space }: { space: Space }) {
                 key={mp.id}
                 secondaryAction={
                   <Button
+                    data-test={`add-profile-button-${mp.id}`}
                     onClick={() => {
                       setMemberProfiles((prevState) => {
                         const prevMemberProfiles = [...prevState];
