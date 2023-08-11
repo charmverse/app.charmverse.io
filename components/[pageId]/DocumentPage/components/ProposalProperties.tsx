@@ -43,6 +43,7 @@ export function ProposalProperties({
   });
 
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { trigger: upsertRubricCriteria } = charmClient.proposals.useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
@@ -80,10 +81,10 @@ export function ProposalProperties({
     refreshProposal();
   }
 
-  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+  function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
     if (proposal) {
       // @ts-ignore TODO: unify types for rubricCriteria
-      await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
+      upsertRubricCriteria({ rubricCriteria });
     }
   }
 
