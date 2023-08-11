@@ -76,13 +76,8 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeProperties(values: ProposalFormInputs) {
-    await charmClient.proposals.updateProposal({
-      proposalId,
-      ...values
-    });
+  async function onChangeRubricCriteriaAnswer() {
     refreshProposal();
-    refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
   async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
@@ -90,6 +85,15 @@ export function ProposalProperties({
       // @ts-ignore TODO: unify types for rubricCriteria
       await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
     }
+  }
+
+  async function onChangeProperties(values: ProposalFormInputs) {
+    await charmClient.proposals.updateProposal({
+      proposalId,
+      ...values
+    });
+    refreshProposal();
+    refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
@@ -117,6 +121,7 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
+      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}

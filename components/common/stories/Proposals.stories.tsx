@@ -131,7 +131,8 @@ ProposalInEvaluation.parameters = {
             id: '1',
             proposalId: '1',
             title: 'Developer Presence',
-            description: 'Makes their point clearly',
+            description:
+              'Makes their point clearly. This is a long description designed to appear on multiple lines :)',
             type: 'range',
             parameters: {
               min: 0,
@@ -142,7 +143,8 @@ ProposalInEvaluation.parameters = {
             id: '2',
             proposalId: '1',
             title: 'Developer Draw',
-            description: null,
+            description:
+              'Makes their point clearly. This is a long description designed to appear on multiple lines :)',
             type: 'range',
             parameters: {
               min: 0,

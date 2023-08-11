@@ -4,6 +4,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { useEffect } from 'react';
 
 interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -39,14 +40,22 @@ type MultiTabsProps = {
   tabs: TabConfig[];
   disabled?: boolean;
   tabPanelSx?: SxProps;
+  // allow for controlled tab
+  activeTab?: number;
+  setActiveTab?: (tabIndex: number) => void;
 };
 
 export default function MultiTabs(props: MultiTabsProps) {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState<any>(0);
   const { tabs, disabled = false, tabPanelSx = {} } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
     setValue(newValue);
+    props.setActiveTab?.(newValue);
   };
+
+  useEffect(() => {
+    setValue(props.activeTab);
+  }, [props.activeTab]);
 
   return (
     <Box sx={{ width: '100%' }}>

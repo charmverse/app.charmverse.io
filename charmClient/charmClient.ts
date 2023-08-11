@@ -38,7 +38,6 @@ import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -99,7 +98,7 @@ class CharmClient {
 
   publicProfile = new PublicProfileApi();
 
-  proposals = new ProposalsApi();
+  proposals = ProposalsApi;
 
   roles = new RolesApi();
 

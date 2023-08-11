@@ -264,13 +264,15 @@ export function IntegerInput({
   onChange,
   readOnly,
   inputProps,
-  maxWidth
+  maxWidth,
+  sx
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
   readOnly?: boolean;
   inputProps?: any;
   maxWidth?: number;
+  sx?: any;
 }) {
   return (
     <TextInput
@@ -281,7 +283,8 @@ export function IntegerInput({
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
       sx={{
-        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth }
+        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
+        ...sx
       }}
       value={value?.toString() || ''}
     />
