@@ -11,7 +11,6 @@ import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -22,6 +21,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
+import { useProposalReviewerIds } from 'components/proposals/hooks/useProposalReviewerIds';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
@@ -117,9 +117,8 @@ export function ProposalProperties({
 
   const { proposalTemplates } = useProposalTemplates();
 
-  const { data: reviewerUserIds } = useSWR(
-    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? `proposal-reviewers-${pageId}` : null,
-    () => charmClient.proposals.getAllReviewerUserIds(pageId as string)
+  const { reviewerUserIds } = useProposalReviewerIds(
+    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
 
   const proposalTemplatePages = useMemo(() => {
