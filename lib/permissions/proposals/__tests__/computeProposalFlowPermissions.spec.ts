@@ -11,7 +11,7 @@ let space: Space;
 let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
-  const { user: user1, space: generatedSpace } = await testUtilsUser.generateUserAndSpace();
+  const { user: user1, space: generatedSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
   space = generatedSpace;
 
@@ -82,6 +82,48 @@ describe('computeProposalFlowPermissions', () => {
     });
 
     expect(flowFlags.reviewed).toBe(false);
+  });
+
+  it('Proposal author should be able to change the proposal status from  evaluation_active to discussion', async () => {
+    // Create a test proposal first
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [],
+      proposalStatus: 'evaluation_active',
+      evaluationType: 'rubric',
+      reviewers: [{ group: 'user', id: reviewer1.id }]
+    });
+
+    const flowFlags = await computeProposalFlowPermissions({
+      resourceId: proposal.id,
+      userId: author.id
+    });
+
+    expect(flowFlags.review).toBe(false);
+    expect(flowFlags.discussion).toBe(true);
+    expect(flowFlags.evaluation_closed).toBe(false);
+  });
+
+  it('Space admin should be able to change the proposal status from evaluation_active to discussion or evaluation_closed', async () => {
+    // Create a test proposal first
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [],
+      proposalStatus: 'evaluation_active',
+      evaluationType: 'rubric',
+      reviewers: [{ group: 'user', id: reviewer1.id }]
+    });
+
+    const flowFlags = await computeProposalFlowPermissions({
+      resourceId: proposal.id,
+      userId: admin.id
+    });
+
+    expect(flowFlags.review).toBe(false);
+    expect(flowFlags.discussion).toBe(true);
+    expect(flowFlags.evaluation_closed).toBe(true);
   });
 
   it("Proposal reviewer (userId) shouldn't be able to change the proposal status from draft to discussion", async () => {

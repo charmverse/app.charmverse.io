@@ -2,6 +2,7 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { debounce } from 'lodash';
 import { useCallback } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
@@ -10,6 +11,7 @@ import { ProposalProperties as ProposalPropertiesBase } from 'components/proposa
 import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { useProposalReviewerIds } from 'components/proposals/hooks/useProposalReviewerIds';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 
@@ -42,13 +44,16 @@ export function ProposalProperties({
     proposalIdOrPath: proposalId
   });
 
+  const { reviewerUserIds } = useProposalReviewerIds(
+    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
+  );
   const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const canAnswerRubric = proposalPermissions?.evaluate;
-  const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
+  const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
 
   const proposalFormInputs: ProposalFormInputs = {
