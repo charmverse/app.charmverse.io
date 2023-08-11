@@ -8,6 +8,7 @@ const uuid = require('uuid');
 const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
+
 // we can save time and skip code checks, which are handle in a special step by the CI
 const skipCodeChecks = process.env.CI === 'true';
 
@@ -182,7 +183,8 @@ const config = {
             cron: './background/cron.ts',
             websockets: './background/initWebsockets.ts',
             countSpaceData: './scripts/countSpaceData.ts',
-            importFromDiscourse: './scripts/importFromDiscourse.ts'
+            importFromDiscourse: './scripts/importFromDiscourse.ts',
+            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };
