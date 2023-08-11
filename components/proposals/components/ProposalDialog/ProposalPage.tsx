@@ -36,23 +36,20 @@ type Props = {
 // Note: this component is only used before a page is saved to the DB
 export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
-
   const { showMessage } = useSnackbar();
-
   const { showProposal } = useProposalDialog();
-
-  const [_, { width: containerWidth }] = useElementSize();
-
+  const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-
   const { mutatePage } = usePages();
-
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
+
   usePreventReload(contentUpdated);
 
   const router = useRouter();
 
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
+
+  const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
     if (currentSpace?.requireProposalTemplate) {
@@ -100,6 +97,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
           throw err;
         });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
       mutate(`proposals/${currentSpace.id}`);
@@ -178,9 +176,12 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
                   <ProposalProperties
-                    isTemplate={false}
+                    readOnlyRubricCriteria={isFromTemplateSource}
+                    readOnlyReviewers={isFromTemplateSource}
+                    readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
+                    title=''
                     setProposalFormInputs={setFormInputs}
                     onChangeRubricCriteria={(rubricCriteria) => {
                       setFormInputs({

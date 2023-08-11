@@ -19,11 +19,10 @@ export function useProposals() {
   } = useSWR(space ? `proposals/${space.id}` : null, () =>
     charmClient.proposals.getProposalsBySpace({ spaceId: space!.id })
   );
-
   // filter out deleted and templates
-  let filteredProposals = proposals?.filter(
-    (proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal'
-  );
+  let filteredProposals = proposals
+    ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')
+    : [];
   if (statusFilter === 'archived') {
     filteredProposals = filteredProposals?.filter((p) => !!p.archived);
     // Never show archived proposals within the other statuses list

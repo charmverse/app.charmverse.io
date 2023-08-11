@@ -8,7 +8,7 @@ import type { Constants } from 'components/common/BoardEditor/focalboard/src/con
 import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 
-const properties: Record<DatabaseProposalPropertyType, () => IPropertyTemplate> = {
+const properties: { [key in DatabaseProposalPropertyType]: () => IPropertyTemplate<key> } = {
   proposalCategory: () => ({
     id: uuid(),
     name: 'Proposal Category',
@@ -26,6 +26,24 @@ const properties: Record<DatabaseProposalPropertyType, () => IPropertyTemplate> 
     name: 'Proposal Url',
     options: [],
     type: 'proposalUrl'
+  }),
+  proposalEvaluatedBy: () => ({
+    id: uuid(),
+    name: 'Proposal Evaluated By',
+    options: [],
+    type: 'proposalEvaluatedBy'
+  }),
+  proposalEvaluationAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Evaluation Average',
+    options: [],
+    type: 'proposalEvaluationAverage'
+  }),
+  proposalEvaluationTotal: () => ({
+    id: uuid(),
+    name: 'Proposal Evaluation Total',
+    options: [],
+    type: 'proposalEvaluationTotal'
   })
 };
 
@@ -141,6 +159,54 @@ export async function generateUpdatedProposalUrlProperty({
   return proposalStatusProp;
 }
 
+export async function generateUpdatedProposalEvaluatedByProperty({
+  boardProperties
+}: {
+  boardProperties: IPropertyTemplate[];
+}) {
+  // We will mutate and return this property
+  const proposalStatusProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalEvaluatedBy') ?? {
+      ...properties.proposalEvaluatedBy(),
+      id: uuid()
+    })
+  };
+
+  return proposalStatusProp;
+}
+
+export async function generateUpdatedProposalEvaluationTotalProperty({
+  boardProperties
+}: {
+  boardProperties: IPropertyTemplate[];
+}) {
+  // We will mutate and return this property
+  const proposalStatusProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalEvaluationTotal') ?? {
+      ...properties.proposalEvaluationTotal(),
+      id: uuid()
+    })
+  };
+
+  return proposalStatusProp;
+}
+
+export async function generateUpdatedProposalEvaluationAverageProperty({
+  boardProperties
+}: {
+  boardProperties: IPropertyTemplate[];
+}) {
+  // We will mutate and return this property
+  const proposalStatusProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalEvaluationAverage') ?? {
+      ...properties.proposalEvaluationAverage(),
+      id: uuid()
+    })
+  };
+
+  return proposalStatusProp;
+}
+
 export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Block> {
   const database = await prisma.block.findUniqueOrThrow({
     where: {
@@ -178,6 +244,49 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
     boardProperties[existingUrlPropIndex] = proposalUrlProp;
   } else {
     boardProperties.push(proposalUrlProp);
+  }
+
+  const spaceUsesRubrics =
+    (await prisma.proposal.findFirst({
+      where: {
+        spaceId: database.spaceId,
+        evaluationType: 'rubric'
+      },
+      select: {
+        id: true
+      }
+    })) !== null;
+
+  if (spaceUsesRubrics) {
+    const [evaluatedByProp, evaluationTotalProp, evaluationAverageProp] = await Promise.all([
+      generateUpdatedProposalEvaluatedByProperty({ boardProperties }),
+      generateUpdatedProposalEvaluationTotalProperty({ boardProperties }),
+      generateUpdatedProposalEvaluationAverageProperty({ boardProperties })
+    ]);
+
+    const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
+
+    if (existingEvaluatedByPropPropIndex > -1) {
+      boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+    } else {
+      boardProperties.push(evaluatedByProp);
+    }
+
+    const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
+
+    if (existingEvaluationTotalPropIndex > -1) {
+      boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
+    } else {
+      boardProperties.push(evaluationTotalProp);
+    }
+
+    const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
+
+    if (existingEvaluationAveragePropIndex > -1) {
+      boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
+    } else {
+      boardProperties.push(evaluationAverageProp);
+    }
   }
 
   return prisma.block.update({

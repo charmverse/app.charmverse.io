@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import getLayout from 'components/common/BaseLayout/BaseLayout';
+import { getLayout } from 'components/common/BaseLayout/getLayout';
 import Loader from 'components/common/LoadingComponent';
 import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';

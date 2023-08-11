@@ -49,7 +49,10 @@ describe('getProposal', () => {
           archived: expect.any(Boolean),
           evaluationType: 'vote',
           rubricAnswers: [],
-          rubricCriteria: []
+          rubricCriteria: [],
+          page: {
+            sourceTemplateId: null
+          }
         }
       })
     );

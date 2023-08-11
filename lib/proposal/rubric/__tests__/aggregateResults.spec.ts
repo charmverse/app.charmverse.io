@@ -1,28 +1,42 @@
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 
+const firstUserId = '1';
+
+const secondUserId = '2';
+
+const firstRubricId = '11';
+
+const secondRubricId = '22';
+
 describe('aggregateResults', () => {
   it('should aggregate results and return data in proper shape', async () => {
     const result = aggregateResults({
       answers: [
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: 'my opinion',
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         }
       ],
-      reviewers: [{ id: '1' }],
       criteria: [
-        { id: '11', title: 't1', type: 'range', parameters: { min: 1, max: 10 }, description: 'd1', proposalId: '111' }
+        {
+          id: firstRubricId,
+          title: 't1',
+          type: 'range',
+          parameters: { min: 1, max: 10 },
+          description: 'd1',
+          proposalId: '111'
+        }
       ]
     });
 
-    expect(result.criteriaSummary['11'].average).toEqual(7);
-    expect(result.criteriaSummary['11'].sum).toEqual(7);
-    expect(result.reviewersResults[0].average).toEqual(7);
-    expect(result.reviewersResults[0].id).toEqual('1');
-    expect(result.reviewersResults[0].answersMap).toMatchObject({
+    expect(result.criteriaSummary[firstRubricId].average).toEqual(7);
+    expect(result.criteriaSummary[firstRubricId].sum).toEqual(7);
+    expect(result.reviewersResults[firstUserId].average).toEqual(7);
+    expect(result.reviewersResults[firstUserId].id).toEqual(firstUserId);
+    expect(result.reviewersResults[firstUserId].answersMap).toMatchObject({
       11: {
         score: 7,
         comment: 'my opinion'
@@ -34,50 +48,63 @@ describe('aggregateResults', () => {
     const result = aggregateResults({
       answers: [
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: null,
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: 3 },
           comment: null,
           userId: '2',
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '22',
+          rubricCriteriaId: secondRubricId,
           response: { score: 1 },
           comment: null,
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '22',
+          rubricCriteriaId: secondRubricId,
           response: { score: 3 },
           comment: null,
-          userId: '2',
+          userId: secondUserId,
           proposalId: '111'
         }
       ],
-      reviewers: [{ id: '1' }, { id: '2' }],
       criteria: [
-        { id: '11', title: 't1', type: 'range', parameters: { min: 1, max: 10 }, description: 'd1', proposalId: '111' },
-        { id: '22', title: 't2', type: 'range', parameters: { min: 1, max: 10 }, description: 'd2', proposalId: '111' }
+        {
+          id: firstRubricId,
+          title: 't1',
+          type: 'range',
+          parameters: { min: 1, max: 10 },
+          description: 'd1',
+          proposalId: '111'
+        },
+        {
+          id: secondRubricId,
+          title: 't2',
+          type: 'range',
+          parameters: { min: 1, max: 10 },
+          description: 'd2',
+          proposalId: '111'
+        }
       ]
     });
 
-    expect(result.criteriaSummary['11'].average).toEqual(5);
-    expect(result.criteriaSummary['11'].sum).toEqual(10);
-    expect(result.criteriaSummary['22'].average).toEqual(2);
-    expect(result.criteriaSummary['22'].sum).toEqual(4);
-    expect(result.reviewersResults[0].average).toEqual(4);
-    expect(result.reviewersResults[0].id).toEqual('1');
-    expect(result.reviewersResults[1].average).toEqual(3);
-    expect(result.reviewersResults[1].id).toEqual('2');
-    expect(result.reviewersResults[0].answersMap).toMatchObject({
+    expect(result.criteriaSummary[firstRubricId].average).toEqual(5);
+    expect(result.criteriaSummary[firstRubricId].sum).toEqual(10);
+    expect(result.criteriaSummary[secondRubricId].average).toEqual(2);
+    expect(result.criteriaSummary[secondRubricId].sum).toEqual(4);
+    expect(result.reviewersResults[firstUserId].average).toEqual(4);
+    expect(result.reviewersResults[firstUserId].id).toEqual(firstUserId);
+    expect(result.reviewersResults[secondUserId].average).toEqual(3);
+    expect(result.reviewersResults[secondUserId].id).toEqual(secondUserId);
+    expect(result.reviewersResults[firstUserId].answersMap).toMatchObject({
       11: {
         score: 7,
         comment: null
@@ -88,7 +115,7 @@ describe('aggregateResults', () => {
       }
     });
 
-    expect(result.reviewersResults[1].answersMap).toMatchObject({
+    expect(result.reviewersResults[secondUserId].answersMap).toMatchObject({
       11: {
         score: 3,
         comment: null
@@ -104,48 +131,61 @@ describe('aggregateResults', () => {
     const result = aggregateResults({
       answers: [
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: 'my opinion',
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: null as any },
           comment: null,
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '11',
+          rubricCriteriaId: firstRubricId,
           response: { score: '2' as any },
           comment: null,
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         },
         {
-          rubricCriteriaId: '22',
+          rubricCriteriaId: secondRubricId,
           response: { score: '3' as any },
           comment: null,
-          userId: '1',
+          userId: firstUserId,
           proposalId: '111'
         }
       ],
-      reviewers: [{ id: '1' }],
       criteria: [
-        { id: '11', title: 't1', type: 'range', parameters: { min: 1, max: 10 }, description: 'd1', proposalId: '111' },
-        { id: '22', title: 't2', type: 'range', parameters: { min: 1, max: 10 }, description: 'd2', proposalId: '111' }
+        {
+          id: firstRubricId,
+          title: 't1',
+          type: 'range',
+          parameters: { min: 1, max: 10 },
+          description: 'd1',
+          proposalId: '111'
+        },
+        {
+          id: secondRubricId,
+          title: 't2',
+          type: 'range',
+          parameters: { min: 1, max: 10 },
+          description: 'd2',
+          proposalId: '111'
+        }
       ]
     });
 
-    expect(result.criteriaSummary['11'].average).toEqual(7);
-    expect(result.criteriaSummary['11'].sum).toEqual(7);
-    expect(result.criteriaSummary['22'].average).toEqual(null);
-    expect(result.criteriaSummary['22'].sum).toEqual(null);
-    expect(result.reviewersResults[0].average).toEqual(7);
-    expect(result.reviewersResults[0].id).toEqual('1');
-    expect(result.reviewersResults[0].answersMap).toMatchObject({
+    expect(result.criteriaSummary[firstRubricId].average).toEqual(7);
+    expect(result.criteriaSummary[firstRubricId].sum).toEqual(7);
+    expect(result.criteriaSummary[secondRubricId].average).toEqual(null);
+    expect(result.criteriaSummary[secondRubricId].sum).toEqual(null);
+    expect(result.reviewersResults[firstUserId].average).toEqual(7);
+    expect(result.reviewersResults[firstUserId].id).toEqual(firstUserId);
+    expect(result.reviewersResults[firstUserId].answersMap).toMatchObject({
       11: {
         score: 7,
         comment: 'my opinion'

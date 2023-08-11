@@ -3,9 +3,9 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type {
   Page,
   Proposal,
-  ProposalStatus,
   ProposalEvaluationType,
-  ProposalRubricCriteria
+  ProposalRubricCriteria,
+  ProposalStatus
 } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -57,46 +57,52 @@ export type ProposalFormInputs = {
 
 type ProposalPropertiesProps = {
   archived?: boolean;
-  canUpdateProposalProperties?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
-  isTemplate: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalFormInputs: ProposalFormInputs;
   proposalStatus?: ProposalStatus;
-  readOnly?: boolean;
+  readOnlyAuthors?: boolean;
+  readOnlyReviewers?: boolean;
+  readOnlyProposalEvaluationType?: boolean;
+  readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: ProposalFormInputs) => void;
+  showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
+  title: string;
 };
 
 export function ProposalProperties({
   archived,
-  canUpdateProposalProperties,
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
-  isTemplate,
   onChangeRubricCriteria,
   proposalFormInputs,
   pageId,
   proposalId,
   proposalFlowFlags,
   proposalStatus,
-  readOnly,
+  readOnlyAuthors,
+  readOnlyProposalEvaluationType,
+  readOnlyReviewers,
+  readOnlyRubricCriteria,
   rubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
+  showStatus,
   snapshotProposalId,
   userId,
-  updateProposalStatus
+  updateProposalStatus,
+  title
 }: ProposalPropertiesProps) {
   const showRubricFeature = useIsCharmverseSpace();
 
@@ -229,7 +235,12 @@ export function ProposalProperties({
         ([
           'Results',
           <LoadingComponent key='results' isLoading={!rubricCriteria}>
-            <RubricResults answers={rubricAnswers} criteriaList={rubricCriteria || []} reviewers={proposalReviewers} />
+            <RubricResults
+              answers={rubricAnswers}
+              criteriaList={rubricCriteria || []}
+              reviewers={proposalReviewers}
+              title={title}
+            />
           </LoadingComponent>,
           { sx: { p: 0 } }
         ] as TabConfig)
@@ -251,7 +262,7 @@ export function ProposalProperties({
       mt={2}
     >
       <div className='octo-propertylist'>
-        {!isTemplate && (
+        {showStatus && (
           <>
             <Grid container mb={2}>
               <ProposalStepSummary
@@ -282,7 +293,7 @@ export function ProposalProperties({
           </>
         )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-          {!isTemplate && (
+          {showStatus && (
             <Box mt={2} mb={2}>
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
@@ -310,7 +321,7 @@ export function ProposalProperties({
           </Box>
 
           {/* Select a template */}
-          {!isTemplate && isNewProposal && (
+          {isNewProposal && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Template</PropertyLabel>
@@ -349,7 +360,7 @@ export function ProposalProperties({
               <Box display='flex' flex={1}>
                 <UserSelect
                   memberIds={proposalAuthorIds}
-                  readOnly={readOnly || canUpdateProposalProperties === false}
+                  readOnly={readOnlyAuthors}
                   onChange={(authors) => {
                     setProposalFormInputs({
                       ...proposalFormInputs,
@@ -367,7 +378,7 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
-                readOnly={readOnly || canUpdateProposalProperties === false}
+                readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 onChange={(options) => {
                   setProposalFormInputs({
@@ -384,7 +395,7 @@ export function ProposalProperties({
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly>Type</PropertyLabel>
                 <ProposalEvaluationTypeSelect
-                  disabled={readOnly || (!isNewProposal && !isTemplate)}
+                  disabled={readOnlyProposalEvaluationType}
                   value={proposalFormInputs.evaluationType}
                   onChange={(evaluationType) => {
                     setProposalFormInputs({
@@ -404,9 +415,11 @@ export function ProposalProperties({
                 <PropertyLabel readOnly>&nbsp;</PropertyLabel>
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
-                    readOnly={readOnly || canUpdateProposalProperties === false}
+                    readOnly={readOnlyRubricCriteria}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
+                    proposalStatus={proposalStatus}
+                    answers={rubricAnswers ?? []}
                   />
                 </Box>
               </Box>
