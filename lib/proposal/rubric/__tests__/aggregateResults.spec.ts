@@ -1,3 +1,4 @@
+import type { AggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 
 const firstUserId = '1';
@@ -190,6 +191,41 @@ describe('aggregateResults', () => {
         score: 7,
         comment: 'my opinion'
       }
+    });
+  });
+
+  it('should return nulls if no answers available', async () => {
+    expect(
+      aggregateResults({
+        answers: [],
+        criteria: []
+      })
+    ).toMatchObject<AggregateResults>({
+      allScores: { average: null, sum: null },
+      criteriaSummary: {},
+      reviewersResults: {}
+    });
+
+    expect(
+      aggregateResults({
+        answers: [],
+        criteria: [
+          {
+            description: '',
+            id: '1',
+            parameters: { min: 1, max: 10 },
+            proposalId: '1',
+            title: 'Example',
+            type: 'range'
+          }
+        ]
+      })
+    ).toMatchObject<AggregateResults>({
+      allScores: { average: null, sum: null },
+      criteriaSummary: {
+        '1': { average: null, sum: null }
+      },
+      reviewersResults: {}
     });
   });
 });
