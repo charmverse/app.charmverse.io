@@ -285,9 +285,11 @@ export function SpaceSettings({ space }: { space: Space }) {
                   >
                     <SettingsItem
                       sx={{ gap: 0 }}
+                      data-test={`settings-feature-item-${id}`}
                       actions={[
                         <MenuItem
-                          key={`action_${id}`}
+                          key='1'
+                          data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
                           onClick={() => {
                             setFeatures((prevState) => {
                               const newState = [...prevState];

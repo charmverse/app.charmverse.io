@@ -15,13 +15,19 @@ export class SpaceProfileSettings extends SettingsModal {
 
   readonly confirmDeleteSpaceButton: Locator;
 
-  readonly bountyVisibilityToggle: Locator;
+  readonly bountyVisibility: Locator;
 
-  readonly forumVisibilityToggle: Locator;
+  readonly forumVisibility: Locator;
 
-  readonly memberDirectoryVisibilityToggle: Locator;
+  readonly memberDirectoryVisibility: Locator;
 
-  readonly proposalsVisibilityToggle: Locator;
+  readonly proposalsVisibility: Locator;
+
+  readonly proposalsVisibilityMenu: Locator;
+
+  readonly proposalsVisibilityHideAction: Locator;
+
+  readonly proposalsVisibilityShowAction: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -32,9 +38,12 @@ export class SpaceProfileSettings extends SettingsModal {
     this.confirmDeleteSpaceButton = page.locator('data-test=confirm-delete-button');
 
     // Space feature visibility toggles
-    this.bountyVisibilityToggle = page.locator(`data-test=space-feature-toggle-bounties`);
-    this.forumVisibilityToggle = page.locator(`data-test=space-feature-toggle-forum`);
-    this.memberDirectoryVisibilityToggle = page.locator(`data-test=space-feature-toggle-member_directory`);
-    this.proposalsVisibilityToggle = page.locator(`data-test=space-feature-toggle-proposals >> input`);
+    this.bountyVisibility = page.locator(`data-test=settings-feature-item-bounties`);
+    this.forumVisibility = page.locator(`data-test=settings-feature-item-forum`);
+    this.memberDirectoryVisibility = page.locator(`data-test=settings-feature-item-member_directory`);
+    this.proposalsVisibility = page.locator(`data-test=settings-feature-item-proposals`);
+    this.proposalsVisibilityMenu = page.locator(`data-test=settings-feature-item-proposals >> button`);
+    this.proposalsVisibilityHideAction = page.locator(`data-test=settings-feature-option-hide`);
+    this.proposalsVisibilityShowAction = page.locator(`data-test=settings-feature-option-show`);
   }
 }
