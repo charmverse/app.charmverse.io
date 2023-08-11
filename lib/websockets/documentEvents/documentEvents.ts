@@ -420,9 +420,9 @@ export class DocumentEventHandler {
             if (ds.slice?.content && (ds.from === ds.to || restorePage)) {
               ds.slice.content.forEach((node) => {
                 if (node && node.type === 'page' && node.attrs) {
-                  const { id: pageId, type: pageType, path: pagePath } = node.attrs.id;
+                  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
                   // pagePath is null when the page is not a linked page
-                  if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
+                  if (pageId && pageType === null && pagePath === null) {
                     restoredPageIds.push(node.attrs?.id);
                   }
                 }
@@ -431,8 +431,8 @@ export class DocumentEventHandler {
               // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (node && node.attrs && node.type === 'page') {
-                const { id: pageId, type: pageType, path: pagePath } = node.attrs.id;
-                if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
+                const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
+                if (pageId && pageType === null && pagePath === null) {
                   deletedPageIds.push(pageId);
                 }
               }
@@ -441,8 +441,8 @@ export class DocumentEventHandler {
               room.node.nodesBetween(ds.from, ds.to, (_node) => {
                 const jsonNode = _node.toJSON() as PageContent;
                 if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
-                  const { id: pageId, type: pageType, path: pagePath } = jsonNode.attrs.id;
-                  if (pageId && !pageType.match(staticPageTypeRegex) && pagePath === null) {
+                  const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
+                  if (pageId && pageType === null && pagePath === null) {
                     deletedPageIds.push(pageId);
                   }
                 }
