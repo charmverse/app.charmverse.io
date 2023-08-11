@@ -277,8 +277,8 @@ jobs:
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
-          npm install @datadog/datadog-ci
-          npx datadog-ci sourcemaps upload .next/static   \
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
             --service=webapp                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://app.charmverse.io/_next/static
