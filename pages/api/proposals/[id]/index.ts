@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -49,6 +50,24 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   });
   if (computed.read !== true) {
     throw new NotFoundError();
+  }
+
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId: proposal.spaceId,
+    userId
+  });
+
+  const reviewerIds =
+    !spaceRole || spaceRole.isAdmin
+      ? []
+      : await getAllReviewerUserIds({
+          proposalId: proposal.id
+        });
+
+  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
+
+  if (!canSeeAnswers) {
+    proposal.rubricAnswers = [];
   }
 
   return res.status(200).json(proposal as ProposalWithUsersAndRubric);
@@ -149,6 +168,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType });
 
   const updatedProposal = await getProposal({ proposalId: proposal.id });
+
+  // Don't allow fetching answers here
+  updatedProposal.proposal.rubricAnswers = [];
 
   return res.status(200).send(updatedProposal);
 }
