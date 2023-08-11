@@ -38,11 +38,12 @@ test('Space settings - toggle feature visibility', async ({ spaceSettings }) => 
   await spaceSettings.proposalsVisibilityMenu.click();
   await expect(spaceSettings.proposalsVisibilityHideAction).toBeVisible();
   await spaceSettings.proposalsVisibilityHideAction.click();
+  await spaceSettings.submitSpaceUpdateButton.click();
 
   // Proposal visibility toggle should now be off
   await spaceSettings.proposalsVisibilityMenu.click();
   await expect(spaceSettings.proposalsVisibilityShowAction).toBeVisible();
-  await spaceSettings.proposalsVisibilityMenu.click();
+  await spaceSettings.page.keyboard.press('Escape');
   await spaceSettings.closeModalButton.click();
 
   // Make sure modal is closed before evaluating the sidebar

@@ -45,5 +45,6 @@ export class SpaceProfileSettings extends SettingsModal {
     this.proposalsVisibilityMenu = page.locator(`data-test=settings-feature-item-proposals >> button`);
     this.proposalsVisibilityHideAction = page.locator(`data-test=settings-feature-option-hide`);
     this.proposalsVisibilityShowAction = page.locator(`data-test=settings-feature-option-show`);
+    this.submitSpaceUpdateButton = page.locator(`data-test=submit-space-update`);
   }
 }
