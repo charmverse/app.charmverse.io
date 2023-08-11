@@ -3,9 +3,10 @@ import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/pr
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import { Button, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 
+import { Button } from 'components/common/Button';
 import {
   proposalStatusDetails,
   getProposalStatuses,
@@ -34,8 +35,6 @@ export function ProposalStepSummary({
   const nextStatus = statuses[currentStatusIndex + 1];
   const previousStatus = statuses[currentStatusIndex - 1];
 
-  const showActions =
-    (nextStatus && proposalFlowFlags?.[nextStatus]) || (previousStatus && proposalFlowFlags?.[previousStatus]);
   return (
     <Stack flex={1}>
       <Stack
@@ -55,49 +54,48 @@ export function ProposalStepSummary({
           </Typography>
         </Stack>
 
-        {showActions && (
-          <Stack gap={0.5} direction='row' fontSize='10px'>
-            {!!previousStatus && (
-              <Button
-                sx={{ whiteSpace: 'nowrap' }}
-                size='small'
-                color='secondary'
-                startIcon={<ArrowBackIos fontSize='inherit' />}
-                disabled={!proposalFlowFlags?.[previousStatus]}
-                disableElevation
-                variant='outlined'
-                onClick={() => {
-                  if (previousStatus) {
-                    updateProposalStatus?.(previousStatus);
+        <Stack gap={0.5} direction='row' fontSize='10px'>
+          {!!previousStatus && (
+            <Button
+              sx={{ whiteSpace: 'nowrap' }}
+              size='small'
+              color='secondary'
+              startIcon={<ArrowBackIos fontSize='inherit' />}
+              disabled={!proposalFlowFlags?.[previousStatus]}
+              disableElevation
+              variant='outlined'
+              onClick={() => {
+                if (previousStatus) {
+                  updateProposalStatus?.(previousStatus);
+                }
+              }}
+            >
+              {PROPOSAL_STATUS_LABELS[previousStatus]}
+            </Button>
+          )}
+          {!!nextStatus && (
+            <Button
+              disabledTooltip={nextStatus === 'discussion' ? 'Select a reviewer to proceed' : undefined}
+              size='small'
+              color='primary'
+              disableElevation
+              sx={{ whiteSpace: 'nowrap' }}
+              endIcon={<ArrowForwardIos fontSize='inherit' />}
+              disabled={!proposalFlowFlags?.[nextStatus]}
+              onClick={() => {
+                if (nextStatus) {
+                  if (nextStatus === 'vote_active') {
+                    openVoteModal?.();
+                  } else {
+                    updateProposalStatus?.(nextStatus);
                   }
-                }}
-              >
-                {PROPOSAL_STATUS_LABELS[previousStatus]}
-              </Button>
-            )}
-            {!!nextStatus && (
-              <Button
-                size='small'
-                color='primary'
-                disableElevation
-                sx={{ whiteSpace: 'nowrap' }}
-                endIcon={<ArrowForwardIos fontSize='inherit' />}
-                disabled={!proposalFlowFlags?.[nextStatus]}
-                onClick={() => {
-                  if (nextStatus) {
-                    if (nextStatus === 'vote_active') {
-                      openVoteModal?.();
-                    } else {
-                      updateProposalStatus?.(nextStatus);
-                    }
-                  }
-                }}
-              >
-                {PROPOSAL_STATUS_LABELS[nextStatus]}
-              </Button>
-            )}
-          </Stack>
-        )}
+                }
+              }}
+            >
+              {PROPOSAL_STATUS_LABELS[nextStatus]}
+            </Button>
+          )}
+        </Stack>
       </Stack>
     </Stack>
   );
