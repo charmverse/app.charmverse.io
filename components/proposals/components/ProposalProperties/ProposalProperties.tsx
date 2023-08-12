@@ -12,6 +12,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -20,7 +21,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
-import { useProposalReviewerIds } from 'components/proposals/hooks/useProposalReviewerIds';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
@@ -71,7 +71,7 @@ type ProposalPropertiesProps = {
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
-  setProposalFormInputs: (values: ProposalFormInputs) => void;
+  setProposalFormInputs: (values: ProposalFormInputs) => Promise<void> | void;
   showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
@@ -115,7 +115,7 @@ export function ProposalProperties({
 
   const { proposalTemplates } = useProposalTemplates();
 
-  const { reviewerUserIds } = useProposalReviewerIds(
+  const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
 
@@ -245,7 +245,7 @@ export function ProposalProperties({
         ] as TabConfig)
     ].filter(isTruthy);
     return tabs;
-  }, [canAnswerRubric, canViewRubricAnswers, rubricAnswers, myRubricAnswers, rubricCriteria]);
+  }, [canAnswerRubric, canViewRubricAnswers, rubricAnswers, myRubricAnswers, reviewerUserIds, rubricCriteria]);
 
   return (
     <Box
@@ -381,11 +381,12 @@ export function ProposalProperties({
               <UserAndRoleSelect
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
-                onChange={(options) => {
-                  setProposalFormInputs({
+                onChange={async (options) => {
+                  await setProposalFormInputs({
                     ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
+                  refreshReviewerIds();
                 }}
               />
             </Box>

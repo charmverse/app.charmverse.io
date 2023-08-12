@@ -82,12 +82,13 @@ export function ProposalsTable({
         </Grid>
         <Grid item xs={1} display='flex' justifyContent='center'></Grid>
       </GridHeader>
-      {isLoading && <LoadingComponent height='250px' isLoading />}
-      {proposals.length === 0 && (
-        <Box height='250px' mt={2}>
-          <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />
-        </Box>
-      )}
+      <LoadingComponent height='250px' isLoading={isLoading}>
+        {proposals.length === 0 && (
+          <Box height='250px' mt={2}>
+            <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />
+          </Box>
+        )}
+      </LoadingComponent>
       {proposals.map((proposal) => {
         const { category } = proposal;
         const proposalPage = pages[proposal.id];

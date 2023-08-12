@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetProposalTemplatesBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 
@@ -12,14 +12,7 @@ export function useProposalTemplates() {
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
-  const {
-    data: proposalTemplates,
-    mutate,
-    isLoading: isLoadingTemplates
-  } = useSWR(
-    () => (space ? `proposals-templates/${space.id}` : null),
-    () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: space!.id })
-  );
+  const { data: proposalTemplates, mutate, isLoading: isLoadingTemplates } = useGetProposalTemplatesBySpace(space?.id);
   const usableTemplates = isAdmin
     ? proposalTemplates
     : proposalTemplates?.filter((template) =>
