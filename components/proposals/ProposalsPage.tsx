@@ -110,7 +110,7 @@ export function ProposalsPage() {
               {proposals?.length === 0 && (
                 <EmptyStateVideo
                   description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with Charmverse'
+                  videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}

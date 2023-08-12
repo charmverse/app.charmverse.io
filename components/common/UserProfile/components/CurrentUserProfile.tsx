@@ -19,6 +19,7 @@ import { UserProfileDialog } from '../UserProfileDialog';
 
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 import { OnboardingEmailForm } from './OnboardingEmailForm';
+import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 type Step = 'email_step' | 'profile_step';
 
@@ -124,6 +125,8 @@ export function CurrentUserProfile({
             userId={currentUser.id}
             showCollectionOptions
           />
+          <Legend mt={4}>Profiles</Legend>
+          <ProfileWidgets userId={currentUser.id} />
           <Box display='flex' justifyContent='flex-end' mt={2}>
             <Button disableElevation size='large' onClick={saveForm}>
               Save

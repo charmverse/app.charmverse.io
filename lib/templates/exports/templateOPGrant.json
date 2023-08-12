@@ -14294,13 +14294,13 @@
                     },
                     "content": [
                       {
-                        "text": "https://www.charmverse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspective",
+                        "text": "https://www.CharmVerse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspective",
                         "type": "text",
                         "marks": [
                           {
                             "type": "link",
                             "attrs": {
-                              "href": "https://www.charmverse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspective"
+                              "href": "https://www.CharmVerse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspective"
                             }
                           },
                           {
@@ -14366,7 +14366,7 @@
                   }
                 ]
               },
-              "contentText": "Create industry standards, professional conduct guidelines, and regulations to steer the enterprise in the right direction.Outline ownership thru Loot + TokenomicsOutline Digital Asset OwnershipOutline RWA OwnershipCreate a Detailed Document Outlining Who Owns What (How Long if needed)Sign Everything using DAOHaus [Explore how to expand the scope of the tool]Referenceshttps://constitutions.metagov.org/https://agilemanifesto.org/https://communityrule.info/https://github.com/BanklessDAO/bankless-dao-constitution/blob/main/bdao-constitution.mdhttps://www.charmverse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspectiveTemplate# Constitutional Template\nby Metagov\n\n## Preamble\n<!-- The preamble introduces the community / DAO, its goals, and its values. We recommend focusing on just the 2-3 values and 2-3 goals that really matter. -->\n\n## Article 1: <Title>\n<!-- Each article of the constitution should respond to the values and goals articulated in the preamble. Each article should address an important issue, policy, institution, or right. Ask yourself: if you had only five articles, would I specify this right or this policy?\n\nNational constitutions typically don’t articulate policy within a constitution; rather, they describe the institutions that shape policies. Many DAOs, like other online communities, do not need  There are good reasons for taking this approach, but many online communities do not need.\n\nConstitutions anchor a DAO’s off-chain governance.\n\nE.g. all decisions will be made by GitcoinDAO via this contract. -->\n\n## Article 2:\n\n## Article 3:\n\n## Article 4:\n\n## Article 5:\n<!-- We recommend restricting constitutions to five or fewer articles. Additional articles can be added through amendments. This is also a good opportunity to practice going through the amendment process! -->\n\n<!-- We encourage community to supply the following JSON-LD metadata as a comment directly in the constitution’s .md file or as a constitution.json file in the same folder as the constitution. -->\n<!-- \n{ \n\"@context\": \"https://www.metagov.org\" \n\"type\": \"constitution\",\n\"address\": \n{\n\"type\": \"EthereumAddress\",\n\"address\": <address>\n},\n\"dateCreated\": <DD-MM-YYYY>,\n\"dateModified\": <DD-MM-YYYY>,\n\"previousConstitutionURI\": <URI>,\n\"inForce\": <True, False>\n}\n-->",
+              "contentText": "Create industry standards, professional conduct guidelines, and regulations to steer the enterprise in the right direction.Outline ownership thru Loot + TokenomicsOutline Digital Asset OwnershipOutline RWA OwnershipCreate a Detailed Document Outlining Who Owns What (How Long if needed)Sign Everything using DAOHaus [Explore how to expand the scope of the tool]Referenceshttps://constitutions.metagov.org/https://agilemanifesto.org/https://communityrule.info/https://github.com/BanklessDAO/bankless-dao-constitution/blob/main/bdao-constitution.mdhttps://www.CharmVerse.io/post/here-to-help-questions-to-ask-yourself-when-founding-a-dao-from-a-legal-perspectiveTemplate# Constitutional Template\nby Metagov\n\n## Preamble\n<!-- The preamble introduces the community / DAO, its goals, and its values. We recommend focusing on just the 2-3 values and 2-3 goals that really matter. -->\n\n## Article 1: <Title>\n<!-- Each article of the constitution should respond to the values and goals articulated in the preamble. Each article should address an important issue, policy, institution, or right. Ask yourself: if you had only five articles, would I specify this right or this policy?\n\nNational constitutions typically don’t articulate policy within a constitution; rather, they describe the institutions that shape policies. Many DAOs, like other online communities, do not need  There are good reasons for taking this approach, but many online communities do not need.\n\nConstitutions anchor a DAO’s off-chain governance.\n\nE.g. all decisions will be made by GitcoinDAO via this contract. -->\n\n## Article 2:\n\n## Article 3:\n\n## Article 4:\n\n## Article 5:\n<!-- We recommend restricting constitutions to five or fewer articles. Additional articles can be added through amendments. This is also a good opportunity to practice going through the amendment process! -->\n\n<!-- We encourage community to supply the following JSON-LD metadata as a comment directly in the constitution’s .md file or as a constitution.json file in the same folder as the constitution. -->\n<!-- \n{ \n\"@context\": \"https://www.metagov.org\" \n\"type\": \"constitution\",\n\"address\": \n{\n\"type\": \"EthereumAddress\",\n\"address\": <address>\n},\n\"dateCreated\": <DD-MM-YYYY>,\n\"dateModified\": <DD-MM-YYYY>,\n\"previousConstitutionURI\": <URI>,\n\"inForce\": <True, False>\n}\n-->",
               "galleryImage": "",
               "hasContent": true,
               "headerImage": null,
@@ -15759,7 +15759,7 @@
                                 ]
                               },
                               {
-                                "text": "Charmverse ",
+                                "text": "CharmVerse ",
                                 "type": "text",
                                 "marks": [
                                   {
@@ -15834,7 +15834,7 @@
                   }
                 ]
               },
-              "contentText": "The height 200px width 1500pxCustom Cover for each Charmverse page categoryLet's start with the \"To Dos\"",
+              "contentText": "The height 200px width 1500pxCustom Cover for each CharmVerse page categoryLet's start with the \"To Dos\"",
               "galleryImage": "",
               "hasContent": true,
               "headerImage": null,
@@ -16087,7 +16087,7 @@
                     },
                     "content": [
                       {
-                        "text": "Optional; Embbed Kokonut Finances into Charmverse or Web Tool.",
+                        "text": "Optional; Embbed Kokonut Finances into CharmVerse or Web Tool.",
                         "type": "text",
                         "marks": [
                           {
@@ -16111,7 +16111,7 @@
                   }
                 ]
               },
-              "contentText": "Merge with the Kokonut Finances SpreadsheetReview inflation-adjusted budgetUpdate accordingly to the new changesOptional; Embbed Kokonut Finances into Charmverse or Web Tool.",
+              "contentText": "Merge with the Kokonut Finances SpreadsheetReview inflation-adjusted budgetUpdate accordingly to the new changesOptional; Embbed Kokonut Finances into CharmVerse or Web Tool.",
               "galleryImage": "",
               "hasContent": true,
               "headerImage": null,
@@ -23694,7 +23694,7 @@
                                   {
                                     "type": "link",
                                     "attrs": {
-                                      "href": "https://link.kokonut.network/charmverse"
+                                      "href": "https://link.kokonut.network/CharmVerse"
                                     }
                                   }
                                 ]

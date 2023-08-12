@@ -44,6 +44,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
+import { memberProfileLabels } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { capitalize } from 'lib/utilities/strings';
@@ -357,7 +358,7 @@ export function SpaceSettings({ space }: { space: Space }) {
                       text={
                         <Box display='flex' alignItems='center' gap={1}>
                           <Image width={25} height={25} alt={mp.id} src={getProfileWidgetLogo(mp.id)} />
-                          <Typography>{capitalize(mp.id)}</Typography>
+                          <Typography>{memberProfileLabels[mp.id]}</Typography>
                         </Box>
                       }
                     />
@@ -480,7 +481,7 @@ export function SpaceSettings({ space }: { space: Space }) {
                 <ListItemIcon>
                   <Image width={25} height={25} alt={mp.id} src={getProfileWidgetLogo(mp.id)} />
                 </ListItemIcon>
-                <ListItemText primary={capitalize(mp.id)} />
+                <ListItemText primary={memberProfileLabels[mp.id]} />
               </ListItem>
             ))}
         </List>
