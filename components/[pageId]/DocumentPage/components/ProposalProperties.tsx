@@ -123,7 +123,9 @@ export function ProposalProperties({
         (proposal?.status !== 'draft' && !isTemplate) ||
         isFromTemplateSource
       }
-      readOnlyReviewers={readOnlyProperties || isFromTemplateSource}
+      readOnlyReviewers={
+        readOnlyProperties || (isFromTemplateSource && proposal?.reviewers && proposal.reviewers.length > 0)
+      }
       rubricAnswers={proposal?.rubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       showStatus={!isTemplate}

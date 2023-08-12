@@ -177,7 +177,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                 <div className='CardDetail content'>
                   <ProposalProperties
                     readOnlyRubricCriteria={isFromTemplateSource}
-                    readOnlyReviewers={isFromTemplateSource}
+                    readOnlyReviewers={isFromTemplateSource && formInputs.reviewers.length > 0}
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
