@@ -21,7 +21,7 @@ jest.mock('next/router', () => ({
   }))
 }));
 jest.mock('charmClient/hooks/proposals', () => ({
-  useProposal: jest.fn(() => ({
+  useGetProposalDetails: jest.fn(() => ({
     proposal: null
   }))
 }));
