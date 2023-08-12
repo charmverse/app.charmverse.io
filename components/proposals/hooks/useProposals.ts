@@ -10,9 +10,10 @@ import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 export function useProposals() {
   const [statusFilter, setStatusFilter] = useState<ProposalStatusFilter>('all');
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
-  const { pages } = usePages();
+  const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
+
   // filter out deleted and templates
   let filteredProposals = proposals
     ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')
@@ -63,7 +64,7 @@ export function useProposals() {
     setStatusFilter,
     setCategoryIdFilter,
     mutateProposals,
-    isLoading,
+    isLoading: isLoading || loadingPages,
     archiveProposal
   };
 }

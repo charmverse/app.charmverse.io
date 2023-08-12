@@ -103,7 +103,7 @@ export function ProposalsPage() {
 
           {loadingData ? (
             <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent isLoading size={50} />
+              <LoadingComponent height={500} isLoading size={50} />
             </Grid>
           ) : (
             <Grid item xs={12} sx={{ mt: 5 }}>
