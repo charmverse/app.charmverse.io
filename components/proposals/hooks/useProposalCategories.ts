@@ -1,17 +1,14 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import useSWR from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { useGetProposalCategories } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
   const { space: currentSpace } = useCurrentSpace();
   // Might need better ACL in the future
-  const { data: categories, mutate } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}/categories` : null),
-    () => charmClient.proposals.getProposalCategories(currentSpace!.id)
-  );
+  const { data: categories, mutate } = useGetProposalCategories(currentSpace?.id);
 
   async function addCategory(category: NewProposalCategory) {
     const newCategory = await charmClient.proposals.createProposalCategory(currentSpace!.id, category);

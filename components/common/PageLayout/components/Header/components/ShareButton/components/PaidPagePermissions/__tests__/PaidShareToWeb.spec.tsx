@@ -3,10 +3,10 @@ import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';
 
 // Import hooks to mock
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { useProposal } from 'hooks/useProposal';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 import PaidShareToWeb from '../PaidShareToWeb';
@@ -20,7 +20,7 @@ jest.mock('next/router', () => ({
     asPath: ''
   }))
 }));
-jest.mock('hooks/useProposal', () => ({
+jest.mock('charmClient/hooks/proposals', () => ({
   useProposal: jest.fn(() => ({
     proposal: null
   }))
@@ -136,8 +136,8 @@ describe('PaidShareToWeb', () => {
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<Partial<ReturnType<typeof useProposal>>>).mockReturnValueOnce({
-      proposal: {
+    (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
+      data: {
         status: 'draft'
       } as any
     });
@@ -172,8 +172,8 @@ describe('PaidShareToWeb', () => {
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<Partial<ReturnType<typeof useProposal>>>).mockReturnValueOnce({
-      proposal: {
+    (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
+      data: {
         status: 'discussion'
       } as any
     });

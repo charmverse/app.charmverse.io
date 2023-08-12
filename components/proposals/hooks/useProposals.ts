@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import type { ProposalStatusFilter } from 'components/proposals/components/ProposalViewOptions/ProposalsViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -12,13 +12,7 @@ export function useProposals() {
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
   const { pages } = usePages();
   const { space } = useCurrentSpace();
-  const {
-    data: proposals,
-    mutate: mutateProposals,
-    isLoading
-  } = useSWR(space ? `proposals/${space.id}` : null, () =>
-    charmClient.proposals.getProposalsBySpace({ spaceId: space!.id })
-  );
+  const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
   // filter out deleted and templates
   let filteredProposals = proposals
     ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')

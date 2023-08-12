@@ -3,7 +3,7 @@ import useSWRMutation from 'swr/mutation';
 
 import * as http from 'adapters/http';
 
-export function useGET<T = unknown>(path: string, query: any = {}) {
+export function useGET<T = unknown>(path: string | undefined | null, query: any = {}) {
   // map optional query inputs into the url
   const queryStr = Object.keys(query)
     .filter((key) => !!query[key])

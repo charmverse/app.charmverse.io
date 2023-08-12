@@ -4,10 +4,10 @@ import Stack from '@mui/material/Stack';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { useProposal } from 'hooks/useProposal';
 
 import { ReadonlyPagePermissionRow } from './ReadonlyPagePermissionRow';
 
@@ -24,7 +24,7 @@ const userFriendlyProposalPagePermissionLabels: Record<ProposalCategoryPermissio
 };
 
 export function ProposalPagePermissions({ proposalId }: Props) {
-  const { proposal } = useProposal({ proposalId });
+  const { data: proposal } = useGetProposalDetails(proposalId);
 
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();

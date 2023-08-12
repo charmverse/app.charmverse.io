@@ -4,14 +4,16 @@ import { debounce } from 'lodash';
 import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
-import { useUpsertRubricCriteria } from 'charmClient/hooks/proposals';
+import {
+  useUpsertRubricCriteria,
+  useGetAllReviewerUserIds,
+  useGetProposalFlowFlags,
+  useGetProposalDetails
+} from 'charmClient/hooks/proposals';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
-import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { useProposalReviewerIds } from 'components/proposals/hooks/useProposalReviewerIds';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 
@@ -36,7 +38,7 @@ export function ProposalProperties({
   isTemplate,
   title
 }: ProposalPropertiesProps) {
-  const { proposal, refreshProposal } = useProposalDetails(proposalId);
+  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
   const { user } = useUser();
 
@@ -44,10 +46,10 @@ export function ProposalProperties({
     proposalIdOrPath: proposalId
   });
 
-  const { reviewerUserIds } = useProposalReviewerIds(
+  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
     !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
   );
-  const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
