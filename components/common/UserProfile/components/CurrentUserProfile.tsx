@@ -19,6 +19,7 @@ import { UserProfileDialog } from '../UserProfileDialog';
 
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 import { OnboardingEmailForm } from './OnboardingEmailForm';
+import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 type Step = 'email_step' | 'profile_step';
 
@@ -131,6 +132,11 @@ export function CurrentUserProfile({
           </Box>
         </>
       ) : null}
+
+      <Box>
+        <Legend mt={4}>Profiles</Legend>
+        <ProfileWidgets userId={currentUser.id} />
+      </Box>
     </UserProfileDialog>
   );
 }
