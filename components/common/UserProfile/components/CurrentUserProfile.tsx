@@ -125,6 +125,8 @@ export function CurrentUserProfile({
             userId={currentUser.id}
             showCollectionOptions
           />
+          <Legend mt={4}>Profiles</Legend>
+          <ProfileWidgets userId={currentUser.id} />
           <Box display='flex' justifyContent='flex-end' mt={2}>
             <Button disableElevation size='large' onClick={saveForm}>
               Save
@@ -132,11 +134,6 @@ export function CurrentUserProfile({
           </Box>
         </>
       ) : null}
-
-      <Box>
-        <Legend mt={4}>Profiles</Legend>
-        <ProfileWidgets userId={currentUser.id} />
-      </Box>
     </UserProfileDialog>
   );
 }
