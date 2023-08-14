@@ -315,15 +315,24 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
           <Grid container direction='column' spacing={3}>
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
-              <InputEnumToOption
-                defaultValue={snapshotVoteMode}
-                keyAndLabel={
-                  snapshotVotingType === null
-                    ? SnapshotVotingMode
-                    : { [snapshotVotingType]: SnapshotVotingMode[snapshotVotingType] }
+              <Tooltip
+                title={
+                  snapshotSpace?.voting.type
+                    ? 'This option is readonly because it is enforced for your space inside Snapshot'
+                    : ''
                 }
-                onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
-              />
+              >
+                <InputEnumToOption
+                  value={snapshotVoteMode}
+                  readOnly={!!snapshotSpace?.voting.type}
+                  keyAndLabel={
+                    snapshotVotingType === null
+                      ? SnapshotVotingMode
+                      : { [snapshotVotingType]: SnapshotVotingMode[snapshotVotingType] }
+                  }
+                  onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
+                />
+              </Tooltip>
             </Grid>
 
             <Grid item>
