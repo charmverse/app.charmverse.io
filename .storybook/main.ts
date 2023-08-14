@@ -10,10 +10,32 @@ const config: StorybookConfig = {
     autodocs: 'tag'
   },
   staticDirs: [
+    '../public',
     {
       from: '../theme/fonts.ts',
       to: 'theme/fonts.ts'
-    },
+    }
   ],
+  webpackFinal: (config) => {
+    // Add fallbacks for node.js libraries
+    let loaders = config.resolve;
+    if (loaders) {
+      loaders.fallback = {
+        fs: false,
+        tls: false,
+        net: false,
+        http: false, //require.resolve('stream-http'),
+        https: false,
+        os: false,
+        zlib: false, //require.resolve('browserify-zlib'),
+        path: require.resolve('path-browserify'),
+        stream: require.resolve('stream-browserify'),
+        util: require.resolve('util/'),
+        crypto: false //require.resolve('crypto-browserify')
+      };
+    }
+
+    return config;
+  }
 };
 export default config;

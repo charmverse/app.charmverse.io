@@ -1,7 +1,7 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 
-import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import InviteLinkPage from 'components/invite/InviteLinkPage';
 import InviteLinkPageError from 'components/invite/InviteLinkPageError';
 import { getInviteLink } from 'lib/invites/getInviteLink';

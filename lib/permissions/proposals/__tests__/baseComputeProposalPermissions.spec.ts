@@ -2,11 +2,11 @@ import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { proposalOperations } from '@charmverse/core/permissions';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { baseComputeProposalPermissions } from '../computeProposalPermissions';
@@ -129,6 +129,7 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       review: false,
+      evaluate: false,
       vote: false,
       archive: false,
       unarchive: false,
@@ -137,7 +138,7 @@ describe('computeProposalPermissions - base', () => {
     });
   });
 
-  it('should allow the reviewer to review the proposal', async () => {
+  it('should allow the reviewer to review and evaluate the proposal', async () => {
     const permissions = await baseComputeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalReviewer.id
@@ -146,6 +147,7 @@ describe('computeProposalPermissions - base', () => {
     expect(permissions).toMatchObject<ProposalPermissionFlags>({
       ...spaceMemberPermisions,
       review: true,
+      evaluate: true,
       edit: false,
       make_public: false,
       delete: false,
@@ -179,6 +181,7 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       review: false,
+      evaluate: false,
       archive: false,
       unarchive: false
     });
@@ -198,6 +201,7 @@ describe('computeProposalPermissions - base', () => {
       delete: true,
       edit: true,
       review: true,
+      evaluate: true,
       make_public: false,
       archive: true,
       unarchive: true
@@ -218,6 +222,7 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       review: false,
+      evaluate: false,
       vote: false,
       archive: false,
       unarchive: false,

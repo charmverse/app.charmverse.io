@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { MemberProfileJson } from 'lib/profile/memberProfiles';
 
 import { useMemberCollections } from '../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
@@ -13,8 +14,6 @@ import { EnsWidget } from './EnsWidget';
 import { LensProfileWidget } from './LensProfileWidget';
 import { MemberPropertiesWidget } from './MemberPropertiesWidget';
 import { SummonProfileWidget } from './SummonProfileWidget';
-
-const profileWidgets = ['charmverse', 'collection', 'ens', 'lens', 'summon'] as const;
 
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
@@ -50,59 +49,63 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     return <LoadingComponent isLoading />;
   }
 
+  const memberProfiles = space?.memberProfiles as MemberProfileJson[] | undefined;
+
   return (
     <Grid container spacing={4}>
-      {profileWidgets.map((profileWidget) => {
-        switch (profileWidget) {
-          case 'ens':
-            return (
-              ensProfile && (
-                <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                  <EnsWidget ensProfile={ensProfile} />
-                </Grid>
-              )
-            );
+      {memberProfiles
+        ?.filter(({ isHidden }) => !isHidden)
+        .map(({ id }) => {
+          switch (id) {
+            case 'ens':
+              return (
+                ensProfile && (
+                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                    <EnsWidget ensProfile={ensProfile} />
+                  </Grid>
+                )
+              );
 
-          case 'collection':
-            return (
-              !hideCollections &&
-              (!nftsError || !poapsError) && (
-                <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                  <CollectionWidget mutateNfts={mutateNfts} nfts={nfts} poaps={poaps} userId={userId} />
-                </Grid>
-              )
-            );
+            case 'collection':
+              return (
+                !hideCollections &&
+                (!nftsError || !poapsError) && (
+                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                    <CollectionWidget mutateNfts={mutateNfts} nfts={nfts} poaps={poaps} userId={userId} />
+                  </Grid>
+                )
+              );
 
-          case 'charmverse':
-            return space ? (
-              <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                <MemberPropertiesWidget memberPropertyValues={memberPropertyValues} userId={userId} />
-              </Grid>
-            ) : null;
-
-          case 'summon': {
-            return (
-              summonProfile && (
-                <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                  <SummonProfileWidget summonProfile={summonProfile} />
+            case 'charmverse':
+              return space ? (
+                <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                  <MemberPropertiesWidget memberPropertyValues={memberPropertyValues} userId={userId} />
                 </Grid>
-              )
-            );
+              ) : null;
+
+            case 'summon': {
+              return (
+                summonProfile && (
+                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                    <SummonProfileWidget summonProfile={summonProfile} />
+                  </Grid>
+                )
+              );
+            }
+
+            case 'lens':
+              return (
+                lensProfile && (
+                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                    <LensProfileWidget lensProfile={lensProfile} />
+                  </Grid>
+                )
+              );
+
+            default:
+              return null;
           }
-
-          case 'lens':
-            return (
-              lensProfile && (
-                <Grid item xs={12} md={6} alignItems='stretch' key={profileWidget}>
-                  <LensProfileWidget lensProfile={lensProfile} />
-                </Grid>
-              )
-            );
-
-          default:
-            return null;
-        }
-      })}
+        })}
     </Grid>
   );
 }

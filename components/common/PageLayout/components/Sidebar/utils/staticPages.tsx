@@ -1,6 +1,11 @@
-import type { Feature } from '@charmverse/core/prisma';
+export type Feature = 'member_directory' | 'proposals' | 'forum' | 'bounties';
 
-export enum StaticPagesPath {
+export type FeatureJson = {
+  id: Feature;
+  isHidden: boolean;
+};
+
+enum StaticPagesPath {
   members = 'members',
   forum = 'forum',
   bounties = 'bounties',
@@ -21,3 +26,8 @@ export const STATIC_PAGES: StaticPage[] = [
   { path: 'bounties', title: 'Bounties', feature: 'bounties' },
   { path: 'forum', title: 'Forum', feature: 'forum' }
 ];
+
+export const STATIC_PAGES_RECORD = STATIC_PAGES.reduce((acc, page) => {
+  acc[page.feature] = page;
+  return acc;
+}, {} as Record<Feature, StaticPage>);

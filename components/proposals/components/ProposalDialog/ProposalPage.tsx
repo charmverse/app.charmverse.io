@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -37,13 +38,18 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
-  const [_, { width: containerWidth }] = useElementSize();
+  const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
+
   usePreventReload(contentUpdated);
+
   const router = useRouter();
+
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
+
+  const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
     if (currentSpace?.requireProposalTemplate) {
@@ -53,6 +59,24 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
+      // TODO: put validation inside the properties form component
+      try {
+        formInputs.rubricCriteria.forEach((criteria) => {
+          if (criteria.type === 'range') {
+            if (
+              (!criteria.parameters.min && criteria.parameters.min !== 0) ||
+              (!criteria.parameters.max && criteria.parameters.max !== 0)
+            ) {
+              throw new Error('Range values are invalid');
+            }
+            if (criteria.parameters.min >= criteria.parameters.max) {
+              throw new Error('Minimum must be less than Maximum');
+            }
+          }
+        });
+      } catch (error) {
+        showMessage((error as Error).message, 'error');
+      }
       setIsCreatingProposal(true);
       const createdProposal = await charmClient.proposals
         .createProposal({
@@ -63,6 +87,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
             contentText: formInputs.contentText ?? '',
             title: formInputs.title
           },
+          evaluationType: formInputs.evaluationType,
+          rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
           reviewers: formInputs.reviewers,
           spaceId: currentSpace.id
         })
@@ -71,6 +97,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
           throw err;
         });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
       mutate(`proposals/${currentSpace.id}`);
@@ -149,10 +176,20 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
                   <ProposalProperties
-                    isTemplate={false}
+                    readOnlyRubricCriteria={isFromTemplateSource}
+                    readOnlyReviewers={isFromTemplateSource && formInputs.reviewers.length > 0}
+                    readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
+                    showStatus={true}
+                    title=''
                     setProposalFormInputs={setFormInputs}
+                    onChangeRubricCriteria={(rubricCriteria) => {
+                      setFormInputs({
+                        ...formInputs,
+                        rubricCriteria
+                      });
+                    }}
                   />
                 </div>
               </div>

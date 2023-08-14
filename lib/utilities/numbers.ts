@@ -143,3 +143,7 @@ export function percent({ total, value, significantDigits }: PercentCalculation)
 
   return `${percentage.toFixed(significantDigits)}%`;
 }
+
+export function isNumber(number: any) {
+  return !Number.isNaN(number) && typeof number === 'number';
+}

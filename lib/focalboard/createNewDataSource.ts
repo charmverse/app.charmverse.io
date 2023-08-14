@@ -3,6 +3,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { PagesContext } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
+import { createTableView } from 'lib/focalboard/table';
 
 import { createTableView } from './boardView';
 

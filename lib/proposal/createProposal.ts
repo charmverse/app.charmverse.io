@@ -1,7 +1,7 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type { WorkspaceEvent } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -13,9 +13,11 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import { getPagePath } from '../pages';
 
+import type { RubricDataInput } from './rubric/upsertRubricCriteria';
+import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
-type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText'>>;
+type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId'>>;
 
 export type CreateProposalInput = {
   pageId?: string;
@@ -25,6 +27,8 @@ export type CreateProposalInput = {
   authors?: string[];
   userId: string;
   spaceId: string;
+  evaluationType?: ProposalEvaluationType;
+  rubricCriteria?: RubricDataInput[];
 };
 
 export type CreatedProposal = {
@@ -39,7 +43,9 @@ export async function createProposal({
   categoryId,
   pageProps,
   authors,
-  reviewers
+  reviewers,
+  evaluationType,
+  rubricCriteria
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -69,6 +75,7 @@ export async function createProposal({
         space: { connect: { id: spaceId } },
         status: proposalStatus,
         category: { connect: { id: categoryId } },
+        evaluationType,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))
@@ -97,6 +104,7 @@ export async function createProposal({
         proposalId,
         contentText: pageProps?.contentText ?? '',
         path: getPagePath(),
+        sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',
         updatedBy: userId,
         createdBy: userId,
@@ -119,5 +127,16 @@ export async function createProposal({
   ]);
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  return { page: page as PageWithPermissions, proposal, workspaceEvent };
+  const upsertedCriteria = rubricCriteria
+    ? await upsertRubricCriteria({
+        proposalId: proposal.id,
+        rubricCriteria
+      })
+    : [];
+
+  return {
+    page: page as PageWithPermissions,
+    proposal: { ...proposal, rubricCriteria: upsertedCriteria, rubricAnswers: [] },
+    workspaceEvent
+  };
 }

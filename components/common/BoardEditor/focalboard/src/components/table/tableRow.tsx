@@ -15,12 +15,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../../components/properties/TextInput';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -203,6 +203,7 @@ function TableRow(props: Props) {
             )}
             <PropertyValueElement
               readOnly={props.readOnly}
+              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               board={board}
               showEmptyPlaceholder={false}

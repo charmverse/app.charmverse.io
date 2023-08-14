@@ -1,9 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
 import { memo, useEffect, useState } from 'react';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 

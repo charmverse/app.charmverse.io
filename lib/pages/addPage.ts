@@ -27,7 +27,11 @@ interface AddPageResponse {
   page: PageWithPermissions;
 }
 
-export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Promise<AddPageResponse> {
+export async function addPage({
+  createdBy,
+  spaceId,
+  ...page
+}: NewPageInput): Promise<Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> }> {
   const pageId = page?.id || v4();
 
   const isBoardPage = page.type?.match(/board/);
@@ -58,7 +62,7 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Pr
   };
 
   if (isBoardPage) {
-    const { board, view } = createDefaultBoardData({ boardId: pageId });
+    const { board } = createDefaultBoardData({ boardId: pageId });
     result.board = board;
     await mutator.insertBlocks([board]);
   }

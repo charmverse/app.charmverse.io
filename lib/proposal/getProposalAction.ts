@@ -1,6 +1,13 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
-export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
+export type ProposalTaskAction =
+  | 'start_discussion'
+  | 'start_vote'
+  | 'review'
+  | 'discuss'
+  | 'vote'
+  | 'start_review'
+  | 'evaluation_closed';
 
 export function getProposalAction({
   isAuthor,
@@ -30,6 +37,10 @@ export function getProposalAction({
     if (isReviewer) {
       return 'review';
     }
+  } else if (currentStatus === 'evaluation_active' && isReviewer) {
+    return 'review';
+  } else if (currentStatus === 'evaluation_closed' && isAuthor) {
+    return 'evaluation_closed';
   }
   return null;
 }

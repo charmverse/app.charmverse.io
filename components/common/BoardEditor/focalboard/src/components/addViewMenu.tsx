@@ -19,7 +19,8 @@ import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { createBoardView, createTableView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { createTableView } from 'lib/focalboard/table';
 
 import { Constants } from '../constants';
 import mutator from '../mutator';
@@ -111,7 +112,7 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView({ board, activeView });
+    const view = createTableView({ board, activeView, views });
     view.id = uuid();
 
     const oldViewId = activeView?.id;

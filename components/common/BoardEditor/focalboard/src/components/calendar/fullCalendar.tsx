@@ -148,20 +148,25 @@ function CalendarFullView(props: Props): JSX.Element | null {
             {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
           </div>
         </div>
-        {visiblePropertyTemplates.map((template) => (
-          <PropertyValueElement
-            board={board}
-            key={template.id}
-            readOnly={true}
-            card={cards.find((o) => o.id === event.id) || cards[0]}
-            updatedAt={page?.updatedAt.toString() ?? ''}
-            updatedBy={page?.updatedBy ?? ''}
-            propertyTemplate={template}
-            showEmptyPlaceholder={true}
-            showTooltip
-            displayType='calendar'
-          />
-        ))}
+        {visiblePropertyTemplates.map((template) => {
+          const card = cards.find((o) => o.id === event.id) || cards[0];
+
+          return (
+            <PropertyValueElement
+              board={board}
+              syncWithPageId={page?.syncWithPageId}
+              key={template.id}
+              readOnly={true}
+              card={card}
+              updatedAt={page?.updatedAt.toString() ?? ''}
+              updatedBy={page?.updatedBy ?? ''}
+              propertyTemplate={template}
+              showEmptyPlaceholder={true}
+              showTooltip
+              displayType='calendar'
+            />
+          );
+        })}
       </div>
     );
   };

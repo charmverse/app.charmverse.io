@@ -30,11 +30,12 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -45,8 +46,6 @@ import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
-
-type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function generateSpaceUser({
   spaceId,
@@ -827,7 +826,9 @@ export async function createProposalWithUsers({
         include: {
           authors: true,
           reviewers: true,
-          category: true
+          category: true,
+          rubricAnswers: true,
+          rubricCriteria: true
         }
       }
     }

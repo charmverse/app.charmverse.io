@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/dist/cjs/prisma-client';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

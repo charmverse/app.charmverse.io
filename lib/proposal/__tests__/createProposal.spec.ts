@@ -6,7 +6,7 @@ import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/set
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
-import type { ProposalWithUsers } from '../interface';
+import type { ProposalWithUsersAndRubric } from '../interface';
 
 let user: User;
 let space: Space;
@@ -59,7 +59,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
     );
 
     expect(proposal).toMatchObject(
-      expect.objectContaining<Partial<ProposalWithUsers>>({
+      expect.objectContaining<Partial<ProposalWithUsersAndRubric>>({
         authors: [
           {
             proposalId: proposal?.id,
@@ -70,6 +70,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
             userId: extraUser.id
           }
         ],
+        rubricAnswers: [],
+        rubricCriteria: [],
         reviewers: [
           {
             id: expect.any(String),

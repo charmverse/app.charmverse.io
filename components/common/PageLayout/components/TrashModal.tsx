@@ -16,7 +16,7 @@ import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
@@ -28,6 +28,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
@@ -85,11 +86,12 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
   const { mutatePagesRemove, pages, getPageByPath } = usePages();
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const { showMessage } = useSnackbar();
+  const { sendMessage } = useWebSocketClient();
+  const dispatch = useAppDispatch();
 
-  const { data: archivedPages, mutate: setArchivedPages } = useSWR<PagesMap>(
+  const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
     () => {
       return charmClient.pages.getArchivedPages(space?.id as string).then((deletablePages) => {
@@ -102,22 +104,32 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   );
 
   async function restorePage(pageId: string) {
-    if (space) {
-      const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
-      setArchivedPages((_archivedPages) => {
-        if (!_archivedPages) {
-          return {};
-        }
-        restoredPageIds.forEach((restoredPageId) => {
-          if (_archivedPages[restoredPageId]) {
-            delete _archivedPages[restoredPageId];
-          }
+    const page = archivedPages[pageId];
+    if (page && space) {
+      if (page.type === 'board' || page.type === 'page') {
+        sendMessage({
+          payload: {
+            id: pageId
+          },
+          type: 'page_restored'
         });
-        return { ..._archivedPages };
-      });
+      } else {
+        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        setArchivedPages((_archivedPages) => {
+          if (!_archivedPages) {
+            return {};
+          }
+          restoredPageIds.forEach((restoredPageId) => {
+            if (_archivedPages[restoredPageId]) {
+              delete _archivedPages[restoredPageId];
+            }
+          });
+          return { ..._archivedPages };
+        });
 
-      await mutate(`pages/${space.id}`);
-      dispatch(initialLoad({ spaceId: space.id }));
+        await mutate(`pages/${space.id}`);
+        dispatch(initialLoad({ spaceId: space.id }));
+      }
     }
   }
 
@@ -152,35 +164,39 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     ) as PageMeta[];
   }, [archivedPages, searchText]);
 
-  const onRestorePage = useCallback(
-    async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
-      try {
-        e.preventDefault();
-        setIsMutating(true);
-        await restorePage(pageId);
-      } catch (err: any) {
-        showMessage(err.message ?? 'Failed to restore page', 'error');
-      } finally {
-        setIsMutating(false);
-      }
-    },
-    [isMutating]
-  );
+  const onRestorePage = async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
+    try {
+      e.preventDefault();
+      setIsMutating(true);
+      await restorePage(pageId);
+      // Optimistically remove the restored page from modal
+      setArchivedPages((_archivedPages) => {
+        if (!_archivedPages) {
+          return {};
+        }
+        if (_archivedPages[pageId]) {
+          delete _archivedPages[pageId];
+        }
+        return { ..._archivedPages };
+      });
+    } catch (err: any) {
+      showMessage(err.message ?? 'Failed to restore page', 'error');
+    } finally {
+      setIsMutating(false);
+    }
+  };
 
-  const onDeletePage = useCallback(
-    async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
-      try {
-        e.preventDefault();
-        setIsMutating(true);
-        await deletePage(pageId);
-      } catch (err: any) {
-        showMessage(err.message ?? 'Failed to delete page', 'error');
-      } finally {
-        setIsMutating(false);
-      }
-    },
-    [isMutating]
-  );
+  const onDeletePage = async (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => {
+    try {
+      e.preventDefault();
+      setIsMutating(true);
+      await deletePage(pageId);
+    } catch (err: any) {
+      showMessage(err.message ?? 'Failed to delete page', 'error');
+    } finally {
+      setIsMutating(false);
+    }
+  };
 
   const isLoading = !archivedPages;
   const archivedPagesExist = archivedPages && Object.keys(archivedPages).length > 0;

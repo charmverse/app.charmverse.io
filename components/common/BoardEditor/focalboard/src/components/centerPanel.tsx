@@ -435,7 +435,7 @@ function CenterPanel(props: Props) {
 
   return (
     <>
-      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageType={boardPage.type} pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
           <PageWebhookBanner

@@ -11,13 +11,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import { InputSearchReviewers } from 'components/proposals/components/ProposalProperties/components/InputSearchReviewers';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -353,7 +353,8 @@ export default function BountyProperties(props: {
               size='small'
               onChange={updateBountyAmount}
               inputProps={{
-                step: 0.01
+                step: 0.01,
+                style: { height: 'auto' }
               }}
               error={isRewardAmountInvalid}
               helperText={
@@ -516,7 +517,7 @@ export default function BountyProperties(props: {
               defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
-              inputProps={{ step: 1, min: 1 }}
+              inputProps={{ step: 1, min: 1, style: { height: 'auto' } }}
               sx={{
                 width: '100%'
               }}
@@ -559,46 +560,36 @@ export default function BountyProperties(props: {
             flexGrow: 1
           }}
         >
-          <div
-            className='octo-propertyname octo-propertyname--readonly'
-            style={{ alignSelf: 'baseline', paddingTop: 12 }}
-          >
+          <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline' }}>
             <ButtonBoard>Reviewer</ButtonBoard>
           </div>
-          <div style={{ width: '100%' }}>
-            <InputSearchReviewers
-              disabled={readOnly}
-              readOnly={readOnly}
-              value={bountyPermissions?.reviewer ?? []}
-              disableCloseOnSelect={true}
-              onChange={async (e, options) => {
-                const roles = options.filter((option) => option.group === 'role');
-                const members = options.filter((option) => option.group === 'user');
-                await applyBountyUpdates({
-                  permissions: rollupPermissions({
-                    assignedRoleSubmitters,
-                    selectedReviewerRoles: roles.map((role) => role.id),
-                    selectedReviewerUsers: members.map((member) => member.id),
-                    spaceId: space!.id
-                  })
-                });
-                if (currentBounty?.id) {
-                  await refreshBountyPermissions(currentBounty.id);
-                }
-              }}
-              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-              sx={{
-                width: '100%'
-              }}
+          <UserAndRoleSelect
+            readOnly={readOnly}
+            value={bountyPermissions?.reviewer ?? []}
+            variant='outlined'
+            onChange={async (options) => {
+              const roles = options.filter((option) => option.group === 'role');
+              const members = options.filter((option) => option.group === 'user');
+              await applyBountyUpdates({
+                permissions: rollupPermissions({
+                  assignedRoleSubmitters,
+                  selectedReviewerRoles: roles.map((role) => role.id),
+                  selectedReviewerUsers: members.map((member) => member.id),
+                  spaceId: space!.id
+                })
+              });
+              if (currentBounty?.id) {
+                await refreshBountyPermissions(currentBounty.id);
+              }
+            }}
+          />
+          {bountyPagePermissions && bountyPermissions && (
+            <MissingPagePermissions
+              target='reviewer'
+              bountyPermissions={bountyPermissions}
+              pagePermissions={bountyPagePermissions}
             />
-            {bountyPagePermissions && bountyPermissions && (
-              <MissingPagePermissions
-                target='reviewer'
-                bountyPermissions={bountyPermissions}
-                pagePermissions={bountyPagePermissions}
-              />
-            )}
-          </div>
+          )}
         </div>
       </Box>
 
@@ -675,21 +666,21 @@ function rollupPermissions({
   assignedRoleSubmitters: string[];
   spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
-  const reviewers = [
+  const reviewers: BountyPermissions['reviewer'] = [
     ...selectedReviewerUsers.map((uid) => {
       return {
         id: uid,
-        group: 'user'
-      } as TargetPermissionGroup;
+        group: 'user' as const
+      };
     }),
     ...selectedReviewerRoles.map((uid) => {
       return {
         id: uid,
-        group: 'role'
-      } as TargetPermissionGroup;
+        group: 'role' as const
+      };
     })
   ];
-  const submitters: TargetPermissionGroup[] =
+  const submitters: BountyPermissions['submitter'] =
     assignedRoleSubmitters.length !== 0
       ? assignedRoleSubmitters.map((uid) => {
           return {

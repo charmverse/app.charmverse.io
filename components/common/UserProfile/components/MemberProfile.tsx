@@ -47,7 +47,7 @@ export function MemberProfile({
       }
     >
       <ContentContainer top={20}>
-        <PublicProfile hideAggregateData user={member} readOnly />
+        <PublicProfile user={member} readOnly />
       </ContentContainer>
     </Dialog>
   );

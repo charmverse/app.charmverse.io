@@ -18,10 +18,6 @@ const StyledAutocomplete = styled(Autocomplete)`
   min-width: 150px;
 ` as typeof Autocomplete;
 
-const StyledPopper = styled(Popover)`
-  min-width: 300px;
-`;
-
 function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {
     return members.filter((member) => {
@@ -57,7 +53,6 @@ export function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
-
   return (
     <StyledAutocomplete
       disabled={options.length === 0 && !allowEmail}
@@ -104,7 +99,6 @@ export function InputSearchMemberBase({
           placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
-          // eslint-disable-next-line react/jsx-no-duplicate-props
           InputProps={{
             ...params.InputProps,
             disableUnderline: true
@@ -206,6 +200,7 @@ export function InputSearchMemberMultiple({
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
       options={members}
     />
