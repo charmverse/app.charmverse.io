@@ -208,7 +208,7 @@ export async function generateUpdatedProposalEvaluationAverageProperty({
   return proposalStatusProp;
 }
 
-export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Block> {
+export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Board> {
   const database = (await prisma.block.findUniqueOrThrow({
     where: {
       id: databaseId
@@ -304,5 +304,5 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
         cardProperties: boardProperties
       }
     }
-  }) as any as Promise<Block & { fields: BoardFields }>;
+  }) as any as Board;
 }

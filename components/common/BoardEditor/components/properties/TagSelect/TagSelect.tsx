@@ -168,6 +168,7 @@ export function TagSelect({
     return (
       <SelectPreviewContainer onClick={onEdit} displayType={displayType} readOnly={readOnly}>
         <SelectPreview
+          data-test='select-input-open'
           readOnly={readOnly}
           sx={{ height: '100%' }}
           wrapColumn={wrapColumn}
@@ -182,6 +183,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
+      data-test='select-input-type'
       canEditOptions={canEditOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}

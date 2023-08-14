@@ -11,10 +11,10 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { Board, BoardFields, DataSourceType } from 'lib/focalboard/board';
+import type { Board, DataSourceType } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import { createTableView } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/focalboard/createNewDataSource';
+import { createTableView } from 'lib/focalboard/tableView';
 
 import mutator from '../../../mutator';
 import { getBoards } from '../../../store/boards';

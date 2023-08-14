@@ -101,6 +101,16 @@ test.describe.serial('Edit database select properties', async () => {
 
     await databasePage.closeModal.click();
 
+    const selectValueLocator = databasePage.getTablePropertyValueLocator({
+      propertyType: 'select',
+      row: 0
+    });
+
+    await expect(selectValueLocator).toBeVisible();
+
+    await selectValueLocator.click();
+
+    const inputLocator = selectValueLocator.locator('data-test=select-input-type');
     // Edit the card
   });
 });

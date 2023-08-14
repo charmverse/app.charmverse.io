@@ -10,8 +10,8 @@ import { getPagesListCacheKey } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { createTableView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { createTableView } from 'lib/focalboard/tableView';
 
 import { getPagePath } from './utils';
 

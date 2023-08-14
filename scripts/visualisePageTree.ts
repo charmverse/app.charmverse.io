@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+// @ts-ignore We only call this method once in script to create the dom, no typesafety needed
 import { createSVGWindow } from 'svgdom';
 import { SVG, registerWindow } from '@svgdotjs/svg.js';
 import { Block, Page, prisma } from '@charmverse/core/prisma-client';

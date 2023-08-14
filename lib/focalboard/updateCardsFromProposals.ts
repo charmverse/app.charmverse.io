@@ -5,7 +5,6 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -15,7 +14,7 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { Card } from './card';
+import type { BoardFields } from './board';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 
@@ -41,7 +40,7 @@ export async function updateCardsFromProposals({
     databaseId: boardId
   });
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
-  if (database.fields.sourceType !== 'proposals') {
+  if ((database.fields as any as BoardFields).sourceType !== 'proposals') {
     throw new InvalidStateError('Board does not have a proposals view');
   }
 
@@ -321,7 +320,7 @@ export async function updateCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: [prismaToBlock(database)]
+      payload: [prismaToBlock(database as any)]
     },
     spaceId
   );

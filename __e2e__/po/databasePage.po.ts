@@ -29,6 +29,9 @@ export class DatabasePage extends GlobalPage {
   }
 
   getTablePropertyValueLocator({ row, propertyType }: { row?: number; propertyType: PropertyType }) {
-    return this.page.locator(`data-test=database-table-row-${row}`).locator(`data-test=property-value-${propertyType}`);
+    return this.page
+      .locator(`data-test=database-table-row-${row ?? 0}`)
+      .locator(`data-test=property-value-${propertyType}`)
+      .first();
   }
 }
