@@ -110,7 +110,15 @@ test.describe.serial('Edit database select properties', async () => {
 
     await selectValueLocator.click();
 
-    const inputLocator = selectValueLocator.locator('data-test=select-input-type');
+    const inputInitialLocator = selectValueLocator.locator('data-test=select-input-open');
+
+    await inputInitialLocator.click();
+
+    const inputOpenedLocator = selectValueLocator.locator('data-test=select-input-type');
+
+    await expect(inputLocator).toBeVisible();
+
+    await inputLocator.click({ clickCount: 3 });
     // Edit the card
   });
 });
