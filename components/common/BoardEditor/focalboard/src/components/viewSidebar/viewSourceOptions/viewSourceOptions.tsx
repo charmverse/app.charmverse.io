@@ -181,7 +181,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               </SourceType>
             )}
             {allowedSourceOptions.includes('new') && (
-              <SourceType onClick={onCreateDatabase}>
+              <SourceType data-test='source-new-database' onClick={onCreateDatabase}>
                 <AddCircleIcon style={{ fontSize: 24 }} />
                 New database
               </SourceType>
