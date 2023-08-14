@@ -153,6 +153,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
     } else if (space.snapshotDomain && !snapshotSpace) {
       const existingSnapshotSpace = await getSnapshotSpace(space.snapshotDomain);
       setSnapshotSpace(existingSnapshotSpace);
+      setSnapshotVoteMode(existingSnapshotSpace?.voting?.type ?? 'single-choice');
     }
 
     if (snapshotSpace) {
@@ -295,6 +296,8 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
     );
   }
 
+  const snapshotVotingType = snapshotSpace?.voting?.type ?? null;
+
   return !checksComplete ? (
     <LoadingIcon />
   ) : configurationError ? (
@@ -314,7 +317,11 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
               <FieldLabel>Voting type</FieldLabel>
               <InputEnumToOption
                 defaultValue={snapshotVoteMode}
-                keyAndLabel={SnapshotVotingMode}
+                keyAndLabel={
+                  snapshotVotingType === null
+                    ? SnapshotVotingMode
+                    : { [snapshotVotingType]: SnapshotVotingMode[snapshotVotingType] }
+                }
                 onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
               />
             </Grid>
