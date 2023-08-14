@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { Board } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -27,15 +28,12 @@ interface AddPageResponse {
   page: PageWithPermissions;
 }
 
-export async function addPage({
-  createdBy,
-  spaceId,
-  ...page
-}: NewPageInput): Promise<Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> }> {
+type CreatedPage = Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> };
+
+export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?: (page: CreatedPage) => void) {
   const pageId = page?.id || v4();
 
   const isBoardPage = page.type?.match(/board/);
-
   const pageProperties: Partial<Page> = {
     id: pageId,
     boardId: isBoardPage ? pageId : undefined,
@@ -52,33 +50,53 @@ export async function addPage({
     ...page
   };
 
-  const newPage = await charmClient.createPage(pageProperties);
+  if (page.type === 'board' || page.type === 'page') {
+    emitSocketMessage({
+      type: 'page_created',
+      payload: pageProperties
+    });
 
-  const result: AddPageResponse = {
-    board: null,
-    page: newPage,
-    cards: [],
-    view: null
-  };
-
-  if (isBoardPage) {
-    const { board } = createDefaultBoardData({ boardId: pageId });
-    result.board = board;
-    await mutator.insertBlocks([board]);
+    /* (createdPage) => {
+      const result: AddPageResponse = {
+        board: null,
+        page: newPage,
+        cards: [],
+        view: null
+      };
+  
+      if (isBoardPage) {
+        const { board } = createDefaultBoardData({ boardId: pageId });
+        result.board = board;
+        await mutator.insertBlocks([board]);
+      }
+  
+      await mutate(
+        getPagesListCacheKey(spaceId),
+        (pages: Record<string, Page> | undefined) => {
+          return { ...pages, [newPage.id]: newPage };
+        },
+        {
+          // revalidate pages for board since we create 3 default ones
+          revalidate: Boolean(isBoardPage)
+        }
+      );
+      if (cb) {
+        cb(createdPage)
+      }
+    } */
+  } else {
+    const newPage = await charmClient.createPage(pageProperties);
+    await mutate(
+      getPagesListCacheKey(spaceId),
+      (pages: Record<string, Page> | undefined) => {
+        return { ...pages, [newPage.id]: newPage };
+      },
+      {
+        // revalidate pages for board since we create 3 default ones
+        revalidate: Boolean(isBoardPage)
+      }
+    );
   }
-
-  await mutate(
-    getPagesListCacheKey(spaceId),
-    (pages: Record<string, Page> | undefined) => {
-      return { ...pages, [newPage.id]: newPage };
-    },
-    {
-      // revalidate pages for board since we create 3 default ones
-      revalidate: Boolean(isBoardPage)
-    }
-  );
-
-  return result;
 }
 
 interface DefaultBoardProps {
@@ -101,7 +119,8 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
 
 export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {
   if (page) {
-    const { page: newPage } = await addPage(page);
-    router.push(`/${router.query.domain}/${newPage.path}`);
+    await addPage(page, (newPage) => {
+      router.push(`/${router.query.domain}/${newPage.page.path}`);
+    });
   }
 }

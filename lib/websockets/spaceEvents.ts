@@ -1,9 +1,12 @@
 import { log } from '@charmverse/core/log';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
 import { archivePages } from 'lib/pages/archivePages';
+import { createPage } from 'lib/pages/server/createPage';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -85,7 +88,7 @@ export class SpaceEventHandler {
               rid: 0,
               cid: -1
             },
-            { skipSendingToActor: false }
+            { socketEvent: 'page_deleted' }
           );
         } else {
           // If the user is not in the document or the position of the page node is not found (present in sidebar)
@@ -142,9 +145,7 @@ export class SpaceEventHandler {
               cid: -1
             },
             {
-              // This is to indicate that it was triggered by a page_restored event
-              restorePage: true,
-              skipSendingToActor: false
+              socketEvent: 'page_restored'
             }
           );
         } else {
@@ -160,6 +161,84 @@ export class SpaceEventHandler {
         }
       } catch (error) {
         const errorMessage = 'Error restoring a page from archive state';
+        log.error(errorMessage, {
+          error,
+          pageId: message.payload.id,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_created' && this.userId) {
+      try {
+        const createdPage = await createPage({
+          data: {
+            ...(message.payload as Prisma.PageUncheckedCreateInput),
+            createdBy: this.userId
+          }
+        });
+
+        const createdPageId = createdPage.id;
+
+        const {
+          pageNode,
+          documentRoom,
+          participant,
+          position,
+          parentId,
+          content: parentPageContent,
+          spaceId
+        } = await getPageDetails({
+          id: createdPage.id,
+          userId: this.userId,
+          docRooms: this.docRooms
+        });
+
+        const lastValidPos = pageNode.content.size;
+        if (parentId && documentRoom && participant && position === null) {
+          await participant.handleDiff(
+            {
+              type: 'diff',
+              ds: generateInsertNestedPageDiffs({ pageId: createdPageId, pos: lastValidPos }),
+              doc: documentRoom.doc.content,
+              c: participant.messages.client,
+              s: participant.messages.server,
+              v: documentRoom.doc.version,
+              rid: 0,
+              cid: -1
+            },
+            {
+              socketEvent: 'page_created'
+            }
+          );
+        } else {
+          await applyDiffAndSaveDocument({
+            pageId: createdPage.id,
+            content: parentPageContent,
+            userId: this.userId,
+            parentId,
+            spaceId,
+            diffs:
+              position !== null ? [] : generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos }),
+            archive: false
+          });
+        }
+
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'created',
+          pageId: createdPage.id
+        });
+
+        const { content, contentText, ...newPageToNotify } = createdPage;
+
+        relay.broadcast(
+          {
+            type: 'pages_created',
+            payload: [newPageToNotify]
+          },
+          createdPage.spaceId
+        );
+      } catch (error) {
+        const errorMessage = 'Error creating a page and adding it to parent page content';
         log.error(errorMessage, {
           error,
           pageId: message.payload.id,
@@ -288,6 +367,7 @@ async function getPageDetails({
     : null;
 
   const { parentId, spaceId } = page;
+
   const documentRoom = parentId ? docRooms.get(parentId) : null;
   const content: PageContent =
     documentRoom && documentRoom.participants.size !== 0
@@ -309,6 +389,7 @@ async function getPageDetails({
       ) ?? participants[0];
   }
 
+  // Find the position of the referenced page node in the parent page content
   pageNode.forEach((node, nodePos) => {
     if (node.type.name === 'page' && node.attrs.id === id) {
       position = nodePos;

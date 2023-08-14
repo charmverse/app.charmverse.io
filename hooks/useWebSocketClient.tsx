@@ -136,3 +136,7 @@ function isServerMessage(message: WebSocketMessage): message is ServerMessage {
 }
 
 export const useWebSocketClient = () => useContext(WebSocketClientContext);
+
+export function emitSocketMessage(message: ClientMessage) {
+  socket.emit('message', message);
+}

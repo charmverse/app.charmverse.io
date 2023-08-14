@@ -18,25 +18,29 @@ export default function useNestedPage(currentPageId?: string) {
   const addNestedPage = useCallback(
     async (type?: Page['type']) => {
       if (user && space) {
-        const { page } = await addPage({
-          createdBy: user.id,
-          spaceId: space.id,
-          type: type ?? 'page',
-          parentId: isInsideCard ? cardId : currentPageId
-        });
-        rafCommandExec(view, (state, dispatch) => {
-          const nestedPageNode = state.schema.nodes.page.create({
-            id: page.id
-          });
-          if (dispatch) {
-            dispatch(state.tr.replaceSelectionWith(nestedPageNode));
-            // A small delay to let the inserted page be saved in the editor
-            setTimeout(() => {
-              router.push(`/${router.query.domain}/${page.path}`);
-            }, 500);
+        await addPage(
+          {
+            createdBy: user.id,
+            spaceId: space.id,
+            type: type ?? 'page',
+            parentId: isInsideCard ? cardId : currentPageId
+          },
+          ({ page }) => {
+            rafCommandExec(view, (state, dispatch) => {
+              const nestedPageNode = state.schema.nodes.page.create({
+                id: page.id
+              });
+              if (dispatch) {
+                dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+                // A small delay to let the inserted page be saved in the editor
+                setTimeout(() => {
+                  router.push(`/${router.query.domain}/${page.path}`);
+                }, 500);
+              }
+              return true;
+            });
           }
-          return true;
-        });
+        );
       }
     },
     [currentPageId, view]

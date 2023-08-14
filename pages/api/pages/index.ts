@@ -96,14 +96,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);
-
-    if (page.type === 'proposal') {
-      logFirstProposal({
-        userId,
-        spaceId
-      });
-    }
-
     updateTrackPageProfile(page.id);
     trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
 
