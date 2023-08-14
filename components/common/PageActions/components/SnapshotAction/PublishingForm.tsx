@@ -48,6 +48,11 @@ const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
 
 const MIN_VOTING_OPTIONS = 2;
 
+/**
+ *
+ * @abstract See this code for restrictions enforced by Snapshot when submitting proposals
+ * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
+ */
 export function PublishingForm({ onSubmit, pageId }: Props) {
   const { account, library } = useWeb3AuthSig();
 
