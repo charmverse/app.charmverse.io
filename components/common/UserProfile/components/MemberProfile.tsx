@@ -1,11 +1,9 @@
 import styled from '@emotion/styled';
-import OpenInFullIcon from '@mui/icons-material/Launch';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import { Button } from 'components/common/Button';
 import { PublicProfile } from 'components/u/PublicProfile';
 import type { Member } from 'lib/members/interfaces';
 
@@ -30,22 +28,7 @@ export function MemberProfile({
   }
 
   return (
-    <Dialog
-      onClose={onClose}
-      fullWidth={fullWidth}
-      toolbar={
-        <Button
-          size='small'
-          color='secondary'
-          href={`/u/${member.path}`}
-          variant='text'
-          target='_blank'
-          startIcon={<OpenInFullIcon fontSize='small' />}
-        >
-          View full profile
-        </Button>
-      }
-    >
+    <Dialog onClose={onClose} fullWidth={fullWidth}>
       <ContentContainer top={20}>
         <PublicProfile user={member} readOnly />
       </ContentContainer>
