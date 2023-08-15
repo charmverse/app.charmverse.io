@@ -92,7 +92,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
           pageProps: {
             content: formInputs.content,
             contentText: formInputs.contentText ?? '',
-            title: formInputs.title
+            title: formInputs.title,
+            sourceTemplateId: formInputs.proposalTemplateId
           },
           evaluationType: formInputs.evaluationType,
           rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
