@@ -1,3 +1,7 @@
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+
+import { baseUrl } from 'config/constants';
+
 import { generateMarkdown } from '../generateMarkdown';
 
 describe('generateMarkdown', () => {
@@ -149,6 +153,121 @@ describe('generateMarkdown', () => {
   - First nested bullet list item
 
   - Second nested bullet list item`
+    );
+  });
+
+  it('should convert urls and nested pages to markdown links', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+
+    const page1 = await testUtilsPages.generatePage({ createdBy: user.id, spaceId: space.id, title: 'Page 1' });
+    const page2 = await testUtilsPages.generatePage({ createdBy: user.id, spaceId: space.id, title: 'Page 2' });
+
+    const inputData = {
+      type: 'doc',
+      content: [
+        {
+          type: 'heading',
+          attrs: { id: null, level: 1, track: [], collapseContent: null },
+          content: [
+            {
+              text: 'Header',
+              type: 'text',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-07-08T01:23:00.000Z',
+                    user: '8e54b253-eeca-420d-9727-4598521d8121',
+                    approved: true,
+                    username: 'Admin'
+                  }
+                }
+              ]
+            },
+            {
+              text: ':',
+              type: 'text',
+              marks: [
+                { type: 'emojiSuggest', attrs: { trigger: ':' } },
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-07-08T01:23:00.000Z',
+                    user: '8e54b253-eeca-420d-9727-4598521d8121',
+                    approved: true,
+                    username: 'Admin'
+                  }
+                }
+              ]
+            },
+            {
+              text: ' ',
+              type: 'text',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-07-08T01:23:00.000Z',
+                    user: '8e54b253-eeca-420d-9727-4598521d8121',
+                    approved: true,
+                    username: 'Admin'
+                  }
+                },
+                { type: 'text-color', attrs: { color: null, bgColor: null } }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          attrs: { track: [] },
+          content: [
+            {
+              text: 'Wikipedia - Ethereum',
+              type: 'text',
+              marks: [
+                {
+                  type: 'link',
+                  attrs: {
+                    href: 'https://en.wikipedia.org/wiki/Ethereum'
+                  }
+                },
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-07-08T01:23:00.000Z',
+                    user: '8e54b253-eeca-420d-9727-4598521d8121',
+                    approved: true,
+                    username: 'Admin'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        { type: 'paragraph', attrs: { track: [] } },
+        {
+          type: 'page',
+          attrs: { id: page1.id, track: [] }
+        },
+        { type: 'paragraph', attrs: { track: [] } },
+        { type: 'page', attrs: { id: page2.id, track: [] } },
+        { type: 'paragraph', attrs: { track: [] } },
+        { type: 'paragraph', attrs: { track: [] } }
+      ]
+    };
+    const exported = await generateMarkdown({ content: inputData });
+
+    expect(exported).toEqual(
+      // eslint-disable-next-line prettier/prettier
+`# Header: 
+
+[Wikipedia - Ethereum](https://en.wikipedia.org/wiki/Ethereum)
+
+[Page 1](${baseUrl}/${space.domain}/${page1.path})
+
+[Page 2](${baseUrl}/${space.domain}/${page2.path})
+`
     );
   });
 });
