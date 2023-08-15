@@ -30,7 +30,10 @@ interface AddPageResponse {
 
 type CreatedPage = Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> };
 
-export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?: (page: CreatedPage) => void) {
+export async function addPage(
+  { createdBy, spaceId, ...page }: NewPageInput,
+  { cb, trigger }: { trigger: 'sidebar' | 'editor'; cb?: (page: CreatedPage) => void }
+) {
   const pageId = page?.id || v4();
   const isBoardPage = page.type?.match(/board/);
   const pageProperties: Partial<Page> = {
@@ -49,7 +52,7 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?
     ...page
   };
 
-  if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
+  if ((page.type === 'board' || page.type === 'page' || page.type === 'linked_board') && trigger === 'sidebar') {
     emitSocketMessage<PageWithPermissions>(
       {
         type: 'page_created',
@@ -96,6 +99,14 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?
         revalidate: Boolean(isBoardPage)
       }
     );
+    if (cb) {
+      cb({
+        page: newPage,
+        board: null,
+        view: null,
+        cards: []
+      });
+    }
   }
 }
 
@@ -119,8 +130,11 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
 
 export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {
   if (page) {
-    await addPage(page, (newPage) => {
-      router.push(`/${router.query.domain}/${newPage.page.path}`);
+    await addPage(page, {
+      trigger: 'sidebar',
+      cb: (newPage) => {
+        router.push(`/${router.query.domain}/${newPage.page.path}`);
+      }
     });
   }
 }

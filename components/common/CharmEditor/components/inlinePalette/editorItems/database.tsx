@@ -47,16 +47,19 @@ export function items({
                     spaceId: space.id,
                     createdBy: userId
                   },
-                  ({ page }) => {
-                    const node = _state.schema.nodes.inlineDatabase.create({
-                      pageId: page.id
-                    });
+                  {
+                    trigger: 'editor',
+                    cb: ({ page }) => {
+                      const node = _state.schema.nodes.inlineDatabase.create({
+                        pageId: page.id
+                      });
 
-                    if (_dispatch && isAtBeginningOfLine(state)) {
-                      _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
-                      return true;
+                      if (_dispatch && isAtBeginningOfLine(state)) {
+                        _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
+                        return true;
+                      }
+                      return insertNode(_state, _dispatch, node);
                     }
-                    return insertNode(_state, _dispatch, node);
                   }
                 );
                 return true;
@@ -105,16 +108,19 @@ export function items({
                 spaceId: space.id,
                 createdBy: userId
               },
-              ({ page }) => {
-                const node = _state.schema.nodes.inlineDatabase.create({
-                  pageId: page.id
-                });
+              {
+                trigger: 'editor',
+                cb: ({ page }) => {
+                  const node = _state.schema.nodes.inlineDatabase.create({
+                    pageId: page.id
+                  });
 
-                if (_dispatch && isAtBeginningOfLine(state)) {
-                  _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
-                  return true;
+                  if (_dispatch && isAtBeginningOfLine(state)) {
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
+                    return true;
+                  }
+                  return insertNode(_state, _dispatch, node);
                 }
-                return insertNode(_state, _dispatch, node);
               }
             );
             return true;

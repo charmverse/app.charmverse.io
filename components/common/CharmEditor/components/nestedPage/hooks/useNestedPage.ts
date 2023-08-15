@@ -25,20 +25,23 @@ export default function useNestedPage(currentPageId?: string) {
             type: type ?? 'page',
             parentId: isInsideCard ? cardId : currentPageId
           },
-          ({ page }) => {
-            rafCommandExec(view, (state, dispatch) => {
-              const nestedPageNode = state.schema.nodes.page.create({
-                id: page.id
+          {
+            cb: ({ page }) => {
+              rafCommandExec(view, (state, dispatch) => {
+                const nestedPageNode = state.schema.nodes.page.create({
+                  id: page.id
+                });
+                if (dispatch) {
+                  dispatch(state.tr.replaceSelectionWith(nestedPageNode));
+                  // A small delay to let the inserted page be saved in the editor
+                  setTimeout(() => {
+                    router.push(`/${router.query.domain}/${page.path}`);
+                  }, 500);
+                }
+                return true;
               });
-              if (dispatch) {
-                dispatch(state.tr.replaceSelectionWith(nestedPageNode));
-                // A small delay to let the inserted page be saved in the editor
-                setTimeout(() => {
-                  router.push(`/${router.query.domain}/${page.path}`);
-                }, 500);
-              }
-              return true;
-            });
+            },
+            trigger: 'editor'
           }
         );
       }
