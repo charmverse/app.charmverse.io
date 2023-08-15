@@ -32,9 +32,9 @@ export class SpaceEventHandler {
   }
 
   init() {
-    this.socket.on(this.socketEvent, async (message) => {
+    this.socket.on(this.socketEvent, async (message, callback) => {
       try {
-        await this.onMessage(message);
+        await this.onMessage(message, callback);
       } catch (error) {
         log.error('Error handling space socket message', error);
       }
@@ -43,7 +43,7 @@ export class SpaceEventHandler {
     this.socket.emit(this.socketEvent, { type: 'welcome' });
   }
 
-  async onMessage(message: ClientMessage) {
+  async onMessage(message: ClientMessage, callback?: (data: any) => void) {
     if (message.type === 'subscribe') {
       try {
         const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
@@ -243,6 +243,10 @@ export class SpaceEventHandler {
             parentId,
             diffs: parentId ? generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos }) : []
           });
+        }
+
+        if (typeof callback === 'function') {
+          callback(createdPage);
         }
       } catch (error) {
         const errorMessage = 'Error creating a page and adding it to parent page content';

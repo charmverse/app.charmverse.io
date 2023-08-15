@@ -32,7 +32,6 @@ type CreatedPage = Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'pa
 
 export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?: (page: CreatedPage) => void) {
   const pageId = page?.id || v4();
-
   const isBoardPage = page.type?.match(/board/);
   const pageProperties: Partial<Page> = {
     id: pageId,
@@ -50,40 +49,41 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput, cb?
     ...page
   };
 
-  if (page.type === 'board' || page.type === 'page') {
-    emitSocketMessage({
-      type: 'page_created',
-      payload: pageProperties
-    });
+  if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
+    emitSocketMessage<PageWithPermissions>(
+      {
+        type: 'page_created',
+        payload: pageProperties
+      },
+      async (newPage) => {
+        const result: AddPageResponse = {
+          board: null,
+          page: newPage,
+          cards: [],
+          view: null
+        };
 
-    /* (createdPage) => {
-      const result: AddPageResponse = {
-        board: null,
-        page: newPage,
-        cards: [],
-        view: null
-      };
-  
-      if (isBoardPage) {
-        const { board } = createDefaultBoardData({ boardId: pageId });
-        result.board = board;
-        await mutator.insertBlocks([board]);
-      }
-  
-      await mutate(
-        getPagesListCacheKey(spaceId),
-        (pages: Record<string, Page> | undefined) => {
-          return { ...pages, [newPage.id]: newPage };
-        },
-        {
-          // revalidate pages for board since we create 3 default ones
-          revalidate: Boolean(isBoardPage)
+        if (isBoardPage) {
+          const { board } = createDefaultBoardData({ boardId: pageId });
+          result.board = board;
+          await mutator.insertBlocks([board]);
         }
-      );
-      if (cb) {
-        cb(createdPage)
+
+        await mutate(
+          getPagesListCacheKey(spaceId),
+          (pages: Record<string, Page> | undefined) => {
+            return { ...pages, [newPage.id]: newPage };
+          },
+          {
+            // revalidate pages for board since we create 3 default ones
+            revalidate: Boolean(isBoardPage)
+          }
+        );
+        if (cb) {
+          cb(result);
+        }
       }
-    } */
+    );
   } else {
     const newPage = await charmClient.createPage(pageProperties);
     await mutate(
