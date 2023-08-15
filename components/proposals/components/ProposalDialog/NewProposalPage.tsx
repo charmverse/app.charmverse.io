@@ -46,6 +46,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
 
   usePreventReload(contentUpdated);
 
+  const { proposalTemplates } = useProposalTemplates();
+
   const router = useRouter();
 
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
@@ -57,6 +59,10 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
       setReadOnlyEditor(!formInputs.proposalTemplateId);
     }
   }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
+
+  const readOnlyReviewers =
+    isFromTemplateSource &&
+    !!proposalTemplates?.find((t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0);
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -178,7 +184,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
                 <div className='CardDetail content'>
                   <ProposalProperties
                     readOnlyRubricCriteria={isFromTemplateSource}
-                    readOnlyReviewers={isFromTemplateSource && formInputs.reviewers.length > 0}
+                    readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}

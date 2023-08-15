@@ -14,6 +14,7 @@ import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 
@@ -45,6 +46,8 @@ export function ProposalProperties({
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
+
+  const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
   const { data: reviewerUserIds } = useGetAllReviewerUserIds(
     !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
@@ -107,6 +110,11 @@ export function ProposalProperties({
 
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
 
+  const readOnlyReviewers =
+    readOnlyProperties ||
+    (isFromTemplateSource &&
+      !!proposalTemplates?.find((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
+
   return (
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
@@ -123,9 +131,7 @@ export function ProposalProperties({
         (proposal?.status !== 'draft' && !isTemplate) ||
         isFromTemplateSource
       }
-      readOnlyReviewers={
-        readOnlyProperties || (isFromTemplateSource && proposal?.reviewers && proposal.reviewers.length > 0)
-      }
+      readOnlyReviewers={readOnlyReviewers}
       rubricAnswers={proposal?.rubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       showStatus={!isTemplate}
