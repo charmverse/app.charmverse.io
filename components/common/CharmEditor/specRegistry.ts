@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -38,6 +38,7 @@ import { spec as tableOfContentSpec } from './components/tableOfContents/tableOf
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
+import { hardBreakSpec } from './specs/hardBreakSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -57,7 +58,7 @@ export const specRegistry = new SpecRegistry([
   inlineVote.spec(),
   bold.spec(), // OK
   bulletList.spec(), // OK
-  hardBreak.spec(), // OK
+  hardBreakSpec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   linkSpec(), // OK

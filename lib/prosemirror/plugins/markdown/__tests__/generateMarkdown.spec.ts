@@ -270,4 +270,145 @@ describe('generateMarkdown', () => {
 `
     );
   });
+
+  it('should convert hard breaks to newlines', async () => {
+    const inputData = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          attrs: { track: [] },
+          content: [
+            {
+              text: 'Content',
+              type: 'text',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          attrs: { track: [] },
+          content: [
+            {
+              type: 'hardBreak',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'hardBreak',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'hardBreak',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'hardBreak',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'hardBreak',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          attrs: { track: [] },
+          content: [
+            {
+              text: 'Second',
+              type: 'text',
+              marks: [
+                {
+                  type: 'insertion',
+                  attrs: {
+                    date: '2023-08-15T13:50:00.000Z',
+                    user: 'ed1a3f61-0d02-4ed2-831a-ed12c188aee6',
+                    approved: true,
+                    username: 'member'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const exported = await generateMarkdown({ content: inputData });
+
+    expect(exported).toEqual(
+      // eslint-disable-next-line prettier/prettier
+`Content
+
+
+
+
+
+
+
+Second`
+    );
+  });
 });
