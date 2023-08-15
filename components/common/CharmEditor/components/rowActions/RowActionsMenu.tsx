@@ -51,10 +51,13 @@ function Component({ menuState }: { menuState: PluginState }) {
     // calculate the node at the mouse position. do it on click in case the content has changed
     let topPos = view.state.doc.resolve(menuState.rowPos);
     // Skip stepping up the document tree if the current node is columnBlock, it will calculate the child in the next step
-    if (topPos.node().type.name !== 'columnBlock') {
-      while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
-        const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
-        topPos = view.state.doc.resolve(parentOffset);
+    while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
+      const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
+      const parentOffsetNode = view.state.doc.resolve(parentOffset);
+      if (parentOffsetNode.node().type.name !== 'columnBlock') {
+        topPos = parentOffsetNode;
+      } else {
+        break;
       }
     }
 
