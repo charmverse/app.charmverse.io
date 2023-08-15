@@ -1,13 +1,13 @@
 import type {
-  ProposalReviewerPool,
   ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags
+  ProposalFlowPermissionFlags,
+  ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { Page } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
+import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -38,7 +38,7 @@ export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListPro
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
-  return useGET<(ProposalWithUsers & { page: Page })[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
+  return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
 }
 
 export function useGetProposalCategories(spaceId?: string) {

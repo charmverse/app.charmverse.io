@@ -12,6 +12,7 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -34,7 +35,7 @@ type Props = {
   setContentUpdated: (changed: boolean) => void;
 };
 // Note: this component is only used before a page is saved to the DB
-export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
+export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
