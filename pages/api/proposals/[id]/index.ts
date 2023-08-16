@@ -134,10 +134,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
             : proposalReviewer.userId === updatedReviewer.id;
         })
     );
-
     if (newReviewers.length > 0) {
       const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
-        resourceId: proposal.id
+        resourceId: proposal.categoryId as string
       });
       for (const reviewer of newReviewers) {
         if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
