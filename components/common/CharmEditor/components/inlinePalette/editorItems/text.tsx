@@ -420,12 +420,19 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
+            const { from, to } = _state.selection;
+            const textContent = from !== to ? _state.doc.textBetween(from, to) : null;
             const node = _state.schema.nodes.blockquote.create(
               undefined,
-              Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
+              Fragment.fromArray([
+                _state.schema.nodes.paragraph.create(
+                  undefined,
+                  Fragment.fromArray(textContent ? [state.schema.text(textContent)] : [])
+                )
+              ])
             );
 
-            if (_dispatch && isAtBeginningOfLine(_state)) {
+            if (_dispatch) {
               const tr = _state.tr;
               tr.replaceSelectionWith(node);
               // move cursor to block
