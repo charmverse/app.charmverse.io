@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import { ProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/ProposalPage';
+import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
@@ -131,7 +131,8 @@ ProposalInEvaluation.parameters = {
             id: '1',
             proposalId: '1',
             title: 'Developer Presence',
-            description: 'Makes their point clearly',
+            description:
+              'Makes their point clearly. This is a long description designed to appear on multiple lines :)',
             type: 'range',
             parameters: {
               min: 0,
@@ -142,7 +143,8 @@ ProposalInEvaluation.parameters = {
             id: '2',
             proposalId: '1',
             title: 'Developer Draw',
-            description: null,
+            description:
+              'Makes their point clearly. This is a long description designed to appear on multiple lines :)',
             type: 'range',
             parameters: {
               min: 0,
@@ -153,7 +155,7 @@ ProposalInEvaluation.parameters = {
             id: '3',
             proposalId: '1',
             title: 'Developer Commitment',
-            description: null,
+            description: `A\nmulti-line\ndescription`,
             type: 'range',
             parameters: {
               min: 0,

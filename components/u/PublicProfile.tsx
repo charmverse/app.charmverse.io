@@ -1,4 +1,5 @@
 import { Chip, Stack } from '@mui/material';
+import { useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -21,6 +22,8 @@ import { UserSpacesList } from './components/UserSpacesList/UserSpacesList';
 export function PublicProfile(props: { user: Member | PublicUser | LoggedInUser; readOnly?: boolean }) {
   const { user, readOnly } = props;
   const { user: currentUser } = useUser();
+
+  const [activeTab, setActiveTab] = useState(0);
 
   const {
     data,
@@ -77,6 +80,8 @@ export function PublicProfile(props: { user: Member | PublicUser | LoggedInUser;
     <Stack spacing={2}>
       {readOnly ? <UserDetailsReadonly {...props} /> : <UserDetailsFormWithSave user={props.user as LoggedInUser} />}
       <MultiTabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         tabs={[
           ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />],
           [

@@ -5,11 +5,13 @@ import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { baseUrl } from 'config/constants';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
@@ -367,6 +369,8 @@ export async function generateUserAndSpace({
         publicBountyBoard,
         updatedBy: user.id,
         updatedAt: new Date().toISOString(),
+        memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
+        features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
         spaceRoles: {
           create: {
             userId: user.id,

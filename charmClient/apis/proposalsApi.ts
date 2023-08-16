@@ -1,10 +1,6 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type {
-  ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags,
-  ProposalReviewerPool
-} from '@charmverse/core/permissions';
-import type { Page, ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
@@ -12,29 +8,10 @@ import type { PageWithProposal } from 'lib/pages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
-import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
-import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
-import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
-  upsertRubricCriteria({ proposalId, rubricCriteria }: RubricCriteriaUpsert) {
-    return http.PUT<ProposalRubricCriteriaWithTypedParams[]>(`/api/proposals/${proposalId}/rubric-criteria`, {
-      rubricCriteria
-    });
-  }
-
-  upsertRubricCriteriaAnswer({ proposalId, answers }: Omit<RubricAnswerUpsert, 'userId'>) {
-    return http.PUT<ProposalRubricCriteriaAnswer[]>(`/api/proposals/${proposalId}/rubric-answers`, { answers });
-  }
-
-  deleteRubricCriteriaAnswer({ proposalId, rubricCriteriaId }: { proposalId: string; rubricCriteriaId: string }) {
-    return http.PUT<ProposalRubricCriteriaAnswer>(`/api/proposals/${proposalId}/rubric-answers`, { rubricCriteriaId });
-  }
-
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
     return http.POST<PageWithProposal>('/api/proposals', input);
   }
@@ -43,28 +20,8 @@ export class ProposalsApi {
     return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, rest);
   }
 
-  getProposal(proposalId: string) {
-    return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
-  }
-
   updateStatus(proposalId: string, newStatus: ProposalStatus) {
     return http.PUT<ProposalWithUsers>(`/api/proposals/${proposalId}/status`, { newStatus });
-  }
-
-  getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
-    return http.GET<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
-  }
-
-  getProposalTemplatesBySpace({ spaceId }: { spaceId: string }) {
-    return http.GET<(ProposalWithUsers & { page: Page })[]>(`/api/spaces/${spaceId}/proposal-templates`);
-  }
-
-  getProposalCategories(spaceId: string) {
-    return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
-  }
-
-  getProposalIdsEvaluatedByUser(spaceId: string) {
-    return http.GET<RubricProposalsUserInfo>(`/api/spaces/${spaceId}/proposals-evaluated-by-user`);
   }
 
   archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
@@ -104,13 +61,5 @@ export class ProposalsApi {
 
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
-  }
-
-  computeProposalFlowPermissions(proposalId: string) {
-    return http.GET<ProposalFlowPermissionFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
-  }
-
-  getReviewerPool(proposalId: string) {
-    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?resourceId=${proposalId}`);
   }
 }

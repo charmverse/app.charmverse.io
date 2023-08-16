@@ -14,7 +14,7 @@ import type { PageWithContent } from 'lib/pages';
 
 import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
 
-import { ProposalPage } from './ProposalPage';
+import { NewProposalPage } from './NewProposalPage';
 
 interface Props {
   isLoading: boolean;
@@ -107,11 +107,11 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
       ) : page ? (
         <EditorPage pageId={page.id} />
       ) : (
-        <ProposalPage
+        <NewProposalPage
           formInputs={formInputs}
           setFormInputs={(_formInputs) => {
             setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+            setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
           }}
           contentUpdated={contentUpdated}
           setContentUpdated={setContentUpdated}
@@ -124,7 +124,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         title='Unsaved changes'
         open={showConfirmDialog}
         buttonText='Discard'
-        secondaryButtonText='Go back'
+        secondaryButtonText='Cancel'
         question='Are you sure you want to close this proposal? You have unsaved changes'
         onConfirm={close}
       />

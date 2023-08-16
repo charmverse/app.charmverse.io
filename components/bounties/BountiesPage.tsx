@@ -168,7 +168,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
           {bounties.length === 0 ? (
             <EmptyStateVideo
               description='Getting started with bounties'
-              videoTitle='Bounties | Getting started with Charmverse'
+              videoTitle='Bounties | Getting started with CharmVerse'
               videoUrl='https://tiny.charmverse.io/bounties'
             />
           ) : currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (

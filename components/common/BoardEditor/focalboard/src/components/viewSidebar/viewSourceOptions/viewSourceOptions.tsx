@@ -110,7 +110,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               }
             >
               <TaskOutlinedIcon fontSize='small' />
-              Charmverse Proposals
+              CharmVerse Proposals
             </SourceType>
             <SourceType active={false} component='label' htmlFor='dbcsvfile'>
               <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />

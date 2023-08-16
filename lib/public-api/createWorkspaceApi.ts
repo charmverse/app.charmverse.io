@@ -7,7 +7,7 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import type { Space } from 'lib/public-api/interfaces';
+import type { SpaceApiResponse } from 'lib/public-api/interfaces';
 import { staticSpaceTemplates } from 'lib/spaces/config';
 import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
@@ -108,7 +108,7 @@ export async function createWorkspaceApi({
   };
 }
 
-export function mapSpace(space: PrismaSpace): Space {
+export function mapSpace(space: PrismaSpace): SpaceApiResponse {
   return {
     id: space.id,
     createdAt: space.createdAt.toString(),

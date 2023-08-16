@@ -6,6 +6,7 @@ import { useCallback, useState, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetReviewerPool } from 'charmClient/hooks/proposals';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -145,9 +146,7 @@ export function UserAndRoleSelect({
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useSWR(proposalId ? 'reviewer-pool' : null, () =>
-    charmClient.proposals.getReviewerPool(proposalId as string)
-  );
+  const { data: reviewerPool } = useGetReviewerPool(proposalId);
 
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace

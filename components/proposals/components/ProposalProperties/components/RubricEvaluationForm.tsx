@@ -5,14 +5,15 @@ import { useEffect, useMemo } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
+import { useUpsertRubricCriteriaAnswer } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { isTruthy } from 'lib/utilities/types';
 
 import { IntegerInput, CriteriaRow } from './ProposalRubricCriteriaInput';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
+  proposalId: string;
   answers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (answers: FormInput) => void;
@@ -46,10 +47,16 @@ const StyledRating = styled(Rating)`
   }
 `;
 
-export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit }: Props) {
+export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = [], onSubmit }: Props) {
   const mappedAnswers = criteriaList.map(
     (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
   );
+
+  const {
+    error: answerError,
+    isMutating: isSaving,
+    trigger: upsertRubricCriteriaAnswer
+  } = useUpsertRubricCriteriaAnswer({ proposalId });
 
   const {
     control,
@@ -66,13 +73,23 @@ export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit
   });
   const { fields } = useFieldArray({ control, name: 'answers' });
 
+  async function saveForm(values: FormInput) {
+    if (proposalId) {
+      await upsertRubricCriteriaAnswer({
+        // @ts-ignore -  TODO: make answer types match
+        answers: values.answers
+      });
+      onSubmit(values);
+    }
+  }
+
   useEffect(() => {
     // update the form values when the criteria list loads
     reset({ answers: mappedAnswers });
   }, [mappedAnswers.length]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(saveForm)}>
       <Box>
         {fields.map((field, index) => (
           <CriteriaInput
@@ -84,7 +101,18 @@ export function RubricEvaluationForm({ criteriaList = [], answers = [], onSubmit
             register={register}
           />
         ))}
-        <Button type='submit'>Submit</Button>
+        <Box display='flex' gap={2}>
+          <div>
+            <Button loading={isSaving} type='submit'>
+              Submit
+            </Button>
+          </div>
+          {answerError && (
+            <Typography variant='body2' color='error'>
+              {answerError.message}
+            </Typography>
+          )}
+        </Box>
       </Box>
     </form>
   );
@@ -124,10 +152,12 @@ function CriteriaInput({
       <FormGroup sx={{ display: 'flex', gap: 1 }}>
         <Box display='flex' justifyContent='space-between'>
           <div>
-            <Typography variant='subtitle1'>
-              {criteria.title} ({parameters.min}&ndash; {parameters.max})
-            </Typography>
-            {criteria.description && <Typography variant='body2'>{criteria.description}</Typography>}
+            <Typography variant='subtitle1'>{criteria.title}</Typography>
+            {criteria.description && (
+              <Typography sx={{ whiteSpace: 'pre-line' }} variant='body2'>
+                {criteria.description}
+              </Typography>
+            )}
           </div>
           <Controller
             render={({ field: _field }) =>
@@ -144,20 +174,25 @@ function CriteriaInput({
                   }}
                 />
               ) : (
-                <FormGroup row sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                  <FormLabel>Your score:</FormLabel>
+                <Box display='flex' gap={1}>
+                  <FormLabel>
+                    <Typography noWrap variant='body2'>
+                      Your score ({parameters.min} &ndash; {parameters.max}):
+                    </Typography>
+                  </FormLabel>
                   <IntegerInput
                     inputProps={{
                       'data-criteria': criteria.id,
-                      placeholder: 'N/A'
+                      placeholder: parameters.min
                     }}
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
                     maxWidth={50}
                     value={_field.value}
+                    sx={{ display: 'block' }}
                   />
-                </FormGroup>
+                </Box>
               )
             }
             control={control}

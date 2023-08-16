@@ -4,12 +4,17 @@ import { debounce } from 'lodash';
 import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
+import {
+  useUpsertRubricCriteria,
+  useGetAllReviewerUserIds,
+  useGetProposalFlowFlags,
+  useGetProposalDetails
+} from 'charmClient/hooks/proposals';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
-import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 
@@ -34,7 +39,7 @@ export function ProposalProperties({
   isTemplate,
   title
 }: ProposalPropertiesProps) {
-  const { proposal, refreshProposal } = useProposalDetails(proposalId);
+  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
   const { user } = useUser();
 
@@ -42,13 +47,19 @@ export function ProposalProperties({
     proposalIdOrPath: proposalId
   });
 
-  const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
+
+  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
+    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
+  );
+  const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
+  const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const canAnswerRubric = proposalPermissions?.evaluate;
-  const canViewRubricAnswers = proposalPermissions?.evaluate || isAdmin;
+  const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
 
   const proposalFormInputs: ProposalFormInputs = {
@@ -76,6 +87,18 @@ export function ProposalProperties({
     }
   }
 
+  async function onChangeRubricCriteriaAnswer() {
+    refreshProposal();
+  }
+
+  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+    // @ts-ignore TODO: unify types for rubricCriteria
+    await upsertRubricCriteria({ rubricCriteria });
+    if (proposal?.status === 'evaluation_active') {
+      refreshProposal();
+    }
+  }
+
   async function onChangeProperties(values: ProposalFormInputs) {
     await charmClient.proposals.updateProposal({
       proposalId,
@@ -85,19 +108,17 @@ export function ProposalProperties({
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }
 
-  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
-    if (proposal) {
-      // @ts-ignore TODO: unify types for rubricCriteria
-      await charmClient.proposals.upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria });
-    }
-  }
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
 
-  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), []);
+  const readOnlyReviewers =
+    readOnlyProperties ||
+    (isFromTemplateSource &&
+      !!proposalTemplates?.find((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
 
   return (
     <ProposalPropertiesBase
       archived={!!proposal?.archived}
-      disabledCategoryInput={!proposalPermissions?.edit}
+      disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
@@ -110,13 +131,14 @@ export function ProposalProperties({
         (proposal?.status !== 'draft' && !isTemplate) ||
         isFromTemplateSource
       }
-      readOnlyReviewers={readOnlyProperties || isFromTemplateSource}
+      readOnlyReviewers={readOnlyReviewers}
       rubricAnswers={proposal?.rubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       showStatus={!isTemplate}
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
+      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}

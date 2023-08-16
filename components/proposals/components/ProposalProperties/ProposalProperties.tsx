@@ -1,18 +1,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type {
-  Page,
-  Proposal,
-  ProposalEvaluationType,
-  ProposalRubricCriteria,
-  ProposalStatus
-} from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -23,8 +17,8 @@ import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
+import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -39,7 +33,6 @@ import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteria
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
-import type { FormInput as EvaluationFormValues } from './components/RubricEvaluationForm';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
 export type ProposalFormInputs = {
@@ -61,6 +54,7 @@ type ProposalPropertiesProps = {
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
+  onChangeRubricCriteriaAnswer?: () => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -72,7 +66,7 @@ type ProposalPropertiesProps = {
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
-  setProposalFormInputs: (values: ProposalFormInputs) => void;
+  setProposalFormInputs: (values: ProposalFormInputs) => Promise<void> | void;
   showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
@@ -86,6 +80,7 @@ export function ProposalProperties({
   canViewRubricAnswers,
   disabledCategoryInput,
   onChangeRubricCriteria,
+  onChangeRubricCriteriaAnswer,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -104,10 +99,9 @@ export function ProposalProperties({
   updateProposalStatus,
   title
 }: ProposalPropertiesProps) {
-  const showRubricFeature = useIsCharmverseSpace();
-
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
 
+  const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
@@ -115,6 +109,10 @@ export function ProposalProperties({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
 
   const { proposalTemplates } = useProposalTemplates();
+
+  const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
+    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
+  );
 
   const proposalTemplatePages = useMemo(() => {
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
@@ -131,7 +129,7 @@ export function ProposalProperties({
   const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
-  }, {} as Record<string, Proposal & { page: Page }>);
+  }, {} as Record<string, ProposalTemplate>);
 
   const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
     const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
@@ -179,7 +177,9 @@ export function ProposalProperties({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
           })),
-          proposalTemplateId: templatePage.id
+          proposalTemplateId: templatePage.id,
+          evaluationType: proposalTemplate.evaluationType,
+          rubricCriteria: proposalTemplate.rubricCriteria
         });
       }
     }
@@ -196,15 +196,10 @@ export function ProposalProperties({
     setIsVoteModalOpen(true);
   }
 
-  function onSubmitEvaluation(results: EvaluationFormValues) {
-    // console.log('submit form', results);
-    if (proposalId) {
-      charmClient.proposals.upsertRubricCriteriaAnswer({
-        proposalId,
-        // @ts-ignore -  TODO: make answer types match
-        answers: results.answers
-      });
-    }
+  function onSubmitEvaluation() {
+    onChangeRubricCriteriaAnswer?.();
+    // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
+    setRubricView(1);
   }
 
   useEffect(() => {
@@ -225,6 +220,7 @@ export function ProposalProperties({
           'Evaluate',
           <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
             <RubricEvaluationForm
+              proposalId={proposalId!}
               answers={myRubricAnswers}
               criteriaList={rubricCriteria!}
               onSubmit={onSubmitEvaluation}
@@ -238,7 +234,7 @@ export function ProposalProperties({
             <RubricResults
               answers={rubricAnswers}
               criteriaList={rubricCriteria || []}
-              reviewers={proposalReviewers}
+              reviewerUserIds={reviewerUserIds ?? []}
               title={title}
             />
           </LoadingComponent>,
@@ -246,7 +242,7 @@ export function ProposalProperties({
         ] as TabConfig)
     ].filter(isTruthy);
     return tabs;
-  }, [canAnswerRubric, canViewRubricAnswers, myRubricAnswers, rubricCriteria]);
+  }, [canAnswerRubric, canViewRubricAnswers, rubricAnswers, myRubricAnswers, reviewerUserIds, rubricCriteria]);
 
   return (
     <Box
@@ -265,14 +261,16 @@ export function ProposalProperties({
         {showStatus && (
           <>
             <Grid container mb={2}>
-              <ProposalStepSummary
-                archived={archived}
-                proposalFlowFlags={proposalFlowFlags}
-                proposalStatus={proposalStatus}
-                openVoteModal={openVoteModal}
-                updateProposalStatus={updateProposalStatus}
-                evaluationType={proposalFormInputs.evaluationType}
-              />
+              {!isNewProposal && (
+                <ProposalStepSummary
+                  archived={archived}
+                  proposalFlowFlags={proposalFlowFlags}
+                  proposalStatus={proposalStatus}
+                  openVoteModal={openVoteModal}
+                  updateProposalStatus={updateProposalStatus}
+                  evaluationType={proposalFormInputs.evaluationType}
+                />
+              )}
             </Grid>
 
             <Stack
@@ -380,33 +378,32 @@ export function ProposalProperties({
               <UserAndRoleSelect
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
-                onChange={(options) => {
-                  setProposalFormInputs({
+                onChange={async (options) => {
+                  await setProposalFormInputs({
                     ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
+                  refreshReviewerIds();
                 }}
               />
             </Box>
           </Box>
           {/* Select valuation type */}
-          {showRubricFeature && (
-            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>Type</PropertyLabel>
-                <ProposalEvaluationTypeSelect
-                  disabled={readOnlyProposalEvaluationType}
-                  value={proposalFormInputs.evaluationType}
-                  onChange={(evaluationType) => {
-                    setProposalFormInputs({
-                      ...proposalFormInputs,
-                      evaluationType
-                    });
-                  }}
-                />
-              </Box>
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <ProposalEvaluationTypeSelect
+                disabled={readOnlyProposalEvaluationType}
+                value={proposalFormInputs.evaluationType}
+                onChange={(evaluationType) => {
+                  setProposalFormInputs({
+                    ...proposalFormInputs,
+                    evaluationType
+                  });
+                }}
+              />
             </Box>
-          )}
+          </Box>
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
@@ -434,7 +431,7 @@ export function ProposalProperties({
 
         {evaluationTabs.length > 0 && (
           <Card variant='outlined' sx={{ my: 2 }}>
-            <MultiTabs tabs={evaluationTabs} />
+            <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
           </Card>
         )}
 
