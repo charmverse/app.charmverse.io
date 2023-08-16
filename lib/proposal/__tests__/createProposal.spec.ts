@@ -1,12 +1,13 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
-import type { ProposalWithUsers } from '../interface';
+import type { ProposalWithUsersAndRubric } from '../interface';
 
 let user: User;
 let space: Space;
@@ -22,7 +23,7 @@ beforeAll(async () => {
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
-  it('Create a page and proposal in a specific category, accepting page content, reviewers and authors as input', async () => {
+  it('Create a page and proposal in a specific category, accepting page content, reviewers, authors and source template ID as input', async () => {
     const reviewerUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -34,10 +35,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
 
     const pageTitle = 'page title 124';
 
+    const templateId = uuid();
+
     const { page, workspaceEvent, proposal } = await createProposal({
       pageProps: {
         contentText: '',
-        title: pageTitle
+        title: pageTitle,
+        sourceTemplateId: templateId
       },
       categoryId: proposalCategory.id,
       userId: user.id,
@@ -54,12 +58,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
     expect(page).toMatchObject(
       expect.objectContaining({
         title: pageTitle,
-        type: 'proposal'
+        type: 'proposal',
+        sourceTemplateId: templateId
       })
     );
 
     expect(proposal).toMatchObject(
-      expect.objectContaining<Partial<ProposalWithUsers>>({
+      expect.objectContaining<Partial<ProposalWithUsersAndRubric>>({
         authors: [
           {
             proposalId: proposal?.id,
@@ -70,6 +75,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
             userId: extraUser.id
           }
         ],
+        rubricAnswers: [],
+        rubricCriteria: [],
         reviewers: [
           {
             id: expect.any(String),

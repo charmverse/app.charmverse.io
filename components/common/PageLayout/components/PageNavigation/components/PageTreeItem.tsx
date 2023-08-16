@@ -17,10 +17,9 @@ import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { PageHeaderIcon } from 'components/[pageId]/DocumentPage/components/PageHeaderIcon';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
@@ -281,7 +280,7 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
         e.stopPropagation();
       }}
     >
-      <PageHeaderIcon updatePageIcon={onSelectEmoji} />
+      <CustomEmojiPicker onUpdate={onSelectEmoji} />
     </Menu>
   );
 }
@@ -400,11 +399,11 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
   const page = pages[pageId];
-
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
+
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,

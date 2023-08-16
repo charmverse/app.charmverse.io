@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { supportedMainnets, getNFTs } from 'lib/blockchain/getNFTs';
+import { getNFTs } from 'lib/blockchain/getNFTs';
 
 export const getUserNFTs = async (userId: string) => {
   const profileItems = await prisma.profileItem.findMany({
@@ -26,22 +26,13 @@ export const getUserNFTs = async (userId: string) => {
     }
   });
 
-  const mappedNfts = (
-    await Promise.all(
-      supportedMainnets.map((mainnetChainId) =>
-        getNFTs({
-          wallets,
-          chainId: mainnetChainId
-        })
-      )
-    )
-  )
-    .flat()
-    .map((nft) => ({
-      ...nft,
-      isHidden: hiddenNftIds.includes(nft.id),
-      isPinned: pinnedNftIds.includes(nft.id)
-    }));
+  const nfts = await getNFTs({
+    wallets
+  });
 
-  return mappedNfts;
+  return nfts.map((nft) => ({
+    ...nft,
+    isHidden: hiddenNftIds.includes(nft.id),
+    isPinned: pinnedNftIds.includes(nft.id)
+  }));
 };

@@ -65,7 +65,8 @@ export const SubscriptionStatus = {
   pending: 'pending',
   cancelled: 'cancelled',
   cancel_at_end: 'cancel_at_end',
-  free_trial: 'free_trial'
+  free_trial: 'free_trial',
+  unpaid: 'unpaid'
 };
 
 export type SubscriptionStatusType = keyof typeof SubscriptionStatus;

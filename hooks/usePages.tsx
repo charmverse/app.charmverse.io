@@ -51,7 +51,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
-  const { subscribe } = useWebSocketClient();
+  const { sendMessage, subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(
     () => getPagesListCacheKey(currentSpace?.id),
@@ -89,54 +89,66 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
+
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
-      (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board')
+      (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board' || p?.type === 'card')
     ).length;
 
+    const pageType = page?.type;
+
     if (page && user && currentSpace) {
-      const { pageIds } = await charmClient.archivePage(page.id);
-      let newPage: null | PageMeta = null;
-      if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
-        newPage = await charmClient.createPage(
-          untitledPage({
-            userId: user.id,
-            spaceId: currentSpace.id
-          })
-        );
-      }
-
-      // Delete the page associated with the card
-      if (board) {
-        mutator.deleteBlock(
-          board,
-          'Delete board',
-          async () => {
-            // success
+      if (pageType === 'page' || pageType === 'board') {
+        sendMessage({
+          payload: {
+            id: pageId
           },
-          async () => {
-            // error
-          }
-        );
-      }
-
-      _setPages((_pages) => {
-        pageIds.forEach((_pageId) => {
-          _pages[_pageId] = {
-            ..._pages[_pageId],
-            deletedBy: user.id,
-            deletedAt: new Date()
-          } as PageMeta;
+          type: 'page_deleted'
         });
-        // If a new page was created add that to state
-        if (newPage) {
-          _pages[newPage.id] = newPage;
-        }
-        return { ..._pages };
-      });
 
-      return newPage;
+        if (board) {
+          await mutator.deleteBlock(
+            board,
+            'Delete board',
+            async () => {
+              // success
+            },
+            async () => {
+              // error
+            }
+          );
+        }
+      } else {
+        const { pageIds } = await charmClient.archivePage(page.id);
+        let newPage: null | PageMeta = null;
+        if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
+          newPage = await charmClient.createPage(
+            untitledPage({
+              userId: user.id,
+              spaceId: currentSpace.id
+            })
+          );
+        }
+
+        // Delete the page associated with the card
+        _setPages((_pages) => {
+          pageIds.forEach((_pageId) => {
+            _pages[_pageId] = {
+              ..._pages[_pageId],
+              deletedBy: user.id,
+              deletedAt: new Date()
+            } as PageMeta;
+          });
+          // If a new page was created add that to state
+          if (newPage) {
+            _pages[newPage.id] = newPage;
+          }
+          return { ..._pages };
+        });
+
+        return newPage;
+      }
     }
   }
 
@@ -259,7 +271,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
     );
   }, []);
-
   useEffect(() => {
     currentSpaceId.current = currentSpace?.id;
   }, [currentSpace]);

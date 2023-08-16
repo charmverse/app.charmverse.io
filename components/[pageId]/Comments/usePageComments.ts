@@ -15,7 +15,7 @@ export function usePageComments(pageId: string) {
   const comments = useMemo(() => {
     if (data) {
       return sortComments({
-        comments: processComments(data),
+        comments: processComments({ comments: data, sort: commentSort }),
         sort: commentSort
       });
     }

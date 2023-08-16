@@ -11,7 +11,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionDetails } from 'lib/subscription/constants';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
-import { getTimeDifference } from 'lib/utilities/dates';
 import CommunityIcon from 'public/images/subscriptions/community.svg';
 import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
@@ -48,8 +47,9 @@ export function CreateSubscriptionInformation({
   pendingPayment?: boolean;
   spaceId: string;
 }) {
-  const { refetchSpaceSubscription } = useSpaceSubscription();
+  const { refetchSpaceSubscription, freeTrialEnds } = useSpaceSubscription();
   const { showMessage } = useSnackbar();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
 
   const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
     `spaces/${spaceId}/switch-to-free-tier`,
@@ -57,6 +57,7 @@ export function CreateSubscriptionInformation({
     {
       onSuccess() {
         refetchSpaceSubscription();
+        refreshCurrentSpace();
         showMessage('You have successfully switch to free tier!', 'success');
       },
       onError(err) {
@@ -71,11 +72,6 @@ export function CreateSubscriptionInformation({
     open: openConfirmFreeTierDowngradeDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
-  const freeTrialEnds =
-    spaceSubscription?.status === 'free_trial'
-      ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
-      : 0;
-
   const freeTrialLabel =
     spaceSubscription?.status === 'free_trial'
       ? freeTrialEnds > 0
@@ -83,16 +79,14 @@ export function CreateSubscriptionInformation({
         : `Free trial finished`
       : '';
 
-  const { space } = useCurrentSpace();
-
   useEffect(() => {
-    if (space) {
+    if (space?.id) {
       charmClient.track.trackAction('page_view', {
         spaceId: space.id,
         type: 'billing/marketing'
       });
     }
-  }, [space]);
+  }, [space?.id]);
 
   return (
     <>

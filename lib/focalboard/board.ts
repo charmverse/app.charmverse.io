@@ -6,7 +6,14 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
-export const proposalPropertyTypesList = ['proposalUrl', 'proposalStatus', 'proposalCategory'] as const;
+export const proposalPropertyTypesList = [
+  'proposalUrl',
+  'proposalStatus',
+  'proposalCategory',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal',
+  'proposalEvaluationAverage'
+] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
 export type PropertyType =
@@ -45,8 +52,8 @@ export const propertyTypesList: PropertyType[] = [
   ...proposalPropertyTypesList
 ];
 
-interface IPropertyOption {
-  id: string;
+interface IPropertyOption<T = string> {
+  id: T;
   value: string;
   color: string;
 }

@@ -1,19 +1,24 @@
 import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-
-export const DEFAULT_MAX_FILE_SIZE_MB = 20;
+import { DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME } from 'lib/file/constants';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 
-export const useS3UploadInput = (
-  onFileUpload: UploadedFileCallback,
-  fileSizeLimitMB: number = DEFAULT_MAX_FILE_SIZE_MB
-) => {
+export const useS3UploadInput = ({
+  onFileUpload,
+  fileSizeLimitMB = DEFAULT_MAX_FILE_SIZE_MB,
+  resize = false
+}: {
+  onFileUpload: UploadedFileCallback;
+  fileSizeLimitMB?: number;
+  resize?: boolean;
+}) => {
   const { showMessage } = useSnackbar();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -30,8 +35,15 @@ export const useS3UploadInput = (
     setFileName(file.name || '');
 
     try {
-      const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
-      onFileUpload({ url, fileName: file.name || '', size: file.size });
+      if (resize) {
+        const formData = new FormData();
+        formData.append(FORM_DATA_FILE_PART_NAME, file);
+        const { url } = await charmClient.resizeImage(formData);
+        onFileUpload({ url, fileName: file.name || '', size: file.size });
+      } else {
+        const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
+        onFileUpload({ url, fileName: file.name || '', size: file.size });
+      }
     } catch (error) {
       log.error('Error uploading image to s3', { error });
       showMessage('Failed to upload file. Please try again.', 'error');

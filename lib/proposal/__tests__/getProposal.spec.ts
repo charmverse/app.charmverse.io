@@ -46,7 +46,13 @@ describe('getProposal', () => {
           snapshotProposalExpiry: null,
           spaceId: space.id,
           status: proposal.status,
-          archived: expect.any(Boolean)
+          archived: expect.any(Boolean),
+          evaluationType: 'vote',
+          rubricAnswers: [],
+          rubricCriteria: [],
+          page: {
+            sourceTemplateId: null
+          }
         }
       })
     );

@@ -35,7 +35,8 @@ export function mapBountyPermissions(bountyPermissions: BountyPermission[]): Bou
         : null;
 
     if (targetGroup) {
-      mapping[permission.permissionLevel].push(targetGroup);
+      // TODO: better separation between permission levels and groups
+      mapping[permission.permissionLevel].push(targetGroup as { id: string; group: 'role' });
     }
   }
 

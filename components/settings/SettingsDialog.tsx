@@ -1,28 +1,32 @@
 import type { Space } from '@charmverse/core/prisma';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Menu, MenuItem, Typography } from '@mui/material';
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
-import { ACCOUNT_TABS, getSettingsTabs } from './config';
+import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import { RoleSettings } from './roles/RoleSettings';
@@ -39,9 +43,8 @@ interface TabPanelProps extends BoxProps {
 
 function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
   const { space, tab } = props;
-  const isAdmin = useIsAdmin();
 
-  const settingsTab = getSettingsTabs({ space, isAdmin }).find((settingTab) => settingTab.path === tab.path);
+  const settingsTab = SETTINGS_TABS.find((settingTab) => settingTab.path === tab.path);
   const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
 
   if (!settingsTab && !accountsTab) {
@@ -105,9 +108,9 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const isAdmin = useIsAdmin();
-  const { spaceSubscription } = useSpaceSubscription();
+  const { spaceSubscription, subscriptionEnded } = useSpaceSubscription();
   const { blockCount } = useBlockCount();
+  const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
@@ -126,7 +129,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={onClose}
+      onClose={subscriptionEnded ? undefined : onClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -159,7 +162,7 @@ export function SpaceSettingsDialog() {
           )}
           {currentSpace &&
             isSpaceSettingsVisible &&
-            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <SidebarLink
                 data-test={`space-settings-tab-${tab.path}`}
                 key={tab.path}
@@ -169,11 +172,35 @@ export function SpaceSettingsDialog() {
                 active={activePath === tab.path}
                 section={tab.path}
               >
-                {tab.path === 'subscription' && passedBlockQuota ? (
+                {tab.path === 'subscription' && passedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
                   <UpgradeChip forceDisplay upgradeContext='upgrade' />
                 ) : null}
               </SidebarLink>
             ))}
+          {subscriptionEnded && memberSpaces.length > 1 && (
+            <Box>
+              <SidebarLink
+                data-test='space-settings-tab-switch-space'
+                label='Switch space'
+                icon={<ChangeCircleIcon fontSize='small' />}
+                {...bindTrigger(switchSpaceMenu)}
+                active={false}
+              />
+              <Menu {...bindMenu(switchSpaceMenu)} sx={{ width: '100%' }}>
+                {memberSpaces.map((_space) => (
+                  <MenuItem
+                    key={_space.id}
+                    component={Link}
+                    href={getSpaceUrl({ domain: _space.domain, customDomain: _space.customDomain })}
+                  >
+                    <Typography noWrap ml={1}>
+                      {_space.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          )}
         </Box>
         <Box flex='1 1 auto' position='relative' overflow='auto'>
           {isMobile && !!activePath && (
@@ -197,7 +224,7 @@ export function SpaceSettingsDialog() {
             </Box>
           )}
           {currentSpace &&
-            getSettingsTabs({ space: currentSpace, isAdmin }).map((tab) => (
+            SETTINGS_TABS.map((tab) => (
               <TabPanel key={tab.path} value={activePath} index={tab.path}>
                 <TabView space={currentSpace} tab={tab} />
               </TabPanel>
@@ -209,34 +236,38 @@ export function SpaceSettingsDialog() {
               </TabPanel>
             ))}
         </Box>
-        {isMobile ? (
-          <Button
-            variant='text'
-            color='inherit'
-            onClick={onClose}
-            sx={{
-              position: 'absolute',
-              right: 10,
-              top: 5,
-              zIndex: 1
-            }}
-          >
-            Close
-          </Button>
-        ) : (
-          <IconButton
-            data-test='close-settings-modal'
-            aria-label='close the settings modal'
-            onClick={onClose}
-            sx={{
-              position: 'absolute',
-              right: 15,
-              top: 15,
-              zIndex: 1
-            }}
-          >
-            <CloseIcon color='secondary' fontSize='small' />
-          </IconButton>
+        {!subscriptionEnded && (
+          <Box>
+            {isMobile ? (
+              <Button
+                variant='text'
+                color='inherit'
+                onClick={onClose}
+                sx={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 5,
+                  zIndex: 1
+                }}
+              >
+                Close
+              </Button>
+            ) : (
+              <IconButton
+                data-test='close-settings-modal'
+                aria-label='close the settings modal'
+                onClick={onClose}
+                sx={{
+                  position: 'absolute',
+                  right: 15,
+                  top: 15,
+                  zIndex: 1
+                }}
+              >
+                <CloseIcon color='secondary' fontSize='small' />
+              </IconButton>
+            )}
+          </Box>
         )}
       </Box>
     </Dialog>

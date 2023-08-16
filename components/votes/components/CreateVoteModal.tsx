@@ -1,5 +1,6 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { VoteType } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -25,7 +26,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ExtendedVote } from 'lib/votes/interfaces';
@@ -101,7 +101,7 @@ interface CreateVoteModalProps {
   pageId?: string;
   postId?: string;
   snapshotProposalId: string | null;
-  proposal?: ProposalWithUsers;
+  proposal?: Pick<ProposalWithUsers, 'status' | 'id'>;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
 }
 

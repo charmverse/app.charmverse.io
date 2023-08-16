@@ -45,8 +45,8 @@ const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonma
 export function parseMarkdown(data: string): PageContent {
   const baseDoc = { type: 'doc', content: [] };
 
-  const parsed = (charmParser.parse(data)?.content as any)?.content;
-
+  const parsedNode = charmParser.parse(data)?.toJSON();
+  const parsed = parsedNode?.content;
   if (parsed) {
     baseDoc.content = parsed;
   }

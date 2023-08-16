@@ -55,7 +55,8 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
       bountyId: true,
       hasContent: true,
       galleryImage: true,
-      deletedBy: true
+      deletedBy: true,
+      syncWithPageId: true
     }
   });
 

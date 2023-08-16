@@ -28,7 +28,7 @@ export async function upgradeProSubscription({
 
   await stripeClient.subscriptions.update(subscription.id, {
     cancel_at_period_end: false,
-    proration_behavior: 'create_prorations',
+    proration_behavior: 'always_invoice',
     items: [
       {
         id: subscription.items.data[0].id,

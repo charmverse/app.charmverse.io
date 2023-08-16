@@ -8,6 +8,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
+import { enableDragAndDrop } from '../../utils';
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -124,7 +125,13 @@ export function VideoNodeView({
   if (attrs.muxAssetId) {
     if (playbackIdWithToken) {
       return (
-        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
+        <BlockAligner
+          readOnly={readOnly}
+          onDelete={deleteNode}
+          onDragStart={() => {
+            enableDragAndDrop(view, getPos());
+          }}
+        >
           <MuxVideo
             playsInline
             style={{ height: '100%', maxWidth: '100%', width: '100%' }}
@@ -148,6 +155,9 @@ export function VideoNodeView({
     const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (
       <Resizable
+        onDragStart={() => {
+          enableDragAndDrop(view, getPos());
+        }}
         readOnly={readOnly}
         aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={attrs.width}

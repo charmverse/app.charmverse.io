@@ -2,12 +2,12 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
 
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
@@ -31,7 +31,7 @@ export function PageComments({ page, permissions }: Props) {
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
 
-  const { proposal } = useProposalDetails(isProposal ? page.id : null);
+  const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
   const commentPermissions: CommentPermissions = {
     add_comment: permissions.comment ?? false,

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSessionStorage } from 'hooks/useSessionStorage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
@@ -25,14 +26,15 @@ import { SubscriptionInformation } from './SubscriptionInformation';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { showMessage } = useSnackbar();
+  const isAdmin = useIsAdmin();
 
   const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
 
-  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>('pending-payment', false);
+  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>(`pending-payment-${space.id}`, false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
-    `/api/spaces/${space?.id}/subscription`,
+    `/api/spaces/${space.id}/subscription`,
     (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateProSubscriptionRequest } }>) =>
       charmClient.subscription.createSubscription(arg.spaceId, arg.payload),
     {
@@ -60,10 +62,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription) {
+    if (pendingPayment && spaceSubscription?.id && spaceSubscription?.status === 'active') {
       setPendingPayment(false);
     }
-  }, [spaceSubscription, pendingPayment]);
+  }, [spaceSubscription?.id, spaceSubscription?.status, pendingPayment]);
 
   async function handleShowCheckoutForm() {
     if (minimumBlockQuota > blockQuota) {
@@ -88,6 +90,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const handleCreateSubscription = async (args: { spaceId: string; payload: CreateProSubscriptionRequest }) => {
     return createSubscription(args);
   };
+
+  if (!isAdmin) {
+    return <Typography>Please talk to an administrator about this space.</Typography>;
+  }
 
   if (space.paidTier === 'enterprise') {
     return <EnterpriseBillingScreen />;
