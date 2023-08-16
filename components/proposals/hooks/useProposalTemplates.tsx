@@ -7,12 +7,16 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 
 import { useProposalCategories } from './useProposalCategories';
 
-export function useProposalTemplates() {
+export function useProposalTemplates({ load } = { load: true }) {
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
-  const { data: proposalTemplates, mutate, isLoading: isLoadingTemplates } = useGetProposalTemplatesBySpace(space?.id);
+  const {
+    data: proposalTemplates,
+    mutate,
+    isLoading: isLoadingTemplates
+  } = useGetProposalTemplatesBySpace(load ? space?.id : null);
   const usableTemplates = isAdmin
     ? proposalTemplates
     : proposalTemplates?.filter((template) =>

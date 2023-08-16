@@ -12,6 +12,7 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -34,7 +35,7 @@ type Props = {
   setContentUpdated: (changed: boolean) => void;
 };
 // Note: this component is only used before a page is saved to the DB
-export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
+export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
@@ -44,6 +45,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
 
   usePreventReload(contentUpdated);
+
+  const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
 
@@ -56,6 +59,10 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
       setReadOnlyEditor(!formInputs.proposalTemplateId);
     }
   }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
+
+  const readOnlyReviewers =
+    isFromTemplateSource &&
+    !!proposalTemplates?.find((t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0);
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -85,7 +92,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
           pageProps: {
             content: formInputs.content,
             contentText: formInputs.contentText ?? '',
-            title: formInputs.title
+            title: formInputs.title,
+            sourceTemplateId: formInputs.proposalTemplateId
           },
           evaluationType: formInputs.evaluationType,
           rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -177,7 +185,7 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
                 <div className='CardDetail content'>
                   <ProposalProperties
                     readOnlyRubricCriteria={isFromTemplateSource}
-                    readOnlyReviewers={isFromTemplateSource && formInputs.reviewers.length > 0}
+                    readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}

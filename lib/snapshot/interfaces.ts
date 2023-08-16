@@ -4,6 +4,19 @@ export interface SnapshotVotingStrategy {
   params: any;
 }
 
+// Comes from snapshot.js https://github.com/snapshot-labs/snapshot/blob/fd1f2ba15543583861df750b0958d1794cc625bb/src/components/Modal/VotingType.vue
+export const SnapshotVotingMode = {
+  'single-choice': 'Single choice',
+  approval: 'Approval',
+  'ranked-choice': 'Ranked choice',
+  quadratic: 'Quadratic',
+  weighted: 'Weighted',
+  custom: 'Custom',
+  basic: 'Basic'
+};
+
+export type SnapshotVotingModeType = keyof typeof SnapshotVotingMode;
+
 /**
  * @id the actual snapshot domain
  */
@@ -28,6 +41,7 @@ export interface SnapshotSpace {
     // Number of seconds proposals are active for
     period: number | null;
     delay: number | null;
+    type: SnapshotVotingModeType | null;
   };
 }
 
@@ -58,16 +72,3 @@ export interface SnapshotReceipt {
     receipt: string;
   };
 }
-
-// Comes from snapshot.js https://github.com/snapshot-labs/snapshot/blob/fd1f2ba15543583861df750b0958d1794cc625bb/src/components/Modal/VotingType.vue
-export const SnapshotVotingMode = {
-  'single-choice': 'Single choice',
-  approval: 'Approval',
-  'ranked-choice': 'Ranked choice',
-  quadratic: 'Quadratic',
-  weighted: 'Weighted',
-  custom: 'Custom',
-  basic: 'Basic'
-};
-
-export type SnapshotVotingModeType = keyof typeof SnapshotVotingMode;

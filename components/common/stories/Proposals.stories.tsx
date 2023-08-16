@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import { ProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/ProposalPage';
+import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';

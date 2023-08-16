@@ -29,13 +29,13 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
 import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
+import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -380,8 +380,9 @@ export function SpaceSettings({ space }: { space: Space }) {
         </Grid>
       </form>
       <SetupCustomDomain space={space} />
-      <Legend mt={3}>Snapshot.org Integration</Legend>
-      <ConnectSnapshot />
+
+      <SpaceIntegrations />
+
       <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
         Warning
       </Legend>

@@ -23,7 +23,8 @@ export function getValidSubdomain(host?: string | null) {
 
     if (candidate) {
       // default staging subdomain is pr-<pr-number> and it should be skipped
-      if (isStagingEnv && candidate.startsWith('pr-')) {
+      // also support for stg- subdomain
+      if (isStagingEnv && (candidate.startsWith('pr-') || candidate.startsWith('stg-'))) {
         return null;
       }
 
