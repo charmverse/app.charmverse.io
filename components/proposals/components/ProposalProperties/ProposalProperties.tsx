@@ -378,6 +378,7 @@ export function ProposalProperties({
               <UserAndRoleSelect
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
+                proposalCategoryId={proposalFormInputs.categoryId}
                 onChange={async (options) => {
                   await setProposalFormInputs({
                     ...proposalFormInputs,

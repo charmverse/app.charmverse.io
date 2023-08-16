@@ -125,7 +125,7 @@ function SelectedReviewers({
 type Props = {
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
-  proposalId?: string;
+  proposalCategoryId?: string | null;
   readOnly?: boolean;
   showEmptyPlaceholder?: boolean;
   value: GroupedOption[];
@@ -135,7 +135,7 @@ type Props = {
 export function UserAndRoleSelect({
   displayType = 'details',
   onChange,
-  proposalId,
+  proposalCategoryId,
   readOnly,
   showEmptyPlaceholder = true,
   variant = 'standard',
@@ -146,7 +146,7 @@ export function UserAndRoleSelect({
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useGetReviewerPool(proposalId);
+  const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
 
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
@@ -167,9 +167,9 @@ export function UserAndRoleSelect({
   }, [reviewerPool]);
 
   let options: GroupedOptionPopulated[] = [];
-  if (proposalId && isFreeSpace) {
+  if (proposalCategoryId && isFreeSpace) {
     options = reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : [];
-  } else if (proposalId && !isFreeSpace) {
+  } else if (proposalCategoryId && !isFreeSpace) {
     options = [
       // For proposals we only want current space members and roles that are allowed to review proposals
       ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
@@ -184,7 +184,7 @@ export function UserAndRoleSelect({
   }
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
-    proposalId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
+    proposalCategoryId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
   );
   const populatedValue = inputValue.map(({ id }) => options.find((opt) => opt.id === id)).filter(isTruthy);
 
@@ -234,7 +234,7 @@ export function UserAndRoleSelect({
         }}
         groupBy={(option) => `${option.group[0].toUpperCase() + option.group.slice(1)}s`}
         isOptionEqualToValue={(option, val) => option.id === val.id}
-        loading={!roles || members.length === 0 || (!!proposalId && !reviewerPool)}
+        loading={!roles || members.length === 0 || (!!proposalCategoryId && !reviewerPool)}
         multiple
         noOptionsText='No more options available'
         onChange={(e, value) => onChange(value)}

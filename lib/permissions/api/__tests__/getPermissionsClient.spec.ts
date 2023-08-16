@@ -18,6 +18,7 @@ describe('getPermissionsClient', () => {
 
     expect(clientInfo.client).toBeInstanceOf(PublicPermissionsClient);
     expect(clientInfo.type).toBe('free');
+    expect(clientInfo.spaceId).toBe(space.id);
   });
 
   it('should return the premium client for a space with pro, cancelled or enterprise tier', async () => {
@@ -37,6 +38,7 @@ describe('getPermissionsClient', () => {
 
       expect(clientInfo.client).toBeInstanceOf(PermissionsApiClient);
       expect(clientInfo.type).toBe('premium');
+      expect(clientInfo.spaceId).toBe(space.id);
     }
   });
 });
