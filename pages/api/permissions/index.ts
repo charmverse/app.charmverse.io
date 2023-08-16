@@ -29,6 +29,10 @@ handler
     requirePaidPermissionsSubscription({ key: 'permissionId', resourceIdType: 'pagePermission' }),
     removePagePermission
   )
+  .put(
+    requirePaidPermissionsSubscription({ key: 'permissionId', location: 'body', resourceIdType: 'pagePermission' }),
+    updatePagePermission
+  )
   .use(requireKeys(['pageId'], 'body'))
   .post(
     requirePaidPermissionsSubscription({ key: 'pageId', location: 'body', resourceIdType: 'page' }),
@@ -117,6 +121,54 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   }
 
   return res.status(201).json(createdPermission);
+}
+
+async function updatePagePermission(req: NextApiRequest, res: NextApiResponse) {
+  const { permissionId, allowDiscovery, pageId } = req.body as PermissionResource & {
+    allowDiscovery: boolean;
+    pageId: string;
+  };
+
+  const permissionData = await prisma.pagePermission.findUnique({
+    where: { id: permissionId },
+    select: { public: true, pageId: true, allowDiscovery: true }
+  });
+
+  if (!permissionData) {
+    throw new DataNotFoundError(permissionId);
+  }
+
+  const computedPermissions = await req.premiumPermissionsClient.pages.computePagePermissions({
+    resourceId: permissionData.pageId,
+    userId: req.session.user.id
+  });
+
+  if (permissionData.public && computedPermissions.edit_isPublic !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  } else if (!permissionData.public && computedPermissions.grant_permissions !== true) {
+    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  }
+
+  // Will add permissions client here instead of doing it the old way
+  // const permissions = await req.premiumPermissionsClient.pages.updatePagePermissions({
+  //   permissionId,
+  //   allowDiscovery,
+  //   pageId
+  // });
+
+  // Old way. To be deleted
+  // const updated = await prisma.pagePermission.update({
+  //   where: {
+  //     id: permissionId
+  //   },
+  //   data: {
+  //     allowDiscovery: allowDiscovery
+  //   }
+  // });
+
+  updateTrackPageProfile(permissionData.pageId);
+
+  return res.status(200).json({ success: true });
 }
 
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {

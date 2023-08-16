@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
@@ -43,18 +44,22 @@ const CopyButton = styled((props: any) => <Button color='secondary' variant='out
 
 export type ShareToWebProps = {
   disabled: boolean;
-  toggleChecked: boolean;
+  shareChecked: boolean;
+  discoveryChecked: boolean;
   pageId: string;
-  onChange?: (newValue: boolean) => void;
+  handlePublish?: (newValue: boolean) => void;
+  handleDiscovery?: (newValue: boolean) => void;
   disabledTooltip?: string | null;
   shareAlertMessage?: string | null;
 };
 
 export default function ShareToWeb({
-  toggleChecked,
+  shareChecked,
+  discoveryChecked,
   disabled,
   pageId,
-  onChange,
+  handlePublish,
+  handleDiscovery,
   shareAlertMessage,
   disabledTooltip
 }: ShareToWebProps) {
@@ -69,7 +74,7 @@ export default function ShareToWeb({
 
   useEffect(() => {
     setShareLink(getShareLink());
-  }, [pageId, !!page, router.query.viewId, toggleChecked]);
+  }, [pageId, !!page, router.query.viewId, shareChecked]);
 
   // Current values of the public permission
 
@@ -79,7 +84,7 @@ export default function ShareToWeb({
   }
 
   function getShareLink() {
-    if (!toggleChecked || !page) {
+    if (!shareChecked || !page) {
       return null;
     } else if (page?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
@@ -98,7 +103,7 @@ export default function ShareToWeb({
           <Typography>Share to web</Typography>
 
           <Typography variant='body2' color='secondary'>
-            {toggleChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
+            {shareChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
           </Typography>
         </Box>
         <UpgradeChip upgradeContext='page_permissions' />
@@ -107,10 +112,10 @@ export default function ShareToWeb({
             <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
               <Switch
                 data-test='toggle-public-page'
-                checked={toggleChecked}
+                checked={shareChecked}
                 disabled={disabled}
                 onChange={(_, checked) => {
-                  onChange?.(checked);
+                  handlePublish?.(checked);
                 }}
               />
             </UpgradeWrapper>
@@ -118,7 +123,7 @@ export default function ShareToWeb({
         </Tooltip>
       </Box>
 
-      <Collapse in={toggleChecked && !!shareLink}>
+      <Collapse in={!!shareChecked && !!shareLink}>
         <Box>
           <StyledInput
             data-test='share-link'
@@ -133,6 +138,26 @@ export default function ShareToWeb({
               </CopyToClipboard>
             }
           />
+        </Box>
+      </Collapse>
+      <Collapse in={!!shareChecked && !!shareLink /* || page.hasGuests */}>
+        <Box>
+          <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
+            <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
+              <InputLabel variant='standard' htmlFor='discovery-toggle'>
+                Discoverable
+              </InputLabel>
+              <Switch
+                id='discovery-toggle'
+                data-test='toggle-discovery-page'
+                checked={discoveryChecked}
+                disabled={disabled}
+                onChange={(_, checked) => {
+                  handleDiscovery?.(checked);
+                }}
+              />
+            </Box>
+          </UpgradeWrapper>
         </Box>
       </Collapse>
       {shareAlertMessage && (

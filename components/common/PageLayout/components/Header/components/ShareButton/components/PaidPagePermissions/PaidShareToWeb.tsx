@@ -49,6 +49,19 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
     refreshPermissions();
   }
 
+  const isDiscoveryChecked = !!publicPermission?.sourcePermission?.allowDiscovery || !!publicPermission?.allowDiscovery;
+
+  async function handleDiscovery() {
+    if (publicPermission) {
+      await charmClient.updatePermission({
+        permissionId: publicPermission.id,
+        pageId,
+        allowDiscovery: !isDiscoveryChecked
+      });
+      refreshPermissions();
+    }
+  }
+
   // In the case of a space with public proposals, we want to override the manual setting
   const disabledToolip =
     !!space?.publicProposals && currentPage?.type === 'proposal'
@@ -57,7 +70,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       ? 'You cannot update permissions for this page'
       : null;
 
-  const isChecked =
+  const isShareChecked =
     // If not using space wide proposals, go by the page permissions
     (!space?.publicProposals && !!publicPermission) ||
     (!!space?.publicProposals &&
@@ -65,6 +78,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       ((currentPage?.type !== 'proposal' && !!publicPermission) ||
         // All proposals beyond draft are public
         (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
+
   const baseShareAlertMessage = currentPage ? alerts[currentPage.type] : '';
 
   const publicProposalToggleInfo =
@@ -84,15 +98,17 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   return (
     <>
       <ShareToWeb
-        toggleChecked={isChecked}
+        shareChecked={isShareChecked}
+        discoveryChecked={isDiscoveryChecked}
         pageId={pageId}
-        onChange={togglePublic}
+        handlePublish={togglePublic}
+        handleDiscovery={handleDiscovery}
         disabled={!!disabledToolip}
         disabledTooltip={disabledToolip}
         shareAlertMessage={shareAlertMessage}
       />
 
-      {isChecked && publicPermission && currentPage?.type !== 'proposal' && (
+      {isShareChecked && publicPermission && currentPage?.type !== 'proposal' && (
         <PermissionInheritedFrom permission={publicPermission} />
       )}
     </>
