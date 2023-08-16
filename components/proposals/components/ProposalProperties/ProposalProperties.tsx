@@ -1,12 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type {
-  Page,
-  Proposal,
-  ProposalEvaluationType,
-  ProposalRubricCriteria,
-  ProposalStatus
-} from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
@@ -24,6 +18,7 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
+import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -134,7 +129,7 @@ export function ProposalProperties({
   const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
     acc[_proposal.id] = _proposal;
     return acc;
-  }, {} as Record<string, Proposal & { page: Page }>);
+  }, {} as Record<string, ProposalTemplate>);
 
   const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
     const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
@@ -182,7 +177,9 @@ export function ProposalProperties({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
           })),
-          proposalTemplateId: templatePage.id
+          proposalTemplateId: templatePage.id,
+          evaluationType: proposalTemplate.evaluationType,
+          rubricCriteria: proposalTemplate.rubricCriteria
         });
       }
     }

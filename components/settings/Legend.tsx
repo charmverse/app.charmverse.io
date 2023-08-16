@@ -25,7 +25,7 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
-function Legend({ children, helperText, noBorder, mb = 2, pb = 2, wrap, ...props }: LegendProps) {
+function Legend({ children, helperText, noBorder, mb = 1, pb = 0.5, wrap, ...props }: LegendProps) {
   return (
     <StyledBox noBorder={noBorder} mb={mb} pb={pb} wrap={wrap}>
       <StyledTypography noWrap={!wrap} {...props}>

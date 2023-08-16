@@ -180,6 +180,7 @@ export class DocumentEventHandler {
         message,
         ...logData
       });
+      this.sendError('There was an error saving changes do your document. Please reload and try again.');
     }
   }
 

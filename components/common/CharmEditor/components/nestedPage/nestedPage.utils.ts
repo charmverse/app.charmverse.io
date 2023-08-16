@@ -14,7 +14,7 @@ export function encloseNestedPage(pageId: string): string {
  * Returns a list of page IDs
  */
 function parseNestedPagesToReplace(convertedToMarkdown: string): string[] {
-  return convertedToMarkdown.match(new RegExp(`_${nestedPageMarkdownEnclosure}\\((?:[a-f]|\\d|-){1,}\\)_`)) ?? [];
+  return convertedToMarkdown.match(new RegExp(`_${nestedPageMarkdownEnclosure}\\((?:[a-f]|\\d|-){1,}\\)_`, 'g')) ?? [];
 }
 
 function extractPageId(matchedMarkdownEnclosure: string): string {
@@ -25,8 +25,6 @@ function extractPageId(matchedMarkdownEnclosure: string): string {
     .split(')')
     .filter((str) => !!str)[0];
 }
-
-// function produceLinkMarkdown()
 
 /**
  * Returns markdown content with page data interpolated
