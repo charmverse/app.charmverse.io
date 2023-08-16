@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Comment, Page, SubscriptionTier, Thread } from '@charmverse/core/prisma';
+import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -102,6 +102,21 @@ type SubscribeToWorkspace = {
   } & SocketAuthResponse;
 };
 
+type PageDeleted = {
+  type: 'page_deleted';
+  payload: Resource;
+};
+
+type PageRestored = {
+  type: 'page_restored';
+  payload: Resource;
+};
+
+type PageCreated = {
+  type: 'page_created';
+  payload: Partial<Page>;
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -127,7 +142,12 @@ type ThreadsUpdated = {
   };
 };
 
-export type ClientMessage = SubscribeToWorkspace;
+type PagesRestored = {
+  type: 'pages_restored';
+  payload: Resource[];
+};
+
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated;
 
 export type ServerMessage =
   | BlocksUpdated
@@ -145,7 +165,8 @@ export type ServerMessage =
   | PostDeleted
   | ThreadsUpdated
   | SpaceSubscriptionUpdated
-  | NotionImportCompleted;
+  | NotionImportCompleted
+  | PagesRestored;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

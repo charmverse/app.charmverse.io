@@ -1,5 +1,16 @@
 name: 'Build Docker Image'
 
+outputs:
+  full_image_name:
+    description: "Full image repo and tag"
+    value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace:${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}"
+  img_tag:
+    description: "Image tag of the image"
+    value: "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}"
+  img_repo:
+    description: "Image tag of the image"
+    value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace"
+
 runs:
   using: 'composite'
   steps:

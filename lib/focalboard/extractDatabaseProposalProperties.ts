@@ -19,6 +19,15 @@ export function extractDatabaseProposalProperties({
     proposalUrl: (database.fields as any).cardProperties.find((prop: IPropertyTemplate) => prop.type === 'proposalUrl'),
     proposalStatus: (database.fields as any).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalStatus'
+    ),
+    proposalEvaluatedBy: (database.fields as any).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluatedBy'
+    ),
+    proposalEvaluationAverage: (database.fields as any).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationAverage'
+    ),
+    proposalEvaluationTotal: (database.fields as any).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationTotal'
     )
   };
 }

@@ -213,7 +213,7 @@ export function PostPage({
   const topLevelComments: PostCommentWithVoteAndChildren[] = useMemo(() => {
     if (postComments && post) {
       return sortComments({
-        comments: processComments(postComments),
+        comments: processComments({ comments: postComments, sort: commentSort }),
         sort: commentSort
       });
     }

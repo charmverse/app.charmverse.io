@@ -2,10 +2,10 @@ import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { useProposal } from 'hooks/useProposal';
 
 import ShareToWeb from '../common/ShareToWeb';
 
@@ -30,7 +30,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const { page: currentPage } = usePage({ pageIdOrPath: pageId });
 
-  const { proposal } = useProposal({ proposalId: currentPage?.proposalId });
+  const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
 
   async function togglePublic() {
     if (publicPermission) {

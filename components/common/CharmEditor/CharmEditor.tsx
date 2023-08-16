@@ -351,6 +351,7 @@ function CharmEditor({
       // console.log('destroy charmeditor');
     };
   }, [editorRef.current]);
+
   return (
     <StyledReactBangleEditor
       colorMode={colorMode}

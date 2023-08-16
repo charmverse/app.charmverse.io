@@ -20,6 +20,7 @@ import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { createTableView } from 'lib/focalboard/table';
 
 import { Constants } from '../constants';
 import mutator from '../mutator';
@@ -292,29 +293,6 @@ function AddViewMenu(props: AddViewProps) {
       </Menu>
     </>
   );
-}
-
-type CreateViewProps = {
-  board: Board;
-  views: BoardView[];
-  activeView?: BoardView;
-  intl?: IntlShape;
-  dataSourceType?: ViewSourceType;
-};
-
-export function createTableView({ board, activeView, intl, dataSourceType, views }: CreateViewProps) {
-  const view = createBoardView(activeView);
-  view.title = '';
-  view.fields.viewType = 'table';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
-  view.fields.columnWidths = {};
-  view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-  view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-  view.fields.sourceType = views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : dataSourceType;
-
-  return view;
 }
 
 export default injectIntl(AddViewMenu);

@@ -2,8 +2,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import { TextInput } from '../../../../../components/properties/TextInput';
 import { Utils } from '../../../utils';
-import { TextInput } from '../../../widgets/TextInput';
 
 type Props = {
   value: string;
@@ -34,7 +34,6 @@ function URLProperty(props: Props): JSX.Element {
   }
 
   const commonProps = {
-    className: 'octo-propertyvalue',
     placeholderText: props.placeholderText,
     readOnly: props.readOnly,
     value: props.value,

@@ -399,11 +399,11 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
   const page = pages[pageId];
-
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
+
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,

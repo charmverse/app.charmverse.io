@@ -61,6 +61,7 @@ const pageContent = {
   ]
 };
 
+// Count blocks in a space
 describe('countSpaceBlocks - count blocks', () => {
   it('should count each database, database view and database card / row as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();

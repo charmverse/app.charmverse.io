@@ -123,10 +123,9 @@ export function DocumentPageActionList({
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
+  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
 
-  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
+  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({

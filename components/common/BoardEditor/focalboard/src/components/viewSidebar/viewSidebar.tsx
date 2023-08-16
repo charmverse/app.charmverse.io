@@ -26,10 +26,10 @@ import { RiFolder2Line } from 'react-icons/ri';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
+import { createTableView } from 'lib/focalboard/table';
 
 import mutator from '../../mutator';
 

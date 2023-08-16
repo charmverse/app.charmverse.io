@@ -5,15 +5,13 @@ import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
-import { createBoard } from 'lib/focalboard/board';
 import type { Board } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
+import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
 import type { Card } from 'lib/focalboard/card';
+import { createTableView } from 'lib/focalboard/table';
 
 import { getPagePath } from './utils';
 
@@ -29,7 +27,11 @@ interface AddPageResponse {
   page: PageWithPermissions;
 }
 
-export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Promise<AddPageResponse> {
+export async function addPage({
+  createdBy,
+  spaceId,
+  ...page
+}: NewPageInput): Promise<Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> }> {
   const pageId = page?.id || v4();
 
   const isBoardPage = page.type?.match(/board/);
@@ -60,7 +62,7 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Pr
   };
 
   if (isBoardPage) {
-    const { board, view } = createDefaultBoardData({ boardId: pageId });
+    const { board } = createDefaultBoardData({ boardId: pageId });
     result.board = board;
     await mutator.insertBlocks([board]);
   }
