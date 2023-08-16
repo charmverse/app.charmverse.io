@@ -1,11 +1,8 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, Chip, IconButton, Box, Stack, Autocomplete, TextField } from '@mui/material';
-import type { SyntheticEvent } from 'react';
-import { useCallback, useState, useMemo } from 'react';
-import useSWR from 'swr';
+import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField } from '@mui/material';
+import { useCallback, useMemo, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useGetReviewerPool } from 'charmClient/hooks/proposals';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
@@ -159,34 +156,49 @@ export function UserAndRoleSelect({
     [];
 
   // Avoid mapping through userIds all the time
-  const mappedProposalUsers = useMemo(() => {
+  const mappedEligibleProposalReviewers = useMemo(() => {
     return (reviewerPool?.userIds ?? []).reduce((acc, userId) => {
       acc[userId] = userId;
       return acc;
     }, {} as Record<string, string>);
   }, [reviewerPool]);
 
-  let options: GroupedOptionPopulated[] = [];
-  if (proposalCategoryId && isFreeSpace) {
-    options = reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : [];
-  } else if (proposalCategoryId && !isFreeSpace) {
-    options = [
-      // For proposals we only want current space members and roles that are allowed to review proposals
-      ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
-      ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
-    ];
-  } else if (isFreeSpace) {
-    // In public space, don't include custom roles
-    options = [...mappedMembers];
-  } else {
-    // For bounties, allow any space member or role to be selected
-    options = [...mappedMembers, ...mappedRoles];
-  }
+  const filteredOptions = useMemo(() => {
+    let _filteredOptions: GroupedOptionPopulated[] = [];
+    if (proposalCategoryId && isFreeSpace) {
+      _filteredOptions = reviewerPool
+        ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
+        : [];
+    } else if (proposalCategoryId && !isFreeSpace) {
+      _filteredOptions = [
+        // For proposals we only want current space members and roles that are allowed to review proposals
+        ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
+        ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
+      ];
+    } else if (isFreeSpace) {
+      // In public space, don't include custom roles
+      _filteredOptions = [...mappedMembers];
+    } else {
+      // For bounties, allow any space member or role to be selected
+      _filteredOptions = [...mappedMembers, ...mappedRoles];
+    }
+    return _filteredOptions;
+  }, [reviewerPool, isFreeSpace, members, roles, proposalCategoryId]);
+
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
     proposalCategoryId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
   );
-  const populatedValue = inputValue.map(({ id }) => options.find((opt) => opt.id === id)).filter(isTruthy);
+
+  const allOptions = useMemo(() => {
+    if (isFreeSpace) {
+      return [...mappedMembers];
+    } else {
+      return [...mappedMembers, ...mappedRoles];
+    }
+  }, [members, roles]);
+
+  const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 
   const onClickToEdit = useCallback(() => {
     if (!readOnly) {
@@ -240,7 +252,7 @@ export function UserAndRoleSelect({
         onChange={(e, value) => onChange(value)}
         onClose={() => setIsOpen(false)}
         openOnFocus
-        options={options}
+        options={filteredOptions}
         renderInput={(params) => (
           <TextField
             {...params}
