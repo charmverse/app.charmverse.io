@@ -179,11 +179,13 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_created' && this.userId) {
+      let childPageId: null | string = null;
       try {
         const createdPage = await createPage({
           data: {
             ...(message.payload as Prisma.PageUncheckedCreateInput),
-            createdBy: this.userId
+            createdBy: this.userId,
+            updatedBy: this.userId
           }
         });
 
@@ -202,7 +204,7 @@ export class SpaceEventHandler {
           createdPage.spaceId
         );
 
-        const createdPageId = createdPage.id;
+        childPageId = createdPage.id;
 
         const {
           pageNode,
@@ -219,12 +221,13 @@ export class SpaceEventHandler {
         if (!parentId) {
           return null;
         }
+
         const lastValidPos = pageNode.content.size;
         if (documentRoom && participant) {
           await participant.handleDiff(
             {
               type: 'diff',
-              ds: generateInsertNestedPageDiffs({ pageId: createdPageId, pos: lastValidPos }),
+              ds: generateInsertNestedPageDiffs({ pageId: childPageId, pos: lastValidPos }),
               doc: documentRoom.doc.content,
               c: participant.messages.client,
               s: participant.messages.server,
@@ -252,7 +255,7 @@ export class SpaceEventHandler {
         const errorMessage = 'Error creating a page and adding it to parent page content';
         log.error(errorMessage, {
           error,
-          pageId: message.payload.id,
+          pageId: childPageId,
           userId: this.userId
         });
         this.sendError(errorMessage);

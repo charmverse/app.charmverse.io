@@ -13,6 +13,7 @@ import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createTableView } from 'lib/focalboard/table';
+import type { PageCreated } from 'lib/websockets/interfaces';
 
 import { getPagePath } from './utils';
 
@@ -52,11 +53,12 @@ export async function addPage(
     ...page
   };
 
+  // Only emit socket message if we are creating a board or page from the sidebar
   if ((page.type === 'board' || page.type === 'page' || page.type === 'linked_board') && trigger === 'sidebar') {
     emitSocketMessage<PageWithPermissions>(
       {
         type: 'page_created',
-        payload: pageProperties
+        payload: pageProperties as PageCreated['payload']
       },
       async (newPage) => {
         const result: AddPageResponse = {
@@ -88,6 +90,7 @@ export async function addPage(
       }
     );
   } else {
+    // For creating board and other pages from the editor use the api
     const newPage = await charmClient.createPage(pageProperties);
     await mutate(
       getPagesListCacheKey(spaceId),
