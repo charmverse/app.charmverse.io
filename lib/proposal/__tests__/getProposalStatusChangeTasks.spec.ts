@@ -6,7 +6,7 @@ import type { ProposalTask } from '../getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from '../getProposalStatusChangeTasks';
 import { updateProposalStatus } from '../updateProposalStatus';
 
-describe('getProposalStatusChangeTasks()', () => {
+describe('getProposalStatusChangeTasks', () => {
   it('Return all the proposal tasks from current workspace events', async () => {
     const { user: user1, space } = await generateUserAndSpace({ isAdmin: true });
 
@@ -137,7 +137,7 @@ describe('getProposalStatusChangeTasks()', () => {
 
     // User is a rubric reviewer
     const rubricReviewerProposal = await generateProposal({
-      authors: [user1.id],
+      authors: [user2.id],
       proposalStatus: 'discussion',
       evaluationType: 'rubric',
       reviewers: [
@@ -147,7 +147,7 @@ describe('getProposalStatusChangeTasks()', () => {
         }
       ],
       spaceId: space.id,
-      userId: user1.id
+      userId: user2.id
     });
 
     await updateProposalStatus({
@@ -194,18 +194,17 @@ describe('getProposalStatusChangeTasks()', () => {
       userId: user2.id
     });
 
-    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(
-      user1.id,
-      await prisma.workspaceEvent.findMany({
-        where: {
-          createdAt: {
-            lte: new Date(),
-            gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-          },
-          type: 'proposal_status_change'
-        }
-      })
-    );
+    const events = await prisma.workspaceEvent.findMany({
+      where: {
+        createdAt: {
+          lte: new Date(),
+          gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
+        },
+        type: 'proposal_status_change'
+      }
+    });
+
+    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(user1.id, events);
 
     expect(proposalTasks).toEqual(
       expect.arrayContaining([
