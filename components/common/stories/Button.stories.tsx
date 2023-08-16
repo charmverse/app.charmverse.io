@@ -19,10 +19,10 @@ export function Primary() {
           <Button color='primary' size='large' variant='contained'>
             Contained large
           </Button>
-          <Button color='primary' variant='contained'>
+          <Button color='secondary' variant='contained'>
             Contained
           </Button>
-          <Button color='warning' variant='contained'>
+          <Button color='success' variant='contained'>
             Contained
           </Button>
           <Button color='error' variant='contained'>
