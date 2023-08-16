@@ -40,6 +40,7 @@ import {
 import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
+import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
@@ -392,8 +393,9 @@ export function SpaceSettings({ space }: { space: Space }) {
         </Grid>
       </form>
       <SetupCustomDomain space={space} />
-      <Legend mt={3}>Snapshot.org Integration</Legend>
-      <ConnectSnapshot />
+
+      <SpaceIntegrations />
+
       <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
         Warning
       </Legend>
