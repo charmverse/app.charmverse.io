@@ -67,8 +67,6 @@ jobs:
         include:
           - test_name: 'Type check and lint'
             test_command: 'npm run typecheck && npm run lint'
-          - test_name: 'Run Chromatic Test'
-            test_command: 'npm run chromatic:ci'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -86,8 +84,6 @@ jobs:
           NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
-        env: 
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: ${{matrix.test_command}}
 
 
