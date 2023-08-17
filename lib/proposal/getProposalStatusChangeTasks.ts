@@ -67,7 +67,11 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
 
   // Ensures we only track the latest status change for each proposal
   const workspaceEventsMap = proposalChangeEvents.reduce((map, workspaceEvent) => {
-    if (!map.get(workspaceEvent.pageId)) {
+    const existingEvent = map.get(workspaceEvent.pageId) as WorkspaceEventSpecial | undefined;
+
+    if (!existingEvent) {
+      map.set(workspaceEvent.pageId, workspaceEvent);
+    } else if (new Date(existingEvent.createdAt) < new Date(workspaceEvent.createdAt)) {
       map.set(workspaceEvent.pageId, workspaceEvent);
     }
     return map;
@@ -150,7 +154,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
         not: true
       },
       status: {
-        in: ['discussion', 'review', 'reviewed', 'vote_active']
+        in: ['discussion', 'review', 'reviewed', 'vote_active', 'evaluation_active', 'evaluation_closed']
       },
       spaceId: {
         in: spaceIds

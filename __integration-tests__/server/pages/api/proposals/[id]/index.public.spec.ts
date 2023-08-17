@@ -79,15 +79,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
     const adminCookie = await loginUser(adminUser.id);
 
-    const role = await testUtilsMembers.generateRole({
-      spaceId: adminSpace.id,
-      createdBy: adminUser.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -213,8 +207,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

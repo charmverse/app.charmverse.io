@@ -1,9 +1,12 @@
 import { log } from '@charmverse/core/log';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
 import { archivePages } from 'lib/pages/archivePages';
+import { createPage } from 'lib/pages/server/createPage';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -29,9 +32,9 @@ export class SpaceEventHandler {
   }
 
   init() {
-    this.socket.on(this.socketEvent, async (message) => {
+    this.socket.on(this.socketEvent, async (message, callback) => {
       try {
-        await this.onMessage(message);
+        await this.onMessage(message, callback);
       } catch (error) {
         log.error('Error handling space socket message', error);
       }
@@ -40,7 +43,7 @@ export class SpaceEventHandler {
     this.socket.emit(this.socketEvent, { type: 'welcome' });
   }
 
-  async onMessage(message: ClientMessage) {
+  async onMessage(message: ClientMessage, callback?: (data: any) => void) {
     if (message.type === 'subscribe') {
       try {
         const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
@@ -85,25 +88,29 @@ export class SpaceEventHandler {
               rid: 0,
               cid: -1
             },
-            { skipSendingToActor: false }
+            { socketEvent: 'page_deleted' }
           );
         } else {
+          if (parentId && position) {
+            await applyDiffAndSaveDocument({
+              content,
+              parentId,
+              userId: this.userId,
+              diffs: [
+                {
+                  from: position,
+                  to: position + 1,
+                  stepType: 'replace'
+                }
+              ]
+            });
+          }
           // If the user is not in the document or the position of the page node is not found (present in sidebar)
-          await applyDiffAndSaveDocument({
-            pageId: message.payload.id,
-            content,
-            parentId,
+
+          await archivePages({
+            pageIds: [pageId],
             userId: this.userId,
             spaceId,
-            diffs: position
-              ? [
-                  {
-                    from: position,
-                    to: position + 1,
-                    stepType: 'replace'
-                  }
-                ]
-              : [],
             archive: true
           });
         }
@@ -142,19 +149,23 @@ export class SpaceEventHandler {
               cid: -1
             },
             {
-              // This is to indicate that it was triggered by a page_restored event
-              restorePage: true,
-              skipSendingToActor: false
+              socketEvent: 'page_restored'
             }
           );
         } else {
-          await applyDiffAndSaveDocument({
-            pageId: message.payload.id,
-            content,
+          if (parentId && position === null) {
+            await applyDiffAndSaveDocument({
+              content,
+              userId: this.userId,
+              parentId,
+              diffs: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
+            });
+          }
+
+          await archivePages({
+            pageIds: [pageId],
             userId: this.userId,
-            parentId,
             spaceId,
-            diffs: position !== null ? [] : generateInsertNestedPageDiffs({ pageId, pos: lastValidPos }),
             archive: false
           });
         }
@@ -163,6 +174,91 @@ export class SpaceEventHandler {
         log.error(errorMessage, {
           error,
           pageId: message.payload.id,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_created' && this.userId) {
+      let childPageId: null | string = null;
+      try {
+        const createdPage = await createPage({
+          data: {
+            ...(message.payload as Prisma.PageUncheckedCreateInput),
+            createdBy: this.userId,
+            updatedBy: this.userId
+          }
+        });
+
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'created',
+          pageId: createdPage.id
+        });
+
+        const { content, contentText, ...newPageToNotify } = createdPage;
+
+        relay.broadcast(
+          {
+            type: 'pages_created',
+            payload: [newPageToNotify]
+          },
+          createdPage.spaceId
+        );
+
+        childPageId = createdPage.id;
+
+        const {
+          pageNode,
+          documentRoom,
+          participant,
+          parentId,
+          content: parentPageContent
+        } = await getPageDetails({
+          id: createdPage.id,
+          userId: this.userId,
+          docRooms: this.docRooms
+        });
+
+        if (!parentId) {
+          if (typeof callback === 'function') {
+            callback(createdPage);
+          }
+          return null;
+        }
+
+        const lastValidPos = pageNode.content.size;
+        if (documentRoom && participant) {
+          await participant.handleDiff(
+            {
+              type: 'diff',
+              ds: generateInsertNestedPageDiffs({ pageId: childPageId, pos: lastValidPos }),
+              doc: documentRoom.doc.content,
+              c: participant.messages.client,
+              s: participant.messages.server,
+              v: documentRoom.doc.version,
+              rid: 0,
+              cid: -1
+            },
+            {
+              socketEvent: 'page_created'
+            }
+          );
+        } else {
+          await applyDiffAndSaveDocument({
+            content: parentPageContent,
+            userId: this.userId,
+            parentId,
+            diffs: parentId ? generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos }) : []
+          });
+        }
+
+        if (typeof callback === 'function') {
+          callback(createdPage);
+        }
+      } catch (error) {
+        const errorMessage = 'Error creating a page and adding it to parent page content';
+        log.error(errorMessage, {
+          error,
+          pageId: childPageId,
           userId: this.userId
         });
         this.sendError(errorMessage);
@@ -216,44 +312,29 @@ function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: n
 }
 
 async function applyDiffAndSaveDocument({
-  pageId,
   content,
   userId,
   parentId,
-  spaceId,
-  archive,
   diffs
 }: {
-  pageId: string;
   content: PageContent;
   userId: string;
-  parentId?: string | null;
-  spaceId: string;
-  archive: boolean;
+  parentId: string;
   diffs: ProsemirrorJSONStep[];
 }) {
-  if (parentId && diffs.length) {
-    const pageNode = getNodeFromJson(content);
+  const pageNode = getNodeFromJson(content);
 
-    const updatedNode = applyStepsToNode(diffs, pageNode);
+  const updatedNode = applyStepsToNode(diffs, pageNode);
 
-    await prisma.page.update({
-      where: { id: parentId },
-      data: {
-        content: updatedNode.toJSON(),
-        contentText: updatedNode.textContent,
-        hasContent: updatedNode.textContent.length > 0,
-        updatedAt: new Date(),
-        updatedBy: userId
-      }
-    });
-  }
-
-  await archivePages({
-    pageIds: [pageId],
-    userId,
-    spaceId,
-    archive
+  await prisma.page.update({
+    where: { id: parentId },
+    data: {
+      content: updatedNode.toJSON(),
+      contentText: updatedNode.textContent,
+      hasContent: updatedNode.textContent.length > 0,
+      updatedAt: new Date(),
+      updatedBy: userId
+    }
   });
 }
 
@@ -288,6 +369,7 @@ async function getPageDetails({
     : null;
 
   const { parentId, spaceId } = page;
+
   const documentRoom = parentId ? docRooms.get(parentId) : null;
   const content: PageContent =
     documentRoom && documentRoom.participants.size !== 0
@@ -309,6 +391,7 @@ async function getPageDetails({
       ) ?? participants[0];
   }
 
+  // Find the position of the referenced page node in the parent page content
   pageNode.forEach((node, nodePos) => {
     if (node.type.name === 'page' && node.attrs.id === id) {
       position = nodePos;

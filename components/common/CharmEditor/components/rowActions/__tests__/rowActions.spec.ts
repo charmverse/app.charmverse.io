@@ -3,7 +3,7 @@ import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { renderTestEditor } from 'testing/prosemirror/renderTestEditor';
 
-import { rowNodeAtPos } from '../rowActions';
+import { getNodeForRowPosition, rowNodeAtPos } from '../rowActions';
 
 const testEditor = renderTestEditor({
   specRegistry,

@@ -40,14 +40,14 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers - public 
 
     const pool = (
       await request(baseUrl)
-        .get(`/api/proposals/reviewer-pool?resourceId=${proposal.id}`)
+        .get(`/api/proposals/reviewer-pool?resourceId=${proposal.categoryId}`)
         .set('Cookie', nonAdminCookie)
         .send()
         .expect(200)
     ).body as ProposalReviewerPool;
 
     const computed = await publicPermissionsClient.proposals.getProposalReviewerPool({
-      resourceId: proposal.id
+      resourceId: proposal.categoryId as string
     });
 
     expect(pool.userIds).toEqual(expect.arrayContaining(computed.userIds));
@@ -61,7 +61,7 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers - public 
     const outsideUserCookie = await loginUser(outsideUser.id);
 
     await request(baseUrl)
-      .get(`/api/proposals/reviewer-pool?resourceId=${proposal.id}`)
+      .get(`/api/proposals/reviewer-pool?resourceId=${proposal.categoryId}`)
       .set('Cookie', outsideUserCookie)
       .send()
       .expect(401);
