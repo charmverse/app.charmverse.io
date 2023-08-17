@@ -84,7 +84,11 @@ export async function addPage(
 
   // Only emit socket message if we are creating a board or page from the sidebar
   // Adding condition for checking page type since card pages can also be added from the sidebar but it should be created via the api
-  if ((page.type === 'board' || page.type === 'page' || page.type === 'linked_board') && trigger === 'sidebar') {
+  if (
+    (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') &&
+    trigger === 'sidebar' &&
+    page.parentId
+  ) {
     emitSocketMessage<PageWithPermissions>(
       {
         type: 'page_created',
