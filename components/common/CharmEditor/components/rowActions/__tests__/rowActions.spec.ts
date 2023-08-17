@@ -35,26 +35,3 @@ describe('rowNodeAtPos() returns the DOM node given a position in the prosemirro
     expect(result?.rowNode.pmViewDesc?.node?.type.name).toBe('paragraph');
   });
 });
-
-describe('getNodeForRowPosition() returns node and its position based on row position', () => {
-  test('Return node at given row', () => {
-    const nodes = [_.p('hello world'), _.blockquote(_.p('some quote')), _.p(_.hardBreak()), _.img()];
-    const doc = _.doc(...nodes);
-
-    const editor = testEditor(doc);
-    const result = getNodeForRowPosition({ view: editor.view, rowPosition: 0 });
-    expect(result?.node.type.name).toBe('doc');
-
-    const result2 = getNodeForRowPosition({ view: editor.view, rowPosition: 1 });
-
-    expect(result2?.node.type.name).toBe('paragraph');
-    expect(result2?.nodeStart).toBe(1);
-    expect(result2?.nodeEnd).toBe(13);
-
-    const result3 = getNodeForRowPosition({ view: editor.view, rowPosition: 2 });
-    expect(result3?.node.type.name).toBe('blockquote');
-
-    const result4 = getNodeForRowPosition({ view: editor.view, rowPosition: 3 });
-    expect(result4?.node.type.name).toBe('doc');
-  });
-});

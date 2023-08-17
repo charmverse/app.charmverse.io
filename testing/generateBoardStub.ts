@@ -136,7 +136,7 @@ export function boardWithCardsArgs({
         createdBy,
         updatedAt: '2022-09-14T14:13:05.326Z',
         updatedBy: createdBy,
-        title: 'How to web3 in Uni? ',
+        title: 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [

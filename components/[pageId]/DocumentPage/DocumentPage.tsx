@@ -185,7 +185,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     <>
       {!!page?.deletedAt && (
         <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
-          <PageDeleteBanner pageId={page.id} />
+          <PageDeleteBanner pageType={page.type} pageId={page.id} />
         </StyledBannerContainer>
       )}
       {connectionError && (
@@ -283,6 +283,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       {card && board && (
                         <>
                           <CardDetailProperties
+                            syncWithPageId={page.syncWithPageId}
                             board={board}
                             card={card}
                             cards={cards}
@@ -304,6 +305,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
+                          title={page.title}
                         />
                       )}
                       {(draftBounty || page.bountyId) && (

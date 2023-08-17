@@ -2,14 +2,17 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRequest) {
+import type { ProposalWithUsersAndRubric } from './interface';
+
+export type ProposalTemplate = ProposalWithUsersAndRubric & { page: Page };
+
+export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<ProposalTemplate[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`SpaceID is required`);
   }
@@ -62,7 +65,8 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
       authors: true,
       reviewers: true,
       category: true,
-      page: true
+      page: true,
+      rubricCriteria: true
     }
-  }) as Promise<(ProposalWithUsers & { page: Page })[]>;
+  }) as Promise<ProposalTemplate[]>;
 }

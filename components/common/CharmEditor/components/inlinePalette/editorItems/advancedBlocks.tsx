@@ -140,6 +140,7 @@ export function items({ view: currentView, enableVoting }: AdvancedItemsProps): 
   editorItems.push({
     uid: 'table-of-contents',
     title: 'Table of contents',
+    keywords: ['table', 'contents', 'toc'],
     icon: (
       <FormatListBulleted
         sx={{

@@ -4,7 +4,7 @@ import { ListItemButton, ListItemText } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { usePage } from 'hooks/usePage';
@@ -23,7 +23,7 @@ export function ArchiveProposalAction({
 }) {
   const { archiveProposal, proposals } = useProposals();
 
-  const { refreshProposal } = useProposalDetails(refreshPageOnChange ? proposalId : null);
+  const { mutate: refreshProposal } = useGetProposalDetails(refreshPageOnChange ? proposalId : null);
   const { refreshPage } = usePage({
     pageIdOrPath: refreshPageOnChange ? proposalId : null
   });

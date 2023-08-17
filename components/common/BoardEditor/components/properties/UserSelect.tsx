@@ -14,7 +14,7 @@ import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
 type Props = {
   memberIds: string[];
-  readOnly: boolean;
+  readOnly?: boolean;
   onChange: (memberIds: string[]) => void;
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
@@ -129,7 +129,7 @@ export function UserSelect({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} onClick={onClickToEdit}>
+      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
         <Stack gap={0.5}>
           {memberIds.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
@@ -163,7 +163,7 @@ export function UserSelect({
         inputVariant='standard'
         forcePopupIcon={false}
         renderTags={() => (
-          <MembersDisplay wrapColumn={true} readOnly={readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+          <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
         )}
       />
     </StyledUserPropertyContainer>

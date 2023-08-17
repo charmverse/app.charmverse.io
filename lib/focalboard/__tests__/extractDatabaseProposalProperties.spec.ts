@@ -49,10 +49,37 @@ const urlProp: IPropertyTemplate = {
   type: 'proposalUrl',
   options: []
 };
+const evaluatedByProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluated By',
+  options: [],
+  type: 'proposalEvaluatedBy'
+};
+
+const evaluatedTotalProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluation Total',
+  options: [],
+  type: 'proposalEvaluationTotal'
+};
+
+const evaluatedAverageProp: IPropertyTemplate = {
+  id: uuid(),
+  name: 'Proposal Evaluation Average',
+  options: [],
+  type: 'proposalEvaluationAverage'
+};
 
 describe('extractDatabaseProposalProperties', () => {
   it('should extract database proposal properties', () => {
-    const exampleProperties: IPropertyTemplate[] = [categoryProp, statusProp, urlProp];
+    const exampleProperties: IPropertyTemplate[] = [
+      categoryProp,
+      statusProp,
+      urlProp,
+      evaluatedByProp,
+      evaluatedTotalProp,
+      evaluatedAverageProp
+    ];
 
     const extractedProps = extractDatabaseProposalProperties({
       database: {
@@ -65,7 +92,10 @@ describe('extractDatabaseProposalProperties', () => {
     expect(extractedProps).toMatchObject<ExtractedDatabaseProposalProperties>({
       proposalCategory: categoryProp,
       proposalStatus: statusProp,
-      proposalUrl: urlProp
+      proposalUrl: urlProp,
+      proposalEvaluatedBy: evaluatedByProp,
+      proposalEvaluationAverage: evaluatedAverageProp,
+      proposalEvaluationTotal: evaluatedTotalProp
     });
   });
 

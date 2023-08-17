@@ -443,7 +443,7 @@ export interface CreateWorkspaceRequestBody {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface Space {
+export interface SpaceApiResponse {
   id: string;
   createdAt: string;
   createdBy: string;
@@ -471,7 +471,7 @@ export interface Space {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface CreateWorkspaceResponseBody extends Space {
+export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
 }
 

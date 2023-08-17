@@ -4,10 +4,10 @@ const path = require('node:path');
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
+const uuid = require('uuid');
 const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
-const uuid = require('uuid');
 
 // we can save time and skip code checks, which are handle in a special step by the CI
 const skipCodeChecks = process.env.CI === 'true';
@@ -46,6 +46,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
+  productionBrowserSourceMaps: true,
   async generateBuildId() {
     return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
   },
@@ -68,6 +69,11 @@ const config = {
       },
       {
         source: '/profile',
+        destination: '/',
+        permanent: true
+      },
+      {
+        source: '/u/:path*',
         destination: '/',
         permanent: true
       },
@@ -177,7 +183,8 @@ const config = {
             cron: './background/cron.ts',
             websockets: './background/initWebsockets.ts',
             countSpaceData: './scripts/countSpaceData.ts',
-            importFromDiscourse: './scripts/importFromDiscourse.ts'
+            importFromDiscourse: './scripts/importFromDiscourse.ts',
+            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };

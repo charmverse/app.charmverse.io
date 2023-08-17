@@ -175,10 +175,6 @@ function DefaultPageTitle() {
   return <PageTitle>{pageTitle}</PageTitle>;
 }
 
-function EmptyPageTitle() {
-  return <div></div>;
-}
-
 export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
 
@@ -194,8 +190,6 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
     return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
-  } else if (router.route.startsWith('/u/')) {
-    return <EmptyPageTitle />;
   } else {
     return <DefaultPageTitle />;
   }

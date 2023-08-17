@@ -37,10 +37,9 @@ export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementTyp
       {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
   );
-
   if (disabledTooltip) {
     return (
-      <Tooltip title={props.disabled ? disabledTooltip : ''}>
+      <Tooltip title={disabled ? disabledTooltip : ''}>
         <span>{buttonComponent}</span>
       </Tooltip>
     );

@@ -24,7 +24,6 @@ import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
-import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
   getViewCardsSortedFilteredAndGrouped,
@@ -48,6 +47,7 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { createTableView } from 'lib/focalboard/table';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
@@ -520,7 +520,7 @@ function CenterPanel(props: Props) {
   const disableAddingNewCards = activeView?.fields.sourceType === 'proposals';
   return (
     <>
-      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageType={boardPage.type} pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
           <PageWebhookBanner

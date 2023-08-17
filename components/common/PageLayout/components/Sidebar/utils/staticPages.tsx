@@ -1,6 +1,11 @@
-import type { Feature } from '@charmverse/core/prisma';
+export type Feature = 'member_directory' | 'proposals' | 'forum' | 'bounties';
 
-export enum StaticPagesPath {
+export type FeatureJson = {
+  id: Feature;
+  isHidden: boolean;
+};
+
+enum StaticPagesPath {
   members = 'members',
   forum = 'forum',
   bounties = 'bounties',
