@@ -89,7 +89,7 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
           isCategoryPage={!!forumCategoryPage}
         />
       </div>
-      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
+      <StyledTypography>{typeof pageTitle === 'string' ? pageTitle || 'Untitled' : 'No access'}</StyledTypography>
     </NestedPageContainer>
   );
 }
