@@ -437,16 +437,21 @@ export class DocumentEventHandler {
                 }
               }
             } else {
+              // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
               // deleted using multi line selection
-              room.node.nodesBetween(ds.from, ds.to, (_node) => {
-                const jsonNode = _node.toJSON() as PageContent;
-                if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
-                  const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
-                  if (pageId && pageType === null && pagePath === null) {
-                    deletedPageIds.push(pageId);
+              try {
+                room.node.nodesBetween(ds.from, ds.to, (_node) => {
+                  const jsonNode = _node.toJSON() as PageContent;
+                  if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
+                    if (pageId && pageType === null && pagePath === null) {
+                      deletedPageIds.push(pageId);
+                    }
                   }
-                }
-              });
+                });
+              } catch (error) {
+                log.error('Error when looping through nodes', { error, ...logMeta });
+              }
             }
           }
         }
