@@ -409,6 +409,7 @@ export async function checkSpaceSpaceSubscriptionInfo({
 export type SpacePermissionsClient = {
   type: PermissionsEngine;
   client: PermissionsClient | PremiumPermissionsClient;
+  spaceId: string;
 };
 
 /**
@@ -424,8 +425,8 @@ export async function getPermissionsClient({
   });
 
   if (spaceInfo.tier !== 'free') {
-    return { type: 'premium', client: premiumPermissionsApiClient };
+    return { type: 'premium', client: premiumPermissionsApiClient, spaceId: spaceInfo.spaceId };
   } else {
-    return { type: 'free', client: publicClient };
+    return { type: 'free', client: publicClient, spaceId: spaceInfo.spaceId };
   }
 }
