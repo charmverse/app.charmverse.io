@@ -219,6 +219,9 @@ export class SpaceEventHandler {
         });
 
         if (!parentId) {
+          if (typeof callback === 'function') {
+            callback(createdPage);
+          }
           return null;
         }
 
