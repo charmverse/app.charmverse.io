@@ -11,6 +11,7 @@ import type {
   Post,
   PostComment,
   ProposalStatus,
+  ProposalEvaluationType,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -940,6 +941,7 @@ export async function generateProposal({
   userId,
   spaceId,
   proposalStatus,
+  evaluationType,
   authors,
   reviewers,
   deletedAt = null,
@@ -952,6 +954,7 @@ export async function generateProposal({
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
+  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
@@ -1000,6 +1003,7 @@ export async function generateProposal({
           category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
+          evaluationType,
           status: proposalStatus,
           space: {
             connect: {
