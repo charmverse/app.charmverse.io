@@ -1,11 +1,11 @@
-name: "Install dependencies"
+name: 'Install dependencies'
 
 inputs:
   core_pkg_version:
     description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
     required: false
   commit_core_pkg_upgrade:
-    description: "Whether commit the update to core package back to branch"
+    description: 'Whether commit the update to core package back to branch'
     required: false
   use_github_core_branch:
     description: |
@@ -13,10 +13,10 @@ inputs:
       If set core_pkg_version and commit_core_pkg_upgrade will be ignored. 
       Add your branch to this variable below to install your custom branch.
     required: false
-    default:
+    default: feat/page-permission-allow-discovery
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - uses: actions/checkout@v3
 
@@ -40,7 +40,7 @@ runs:
       if: steps.cache_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
-    # If installing specific version of core via npmjs 
+    # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
       shell: bash
       if: inputs.core_pkg_version
@@ -52,8 +52,8 @@ runs:
       if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        file_pattern: "package*.json"
-        commit_message: "Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}"
+        file_pattern: 'package*.json'
+        commit_message: 'Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}'
 
     # If installing core via github branch
     - name: Install custom core branch
