@@ -46,7 +46,7 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
             Accept Invite
           </PrimaryButton>
         ) : (
-          <LoginButton redirectUrl={typeof window !== 'undefined' ? window.location.pathname : ''} />
+          <LoginButton showSignup redirectUrl={typeof window !== 'undefined' ? window.location.pathname : ''} />
         )}
       </Card>
     </CenteredBox>

@@ -8,15 +8,15 @@ import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import { LoginPageContent } from 'components/login';
 import { CollectEmailDialog } from 'components/login/CollectEmail';
+import { LoginButton } from 'components/login/LoginButton';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { SystemError } from 'lib/utilities/errors';
 import { isValidEmail } from 'lib/utilities/strings';
 
 export default function Authenticate() {
-  const [error, setError] = useState<SystemError | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded: isUserLoaded, user } = useUser();
   const { spaces } = useSpaces();
@@ -37,21 +37,17 @@ export default function Authenticate() {
       })
       .catch((err) => {
         setIsAuthenticating(false);
-        setError(new SystemError({ errorType: 'External service', message: 'Invalid authentication code' }));
+        setError('Invalid invite link');
       });
   }
 
   useEffect(() => {
     if (isUserLoaded && emailForSignIn && isValidEmail(emailForSignIn)) {
       loginViaEmail();
-    }
-  }, [isUserLoaded, emailForSignIn]);
-
-  useEffect(() => {
-    if (!emailForSignIn) {
+    } else if (isUserLoaded && !error && !isAuthenticating) {
       emailPopup.open();
     }
-  }, []);
+  }, [isUserLoaded, emailForSignIn]);
 
   function submitEmail(email: string) {
     setIsAuthenticating(true);
@@ -68,8 +64,10 @@ export default function Authenticate() {
   }
   return getLayout(
     <Box height='100%' display='flex' flexDirection='column'>
-      <LoginPageContent hideLoginOptions={!showLoginButton} isLoggingIn={isAuthenticating}>
-        <Box gap={3} sx={{ maxWidth: '370px', display: 'flex', flexDirection: 'column', pt: 2 }}>
+      <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating}>
+        <Box gap={3} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'column', pt: 2 }}>
+          {showLoginButton && <LoginButton showSignup={false} />}
+
           {showAdditionalOptions && (
             <>
               {user && !!spaces?.length && (
@@ -86,8 +84,8 @@ export default function Authenticate() {
           )}
 
           {error && (
-            <Alert sx={{ width: '100%' }} severity='error'>
-              {error?.message}
+            <Alert sx={{ width: 'fit-content' }} severity='error'>
+              {error}
             </Alert>
           )}
         </Box>
@@ -98,7 +96,6 @@ export default function Authenticate() {
         description='Please enter the email address on which you received the login link.'
         isOpen={emailPopup.isOpen}
         handleSubmit={submitEmail}
-        onClose={emailPopup.close}
       />
     </Box>
   );

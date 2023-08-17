@@ -97,7 +97,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
               justifyContent={{ xs: 'center', md: 'flex-start' }}
             >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
-              {!hideLoginOptions && <LoginButton />}
+              {!hideLoginOptions && <LoginButton showSignup />}
             </Box>
             {children}
           </Box>
