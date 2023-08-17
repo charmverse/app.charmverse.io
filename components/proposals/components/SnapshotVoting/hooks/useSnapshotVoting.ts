@@ -1,28 +1,36 @@
-import { useEffect, useMemo, useState } from 'react';
+import { log } from '@charmverse/core/log';
+import { utils } from 'ethers';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
+import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getVotingPower } from 'lib/snapshot/getVotingPower';
-import type { SnapshotProposal } from 'lib/snapshot/interfaces';
+import type { SnapshotProposal, VoteChoice } from 'lib/snapshot/interfaces';
 import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
+import { sleep } from 'lib/utilities/sleep';
+
+export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account } = useWeb3AuthSig();
+  const { account, library } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
-  const snapshotSpaceDomain = space?.domain;
-  const [userVoteChoice, setUserVoteChoice] = useState(0);
+  const snapshotSpaceDomain = space?.snapshotDomain;
 
-  const { data: snapshotProposal } = useSWR<SnapshotProposal | null>(`/snapshotProposal/${snapshotProposalId}`, () =>
-    getSnapshotProposal(snapshotProposalId)
+  const { data: snapshotProposal, mutate: refreshProposal } = useSWR<SnapshotProposal | null>(
+    `/snapshotProposal/${snapshotProposalId}`,
+    () => getSnapshotProposal(snapshotProposalId)
   );
 
-  const { data: userVotes } = useSWR(account && snapshotSpaceDomain ? `snapshotUserVotes-${account}` : null, () =>
-    getUserProposalVotes({
-      walletAddress: account as string,
-      snapshotProposalId
-    })
+  const { data: userVotes, mutate: refreshVotes } = useSWR(
+    account && snapshotSpaceDomain ? `snapshotUserVotes-${account}` : null,
+    () =>
+      getUserProposalVotes({
+        walletAddress: account as string,
+        snapshotProposalId
+      })
   );
 
   const { data: userVotingPower } = useSWR(
@@ -36,11 +44,33 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   const hasPassedDeadline = proposalEndDate < Date.now();
   const remainingTime = relativeTime(proposalEndDate);
 
-  useEffect(() => {
-    if (userVotes?.length) {
-      setUserVoteChoice(userVotes[0].choice);
+  const castSnapshotVote: CastVote = async (choice: VoteChoice) => {
+    if (!snapshotProposal || !snapshotSpaceDomain || !account || !library) {
+      return;
     }
-  }, [userVotes]);
+
+    const client = await getSnapshotClient();
+    const vote = {
+      space: snapshotSpaceDomain,
+      proposal: snapshotProposalId,
+      type: snapshotProposal.type,
+      choice,
+      reason: '',
+      app: 'my-app'
+    };
+
+    await client.vote(library, utils.getAddress(account as string), vote);
+    // we need this delay for vote to be propagated to the graph
+    await sleep(5000);
+    // workaround - fetch one more time with delay, sometimes it takes more time to get updated value
+    setTimeout(() => {
+      refreshProposal();
+      refreshVotes();
+    }, 5000);
+
+    refreshProposal();
+    refreshVotes();
+  };
 
   return {
     snapshotProposal,
@@ -51,8 +81,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
     remainingTime,
     hasPassedDeadline,
     proposalEndDate,
-    userVoteChoice,
-    setUserVoteChoice,
+    castSnapshotVote,
     votingDisabledStatus: getVotingDisabledStatus({ account, votingPower, isVotingActive })
   };
 }

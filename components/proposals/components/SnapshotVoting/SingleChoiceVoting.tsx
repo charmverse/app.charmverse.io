@@ -1,21 +1,29 @@
-import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Box, Chip, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material';
+import { useEffect } from 'react';
 
-import type { SnapshotProposal } from 'lib/snapshot';
+import type {
+  SnapshotVotingProps,
+  VoteChoiceFormProps
+} from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
 import { percent } from 'lib/utilities/numbers';
 
-type Props = {
-  snapshotProposal: SnapshotProposal;
-};
-
-export function SingleChoiceVoting({ snapshotProposal }: Props) {
-  const [userVoteChoice, setUserVoteChoice] = useState(0);
+export function SingleChoiceVoting({
+  snapshotProposal,
+  userVotes,
+  setVoteChoice,
+  voteChoice
+}: SnapshotVotingProps & VoteChoiceFormProps) {
+  useEffect(() => {
+    if (userVotes?.[0]?.choice) {
+      setVoteChoice(userVotes?.[0]?.choice);
+    }
+  }, [userVotes?.[0]?.choice]);
 
   const voteOptions = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
 
   return (
-    <RadioGroup value={userVoteChoice} onChange={(e, value) => setUserVoteChoice(Number(value))}>
+    <RadioGroup value={voteChoice} onChange={(e, value) => setVoteChoice(Number(value))}>
       {voteOptions.map((voteOption, index) => (
         <FormControlLabel
           key={voteOption}
@@ -23,7 +31,10 @@ export function SingleChoiceVoting({ snapshotProposal }: Props) {
           value={index + 1}
           label={
             <Box display='flex' justifyContent='space-between' flexGrow={1}>
-              <span>{voteOption}</span>
+              <Stack direction='row' spacing={1}>
+                <Typography>{voteOption}</Typography>
+                {userVotes?.find((v) => v.choice === index + 1) && <Chip color='teal' size='small' label='Voted' />}
+              </Stack>
               <Typography variant='subtitle1' color='secondary'>
                 {!voteScores[index]
                   ? 'No votes yet'
@@ -35,6 +46,7 @@ export function SingleChoiceVoting({ snapshotProposal }: Props) {
               </Typography>
             </Box>
           }
+          sx={{ mr: 0 }}
           disableTypography
         />
       ))}

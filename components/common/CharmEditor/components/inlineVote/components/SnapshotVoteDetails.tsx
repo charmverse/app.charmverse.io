@@ -3,8 +3,8 @@ import { Box, Chip, Divider, Tooltip, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 
 import { Button } from 'components/common/Button';
-import { useSnapshotVoting } from 'components/common/CharmEditor/components/inlineVote/hooks/useSnapshotVoting';
 import Loader from 'components/common/LoadingComponent';
+import { useSnapshotVoting } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
 import { SnapshotVotingForm } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { percent } from 'lib/utilities/numbers';
@@ -24,7 +24,8 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
     remainingTime,
     hasPassedDeadline,
     proposalEndDate,
-    votingDisabledStatus
+    votingDisabledStatus,
+    castSnapshotVote
   } = useSnapshotVoting({
     snapshotProposalId
   });
@@ -59,7 +60,6 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         justifyContent='space-between'
         gap={1}
         alignItems='center'
-        mb={2}
       >
         <Typography color='secondary' variant='subtitle1'>
           Status: {statusText}
@@ -77,7 +77,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         </Button>
       </Box>
 
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ mb: 1, mt: 2 }} />
 
       {!snapshotProposal && isLoading && <Loader isLoading={true} />}
 
@@ -92,6 +92,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
                   snapshotProposal={snapshotProposal}
                   votingPower={votingPower}
                   userVotes={userVotes}
+                  castVote={castSnapshotVote}
                 />
               </Box>
             </Tooltip>
