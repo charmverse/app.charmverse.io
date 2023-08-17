@@ -6,6 +6,7 @@ import { Button } from 'components/common/Button';
 import type { CastVote } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
 import { MultiChoiceVoting } from 'components/proposals/components/SnapshotVoting/MultiChoiceVoting';
 import { SingleChoiceVoting } from 'components/proposals/components/SnapshotVoting/SingleChoiceVoting';
+import { WeightedVoting } from 'components/proposals/components/SnapshotVoting/WeightedVoting';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SnapshotProposal, SnapshotVote, VoteChoice } from 'lib/snapshot';
 
@@ -51,7 +52,9 @@ export function SnapshotVotingForm(props: SnapshotVotingProps) {
   };
 
   // TEMP: Only support single-choice and basic voting
-  const isSupported = ['single-choice', 'basic', 'approval'].includes(props.snapshotProposal.type);
+  const isSupported = ['single-choice', 'basic', 'approval', 'weighted', 'quadratic'].includes(
+    props.snapshotProposal.type
+  );
 
   return (
     <Stack>
@@ -86,7 +89,7 @@ function RenderFormComponent(props: SnapshotVotingProps & VoteChoiceFormProps) {
       return null;
     case 'quadratic':
     case 'weighted':
-      return null;
+      return <WeightedVoting {...props} />;
 
     default:
       return null;

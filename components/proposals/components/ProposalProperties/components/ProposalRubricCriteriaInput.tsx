@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import { getNumberFromString } from 'components/common/form/getNumberFromString';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 
@@ -291,10 +292,6 @@ export function IntegerInput({
   );
 }
 
-function getNumberFromString(strValue: string): number | null {
-  const parsedString = parseInt(strValue, 10);
-  return parsedString || parsedString === 0 ? parsedString : null;
-}
 function isValidCriteria(criteria: RangeProposalCriteria, rubricAnswers: ProposalRubricCriteriaAnswer[]) {
   const min = criteria.parameters.min;
   const max = criteria.parameters.max;
