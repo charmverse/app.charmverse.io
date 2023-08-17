@@ -49,13 +49,12 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
     refreshPermissions();
   }
 
-  const isDiscoveryChecked = !!publicPermission?.sourcePermission?.allowDiscovery || !!publicPermission?.allowDiscovery;
+  const isDiscoveryChecked = !!publicPermission?.allowDiscovery;
 
   async function handleDiscovery() {
     if (publicPermission) {
-      await charmClient.updatePermission({
+      await charmClient.permissions.pages.updatePagePermissionDiscoverability({
         permissionId: publicPermission.id,
-        pageId,
         allowDiscovery: !isDiscoveryChecked
       });
       refreshPermissions();
