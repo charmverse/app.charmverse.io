@@ -420,8 +420,16 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-            const { from, to } = _state.selection;
-            const textContent = from !== to ? _state.doc.textBetween(from, to) : null;
+            const { $from, $to } = _state.selection;
+            const isMultiNode = !$from.sameParent($to);
+            const from = $from.start();
+            const to = $to.end();
+            const isEmptySelection = from === to;
+            // if the selection spans across multi nodes then use the exact from and to position
+            // Otherwise use the start and end position of the whole node
+            const textContent = !isEmptySelection
+              ? _state.doc.textBetween(isMultiNode ? $from.pos : from, isMultiNode ? $to.pos : to)
+              : null;
             const node = _state.schema.nodes.blockquote.create(
               undefined,
               Fragment.fromArray([
@@ -434,7 +442,11 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
 
             if (_dispatch) {
               const tr = _state.tr;
-              tr.replaceSelectionWith(node);
+              if (isMultiNode || isEmptySelection) {
+                tr.replaceSelectionWith(node);
+              } else {
+                tr.replaceWith(from - 1, to, node);
+              }
               // move cursor to block
               const offset = tr.selection.$head.end(1); // param 1 is node deep
               const resolvedPos = tr.doc.resolve(offset);
