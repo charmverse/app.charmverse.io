@@ -64,6 +64,10 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await permissionDialog.click();
 
+    const publishTab = page.locator('data-test=Publish-tab');
+
+    await publishTab.click();
+
     const publicShareToggle = page.locator('data-test=toggle-public-page');
 
     await publicShareToggle.click();
