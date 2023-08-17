@@ -47,7 +47,7 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
     ).body as ProposalReviewerPool;
 
     const computed = await premiumPermissionsApiClient.proposals.getProposalReviewerPool({
-      resourceId: proposal.id
+      resourceId: proposal.categoryId as string
     });
 
     expect(pool.userIds).toEqual(expect.arrayContaining(computed.userIds));
