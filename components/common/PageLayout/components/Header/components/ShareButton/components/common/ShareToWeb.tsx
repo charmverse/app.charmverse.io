@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
+import CircleIcon from '@mui/icons-material/Circle';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
+import MuiButton from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import Input from '@mui/material/OutlinedInput';
@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import { Button } from 'components/common/Button';
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
@@ -35,7 +36,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
+const CopyButton = styled((props: any) => <MuiButton color='secondary' variant='outlined' size='small' {...props} />)`
   border-radius: 0;
   border-right-color: transparent;
   border-top-color: transparent;
@@ -47,7 +48,7 @@ export type ShareToWebProps = {
   shareChecked: boolean;
   discoveryChecked: boolean;
   pageId: string;
-  handlePublish?: (newValue: boolean) => void;
+  handlePublish?: () => void;
   handleDiscovery?: (newValue: boolean) => void;
   disabledTooltip?: string | null;
   shareAlertMessage?: string | null;
@@ -97,34 +98,25 @@ export default function ShareToWeb({
   }
 
   return (
-    <>
-      <Box display='flex' justifyContent='space-between' alignItems='center' my={1}>
+    <Box my={1} gap={2} display='flex' flexDirection='column'>
+      {!shareChecked && !shareLink ? (
         <Box>
-          <Typography>Share to web</Typography>
-
-          <Typography variant='body2' color='secondary'>
-            {shareChecked ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
-          </Typography>
-        </Box>
-        <UpgradeChip upgradeContext='page_permissions' />
-        <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
           <Box>
-            <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
-              <Switch
-                data-test='toggle-public-page'
-                checked={shareChecked}
-                disabled={disabled}
-                onChange={(_, checked) => {
-                  handlePublish?.(checked);
-                }}
-              />
-            </UpgradeWrapper>
+            <Typography variant='h6' textAlign='center' mb={1}>
+              Publish to web
+            </Typography>
+            <Typography variant='body2'>
+              Publish a static website of this page. You can allow others to view it.
+            </Typography>
           </Box>
-        </Tooltip>
-      </Box>
-
-      <Collapse in={!!shareChecked && !!shareLink}>
+          <UpgradeChip upgradeContext='page_permissions' />
+        </Box>
+      ) : (
         <Box>
+          <Box display='flex' gap={0.5} mb={2}>
+            <CircleIcon color='primary' fontSize='small' />
+            <Typography variant='body2'>This page is live on the web. Anyone with the link can view it.</Typography>
+          </Box>
           <StyledInput
             data-test='share-link'
             fullWidth
@@ -138,33 +130,37 @@ export default function ShareToWeb({
               </CopyToClipboard>
             }
           />
+          <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
+            <InputLabel htmlFor='discovery-toggle' color='primary'>
+              Add to sidebar
+            </InputLabel>
+            <Switch
+              id='discovery-toggle'
+              data-test='toggle-discovery-page'
+              checked={discoveryChecked}
+              disabled={disabled}
+              onChange={(_, checked) => {
+                handleDiscovery?.(checked);
+              }}
+            />
+          </Box>
+          <Typography width={{ xs: '100%', md: '80%' }} variant='body2'>
+            Anyone with access to the space will see this page in the sidebar
+          </Typography>
         </Box>
-      </Collapse>
-      <Collapse in={!!shareChecked && !!shareLink /* || page.hasGuests */}>
-        <Box>
-          <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
-            <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
-              <InputLabel variant='standard' htmlFor='discovery-toggle'>
-                Discoverable
-              </InputLabel>
-              <Switch
-                id='discovery-toggle'
-                data-test='toggle-discovery-page'
-                checked={discoveryChecked}
-                disabled={disabled}
-                onChange={(_, checked) => {
-                  handleDiscovery?.(checked);
-                }}
-              />
-            </Box>
-          </UpgradeWrapper>
-        </Box>
-      </Collapse>
+      )}
       {shareAlertMessage && (
         <Alert severity='info' sx={{ whiteSpace: 'break-spaces', mt: 1 }}>
           {shareAlertMessage}
         </Alert>
       )}
-    </>
+      <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
+        <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
+          <Button onClick={handlePublish} disabled={disabled}>
+            {shareChecked ? 'Unpublish' : 'Publish to web'}
+          </Button>
+        </Tooltip>
+      </UpgradeWrapper>
+    </Box>
   );
 }
