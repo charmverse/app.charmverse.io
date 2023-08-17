@@ -384,7 +384,7 @@ export class DocumentEventHandler {
   // sendMessageToActor is used when we want to send the diff to all other participants, but not the actor
   async handleDiff(
     message: WrappedSocketMessage<ClientDiffMessage>,
-    { socketEvent }: { socketEvent?: 'page_created' | 'page_restored' | 'page_deleted' | null } = {
+    { socketEvent }: { socketEvent?: 'page_created' | 'page_restored' | 'page_deleted' | 'page_reordered' | null } = {
       socketEvent: null
     }
   ) {
@@ -479,7 +479,7 @@ export class DocumentEventHandler {
           await this.saveDocument();
         }
 
-        if (deletedPageIds.length) {
+        if (deletedPageIds.length && socketEvent !== 'page_reordered') {
           await archivePages({
             pageIds: deletedPageIds,
             userId: session.user.id,
@@ -488,7 +488,7 @@ export class DocumentEventHandler {
           });
         }
 
-        if (restoredPageIds.length) {
+        if (restoredPageIds.length && socketEvent !== 'page_reordered') {
           await archivePages({
             pageIds: restoredPageIds,
             userId: session.user.id,

@@ -17,6 +17,7 @@ import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { NewPageInput, PagesMap } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
@@ -156,6 +157,19 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           }
         });
 
+        // dropped on root level, so remove child page reference in parent's content
+        if (droppedItem.parentId !== containerItem.parentId) {
+          emitSocketMessage({
+            type: 'page_reordered',
+            payload: {
+              pageId: droppedItem.id,
+              currentParentId: droppedItem.parentId,
+              newParentId: containerItem.parentId,
+              newIndex: droppedItem.index
+            }
+          });
+        }
+
         return { ..._pages };
       });
     },
@@ -191,6 +205,18 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       const parentId = (containerItem as MenuNode)?.id ?? null;
 
       mutatePage({ id: droppedItem.id, parentId });
+
+      if (parentId) {
+        emitSocketMessage({
+          type: 'page_reordered',
+          payload: {
+            pageId: droppedItem.id,
+            currentParentId: droppedItem.parentId,
+            newParentId: containerItem.id,
+            newIndex: droppedItem.index
+          }
+        });
+      }
 
       charmClient.pages
         .updatePage({

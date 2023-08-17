@@ -1,4 +1,6 @@
+import { UndesirableOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
@@ -12,7 +14,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
-import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
+import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
@@ -62,67 +64,13 @@ export class SpaceEventHandler {
         this.sendError('Error subscribing to space');
       }
     } else if (message.type === 'page_deleted' && this.userId) {
-      try {
-        const pageId = message.payload.id;
-        const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
-          id: pageId,
-          userId: this.userId,
-          docRooms: this.docRooms
-        });
-
-        if (parentId && documentRoom && participant && position !== null) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: [
-                {
-                  stepType: 'replace',
-                  from: position,
-                  to: position + 1
-                }
-              ],
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            { socketEvent: 'page_deleted' }
-          );
-        } else {
-          if (parentId && position) {
-            await applyDiffAndSaveDocument({
-              content,
-              parentId,
-              userId: this.userId,
-              diffs: [
-                {
-                  from: position,
-                  to: position + 1,
-                  stepType: 'replace'
-                }
-              ]
-            });
-          }
-          // If the user is not in the document or the position of the page node is not found (present in sidebar)
-
-          await archivePages({
-            pageIds: [pageId],
-            userId: this.userId,
-            spaceId,
-            archive: true
-          });
-        }
-      } catch (error) {
-        const errorMessage = 'Error deleting a page after link was deleted from its parent page';
-        log.error(errorMessage, {
-          error,
-          pageId: message.payload.id,
-          userId: this.userId
-        });
-        this.sendError(errorMessage);
-      }
+      await handlePageRemoveMessage({
+        userId: this.userId,
+        docRooms: this.docRooms,
+        payload: message.payload,
+        sendError: this.sendError,
+        event: 'page_deleted'
+      });
     } else if (message.type === 'page_restored' && this.userId) {
       const pageId = message.payload.id;
 
@@ -263,11 +211,179 @@ export class SpaceEventHandler {
         });
         this.sendError(errorMessage);
       }
+    } else if (message.type === 'page_reordered' && this.userId) {
+      const { pageId, currentParentId, newParentId, newIndex } = message.payload;
+
+      try {
+        const { flatChildren } = await resolvePageTree({
+          pageId,
+          flattenChildren: true
+        });
+
+        if (newParentId === pageId || flatChildren.some((p) => p.id === newParentId)) {
+          throw new UndesirableOperationError(
+            `You cannot reposition a page to be a child of ${
+              newParentId === pageId ? 'itself' : 'one of its child pages'
+            }`
+          );
+        }
+
+        // Dropped on root level, remove reference from parent's content
+        if (currentParentId) {
+          await handlePageRemoveMessage({
+            userId: this.userId,
+            docRooms: this.docRooms,
+            payload: {
+              id: pageId
+            },
+            sendError: this.sendError,
+            event: 'page_reordered'
+          });
+        }
+
+        if (newParentId) {
+          const {
+            pageNode,
+            documentRoom,
+            participant,
+            position,
+            content: parentPageContent
+          } = await getPageDetails({
+            id: pageId,
+            userId: this.userId,
+            docRooms: this.docRooms,
+            parentId: newParentId
+          });
+          const lastValidPos = pageNode.content.size;
+
+          // If position is not null then the page is present in the parent page content
+          if (position === null) {
+            if (documentRoom && participant) {
+              await participant.handleDiff(
+                {
+                  type: 'diff',
+                  ds: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos }),
+                  doc: documentRoom.doc.content,
+                  c: participant.messages.client,
+                  s: participant.messages.server,
+                  v: documentRoom.doc.version,
+                  rid: 0,
+                  cid: -1
+                },
+                {
+                  socketEvent: 'page_reordered'
+                }
+              );
+            } else {
+              await applyDiffAndSaveDocument({
+                content: parentPageContent,
+                userId: this.userId,
+                parentId: newParentId,
+                diffs: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
+              });
+            }
+          }
+        }
+
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'repositioned',
+          pageId
+        });
+      } catch (error) {
+        const errorMessage = 'Error repositioning a page in parent page content';
+        log.error(errorMessage, {
+          error,
+          pageId,
+          newParentId,
+          currentParentId,
+          newIndex,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
+      }
     }
   }
 
   sendError(message: string) {
     this.socket.emit(this.socketEvent, { type: 'error', message });
+  }
+}
+
+async function handlePageRemoveMessage({
+  event,
+  userId,
+  docRooms,
+  payload,
+  sendError
+}: {
+  event: 'page_deleted' | 'page_reordered';
+  userId: string;
+  docRooms: Map<string | undefined, DocumentRoom>;
+  payload: WebSocketPayload<'page_deleted'>;
+  sendError: (message: string) => void;
+}) {
+  try {
+    const pageId = payload.id;
+    const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
+      id: pageId,
+      userId,
+      docRooms
+    });
+
+    if (parentId && documentRoom && participant && position !== null) {
+      await participant.handleDiff(
+        {
+          type: 'diff',
+          ds: [
+            {
+              stepType: 'replace',
+              from: position,
+              to: position + 1
+            }
+          ],
+          doc: documentRoom.doc.content,
+          c: participant.messages.client,
+          s: participant.messages.server,
+          v: documentRoom.doc.version,
+          rid: 0,
+          cid: -1
+        },
+        { socketEvent: event }
+      );
+    } else {
+      if (parentId && position !== null) {
+        await applyDiffAndSaveDocument({
+          content,
+          parentId,
+          userId,
+          diffs: [
+            {
+              from: position,
+              to: position + 1,
+              stepType: 'replace'
+            }
+          ]
+        });
+      }
+      // If the user is not in the document or the position of the page node is not found (present in sidebar)
+
+      if (event === 'page_deleted') {
+        await archivePages({
+          pageIds: [pageId],
+          userId,
+          spaceId,
+          archive: true
+        });
+      }
+    }
+  } catch (error) {
+    const errorMessage = 'Error deleting a page after link was deleted from its parent page';
+    log.error(errorMessage, {
+      error,
+      pageId: payload.id,
+      userId
+    });
+    sendError(errorMessage);
   }
 }
 
@@ -341,11 +457,13 @@ async function applyDiffAndSaveDocument({
 async function getPageDetails({
   id,
   userId,
-  docRooms
+  docRooms,
+  parentId
 }: {
   docRooms: Map<string | undefined, DocumentRoom>;
   userId: string;
   id: string;
+  parentId?: string;
 }) {
   const page = await prisma.page.findUniqueOrThrow({
     where: {
@@ -357,10 +475,12 @@ async function getPageDetails({
     }
   });
 
-  const parentPage = page.parentId
+  const _parentId = parentId ?? page.parentId;
+
+  const parentPage = _parentId
     ? await prisma.page.findUniqueOrThrow({
         where: {
-          id: page.parentId
+          id: _parentId
         },
         select: {
           content: true
@@ -368,9 +488,9 @@ async function getPageDetails({
       })
     : null;
 
-  const { parentId, spaceId } = page;
+  const { spaceId } = page;
 
-  const documentRoom = parentId ? docRooms.get(parentId) : null;
+  const documentRoom = _parentId ? docRooms.get(_parentId) : null;
   const content: PageContent =
     documentRoom && documentRoom.participants.size !== 0
       ? documentRoom.node.toJSON()
@@ -404,7 +524,7 @@ async function getPageDetails({
     documentRoom,
     participant,
     spaceId,
-    parentId,
+    parentId: _parentId,
     position,
     content
   };
