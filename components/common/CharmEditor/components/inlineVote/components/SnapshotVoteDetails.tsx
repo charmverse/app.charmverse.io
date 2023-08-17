@@ -35,7 +35,19 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
   const voteChoices = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
 
-  const currentUserChoices = (userVotes ?? []).map((v) => voteChoices[v.choice - 1]).join(',');
+  const flatUserChoices = (userVotes ?? []).reduce((acc, v) => {
+    if (typeof v.choice === 'number') {
+      acc.push(v.choice);
+    }
+
+    if (Array.isArray(v.choice)) {
+      v.choice.forEach((c) => acc.push(c));
+    }
+
+    return acc;
+  }, [] as number[]);
+
+  const currentUserChoices = flatUserChoices.map((v) => voteChoices[v - 1]).join(',');
 
   const isLoading = snapshotProposal === undefined;
   let statusText = 'Loading...';

@@ -1,6 +1,4 @@
-import { log } from '@charmverse/core/log';
 import { utils } from 'ethers';
-import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
