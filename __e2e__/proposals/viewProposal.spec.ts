@@ -217,6 +217,8 @@ test.describe.serial('View proposal', () => {
     // Start sharing flow
     await pagePermissions.permissionDialog.click();
 
+    await pagePermissions.publishTab.click();
+
     await expect(pagePermissions.publicShareToggle).toBeVisible();
 
     await pagePermissions.togglePageIsPublic();
