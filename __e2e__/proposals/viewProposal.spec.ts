@@ -134,8 +134,6 @@ test.describe.serial('View proposal', () => {
 
     const categoriesDropDown = proposalListPage.getProposalCategoryListButtonLocator();
 
-    await page.pause();
-
     await expect(categoriesDropDown).toBeVisible();
 
     await categoriesDropDown.click();
