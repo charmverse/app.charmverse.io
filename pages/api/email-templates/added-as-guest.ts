@@ -166,9 +166,9 @@ const createBountyTask = ({
 const templates = {
   'Guest added': () => {
     return emails.getAddedAsGuestEmail({
-      action: 'edit',
       invitingUserName: 'momakes.blockchain',
-      pageTitle: 'Acme Inc proposal'
+      pageTitle: 'Acme Inc proposal',
+      documentLinkWithSignin: 'https://app.charmverse.io/cvt-mospace/page-12344553'
     });
   }
 };
