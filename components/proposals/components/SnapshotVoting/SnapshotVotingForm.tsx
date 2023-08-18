@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import type { CastVote } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
 import { MultiChoiceVoting } from 'components/proposals/components/SnapshotVoting/MultiChoiceVoting';
+import { RankedVoting } from 'components/proposals/components/SnapshotVoting/RankedVoting';
 import { SingleChoiceVoting } from 'components/proposals/components/SnapshotVoting/SingleChoiceVoting';
 import { WeightedVoting } from 'components/proposals/components/SnapshotVoting/WeightedVoting';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -17,7 +18,7 @@ export type SnapshotVotingProps = {
   castVote: CastVote;
 };
 
-export type SetVoteChoice = (voteChoice: VoteChoice) => void;
+export type SetVoteChoice = (voteChoice: VoteChoice | null) => void;
 
 export type VoteChoiceFormProps = {
   voteChoice: VoteChoice | null;
@@ -51,8 +52,7 @@ export function SnapshotVotingForm(props: SnapshotVotingProps) {
     }
   };
 
-  // TEMP: Only support single-choice and basic voting
-  const isSupported = ['single-choice', 'basic', 'approval', 'weighted', 'quadratic'].includes(
+  const isSupported = ['single-choice', 'basic', 'approval', 'weighted', 'quadratic', 'ranked-choice'].includes(
     props.snapshotProposal.type
   );
 
@@ -89,9 +89,8 @@ function RenderFormComponent(props: SnapshotVotingProps & VoteChoiceFormProps) {
       return <SingleChoiceVoting {...props} />;
     case 'approval':
       return <MultiChoiceVoting {...props} />;
-
     case 'ranked-choice':
-      return null;
+      return <RankedVoting {...props} />;
     case 'quadratic':
     case 'weighted':
       return <WeightedVoting {...props} />;
