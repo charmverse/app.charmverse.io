@@ -136,7 +136,7 @@ export default function ShareToWeb({
             </InputLabel>
             <Switch
               id='discovery-toggle'
-              data-test='toggle-discovery-page'
+              data-test='toggle-allow-page-discovery'
               checked={discoveryChecked}
               disabled={disabled}
               onChange={(_, checked) => {
