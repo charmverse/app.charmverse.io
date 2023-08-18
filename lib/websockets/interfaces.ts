@@ -121,6 +121,16 @@ export type PageCreated = {
     >;
 };
 
+type PageReordered = {
+  type: 'page_reordered';
+  payload: {
+    pageId: string;
+    currentParentId: string | null;
+    newParentId: string | null;
+    newIndex: number;
+  };
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -151,7 +161,7 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated;
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
 
 export type ServerMessage =
   | BlocksUpdated
