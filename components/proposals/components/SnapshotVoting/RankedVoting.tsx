@@ -1,8 +1,9 @@
-import { Close } from '@mui/icons-material';
-import { FormGroup, Stack, Typography } from '@mui/material';
+import { FormGroup, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
+import { DraggableRankedItem } from 'components/proposals/components/SnapshotVoting/DraggableRankedItem';
 import type {
   SnapshotVotingProps,
   VoteChoiceFormProps
@@ -16,7 +17,6 @@ export function RankedVoting({
 }: SnapshotVotingProps & VoteChoiceFormProps) {
   const voteOptions = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
-  const voteChoiceArray = Array.isArray(voteChoice) ? voteChoice : null;
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [unselectedItems, setUnselectedItems] = useState<number[]>([]);
@@ -58,33 +58,41 @@ export function RankedVoting({
       return updatedSelectedItems;
     });
 
+  const moveItem = (dragIndex: number, hoverIndex: number) => {
+    setSelectedItems((items) => {
+      const arr = [...items];
+      [arr[dragIndex], arr[hoverIndex]] = [arr[hoverIndex], arr[dragIndex]];
+
+      return arr;
+    });
+  };
+
   return (
-    <FormGroup sx={{ gap: 3 }}>
+    <FormGroup sx={{ gap: 3, mb: 2 }}>
       <Stack gap={0.5}>
         {selectedItems.map((selected, i) => (
-          <Button key={selected} variant='outlined' color='textPrimary'>
-            <Stack direction='row' justifyContent='space-between' alignItems='center' flex={1} px={1}>
-              <Typography sx={{ width: '25px' }}>{i + 1}.</Typography>
-              <Typography>{voteOptions[selected - 1]}</Typography>
-              <Stack
-                sx={{ width: '25px', cursor: 'pointer' }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  removeItem(selected);
-                }}
-              >
-                <Close color='secondary' fontSize='small' />
-              </Stack>
-            </Stack>
-          </Button>
+          <DraggableRankedItem
+            key={selected}
+            selectedItem={selected}
+            index={i}
+            label={voteOptions[selected - 1]}
+            removeItem={removeItem}
+            moveItem={moveItem}
+            snapshotProposal={snapshotProposal}
+          />
         ))}
       </Stack>
 
       <Stack gap={0.5}>
         {unselectedItems.map((unselected) => (
-          <Button key={unselected} variant='outlined' color='textPrimary' onClick={() => addItem(unselected)}>
-            {voteOptions[unselected - 1]}
-          </Button>
+          <Stack direction='row' key={unselected} alignItems='center' gap={1}>
+            <Button variant='outlined' color='textPrimary' onClick={() => addItem(unselected)} sx={{ flex: 1 }}>
+              {voteOptions[unselected - 1]}
+            </Button>
+            <Stack>
+              <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOptions[unselected - 1]} />
+            </Stack>
+          </Stack>
         ))}
       </Stack>
     </FormGroup>

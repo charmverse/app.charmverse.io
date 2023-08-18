@@ -1,11 +1,11 @@
 import { Box, Checkbox, Chip, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
+import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
 import type {
   SnapshotVotingProps,
   VoteChoiceFormProps
 } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
-import { percent } from 'lib/utilities/numbers';
 
 export function MultiChoiceVoting({
   snapshotProposal,
@@ -22,7 +22,6 @@ export function MultiChoiceVoting({
   }, [userVotes]);
 
   const voteOptions = snapshotProposal?.choices ?? [];
-  const voteScores = snapshotProposal?.scores ?? [];
 
   const isChecked = (index: number) => {
     if (Array.isArray(voteChoice)) {
@@ -59,15 +58,8 @@ export function MultiChoiceVoting({
                 <Typography>{voteOption}</Typography>
                 {userVotes?.find((v) => v.choice === index + 1) && <Chip color='teal' size='small' label='Voted' />}
               </Stack>
-              <Typography variant='subtitle1' color='secondary'>
-                {!voteScores[index]
-                  ? 'No votes yet'
-                  : percent({
-                      value: voteScores[index],
-                      total: snapshotProposal.scores_total,
-                      significantDigits: 2
-                    })}
-              </Typography>
+
+              <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOption} />
             </Box>
           }
           sx={{ mr: 0 }}

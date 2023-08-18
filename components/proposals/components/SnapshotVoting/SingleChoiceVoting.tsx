@@ -1,11 +1,11 @@
 import { Box, Chip, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
+import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
 import type {
   SnapshotVotingProps,
   VoteChoiceFormProps
 } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
-import { percent } from 'lib/utilities/numbers';
 
 export function SingleChoiceVoting({
   snapshotProposal,
@@ -20,7 +20,6 @@ export function SingleChoiceVoting({
   }, [userVotes?.[0]?.choice]);
 
   const voteOptions = snapshotProposal?.choices ?? [];
-  const voteScores = snapshotProposal?.scores ?? [];
 
   return (
     <RadioGroup value={voteChoice} onChange={(e, value) => setVoteChoice(Number(value))}>
@@ -35,15 +34,8 @@ export function SingleChoiceVoting({
                 <Typography>{voteOption}</Typography>
                 {userVotes?.find((v) => v.choice === index + 1) && <Chip color='teal' size='small' label='Voted' />}
               </Stack>
-              <Typography variant='subtitle1' color='secondary'>
-                {!voteScores[index]
-                  ? 'No votes yet'
-                  : percent({
-                      value: voteScores[index],
-                      total: snapshotProposal.scores_total,
-                      significantDigits: 2
-                    })}
-              </Typography>
+
+              <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOption} />
             </Box>
           }
           sx={{ mr: 0 }}

@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
 import { getNumberFromString } from 'components/common/form/getNumberFromString';
+import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
 import type {
   SnapshotVotingProps,
   VoteChoiceFormProps
@@ -97,13 +98,7 @@ export function WeightedVoting({
               </Button>
 
               <Stack justifyContent='center' alignContent='center' minWidth='45px'>
-                <Typography variant='caption' color='secondary'>
-                  {percent({
-                    value: voteChoiceRecord?.[index + 1] || 0,
-                    total: totalScore,
-                    significantDigits: 1
-                  })}
-                </Typography>
+                <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOption} />
               </Stack>
             </Stack>
           }
