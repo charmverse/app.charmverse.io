@@ -74,6 +74,7 @@ export default function MultiTabs(props: MultiTabsProps) {
               }}
               key={tabLabel}
               label={tabLabel}
+              data-test={`${tabLabel}-tab`}
             />
           ))}
         </Tabs>

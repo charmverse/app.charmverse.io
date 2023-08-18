@@ -134,8 +134,6 @@ test.describe.serial('View proposal', () => {
 
     const categoriesDropDown = proposalListPage.getProposalCategoryListButtonLocator();
 
-    await page.pause();
-
     await expect(categoriesDropDown).toBeVisible();
 
     await categoriesDropDown.click();
@@ -216,6 +214,8 @@ test.describe.serial('View proposal', () => {
 
     // Start sharing flow
     await pagePermissions.permissionDialog.click();
+
+    await pagePermissions.publishTab.click();
 
     await expect(pagePermissions.publicShareToggle).toBeVisible();
 
