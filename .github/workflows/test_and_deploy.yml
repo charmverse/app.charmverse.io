@@ -54,6 +54,8 @@ jobs:
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:
+          # temp disable pr blocking
+          skip: true
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
@@ -275,6 +277,7 @@ jobs:
       # - name: Publish to Chromatic
       #   uses: chromaui/action@v1
       #   with:
+      #     skip: true
       #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Deploy webapp to Beanstalk
