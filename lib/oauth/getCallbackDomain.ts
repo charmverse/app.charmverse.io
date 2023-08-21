@@ -13,7 +13,7 @@ export function getCallbackDomain(host?: string | undefined) {
 
   if (!host) {
     if (isStagingEnv) {
-      return protocol + (baseUrl || '');
+      return baseUrl || '';
     }
     return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
@@ -25,7 +25,7 @@ export function getCallbackDomain(host?: string | undefined) {
   const subdomain = getValidSubdomain(host);
 
   if (!subdomain && isStagingEnv) {
-    return protocol + (baseUrl || host || '');
+    return baseUrl || `${protocol}${host}`;
   }
 
   const callbackDomain = subdomain ? `${protocol}${host?.replace(subdomain, 'app')}` : `${protocol}${host}`;
