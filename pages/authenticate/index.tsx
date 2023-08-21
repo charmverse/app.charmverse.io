@@ -26,18 +26,30 @@ export default function Authenticate() {
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
 
   // Case where existing user is adding an email to their account
-  const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
 
   function loginViaEmail() {
     setIsAuthenticating(true);
     validateMagicLink()
       .then(() => {
+        const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
         showMessage('Logged in with email. Redirecting you now', 'success');
         router.push(redirectPath);
       })
       .catch((err) => {
-        setIsAuthenticating(false);
-        setError('Invalid invite link');
+        const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
+        if (user) {
+          const domainFromRedirect = redirectPath.split('/')[1];
+          if (spaces?.length && domainFromRedirect && spaces.find((s) => s.domain === domainFromRedirect)) {
+            router.push(`/${domainFromRedirect}`);
+          } else if (spaces?.length) {
+            router.push(`/${spaces[0].domain}`);
+          } else {
+            router.push('/createSpace');
+          }
+        } else {
+          setIsAuthenticating(false);
+          setError('Invalid invite link');
+        }
       });
   }
 
@@ -66,7 +78,7 @@ export default function Authenticate() {
     <Box height='100%' display='flex' flexDirection='column'>
       <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating}>
         <Box gap={3} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'column', pt: 2 }}>
-          {showLoginButton && <LoginButton showSignup={false} />}
+          {showLoginButton && <LoginButton emailOnly showSignup={false} />}
 
           {showAdditionalOptions && (
             <>
