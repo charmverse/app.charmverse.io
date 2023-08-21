@@ -45,7 +45,7 @@ const EthereumSelectNFT = ({updateUnifiedAccessControlConditions, submitDisabled
     }
   }, [ selectedToken ]);
 
-  const handleSubmit = (address) => {
+ const handleSubmit = (address) => {
     const isValid = chain.addressValidator(address);
     setAddressIsValid(isValid);
 

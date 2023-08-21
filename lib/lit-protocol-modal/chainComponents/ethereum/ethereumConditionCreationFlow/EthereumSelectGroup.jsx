@@ -62,9 +62,10 @@ const EthereumSelectGroup = ({
     if (selectedToken?.['value'] && utils.isAddress(selectedToken?.['value'])) {
       setContractAddress(selectedToken['value']);
     }
-    if (selectedToken?.['standard']) {
-      setContractType(selectedToken['standard'].toUpperCase());
-    }
+    // Disabled - contractType should only be ERC20, ERC721, or ERC1155, and selectedToken['standard'] is used for Ethereum balance
+    // if (selectedToken?.['standard']) {
+    //   setContractType(selectedToken['standard'].toUpperCase());
+    // }
   }, [ selectedToken ]);
 
   useEffect(() => {
@@ -81,24 +82,25 @@ const EthereumSelectGroup = ({
   //   setErc1155TokenIdIsValid(erc1155IsValid);
   // }, [ erc1155TokenId ])
 
-  useEffect(() => {
-    const itIsValid = isValid();
-    handleSubmit();
-
-    submitDisabled(itIsValid);
-  }, [ amount, addressIsValid, contractAddress, chain, selectedToken, contractType, erc1155TokenId ]);
-
-
-  const isValid = () => {
+  const isInvalid = () => {
     if (selectedToken?.['value'] === 'ethereum') {
       return !amount;
     }
+    console.log(contractType)
     return !amount ||
       !addressIsValid ||
       !contractAddress.length ||
       !contractType.length ||
       (contractType === 'ERC1155' && !erc1155TokenId.length)
   }
+
+  useEffect(() => {
+    const isDisabled = isInvalid();
+    handleSubmit();
+    console.log('submitDisabled', { isDisabled })
+    submitDisabled(isDisabled);
+  }, [ amount, addressIsValid, contractAddress, chain, selectedToken, contractType, erc1155TokenId ]);
+
 
   const checkEthereum = () => {
     // ethereum
@@ -176,26 +178,20 @@ const EthereumSelectGroup = ({
       logDevError(err)
     }
 
-
-    try {
-      unifiedAccessControlConditions = [
-        {
-          conditionType: 'evmBasic',
-          contractAddress: contractAddress,
-          standardContractType: contractType,
-          chain: chain['value'],
-          method: "balanceOf",
-          parameters: [ ":userAddress" ],
-          returnValueTest: {
-            comparator: ">=",
-            value: amountInBaseUnit.toString(),
-          },
+    unifiedAccessControlConditions = [
+      {
+        conditionType: 'evmBasic',
+        contractAddress: contractAddress,
+        standardContractType: contractType,
+        chain: chain['value'],
+        method: "balanceOf",
+        parameters: [ ":userAddress" ],
+        returnValueTest: {
+          comparator: ">=",
+          value: amountInBaseUnit.toString(),
         },
-      ];
-    } catch (err) {
-      logDevError(err);
-      return;
-    }
+      },
+    ];
     saveCondition(unifiedAccessControlConditions);
   }
 
@@ -204,7 +200,7 @@ const EthereumSelectGroup = ({
   }
 
   const handleSubmit = async () => {
-    if (isValid()) {
+    if (isInvalid()) {
       return;
     }
 
@@ -221,6 +217,7 @@ const EthereumSelectGroup = ({
   };
 
   const handleChangeContractType = (value) => {
+    console.log('handleChangeContractType', value)
     setContractType(value);
   };
 
@@ -264,27 +261,28 @@ const EthereumSelectGroup = ({
               <span onChange={(e) => handleChangeContractType(e.target.value)}
                     className={'lsm-radio-container'}>
                 <div>
-                  <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
+                  <label className={'lsm-radio-label'} htmlFor="erc20">
+                    <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
                          checked={contractType === 'ERC20'} type="radio" id="erc20"
                          name="addressType"
-                         value="ERC20"/>
-                  <label className={'lsm-radio-label'} htmlFor="erc20">ERC20</label>
+                         value="ERC20"/>ERC20
+                  </label>
                 </div>
 
                 <div>
-                  <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
+                  <label className={'lsm-radio-label'} htmlFor="erc721">
+                    <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
                          checked={contractType === 'ERC721'} type="radio" id="erc721" name="addressType"
-                         value="ERC721"/>
-                  <label className={'lsm-radio-label'}
-                         htmlFor="erc721">ERC721</label>
+                         value="ERC721"/>ERC721
+                  </label>
                 </div>
 
                 <div>
-                  <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
+                  <label className={'lsm-radio-label'} htmlFor="erc1155">
+                    <input disabled={selectedToken?.['standard'] && selectedToken?.standard === contractType} readOnly
                          checked={contractType === 'ERC1155'} type="radio" id="erc1155" name="addressType"
-                         value="ERC1155"/>
-                  <label className={'lsm-radio-label'}
-                         htmlFor="erc1155">ERC1155</label>
+                         value="ERC1155"/>ERC1155
+                  </label>
                 </div>
               </span>
             </div>
