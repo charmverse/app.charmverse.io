@@ -12,6 +12,9 @@ export function getCallbackDomain(host?: string | undefined) {
   }
 
   if (!host) {
+    if (isStagingEnv) {
+      return protocol + (baseUrl || '');
+    }
     return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
 
