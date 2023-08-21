@@ -55,7 +55,7 @@ jobs:
         uses: chromaui/action@v1
         with:
           # temp disable pr blocking
-          skip: true
+          exitZeroOnChanges: true
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
