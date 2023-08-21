@@ -166,7 +166,7 @@
     "ethers": "^5.5.4",
     "fetch-retry": "^5.0.4",
     "firebase": "^10.2.0",
-    "firebase-admin": "^11.5.0",
+    "firebase-admin": "^11.10.1",
     "form-data": "^4.0.0",
     "formidable": "^3.5.0",
     "gaxios": "^5.0.2",
