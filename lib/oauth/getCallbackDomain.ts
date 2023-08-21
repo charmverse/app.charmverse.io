@@ -22,7 +22,7 @@ export function getCallbackDomain(host?: string | undefined) {
   const subdomain = getValidSubdomain(host);
 
   if (!subdomain && isStagingEnv) {
-    return baseUrl || host || '';
+    return protocol + (baseUrl || host || '');
   }
 
   const callbackDomain = subdomain ? `${protocol}${host?.replace(subdomain, 'app')}` : `${protocol}${host}`;
