@@ -453,7 +453,12 @@ export class DocumentEventHandler {
             }
           }
         } catch (error) {
-          log.warn('Error looping through nodes for page meta', { error, ds: message.ds, ...logMeta });
+          log.warn('Error looping through nodes for page meta', {
+            error,
+            docSize: room.node.nodeSize,
+            ds: message.ds,
+            ...logMeta
+          });
         }
 
         try {
