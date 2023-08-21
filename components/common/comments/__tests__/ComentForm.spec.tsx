@@ -26,6 +26,10 @@ jest.mock('lib/snapshot/getVotes', () => ({
   getSnapshotVotes: () => ({ votes: {} })
 }));
 
+jest.mock('lib/snapshot/getVotingPower', () => ({
+  getSnapshotVotes: () => ({})
+}));
+
 jest.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/[domain]/',
