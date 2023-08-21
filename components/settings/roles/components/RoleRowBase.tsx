@@ -81,7 +81,7 @@ export function RoleRowBase({
                 <Chip size='small' label={members.length} />
                 {descriptionIcon && (
                   <Tooltip title={description}>
-                    <SvgIcon sx={{ height: 20 }}>{descriptionIcon}</SvgIcon>
+                    <SvgIcon sx={{ height: 20 }} component={descriptionIcon} inheritViewBox />
                   </Tooltip>
                 )}
                 {upgradeProps?.upgradeContext && (

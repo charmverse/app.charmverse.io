@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import type { EnsProfile } from 'lib/profile/getEnsProfile';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 import { ProfileWidget } from './ProfileWidget';
 
