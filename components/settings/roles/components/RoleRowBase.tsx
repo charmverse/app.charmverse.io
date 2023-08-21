@@ -42,7 +42,7 @@ type RoleRowProps = {
   roleActions?: ReactNode;
   memberRoleId?: string;
   upgradeProps?: UpgradeProps;
-  descriptionIcon?: ReactNode;
+  descriptionIcon?: any;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
