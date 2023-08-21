@@ -487,7 +487,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
@@ -1621,7 +1622,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     sourceTemplateId: null,
@@ -2041,7 +2043,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     sourceTemplateId: null,
@@ -2387,7 +2390,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
@@ -3077,7 +3081,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
@@ -3767,7 +3772,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],

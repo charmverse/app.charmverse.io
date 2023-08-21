@@ -427,6 +427,10 @@ class CharmClient {
     return http.POST('/api/permissions', permission);
   }
 
+  updatePermission(body: PermissionResource & { pageId: string; allowDiscovery: boolean }): Promise<any> {
+    return http.PUT('/api/permissions', body);
+  }
+
   deletePermission(query: PermissionResource): Promise<boolean> {
     return http.DELETE('/api/permissions', query);
   }
