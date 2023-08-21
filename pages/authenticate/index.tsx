@@ -1,4 +1,3 @@
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -16,7 +15,7 @@ import { useUser } from 'hooks/useUser';
 import { isValidEmail } from 'lib/utilities/strings';
 
 export default function Authenticate() {
-  const [error, setError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded: isUserLoaded, user } = useUser();
   const { spaces } = useSpaces();
@@ -26,7 +25,6 @@ export default function Authenticate() {
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
 
   // Case where existing user is adding an email to their account
-
   function loginViaEmail() {
     setIsAuthenticating(true);
     validateMagicLink()
@@ -48,7 +46,8 @@ export default function Authenticate() {
           }
         } else {
           setIsAuthenticating(false);
-          setError('Invalid invite link');
+          setLoginError(true);
+          showMessage('Invalid invite link', 'error');
         }
       });
   }
@@ -56,7 +55,7 @@ export default function Authenticate() {
   useEffect(() => {
     if (isUserLoaded && emailForSignIn && isValidEmail(emailForSignIn)) {
       loginViaEmail();
-    } else if (isUserLoaded && !error && !isAuthenticating) {
+    } else if (isUserLoaded && !loginError && !isAuthenticating) {
       emailPopup.open();
     }
   }, [isUserLoaded, emailForSignIn]);
@@ -93,12 +92,6 @@ export default function Authenticate() {
                 </Button>
               )}
             </>
-          )}
-
-          {error && (
-            <Alert sx={{ width: 'fit-content' }} severity='error'>
-              {error}
-            </Alert>
           )}
         </Box>
       </LoginPageContent>

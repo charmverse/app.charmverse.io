@@ -207,9 +207,11 @@ function LoginHandler(props: DialogProps) {
               )}
             </>
           )}
-          <DialogTitle sx={{ mt: -1 }} textAlign='left'>
-            Connect Account
-          </DialogTitle>
+          {!loginMethod && (
+            <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+              Connect Account
+            </DialogTitle>
+          )}
           {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
 
           {/* Google login method */}
