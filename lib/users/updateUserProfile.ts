@@ -28,6 +28,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
       },
       include: sessionUserRelations,
       data: {
+        autoLensPublish: update.autoLensPublish,
         avatar: update.avatar,
         avatarChain: update.avatarChain,
         avatarContract: update.avatarContract,
