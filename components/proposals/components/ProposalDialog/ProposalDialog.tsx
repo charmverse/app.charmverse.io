@@ -12,8 +12,7 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 
-import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
-
+import type { ProposalPageAndPropertiesInput } from './NewProposalPage';
 import { NewProposalPage } from './NewProposalPage';
 
 interface Props {
@@ -26,17 +25,8 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
   const mounted = useRef(false);
   const router = useRouter();
   const { user } = useUser();
-  const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
-    authors: user ? [user.id] : [],
-    categoryId: null,
-    content: null,
-    contentText: '',
-    evaluationType: 'vote',
-    proposalTemplateId: null,
-    reviewers: [],
-    rubricCriteria: [],
-    title: ''
-  });
+  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(emptyState({ userId: user?.id }));
+
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -50,17 +40,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
 
   function close() {
     onClose();
-    setFormInputs({
-      authors: [],
-      categoryId: null,
-      content: null,
-      contentText: '',
-      evaluationType: 'vote',
-      proposalTemplateId: null,
-      reviewers: [],
-      rubricCriteria: [],
-      title: ''
-    });
+    setFormInputs(emptyState());
     setContentUpdated(false);
     setShowConfirmDialog(false);
   }
@@ -130,4 +110,20 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
       />
     </Dialog>
   );
+}
+
+function emptyState({ userId }: { userId?: string } = {}): ProposalPageAndPropertiesInput {
+  return {
+    authors: userId ? [userId] : [],
+    categoryId: null,
+    content: null,
+    contentText: '',
+    headerImage: null,
+    icon: null,
+    evaluationType: 'vote',
+    proposalTemplateId: null,
+    reviewers: [],
+    rubricCriteria: [],
+    title: ''
+  };
 }

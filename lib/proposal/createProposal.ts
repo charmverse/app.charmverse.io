@@ -17,7 +17,7 @@ import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
-type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId'>>;
+type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon'>>;
 
 export type CreateProposalInput = {
   pageId?: string;
@@ -101,16 +101,18 @@ export async function createProposal({
     createPage({
       data: {
         content: pageProps?.content ?? undefined,
-        proposalId,
+        createdBy: userId,
         contentText: pageProps?.contentText ?? '',
+        headerImage: pageProps?.headerImage,
+        icon: pageProps?.icon,
+        id: proposalId,
         path: getPagePath(),
+        proposalId,
         sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',
+        type: 'proposal',
         updatedBy: userId,
-        createdBy: userId,
-        spaceId,
-        id: proposalId,
-        type: 'proposal'
+        spaceId
       }
     }),
     prisma.workspaceEvent.create({

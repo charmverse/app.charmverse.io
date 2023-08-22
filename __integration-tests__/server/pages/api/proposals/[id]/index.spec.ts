@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
+import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole } from 'testing/setupDatabase';
@@ -115,15 +116,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${page.proposalId}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: page.proposalId! });
 
     expect(updated.proposal?.reviewers).toHaveLength(1);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
@@ -159,15 +159,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${proposalTemplate.id}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${proposalTemplate.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: proposalTemplate.id });
     expect(updated.proposal?.reviewers).toHaveLength(2);
     expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
