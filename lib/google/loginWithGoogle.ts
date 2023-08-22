@@ -4,8 +4,8 @@ import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
+import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
-import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -37,98 +37,73 @@ export async function loginWithGoogle({
       throw new InvalidInputError(`Email required to complete signup`);
     }
 
-    const googleAccount = await prisma.googleAccount.findUnique({
+    let user = await prisma.user.findFirst({
       where: {
-        email
-      },
-      include: {
-        user: {
-          select: {
-            deletedAt: true
-          }
-        }
-      }
-    });
-
-    const emailAccount = await prisma.verifiedEmail.findUnique({
-      where: {
-        email
-      },
-      include: {
-        user: {
-          select: {
-            deletedAt: true
-          }
-        }
-      }
-    });
-
-    if (googleAccount) {
-      if (googleAccount.user.deletedAt) {
-        throw new DisabledAccountError(`This account has been disabled`);
-      }
-
-      if (googleAccount.name !== displayName || googleAccount.avatarUrl !== avatarUrl) {
-        trackUserAction('sign_in', { userId: googleAccount.userId, identityType: 'Google' });
-
-        await prisma.googleAccount.update({
-          where: {
-            id: googleAccount.id
+        OR: [
+          {
+            googleAccounts: {
+              some: {
+                email
+              }
+            }
           },
-          data: {
-            avatarUrl,
-            name: displayName
+          {
+            verifiedEmails: {
+              some: {
+                email
+              }
+            }
           }
-        });
+        ]
+      },
+      include: sessionUserRelations
+    });
 
-        return updateUserProfile(googleAccount.userId, { identityType: 'Google', username: displayName });
-      } else {
-        return getUserProfile('id', googleAccount.userId);
-      }
+    if (user?.deletedAt) {
+      throw new DisabledAccountError(`This account has been disabled`);
     }
 
-    if (emailAccount && !emailAccount.user.deletedAt) {
-      if (emailAccount.name !== displayName || emailAccount.avatarUrl !== avatarUrl) {
-        trackUserAction('sign_in', { userId: emailAccount.userId, identityType: 'Google' });
-
-        await prisma.verifiedEmail.update({
-          where: {
-            id: emailAccount.id
-          },
-          data: {
-            avatarUrl,
-            name: displayName
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          username: email,
+          path: uid(),
+          googleAccounts: {
+            create: {
+              avatarUrl,
+              email,
+              name: displayName
+            }
           }
-        });
-
-        return updateUserProfile(emailAccount.userId, { identityType: 'Google', username: displayName });
-      } else {
-        return getUserProfile('id', emailAccount.userId);
-      }
+        },
+        include: sessionUserRelations
+      });
+      trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
+    } else {
+      await prisma.googleAccount.upsert({
+        where: {
+          email
+        },
+        create: {
+          avatarUrl,
+          email,
+          name: displayName,
+          user: { connect: { id: user.id } }
+        },
+        update: {
+          avatarUrl,
+          name: displayName
+        }
+      });
     }
 
-    const createdGoogleAccount = await prisma.googleAccount.create({
-      data: {
-        name: displayName,
-        avatarUrl,
-        email,
-        user: {
-          create: {
-            identityType: 'Google',
-            username: displayName,
-            avatar: avatarUrl,
-            path: uid()
-          }
-        }
-      }
-    });
+    trackUserAction('sign_in', { userId: user.id, identityType: 'Google' });
 
-    const newUser = await getUserProfile('id', createdGoogleAccount.userId);
+    const updatedUser = await getUserProfile('id', user.id);
 
-    updateTrackUserProfile(newUser);
-    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Google', ...signupAnalytics });
+    updateTrackUserProfile(updatedUser);
 
-    return newUser;
+    return updatedUser;
   } catch (err) {
     if (err instanceof SystemError === false) {
       throw new InsecureOperationError(`Could not verify the Google ID token that was provided`);

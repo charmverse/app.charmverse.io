@@ -8,6 +8,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
+import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
+import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
@@ -26,7 +28,7 @@ async function connectEmailAccount(req: NextApiRequest, res: NextApiResponse<Log
     throw new InvalidInputError(`No email found in verification result`);
   }
 
-  const existingAccount = await prisma.verifiedEmail.findUnique({
+  const existingVerifiedEmailAccount = await prisma.verifiedEmail.findUnique({
     where: {
       email: verificationResult.email
     },
@@ -36,6 +38,18 @@ async function connectEmailAccount(req: NextApiRequest, res: NextApiResponse<Log
       }
     }
   });
+
+  const existingGoogleAccount = await prisma.googleAccount.findUnique({
+    where: {
+      email: verificationResult.email
+    },
+    include: {
+      user: {
+        include: sessionUserRelations
+      }
+    }
+  });
+
   const afterUpdate = await prisma.$transaction(async (tx) => {
     const upsertedEmail = await tx.verifiedEmail.upsert({
       where: {
@@ -62,19 +76,43 @@ async function connectEmailAccount(req: NextApiRequest, res: NextApiResponse<Log
     });
 
     // Soft delete old user since the email was their last identity
-    if (
-      existingAccount &&
-      existingAccount.user.id !== userId &&
-      countConnectableIdentities(existingAccount.user) <= 1
-    ) {
-      await prisma.user.update({
+    if (existingVerifiedEmailAccount && existingVerifiedEmailAccount.user.id !== userId) {
+      if (countConnectableIdentities(existingVerifiedEmailAccount.user) <= 1) {
+        await tx.user.update({
+          where: {
+            id: existingVerifiedEmailAccount.user.id
+          },
+          data: {
+            deletedAt: new Date()
+          }
+        });
+      } else {
+        await updateUsedIdentity(existingVerifiedEmailAccount.userId, undefined, tx);
+      }
+    }
+
+    // Soft delete old user since the Google Account was their last identity
+    if (existingGoogleAccount && existingGoogleAccount.user.id !== userId) {
+      await tx.googleAccount.update({
         where: {
-          id: existingAccount.user.id
+          email: verificationResult.email
         },
         data: {
-          deletedAt: new Date()
+          user: { connect: { id: userId } }
         }
       });
+      if (countConnectableIdentities(existingGoogleAccount.user) <= 1) {
+        await tx.user.update({
+          where: {
+            id: existingGoogleAccount.user.id
+          },
+          data: {
+            deletedAt: new Date()
+          }
+        });
+      } else {
+        await updateUsedIdentity(existingGoogleAccount.user.id, undefined, tx);
+      }
     }
 
     return upsertedEmail;
