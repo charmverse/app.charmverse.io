@@ -1,5 +1,5 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, Chip, Divider, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, Divider, Stack, Tooltip, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 
 import { Button } from 'components/common/Button';
@@ -98,16 +98,15 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
       {snapshotProposal && (
         <Box display='flex' flexDirection='column' gap={1}>
           {isVotingActive ? (
-            <Tooltip title={votingDisabledStatus}>
-              <Box>
-                <SnapshotVotingForm
-                  snapshotProposal={snapshotProposal}
-                  votingPower={votingPower}
-                  userVotes={userVotes}
-                  castVote={castSnapshotVote}
-                />
-              </Box>
-            </Tooltip>
+            <Box>
+              <Stack mb={1}>{votingDisabledStatus && <Alert severity='warning'>{votingDisabledStatus}</Alert>}</Stack>
+              <SnapshotVotingForm
+                snapshotProposal={snapshotProposal}
+                votingPower={votingPower}
+                userVotes={userVotes}
+                castVote={castSnapshotVote}
+              />
+            </Box>
           ) : (
             voteChoices.map((voteOption, index) => (
               <Box key={voteOption} display='flex' justifyContent='space-between'>

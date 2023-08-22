@@ -102,7 +102,7 @@ export function WeightedVoting({
               </Stack>
             </Stack>
           }
-          sx={{ mr: 0 }}
+          sx={{ mr: 0, ml: 0 }}
           label={
             <Box display='flex' justifyContent='space-between' flexGrow={1}>
               <Stack direction='row' spacing={1}>

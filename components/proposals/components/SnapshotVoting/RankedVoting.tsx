@@ -68,7 +68,7 @@ export function RankedVoting({
   };
 
   return (
-    <FormGroup sx={{ gap: 3, mb: 2 }}>
+    <Stack>
       <Stack gap={0.5}>
         {selectedItems.map((selected, i) => (
           <DraggableRankedItem
@@ -95,6 +95,6 @@ export function RankedVoting({
           </Stack>
         ))}
       </Stack>
-    </FormGroup>
+    </Stack>
   );
 }
