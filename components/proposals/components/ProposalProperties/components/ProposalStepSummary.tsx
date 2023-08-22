@@ -129,6 +129,7 @@ export function ProposalStepSummary({
               </Button>
               <ModalWithButtons
                 open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
+                buttonText='Continue'
                 onClose={previousConfirmationPopup.close}
                 onConfirm={() => updateProposalStatus?.(previousStatus)}
               >
@@ -153,6 +154,7 @@ export function ProposalStepSummary({
               <ModalWithButtons
                 open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
                 onClose={nextConfirmationPopup.close}
+                buttonText='Continue'
                 onConfirm={() => {
                   if (nextStatus === 'vote_active') {
                     openVoteModal?.();
