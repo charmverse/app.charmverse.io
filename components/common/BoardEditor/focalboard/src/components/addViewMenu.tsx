@@ -18,8 +18,9 @@ import { publishIncrementalUpdate } from 'components/common/BoardEditor/publishe
 import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { createTableView } from 'lib/focalboard/table';
 
 import { Constants } from '../constants';
 import mutator from '../mutator';
@@ -30,6 +31,10 @@ import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
 import { typeDisplayName } from '../widgets/propertyMenu';
+
+function getViewSource({ source, views }: { source?: ViewSourceType; views: BoardView[] }): ViewSourceType | undefined {
+  return views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : source;
+}
 
 type AddViewProps = {
   board: Board;
@@ -48,6 +53,7 @@ function AddViewMenu(props: AddViewProps) {
   const showView = props.showView;
 
   const views = props.views.filter((view) => !view.fields.inline);
+
   const viewIdsFromFields = props.board.fields?.viewIds ?? [];
   const viewIds = viewIdsFromFields.length === views.length ? viewIdsFromFields : views.map((view) => view.id);
 
@@ -76,6 +82,7 @@ function AddViewMenu(props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -107,8 +114,9 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView(board, activeView, intl);
+    const view = createTableView({ board, activeView, intl, views: props.views });
     view.id = uuid();
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -148,6 +156,7 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -184,6 +193,7 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -283,19 +293,6 @@ function AddViewMenu(props: AddViewProps) {
       </Menu>
     </>
   );
-}
-
-export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
-  const view = createBoardView(activeView);
-  view.title = '';
-  view.fields.viewType = 'table';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
-  view.fields.columnWidths = {};
-  view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-  view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-  return view;
 }
 
 export default injectIntl(AddViewMenu);

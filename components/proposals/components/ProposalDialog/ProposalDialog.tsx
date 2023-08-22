@@ -12,9 +12,8 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 
-import type { ProposalFormInputs } from '../interfaces';
-
-import { ProposalPage } from './ProposalPage';
+import type { ProposalPageAndPropertiesInput } from './NewProposalPage';
+import { NewProposalPage } from './NewProposalPage';
 
 interface Props {
   isLoading: boolean;
@@ -26,15 +25,8 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
   const mounted = useRef(false);
   const router = useRouter();
   const { user } = useUser();
-  const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
-    title: '',
-    content: null,
-    contentText: '',
-    categoryId: null,
-    authors: user ? [user.id] : [],
-    reviewers: [],
-    proposalTemplateId: null
-  });
+  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(emptyState({ userId: user?.id }));
+
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -48,15 +40,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
 
   function close() {
     onClose();
-    setFormInputs({
-      title: '',
-      content: null,
-      contentText: '',
-      categoryId: null,
-      authors: [],
-      reviewers: [],
-      proposalTemplateId: null
-    });
+    setFormInputs(emptyState());
     setContentUpdated(false);
     setShowConfirmDialog(false);
   }
@@ -103,11 +87,11 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
       ) : page ? (
         <EditorPage pageId={page.id} />
       ) : (
-        <ProposalPage
+        <NewProposalPage
           formInputs={formInputs}
           setFormInputs={(_formInputs) => {
             setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+            setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
           }}
           contentUpdated={contentUpdated}
           setContentUpdated={setContentUpdated}
@@ -120,10 +104,26 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         title='Unsaved changes'
         open={showConfirmDialog}
         buttonText='Discard'
-        secondaryButtonText='Go back'
+        secondaryButtonText='Cancel'
         question='Are you sure you want to close this proposal? You have unsaved changes'
         onConfirm={close}
       />
     </Dialog>
   );
+}
+
+function emptyState({ userId }: { userId?: string } = {}): ProposalPageAndPropertiesInput {
+  return {
+    authors: userId ? [userId] : [],
+    categoryId: null,
+    content: null,
+    contentText: '',
+    headerImage: null,
+    icon: null,
+    evaluationType: 'vote',
+    proposalTemplateId: null,
+    reviewers: [],
+    rubricCriteria: [],
+    title: ''
+  };
 }

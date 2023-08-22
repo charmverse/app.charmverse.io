@@ -1,9 +1,10 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -101,6 +102,35 @@ type SubscribeToWorkspace = {
   } & SocketAuthResponse;
 };
 
+type PageDeleted = {
+  type: 'page_deleted';
+  payload: Resource;
+};
+
+type PageRestored = {
+  type: 'page_restored';
+  payload: Resource;
+};
+
+export type PageCreated = {
+  type: 'page_created';
+  payload: Partial<Prisma.PageUncheckedCreateInput> &
+    Pick<
+      Prisma.PageUncheckedCreateInput,
+      'boardId' | 'content' | 'contentText' | 'path' | 'title' | 'type' | 'spaceId'
+    >;
+};
+
+type PageReordered = {
+  type: 'page_reordered';
+  payload: {
+    pageId: string;
+    currentParentId: string | null;
+    newParentId: string | null;
+    newIndex: number;
+  };
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -109,7 +139,29 @@ type SpaceSubscriptionUpdated = {
   };
 };
 
-export type ClientMessage = SubscribeToWorkspace;
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+    failedImports: FailedImportsError[];
+  };
+};
+
+type ThreadsUpdated = {
+  type: 'threads_updated';
+  payload: {
+    threadId: string;
+    pageId: string;
+  };
+};
+
+type PagesRestored = {
+  type: 'pages_restored';
+  payload: Resource[];
+};
+
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
 
 export type ServerMessage =
   | BlocksUpdated
@@ -125,7 +177,10 @@ export type ServerMessage =
   | PostPublished
   | PostUpdated
   | PostDeleted
-  | SpaceSubscriptionUpdated;
+  | ThreadsUpdated
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted
+  | PagesRestored;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

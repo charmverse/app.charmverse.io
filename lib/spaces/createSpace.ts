@@ -5,6 +5,7 @@ import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
@@ -14,8 +15,9 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { communityProduct } from 'lib/subscription/constants';
+import { communityProduct, defaultFreeTrialBlockQuota } from 'lib/subscription/constants';
 import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -96,6 +98,9 @@ export async function createWorkspace({
       webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
+      blockQuota: defaultFreeTrialBlockQuota,
+      memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
+      features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -240,7 +245,7 @@ export async function createWorkspace({
       spaceId: space.id,
       name: spaceData.name,
       freeTrial: true,
-      blockQuota: 30
+      blockQuota: defaultFreeTrialBlockQuota
     });
   } catch (err) {
     log.error('Error creating pro subscription', {

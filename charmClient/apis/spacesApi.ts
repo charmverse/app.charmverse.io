@@ -5,7 +5,6 @@ import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
-import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
@@ -23,10 +22,6 @@ export class SpacesApi {
 
   searchByName(search: string) {
     return http.GET<SpaceWithGates[]>('/api/spaces/search-name', { search });
-  }
-
-  setHiddenFeatures({ hiddenFeatures, spaceId }: SpaceHiddenFeatures) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-hidden-features`, { hiddenFeatures });
   }
 
   setPublicProposals({ publicProposals, spaceId }: SpacePublicProposalToggle): Promise<Space> {
@@ -100,5 +95,9 @@ export class SpacesApi {
 
   verifyCustomDomain(spaceId: string) {
     return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
+  }
+
+  getCollablandCode(spaceId: string) {
+    return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
   }
 }

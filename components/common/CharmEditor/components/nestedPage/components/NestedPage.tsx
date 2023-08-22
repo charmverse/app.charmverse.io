@@ -1,4 +1,5 @@
 import type { NodeViewProps } from '@bangle.dev/core';
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
@@ -10,6 +11,8 @@ import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/ut
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+
+import { enableDragAndDrop } from '../../../utils';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -40,8 +43,9 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
-export default function NestedPage({ node, currentPageId }: NodeViewProps & { currentPageId?: string }) {
+export default function NestedPage({ node, currentPageId, getPos }: NodeViewProps & { currentPageId?: string }) {
   const { space } = useCurrentSpace();
+  const view = useEditorViewContext();
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const documentPage = pages[node.attrs.id];
@@ -71,6 +75,10 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
       data-id={`page-${pageId}`}
       data-title={pageTitle}
       data-path={fullPath}
+      onDragStart={() => {
+        const nodePos = getPos();
+        enableDragAndDrop(view, nodePos);
+      }}
       data-type={node.attrs.type}
     >
       <div>
@@ -81,7 +89,7 @@ export default function NestedPage({ node, currentPageId }: NodeViewProps & { cu
           isCategoryPage={!!forumCategoryPage}
         />
       </div>
-      <StyledTypography>{(pageTitle ? pageTitle || 'Untitled' : null) || 'No access'}</StyledTypography>
+      <StyledTypography>{typeof pageTitle === 'string' ? pageTitle || 'Untitled' : 'No access'}</StyledTypography>
     </NestedPageContainer>
   );
 }

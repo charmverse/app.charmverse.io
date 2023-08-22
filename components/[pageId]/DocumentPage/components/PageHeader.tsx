@@ -11,11 +11,11 @@ import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIc
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
-import { PageHeaderIcon } from './PageHeaderIcon';
 import { PageTitleInput } from './PageTitleInput';
 
 const PageControlItem = styled(ListItemButton)`
@@ -54,16 +54,19 @@ const EditorHeader = styled.div`
   }
 `;
 
-interface PageHeaderProps {
+type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+
+type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
-  setPage: (p: Partial<Page>) => void;
+  setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
-}
+  readOnlyTitle?: boolean;
+};
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
+function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readOnlyTitle }: PageHeaderProps) {
   function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
@@ -102,8 +105,8 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
                     }}
                   />
                   <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
-                    <PageHeaderIcon
-                      updatePageIcon={(emoji) => {
+                    <CustomEmojiPicker
+                      onUpdate={(emoji) => {
                         updatePageIcon(emoji);
                       }}
                     />
@@ -136,9 +139,21 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
           )}
         </Controls>
       </EditorHeader>
-      <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageTitleInput readOnly={readOnly || readOnlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>
   );
+}
+export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+  let pageTop = 100;
+  if (headerImage) {
+    pageTop = 50;
+    if (icon) {
+      pageTop = 80;
+    }
+  } else if (icon) {
+    pageTop = 200;
+  }
+  return pageTop;
 }
 
 export default memo(PageHeader);

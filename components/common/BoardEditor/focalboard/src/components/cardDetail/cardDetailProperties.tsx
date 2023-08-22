@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -7,6 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -27,6 +29,7 @@ import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
   board: Board;
+  syncWithPageId?: string | null;
   card: Card;
   cards: Card[];
   activeView?: BoardView;
@@ -66,8 +69,10 @@ function CardDetailProperty({
   pageUpdatedBy,
   pageUpdatedAt,
   deleteDisabledMessage,
-  onDrop
+  onDrop,
+  syncWithPageId
 }: {
+  syncWithPageId?: string | null;
   readOnly: boolean;
   property: IPropertyTemplate;
   card: Card;
@@ -97,11 +102,7 @@ function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {readOnly && (
-        <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>{property.name}</Button>
-        </div>
-      )}
+      {readOnly && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
       {!readOnly && (
         <Box>
           <PropertyNameContainer
@@ -130,6 +131,7 @@ function CardDetailProperty({
       )}
       <PropertyValueElement
         readOnly={readOnly}
+        syncWithPageId={syncWithPageId}
         card={card}
         board={board}
         updatedAt={pageUpdatedAt}
@@ -143,7 +145,7 @@ function CardDetailProperty({
 }
 
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
+  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, syncWithPageId } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -355,6 +357,7 @@ function CardDetailProperties(props: Props) {
       {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
+            syncWithPageId={syncWithPageId}
             onDrop={onDrop}
             key={propertyTemplate.id}
             board={board}

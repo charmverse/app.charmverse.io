@@ -6,6 +6,16 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
+export const proposalPropertyTypesList = [
+  'proposalUrl',
+  'proposalStatus',
+  'proposalCategory',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal',
+  'proposalEvaluationAverage'
+] as const;
+export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
+
 export type PropertyType =
   | 'text'
   | 'number'
@@ -16,28 +26,46 @@ export type PropertyType =
   | 'file'
   | 'checkbox'
   | 'url'
-  | 'proposalUrl'
   | 'email'
   | 'phone'
   | 'createdTime'
   | 'createdBy'
   | 'updatedTime'
-  | 'updatedBy';
+  | 'updatedBy'
+  | DatabaseProposalPropertyType;
 
-interface IPropertyOption {
-  id: string;
+export const propertyTypesList: PropertyType[] = [
+  'text',
+  'number',
+  'email',
+  'phone',
+  'url',
+  'select',
+  'multiSelect',
+  'date',
+  'person',
+  'checkbox',
+  'createdTime',
+  'createdBy',
+  'updatedTime',
+  'updatedBy',
+  ...proposalPropertyTypesList
+];
+
+interface IPropertyOption<T = string> {
+  id: T;
   value: string;
   color: string;
 }
 
 // A template for card properties attached to a board
-interface IPropertyTemplate<T extends PropertyType = PropertyType> {
+export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   id: string;
   name: string;
   type: T;
   options: IPropertyOption[];
   description?: string;
-}
+};
 
 export type BoardFields = {
   icon: string;
@@ -117,4 +145,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, BoardGroup };

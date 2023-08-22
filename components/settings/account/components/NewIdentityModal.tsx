@@ -43,7 +43,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
-  const isUserWalletActive = user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
+  const isUserWalletActive = !!user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
   const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
 
@@ -124,7 +124,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   return (
     <Modal
       open={isOpen}
-      onClose={isUserWalletActive ? close : undefined}
+      onClose={!isUserWalletActive && identityToAdd === 'wallet' && !!account ? undefined : close}
       title={!identityToAdd ? 'Add an account' : modalTitles[identityToAdd]}
       aria-labelledby='Conect an account modal'
       size='600px'

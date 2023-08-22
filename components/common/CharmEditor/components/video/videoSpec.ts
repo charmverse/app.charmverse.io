@@ -56,6 +56,7 @@ export function spec(): RawSpecs {
           default: []
         }
       },
+      draggable: true,
       parseDOM: [
         {
           tag: 'charm-video',

@@ -51,7 +51,12 @@ const StyledButton = styled(Button)`
   }
 `;
 
-export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
+type Props = {
+  redirectUrl?: string;
+  showSignup: boolean;
+};
+
+export function LoginButton({ redirectUrl, showSignup }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3AuthSig();
 
@@ -73,10 +78,23 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       justifyContent={{ xs: 'center', md: 'flex-start' }}
       py={{ xs: 2, md: 0 }}
     >
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' color='primary'>
-        Sign up
-      </StyledButton>
-      <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>
+      {showSignup && (
+        <StyledButton
+          size='large'
+          onClick={handleClickOpen}
+          data-test='universal-connect-button'
+          color='primary'
+          disableElevation={false}
+        >
+          Sign up
+        </StyledButton>
+      )}
+      <StyledButton
+        color={!showSignup ? 'primary' : 'secondary'}
+        size='large'
+        onClick={handleClickOpen}
+        variant='outlined'
+      >
         Sign in
       </StyledButton>
       <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />

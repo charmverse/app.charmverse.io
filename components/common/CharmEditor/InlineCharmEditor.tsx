@@ -95,8 +95,7 @@ export function charmEditorPlugins({
     }),
     floatingMenu.plugins({
       key: floatingMenuPluginKey,
-      readOnly,
-      enableComments: false
+      readOnly
     }),
     tabIndent.plugins()
   ];

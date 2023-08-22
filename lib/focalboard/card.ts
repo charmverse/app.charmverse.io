@@ -6,7 +6,7 @@ import { createBlock } from 'lib/focalboard/block';
 export type CardFields = {
   icon?: string;
   isTemplate?: boolean;
-  properties: Record<string, string | string[]>;
+  properties: Record<string, string | string[] | number>;
   contentOrder: (string | string[])[];
 };
 

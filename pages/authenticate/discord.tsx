@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import { useEffect } from 'react';
 
-import getLayout from 'components/common/BaseLayout/BaseLayout';
+import { getLayout } from 'components/common/BaseLayout/getLayout';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { OauthLoginState } from 'lib/oauth/interfaces';
 

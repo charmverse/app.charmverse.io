@@ -32,7 +32,7 @@ import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
-import PageHeader from './components/PageHeader';
+import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
@@ -111,12 +111,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
   }, [printRef, _printRef]);
 
-  const cannotComment = readOnly || !pagePermissions.comment;
-
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
-
-  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
-
   const card = useAppSelector((state) => {
     if (page.cardId) {
       return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
@@ -145,29 +139,30 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const activeView = boardViews[0];
 
-  let pageTop = 100;
-  if (page.headerImage) {
-    pageTop = 50;
-    if (page.icon) {
-      pageTop = 80;
-    }
-  } else if (page.icon) {
-    pageTop = 200;
-  }
+  const pageTop = getPageTop(page);
 
   const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
 
-  const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
-  function onParticipantUpdate(participants: FrontendParticipant[]) {
-    setPageProps({ participants });
-  }
+  const cannotComment = readOnly || !pagePermissions.comment;
+
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
+  const isPageTemplate = page.type.includes('template');
+  const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
+  const showPageActionSidebar =
+    currentPageActionDisplay !== null && !insideModal && (currentPageActionDisplay !== 'comments' || enableComments);
+
+  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+
+  function onParticipantUpdate(participants: FrontendParticipant[]) {
+    setPageProps({ participants });
+  }
 
   function onConnectionError(error: Error) {
     setConnectionError(error);
@@ -182,7 +177,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     <>
       {!!page?.deletedAt && (
         <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
-          <PageDeleteBanner pageId={page.id} />
+          <PageDeleteBanner pageType={page.type} pageId={page.id} />
         </StyledBannerContainer>
       )}
       {connectionError && (
@@ -224,13 +219,14 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   }
                   key={editorKey}
                   content={page.content as PageContent}
-                  readOnly={readOnly}
+                  readOnly={readOnly || !!page.syncWithPageId}
                   autoFocus={false}
                   pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
                   pageId={page.id}
                   disablePageSpecificFeatures={isSharedPage}
                   enableSuggestingMode={enableSuggestingMode}
                   enableVoting={page.type !== 'proposal'}
+                  enableComments={enableComments}
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
@@ -252,6 +248,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     updatedAt={page.updatedAt.toString()}
                     readOnly={readOnly || !!enableSuggestingMode}
                     setPage={savePage}
+                    readOnlyTitle={!!page.syncWithPageId}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                     <Box my={2} className='font-family-default'>
@@ -278,6 +275,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       {card && board && (
                         <>
                           <CardDetailProperties
+                            syncWithPageId={page.syncWithPageId}
                             board={board}
                             card={card}
                             cards={cards}
@@ -299,6 +297,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
+                          title={page.title}
                         />
                       )}
                       {(draftBounty || page.bountyId) && (

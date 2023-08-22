@@ -13,8 +13,8 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
-import { ProposalsTable } from './components/ProposalsTable';
-import { ProposalsViewOptions } from './components/ProposalsViewOptions';
+import { ProposalsTable } from './components/ProposalsTable/ProposalsTable';
+import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
@@ -103,14 +103,14 @@ export function ProposalsPage() {
 
           {loadingData ? (
             <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent isLoading size={50} />
+              <LoadingComponent height={500} isLoading size={50} />
             </Grid>
           ) : (
             <Grid item xs={12} sx={{ mt: 5 }}>
               {proposals?.length === 0 && (
                 <EmptyStateVideo
                   description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with Charmverse'
+                  videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}

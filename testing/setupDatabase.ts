@@ -11,6 +11,7 @@ import type {
   Post,
   PostComment,
   ProposalStatus,
+  ProposalEvaluationType,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -21,18 +22,21 @@ import type {
   WorkspaceEvent
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { ViewSourceType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -43,8 +47,6 @@ import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
-
-type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function generateSpaceUser({
   spaceId,
@@ -825,7 +827,9 @@ export async function createProposalWithUsers({
         include: {
           authors: true,
           reviewers: true,
-          category: true
+          category: true,
+          rubricAnswers: true,
+          rubricCriteria: true
         }
       }
     }
@@ -937,6 +941,7 @@ export async function generateProposal({
   userId,
   spaceId,
   proposalStatus,
+  evaluationType,
   authors,
   reviewers,
   deletedAt = null,
@@ -949,6 +954,7 @@ export async function generateProposal({
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalStatus: ProposalStatus;
+  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
@@ -997,6 +1003,7 @@ export async function generateProposal({
           category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
+          evaluationType,
           status: proposalStatus,
           space: {
             connect: {
@@ -1056,14 +1063,18 @@ export async function generateBoard({
   parentId,
   cardCount,
   views,
-  addPageContent
+  addPageContent,
+  viewDataSource,
+  boardPageType
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
   views?: number;
+  viewDataSource?: ViewSourceType;
   addPageContent?: boolean;
+  boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1071,7 +1082,9 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
-    addPageContent
+    addPageContent,
+    viewDataSource,
+    boardPageType
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

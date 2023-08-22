@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -17,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -183,6 +185,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
             isLoadingRef.current = false;
+          },
+          onCommentUpdate: () => {
+            mutate(getThreadsKey(pageId));
           },
           onParticipantUpdate
         });

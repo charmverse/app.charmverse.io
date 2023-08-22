@@ -30,6 +30,7 @@ type Props = {
   dateDisplayProperty?: IPropertyTemplate;
   showCard: (cardId: string) => void;
   addCard: (properties: Record<string, string>) => void;
+  disableAddingCards?: boolean;
 };
 
 const timeZoneOffset = (date: number): number => {
@@ -147,20 +148,25 @@ function CalendarFullView(props: Props): JSX.Element | null {
             {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
           </div>
         </div>
-        {visiblePropertyTemplates.map((template) => (
-          <PropertyValueElement
-            board={board}
-            key={template.id}
-            readOnly={true}
-            card={cards.find((o) => o.id === event.id) || cards[0]}
-            updatedAt={page?.updatedAt.toString() ?? ''}
-            updatedBy={page?.updatedBy ?? ''}
-            propertyTemplate={template}
-            showEmptyPlaceholder={true}
-            showTooltip
-            displayType='calendar'
-          />
-        ))}
+        {visiblePropertyTemplates.map((template) => {
+          const card = cards.find((o) => o.id === event.id) || cards[0];
+
+          return (
+            <PropertyValueElement
+              board={board}
+              syncWithPageId={page?.syncWithPageId}
+              key={template.id}
+              readOnly={true}
+              card={card}
+              updatedAt={page?.updatedAt.toString() ?? ''}
+              updatedBy={page?.updatedBy ?? ''}
+              propertyTemplate={template}
+              showEmptyPlaceholder={true}
+              showTooltip
+              displayType='calendar'
+            />
+          );
+        })}
       </div>
     );
   };
@@ -238,9 +244,13 @@ function CalendarFullView(props: Props): JSX.Element | null {
     (args: DayCellContentArg): JSX.Element | null => {
       return (
         <div className='dateContainer'>
-          <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
-            +
-          </div>
+          {props.readOnly || props.disableAddingCards ? (
+            <div></div>
+          ) : (
+            <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
+              +
+            </div>
+          )}
           <div className='dateDisplay'>{args.dayNumberText}</div>
         </div>
       );

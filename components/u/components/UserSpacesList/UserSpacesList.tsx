@@ -62,7 +62,7 @@ export function UserSpacesList({ userId }: Props) {
 
   return (
     <Box mt={2} mb={2}>
-      <Legend noBorder>My Charmverse Spaces</Legend>
+      <Legend noBorder>My CharmVerse Spaces</Legend>
       <LoadingComponent minHeight={100} isLoading={isLoading} />
       {propertyValues.map((pv) => (
         <UserSpaceListItem

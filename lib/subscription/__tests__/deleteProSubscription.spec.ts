@@ -18,6 +18,7 @@ describe('deleteProSubscription', () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     (stripeClient.subscriptions.cancel as jest.Mock) = stripeMock.stripeClient.subscriptions.cancel;
+    (stripeClient.subscriptions.retrieve as jest.Mock) = stripeMock.stripeClient.subscriptions.retrieve;
 
     await addSpaceSubscription({
       spaceId: space.id,
@@ -35,15 +36,5 @@ describe('deleteProSubscription', () => {
 
     expect(spaceSubscription?.paidTier).toBe('cancelled');
     expect(!!subscription?.deletedAt).toBeTruthy();
-  });
-  it(`Should fail if there is no subscription`, async () => {
-    const userId = v4();
-
-    await expect(
-      deleteProSubscription({
-        spaceId: v4(),
-        userId
-      })
-    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });

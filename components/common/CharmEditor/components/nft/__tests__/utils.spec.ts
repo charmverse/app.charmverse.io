@@ -48,8 +48,8 @@ describe('NFT Utils', () => {
       }
     },
     {
-      // ignores an unrecognized network (ex: avalanche)
-      url: 'https://opensea.io/assets/avalanche/0xe35587bd1985c98173ce7b6ab6fc0f9ae3a53e79/3816',
+      // ignores an unrecognized network (ex: klaytn)
+      url: 'https://opensea.io/assets/klaytn/0xe35587bd1985c98173ce7b6ab6fc0f9ae3a53e79/3816',
       result: null
     }
   ];
@@ -81,7 +81,7 @@ describe('NFT Utils', () => {
     },
     {
       // arbitrum
-      url: 'https://stratosnft.io/assets/0xebba467ecb6b21239178033189ceae27ca12eadf/77',
+      url: 'https://opensea.io/assets/arbitrum/0xebba467ecb6b21239178033189ceae27ca12eadf/77',
       nft: {
         chain: 42161,
         contract: '0xebba467ecb6b21239178033189ceae27ca12eadf',

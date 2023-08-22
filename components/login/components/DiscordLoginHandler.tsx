@@ -6,7 +6,7 @@ import Link from 'components/common/Link';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 type Props = {
   redirectUrl?: string;

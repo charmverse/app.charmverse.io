@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
@@ -7,7 +8,6 @@ import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
@@ -27,6 +27,7 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
@@ -149,8 +150,9 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
       setIsOldBuild(true);
+      log.info('Requested user to refresh their browser to get new version');
     }
   }, 180000);
 
@@ -233,25 +235,27 @@ function DataProviders({ children }: { children: ReactNode }) {
             <Web3ConnectionManager>
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <PostCategoriesProvider>
-                    <IsSpaceMemberProvider>
-                      <WebSocketClientProvider>
-                        <MembersProvider>
-                          <BountiesProvider>
-                            <PaymentMethodsProvider>
-                              <PagesProvider>
-                                <MemberPropertiesProvider>
-                                  <UserProfileProvider>
-                                    <PageTitleProvider>{children}</PageTitleProvider>
-                                  </UserProfileProvider>
-                                </MemberPropertiesProvider>
-                              </PagesProvider>
-                            </PaymentMethodsProvider>
-                          </BountiesProvider>
-                        </MembersProvider>
-                      </WebSocketClientProvider>
-                    </IsSpaceMemberProvider>
-                  </PostCategoriesProvider>
+                  <CurrentSpaceProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <PaymentMethodsProvider>
+                                <PagesProvider>
+                                  <MemberPropertiesProvider>
+                                    <UserProfileProvider>
+                                      <PageTitleProvider>{children}</PageTitleProvider>
+                                    </UserProfileProvider>
+                                  </MemberPropertiesProvider>
+                                </PagesProvider>
+                              </PaymentMethodsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
+                  </CurrentSpaceProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>

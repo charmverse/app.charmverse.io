@@ -1,3 +1,4 @@
+import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
@@ -19,7 +20,7 @@ export function SubscriptionActions({
 }: {
   spaceSubscription: SpaceSubscriptionWithStripeData | null | undefined;
   loading: boolean;
-  paidTier: string;
+  paidTier: SubscriptionTier;
   onCancelAtEnd: () => void;
   onReactivation: () => void;
   onUpgrade: () => void;
@@ -50,7 +51,7 @@ export function SubscriptionActions({
           Reactivate Plan
         </Button>
       )}
-      {(spaceSubscription?.status === 'active' || spaceSubscription?.status === 'cancelled') && (
+      {spaceSubscription?.status === 'active' && (
         <>
           <Button disabled={loading} onClick={onUpgrade}>
             Update Plan
@@ -66,7 +67,10 @@ export function SubscriptionActions({
           />
         </>
       )}
-      {(paidTier === 'cancelled' || spaceSubscription?.status === 'cancel_at_end') && (
+      {(paidTier === 'cancelled' ||
+        spaceSubscription?.status === 'cancel_at_end' ||
+        spaceSubscription?.status === 'past_due' ||
+        spaceSubscription?.status === 'unpaid') && (
         <>
           <Button disabled={loading} onClick={openConfirmFreeTierDowngradeDialog} variant='outlined'>
             Use free plan

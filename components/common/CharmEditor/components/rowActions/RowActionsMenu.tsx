@@ -23,9 +23,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utilities/browser';
 
-import { nodeViewUpdateStore } from '../@bangle.dev/react/node-view-helpers';
-
-import type { PluginState } from './rowActions';
+import { getNodeForRowPosition, type PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -45,61 +43,8 @@ function Component({ menuState }: { menuState: PluginState }) {
   const { space: currentSpace } = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
-  function _getNode() {
-    if (menuState.rowPos === undefined) {
-      return null;
-    }
-
-    // calculate the node at the mouse position. do it on click in case the content has changed
-    let topPos = view.state.doc.resolve(menuState.rowPos);
-    while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
-      const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
-      topPos = view.state.doc.resolve(parentOffset);
-    }
-
-    // console.log('Position of row', topPos, { node: topPos.node() });
-
-    let pmNode = topPos.node();
-    // handle top-level children, where pmNode === doc
-    if (menuState.rowNodeOffset && menuState.rowNodeOffset > 0) {
-      const child = pmNode.maybeChild(menuState.rowNodeOffset);
-      pmNode = child || pmNode;
-    }
-
-    const nodeStart = topPos.pos;
-    const firstChild = pmNode.type.name === 'doc' ? pmNode.firstChild : null;
-    const nodeSize =
-      pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : firstChild?.content.size ?? pmNode.content.size;
-    // nodeSize includes the start and end tokens, so we need to subtract 1
-    // for images, nodeSize is 0
-    let nodeEnd = nodeStart + (nodeSize > 0 ? nodeSize - 1 : 0);
-    if (nodeEnd === nodeStart) {
-      nodeEnd = nodeStart + 1;
-    }
-
-    // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
-    if (nodeEnd > view.state.doc.content.size) {
-      nodeEnd = view.state.doc.content.size;
-    }
-
-    log.debug('Row meta', {
-      child: firstChild?.content.size,
-      nodeStart,
-      topPos: topPos.pos,
-      pmNode,
-      nodeEnd,
-      nodeSize
-    });
-
-    return {
-      node: pmNode,
-      nodeEnd,
-      nodeStart
-    };
-  }
-
   function deleteRow() {
-    const node = _getNode();
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
     if (node) {
       let start = node.nodeStart;
       let end = node.nodeEnd;
@@ -107,7 +52,7 @@ function Component({ menuState }: { menuState: PluginState }) {
       if (start === 1) {
         start = 0;
         end -= 1;
-      } else if (node.node.type.name === 'disclosureDetails') {
+      } else if (node.node.type.name === 'disclosureDetails' || node.node.type.name === 'blockquote') {
         // This removes disclosureSummary node
         start -= 2;
       }
@@ -127,7 +72,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   }
 
   async function duplicateRow() {
-    const node = _getNode();
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
     const tr = view.state.tr;
     if (node?.node.type.name === 'page') {
       if (currentSpace && node.node.attrs.id) {
@@ -160,7 +105,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   }
 
   function addNewRow(e: MouseEvent) {
-    const node = _getNode();
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
     if (!node) {
       log.warn('no node identified to add new row');
       return;

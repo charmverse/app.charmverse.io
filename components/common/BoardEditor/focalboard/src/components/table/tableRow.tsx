@@ -15,12 +15,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../../components/properties/TextInput';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -43,6 +43,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
+  readOnlyTitle?: boolean;
 };
 
 export const columnWidth = (
@@ -132,7 +133,7 @@ function TableRow(props: Props) {
     onChange: (newTitle: string) => setTitle(newTitle),
     onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
     onCancel: () => setTitle(card.title || ''),
-    readOnly: props.readOnly,
+    readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
 
@@ -202,6 +203,7 @@ function TableRow(props: Props) {
             )}
             <PropertyValueElement
               readOnly={props.readOnly}
+              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               board={board}
               showEmptyPlaceholder={false}

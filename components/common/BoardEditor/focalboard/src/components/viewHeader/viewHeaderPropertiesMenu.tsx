@@ -30,12 +30,17 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
       return <AttachFileIcon fontSize='small' {...props} />;
     case 'multiSelect':
       return <ListIcon fontSize='small' {...props} />;
+    case 'proposalEvaluationAverage':
+    case 'proposalEvaluationTotal':
     case 'number':
       return <NumbersIcon fontSize='small' {...props} />;
     case 'person':
+    case 'proposalEvaluatedBy':
       return <PersonIcon fontSize='small' {...props} />;
     case 'phone':
       return <PhoneIcon fontSize='small' {...props} />;
+    case 'proposalCategory':
+    case 'proposalStatus':
     case 'select':
       return <FormatListBulletedIcon fontSize='small' {...props} />;
     case 'text':
@@ -45,7 +50,6 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'updatedTime':
       return <AccessTimeIcon fontSize='small' {...props} />;
     case 'url':
-      return <LinkIcon fontSize='small' {...props} />;
     case 'proposalUrl':
       return <LinkIcon fontSize='small' {...props} />;
     default:

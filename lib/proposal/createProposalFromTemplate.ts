@@ -30,15 +30,18 @@ export async function createProposalFromTemplate({
   return createProposal({
     pageProps: {
       title,
-      contentText: proposalTemplate?.contentText ?? '',
-      content: proposalTemplate?.content as Prisma.JsonValue
+      contentText: proposalTemplate.contentText ?? '',
+      content: proposalTemplate.content as Prisma.JsonValue,
+      sourceTemplateId: templateId
     },
+    evaluationType: proposalTemplate.proposal.evaluationType,
     userId: createdBy,
     spaceId,
-    categoryId: proposalTemplate.proposal?.categoryId as string,
-    reviewers: proposalTemplate.proposal?.reviewers.map((reviewer) => ({
+    categoryId: proposalTemplate.proposal.categoryId as string,
+    reviewers: proposalTemplate.proposal.reviewers.map((reviewer) => ({
       group: reviewer.roleId ? 'role' : 'user',
       id: (reviewer.roleId ?? reviewer.userId) as string
-    }))
+    })),
+    rubricCriteria: proposalTemplate.proposal.rubricCriteria.map(({ id, ...criteria }) => criteria)
   });
 }

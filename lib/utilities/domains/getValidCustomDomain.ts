@@ -2,6 +2,10 @@ import { getValidDefaultHost } from 'lib/utilities/domains/getValidDefaultHost';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 export function getValidCustomDomain(host?: string | null) {
+  if (process.env.DISABLE_SUBDOMAINS === 'true') {
+    return null;
+  }
+
   if (!host && typeof window !== 'undefined') {
     // On client side, get the host from window
     host = window.location.host;
