@@ -3,8 +3,8 @@ import { Wallet } from 'ethers';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
+import { lensClient } from '../../lens/lensClient';
 import { getDefaultLensProfile } from '../getDefaultLensProfile';
-import { lensClient } from '../lensClient';
 
 jest.mock('../lensClient', () => ({
   lensClient: {
