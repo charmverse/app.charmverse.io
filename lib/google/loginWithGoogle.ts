@@ -67,7 +67,7 @@ export async function loginWithGoogle({
       throw new DisabledAccountError(`This account has been disabled`);
     }
 
-    if (!user && verifiedEmail) {
+    if (!matchedUser && verifiedEmail) {
       await prisma.googleAccount.create({
         data: {
           avatarUrl,
@@ -77,7 +77,7 @@ export async function loginWithGoogle({
         }
       });
       user = verifiedEmail.user;
-    } else if (!user) {
+    } else if (!matchedUser) {
       user = await prisma.user.create({
         data: {
           username: email,
@@ -105,13 +105,16 @@ export async function loginWithGoogle({
       });
     }
 
-    trackUserAction('sign_in', { userId: user.id, identityType: 'Google' });
+    trackUserAction('sign_in', { userId: (user as LoggedInUser).id, identityType: 'Google' });
 
-    const updatedUser = await getUserProfile('id', user.id);
+    const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 
     updateTrackUserProfile(updatedUser);
 
-    log.info(`User ${user.id} logged in with Google`, { userId: user.id, method: 'google' });
+    log.info(`User ${(user as LoggedInUser).id} logged in with Google`, {
+      userId: (user as LoggedInUser).id,
+      method: 'google'
+    });
 
     return updatedUser;
   } catch (err) {

@@ -81,24 +81,18 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       include: sessionUserRelations
     });
   } else {
-    await prisma.user.update({
+    await prisma.verifiedEmail.update({
       where: {
-        id: user.id
+        email: verificationResult.email
       },
       data: {
-        verifiedEmails: {
-          create: {
-            email: verificationResult.email,
-            avatarUrl: magicLink.avatarUrl ?? verificationResult.picture ?? '',
-            name: verificationResult.name || verificationResult.email
-          }
-        }
-      },
-      include: sessionUserRelations
+        avatarUrl: magicLink.avatarUrl ?? verificationResult.picture ?? '',
+        name: verificationResult.name || verificationResult.email
+      }
     });
   }
 
-  const updatedUser = await getUserProfile('id', user.id);
+  const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 
   return {
     isNew: userWillBeCreated,
