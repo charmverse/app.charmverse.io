@@ -13,6 +13,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   secondaryButtonText?: string;
   onClose: () => void;
   disabled?: boolean;
+  hideCancelButton?: boolean;
 };
 
 export default function ModalWithButtons({
@@ -24,7 +25,8 @@ export default function ModalWithButtons({
   onConfirm,
   size,
   secondaryButtonText = 'Cancel',
-  disabled
+  disabled,
+  hideCancelButton
 }: Props) {
   async function _onConfirm() {
     await onConfirm();
@@ -49,10 +51,11 @@ export default function ModalWithButtons({
         >
           {buttonText}
         </Button>
-
-        <Button color='secondary' variant='outlined' onClick={onClose}>
-          {secondaryButtonText}
-        </Button>
+        {!hideCancelButton && (
+          <Button color='secondary' variant='outlined' onClick={onClose}>
+            {secondaryButtonText}
+          </Button>
+        )}
       </Box>
     </Modal>
   );
