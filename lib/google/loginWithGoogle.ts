@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
@@ -37,33 +38,46 @@ export async function loginWithGoogle({
       throw new InvalidInputError(`Email required to complete signup`);
     }
 
-    let user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          {
-            googleAccounts: {
-              some: {
-                email
-              }
-            }
-          },
-          {
-            verifiedEmails: {
-              some: {
-                email
-              }
+    const [matchedUser, verifiedEmail] = await Promise.all([
+      prisma.user.findFirst({
+        where: {
+          googleAccounts: {
+            some: {
+              email
             }
           }
-        ]
-      },
-      include: sessionUserRelations
-    });
+        },
+        include: sessionUserRelations
+      }),
+      prisma.verifiedEmail.findUnique({
+        where: {
+          email
+        },
+        include: {
+          user: {
+            include: sessionUserRelations
+          }
+        }
+      })
+    ]);
+
+    let user: LoggedInUser | null = matchedUser;
 
     if (user?.deletedAt) {
       throw new DisabledAccountError(`This account has been disabled`);
     }
 
-    if (!user) {
+    if (!user && verifiedEmail) {
+      await prisma.googleAccount.create({
+        data: {
+          avatarUrl,
+          email,
+          name: displayName,
+          user: { connect: { id: verifiedEmail.userId } }
+        }
+      });
+      user = verifiedEmail.user;
+    } else if (!user) {
       user = await prisma.user.create({
         data: {
           username: email,
@@ -80,17 +94,11 @@ export async function loginWithGoogle({
       });
       trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
     } else {
-      await prisma.googleAccount.upsert({
+      await prisma.googleAccount.update({
         where: {
           email
         },
-        create: {
-          avatarUrl,
-          email,
-          name: displayName,
-          user: { connect: { id: user.id } }
-        },
-        update: {
+        data: {
           avatarUrl,
           name: displayName
         }
@@ -102,6 +110,8 @@ export async function loginWithGoogle({
     const updatedUser = await getUserProfile('id', user.id);
 
     updateTrackUserProfile(updatedUser);
+
+    log.info(`User ${user.id} logged in with Google`, { userId: user.id, method: 'google' });
 
     return updatedUser;
   } catch (err) {

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -26,6 +27,8 @@ async function verifyMagicLink(req: NextApiRequest, res: NextApiResponse<LoggedI
     updateTrackUserProfile(user);
     trackUserAction('sign_up', { userId: user.id, identityType: 'VerifiedEmail', ...signupAnalytics });
   }
+
+  log.info(`User ${user.id} logged in with Magic Link`, { userId: user.id, method: 'magic_link' });
 
   req.session.user = { id: user.id };
 

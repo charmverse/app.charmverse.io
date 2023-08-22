@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { firebaseApp } from 'lib/google/firebaseApp';
 import { sessionUserRelations } from 'lib/session/config';
+import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
 
 import type { LoginWithGoogleRequest } from './loginWithGoogle';
@@ -24,31 +25,44 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     throw new InvalidInputError(`No email found in verification result`);
   }
 
-  let user = await prisma.user.findFirst({
-    where: {
-      OR: [
-        {
-          googleAccounts: {
-            some: {
-              email: verificationResult.email
-            }
-          }
-        },
-        {
-          verifiedEmails: {
-            some: {
-              email: verificationResult.email
-            }
+  const [matchedUser, googleAccount] = await Promise.all([
+    prisma.user.findFirst({
+      where: {
+        verifiedEmails: {
+          some: {
+            email: verificationResult.email
           }
         }
-      ]
-    },
-    include: sessionUserRelations
-  });
+      },
+      include: sessionUserRelations
+    }),
+    prisma.googleAccount.findUnique({
+      where: {
+        email: verificationResult.email
+      },
+      include: {
+        user: {
+          include: sessionUserRelations
+        }
+      }
+    })
+  ]);
+
+  let user: LoggedInUser | null = matchedUser;
 
   let userWillBeCreated = false;
 
-  if (!user) {
+  if (!user && googleAccount) {
+    await prisma.verifiedEmail.create({
+      data: {
+        avatarUrl: magicLink.avatarUrl ?? verificationResult.picture ?? '',
+        email: verificationResult.email,
+        name: verificationResult.name || verificationResult.email,
+        user: { connect: { id: googleAccount.userId } }
+      }
+    });
+    user = googleAccount.user;
+  } else if (!user) {
     userWillBeCreated = true;
     user = await prisma.user.create({
       data: {
@@ -66,8 +80,8 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       },
       include: sessionUserRelations
     });
-  } else if (user && !user.verifiedEmails.some((verifiedEmail) => verifiedEmail.email === verificationResult.email)) {
-    user = await prisma.user.update({
+  } else {
+    await prisma.user.update({
       where: {
         id: user.id
       },
@@ -84,8 +98,10 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     });
   }
 
+  const updatedUser = await getUserProfile('id', user.id);
+
   return {
     isNew: userWillBeCreated,
-    user
+    user: updatedUser
   };
 }
