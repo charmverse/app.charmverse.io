@@ -11,10 +11,7 @@ import {
   useGetProposalDetails
 } from 'charmClient/hooks/proposals';
 import { useTasks } from 'components/nexus/hooks/useTasks';
-import type {
-  ProposalValues,
-  ProposalPropertiesValues
-} from 'components/proposals/components/ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -65,7 +62,7 @@ export function ProposalProperties({
   const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
 
-  const proposalFormInputs: ProposalValues = {
+  const proposalFormInputs: ProposalPropertiesInput = {
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
@@ -94,7 +91,7 @@ export function ProposalProperties({
     refreshProposal();
   }
 
-  async function onChangeRubricCriteria(rubricCriteria: ProposalValues['rubricCriteria']) {
+  async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
     // @ts-ignore TODO: unify types for rubricCriteria
     await upsertRubricCriteria({ rubricCriteria });
     if (proposal?.status === 'evaluation_active') {
@@ -102,7 +99,7 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeProperties(values: Partial<ProposalPropertiesValues>) {
+  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     if (proposal) {
       await charmClient.proposals.updateProposal({
         proposalId,

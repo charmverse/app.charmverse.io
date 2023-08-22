@@ -54,12 +54,14 @@ const EditorHeader = styled.div`
   }
 `;
 
+type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+
 type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
-  setPage: (p: Partial<Page>) => void;
+  setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
   readOnlyTitle?: boolean;
 };

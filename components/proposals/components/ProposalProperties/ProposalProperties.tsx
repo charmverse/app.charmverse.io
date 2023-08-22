@@ -35,7 +35,7 @@ import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
-export type ProposalPropertiesValues = {
+export type ProposalPropertiesInput = {
   contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
@@ -43,12 +43,6 @@ export type ProposalPropertiesValues = {
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
-};
-export type ProposalValues = ProposalPropertiesValues & {
-  title?: string; // title is saved to the same state that's used in ProposalPage
-  content?: PageContent | null;
-  contentText?: string;
-  headerImage?: string | null;
 };
 
 type ProposalPropertiesProps = {
@@ -61,7 +55,7 @@ type ProposalPropertiesProps = {
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
-  proposalFormInputs: ProposalPropertiesValues;
+  proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
   readOnlyReviewers?: boolean;
@@ -69,7 +63,7 @@ type ProposalPropertiesProps = {
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
-  setProposalFormInputs: (values: Partial<ProposalPropertiesValues>) => Promise<void> | void;
+  setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
