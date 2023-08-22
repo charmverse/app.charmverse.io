@@ -1,15 +1,12 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, Chip, Divider, Typography } from '@mui/material';
+import { Box, Chip, Divider, Stack, Tooltip, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import useSWR from 'swr';
 
 import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
+import { useSnapshotVoting } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
+import { SnapshotVotingForm } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { SnapshotProposal } from 'lib/snapshot';
-import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
-import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
 import { percent } from 'lib/utilities/numbers';
 
 import { VotesWrapper } from './VotesWrapper';
@@ -19,32 +16,42 @@ type Props = {
 };
 
 export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
-  const { account } = useWeb3AuthSig();
-  const { data: snapshotProposal } = useSWR<SnapshotProposal | null>(`/snapshotProposal/${snapshotProposalId}`, () =>
-    getSnapshotProposal(snapshotProposalId)
-  );
-  const { data: userVotes } = useSWR(account ? `snapshotUserVotes-${account}` : null, () =>
-    getUserProposalVotes({ walletAddress: account as string, snapshotProposalId })
-  );
+  const {
+    snapshotProposal,
+    userVotes,
+    votingPower,
+    isVotingActive,
+    remainingTime,
+    hasPassedDeadline,
+    proposalEndDate,
+    votingDisabledStatus,
+    castSnapshotVote
+  } = useSnapshotVoting({
+    snapshotProposalId
+  });
   const { formatDate } = useDateFormatter();
-
-  const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
-
   // Either the number of votes or tokens
 
   const voteChoices = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
 
-  const hasPassedDeadline = proposalEndDate < Date.now();
+  const flatUserChoices = (userVotes ?? []).reduce((acc, v) => {
+    if (typeof v.choice === 'number') {
+      acc.push(v.choice);
+    }
 
-  const currentUserChoices = (userVotes ?? []).map((v) => voteChoices[v.choice - 1]).join(',');
+    if (Array.isArray(v.choice)) {
+      v.choice.forEach((c) => acc.push(c));
+    }
 
-  const remainingTime = relativeTime(proposalEndDate);
+    return acc;
+  }, [] as number[]);
 
-  const needsYourVote = !hasPassedDeadline && !currentUserChoices && snapshotProposal?.state !== 'pending';
+  const currentUserChoices = flatUserChoices.map((v) => voteChoices[v - 1]).join(',');
 
   const isLoading = snapshotProposal === undefined;
   let statusText = 'Loading...';
+
   if (snapshotProposal) {
     if (snapshotProposal.state === 'pending') {
       statusText = 'Pending';
@@ -65,7 +72,6 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         justifyContent='space-between'
         gap={1}
         alignItems='center'
-        mb={2}
       >
         <Typography color='secondary' variant='subtitle1'>
           Status: {statusText}
@@ -73,17 +79,17 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         <Button
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
-          color={needsYourVote ? 'primary' : 'secondary'}
-          variant={needsYourVote ? 'contained' : 'outlined'}
+          color='secondary'
+          variant='outlined'
           external
           target='_blank'
           disabled={!snapshotProposal}
         >
-          {needsYourVote ? 'Vote' : 'View'} on Snapshot
+          View on Snapshot
         </Button>
       </Box>
 
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ mb: 1, mt: 2 }} />
 
       {!snapshotProposal && isLoading && <Loader isLoading={true} />}
 
@@ -91,23 +97,35 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
       {snapshotProposal && (
         <Box display='flex' flexDirection='column' gap={1}>
-          {voteChoices.map((voteOption, index) => (
-            <Box key={voteOption} display='flex' justifyContent='space-between'>
-              <Box gap={1} display='flex'>
-                {voteOption}
-                {currentUserChoices.includes(voteOption) && <Chip color='teal' size='small' label='Voted' />}
-              </Box>
-              <Typography variant='subtitle1' color='secondary'>
-                {!voteScores[index]
-                  ? 'No votes yet'
-                  : percent({
-                      value: voteScores[index],
-                      total: snapshotProposal.scores_total,
-                      significantDigits: 2
-                    })}
-              </Typography>
+          {isVotingActive ? (
+            <Box>
+              <Stack mb={1}>{votingDisabledStatus && <Alert severity='warning'>{votingDisabledStatus}</Alert>}</Stack>
+              <SnapshotVotingForm
+                snapshotProposal={snapshotProposal}
+                votingPower={votingPower}
+                userVotes={userVotes}
+                castVote={castSnapshotVote}
+              />
             </Box>
-          ))}
+          ) : (
+            voteChoices.map((voteOption, index) => (
+              <Box key={voteOption} display='flex' justifyContent='space-between'>
+                <Box gap={1} display='flex'>
+                  {voteOption}
+                  {currentUserChoices.includes(voteOption) && <Chip color='teal' size='small' label='Voted' />}
+                </Box>
+                <Typography variant='subtitle1' color='secondary'>
+                  {!voteScores[index]
+                    ? 'No votes yet'
+                    : percent({
+                        value: voteScores[index],
+                        total: snapshotProposal.scores_total,
+                        significantDigits: 2
+                      })}
+                </Typography>
+              </Box>
+            ))
+          )}
         </Box>
       )}
     </VotesWrapper>

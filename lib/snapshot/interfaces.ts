@@ -1,3 +1,5 @@
+import type { ProposalType, Vote } from '@snapshot-labs/snapshot.js/dist/sign/types';
+
 export interface SnapshotVotingStrategy {
   name: string;
   network: string;
@@ -5,17 +7,14 @@ export interface SnapshotVotingStrategy {
 }
 
 // Comes from snapshot.js https://github.com/snapshot-labs/snapshot/blob/fd1f2ba15543583861df750b0958d1794cc625bb/src/components/Modal/VotingType.vue
-export const SnapshotVotingMode = {
+export const SnapshotVotingMode: Record<ProposalType, string> = {
   'single-choice': 'Single choice',
   approval: 'Approval',
   'ranked-choice': 'Ranked choice',
   quadratic: 'Quadratic',
   weighted: 'Weighted',
-  custom: 'Custom',
   basic: 'Basic'
 };
-
-export type SnapshotVotingModeType = keyof typeof SnapshotVotingMode;
 
 /**
  * @id the actual snapshot domain
@@ -41,7 +40,7 @@ export interface SnapshotSpace {
     // Number of seconds proposals are active for
     period: number | null;
     delay: number | null;
-    type: SnapshotVotingModeType | null;
+    type: ProposalType | null;
   };
 }
 
@@ -62,6 +61,7 @@ export interface SnapshotProposal {
   // List of numbers in same order as the scores
   scores: number[];
   scores_total: number;
+  type: ProposalType;
 }
 
 export interface SnapshotReceipt {
@@ -72,3 +72,5 @@ export interface SnapshotReceipt {
     receipt: string;
   };
 }
+
+export type VoteChoice = Vote['choice'];

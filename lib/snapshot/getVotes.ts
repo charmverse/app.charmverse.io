@@ -1,12 +1,14 @@
 import { gql } from '@apollo/client';
 
+import type { VoteChoice } from 'lib/snapshot/interfaces';
+
 import client from './graphql-client';
 
 export type SnapshotVote = {
   id: string;
   voter: string;
   created: number;
-  choice: 1;
+  choice: VoteChoice;
   vp: number;
 };
 
