@@ -80,7 +80,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
           color='secondary'
-          variant='outlined'
+          variant='text'
           external
           target='_blank'
           disabled={!snapshotProposal}
@@ -89,7 +89,7 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         </Button>
       </Box>
 
-      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Divider sx={{ mb: 1, mt: 1 }} />
 
       {!snapshotProposal && isLoading && <Loader isLoading={true} />}
 
