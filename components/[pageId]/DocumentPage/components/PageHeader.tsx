@@ -143,5 +143,17 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
     </>
   );
 }
+export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+  let pageTop = 100;
+  if (headerImage) {
+    pageTop = 50;
+    if (icon) {
+      pageTop = 80;
+    }
+  } else if (icon) {
+    pageTop = 200;
+  }
+  return pageTop;
+}
 
 export default memo(PageHeader);

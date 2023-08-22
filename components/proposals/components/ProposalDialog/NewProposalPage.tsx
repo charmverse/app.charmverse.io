@@ -6,7 +6,8 @@ import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
-import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
+import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -101,7 +102,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             content: formInputs.content,
             contentText: formInputs.contentText ?? '',
             title: formInputs.title,
-            sourceTemplateId: formInputs.proposalTemplateId
+            sourceTemplateId: formInputs.proposalTemplateId,
+            headerImage: formInputs.headerImage,
+            icon: formInputs.icon
           },
           evaluationType: formInputs.evaluationType,
           rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -151,7 +154,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   return (
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
-        <Container top={50} fullWidth={isSmallScreen}>
+        {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+        <Container top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
               placeholderText={
