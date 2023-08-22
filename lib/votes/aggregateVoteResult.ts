@@ -19,15 +19,14 @@ export function aggregateVoteResult({
   let userChoice: string[] | null = [];
 
   userVotes.forEach((userVote) => {
+    const currentUserChoice = userVote.choice ? [userVote.choice] : userVote.choices;
     if (userId && userId === userVote.userId) {
-      userChoice = userVote.choice ? [userVote.choice] : userVote.choices;
+      userChoice = currentUserChoice;
     }
 
-    if (userChoice) {
-      userChoice.forEach((choice) => {
-        aggregatedResult[choice] += 1;
-      });
-    }
+    currentUserChoice.forEach((choice) => {
+      aggregatedResult[choice] += 1;
+    });
   });
 
   return {

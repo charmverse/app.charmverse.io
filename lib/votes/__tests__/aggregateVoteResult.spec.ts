@@ -9,20 +9,18 @@ describe('aggregateVoteResult', () => {
       userId,
       userVotes: [
         {
-          // old way choice string
-          choice: '1',
-          choices: [],
+          choice: null,
+          choices: ['1', '2'],
           userId
         },
         {
-          // new way choices string[]
-          choice: '',
-          choices: ['1'],
+          choice: '1',
+          choices: [],
           userId: v4()
         },
         {
           choice: '',
-          choices: ['2'],
+          choices: ['2', '1'],
           userId: v4()
         }
       ],
@@ -36,10 +34,10 @@ describe('aggregateVoteResult', () => {
       ]
     });
     expect(aggregatedVoteResult).toStrictEqual({
-      userChoice: '1',
+      userChoice: ['1', '2'],
       aggregatedResult: {
-        1: 2,
-        2: 1
+        1: 3,
+        2: 2
       }
     });
   });
