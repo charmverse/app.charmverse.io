@@ -21,7 +21,6 @@ import { usePages } from 'hooks/usePages';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
