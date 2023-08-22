@@ -101,37 +101,8 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
   }
 
   useEffect(() => {
-    // console.log('set criteria since value changed', value);
     setCriteriaList(value);
   }, [value]);
-
-  // useEffect(() => {
-  //   function upHandler(event: KeyboardEvent) {
-  //     const criteriaId = (event.target as HTMLElement)?.dataset.criteria;
-  //     const criteria = criteriaList.find((c) => c.id === criteriaId);
-  //     const parameterType = (event.target as HTMLElement)?.dataset.parameterType as 'min' | 'max';
-  //     if (criteria && event.key === 'ArrowUp') {
-  //       const newValue = (criteria.parameters[parameterType] || 0) + 1;
-  //       const parameters = {
-  //         ...criteria.parameters,
-  //         [parameterType]: newValue
-  //       };
-  //       setCriteriaProperty(criteria.id, { parameters });
-  //     } else if (criteria && event.key === 'ArrowDown') {
-  //       const newValue = (criteria.parameters[parameterType] || 0) - 1;
-  //       const parameters = {
-  //         ...criteria.parameters,
-  //         [parameterType]: newValue
-  //       };
-  //       setCriteriaProperty(criteria.id, { parameters });
-  //     }
-  //   }
-  //   window.addEventListener('keyup', upHandler);
-
-  //   return () => {
-  //     window.removeEventListener('keyup', upHandler);
-  //   };
-  // }, [criteriaList]);
 
   function handleClickDelete(criteriaId: string) {
     if (proposalStatus === 'evaluation_active') {
