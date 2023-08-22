@@ -2,7 +2,7 @@ import { Box, SvgIcon, Tooltip, Typography, Stack } from '@mui/material';
 import React, { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 export function DiscordSocialIcon({
   username,

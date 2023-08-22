@@ -10,7 +10,7 @@ import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import GuildXYZIcon from 'public/images/guild_logo.svg';
+import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
 
 import GuildsAutocomplete from './GuildsAutocomplete';
 
