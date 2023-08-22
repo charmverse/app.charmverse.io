@@ -40,10 +40,15 @@ export function LensPublication() {
       </Legend>
       <Stack gap={2}>
         <InputLabel>
-          <Stack flexDirection='row' alignItems='center' gap={1} width='fit-content' onClick={setAutoLensPublish}>
+          <Stack flexDirection='row' alignItems='center' gap={1}>
             <Tooltip title={!lensProfile && !isLoadingLensProfile ? "You don't have any Lens profile" : ''}>
               <div>
-                <Switch size='small' disabled={isLoadingLensProfile || !lensProfile} checked={isSwitchOn} />
+                <Switch
+                  size='small'
+                  disabled={isLoadingLensProfile || !lensProfile}
+                  checked={isSwitchOn}
+                  onChange={setAutoLensPublish}
+                />
               </div>
             </Tooltip>
             Lens Publication

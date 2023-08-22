@@ -1,5 +1,6 @@
 import type { Theme } from '@mui/material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
+import log from 'loglevel';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -13,13 +14,16 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useNewLensPublication } from 'components/settings/account/components/useNewLensPublication';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
 
@@ -27,6 +31,8 @@ import type { ProposalFormInputs } from '../ProposalProperties/ProposalPropertie
 import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
 import { useProposalDialog } from './hooks/useProposalDialog';
+
+const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
 
 type Props = {
   setFormInputs: (params: Partial<ProposalFormInputs>) => void;
@@ -43,7 +49,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
-
+  const { user } = useUser();
+  const { createPublication } = useNewLensPublication();
   usePreventReload(contentUpdated);
 
   const { proposalTemplates } = useProposalTemplates();
@@ -105,6 +112,22 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
           throw err;
         });
 
+      if (user?.autoLensPublish) {
+        const markdownContent = await generateMarkdown({
+          content: createdProposal.content,
+          title: createdProposal.title
+        });
+        await createPublication({
+          contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
+          proposalLink: `https://app.charmverse.io/${currentSpace.domain}/${createdProposal.path}`
+        }).catch((error) => {
+          log.error('Publishing to Lens failed', {
+            error,
+            proposalId: createdProposal.id,
+            spaceId: currentSpace.id
+          });
+        });
+      }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
