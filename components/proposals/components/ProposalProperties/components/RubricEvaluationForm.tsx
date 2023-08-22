@@ -184,6 +184,10 @@ function CriteriaInput({
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
+                    inputProps={{
+                      min: parameters.min,
+                      max: parameters.max
+                    }}
                     maxWidth={50}
                     value={_field.value}
                     sx={{ display: 'block' }}
