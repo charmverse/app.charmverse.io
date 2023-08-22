@@ -17,7 +17,7 @@ export class ProposalsApi {
   }
 
   updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
-    return http.PUT<PageWithProposal>(`/api/proposals/${proposalId}`, rest);
+    return http.PUT(`/api/proposals/${proposalId}`, rest);
   }
 
   updateStatus(proposalId: string, newStatus: ProposalStatus) {

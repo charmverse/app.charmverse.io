@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 
-import type { ProposalReviewerInput, ProposalWithUsersAndRubric } from './interface';
+import type { ProposalReviewerInput } from './interface';
 
 export type UpdateProposalRequest = {
   proposalId: string;
@@ -19,7 +19,7 @@ export async function updateProposal({
   reviewers,
   categoryId,
   evaluationType
-}: UpdateProposalRequest): Promise<ProposalWithUsersAndRubric> {
+}: UpdateProposalRequest) {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
@@ -69,17 +69,4 @@ export async function updateProposal({
       }))
     });
   });
-
-  return prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    include: {
-      authors: true,
-      reviewers: true,
-      category: true,
-      rubricAnswers: true,
-      rubricCriteria: true
-    }
-  }) as any as Promise<ProposalWithUsersAndRubric>;
 }

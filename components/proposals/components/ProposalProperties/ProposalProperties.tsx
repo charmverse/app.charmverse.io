@@ -35,17 +35,20 @@ import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
-export type ProposalFormInputs = {
-  title?: string; // title is saved to the same state that's used in ProposalPage
-  content?: PageContent | null;
-  contentText?: string;
-  // id?: string;
+export type ProposalPropertiesValues = {
+  contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
+};
+export type ProposalValues = ProposalPropertiesValues & {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  headerImage?: string | null;
 };
 
 type ProposalPropertiesProps = {
@@ -58,7 +61,7 @@ type ProposalPropertiesProps = {
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
-  proposalFormInputs: ProposalFormInputs;
+  proposalFormInputs: ProposalPropertiesValues;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
   readOnlyReviewers?: boolean;
@@ -66,7 +69,7 @@ type ProposalPropertiesProps = {
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
-  setProposalFormInputs: (values: ProposalFormInputs) => Promise<void> | void;
+  setProposalFormInputs: (values: Partial<ProposalPropertiesValues>) => Promise<void> | void;
   showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
@@ -148,13 +151,11 @@ export function ProposalProperties({
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
       setProposalFormInputs({
-        ...proposalFormInputs,
         categoryId: updatedCategory.id,
         proposalTemplateId: null
       });
     } else if (!updatedCategory) {
       setProposalFormInputs({
-        ...proposalFormInputs,
         categoryId: null,
         proposalTemplateId: null
       });
@@ -169,10 +170,7 @@ export function ProposalProperties({
       );
       if (proposalTemplate) {
         setProposalFormInputs({
-          ...proposalFormInputs,
           categoryId: proposalTemplate.categoryId,
-          content: proposalTemplate.page.content as PageContent,
-          contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
@@ -187,7 +185,6 @@ export function ProposalProperties({
 
   function clearTemplate() {
     setProposalFormInputs({
-      ...proposalFormInputs,
       proposalTemplateId: null
     });
   }
@@ -361,7 +358,6 @@ export function ProposalProperties({
                   readOnly={readOnlyAuthors}
                   onChange={(authors) => {
                     setProposalFormInputs({
-                      ...proposalFormInputs,
                       authors
                     });
                   }}
@@ -381,7 +377,6 @@ export function ProposalProperties({
                 proposalCategoryId={proposalFormInputs.categoryId}
                 onChange={async (options) => {
                   await setProposalFormInputs({
-                    ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
                   refreshReviewerIds();
@@ -398,7 +393,6 @@ export function ProposalProperties({
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
-                    ...proposalFormInputs,
                     evaluationType
                   });
                 }}

@@ -177,6 +177,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
                 // readOnly={readOnly || !!enableSuggestingMode}
                 setPage={(updatedPage) => {
                   setFormInputs({
+                    headerImage: updatedPage.headerImage,
+                    pageIcon: updatedPage.pageIcon,
                     title: updatedPage.title
                   });
                 }}
