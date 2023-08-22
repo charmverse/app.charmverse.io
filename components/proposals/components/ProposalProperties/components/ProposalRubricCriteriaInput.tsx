@@ -7,9 +7,9 @@ import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import { getNumberFromString } from 'components/common/form/getNumberFromString';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type RangeProposalCriteria = {
   id: string;

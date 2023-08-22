@@ -1,15 +1,14 @@
 import { Add, Remove } from '@mui/icons-material';
 import { Box, Chip, FormControlLabel, FormGroup, Stack, TextField, Typography } from '@mui/material';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 import { Button } from 'components/common/Button';
-import { getNumberFromString } from 'components/common/form/getNumberFromString';
 import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
 import type {
   SnapshotVotingProps,
   VoteChoiceFormProps
 } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
-import { percent } from 'lib/utilities/numbers';
+import { getNumberFromString, percent } from 'lib/utilities/numbers';
 
 const isValidChoiceRecord = (choice: any): choice is Record<string, number> => {
   return typeof choice === 'object' && !Array.isArray(choice) && choice !== null;
@@ -35,14 +34,6 @@ export function WeightedVoting({
 
   const voteOptions = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
-
-  const totalScore = useMemo(() => {
-    if (voteChoiceRecord) {
-      return Object.values(voteChoiceRecord).reduce((acc, curr) => acc + curr, 0);
-    }
-
-    return 0;
-  }, [voteChoiceRecord]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newVoteChoice = { ...voteChoiceRecord };
