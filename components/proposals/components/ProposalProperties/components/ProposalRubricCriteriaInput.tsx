@@ -238,7 +238,6 @@ export function IntegerInput({
     <TextInput
       displayType='details'
       fullWidth={!maxWidth}
-      // store props on DOM for keyboard events
       inputProps={{ type: 'number', ...inputProps }}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
