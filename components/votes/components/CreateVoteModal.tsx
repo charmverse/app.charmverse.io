@@ -22,8 +22,8 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Modal from 'components/common/Modal';
 import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -73,22 +73,25 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           </ListItem>
         );
       })}
-      <Button
-        variant='outlined'
-        color='secondary'
-        size='small'
-        onClick={() => {
-          setOptions([
-            ...options,
-            {
-              name: ''
-            }
-          ]);
-        }}
-      >
-        <AddCircle fontSize='small' sx={{ mr: 1 }} />
-        <Typography variant='subtitle1'>Add Option</Typography>
-      </Button>
+      <Stack alignItems='flex-end' flex={1}>
+        <Button
+          sx={{ mr: 4 }}
+          variant='outlined'
+          color='secondary'
+          size='small'
+          onClick={() => {
+            setOptions([
+              ...options,
+              {
+                name: ''
+              }
+            ]);
+          }}
+        >
+          <AddCircle fontSize='small' sx={{ mr: 1 }} />
+          <Typography variant='subtitle1'>Add Option</Typography>
+        </Button>
+      </Stack>
     </div>
   );
 }
@@ -184,13 +187,51 @@ export function CreateVoteModal({
     new Set(options.map((option) => option.name)).size !== options.length;
 
   return (
-    <Modal
+    <Dialog
       title={proposal ? 'Create a vote' : 'Create a poll'}
-      size='large'
       open={open}
       onClose={onClose ?? (() => {})}
+      footerActions={
+        <Stack gap={2} flexDirection='row' alignItems='center'>
+          <Button
+            onClick={handleSubmit}
+            sx={{
+              alignSelf: 'flex-start'
+            }}
+            disabled={disabledSave}
+          >
+            Create
+          </Button>
+          {proposal?.status === 'reviewed' && (
+            <>
+              or
+              <Tooltip
+                title={
+                  !proposalFlowFlags?.vote_active
+                    ? 'Only proposal authors and space admins can publish this proposal to snapshot'
+                    : ''
+                }
+              >
+                <div>
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick, icon }) => (
+                      <Button disabled={!proposalFlowFlags?.vote_active} onClick={onClick}>
+                        {icon}
+                        <Typography>{label}</Typography>
+                      </Button>
+                    )}
+                    onPublish={onPublishToSnapshot}
+                    pageId={proposal.id}
+                    snapshotProposalId={snapshotProposalId}
+                  />
+                </div>
+              </Tooltip>
+            </>
+          )}
+        </Stack>
+      }
     >
-      <Box flexDirection='column' gap={1.5} m={1} display='flex'>
+      <Box flexDirection='column' gap={1.5} m={1} display='flex' flex={1}>
         {!proposal && (
           <Box flexDirection='column' display='flex'>
             <FieldLabel>Title</FieldLabel>
@@ -301,44 +342,7 @@ export function CreateVoteModal({
           </RadioGroup>
         </Box>
         {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
-        <Stack gap={2} flexDirection='row' alignItems='center'>
-          <Button
-            onClick={handleSubmit}
-            sx={{
-              alignSelf: 'flex-start'
-            }}
-            disabled={disabledSave}
-          >
-            Create
-          </Button>
-          {proposal?.status === 'reviewed' && (
-            <>
-              or
-              <Tooltip
-                title={
-                  !proposalFlowFlags?.vote_active
-                    ? 'Only proposal authors and space admins can publish this proposal to snapshot'
-                    : ''
-                }
-              >
-                <div>
-                  <PublishToSnapshot
-                    renderContent={({ label, onClick, icon }) => (
-                      <Button disabled={!proposalFlowFlags?.vote_active} onClick={onClick}>
-                        {icon}
-                        <Typography>{label}</Typography>
-                      </Button>
-                    )}
-                    onPublish={onPublishToSnapshot}
-                    pageId={proposal.id}
-                    snapshotProposalId={snapshotProposalId}
-                  />
-                </div>
-              </Tooltip>
-            </>
-          )}
-        </Stack>
       </Box>
-    </Modal>
+    </Dialog>
   );
 }
