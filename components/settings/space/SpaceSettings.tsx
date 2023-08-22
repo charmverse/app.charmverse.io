@@ -179,7 +179,7 @@ export function SpaceSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend marginTop={0}>Space Settings</Legend>
+      <Legend marginTop={0}>Overview</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
