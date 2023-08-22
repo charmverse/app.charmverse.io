@@ -168,7 +168,8 @@ export function CreateVoteModal({
       postId,
       threshold: +passThreshold,
       type: voteType,
-      context: proposal ? 'proposal' : 'inline'
+      context: proposal ? 'proposal' : 'inline',
+      maxChoices: 1
     });
 
     if (onCreateVote) {

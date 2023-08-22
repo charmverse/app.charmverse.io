@@ -220,6 +220,12 @@ export function VoteDetail({
         <List>
           {userVotes.map((userVote) => {
             const member = getMemberById(userVote.user.id);
+            const choices = userVote.choice ? [userVote.choice] : userVote.choices;
+
+            if (!choices.length) {
+              return null;
+            }
+
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem
@@ -241,7 +247,7 @@ export function VoteDetail({
                     }
                   />
                   <Typography fontWeight={500} color='secondary'>
-                    {userVote.choice}
+                    {choices.join(', ')}
                   </Typography>
                 </ListItem>
                 <Divider />

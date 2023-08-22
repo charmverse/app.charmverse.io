@@ -8,23 +8,30 @@ export function aggregateVoteResult({
   voteOptions
 }: {
   voteOptions: Pick<VoteOptions, 'name'>[];
-  userVotes: Pick<UserVote, 'choice' | 'userId'>[];
+  userVotes: Pick<UserVote, 'choice' | 'choices' | 'userId'>[];
   userId?: string;
 }) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
   voteOptions.forEach((voteOption) => {
     aggregatedResult[voteOption.name] = 0;
   });
-  let userChoice: string | null = null;
+
+  let userChoice: string[] | null = [];
+
   userVotes.forEach((userVote) => {
     if (userId && userId === userVote.userId) {
-      userChoice = userVote.choice;
+      userChoice = userVote.choice ? [userVote.choice] : userVote.choices;
     }
-    aggregatedResult[userVote.choice] += 1;
+
+    if (userChoice) {
+      userChoice.forEach((choice) => {
+        aggregatedResult[choice] += 1;
+      });
+    }
   });
 
   return {
-    userChoice,
+    userChoice: userChoice.length ? userChoice : null,
     aggregatedResult
   };
 }

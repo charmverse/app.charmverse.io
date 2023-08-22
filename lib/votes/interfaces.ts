@@ -16,12 +16,12 @@ export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'pos
 export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;
 
 export interface UserVoteDTO {
-  choice: string;
+  choice: string | string[];
 }
 export interface ExtendedVote extends Vote {
   aggregatedResult: Record<string, number>;
   voteOptions: VoteOptions[];
-  userChoice: null | string;
+  userChoice: null | string[];
   totalVotes: number;
 }
 

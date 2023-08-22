@@ -167,19 +167,35 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  async function castVote(voteId: string, choice: string) {
-    const userVote = await charmClient.votes.castVote(voteId, choice);
+  async function castVote(voteId: string, choice: string | string[]) {
+    const updatedChoice = Array.isArray(choice) ? choice : [choice];
+    const userVote = await charmClient.votes.castVote(voteId, updatedChoice);
+
     setVotes((_votes) => {
-      const vote = _votes[voteId];
+      const vote = { ..._votes[voteId] };
       if (vote && user) {
         const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
         if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+          // Remove previous choices
+          currentChoice.forEach((c) => {
+            vote.aggregatedResult[c] -= 1;
+          });
         } else {
           vote.totalVotes += 1;
         }
-        vote.aggregatedResult[choice] += 1;
+
+        vote.userChoice = updatedChoice;
+
+        if (updatedChoice.length > 0) {
+          // Add new choices
+          updatedChoice.forEach((c) => {
+            vote.aggregatedResult[c] += 1;
+          });
+        } else if (currentChoice && currentChoice.length) {
+          // User deselected all previous choices
+          vote.totalVotes -= 1;
+        }
+
         _votes[voteId] = {
           ...vote
         };

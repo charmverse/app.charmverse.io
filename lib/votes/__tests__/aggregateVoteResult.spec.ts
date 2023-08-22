@@ -9,15 +9,20 @@ describe('aggregateVoteResult', () => {
       userId,
       userVotes: [
         {
+          // old way choice string
           choice: '1',
+          choices: [],
           userId
         },
         {
-          choice: '1',
+          // new way choices string[]
+          choice: '',
+          choices: ['1'],
           userId: v4()
         },
         {
-          choice: '2',
+          choice: '',
+          choices: ['2'],
           userId: v4()
         }
       ],
