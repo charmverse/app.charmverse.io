@@ -18,7 +18,7 @@ export default function ProfileSettings() {
 
   return (
     <>
-      <Legend>My profile</Legend>
+      <Legend>My Profile</Legend>
       <PublicProfile user={user} />
     </>
   );
