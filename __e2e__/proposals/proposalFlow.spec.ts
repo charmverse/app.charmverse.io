@@ -7,7 +7,7 @@ import type { PageWithProposal } from 'lib/pages';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('An admin can create a proposal with a space-wide vote', () => {
+test.describe.serial('A user can create a proposal with a space-wide vote', () => {
   // create reusable pages we can reuse between tests
   let proposalListPage: ProposalsListPage;
   let proposalPage: ProposalPage;
@@ -21,15 +21,15 @@ test.describe.serial('An admin can create a proposal with a space-wide vote', ()
     proposalPage = new ProposalPage(page);
   });
 
-  test('An admin creates a draft proposal', async () => {
+  test('An user creates a draft proposal', async () => {
     // Initial setup
-    const { space, user: spaceAdmin } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace();
 
-    userId = spaceAdmin.id;
+    userId = user.id;
 
     await loginBrowserUser({
       browserPage: proposalListPage.page,
-      userId: spaceAdmin.id
+      userId
     });
 
     const category = await testUtilsProposals.generateProposalCategory({
@@ -75,7 +75,7 @@ test.describe.serial('An admin can create a proposal with a space-wide vote', ()
     await expect(proposalRow).toBeVisible();
   });
 
-  test('An admin moves draft proposal to feedback', async () => {
+  test('An user moves draft proposal to feedback', async () => {
     await proposalListPage.getProposalRowLocator(proposalId).click();
 
     await expect(proposalPage.dialog).toBeVisible();
@@ -86,17 +86,17 @@ test.describe.serial('An admin can create a proposal with a space-wide vote', ()
 
     await proposalPage.nextStatusButton.click();
   });
-  test('An admin moves feedback to In Review', async () => {
+  test('An user moves feedback to In Review', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText('In Review');
     await proposalPage.nextStatusButton.click();
   });
 
-  test('An admin moves feedback to Reviewed', async () => {
+  test('An user moves feedback to Reviewed', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText('Reviewed');
     await proposalPage.nextStatusButton.click();
   });
 
-  test('An admin creates a vote', async () => {
+  test('An user creates a vote', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText('Vote Active');
     await proposalPage.nextStatusButton.click();
     await proposalPage.createVoteButton.click();
