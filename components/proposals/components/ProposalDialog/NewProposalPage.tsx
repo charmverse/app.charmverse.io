@@ -225,7 +225,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             >
               <Typography>
                 The chosen Reviewer will perform a final examination, ensuring the proposal is ready for the
-                organization's vote.
+                organization's {formInputs.evaluationType === 'vote' ? 'Vote' : 'Review'}.
               </Typography>
             </ModalWithButtons>
           </Stack>

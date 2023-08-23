@@ -51,6 +51,8 @@ export function ProposalStepSummary({
       case 'discussion':
       case 'review':
       case 'vote_active':
+      case 'evaluation_active':
+      case 'evaluation_closed':
       case 'reviewed':
         if (newStatus === previousStatus) {
           previousConfirmationPopup.open();
@@ -80,9 +82,13 @@ export function ProposalStepSummary({
       case 'discussion':
         return 'In the Feedback stage, all Members can view and provide feedback on the proposal.';
       case 'review':
-        return 'In the Review stage, the Proposal is visible to all organization members, but disables feedback. Reviewer approval is required to proceed to the voting stage.';
+        return 'In the Review stage, the Proposal is visible to all organization members. Reviewer approval is required to proceed to the voting stage.';
       case 'vote_active':
         return 'Proceeding with this action will transition the proposal into the Voting stage.';
+      case 'evaluation_active':
+        return 'Proceeding with this action will transition the proposal into the Evaluation stage.';
+      case 'evaluation_closed':
+        return 'This will close the Evaluation. No additional Rubric answers will be accepted.';
       case 'reviewed':
         return 'By approving this proposal, you authorize its advancement to the voting stage, to be initiated by an author.';
       default:
