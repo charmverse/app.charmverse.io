@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 export default function ImportDiscordRolesMenuItem() {
   const router = useRouter();

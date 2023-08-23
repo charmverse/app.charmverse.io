@@ -6,6 +6,8 @@ jest.mock('hooks/useFirebaseAuth', () => ({
   useFirebaseAuth: {}
 }));
 
+jest.mock('components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting', () => ({}));
+
 jest.mock('@lit-protocol/lit-node-client', () => ({
   humanizeAccessControlConditions: () => {}
 }));
@@ -24,6 +26,10 @@ jest.mock('lib/snapshot/getSpace', () => ({
 
 jest.mock('lib/snapshot/getVotes', () => ({
   getSnapshotVotes: () => ({ votes: {} })
+}));
+
+jest.mock('lib/snapshot/getVotingPower', () => ({
+  getSnapshotVotes: () => ({})
 }));
 
 jest.mock('next/router', () => ({

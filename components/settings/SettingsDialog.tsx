@@ -144,7 +144,7 @@ export function SpaceSettingsDialog() {
           }}
         >
           <Box mt={2} py={0.5}>
-            <SectionName>User settings</SectionName>
+            <SectionName>Account</SectionName>
           </Box>
           {ACCOUNT_TABS.map((tab) => (
             <SidebarLink
@@ -157,7 +157,7 @@ export function SpaceSettingsDialog() {
           ))}
           {currentSpace && isSpaceSettingsVisible && (
             <Box mt={2} py={0.5}>
-              <SectionName>Space settings</SectionName>
+              <SectionName>Space</SectionName>
             </Box>
           )}
           {currentSpace &&

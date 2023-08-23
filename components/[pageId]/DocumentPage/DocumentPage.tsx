@@ -32,7 +32,7 @@ import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
-import PageHeader from './components/PageHeader';
+import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
@@ -139,15 +139,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const activeView = boardViews[0];
 
-  let pageTop = 100;
-  if (page.headerImage) {
-    pageTop = 50;
-    if (page.icon) {
-      pageTop = 80;
-    }
-  } else if (page.icon) {
-    pageTop = 200;
-  }
+  const pageTop = getPageTop(page);
 
   const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
 
