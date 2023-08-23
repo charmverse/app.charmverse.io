@@ -28,13 +28,13 @@ export class DocumentPage {
 
   documentTitle: Locator;
 
-  shareButton: PagePermissionsDialog;
+  shareDialog: PagePermissionsDialog;
 
   constructor(page: Page) {
     this.page = page;
     this.header = new PageHeader(page);
     this.archivedBanner = this.page.locator('data-test=archived-page-banner');
-    this.shareButton = new PagePermissionsDialog(page);
+    this.shareDialog = new PagePermissionsDialog(page);
     this.trashToggle = this.page.locator('data-test=sidebar--trash-toggle');
     this.deletePermanentlyButton = this.page.locator('data-test=banner--permanently-delete');
     this.restoreArchivedButton = this.page.locator('data-test=banner--restore-archived-page');
