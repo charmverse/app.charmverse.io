@@ -71,10 +71,13 @@ services:
     extends:
       service: defaults
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
+    ports:
+      - '3002:3000'
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-sockets
+      - stg-webapp
 
   devapp:
     build:

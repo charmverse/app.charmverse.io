@@ -248,7 +248,9 @@ jobs:
               ' .ebextensions_websockets/00_env_vars.config
 
       - name: Package Webapp
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        run: |
+          rm .ebextensions/07_stg_websocket_port_3002
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Update and Package background worker
         run: |
