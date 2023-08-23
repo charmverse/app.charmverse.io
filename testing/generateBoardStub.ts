@@ -217,10 +217,10 @@ export function boardWithCardsArgs({
         type: 'board',
         title: 'My blog',
         fields: {
-          sourceType: viewDataSource === 'proposals' ? 'proposals' : undefined,
+          sourceType: viewDataSource,
           icon: '📝',
           isTemplate: false,
-          description: { ...emptyDocument },
+          description: undefined,
           headerImage: null,
           cardProperties: [
             {

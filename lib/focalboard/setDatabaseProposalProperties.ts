@@ -1,12 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Block } from '@charmverse/core/prisma-client';
 import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
-import type { Board, BoardFields, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 import { InvalidStateError } from 'lib/middleware';
 
 const properties: { [key in DatabaseProposalPropertyType]: () => IPropertyTemplate<key> } = {

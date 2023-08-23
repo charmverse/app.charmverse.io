@@ -103,7 +103,9 @@ describe('setDatabaseProposalProperties()', () => {
         title: 'Example',
         type: 'board',
         updatedBy: user.id,
-        fields: {},
+        fields: {
+          sourceType: 'proposals'
+        },
         space: { connect: { id: spaceWithRubrics.id } },
         user: { connect: { id: spaceUser.id } }
       }
