@@ -37,7 +37,9 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features. Use generateUser instead
+ */
 export async function createUser({
   browserPage,
   address
@@ -54,7 +56,9 @@ export async function createUser({
     .then((res) => res.json());
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function createSpace({
   browserPage,
   permissionConfigurationMode,
@@ -87,7 +91,9 @@ export async function createSpace({
   }
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function getPages({
   browserPage,
   spaceId
@@ -100,7 +106,7 @@ export async function getPages({
 
 /**
  *
- * DEPRECATED - Use generateUserAndSpace instead. Mock data should be generated directly, not using webapp features
+ * @deprecated - Use generateUserAndSpace() instead. Mock data should be generated directly, not using webapp features
  *
  * @browserPage - the page object for the browser context that will execute the requests
  *

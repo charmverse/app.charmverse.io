@@ -4,6 +4,7 @@ import type { Locator, Page } from '@playwright/test';
 import { baseUrl } from 'config/constants';
 
 import { PageHeader } from './pageHeader.po';
+import { PagePermissionsDialog } from './pagePermissions.po';
 
 // capture actions on the pages in signup flow
 export class DocumentPage {
@@ -27,10 +28,13 @@ export class DocumentPage {
 
   documentTitle: Locator;
 
+  shareButton: PagePermissionsDialog;
+
   constructor(page: Page) {
     this.page = page;
     this.header = new PageHeader(page);
     this.archivedBanner = this.page.locator('data-test=archived-page-banner');
+    this.shareButton = new PagePermissionsDialog(page);
     this.trashToggle = this.page.locator('data-test=sidebar--trash-toggle');
     this.deletePermanentlyButton = this.page.locator('data-test=banner--permanently-delete');
     this.restoreArchivedButton = this.page.locator('data-test=banner--restore-archived-page');
@@ -50,6 +54,14 @@ export class DocumentPage {
 
   getTrashItem(pageId: string) {
     return this.page.locator(`data-test=archived-page-${pageId}`);
+  }
+
+  closeDialog() {
+    return this.page.click('data-test=close-dialog');
+  }
+
+  waitForDialog() {
+    return this.page.waitForSelector('data-test=dialog');
   }
 
   async isPageEditable() {

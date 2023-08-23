@@ -75,6 +75,7 @@ export function ProposalStepSummary({
           )}
           {!!nextStatus && (
             <Button
+              data-test='next-status-button'
               disabledTooltip={nextStatus === 'discussion' ? 'Select a reviewer to proceed' : undefined}
               size='small'
               color='primary'

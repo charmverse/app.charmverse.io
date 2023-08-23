@@ -218,6 +218,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
               onClick={createProposal}
+              data-test='create-proposal-button'
             >
               Create
             </Button>

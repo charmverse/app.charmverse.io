@@ -5,12 +5,16 @@ import { baseUrl } from 'config/constants';
 import { GlobalPage } from './global.po';
 
 export class ProposalsListPage extends GlobalPage {
-  async goToProposals(domain: string) {
-    await this.page.goto(`${baseUrl}/${domain}/proposals`);
+  goToProposals(domain: string) {
+    return this.page.goto(`${baseUrl}/${domain}/proposals`);
   }
 
-  async waitForProposalsList(domain: string) {
-    await this.page.waitForURL(`${baseUrl}/${domain}/proposals`);
+  waitForProposalsList() {
+    return this.page.waitForURL(/\/proposals^/);
+  }
+
+  clickNewProposalDialog() {
+    return this.page.click('data-test=new-proposal-button');
   }
 
   getProposalRowLocator(proposalId: string): Locator {
@@ -27,5 +31,9 @@ export class ProposalsListPage extends GlobalPage {
 
   getProposalCategoryListButtonLocator() {
     return this.page.locator('data-test=proposal-view-options-desktop').locator(`data-test=proposal-category-list`);
+  }
+
+  getEmptyStateLocator() {
+    return this.page.locator('data-test=empty-state');
   }
 }
