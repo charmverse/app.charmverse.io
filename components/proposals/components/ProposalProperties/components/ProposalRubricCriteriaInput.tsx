@@ -155,16 +155,15 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
               readOnly={readOnly}
               value={criteria.title}
             />
-            <Box maxHeight='3em'>
-              <TextInput
-                multiline={false}
-                onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-                placeholderText='Add a description...'
-                readOnly={readOnly}
-                sx={{ flexGrow: 1, width: '100%' }}
-                value={criteria.description ?? ''}
-              />
-            </Box>
+            <TextInput
+              displayType='details'
+              multiline={true}
+              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+              placeholderText='Add a description...'
+              readOnly={readOnly}
+              sx={{ flexGrow: 1, width: '100%' }}
+              value={criteria.description ?? ''}
+            />
             <Box display='flex' gap={1} alignItems='flex-start'>
               <Grid container width={90} spacing={1}>
                 <Grid xs item>
