@@ -68,6 +68,36 @@ export class CdkDeployStack extends Stack {
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
       },
       {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'HealthCheckPath',
+        value: '/health_check'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Port',
+        value: '3002'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Protocol',
+        value: 'HTTP'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'Protocol',
+        value: 'HTTP'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'ListenerEnabled',
+        value: 'true'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'DefaultProcess',
+        value: 'websocket'
+      },
+      {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
