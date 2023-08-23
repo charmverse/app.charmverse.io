@@ -5,8 +5,6 @@ services:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
       com.datadoghq.tags.service: '${SERVICE_NAME}'
       com.datadoghq.tags.version: '${IMGTAG}'
-    ports:
-      - '80:3000'
     env_file:
       - '.env'
     environment:
@@ -18,6 +16,8 @@ services:
   prd-cron:
     extends:
       service: defaults
+    ports:
+      - '80:3000'
     command: ['npm', 'run', 'cron:prod']
     profiles:
       - prd-cron
@@ -25,6 +25,8 @@ services:
   stg-cron:
     extends:
       service: defaults
+    ports:
+      - '80:3000'
     command: ['npm', 'run', 'cron:staging']
     environment:
       - NEXT_PUBLIC_APP_ENV=staging
@@ -34,6 +36,8 @@ services:
   prd-webapp:
     extends:
       service: defaults
+    ports:
+      - '80:3000'
     command:
       [
         'sh',
@@ -48,6 +52,8 @@ services:
   stg-webapp:
     extends:
       service: defaults
+    ports:
+      - '80:3000'
     command:
       [
         'sh',
@@ -63,6 +69,8 @@ services:
   prd-sockets:
     extends:
       service: defaults
+    ports:
+      - '80:3000'
     command: ['sh', '-c', 'node ./.next/server/websockets.js']
     profiles:
       - prd-sockets
