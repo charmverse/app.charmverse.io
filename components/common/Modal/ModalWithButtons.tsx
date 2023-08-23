@@ -36,11 +36,16 @@ export default function ModalWithButtons({
   return (
     <Modal open={open} onClose={onClose} title={title} size={size}>
       {children}
-      <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
+      <Box sx={{ gap: 2, mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        {!hideCancelButton && (
+          <Button color='secondary' variant='outlined' onClick={onClose}>
+            {secondaryButtonText}
+          </Button>
+        )}
         <Button
           color='primary'
           sx={{
-            mr: 2,
+            mr: 0.5,
             fontWeight: 'bold',
             display: 'block',
             overflow: 'hidden',
@@ -51,11 +56,6 @@ export default function ModalWithButtons({
         >
           {buttonText}
         </Button>
-        {!hideCancelButton && (
-          <Button color='secondary' variant='outlined' onClick={onClose}>
-            {secondaryButtonText}
-          </Button>
-        )}
       </Box>
     </Modal>
   );
