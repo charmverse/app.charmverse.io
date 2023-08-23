@@ -80,7 +80,7 @@ export function ProposalStepSummary({
   function nextProposalStatusUpdateMessage(status: ProposalStatus) {
     switch (status) {
       case 'discussion':
-        return 'In the Feedback stage, all Members can view and provide feedback on the proposal.';
+        return 'In the Feedback stage, Members can view and provide feedback on the proposal.';
       case 'review':
         return 'In the Review stage, the Proposal is visible to all organization members. Reviewer approval is required to proceed to the voting stage.';
       case 'vote_active':
