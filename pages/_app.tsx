@@ -235,9 +235,9 @@ function DataProviders({ children }: { children: ReactNode }) {
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
               <Web3AccountProvider>
-                <LensProfileProvider>
-                  <SpacesProvider>
-                    <CurrentSpaceProvider>
+                <SpacesProvider>
+                  <CurrentSpaceProvider>
+                    <LensProfileProvider>
                       <PostCategoriesProvider>
                         <IsSpaceMemberProvider>
                           <WebSocketClientProvider>
@@ -257,9 +257,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                           </WebSocketClientProvider>
                         </IsSpaceMemberProvider>
                       </PostCategoriesProvider>
-                    </CurrentSpaceProvider>
-                  </SpacesProvider>
-                </LensProfileProvider>
+                    </LensProfileProvider>
+                  </CurrentSpaceProvider>
+                </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
           </Web3ReactProvider>
