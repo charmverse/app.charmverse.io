@@ -25,6 +25,7 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import { LensProfileProvider } from 'components/settings/LensProfileProvider';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -234,29 +235,31 @@ function DataProviders({ children }: { children: ReactNode }) {
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
               <Web3AccountProvider>
-                <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <BountiesProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberPropertiesProvider>
-                                    <UserProfileProvider>
-                                      <PageTitleProvider>{children}</PageTitleProvider>
-                                    </UserProfileProvider>
-                                  </MemberPropertiesProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
-                            </BountiesProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
-                </SpacesProvider>
+                <LensProfileProvider>
+                  <SpacesProvider>
+                    <CurrentSpaceProvider>
+                      <PostCategoriesProvider>
+                        <IsSpaceMemberProvider>
+                          <WebSocketClientProvider>
+                            <MembersProvider>
+                              <BountiesProvider>
+                                <PaymentMethodsProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <UserProfileProvider>
+                                        <PageTitleProvider>{children}</PageTitleProvider>
+                                      </UserProfileProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </PaymentMethodsProvider>
+                              </BountiesProvider>
+                            </MembersProvider>
+                          </WebSocketClientProvider>
+                        </IsSpaceMemberProvider>
+                      </PostCategoriesProvider>
+                    </CurrentSpaceProvider>
+                  </SpacesProvider>
+                </LensProfileProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
           </Web3ReactProvider>

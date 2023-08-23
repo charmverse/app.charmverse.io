@@ -11,7 +11,6 @@ const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) 
   const chainId = `0x${(+BigNumber.from(RPC[targetNetwork].chainId)).toString(16)}`;
 
   const { ethereum } = window as WindowType;
-
   try {
     await ethereum.request?.({
       method: 'wallet_switchEthereumChain',
