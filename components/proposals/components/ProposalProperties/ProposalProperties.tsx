@@ -21,6 +21,7 @@ import { usePages } from 'hooks/usePages';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
@@ -35,6 +36,7 @@ import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
 export type ProposalPropertiesInput = {
+  content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
@@ -164,6 +166,8 @@ export function ProposalProperties({
       if (proposalTemplate) {
         setProposalFormInputs({
           categoryId: proposalTemplate.categoryId,
+          content: proposalTemplate.page.content as PageContent,
+          contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
