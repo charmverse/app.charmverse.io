@@ -29,7 +29,11 @@ export function LensPublication() {
     if (!_lensProfile) {
       try {
         _lensProfile = await setupLensProfile();
-        showMessage('Lens profile setup successfully', 'success');
+        if (_lensProfile) {
+          showMessage('Lens profile setup successfully', 'success');
+        } else {
+          showMessage("You don't have a lens profile. Please setup one first.", 'warning');
+        }
       } catch (err) {
         showMessage('Failed to setup Lens profile', 'error');
         // User rejected to sign the message
@@ -64,14 +68,7 @@ export function LensPublication() {
       <Stack gap={2}>
         <InputLabel>
           <Stack flexDirection='row' alignItems='center' gap={1}>
-            <div>
-              <Switch
-                size='small'
-                disabled={isSettingUpLensProfile}
-                checked={isSwitchOn}
-                onChange={setAutoLensPublish}
-              />
-            </div>
+            <Switch size='small' disabled={isSettingUpLensProfile} checked={isSwitchOn} onChange={setAutoLensPublish} />
             Lens Publication
             {isSettingUpLensProfile && <CircularProgress sx={{ ml: 1 }} color='secondary' size={16} />}
           </Stack>
