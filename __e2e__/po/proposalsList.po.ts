@@ -1,16 +1,20 @@
-import type { Locator } from '@playwright/test';
+import type { Page, Locator } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
 import { GlobalPage } from './global.po';
 
 export class ProposalsListPage extends GlobalPage {
+  constructor(page: Page, public emptyState = page.locator('data-test=empty-state')) {
+    super(page);
+  }
+
   goToProposals(domain: string) {
     return this.page.goto(`${baseUrl}/${domain}/proposals`);
   }
 
   waitForProposalsList() {
-    return this.page.waitForURL(/\/proposals^/);
+    return this.page.waitForURL(/\/proposals$/);
   }
 
   clickNewProposalDialog() {
@@ -31,9 +35,5 @@ export class ProposalsListPage extends GlobalPage {
 
   getProposalCategoryListButtonLocator() {
     return this.page.locator('data-test=proposal-view-options-desktop').locator(`data-test=proposal-category-list`);
-  }
-
-  getEmptyStateLocator() {
-    return this.page.locator('data-test=empty-state');
   }
 }

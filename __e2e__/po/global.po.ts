@@ -3,14 +3,11 @@ import type { Locator, Page } from '@playwright/test';
 import { baseUrl } from 'config/constants';
 
 export class GlobalPage {
-  readonly page: Page;
-
   readonly dialog: Locator;
 
   readonly openAsPageButton: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(public page: Page) {
     this.dialog = page.locator('data-test=dialog');
     this.openAsPageButton = page.locator('data-test=open-as-page');
   }
@@ -25,5 +22,11 @@ export class GlobalPage {
 
   async waitForDocumentPage({ domain, path }: { domain: string; path: string }) {
     await this.page.waitForURL(`${baseUrl}/${domain}/${path}`);
+  }
+
+  // url example: '**/api/proposals'
+  async waitForJsonResponse<T>(url: string): Promise<T> {
+    const response = await this.page.waitForResponse(url);
+    return response.json();
   }
 }
