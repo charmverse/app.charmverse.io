@@ -1,13 +1,14 @@
 import { log } from '@charmverse/core/log';
-import type { Web3Provider } from '@ethersproject/providers';
+import { BigNumber } from '@ethersproject/bignumber';
+import type { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import type { ProfileFragment } from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import requestNetworkChange from 'components/_app/Web3ConnectionManager/components/NetworkModal/utils/requestNetworkChange';
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { createPostPublication } from 'lib/lens/createPostPublication';
@@ -16,6 +17,7 @@ import type { PageWithContent } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
+type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider };
 
 export type ILensProfileContext = {
   lensProfile: ProfileFragment | null;
@@ -31,11 +33,21 @@ export const LensProfileContext = createContext<Readonly<ILensProfileContext>>({
   createPost: () => new Promise(() => {})
 });
 
+async function switchNetwork() {
+  const { ethereum } = window as WindowType;
+  const switchedChainId = `0x${(+BigNumber.from(RPC[CHAIN].chainId)).toString(16)}`;
+  await ethereum.request?.({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: switchedChainId }]
+  });
+}
+
 export function LensProfileProvider({ children }: { children: React.ReactNode }) {
   const [lensProfile, setLensProfile] = useState<ProfileFragment | null>(null);
   const { account, library, chainId } = useWeb3AuthSig();
   const { user } = useUser();
   const { space } = useCurrentSpace();
+  const { showMessage } = useSnackbar();
 
   async function fetchLensProfile() {
     if (!user || !account) {
@@ -86,13 +98,13 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
 
   async function setupLensProfile() {
     if (chainId !== RPC[CHAIN].chainId) {
-      requestNetworkChange(CHAIN, authenticateLensProfile);
+      authenticateLensProfile();
     } else {
       authenticateLensProfile();
     }
   }
 
-  async function createPost(proposal: PageWithContent) {
+  async function createLensPostPublication(proposal: PageWithContent) {
     if (!lensProfile || !user?.autoLensPublish || !space) {
       return;
     }
@@ -106,13 +118,31 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
       contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
       proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
       lensProfile
-    }).catch((error) => {
-      log.error('Publishing proposal to Lens failed', {
-        error,
-        proposalId: proposal.id,
-        spaceId: space.id
+    })
+      .then(() => {
+        showMessage('Proposal published to Lens', 'info');
+      })
+      .catch((error) => {
+        log.error('Publishing proposal to Lens failed', {
+          error,
+          proposalId: proposal.id,
+          spaceId: space.id
+        });
       });
-    });
+  }
+
+  async function createPost(proposal: PageWithContent) {
+    if (!lensProfile || !user?.autoLensPublish || !space) {
+      return;
+    }
+
+    if (chainId !== RPC[CHAIN].chainId) {
+      await switchNetwork();
+      await createLensPostPublication(proposal);
+      return;
+    }
+
+    await createLensPostPublication(proposal);
   }
 
   const value = useMemo<ILensProfileContext>(

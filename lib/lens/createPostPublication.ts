@@ -1,16 +1,11 @@
-import type {
-  CreatePublicPostRequest,
-  ProfileFragment,
-  PublicationMetadataV2Input,
-  LensClient
-} from '@lens-protocol/client';
+import type { CreatePublicPostRequest, ProfileFragment, PublicationMetadataV2Input } from '@lens-protocol/client';
 import { CollectModules, PublicationMainFocus, PublicationMetadataDisplayTypes } from '@lens-protocol/client';
 import { v4 as uuid } from 'uuid';
 
 import { POST } from 'adapters/http';
 
 import type { CollectModuleType } from './interfaces';
-import { lensClient as defaultLensClient } from './lensClient';
+import { lensClient } from './lensClient';
 
 const INITIAL_COLLECT_MODULE: CollectModuleType = {
   type: CollectModules.RevertCollectModule,
@@ -44,12 +39,10 @@ const collectModuleParams = (collectModule: CollectModuleType): { revertCollectM
 };
 
 export async function createPostPublication({
-  lensClient = defaultLensClient,
   lensProfile,
   contentText,
   proposalLink
 }: {
-  lensClient?: LensClient;
   contentText: string;
   proposalLink: string;
   lensProfile: ProfileFragment;
