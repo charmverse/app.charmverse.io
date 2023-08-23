@@ -82,7 +82,7 @@ export function ProposalStepSummary({
       case 'discussion':
         return 'In the Feedback stage, Members can view and provide feedback on the proposal.';
       case 'review':
-        return 'In the Review stage, the Proposal is visible to all organization members. Reviewer approval is required to proceed to the voting stage.';
+        return 'In the Review stage, the Proposal is visible to Members. Reviewer approval is required to proceed to the voting stage.';
       case 'vote_active':
         return 'Proceeding with this action will transition the proposal into the Voting stage.';
       case 'evaluation_active':
