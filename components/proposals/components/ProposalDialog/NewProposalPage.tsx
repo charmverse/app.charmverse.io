@@ -118,7 +118,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
-      mutate(`proposals/${currentSpace.id}`);
+      mutate(`/api/spaces/${currentSpace.id}/proposals`);
       showProposal({
         pageId: page.id,
         onClose() {

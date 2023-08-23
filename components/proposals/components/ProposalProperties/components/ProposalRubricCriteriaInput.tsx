@@ -101,37 +101,8 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
   }
 
   useEffect(() => {
-    // console.log('set criteria since value changed', value);
     setCriteriaList(value);
   }, [value]);
-
-  useEffect(() => {
-    function upHandler(event: KeyboardEvent) {
-      const criteriaId = (event.target as HTMLElement)?.dataset.criteria;
-      const criteria = criteriaList.find((c) => c.id === criteriaId);
-      const parameterType = (event.target as HTMLElement)?.dataset.parameterType as 'min' | 'max';
-      if (criteria && event.key === 'ArrowUp') {
-        const newValue = (criteria.parameters[parameterType] || 0) + 1;
-        const parameters = {
-          ...criteria.parameters,
-          [parameterType]: newValue
-        };
-        setCriteriaProperty(criteria.id, { parameters });
-      } else if (criteria && event.key === 'ArrowDown') {
-        const newValue = (criteria.parameters[parameterType] || 0) - 1;
-        const parameters = {
-          ...criteria.parameters,
-          [parameterType]: newValue
-        };
-        setCriteriaProperty(criteria.id, { parameters });
-      }
-    }
-    window.addEventListener('keyup', upHandler);
-
-    return () => {
-      window.removeEventListener('keyup', upHandler);
-    };
-  }, [criteriaList]);
 
   function handleClickDelete(criteriaId: string) {
     if (proposalStatus === 'evaluation_active') {
@@ -155,32 +126,24 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
               readOnly={readOnly}
               value={criteria.title}
             />
-            <Box maxHeight='3em'>
-              <TextInput
-                multiline={false}
-                onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-                placeholderText='Add a description...'
-                readOnly={readOnly}
-                sx={{ flexGrow: 1, width: '100%' }}
-                value={criteria.description ?? ''}
-              />
-            </Box>
+            <TextInput
+              displayType='details'
+              multiline={true}
+              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+              placeholderText='Add a description...'
+              readOnly={readOnly}
+              sx={{ flexGrow: 1, width: '100%' }}
+              value={criteria.description ?? ''}
+            />
             <Box display='flex' gap={1} alignItems='flex-start'>
               <Grid container width={90} spacing={1}>
                 <Grid xs item>
                   <div>
                     <IntegerInput
-                      // store props on DOM for keyboard events
-                      inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'min'
-                      }}
                       onChange={(min) => {
-                        if (min !== null) {
-                          setCriteriaProperty(criteria.id, {
-                            parameters: { ...criteria.parameters, min }
-                          });
-                        }
+                        setCriteriaProperty(criteria.id, {
+                          parameters: { ...criteria.parameters, min }
+                        });
                       }}
                       readOnly={readOnly}
                       value={criteria.parameters.min}
@@ -199,18 +162,13 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
                 <Grid xs item>
                   <div className='to-pseudo-element'>
                     <IntegerInput
-                      // store props on DOM for keyboard events
                       inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'max',
                         min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
                       }}
                       onChange={(max) => {
-                        if (max !== null) {
-                          setCriteriaProperty(criteria.id, {
-                            parameters: { ...criteria.parameters, max }
-                          });
-                        }
+                        setCriteriaProperty(criteria.id, {
+                          parameters: { ...criteria.parameters, max }
+                        });
                       }}
                       readOnly={readOnly}
                       value={criteria.parameters.max}
@@ -279,8 +237,7 @@ export function IntegerInput({
     <TextInput
       displayType='details'
       fullWidth={!maxWidth}
-      // store props on DOM for keyboard events
-      inputProps={inputProps}
+      inputProps={{ type: 'number', ...inputProps }}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
       sx={{

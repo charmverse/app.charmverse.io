@@ -37,6 +37,7 @@ import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
 export type ProposalPropertiesInput = {
+  content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
@@ -168,6 +169,8 @@ export function ProposalProperties({
       if (proposalTemplate) {
         setProposalFormInputs({
           categoryId: proposalTemplate.categoryId,
+          content: proposalTemplate.page.content as PageContent,
+          contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
