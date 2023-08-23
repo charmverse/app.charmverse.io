@@ -516,6 +516,19 @@ ol li {
   }
 }
 
+.charm-column-row {
+  @media (max-width: 600px) {
+    flex-direction: column !important;
+
+    .charm-column {
+      flex: 1 1 auto !important;
+    }
+    .charm-column-resizer {
+      display: none;
+    }
+  }
+}
+
 // for inline comments
 .charm-row-decoration {
   background-color: var(--background-default);
@@ -551,7 +564,6 @@ ol li {
   top: 3px;
 }
 
-
 /** Begin Resizable columns **/
 
 .charm-column {
@@ -565,7 +577,7 @@ ol li {
     opacity: 0.4;
     transition: background-color 250ms ease-in-out;
     border-radius: 2px;
-    position:absolute;
+    position: absolute;
     top: 8px;
     left: 0;
     right: 0;
@@ -579,7 +591,6 @@ ol li {
   & .bangle-nv-content p {
     overflow-wrap: anywhere;
   }
-
 }
 
 .charm-column-resizer {
