@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -112,9 +112,23 @@ type PageRestored = {
   payload: Resource;
 };
 
-type PageCreated = {
+export type PageCreated = {
   type: 'page_created';
-  payload: Partial<Page>;
+  payload: Partial<Prisma.PageUncheckedCreateInput> &
+    Pick<
+      Prisma.PageUncheckedCreateInput,
+      'boardId' | 'content' | 'contentText' | 'path' | 'title' | 'type' | 'spaceId'
+    >;
+};
+
+type PageReordered = {
+  type: 'page_reordered';
+  payload: {
+    pageId: string;
+    currentParentId: string | null;
+    newParentId: string | null;
+    newIndex: number;
+  };
 };
 
 type SpaceSubscriptionUpdated = {
@@ -147,7 +161,7 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated;
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
 
 export type ServerMessage =
   | BlocksUpdated

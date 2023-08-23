@@ -25,5 +25,13 @@ export default function FreeShareToWeb({ pageId }: Props) {
     // All proposals beyond draft are public
     (currentPage?.type === 'proposal' && proposal?.status !== 'draft');
 
-  return <ShareToWeb disabled pageId={pageId} toggleChecked={isChecked} shareAlertMessage={shareAlertMessage} />;
+  return (
+    <ShareToWeb
+      disabled
+      pageId={pageId}
+      shareChecked={isChecked}
+      discoveryChecked={false}
+      shareAlertMessage={shareAlertMessage}
+    />
+  );
 }

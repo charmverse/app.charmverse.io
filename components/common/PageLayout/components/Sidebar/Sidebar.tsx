@@ -20,6 +20,7 @@ import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -39,8 +40,6 @@ import TrashModal from '../TrashModal';
 
 import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
-import type { FeatureJson } from './utils/staticPages';
-import { STATIC_PAGES_RECORD } from './utils/staticPages';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -236,6 +235,8 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
     );
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
+  const { features } = useFeaturesAndMembers();
+
   return (
     <SidebarContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
@@ -282,25 +283,23 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                     />
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
-                  {(space.features as FeatureJson[])
-                    .filter((mp) => !mp.isHidden)
-                    .map(({ id }) => {
-                      const page = STATIC_PAGES_RECORD[id];
+                  {features
+                    .filter((feat) => !feat.isHidden)
+                    .map((feat) => {
                       if (
-                        page &&
-                        (showMemberFeatures ||
-                          // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                          (page.path === 'forum' && categories.length > 0))
+                        showMemberFeatures ||
+                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                        (feat.path === 'forum' && categories.length > 0)
                       ) {
                         return (
                           <SidebarLink
-                            key={page.path}
-                            href={`/${space.domain}/${page.path}`}
-                            active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                            icon={<PageIcon icon={null} pageType={page.path} />}
-                            label={page.title}
+                            key={feat.path}
+                            href={`/${space.domain}/${feat.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
+                            icon={<PageIcon icon={null} pageType={feat.path} />}
+                            label={feat.title}
                             onClick={navAction}
-                            data-test={`sidebar-link-${page.path}`}
+                            data-test={`sidebar-link-${feat.path}`}
                           />
                         );
                       }

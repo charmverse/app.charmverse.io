@@ -1,22 +1,29 @@
 import type { Page, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { chromium, expect, test as base } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
+import { PagePermissionsDialog } from './po/pagePermissions.po';
 import { generateUserAndSpace } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
 let browser: Browser;
+type Fixtures = {
+  pagePermissions: PagePermissionsDialog;
+};
+
+const test = base.extend<Fixtures>({
+  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page))
+});
 
 test.beforeAll(async () => {
   // Set headless to false in chromium.launch to visually debug the test
   browser = await chromium.launch({});
 });
-
 test.describe.serial('Make a page public and visit it', async () => {
   // Will be set by the first test
   let shareUrl = '';
@@ -24,10 +31,9 @@ test.describe.serial('Make a page public and visit it', async () => {
   let cardPage: Page;
   let spaceUser: User;
 
-  test('make a page public', async () => {
+  test('make a page public', async ({ pagePermissions, page }) => {
     // Arrange ------------------
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-    const page = await userContext.newPage();
 
     const { space, user } = await generateUserAndSpace();
     boardPage = await generateBoard({
@@ -60,23 +66,28 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
-    const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
+    const permissionDialog = pagePermissions.permissionDialog;
 
     await permissionDialog.click();
 
-    const publicShareToggle = page.locator('data-test=toggle-public-page');
+    const publishTab = pagePermissions.publishTab;
 
-    await publicShareToggle.click();
+    await expect(publishTab).toBeVisible();
+
+    await publishTab.click({ force: true });
+
+    await pagePermissions.publicShareToggle.click();
+
     shareUrl = `${baseUrl}/${domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
+
+    await pagePermissions.allowDiscoveryToggle.click();
 
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
 
     await expect(shareLinkInput).toBeVisible();
-
-    await page.pause();
 
     const inputValue = await shareLinkInput.inputValue();
 

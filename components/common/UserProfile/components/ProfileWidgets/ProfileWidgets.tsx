@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { MemberProfileJson } from 'lib/profile/memberProfiles';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 
 import { useMemberCollections } from '../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
@@ -18,6 +18,7 @@ import { SummonProfileWidget } from './SummonProfileWidget';
 export function ProfileWidgets({ userId }: { userId: string }) {
   const { space } = useCurrentSpace();
   const { memberPropertyValues = [], isLoading: isLoadingMemberPropertiesValues } = useMemberPropertyValues(userId);
+  const { memberProfiles } = useFeaturesAndMembers();
 
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
     charmClient.publicProfile.getEnsProfile(userId)
@@ -48,8 +49,6 @@ export function ProfileWidgets({ userId }: { userId: string }) {
   if (isLoading) {
     return <LoadingComponent isLoading />;
   }
-
-  const memberProfiles = space?.memberProfiles as MemberProfileJson[] | undefined;
 
   return (
     <Grid container spacing={4}>

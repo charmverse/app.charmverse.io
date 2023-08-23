@@ -1,4 +1,4 @@
-import { ProposalNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import type { ProposalReviewerPool } from '@charmverse/core/permissions';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
@@ -29,7 +29,7 @@ describe('getProposalReviewerPool', () => {
     });
 
     const reviewerPool: ProposalReviewerPool = await getProposalReviewerPool({
-      resourceId: proposal.id
+      resourceId: proposal.categoryId as string
     });
 
     expect(reviewerPool.userIds).toEqual(expect.arrayContaining([user.id, extraUser.id]));
@@ -38,6 +38,6 @@ describe('getProposalReviewerPool', () => {
 
   it('should throw an error if the proposal does not exist', async () => {
     const id = v4();
-    await expect(getProposalReviewerPool({ resourceId: id })).rejects.toMatchObject(new ProposalNotFoundError(id));
+    await expect(getProposalReviewerPool({ resourceId: id })).rejects.toBeInstanceOf(DataNotFoundError);
   });
 });

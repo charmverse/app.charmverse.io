@@ -54,12 +54,14 @@ const EditorHeader = styled.div`
   }
 `;
 
+type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+
 type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
-  setPage: (p: Partial<Page>) => void;
+  setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
   readOnlyTitle?: boolean;
 };
@@ -140,6 +142,18 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
       <PageTitleInput readOnly={readOnly || readOnlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>
   );
+}
+export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+  let pageTop = 100;
+  if (headerImage) {
+    pageTop = 50;
+    if (icon) {
+      pageTop = 80;
+    }
+  } else if (icon) {
+    pageTop = 200;
+  }
+  return pageTop;
 }
 
 export default memo(PageHeader);

@@ -1,6 +1,7 @@
 import { SWRConfig } from 'swr';
 
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
@@ -15,7 +16,9 @@ export function BaseAuthenticateProviders({ children }: { children: React.ReactN
             }
           }}
         >
-          <UserProvider>{children}</UserProvider>
+          <UserProvider>
+            <SpacesProvider>{children}</SpacesProvider>
+          </UserProvider>
         </SWRConfig>
       </SnackbarProvider>
     </AppThemeProvider>

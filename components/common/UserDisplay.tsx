@@ -5,7 +5,6 @@ import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
-import Link from 'components/common/Link';
 import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
 import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -86,11 +85,10 @@ interface UserDisplayProps extends StyleProps {
     path?: string | null;
     id: string;
   } | null;
-  linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }
 
-function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
   const { showUserProfile } = useUserProfile();
 
   if (!user) {
@@ -104,19 +102,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
     );
   }
 
-  // Copied from User Details component
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path;
-  const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
-
-  if (linkToProfile) {
-    return (
-      <Link color='inherit' href={userLink} key={user?.id} external={false}>
-        <BaseComponent username={user.username} avatar={user.avatar} isNft={isNft} {...props} />
-      </Link>
-    );
-  }
 
   return (
     <BaseComponent

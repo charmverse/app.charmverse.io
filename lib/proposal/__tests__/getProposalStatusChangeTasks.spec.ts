@@ -1,25 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { createUserFromWallet } from 'lib/users/createUser';
-import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposal, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { ProposalTask } from '../getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from '../getProposalStatusChangeTasks';
 import { updateProposalStatus } from '../updateProposalStatus';
 
-describe('getProposalStatusChangeTasks()', () => {
+describe('getProposalStatusChangeTasks', () => {
   it('Return all the proposal tasks from current workspace events', async () => {
-    const { user: user1, space } = await generateUserAndSpaceWithApiToken();
+    const { user: user1, space } = await generateUserAndSpace({ isAdmin: true });
 
-    const user2 = await createUserFromWallet();
-
-    await prisma.spaceRole.create({
-      data: {
-        spaceId: space.id,
-        userId: user2.id
-      }
-    });
-
+    const user2 = await generateSpaceUser({ spaceId: space.id });
     // User is the proposal author
     // Moved a draft proposal from discussion back to draft
     // Should create two separate workspace events
@@ -144,6 +135,48 @@ describe('getProposalStatusChangeTasks()', () => {
       userId: user1.id
     });
 
+    // User is a rubric reviewer
+    const rubricReviewerProposal = await generateProposal({
+      authors: [user2.id],
+      proposalStatus: 'discussion',
+      evaluationType: 'rubric',
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
+      spaceId: space.id,
+      userId: user2.id
+    });
+
+    await updateProposalStatus({
+      proposalId: rubricReviewerProposal.proposal.id,
+      newStatus: 'evaluation_active',
+      userId: user1.id
+    });
+
+    // User is a rubric author
+    const rubricClosedProposal = await generateProposal({
+      authors: [user1.id],
+      proposalStatus: 'evaluation_active',
+      evaluationType: 'rubric',
+      reviewers: [
+        {
+          group: 'user',
+          id: user2.id
+        }
+      ],
+      spaceId: space.id,
+      userId: user1.id
+    });
+
+    await updateProposalStatus({
+      proposalId: rubricClosedProposal.proposal.id,
+      newStatus: 'evaluation_closed',
+      userId: user1.id
+    });
+
     // User is a space member
     // Move a reviewed proposal to vote_active
     // Single proposal task with action vote
@@ -161,18 +194,17 @@ describe('getProposalStatusChangeTasks()', () => {
       userId: user2.id
     });
 
-    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(
-      user1.id,
-      await prisma.workspaceEvent.findMany({
-        where: {
-          createdAt: {
-            lte: new Date(),
-            gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-          },
-          type: 'proposal_status_change'
-        }
-      })
-    );
+    const events = await prisma.workspaceEvent.findMany({
+      where: {
+        createdAt: {
+          lte: new Date(),
+          gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
+        },
+        type: 'proposal_status_change'
+      }
+    });
+
+    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(user1.id, events);
 
     expect(proposalTasks).toEqual(
       expect.arrayContaining([
@@ -195,6 +227,14 @@ describe('getProposalStatusChangeTasks()', () => {
         expect.objectContaining<Partial<ProposalTask>>({
           action: 'review',
           pagePath: reviewProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'review',
+          pagePath: rubricReviewerProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'evaluation_closed',
+          pagePath: rubricClosedProposal.path
         })
       ])
     );

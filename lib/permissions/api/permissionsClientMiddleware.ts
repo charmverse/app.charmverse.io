@@ -51,6 +51,8 @@ export function providePermissionClients({ key, location, resourceIdType }: Midd
 
     req.spacePermissionsEngine = clientWithInfo.type;
 
+    req.authorizedSpaceId = clientWithInfo.spaceId;
+
     // Allows using this as a middleware, or inside another middleware which should not pass the next function
     next?.();
   };

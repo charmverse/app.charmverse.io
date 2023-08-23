@@ -6,12 +6,14 @@ import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
-import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
+import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -22,19 +24,27 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalProperties';
 import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
 import { useProposalDialog } from './hooks/useProposalDialog';
 
+export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  headerImage: string | null;
+  icon: string | null;
+};
+
 type Props = {
-  setFormInputs: (params: Partial<ProposalFormInputs>) => void;
-  formInputs: ProposalFormInputs;
+  setFormInputs: (params: Partial<ProposalPageAndPropertiesInput>) => void;
+  formInputs: ProposalPageAndPropertiesInput;
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
 // Note: this component is only used before a page is saved to the DB
-export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
+export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
@@ -44,6 +54,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
 
   usePreventReload(contentUpdated);
+
+  const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
 
@@ -56,6 +68,10 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
       setReadOnlyEditor(!formInputs.proposalTemplateId);
     }
   }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
+
+  const readOnlyReviewers =
+    isFromTemplateSource &&
+    !!proposalTemplates?.find((t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0);
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -85,7 +101,10 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
           pageProps: {
             content: formInputs.content,
             contentText: formInputs.contentText ?? '',
-            title: formInputs.title
+            title: formInputs.title,
+            sourceTemplateId: formInputs.proposalTemplateId,
+            headerImage: formInputs.headerImage,
+            icon: formInputs.icon
           },
           evaluationType: formInputs.evaluationType,
           rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -135,7 +154,8 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
   return (
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
-        <Container top={50} fullWidth={isSmallScreen}>
+        {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+        <Container top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
               placeholderText={
@@ -161,23 +181,21 @@ export function ProposalPage({ setFormInputs, formInputs, contentUpdated, setCon
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
-                headerImage={null}
-                icon={null}
+                headerImage={formInputs.headerImage}
+                icon={formInputs.icon}
                 readOnly={false}
                 updatedAt={new Date().toString()}
                 title={formInputs.title || ''}
                 // readOnly={readOnly || !!enableSuggestingMode}
                 setPage={(updatedPage) => {
-                  setFormInputs({
-                    title: updatedPage.title
-                  });
+                  setFormInputs(updatedPage);
                 }}
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
                   <ProposalProperties
                     readOnlyRubricCriteria={isFromTemplateSource}
-                    readOnlyReviewers={isFromTemplateSource && formInputs.reviewers.length > 0}
+                    readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
