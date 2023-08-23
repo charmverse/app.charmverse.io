@@ -28,10 +28,13 @@ export class DatabasePage extends GlobalPage {
     return this.page.locator(`data-test=table-property-${type}`);
   }
 
-  getTablePropertyValueLocator({ row, propertyType }: { row?: number; propertyType: PropertyType }) {
-    return this.page
-      .locator(`data-test=database-table-row-${row ?? 0}`)
-      .locator(`data-test=property-value-${propertyType}`)
-      .first();
+  getTablePropertySelectLocator({ cardId }: { cardId?: string }) {
+    return {
+      closedSelect: this.page
+        .locator(`data-test=database-row-${cardId}`)
+        .locator('data-test=closed-select-input')
+        .first(),
+      openSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=autocomplete').first()
+    };
   }
 }

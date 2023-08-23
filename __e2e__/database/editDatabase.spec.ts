@@ -1,10 +1,13 @@
 import type { User } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
+
+import { baseUrl } from 'config/constants';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -24,6 +27,7 @@ const test = base.extend<Fixtures>({
 let spaceUser: User;
 let space: Space;
 let databasePagePath: string;
+let databasePageId: string;
 
 test.beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
@@ -56,17 +60,24 @@ test.describe.serial('Edit database select properties', async () => {
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
     await expect(pagesSidebar.databasePage).toBeVisible();
-    await page.pause();
 
     // Initialise the new database
     await expect(databasePage.selectNewDatabaseAsSource).toBeVisible();
 
     await databasePage.selectNewDatabaseAsSource.click();
 
-    await expect(databasePage.addTablePropButton).toBeVisible();
+    // Wait until the database is initialised
+    await expect(databasePage.addCardFromTableButton).toBeVisible();
 
     const pageUrl = page.url();
-    databasePagePath = pageUrl.split('/')[pageUrl.length - 1];
+    databasePagePath = pageUrl
+      .split(baseUrl as string)[1]
+      .split('/')[2]
+      .split('?')[0];
+
+    databasePageId = await prisma.page
+      .findFirstOrThrow({ where: { path: databasePagePath, spaceId: space.id } })
+      .then((p) => p.id);
   });
 
   test('edit a board', async ({ page, document, databasePage }) => {
@@ -93,32 +104,40 @@ test.describe.serial('Edit database select properties', async () => {
     expect(selectPropertyType).toBeVisible();
 
     await selectPropertyType.click();
-
     // Create new card and close it
     await databasePage.addCardFromTableButton.click();
 
-    await expect(databasePage.closeModal).toBeVisible();
+    // Leave time for all creation processes to happen
+    await page.waitForTimeout(500);
 
-    await databasePage.closeModal.click();
+    const card = await prisma.page.findFirstOrThrow({ where: { parentId: databasePageId } });
 
-    const selectValueLocator = databasePage.getTablePropertyValueLocator({
-      propertyType: 'select',
-      row: 0
+    const { closedSelect, openSelect } = databasePage.getTablePropertySelectLocator({
+      cardId: card.id
     });
 
-    await expect(selectValueLocator).toBeVisible();
+    await expect(closedSelect).toBeVisible();
 
-    await selectValueLocator.click();
+    await closedSelect.click();
 
-    const inputInitialLocator = selectValueLocator.locator('data-test=select-input-open');
+    await expect(openSelect).toBeVisible();
 
-    await inputInitialLocator.click();
+    await openSelect.focus();
 
-    const inputOpenedLocator = selectValueLocator.locator('data-test=select-input-type');
+    const optionValue = 'Option 1';
 
-    await expect(inputLocator).toBeVisible();
+    await openSelect.type(optionValue);
 
-    await inputLocator.click({ clickCount: 3 });
-    // Edit the card
+    await openSelect.press('Enter');
+
+    await expect(openSelect).not.toBeVisible();
+
+    await expect(closedSelect).toBeVisible();
+
+    await page.waitForTimeout(500);
+
+    const textValue = (await closedSelect.allInnerTexts()).join('');
+
+    expect(textValue).toMatch(optionValue);
   });
 });

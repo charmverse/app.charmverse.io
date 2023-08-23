@@ -206,8 +206,8 @@ function TableHeaders(props: Props): JSX.Element {
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
         {!props.readOnly && !props.readOnlySourceData && (
           <>
-            <Button data-test='add-table-prop' {...bindTrigger(addPropertyPopupState)}>
-              <AddIcon fontSize='small' />
+            <Button {...bindTrigger(addPropertyPopupState)}>
+              <AddIcon data-test='add-table-prop' fontSize='small' />
             </Button>
             {isSmallScreen ? (
               <MobileDialog
