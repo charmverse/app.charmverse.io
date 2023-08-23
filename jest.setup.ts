@@ -14,7 +14,7 @@ jest.mock('lib/blockchain/getENSName', () => ({
   default: jest.fn().mockImplementation(() => Promise.resolve(null))
 }));
 
-jest.mock('lib/alchemy/getNFTs', () => ({
+jest.mock('lib/blockchain/provider/alchemy', () => ({
   ...jest.requireActual('lib/alchemy/getNFTs'),
   __esModule: true,
   getNFTs: jest.fn().mockImplementation(() => Promise.resolve([]))
