@@ -21,7 +21,7 @@ type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider };
 
 export type ILensProfileContext = {
   lensProfile: ProfileFragment | null;
-  setupLensProfile: () => Promise<void>;
+  setupLensProfile: () => Promise<ProfileFragment | null>;
   createPost: (proposal: PageWithContent) => Promise<void>;
 };
 
@@ -51,7 +51,7 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
 
   async function fetchLensProfile() {
     if (!user || !account) {
-      return;
+      return null;
     }
 
     const lensProfiles = await lensClient.profile.fetchAll({
@@ -62,6 +62,8 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
     if (lensProfiles.items.length > 0) {
       setLensProfile(lensProfiles.items[0]);
     }
+
+    return lensProfiles.items[0] ?? null;
   }
 
   useEffect(() => {
@@ -83,7 +85,7 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
 
   async function authenticateLensProfile() {
     if (!user || !account) {
-      return;
+      return null;
     }
 
     const isAuthenticated = await lensClient.authentication.isAuthenticated();
@@ -93,15 +95,15 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
       const signature = await web3Provider.getSigner(account).signMessage(challenge);
       await lensClient.authentication.authenticate(account, signature);
     }
-    await fetchLensProfile();
+    return fetchLensProfile();
   }
 
   async function setupLensProfile() {
     if (chainId !== RPC[CHAIN].chainId) {
       await switchNetwork();
-      await authenticateLensProfile();
+      return authenticateLensProfile();
     } else {
-      await authenticateLensProfile();
+      return authenticateLensProfile();
     }
   }
 

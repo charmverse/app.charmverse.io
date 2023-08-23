@@ -1,20 +1,45 @@
-import { Box, InputLabel, Stack, Switch, Tooltip, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Box, CircularProgress, InputLabel, Stack, Switch, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import { useLensProfile } from 'components/settings/LensProfileProvider';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
 export function LensPublication() {
   const { user, updateUser } = useUser();
   const { setupLensProfile, lensProfile } = useLensProfile();
-
+  const { showMessage } = useSnackbar();
   const [isSwitchOn, setIsSwitchOn] = useState(user?.autoLensPublish ?? false);
+  const [isSettingUpLensProfile, setIsSettingUpLensProfile] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setIsSwitchOn(user.autoLensPublish ?? false);
+    }
+  }, [user]);
 
   async function setAutoLensPublish() {
-    if (user) {
+    if (!user) {
+      return;
+    }
+    setIsSettingUpLensProfile(true);
+    let _lensProfile = lensProfile;
+    if (!_lensProfile) {
+      try {
+        _lensProfile = await setupLensProfile();
+        showMessage('Lens profile setup successfully', 'success');
+      } catch (err) {
+        showMessage('Failed to setup Lens profile', 'error');
+        // User rejected to sign the message
+        return;
+      } finally {
+        setIsSettingUpLensProfile(false);
+      }
+    }
+    // Only continue if the user has a lens profile
+    if (_lensProfile) {
       const newState = !isSwitchOn;
       setIsSwitchOn(newState);
       await charmClient.updateUser({
@@ -22,6 +47,7 @@ export function LensPublication() {
       });
       updateUser({ ...user, autoLensPublish: newState });
     }
+    setIsSettingUpLensProfile(false);
   }
 
   return (
@@ -38,32 +64,26 @@ export function LensPublication() {
       <Stack gap={2}>
         <InputLabel>
           <Stack flexDirection='row' alignItems='center' gap={1}>
-            <Tooltip title={!lensProfile ? "You don't have any Lens profile" : ''}>
-              <div>
-                <Switch size='small' disabled={!lensProfile} checked={isSwitchOn} onChange={setAutoLensPublish} />
-              </div>
-            </Tooltip>
+            <div>
+              <Switch
+                size='small'
+                disabled={isSettingUpLensProfile}
+                checked={isSwitchOn}
+                onChange={setAutoLensPublish}
+              />
+            </div>
             Lens Publication
+            {isSettingUpLensProfile && <CircularProgress sx={{ ml: 1 }} color='secondary' size={16} />}
           </Stack>
-          <Typography variant='caption'>Automatically publish Proposal and associated comments to Lens</Typography>
+          <Typography variant='caption'>
+            Automatically publish Proposal and associated comments to Lens. You must have a Lens profile.
+          </Typography>
         </InputLabel>
       </Stack>
-      {lensProfile ? (
+      {lensProfile && (
         <Typography variant='caption' my={0.5}>
           Signed in as {lensProfile.handle}
         </Typography>
-      ) : (
-        <Button
-          onClick={setupLensProfile}
-          size='small'
-          sx={{
-            my: 1,
-            width: 'fit-content'
-          }}
-          startIcon={<img src='/images/logos/lens_logo.png' alt='Lens' width={16} height={16} />}
-        >
-          Login
-        </Button>
       )}
     </Stack>
   );
