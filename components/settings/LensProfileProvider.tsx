@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { BigNumber } from '@ethersproject/bignumber';
 import type { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import type { ProfileFragment } from '@lens-protocol/client';
+import type { CreatePostTypedDataFragment, ProfileFragment } from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
@@ -98,14 +98,15 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
 
   async function setupLensProfile() {
     if (chainId !== RPC[CHAIN].chainId) {
-      authenticateLensProfile();
+      await switchNetwork();
+      await authenticateLensProfile();
     } else {
-      authenticateLensProfile();
+      await authenticateLensProfile();
     }
   }
 
   async function createLensPostPublication(proposal: PageWithContent) {
-    if (!lensProfile || !user?.autoLensPublish || !space) {
+    if (!lensProfile || !user?.autoLensPublish || !space || !account) {
       return;
     }
 
@@ -114,21 +115,34 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
       title: proposal.title
     });
 
-    createPostPublication({
-      contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
-      proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
-      lensProfile
-    })
-      .then(() => {
-        showMessage('Proposal published to Lens', 'info');
-      })
-      .catch((error) => {
-        log.error('Publishing proposal to Lens failed', {
-          error,
-          proposalId: proposal.id,
-          spaceId: space.id
-        });
+    try {
+      const postPublication = await createPostPublication({
+        contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
+        proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
+        lensProfile
       });
+      if (postPublication.method === 'postTypedData' && postPublication.data.isSuccess()) {
+        const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
+        const { id, typedData } = postTypedDataFragment;
+        const web3Provider: Web3Provider = library;
+        const signature = await web3Provider
+          .getSigner(account)
+          ._signTypedData(typedData.domain, typedData.types, typedData.value);
+        await lensClient.transaction.broadcast({
+          id,
+          signature
+        });
+        showMessage('Proposal published to Lens', 'info');
+      } else {
+        showMessage('Proposal published to Lens', 'info');
+      }
+    } catch (error) {
+      log.error('Publishing proposal to Lens failed', {
+        error,
+        proposalId: proposal.id,
+        spaceId: space.id
+      });
+    }
   }
 
   async function createPost(proposal: PageWithContent) {

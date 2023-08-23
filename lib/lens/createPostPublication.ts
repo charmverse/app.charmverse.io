@@ -89,11 +89,26 @@ export async function createPostPublication({
 
   if (canUseRelay) {
     if (useDataAvailability && isSponsored) {
-      return lensClient.publication.createDataAvailabilityPostViaDispatcher(dataAvailabilityRequest);
+      const dataAvailabilityPostViaDispatcher = await lensClient.publication.createDataAvailabilityPostViaDispatcher(
+        dataAvailabilityRequest
+      );
+      return {
+        method: 'dataAvailabilityPostViaDispatcher',
+        data: dataAvailabilityPostViaDispatcher
+      };
     }
 
-    return lensClient.publication.createPostViaDispatcher(request);
+    const postViaDispatcher = await lensClient.publication.createPostViaDispatcher(request);
+    return {
+      method: 'postViaDispatcher',
+      data: postViaDispatcher
+    };
   }
 
-  return lensClient.publication.createPostTypedData(request);
+  const postTypedData = await lensClient.publication.createPostTypedData(request);
+
+  return {
+    method: 'postTypedData',
+    data: postTypedData
+  };
 }
