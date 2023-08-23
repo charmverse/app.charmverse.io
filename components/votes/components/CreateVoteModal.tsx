@@ -24,77 +24,12 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
 import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ExtendedVote } from 'lib/votes/interfaces';
-
-interface InlineVoteOptionsProps {
-  options: { name: string }[];
-  setOptions: Dispatch<SetStateAction<{ name: string }[]>>;
-}
-
-function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
-  return (
-    <div>
-      {options.map((option, index) => {
-        return (
-          <ListItem
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}
-          >
-            <TextField
-              // Disable changing text for No change option
-              fullWidth
-              placeholder={`Option ${index + 1}`}
-              value={option.name}
-              onChange={(e) => {
-                options[index] = {
-                  name: e.target.value
-                };
-                setOptions([...options]);
-              }}
-            />
-            <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
-              <div>
-                <IconButton
-                  disabled={options.length <= 2}
-                  size='small'
-                  onClick={() => {
-                    setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
-                  }}
-                >
-                  <DeleteOutlinedIcon fontSize='small' />
-                </IconButton>
-              </div>
-            </Tooltip>
-          </ListItem>
-        );
-      })}
-      <Stack alignItems='flex-end' flex={1}>
-        <Button
-          sx={{ mr: 4 }}
-          variant='outlined'
-          color='secondary'
-          size='small'
-          onClick={() => {
-            setOptions([
-              ...options,
-              {
-                name: ''
-              }
-            ]);
-          }}
-        >
-          <AddCircle fontSize='small' sx={{ mr: 1 }} />
-          <Typography variant='subtitle1'>Add Option</Typography>
-        </Button>
-      </Stack>
-    </div>
-  );
-}
 
 interface CreateVoteModalProps {
   onClose?: () => void;
@@ -129,6 +64,7 @@ export function CreateVoteModal({
     content: emptyDocument,
     contentText: ''
   });
+  const [maxChoices, setMaxChoices] = useState(1);
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -161,6 +97,10 @@ export function CreateVoteModal({
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
+
+    const maxChoicesToSave = voteType === VoteType.Approval ? 1 : maxChoices;
+    const voteTypeToSave = maxChoicesToSave > 1 ? VoteType.MultiChoice : voteType;
+
     const vote = await createVote({
       deadline: deadline.toJSDate(),
       voteOptions: options.map((option) => option.name),
@@ -170,9 +110,9 @@ export function CreateVoteModal({
       pageId,
       postId,
       threshold: +passThreshold,
-      type: voteType,
       context: proposal ? 'proposal' : 'inline',
-      maxChoices: 1
+      type: voteTypeToSave,
+      maxChoices: maxChoicesToSave
     });
 
     if (onCreateVote) {
@@ -274,60 +214,44 @@ export function CreateVoteModal({
           </Box>
         )}
         <Box display='flex' gap={1}>
-          <Box flexDirection='column' display='flex' flexGrow={1}>
-            <FieldLabel>End date</FieldLabel>
+          <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' flex={1}>
+            <FieldLabel whiteSpace='nowrap'>End date:</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
-            <DateTimePicker
-              minDate={DateTime.fromMillis(Date.now())}
-              value={deadline}
-              disableMaskedInput
-              onAccept={async (value) => {
-                if (value) {
-                  setDeadline(value);
-                }
-              }}
-              onChange={(value) => {
-                if (value) {
-                  setDeadline(value);
-                }
-              }}
-              renderInput={(props) => (
-                <TextField
-                  {...props}
-                  inputProps={{
-                    ...props.inputProps,
-                    readOnly: true
-                  }}
-                  fullWidth
-                  onClick={() => {
-                    setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                  }}
-                />
-              )}
-              onClose={() => setIsDateTimePickerOpen(false)}
-              open={isDateTimePickerOpen}
-            />
-          </Box>
-          <Box flexDirection='column' display='flex' flexGrow={1}>
-            <FieldLabel>Pass Threshold (%)</FieldLabel>
-            <TextField
-              fullWidth
-              type='number'
-              value={passThreshold}
-              onChange={(e) => {
-                setPassThreshold(Number(e.target.value as any));
-              }}
-              InputProps={{
-                inputProps: {
-                  min: 1,
-                  max: 100,
-                  step: 1
-                }
-              }}
-            />
-          </Box>
+            <Stack>
+              <DateTimePicker
+                minDate={DateTime.fromMillis(Date.now())}
+                value={deadline}
+                disableMaskedInput
+                onAccept={async (value) => {
+                  if (value) {
+                    setDeadline(value);
+                  }
+                }}
+                onChange={(value) => {
+                  if (value) {
+                    setDeadline(value);
+                  }
+                }}
+                renderInput={(props) => (
+                  <TextField
+                    {...props}
+                    inputProps={{
+                      ...props.inputProps,
+                      readOnly: true
+                    }}
+                    fullWidth
+                    onClick={() => {
+                      setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
+                    }}
+                  />
+                )}
+                onClose={() => setIsDateTimePickerOpen(false)}
+                open={isDateTimePickerOpen}
+              />
+            </Stack>
+          </Stack>
         </Box>
-        <Box display='flex' gap={2} alignItems='center'>
+        <Box display='flex' gap={2} alignItems='center' justifyContent='space-between'>
           <Typography fontWeight='bold'>Options: </Typography>
           <RadioGroup
             row
@@ -338,11 +262,92 @@ export function CreateVoteModal({
             }}
           >
             <FormControlLabel value={VoteType.Approval} control={<Radio />} label='Yes / No / Abstain' />
-            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='Custom Options' />
+            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='Custom Options' sx={{ mr: 0 }} />
           </RadioGroup>
         </Box>
-        {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
+        {voteType === VoteType.SingleChoice && (
+          <Stack>
+            <InlineVoteOptions options={options} setOptions={setOptions} />
+            <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+              <FieldLabel>Max choices:</FieldLabel>
+              <NumericFieldWithButtons value={maxChoices} onChange={setMaxChoices} min={1} />
+            </Stack>
+          </Stack>
+        )}
+
+        {maxChoices === 1 && (
+          <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+            <FieldLabel>Pass Threshold (%):</FieldLabel>
+            <NumericFieldWithButtons value={passThreshold} onChange={setPassThreshold} max={100} />
+          </Stack>
+        )}
       </Box>
     </Dialog>
+  );
+}
+
+interface InlineVoteOptionsProps {
+  options: { name: string }[];
+  setOptions: Dispatch<SetStateAction<{ name: string }[]>>;
+}
+
+function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
+  return (
+    <div>
+      {options.map((option, index) => {
+        return (
+          <ListItem
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            sx={{ px: 0, pt: 0, display: 'flex', gap: 0.5 }}
+          >
+            <TextField
+              // Disable changing text for No change option
+              fullWidth
+              placeholder={`Option ${index + 1}`}
+              value={option.name}
+              onChange={(e) => {
+                options[index] = {
+                  name: e.target.value
+                };
+                setOptions([...options]);
+              }}
+            />
+            <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
+              <div>
+                <IconButton
+                  disabled={options.length <= 2}
+                  size='small'
+                  onClick={() => {
+                    setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
+                  }}
+                >
+                  <DeleteOutlinedIcon fontSize='small' />
+                </IconButton>
+              </div>
+            </Tooltip>
+          </ListItem>
+        );
+      })}
+      <Stack flex={1}>
+        <Button
+          sx={{ mr: 4 }}
+          variant='outlined'
+          color='secondary'
+          size='small'
+          onClick={() => {
+            setOptions([
+              ...options,
+              {
+                name: ''
+              }
+            ]);
+          }}
+        >
+          <AddCircle fontSize='small' sx={{ mr: 1 }} />
+          <Typography variant='subtitle1'>Add Option</Typography>
+        </Button>
+      </Stack>
+    </div>
   );
 }
