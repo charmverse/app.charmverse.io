@@ -57,7 +57,7 @@ export async function verifyMembership({
       });
       // check another user isnt already using this Summon account
       if (summonUserId) {
-        const existing = await prisma.user.findUnique({
+        const existing = await prisma.user.findFirst({
           where: {
             xpsEngineId: summonUserId
           }

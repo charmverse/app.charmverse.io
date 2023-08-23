@@ -6,6 +6,7 @@ import type { LoggedInUser } from 'models';
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
   const id = uuid();
   return {
+    autoLensPublish: false,
     id: uuid(),
     avatar: null,
     avatarChain: null,
