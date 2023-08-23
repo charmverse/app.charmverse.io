@@ -10,7 +10,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
 import { charmverseDiscordInvite } from 'config/constants';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 import { Container } from './components/LoginLayout';
 

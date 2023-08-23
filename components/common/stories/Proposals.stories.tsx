@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
-import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
@@ -56,12 +56,14 @@ function Context({ children }: { children: ReactNode }) {
 
 export function NewProposal() {
   const [contentUpdated, setContentUpdated] = useState(false);
-  const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
+  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>({
     authors: [],
     categoryId: null,
     content: null,
     contentText: '',
     evaluationType: 'rubric',
+    headerImage: null,
+    icon: null,
     proposalTemplateId: null,
     reviewers: [],
     rubricCriteria: [

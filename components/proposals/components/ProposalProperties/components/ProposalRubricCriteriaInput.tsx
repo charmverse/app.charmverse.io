@@ -9,6 +9,7 @@ import { AddAPropertyButton } from 'components/common/BoardEditor/components/pro
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type RangeProposalCriteria = {
   id: string;
@@ -291,10 +292,6 @@ export function IntegerInput({
   );
 }
 
-function getNumberFromString(strValue: string): number | null {
-  const parsedString = parseInt(strValue, 10);
-  return parsedString || parsedString === 0 ? parsedString : null;
-}
 function isValidCriteria(criteria: RangeProposalCriteria, rubricAnswers: ProposalRubricCriteriaAnswer[]) {
   const min = criteria.parameters.min;
   const max = criteria.parameters.max;

@@ -413,33 +413,33 @@ export class DocumentEventHandler {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
         // Go through the diffs and see if any of them are for deleting a page.
-        for (const ds of message.ds) {
-          if (ds.stepType === 'replace') {
-            // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
-            // We don't need to restore the page if it was created by the user manually
-            if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
-              ds.slice.content.forEach((node) => {
-                if (node && node.type === 'page' && node.attrs) {
+        try {
+          for (const ds of message.ds) {
+            if (ds.stepType === 'replace') {
+              // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
+              // We don't need to restore the page if it was created by the user manually
+              if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
+                ds.slice.content.forEach((node) => {
+                  if (node && node.type === 'page' && node.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
+                    // pagePath is null when the page is not a linked page
+                    if (pageId && pageType === null && pagePath === null) {
+                      restoredPageIds.push(node.attrs?.id);
+                    }
+                  }
+                });
+              } else if (ds.from + 1 === ds.to) {
+                // deleted using row action menu
+                const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
+                if (node && node.attrs && node.type === 'page') {
                   const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                  // pagePath is null when the page is not a linked page
                   if (pageId && pageType === null && pagePath === null) {
-                    restoredPageIds.push(node.attrs?.id);
+                    deletedPageIds.push(pageId);
                   }
                 }
-              });
-            } else if (ds.from + 1 === ds.to) {
-              // deleted using row action menu
-              const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
-              if (node && node.attrs && node.type === 'page') {
-                const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                if (pageId && pageType === null && pagePath === null) {
-                  deletedPageIds.push(pageId);
-                }
-              }
-            } else {
-              // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
-              // deleted using multi line selection
-              try {
+              } else {
+                // deleted using multi line selection
+                // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
                 room.node.nodesBetween(ds.from, ds.to, (_node) => {
                   const jsonNode = _node.toJSON() as PageContent;
                   if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
@@ -449,11 +449,16 @@ export class DocumentEventHandler {
                     }
                   }
                 });
-              } catch (error) {
-                log.error('Error when looping through nodes', { error, ...logMeta });
               }
             }
           }
+        } catch (error) {
+          log.warn('Error looping through nodes for page meta', {
+            error,
+            docSize: room.node.nodeSize,
+            ds: message.ds,
+            ...logMeta
+          });
         }
 
         try {

@@ -21,7 +21,7 @@ import type { ReactNode } from 'react';
 
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   text: <TextIcon fontSize='small' />,

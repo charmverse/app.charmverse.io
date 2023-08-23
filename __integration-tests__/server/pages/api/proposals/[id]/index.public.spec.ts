@@ -5,6 +5,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
+import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -94,14 +95,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${page.proposalId}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
+    const updated = await getProposal({ proposalId: page.proposalId! });
     // Make sure update went through
     expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>([
       {
@@ -182,15 +182,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${proposalTemplate.id}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${proposalTemplate.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: proposalTemplate.id });
     expect(updated.proposal?.reviewers).toHaveLength(2);
     expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
