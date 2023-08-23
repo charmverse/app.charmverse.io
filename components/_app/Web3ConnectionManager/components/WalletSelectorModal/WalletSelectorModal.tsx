@@ -33,8 +33,13 @@ type Props = {
 };
 
 export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
-  const { setActivatingConnector, closeWalletSelectorModal, isConnectingIdentity, activatingConnector } =
-    useWeb3ConnectionManager();
+  const {
+    setActivatingConnector,
+    closeWalletSelectorModal,
+    isWalletSelectorModalOpen,
+    isConnectingIdentity,
+    activatingConnector
+  } = useWeb3ConnectionManager();
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
   const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
@@ -59,10 +64,10 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   // close the modal after signing in
   useEffect(() => {
-    if (active) {
+    if (active && isWalletSelectorModalOpen) {
       closeWalletSelectorModal();
     }
-  }, [active]);
+  }, [active, isWalletSelectorModalOpen]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
