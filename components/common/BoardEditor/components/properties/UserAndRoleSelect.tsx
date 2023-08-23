@@ -127,6 +127,7 @@ type Props = {
   showEmptyPlaceholder?: boolean;
   value: GroupedOption[];
   variant?: 'outlined' | 'standard';
+  'data-test'?: string;
 };
 
 export function UserAndRoleSelect({
@@ -136,7 +137,8 @@ export function UserAndRoleSelect({
   readOnly,
   showEmptyPlaceholder = true,
   variant = 'standard',
-  value: inputValue
+  value: inputValue,
+  'data-test': dataTest
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -213,7 +215,13 @@ export function UserAndRoleSelect({
   // TODO: maybe we don't need a separate component for un-open state?
   if (variant === 'standard' && !isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
+      <SelectPreviewContainer
+        data-test={dataTest}
+        isHidden={isOpen}
+        displayType={displayType}
+        readOnly={readOnly}
+        onClick={onClickToEdit}
+      >
         <Stack gap={0.5}>
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
@@ -228,6 +236,7 @@ export function UserAndRoleSelect({
   return (
     <StyledUserPropertyContainer displayType='details'>
       <StyledAutocomplete
+        data-test={dataTest}
         autoHighlight
         // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
         disableClearable
@@ -276,12 +285,19 @@ export function UserAndRoleSelect({
         renderOption={(_props, option) => {
           if (option.group === 'role') {
             return (
-              <li {..._props}>
+              <li data-test={`select-option-${option.id}`} {..._props}>
                 <Chip sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }} label={option.name} size='small' />
               </li>
             );
           }
-          return <UserDisplay {...(_props as any)} user={option} avatarSize='small' />;
+          return (
+            <UserDisplay
+              data-test={`select-option-${option.id}`}
+              {...(_props as any)}
+              user={option}
+              avatarSize='small'
+            />
+          );
         }}
         renderTags={() => (
           <SelectedReviewers wrapColumn readOnly={!!readOnly} value={populatedValue} onRemove={removeReviewer} />

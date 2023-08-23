@@ -86,6 +86,7 @@ interface UserDisplayProps extends StyleProps {
     id: string;
   } | null;
   showMiniProfile?: boolean;
+  'data-test'?: string;
 }
 
 function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {

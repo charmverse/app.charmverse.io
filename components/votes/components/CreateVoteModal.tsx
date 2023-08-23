@@ -302,6 +302,7 @@ export function CreateVoteModal({
         {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
         <Stack gap={2} flexDirection='row' alignItems='center'>
           <Button
+            data-test='create-vote-button'
             onClick={handleSubmit}
             sx={{
               alignSelf: 'flex-start'

@@ -355,6 +355,7 @@ export async function generateUserAndSpace({
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space: Space;
+  const spaceId = v4();
 
   if (existingSpaceId) {
     space = await prisma.space.findUniqueOrThrow({
@@ -364,6 +365,7 @@ export async function generateUserAndSpace({
   } else {
     space = await prisma.space.create({
       data: {
+        id: spaceId,
         name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
@@ -383,6 +385,12 @@ export async function generateUserAndSpace({
             isAdmin,
             // skip onboarding for normal test users
             onboarded: skipOnboarding
+          }
+        },
+        permittedGroups: {
+          create: {
+            operations: ['reviewProposals'],
+            spaceId
           }
         }
       }

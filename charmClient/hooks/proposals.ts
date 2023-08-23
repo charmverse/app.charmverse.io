@@ -28,8 +28,8 @@ export function useGetAllReviewerUserIds(proposalId: MaybeString) {
   return useGET<string[]>(proposalId ? `/api/proposals/${proposalId}/get-user-reviewerids` : null);
 }
 
-export function useGetReviewerPool(proposalId: MaybeString) {
-  return useGET<ProposalReviewerPool>(proposalId ? `/api/proposals/reviewer-pool?resourceId=${proposalId}` : null);
+export function useGetReviewerPool(categoryId: MaybeString) {
+  return useGET<ProposalReviewerPool>(categoryId ? `/api/proposals/reviewer-pool?resourceId=${categoryId}` : null);
 }
 
 export function useGetProposalFlowFlags(proposalId: MaybeString) {
