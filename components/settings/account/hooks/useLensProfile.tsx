@@ -85,7 +85,7 @@ export function useLensProfile() {
   }
 
   async function createPost(proposal: PageWithContent) {
-    if (!lensProfile || !user?.autoLensPublish || !space || !account) {
+    if (!lensProfile || !user?.publishToLensDefault || !space || !account) {
       return;
     }
 

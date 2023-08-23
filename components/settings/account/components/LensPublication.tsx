@@ -12,12 +12,12 @@ export function LensPublication() {
   const { user, updateUser } = useUser();
   const { setupLensProfile, lensProfile } = useLensProfile();
   const { showMessage } = useSnackbar();
-  const [isSwitchOn, setIsSwitchOn] = useState(user?.autoLensPublish ?? false);
+  const [isSwitchOn, setIsSwitchOn] = useState(user?.publishToLensDefault ?? false);
   const [isSettingUpLensProfile, setIsSettingUpLensProfile] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setIsSwitchOn(user.autoLensPublish ?? false);
+      setIsSwitchOn(user.publishToLensDefault ?? false);
     }
   }, [user]);
 
@@ -48,9 +48,9 @@ export function LensPublication() {
     if (isSwitchOn || _lensProfile) {
       setIsSwitchOn(newState);
       await charmClient.updateUser({
-        autoLensPublish: newState
+        publishToLensDefault: newState
       });
-      updateUser({ ...user, autoLensPublish: newState });
+      updateUser({ ...user, publishToLensDefault: newState });
     }
     setIsSettingUpLensProfile(false);
   }
