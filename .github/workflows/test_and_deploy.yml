@@ -41,6 +41,7 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          use_github_core_branch: feat/lens-profile-publish
 
       - name: Build app
         uses: ./.github/actions/build
