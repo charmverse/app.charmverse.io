@@ -180,6 +180,7 @@ export function VoteDetail({
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
               maxChoices={maxChoices}
+              hasPassedDeadline={hasPassedDeadline}
             />
           )}
         </StyledFormControl>

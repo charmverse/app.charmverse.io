@@ -1,5 +1,6 @@
 import type { VoteOptions } from '@charmverse/core/prisma-client';
-import { Box, Checkbox, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
+import { Box, Checkbox, Chip, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
+import { useMemo } from 'react';
 
 import { percent } from 'lib/utilities/numbers';
 
@@ -11,6 +12,7 @@ type Props = {
   totalVotes: number;
   aggregatedResult: Record<string, number>;
   maxChoices: number | null;
+  hasPassedDeadline: boolean;
 };
 
 export function MultiChoiceForm({
@@ -20,8 +22,18 @@ export function MultiChoiceForm({
   disabled,
   totalVotes,
   aggregatedResult,
-  maxChoices
+  maxChoices,
+  hasPassedDeadline
 }: Props) {
+  const sortedVoteOptions = useMemo(() => {
+    if (!hasPassedDeadline) return voteOptions;
+
+    const sortedOptions = [...voteOptions];
+    sortedOptions.sort((a, b) => (aggregatedResult[b.name] ?? 0) - (aggregatedResult[a.name] ?? 0));
+
+    return sortedOptions;
+  }, []);
+
   const isChecked = (v: string) => {
     if (Array.isArray(value)) {
       return value.includes(v);
@@ -41,10 +53,14 @@ export function MultiChoiceForm({
     onChange(newValue);
   };
 
+  const hasOptionPassed = (index: number) => {
+    return hasPassedDeadline && maxChoices && index < maxChoices;
+  };
+
   return (
     <Stack>
       <FormGroup>
-        {voteOptions.map(({ name }) => (
+        {sortedVoteOptions.map(({ name }, index) => (
           <FormControlLabel
             key={name}
             control={<Checkbox checked={isChecked(name)} onChange={handleChange} name={name} />}
@@ -52,11 +68,17 @@ export function MultiChoiceForm({
             disabled={disabled || (!isChecked(name) && value?.length === maxChoices)}
             label={
               <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                <Stack direction='row' spacing={1}>
-                  <Typography>{name}</Typography>
+                <Stack direction='row' spacing={1} justifyContent='space-between' mr={1} flex={1}>
+                  <Typography fontWeight={hasOptionPassed(index) ? 'bold' : 'normal'}>{name}</Typography>
+                  {hasOptionPassed(index) && <Chip color='primary' size='small' label='Passed' />}
                 </Stack>
 
-                <Typography variant='subtitle1' color='secondary' component='span'>
+                <Typography
+                  variant='subtitle1'
+                  color='secondary'
+                  component='span'
+                  sx={{ minWidth: '65px', textAlign: 'right' }}
+                >
                   {percent({
                     value: aggregatedResult?.[name] ?? 0,
                     total: totalVotes,
@@ -73,7 +95,11 @@ export function MultiChoiceForm({
 
       {typeof maxChoices === 'number' && (
         <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} mb={0.5}>
-          <Typography variant='subtitle1'>Choices left: {maxChoices - (value?.length || 0)}</Typography>
+          {hasPassedDeadline ? (
+            <Typography variant='subtitle1'>Max choices: {maxChoices}</Typography>
+          ) : (
+            <Typography variant='subtitle1'>Choices left: {maxChoices - (value?.length || 0)}</Typography>
+          )}
         </Stack>
       )}
     </Stack>

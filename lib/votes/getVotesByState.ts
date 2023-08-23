@@ -31,7 +31,7 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       } else {
         rejectedVotes.push(vote);
       }
-    } else {
+    } else if (vote.type === VoteType.SingleChoice) {
       const choices: string[] = vote.userVotes.reduce((currentChoices, userVote) => {
         if (userVote.choice) {
           currentChoices.push(userVote.choice);
@@ -72,6 +72,8 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       } else {
         passedVotes.push(vote);
       }
+    } else if (vote.type === VoteType.MultiChoice) {
+      passedVotes.push(vote);
     }
   }
 
