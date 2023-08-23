@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { BigNumber } from '@ethersproject/bignumber';
 import type { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import type { CreatePostTypedDataFragment, ProfileFragment } from '@lens-protocol/client';
+import type { CreatePostTypedDataFragment } from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -19,19 +19,7 @@ import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkd
 const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
 type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider };
 
-export type ILensProfileContext = {
-  lensProfile: ProfileFragment | null;
-  setupLensProfile: () => Promise<ProfileFragment | null>;
-  createPost: (proposal: PageWithContent) => Promise<void>;
-};
-
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
-
-export const LensProfileContext = createContext<Readonly<ILensProfileContext>>({
-  lensProfile: null,
-  setupLensProfile: () => new Promise(() => {}),
-  createPost: () => new Promise(() => {})
-});
 
 async function switchNetwork() {
   const { ethereum } = window as WindowType;
@@ -42,12 +30,27 @@ async function switchNetwork() {
   });
 }
 
-export function LensProfileProvider({ children }: { children: React.ReactNode }) {
-  const [lensProfile, setLensProfile] = useState<ProfileFragment | null>(null);
+export function useLensProfile() {
   const { account, library, chainId } = useWeb3AuthSig();
   const { user } = useUser();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
+  const { data: lensProfile, mutate } = useSWR(
+    user && account ? ['lensProfile', account] : null,
+    async () => {
+      if (!user || !account) {
+        return;
+      }
+
+      const isAuthenticated = await lensClient.authentication.isAuthenticated();
+      if (!isAuthenticated) {
+        return;
+      }
+
+      return fetchLensProfile();
+    },
+    {}
+  );
 
   async function fetchLensProfile() {
     if (!user || !account) {
@@ -59,33 +62,16 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
       limit: 1
     });
 
-    if (lensProfiles.items.length > 0) {
-      setLensProfile(lensProfiles.items[0]);
-    }
-
     return lensProfiles.items[0] ?? null;
   }
 
-  useEffect(() => {
-    async function setup() {
-      if (!user || !account) {
-        return;
-      }
-
-      const isAuthenticated = await lensClient.authentication.isAuthenticated();
-      if (!isAuthenticated) {
-        return;
-      }
-
-      await fetchLensProfile();
-    }
-
-    setup();
-  }, [user?.id, chainId, account]);
-
-  async function authenticateLensProfile() {
+  async function setupLensProfile() {
     if (!user || !account) {
       return null;
+    }
+
+    if (chainId !== RPC[CHAIN].chainId) {
+      await switchNetwork();
     }
 
     const isAuthenticated = await lensClient.authentication.isAuthenticated();
@@ -95,21 +81,16 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
       const signature = await web3Provider.getSigner(account).signMessage(challenge);
       await lensClient.authentication.authenticate(account, signature);
     }
-    return fetchLensProfile();
+    return mutate();
   }
 
-  async function setupLensProfile() {
-    if (chainId !== RPC[CHAIN].chainId) {
-      await switchNetwork();
-      return authenticateLensProfile();
-    } else {
-      return authenticateLensProfile();
-    }
-  }
-
-  async function createLensPostPublication(proposal: PageWithContent) {
+  async function createPost(proposal: PageWithContent) {
     if (!lensProfile || !user?.autoLensPublish || !space || !account) {
       return;
+    }
+
+    if (chainId !== RPC[CHAIN].chainId) {
+      await switchNetwork();
     }
 
     const markdownContent = await generateMarkdown({
@@ -134,10 +115,8 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
           id,
           signature
         });
-        showMessage('Proposal published to Lens', 'info');
-      } else {
-        showMessage('Proposal published to Lens', 'info');
       }
+      showMessage('Proposal published to Lens', 'info');
     } catch (error) {
       log.error('Publishing proposal to Lens failed', {
         error,
@@ -147,30 +126,9 @@ export function LensProfileProvider({ children }: { children: React.ReactNode })
     }
   }
 
-  async function createPost(proposal: PageWithContent) {
-    if (!lensProfile || !user?.autoLensPublish || !space) {
-      return;
-    }
-
-    if (chainId !== RPC[CHAIN].chainId) {
-      await switchNetwork();
-      await createLensPostPublication(proposal);
-      return;
-    }
-
-    await createLensPostPublication(proposal);
-  }
-
-  const value = useMemo<ILensProfileContext>(
-    () => ({
-      lensProfile,
-      setupLensProfile,
-      createPost
-    }),
-    [lensProfile, user, space, setupLensProfile, createPost]
-  );
-
-  return <LensProfileContext.Provider value={value}>{children}</LensProfileContext.Provider>;
+  return {
+    lensProfile,
+    setupLensProfile,
+    createPost
+  };
 }
-
-export const useLensProfile = () => useContext(LensProfileContext);

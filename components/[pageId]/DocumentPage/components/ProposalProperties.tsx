@@ -15,7 +15,7 @@ import type { ProposalPropertiesInput } from 'components/proposals/components/Pr
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useLensProfile } from 'components/settings/LensProfileProvider';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';

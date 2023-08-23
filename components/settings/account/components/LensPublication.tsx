@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Legend from 'components/settings/Legend';
-import { useLensProfile } from 'components/settings/LensProfileProvider';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+
+import { useLensProfile } from '../hooks/useLensProfile';
 
 export function LensPublication() {
   const { user, updateUser } = useUser();
@@ -24,9 +25,10 @@ export function LensPublication() {
     if (!user) {
       return;
     }
+    const newState = !isSwitchOn;
     setIsSettingUpLensProfile(true);
     let _lensProfile = lensProfile;
-    if (!_lensProfile) {
+    if (!_lensProfile && !isSwitchOn) {
       try {
         _lensProfile = await setupLensProfile();
         if (_lensProfile) {
@@ -42,9 +44,8 @@ export function LensPublication() {
         setIsSettingUpLensProfile(false);
       }
     }
-    // Only continue if the user has a lens profile
-    if (_lensProfile) {
-      const newState = !isSwitchOn;
+    // Only continue if the user has a lens profile or if the switch is turned on
+    if (isSwitchOn || _lensProfile) {
       setIsSwitchOn(newState);
       await charmClient.updateUser({
         autoLensPublish: newState
@@ -56,11 +57,7 @@ export function LensPublication() {
 
   return (
     <Stack mt={2}>
-      <Legend
-        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-        marginTop={(theme) => theme.spacing(4)}
-        id='multisig-section'
-      >
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4 }}>
         <Box component='span' display='flex' alignItems='center' gap={1}>
           Publish
         </Box>

@@ -3,6 +3,7 @@ import { CollectModules, PublicationMainFocus, PublicationMetadataDisplayTypes }
 import { v4 as uuid } from 'uuid';
 
 import { POST } from 'adapters/http';
+import { getUserLocale } from 'lib/utilities/browser';
 
 import type { CollectModuleType } from './interfaces';
 import { lensClient } from './lensClient';
@@ -18,18 +19,14 @@ const INITIAL_COLLECT_MODULE: CollectModuleType = {
 };
 
 const uploadToArweave = async (data: any): Promise<string> => {
-  const response = (await POST('https://metadata.lenster.xyz', data, {
+  const response = await POST<string>('https://metadata.lenster.xyz', data, {
     headers: { 'Content-Type': 'application/json' },
     // remove credentials to bypass CORS error
     credentials: 'omit'
-  })) as string;
+  });
   // Lenster response header content type is text/plain;charset=UTF-8, so we need to json parse it manually
   const { id } = JSON.parse(response);
   return id;
-};
-
-const getUserLocale = () => {
-  return navigator?.languages?.length ? navigator.languages[0] : navigator.language;
 };
 
 const collectModuleParams = (collectModule: CollectModuleType): { revertCollectModule: true } => {
@@ -48,20 +45,19 @@ export async function createPostPublication({
   proposalLink: string;
   lensProfile: ProfileFragment;
 }) {
-  const collectModule = INITIAL_COLLECT_MODULE;
   const restricted = false;
 
   // Dispatcher
   const canUseRelay = lensProfile?.dispatcher?.canUseRelay;
   const isSponsored = (lensProfile?.dispatcher as ProfileFragment['dispatcher'] & { sponsor: null | boolean })?.sponsor;
 
-  const isRevertCollectModule = collectModule.type === CollectModules.RevertCollectModule;
+  const isRevertCollectModule = INITIAL_COLLECT_MODULE.type === CollectModules.RevertCollectModule;
   const useDataAvailability = !restricted && isRevertCollectModule;
 
   const metadata: PublicationMetadataV2Input = {
     version: '2.0.0',
     metadata_id: uuid(),
-    content: `${contentText} \n\n CharmVerse Proposal Link: ${proposalLink}`,
+    content: `${contentText} \n\n View on CharmVerse: ${proposalLink}`,
     external_url: `https://lenster.xyz/u/${lensProfile.handle}`,
     image: null,
     imageMimeType: null,
@@ -72,7 +68,7 @@ export async function createPostPublication({
     media: [],
     tags: [],
     locale: getUserLocale(),
-    // lenster users Lenster
+    // lenster uses Lenster
     appId: 'CharmVerse'
   };
 
@@ -86,7 +82,7 @@ export async function createPostPublication({
   const request: CreatePublicPostRequest = {
     profileId: lensProfile.id,
     contentURI: `ar://${arweaveId}`,
-    collectModule: collectModuleParams(collectModule)
+    collectModule: collectModuleParams(INITIAL_COLLECT_MODULE)
   };
 
   if (canUseRelay) {
