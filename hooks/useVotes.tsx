@@ -23,7 +23,7 @@ type IContext = {
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
-  castVote: (voteId: string, option: string) => Promise<UserVote>;
+  castVote: (voteId: string, option: string | string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -175,7 +175,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       const vote = { ..._votes[voteId] };
       if (vote && user) {
         const currentChoice = vote.userChoice;
-        if (currentChoice) {
+        if (currentChoice?.length) {
           // Remove previous choices
           currentChoice.forEach((c) => {
             vote.aggregatedResult[c] -= 1;
@@ -193,13 +193,12 @@ export function VotesProvider({ children }: { children: ReactNode }) {
           });
         } else if (currentChoice && currentChoice.length) {
           // User deselected all previous choices
-          vote.totalVotes -= 1;
+          vote.totalVotes = vote.totalVotes > 0 ? vote.totalVotes - 1 : 0;
         }
 
-        _votes[voteId] = {
-          ...vote
-        };
+        _votes[voteId] = vote;
       }
+
       return { ..._votes };
     });
     removeVoteFromTask(voteId);

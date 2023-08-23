@@ -40,6 +40,8 @@ export async function castVote(
     }
   }));
 
+  // TODO - delete user vote when choices.length === 0
+
   const userVote = await prisma.userVote.upsert({
     where: {
       voteId_userId: {
