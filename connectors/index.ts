@@ -371,7 +371,8 @@ const supportedChains: Blockchain[] = [
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
 
 // Metamask Web3 Connector
-const injected = new InjectedConnector({ supportedChainIds });
+// Optionally there is the option to add an array of supportedChainIds
+const injected = new InjectedConnector({});
 
 // WalletConnect Web3 Connector
 const walletConnect = new WalletConnectV2Connector({
