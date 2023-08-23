@@ -90,7 +90,7 @@ export function ProposalStepSummary({
       case 'evaluation_closed':
         return 'This will close the Evaluation. No additional Rubric answers will be accepted.';
       case 'reviewed':
-        return 'By approving this proposal, you authorize its advancement to the voting stage, to be initiated by an author.';
+        return "By approving this proposal, you authorize its advancement to the voting stage. Voting is initiated by one of the proposal's authors.";
       default:
         return null;
     }
