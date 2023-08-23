@@ -20,6 +20,7 @@ const INITIAL_COLLECT_MODULE: CollectModuleType = {
 const uploadToArweave = async (data: any): Promise<string> => {
   const response = (await POST('https://metadata.lenster.xyz', data, {
     headers: { 'Content-Type': 'application/json' },
+    // remove credentials to bypass CORS error
     credentials: 'omit'
   })) as string;
   // Lenster response header content type is text/plain;charset=UTF-8, so we need to json parse it manually
@@ -71,7 +72,8 @@ export async function createPostPublication({
     media: [],
     tags: [],
     locale: getUserLocale(),
-    appId: 'Lenster'
+    // lenster users Lenster
+    appId: 'CharmVerse'
   };
 
   const arweaveId = await uploadToArweave(metadata);
@@ -105,6 +107,7 @@ export async function createPostPublication({
     };
   }
 
+  // No dispatcher was found so we need to manually sign the post publication transaction
   const postTypedData = await lensClient.publication.createPostTypedData(request);
 
   return {
