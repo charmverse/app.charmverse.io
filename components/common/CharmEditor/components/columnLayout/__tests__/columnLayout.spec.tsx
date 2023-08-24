@@ -7,6 +7,7 @@ jest.mock('hooks/useFirebaseAuth', () => ({
 }));
 
 jest.mock('components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting', () => ({}));
+jest.mock('components/settings/account/hooks/useLensProfile', () => ({}));
 
 jest.mock('@lit-protocol/lit-node-client', () => ({
   humanizeAccessControlConditions: () => {}

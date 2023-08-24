@@ -79,6 +79,8 @@ export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions
         </UserContext.Provider>
       </ThemeProvider>
     </SWRConfig>,
-    renderOptions
+    {
+      hydrate: true
+    }
   );
 };

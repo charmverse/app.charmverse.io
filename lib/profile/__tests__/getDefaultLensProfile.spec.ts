@@ -3,10 +3,10 @@ import { Wallet } from 'ethers';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
+import { lensClient } from '../../lens/lensClient';
 import { getDefaultLensProfile } from '../getDefaultLensProfile';
-import { lensClient } from '../lensClient';
 
-jest.mock('../lensClient', () => ({
+jest.mock('../../lens/lensClient', () => ({
   lensClient: {
     profile: {
       fetchAll: jest.fn().mockImplementation(() =>
@@ -58,15 +58,18 @@ describe('getDefaultLensProfile', () => {
       return Promise.resolve({
         items: [
           {
-            id: 'test'
+            id: 'test-1',
+            isDefault: false
+          },
+          {
+            id: 'test-2',
+            isDefault: true
           }
         ]
       });
     });
 
     const defaultLensProfile = await getDefaultLensProfile(user.id);
-    expect(defaultLensProfile).toStrictEqual({
-      id: 'test'
-    });
+    expect(defaultLensProfile?.id).toBe('test-2');
   });
 });

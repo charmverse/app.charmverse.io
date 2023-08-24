@@ -20,13 +20,16 @@ export async function switchActiveNetwork(chainId: number) {
       if (!chainInfo) {
         throw new Error('Unsupported chain');
       }
-
+      const { chainName, nativeCurrency, rpcUrls, blockExplorerUrls } = chainInfo;
       return (window as any).ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [
           {
-            ...chainInfo,
-            chainId: ethers.utils.hexValue(chainInfo?.chainId)
+            chainName,
+            nativeCurrency,
+            rpcUrls,
+            blockExplorerUrls,
+            chainId: ethers.utils.hexValue(chainId)
           }
         ]
       });

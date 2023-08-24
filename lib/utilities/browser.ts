@@ -373,3 +373,7 @@ export function redirectToAppLogin() {
 
   return false;
 }
+
+export function getUserLocale() {
+  return typeof navigator !== 'undefined' && navigator?.languages?.length ? navigator.languages[0] : navigator.language;
+}
