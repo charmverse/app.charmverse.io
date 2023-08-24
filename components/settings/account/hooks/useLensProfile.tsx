@@ -104,7 +104,6 @@ export function useLensProfile() {
         proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
         lensProfile
       });
-
       if (postPublication.data.isFailure()) {
         failedToPublishInLens = true;
         lensError = new Error(postPublication.data.error.message);
@@ -121,7 +120,7 @@ export function useLensProfile() {
         });
 
         if (broadcastResponse.isFailure()) {
-          failedToPublishInLens = broadcastResponse.isFailure();
+          failedToPublishInLens = true;
           lensError = new Error(broadcastResponse.error.message);
         } else if (broadcastResponse.value.__typename === 'RelayError') {
           failedToPublishInLens = true;
@@ -135,9 +134,6 @@ export function useLensProfile() {
           proposalId: proposal.id,
           spaceId: space.id
         });
-      } else if (postPublication.data.isFailure()) {
-        failedToPublishInLens = true;
-        lensError = new Error(postPublication.data.error.message);
       }
     } catch (error) {
       failedToPublishInLens = true;
