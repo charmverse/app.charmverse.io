@@ -16,9 +16,9 @@ import { lensClient } from 'lib/lens/lensClient';
 import type { PageWithContent } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
-const CHAIN: Blockchain = !isProdEnv ? 'POLYGON' : 'MUMBAI';
+const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
 
-const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
+const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
 async function switchNetwork() {
   return switchActiveNetwork(RPC[CHAIN].chainId);
@@ -88,16 +88,19 @@ export function useLensProfile() {
     }
 
     const markdownContent = await generateMarkdown({
-      content: proposal.content,
-      title: proposal.title
+      content: proposal.content
     });
 
     let failedToPublishInLens = false;
     let lensError: Error | null = null;
-
+    const isMarkdownContentOverflowing = markdownContent.length > LENS_PROPOSAL_PUBLICATION_LENGTH;
     try {
       const postPublication = await createPostPublication({
-        contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
+        contentText: `Proposal ${proposal.title} from ${space.name} is now open for feedback.\n\n${
+          isMarkdownContentOverflowing
+            ? `${markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH)}...`
+            : markdownContent
+        }`,
         proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
         lensProfile
       });
@@ -105,7 +108,7 @@ export function useLensProfile() {
       if (postPublication.data.isFailure()) {
         failedToPublishInLens = true;
         lensError = new Error(postPublication.data.error.message);
-      } else if (postPublication.dispatcherUsed && postPublication.data.isSuccess()) {
+      } else if (!postPublication.dispatcherUsed && postPublication.data.isSuccess()) {
         const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
         const { id, typedData } = postTypedDataFragment;
         const web3Provider: Web3Provider = library;

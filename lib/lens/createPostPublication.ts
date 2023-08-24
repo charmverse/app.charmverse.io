@@ -32,7 +32,7 @@ export async function createPostPublication({
   const metadata: PublicationMetadataV2Input = {
     version: '2.0.0',
     metadata_id: uuid(),
-    content: `${contentText} \n\n View on CharmVerse: ${proposalLink}`,
+    content: `${contentText}\n\nView on CharmVerse ${proposalLink}`,
     external_url: `https://lenster.xyz/u/${lensProfile.handle}`,
     image: null,
     imageMimeType: null,
