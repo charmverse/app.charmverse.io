@@ -17,7 +17,6 @@ interface NestedMemberships {
 }
 
 export interface LoggedInUser extends User {
-  publishToLensDefault: boolean | null;
   favorites: { pageId: string; index?: number }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: Pick<UserWallet, 'address' | 'ensname' | 'id'>[];

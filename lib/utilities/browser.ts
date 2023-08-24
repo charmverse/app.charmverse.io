@@ -374,6 +374,6 @@ export function redirectToAppLogin() {
   return false;
 }
 
-export const getUserLocale = () => {
-  return navigator?.languages?.length ? navigator.languages[0] : navigator.language;
-};
+export function getUserLocale() {
+  return typeof navigator !== 'undefined' && navigator?.languages?.length ? navigator.languages[0] : navigator.language;
+}
