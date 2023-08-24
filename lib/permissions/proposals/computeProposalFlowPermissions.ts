@@ -3,13 +3,16 @@ import type { PermissionCompute, ProposalFlowPermissionFlags } from '@charmverse
 import { TransitionFlags, getProposalFlagFilters } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
+
 import { computeProposalPermissions } from './computeProposalPermissions';
 import { countReviewers } from './countReviewers';
 
 const filters = getProposalFlagFilters({
   computeProposalPermissions,
   // In public mode, only take into account user reviewers
-  countReviewers
+  countReviewers,
+  isProposalReviewer
 });
 
 export async function computeProposalFlowPermissions({
