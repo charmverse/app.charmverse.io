@@ -9,8 +9,10 @@ export class ProposalPage extends DocumentPage {
     public categorySelect = page.locator('data-test=proposal-category-select'),
     public reviewerSelect = page.locator('data-test=proposal-reviewer-select'),
     public nextStatusButton = page.locator('data-test=next-status-button'),
+    public confirmStatusButton = page.locator('data-test=modal-confirm-button'),
     public createVoteButton = page.locator('data-test=create-vote-button'),
-    public voteContainer = page.locator('data-test=vote-container')
+    public voteContainer = page.locator('data-test=vote-container'),
+    public currentStatus = page.locator('data-test=current-proposal-status')
   ) {
     super(page);
   }

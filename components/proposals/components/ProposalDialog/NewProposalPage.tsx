@@ -1,6 +1,5 @@
 import type { Theme } from '@mui/material';
-import { Box, Stack, Typography, useMediaQuery } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -13,7 +12,6 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -62,9 +60,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
-
-  const confirmationPopup = usePopupState({ variant: 'popover', popupId: 'create-proposal-confirmation' });
-
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
@@ -152,6 +147,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
     disabledTooltip = 'Category is required';
   } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
     disabledTooltip = 'Template is required';
+  } else if (formInputs.reviewers.length === 0) {
+    disabledTooltip = 'Reviewers are required';
   }
 
   return (
@@ -220,25 +217,12 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             <Button
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
-              onClick={formInputs.reviewers.length < 1 ? confirmationPopup.open : createProposal}
+              onClick={createProposal}
               isLoading={isCreatingProposal}
               data-test='create-proposal-button'
             >
               Create
             </Button>
-            <ModalWithButtons
-              open={confirmationPopup.isOpen}
-              onClose={confirmationPopup.close}
-              buttonText='Ok'
-              onConfirm={confirmationPopup.close}
-              hideCancelButton
-              title='Assign a Reviewer to proceed'
-            >
-              <Typography>
-                The chosen Reviewer will perform a final examination, ensuring the proposal is ready for the
-                organization's {formInputs.evaluationType === 'vote' ? 'Vote' : 'Review'}.
-              </Typography>
-            </ModalWithButtons>
           </Stack>
         </Container>
       </div>
