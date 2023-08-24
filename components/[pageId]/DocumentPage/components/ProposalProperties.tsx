@@ -138,6 +138,7 @@ export function ProposalProperties({
 
   return (
     <ProposalPropertiesBase
+      proposalLensLink={proposal?.lensPostLink ?? undefined}
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}

@@ -10,6 +10,7 @@ import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
@@ -47,6 +48,7 @@ export type ProposalPropertiesInput = {
 };
 
 type ProposalPropertiesProps = {
+  proposalLensLink?: string;
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
@@ -73,6 +75,7 @@ type ProposalPropertiesProps = {
 };
 
 export function ProposalProperties({
+  proposalLensLink,
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
@@ -396,6 +399,29 @@ export function ProposalProperties({
               />
             </Box>
           </Box>
+
+          {/* Lens post link */}
+          {proposalLensLink && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                // override align-items flex-start with inline style
+                style={{
+                  alignItems: 'center'
+                }}
+              >
+                <PropertyLabel readOnly>Lens Link</PropertyLabel>
+                <Link href={`https://lenster.xyz/posts/${proposalLensLink}`} target='_blank' rel='noopener noreferrer'>
+                  <Typography variant='body2' color='primary'>
+                    {proposalLensLink}
+                  </Typography>
+                </Link>
+              </Box>
+            </Box>
+          )}
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
