@@ -5,6 +5,8 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 export function createMockProposal(input: Partial<ProposalWithUsersAndRubric> = {}): ProposalWithUsersAndRubric {
   const id = uuid();
   return {
+    lensPostLink: null,
+    publishToLens: null,
     archived: false,
     category: null,
     createdBy: '',

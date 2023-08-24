@@ -52,6 +52,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
+
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
 
   usePreventReload(contentUpdated);
