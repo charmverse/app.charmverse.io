@@ -18,7 +18,7 @@ import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkd
 
 const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
 
-const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
+const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
 async function switchNetwork() {
   return switchActiveNetwork(RPC[CHAIN].chainId);
@@ -88,32 +88,62 @@ export function useLensProfile() {
     }
 
     const markdownContent = await generateMarkdown({
-      content: proposal.content,
-      title: proposal.title
+      content: proposal.content
     });
 
+    let failedToPublishInLens = false;
+    let lensError: Error | null = null;
+    const isMarkdownContentOverflowing = markdownContent.length > LENS_PROPOSAL_PUBLICATION_LENGTH;
     try {
       const postPublication = await createPostPublication({
-        contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
+        contentText: `Proposal ${proposal.title} from ${space.name} is now open for feedback.\n\n${
+          isMarkdownContentOverflowing
+            ? `${markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH)}...`
+            : markdownContent
+        }`,
         proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
         lensProfile
       });
-      if (postPublication.method === 'postTypedData' && postPublication.data.isSuccess()) {
+      if (postPublication.data.isFailure()) {
+        failedToPublishInLens = true;
+        lensError = new Error(postPublication.data.error.message);
+      } else if (!postPublication.dispatcherUsed && postPublication.data.isSuccess()) {
         const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
         const { id, typedData } = postTypedDataFragment;
         const web3Provider: Web3Provider = library;
         const signature = await web3Provider
           .getSigner(account)
           ._signTypedData(typedData.domain, typedData.types, typedData.value);
-        await lensClient.transaction.broadcast({
+        const broadcastResponse = await lensClient.transaction.broadcastDataAvailability({
           id,
           signature
         });
+
+        if (broadcastResponse.isFailure()) {
+          failedToPublishInLens = true;
+          lensError = new Error(broadcastResponse.error.message);
+        } else if (broadcastResponse.value.__typename === 'RelayError') {
+          failedToPublishInLens = true;
+          lensError = new Error(broadcastResponse.value.reason);
+        }
       }
-      showMessage('Proposal published to Lens', 'info');
+
+      if (!failedToPublishInLens) {
+        showMessage('Proposal published to Lens', 'info');
+        log.info('Proposal published to Lens', {
+          proposalId: proposal.id,
+          spaceId: space.id
+        });
+      }
     } catch (error) {
+      failedToPublishInLens = true;
+      lensError = error as Error;
+    }
+
+    if (lensError && failedToPublishInLens) {
+      showMessage('Failed to publish proposal to Lens', 'error');
       log.error('Publishing proposal to Lens failed', {
-        error,
+        error: lensError,
         proposalId: proposal.id,
         spaceId: space.id
       });
