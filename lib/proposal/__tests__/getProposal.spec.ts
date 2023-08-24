@@ -35,6 +35,8 @@ describe('getProposal', () => {
       expect.objectContaining<PageWithProposal>({
         ...page,
         proposal: {
+          lensPostLink: null,
+          publishToLens: null,
           authors: [],
           category: proposalCategory,
           categoryId: proposalCategory.id,

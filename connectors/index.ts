@@ -221,7 +221,7 @@ const RPC = {
   },
   MUMBAI: {
     chainId: 80001,
-    chainName: 'Polygon - Mumbai',
+    chainName: 'Mumbai',
     nativeCurrency: {
       name: 'Polygon',
       symbol: 'MATIC',
@@ -229,7 +229,7 @@ const RPC = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
-    rpcUrls: ['https://rpc-mumbai.matic.today'],
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
