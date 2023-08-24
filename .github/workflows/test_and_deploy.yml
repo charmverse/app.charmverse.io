@@ -250,7 +250,7 @@ jobs:
       - name: Package Webapp and upload web assets to s3
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.public/webapp-assets/
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/
 
       - name: Update and Package background worker
         run: |

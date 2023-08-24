@@ -147,7 +147,7 @@ jobs:
       - name: Package
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.public/webapp-assets/_next/static/
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
