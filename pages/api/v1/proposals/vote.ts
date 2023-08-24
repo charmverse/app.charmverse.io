@@ -66,9 +66,11 @@ export interface CastProposalVoteRequestBody {
  *        userId:
  *          type: string
  *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *        choice:
- *          type: string
- *          example: Abstain
+ *        choices:
+            type: array
+            items:
+              type: string
+ *          example: ['Abstain']
  *        createdAt:
  *          type: string
  *          format: date-time

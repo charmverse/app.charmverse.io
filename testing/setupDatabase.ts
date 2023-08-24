@@ -678,7 +678,8 @@ export async function createVote({
   title = 'Vote Title',
   context = 'inline',
   content,
-  contentText = null
+  contentText = null,
+  maxChoices = 1
 }: Partial<Vote> &
   Pick<Vote, 'spaceId' | 'createdBy'> & {
     pageId?: string | null;
@@ -734,7 +735,8 @@ export async function createVote({
       },
       type: 'Approval',
       content: content ?? Prisma.DbNull,
-      contentText
+      contentText,
+      maxChoices
     },
     include: {
       voteOptions: true
