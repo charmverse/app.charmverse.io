@@ -54,7 +54,7 @@ export default function MultiTabs(props: MultiTabsProps) {
   };
 
   useEffect(() => {
-    if (props.activeTab) {
+    if (typeof props.activeTab !== 'undefined') {
       setValue(props.activeTab);
     }
   }, [props.activeTab]);
