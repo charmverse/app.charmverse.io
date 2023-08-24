@@ -18,32 +18,35 @@ export default function Authenticate() {
   const [loginError, setLoginError] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded: isUserLoaded, user } = useUser();
-  const { spaces } = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const { validateMagicLink, emailForSignIn, setEmailForSignIn } = useFirebaseAuth();
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
+
+  function redirectLoggedInUser() {
+    const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
+    const domainFromRedirect = redirectPath.split('/')[1];
+    if (spaces?.length && domainFromRedirect && spaces.find((s) => s.domain === domainFromRedirect)) {
+      router.push(redirectPath);
+    } else if (spaces?.length) {
+      router.push(`/${spaces[0].domain}`);
+    } else {
+      router.push('/createSpace');
+    }
+  }
 
   // Case where existing user is adding an email to their account
   function loginViaEmail() {
     setIsAuthenticating(true);
     validateMagicLink()
       .then(() => {
-        const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
         showMessage('Logged in with email. Redirecting you now', 'success');
-        router.push(redirectPath);
+        redirectLoggedInUser();
       })
       .catch((err) => {
-        const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
         if (user) {
-          const domainFromRedirect = redirectPath.split('/')[1];
-          if (spaces?.length && domainFromRedirect && spaces.find((s) => s.domain === domainFromRedirect)) {
-            router.push(`/${domainFromRedirect}`);
-          } else if (spaces?.length) {
-            router.push(`/${spaces[0].domain}`);
-          } else {
-            router.push('/createSpace');
-          }
+          redirectLoggedInUser();
         } else {
           setIsAuthenticating(false);
           setLoginError(true);
@@ -53,12 +56,14 @@ export default function Authenticate() {
   }
 
   useEffect(() => {
-    if (isUserLoaded && emailForSignIn && isValidEmail(emailForSignIn)) {
-      loginViaEmail();
-    } else if (isUserLoaded && !loginError && !isAuthenticating) {
-      emailPopup.open();
+    if (isUserLoaded && isSpacesLoaded) {
+      if (emailForSignIn && isValidEmail(emailForSignIn)) {
+        loginViaEmail();
+      } else if (!loginError && !isAuthenticating) {
+        emailPopup.open();
+      }
     }
-  }, [isUserLoaded, emailForSignIn]);
+  }, [isUserLoaded, emailForSignIn, isSpacesLoaded]);
 
   function submitEmail(email: string) {
     setIsAuthenticating(true);
