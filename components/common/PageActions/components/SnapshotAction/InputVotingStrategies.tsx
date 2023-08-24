@@ -5,7 +5,7 @@ import Select from '@mui/material/Select';
 import { useEffect, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import type { SnapshotVotingStrategy } from 'lib/snapshot';
+import type { SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 
 export interface Props {
   onChange?: (option: SnapshotVotingStrategy[]) => void;
