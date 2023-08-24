@@ -16,7 +16,7 @@ import { lensClient } from 'lib/lens/lensClient';
 import type { PageWithContent } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
-const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
+const CHAIN: Blockchain = !isProdEnv ? 'POLYGON' : 'MUMBAI';
 
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
 
@@ -92,12 +92,16 @@ export function useLensProfile() {
       title: proposal.title
     });
 
+    let failedToPublishInLens = false;
+    let lensError: Error | null = null;
+
     try {
       const postPublication = await createPostPublication({
         contentText: markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH),
         proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
         lensProfile
       });
+
       if (postPublication.method === 'postTypedData' && postPublication.data.isSuccess()) {
         const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
         const { id, typedData } = postTypedDataFragment;
@@ -105,15 +109,40 @@ export function useLensProfile() {
         const signature = await web3Provider
           .getSigner(account)
           ._signTypedData(typedData.domain, typedData.types, typedData.value);
-        await lensClient.transaction.broadcast({
+        const broadcastResponse = await lensClient.transaction.broadcast({
           id,
           signature
         });
+
+        if (broadcastResponse.isFailure()) {
+          failedToPublishInLens = broadcastResponse.isFailure();
+          lensError = new Error(broadcastResponse.error.message);
+        } else if (broadcastResponse.value.__typename === 'RelayError') {
+          failedToPublishInLens = true;
+          lensError = new Error(broadcastResponse.value.reason);
+        }
       }
-      showMessage('Proposal published to Lens', 'info');
+
+      if (postPublication.data.isFailure()) {
+        failedToPublishInLens = true;
+        lensError = new Error(postPublication.data.error.message);
+      }
+
+      if (!failedToPublishInLens) {
+        showMessage('Proposal published to Lens', 'info');
+      } else if (postPublication.data.isFailure()) {
+        failedToPublishInLens = true;
+        lensError = new Error(postPublication.data.error.message);
+      }
     } catch (error) {
+      failedToPublishInLens = true;
+      lensError = error as Error;
+    }
+
+    if (lensError && failedToPublishInLens) {
+      showMessage('Failed to publish proposal to Lens', 'error');
       log.error('Publishing proposal to Lens failed', {
-        error,
+        error: lensError,
         proposalId: proposal.id,
         spaceId: space.id
       });
