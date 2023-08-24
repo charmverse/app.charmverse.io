@@ -23,7 +23,7 @@ export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyT
       {propertyTypesList
         .filter((type) => !proposalPropertyTypesList.includes(type as any))
         .map((type) => (
-          <MenuItem onClick={() => onClick(type)} key={type}>
+          <MenuItem data-test={`select-property-${type}`} onClick={() => onClick(type)} key={type}>
             <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
             <Typography>{typeDisplayName(intl, type)}</Typography>
           </MenuItem>

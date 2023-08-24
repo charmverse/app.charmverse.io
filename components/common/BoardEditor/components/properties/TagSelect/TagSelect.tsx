@@ -166,7 +166,12 @@ export function TagSelect({
   }
   if (!isOpened) {
     return (
-      <SelectPreviewContainer onClick={onEdit} displayType={displayType} readOnly={readOnly}>
+      <SelectPreviewContainer
+        data-test='closed-select-input'
+        onClick={onEdit}
+        displayType={displayType}
+        readOnly={readOnly}
+      >
         <SelectPreview
           readOnly={readOnly}
           sx={{ height: '100%' }}
