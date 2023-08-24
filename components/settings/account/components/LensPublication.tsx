@@ -6,6 +6,7 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 import { useLensProfile } from '../hooks/useLensProfile';
 
@@ -15,6 +16,7 @@ export function LensPublication() {
   const { showMessage } = useSnackbar();
   const [isSwitchOn, setIsSwitchOn] = useState(user?.publishToLensDefault ?? false);
   const [isSettingUpLensProfile, setIsSettingUpLensProfile] = useState(false);
+  const { connectWallet, account } = useWeb3AuthSig();
 
   useEffect(() => {
     if (user) {
@@ -26,6 +28,11 @@ export function LensPublication() {
     if (!user) {
       return;
     }
+
+    if (!account) {
+      return connectWallet();
+    }
+
     const newState = !isSwitchOn;
     setIsSettingUpLensProfile(true);
     let _lensProfile = lensProfile;
