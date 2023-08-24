@@ -10,6 +10,7 @@ import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/erro
 declare module 'http' {
   interface IncomingMessage {
     isAdmin: boolean;
+    isGuest: boolean;
   }
 }
 
@@ -65,6 +66,7 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
       throw new AdministratorOnlyError();
     } else {
       req.isAdmin = spaceRole.isAdmin;
+      req.isGuest = !spaceRole.isAdmin && spaceRole.isGuest;
       next();
     }
   };
