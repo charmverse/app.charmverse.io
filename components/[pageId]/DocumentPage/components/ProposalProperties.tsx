@@ -81,8 +81,15 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      if (newStatus === 'discussion' && proposalPage) {
-        await createPost(proposalPage);
+      // TODO: Handle when proposal is published to lens
+      if (newStatus === 'discussion' && proposalPage /* && proposal.publishToLens */) {
+        const createdLensPost = await createPost(proposalPage);
+        if (createdLensPost) {
+          await charmClient.proposals.updateProposalLensProperties({
+            proposalId: proposal.id,
+            lensPostLink: createdLensPost.id
+          });
+        }
       }
       await Promise.all([
         refreshProposal(),

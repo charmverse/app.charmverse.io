@@ -10,6 +10,7 @@ import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
   createProposal(input: Omit<CreateProposalInput, 'userId'>) {
@@ -18,6 +19,10 @@ export class ProposalsApi {
 
   updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
     return http.PUT(`/api/proposals/${proposalId}`, rest);
+  }
+
+  updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {
+    return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
   }
 
   updateStatus(proposalId: string, newStatus: ProposalStatus) {

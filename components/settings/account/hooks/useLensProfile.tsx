@@ -1,11 +1,20 @@
 import { log } from '@charmverse/core/log';
 import type { Web3Provider } from '@ethersproject/providers';
-import type { CreateCommentTypedDataFragment, CreatePostTypedDataFragment, Publication } from '@lens-protocol/client';
+import type {
+  CreateCommentTypedDataFragment,
+  CreateDataAvailabilityPublicationResultFragment,
+  CreatePostTypedDataFragment,
+  CredentialsExpiredError,
+  NotAuthenticatedError,
+  Publication,
+  RelayErrorFragment,
+  Result
+} from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
 import useSWR from 'swr';
 
-import { isProdEnv } from 'config/constants';
+import { isDevEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -18,7 +27,7 @@ import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
-const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
+const CHAIN: Blockchain = !isDevEnv ? 'MUMBAI' : 'POLYGON';
 
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
@@ -125,6 +134,11 @@ export function useLensProfile() {
           | Awaited<ReturnType<Publication['createDataAvailabilityCommentViaDispatcher']>>;
       };
 
+      let broadcastResponse: Result<
+        CreateDataAvailabilityPublicationResultFragment | RelayErrorFragment,
+        CredentialsExpiredError | NotAuthenticatedError
+      > | null = null;
+
       if (publicationType === 'post') {
         publicationResponse = await createPostPublication({
           contentText: `Proposal ${proposalTitle} from ${space.name} is now open for feedback.\n\n${finalMarkdownContent}`,
@@ -152,7 +166,7 @@ export function useLensProfile() {
         const signature = await web3Provider
           .getSigner(account)
           ._signTypedData(typedData.domain, typedData.types, typedData.value);
-        const broadcastResponse = await lensClient.transaction.broadcastDataAvailability({
+        broadcastResponse = await lensClient.transaction.broadcastDataAvailability({
           id,
           signature
         });
@@ -166,12 +180,19 @@ export function useLensProfile() {
         }
       }
 
-      if (!failedToPublishInLens) {
+      if (!failedToPublishInLens && publicationResponse.data.isSuccess()) {
         showMessage(`${capitalizedPublicationType} published to Lens`, 'info');
         log.info(`${capitalizedPublicationType} published to Lens`, {
           spaceId: space.id,
           ...params
         });
+        if (broadcastResponse?.isSuccess()) {
+          return {
+            ...publicationResponse.data.value,
+            id: (broadcastResponse.value as { id: string }).id
+          };
+        }
+        return publicationResponse.data.value;
       }
     } catch (error) {
       failedToPublishInLens = true;
@@ -186,23 +207,28 @@ export function useLensProfile() {
         ...params
       });
     }
+    return null;
   }
 
   async function createPost(proposal: PageWithContent) {
-    return createPublication({
+    const createdPost = (await createPublication({
       proposalId: proposal.id,
       proposalPath: proposal.path,
       proposalTitle: proposal.title,
       content: proposal.content as PageContent,
       publicationType: 'post'
-    });
+    })) as CreateDataAvailabilityPublicationResultFragment | CreatePostTypedDataFragment;
+
+    return createdPost;
   }
 
   async function createComment({
     commentId,
     lensPostId,
-    proposal
+    proposal,
+    commentContent
   }: {
+    commentContent: PageContent;
     proposal: PageWithContent;
     commentId: string;
     lensPostId: string;
@@ -211,7 +237,7 @@ export function useLensProfile() {
       proposalId: proposal.id,
       proposalPath: proposal.path,
       proposalTitle: proposal.title,
-      content: proposal.content as PageContent,
+      content: commentContent,
       commentId,
       lensPostId,
       publicationType: 'comment'
