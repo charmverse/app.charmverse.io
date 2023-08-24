@@ -249,7 +249,6 @@ jobs:
 
       - name: Package Webapp
         run: |
-          rm .ebextensions/07_stg_websocket_port_3002
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Update and Package background worker
