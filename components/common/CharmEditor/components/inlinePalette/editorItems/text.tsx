@@ -432,6 +432,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
               const tr = _state.tr;
               let wrapping: ReturnType<typeof findWrapping> = null;
               const range = $from.blockRange();
+              // if selection is not empty, try to wrap the node(s) with a callout instead of creating a new node
               if (!isEmptySelection) {
                 wrapping = range && findWrapping(range, nodeType);
               }
