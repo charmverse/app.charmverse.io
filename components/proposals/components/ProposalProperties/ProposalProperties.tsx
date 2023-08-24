@@ -18,7 +18,6 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
-import type { PageWithContent } from 'lib/pages';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
