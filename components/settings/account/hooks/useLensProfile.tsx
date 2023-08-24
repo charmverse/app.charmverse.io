@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Web3Provider } from '@ethersproject/providers';
-import type { CreatePostTypedDataFragment } from '@lens-protocol/client';
+import type { CreateCommentTypedDataFragment, CreatePostTypedDataFragment, Publication } from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
 import useSWR from 'swr';
@@ -11,9 +11,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import { createCommentPublication } from 'lib/lens/createCommentPublication';
 import { createPostPublication } from 'lib/lens/createPostPublication';
 import { lensClient } from 'lib/lens/lensClient';
 import type { PageWithContent } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
@@ -29,22 +31,18 @@ export function useLensProfile() {
   const { user } = useUser();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { data: lensProfile, mutate } = useSWR(
-    user && account ? ['lensProfile', account] : null,
-    async () => {
-      if (!user || !account) {
-        return;
-      }
+  const { data: lensProfile, mutate } = useSWR(user && account ? ['lensProfile', account] : null, async () => {
+    if (!user || !account) {
+      return;
+    }
 
-      const isAuthenticated = await lensClient.authentication.isAuthenticated();
-      if (!isAuthenticated) {
-        return;
-      }
+    const isAuthenticated = await lensClient.authentication.isAuthenticated();
+    if (!isAuthenticated) {
+      return;
+    }
 
-      return fetchLensProfile();
-    },
-    {}
-  );
+    return fetchLensProfile();
+  });
 
   async function fetchLensProfile() {
     if (!user || !account) {
@@ -78,7 +76,24 @@ export function useLensProfile() {
     return mutate();
   }
 
-  async function createPost(proposal: PageWithContent) {
+  async function createPublication(
+    params: {
+      proposalId: string;
+      proposalPath: string;
+      proposalTitle: string;
+      content: PageContent;
+    } & (
+      | {
+          publicationType: 'post';
+        }
+      | {
+          commentId: string;
+          lensPostId: string;
+          publicationType: 'comment';
+        }
+    )
+  ) {
+    const { proposalPath, content, proposalTitle, publicationType } = params;
     if (!lensProfile || !user?.publishToLensDefault || !space || !account) {
       return;
     }
@@ -88,28 +103,51 @@ export function useLensProfile() {
     }
 
     const markdownContent = await generateMarkdown({
-      content: proposal.content
+      content
     });
 
     let failedToPublishInLens = false;
     let lensError: Error | null = null;
-    const isMarkdownContentOverflowing = markdownContent.length > LENS_PROPOSAL_PUBLICATION_LENGTH;
+    const finalMarkdownContent =
+      markdownContent.length > LENS_PROPOSAL_PUBLICATION_LENGTH
+        ? `${markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH)}...`
+        : markdownContent;
+
+    const capitalizedPublicationType = publicationType.charAt(0).toUpperCase() + publicationType.slice(1);
+
     try {
-      const postPublication = await createPostPublication({
-        contentText: `Proposal ${proposal.title} from ${space.name} is now open for feedback.\n\n${
-          isMarkdownContentOverflowing
-            ? `${markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH)}...`
-            : markdownContent
-        }`,
-        proposalLink: `https://app.charmverse.io/${space.domain}/${proposal.path}`,
-        lensProfile
-      });
-      if (postPublication.data.isFailure()) {
+      let publicationResponse: {
+        dispatcherUsed: boolean;
+        data:
+          | Awaited<ReturnType<Publication['createDataAvailabilityPostViaDispatcher']>>
+          | Awaited<ReturnType<Publication['createDataAvailabilityPostTypedData']>>
+          | Awaited<ReturnType<Publication['createDataAvailabilityCommentTypedData']>>
+          | Awaited<ReturnType<Publication['createDataAvailabilityCommentViaDispatcher']>>;
+      };
+
+      if (publicationType === 'post') {
+        publicationResponse = await createPostPublication({
+          contentText: `Proposal ${proposalTitle} from ${space.name} is now open for feedback.\n\n${finalMarkdownContent}`,
+          proposalLink: `https://app.charmverse.io/${space.domain}/${proposalPath}`,
+          lensProfile
+        });
+      } else {
+        publicationResponse = await createCommentPublication({
+          contentText: `I just commented on ${proposalTitle} from ${space.name}\n\n${finalMarkdownContent}`,
+          postId: params.lensPostId,
+          lensProfile,
+          commentLink: `https://app.charmverse.io/${space.domain}/${proposalPath}?commentId=${params.commentId}`
+        });
+      }
+
+      if (publicationResponse.data.isFailure()) {
         failedToPublishInLens = true;
-        lensError = new Error(postPublication.data.error.message);
-      } else if (!postPublication.dispatcherUsed && postPublication.data.isSuccess()) {
-        const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
-        const { id, typedData } = postTypedDataFragment;
+        lensError = new Error(publicationResponse.data.error.message);
+      } else if (!publicationResponse.dispatcherUsed && publicationResponse.data.isSuccess()) {
+        const publicationTypedDataFragment = publicationResponse.data.value as
+          | CreatePostTypedDataFragment
+          | CreateCommentTypedDataFragment;
+        const { id, typedData } = publicationTypedDataFragment;
         const web3Provider: Web3Provider = library;
         const signature = await web3Provider
           .getSigner(account)
@@ -129,10 +167,10 @@ export function useLensProfile() {
       }
 
       if (!failedToPublishInLens) {
-        showMessage('Proposal published to Lens', 'info');
-        log.info('Proposal published to Lens', {
-          proposalId: proposal.id,
-          spaceId: space.id
+        showMessage(`${capitalizedPublicationType} published to Lens`, 'info');
+        log.info(`${capitalizedPublicationType} published to Lens`, {
+          spaceId: space.id,
+          ...params
         });
       }
     } catch (error) {
@@ -141,18 +179,49 @@ export function useLensProfile() {
     }
 
     if (lensError && failedToPublishInLens) {
-      showMessage('Failed to publish proposal to Lens', 'error');
-      log.error('Publishing proposal to Lens failed', {
+      showMessage(`Failed to publish ${capitalizedPublicationType} to Lens`, 'error');
+      log.error(`Publishing ${capitalizedPublicationType} to Lens failed`, {
         error: lensError,
-        proposalId: proposal.id,
-        spaceId: space.id
+        spaceId: space.id,
+        ...params
       });
     }
+  }
+
+  async function createPost(proposal: PageWithContent) {
+    return createPublication({
+      proposalId: proposal.id,
+      proposalPath: proposal.path,
+      proposalTitle: proposal.title,
+      content: proposal.content as PageContent,
+      publicationType: 'post'
+    });
+  }
+
+  async function createComment({
+    commentId,
+    lensPostId,
+    proposal
+  }: {
+    proposal: PageWithContent;
+    commentId: string;
+    lensPostId: string;
+  }) {
+    return createPublication({
+      proposalId: proposal.id,
+      proposalPath: proposal.path,
+      proposalTitle: proposal.title,
+      content: proposal.content as PageContent,
+      commentId,
+      lensPostId,
+      publicationType: 'comment'
+    });
   }
 
   return {
     lensProfile,
     setupLensProfile,
-    createPost
+    createPost,
+    createComment
   };
 }
