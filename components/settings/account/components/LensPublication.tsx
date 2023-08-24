@@ -2,6 +2,7 @@ import { Box, CircularProgress, InputLabel, Stack, Switch, Typography } from '@m
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
+import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -37,7 +38,7 @@ export function LensPublication() {
           showMessage("You don't have a lens profile. Please setup one first.", 'warning');
         }
       } catch (err) {
-        showMessage('Failed to setup Lens profile', 'error');
+        showMessage('Failed to set up Lens profile', 'error');
         // User rejected to sign the message
         return;
       } finally {
@@ -59,18 +60,22 @@ export function LensPublication() {
     <Stack mt={2}>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4 }}>
         <Box component='span' display='flex' alignItems='center' gap={1}>
-          Publish
+          Lens Protocol Integration
         </Box>
       </Legend>
       <Stack gap={2}>
         <InputLabel>
           <Stack flexDirection='row' alignItems='center' gap={1}>
             <Switch size='small' disabled={isSettingUpLensProfile} checked={isSwitchOn} onChange={setAutoLensPublish} />
-            Lens Publication
+            Publish to Lens
             {isSettingUpLensProfile && <CircularProgress sx={{ ml: 1 }} color='secondary' size={16} />}
           </Stack>
           <Typography variant='caption'>
-            Automatically publish Proposal and associated comments to Lens. You must have a Lens profile.
+            Publish your proposals and proposal comments to Lens. A{' '}
+            <Link href='https://www.lens.xyz/' external>
+              Lens profile
+            </Link>{' '}
+            is required.
           </Typography>
         </InputLabel>
       </Stack>

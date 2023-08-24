@@ -131,7 +131,6 @@ export function ProposalProperties({
 
   return (
     <ProposalPropertiesBase
-      proposalPage={proposalPage}
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}

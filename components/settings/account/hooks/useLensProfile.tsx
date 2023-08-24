@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { BigNumber } from '@ethersproject/bignumber';
-import type { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 import type { CreatePostTypedDataFragment } from '@lens-protocol/client';
 import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
@@ -11,23 +10,18 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createPostPublication } from 'lib/lens/createPostPublication';
 import { lensClient } from 'lib/lens/lensClient';
 import type { PageWithContent } from 'lib/pages';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 const CHAIN: Blockchain = isProdEnv ? 'POLYGON' : 'MUMBAI';
-type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider };
 
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 1000;
 
 async function switchNetwork() {
-  const { ethereum } = window as WindowType;
-  const switchedChainId = `0x${(+BigNumber.from(RPC[CHAIN].chainId)).toString(16)}`;
-  await ethereum.request?.({
-    method: 'wallet_switchEthereumChain',
-    params: [{ chainId: switchedChainId }]
-  });
+  return switchActiveNetwork(RPC[CHAIN].chainId);
 }
 
 export function useLensProfile() {

@@ -48,7 +48,6 @@ export type ProposalPropertiesInput = {
 };
 
 type ProposalPropertiesProps = {
-  proposalPage?: PageWithContent;
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
@@ -97,8 +96,7 @@ export function ProposalProperties({
   snapshotProposalId,
   userId,
   updateProposalStatus,
-  title,
-  proposalPage
+  title
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
 
@@ -291,7 +289,6 @@ export function ProposalProperties({
           {showStatus && (
             <Box mt={2} mb={2}>
               <ProposalStepper
-                proposalPage={proposalPage}
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
                 openVoteModal={openVoteModal}
