@@ -102,14 +102,17 @@ export function useLensProfile() {
         lensProfile
       });
 
-      if (postPublication.method === 'postTypedData' && postPublication.data.isSuccess()) {
+      if (postPublication.data.isFailure()) {
+        failedToPublishInLens = true;
+        lensError = new Error(postPublication.data.error.message);
+      } else if (postPublication.dispatcherUsed && postPublication.data.isSuccess()) {
         const postTypedDataFragment = postPublication.data.value as CreatePostTypedDataFragment;
         const { id, typedData } = postTypedDataFragment;
         const web3Provider: Web3Provider = library;
         const signature = await web3Provider
           .getSigner(account)
           ._signTypedData(typedData.domain, typedData.types, typedData.value);
-        const broadcastResponse = await lensClient.transaction.broadcast({
+        const broadcastResponse = await lensClient.transaction.broadcastDataAvailability({
           id,
           signature
         });
@@ -123,13 +126,12 @@ export function useLensProfile() {
         }
       }
 
-      if (postPublication.data.isFailure()) {
-        failedToPublishInLens = true;
-        lensError = new Error(postPublication.data.error.message);
-      }
-
       if (!failedToPublishInLens) {
         showMessage('Proposal published to Lens', 'info');
+        log.info('Proposal published to Lens', {
+          proposalId: proposal.id,
+          spaceId: space.id
+        });
       } else if (postPublication.data.isFailure()) {
         failedToPublishInLens = true;
         lensError = new Error(postPublication.data.error.message);
