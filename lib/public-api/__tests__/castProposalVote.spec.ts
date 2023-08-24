@@ -42,7 +42,7 @@ describe('castProposalVote', () => {
       expect.objectContaining({
         userId: user.id,
         voteId: vote.id,
-        choice
+        choices: [choice]
       })
     );
   });

@@ -51,6 +51,7 @@ export function DesktopStepper({
               <Stack alignItems='center' height='100%' gap={1}>
                 <Tooltip title={archived ? 'Archived proposals cannot be updated' : proposalStatusDetails[status]}>
                   <StepperIcon
+                    data-test={`proposal-status-stepper-${status}`}
                     isComplete={currentStatusIndex > statusIndex}
                     isCurrent={currentStatusIndex === statusIndex}
                     isEnabled={!!proposalFlowPermissions?.[status] && !archived}

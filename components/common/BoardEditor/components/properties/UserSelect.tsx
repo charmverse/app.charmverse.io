@@ -19,6 +19,7 @@ type Props = {
   showEmptyPlaceholder?: boolean;
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
+  'data-test'?: string;
 };
 
 type ContainerProps = {
@@ -108,7 +109,8 @@ export function UserSelect({
   onChange,
   readOnly,
   showEmptyPlaceholder,
-  wrapColumn
+  wrapColumn,
+  'data-test': dataTest
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -129,7 +131,13 @@ export function UserSelect({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
+      <SelectPreviewContainer
+        data-test={dataTest}
+        isHidden={isOpen}
+        displayType={displayType}
+        readOnly={readOnly}
+        onClick={onClickToEdit}
+      >
         <Stack gap={0.5}>
           {memberIds.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
@@ -148,6 +156,7 @@ export function UserSelect({
   return (
     <StyledUserPropertyContainer displayType={displayType}>
       <InputSearchMemberMultiple
+        data-test={dataTest}
         disableClearable
         clearOnBlur
         open

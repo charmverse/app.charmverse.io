@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { ClickAwayListener, Collapse, Stack } from '@mui/material';
 
-import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
+import { DatabaseSidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/databaseSidebarHeader';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
@@ -32,7 +32,7 @@ export function MemberPropertiesSidebar({ isOpen, onClose }: { isOpen: boolean; 
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000, height: 'fit-content', marginBottom: 1 }}
       >
         <StyledSidebar>
-          <SidebarHeader closeSidebar={onClose} title='Properties' />
+          <DatabaseSidebarHeader onClose={onClose} title='Properties' />
           <Stack height='fit-content'>
             {properties.map((property) => (
               <MemberPropertySidebarItem property={property} key={property.id} />

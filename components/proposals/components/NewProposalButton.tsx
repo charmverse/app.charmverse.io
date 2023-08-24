@@ -10,13 +10,15 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
-import { useProposalDialog } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+
+import { useProposalCategories } from '../hooks/useProposalCategories';
+import { useProposalTemplates } from '../hooks/useProposalTemplates';
+
+import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
 
 export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
@@ -85,7 +87,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
-            <Button disabled={!canCreateProposal} onClick={onClickCreate}>
+            <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
               {isXsScreen ? 'Create' : 'Create Proposal'}
             </Button>
             <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>

@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 
-import type { SnapshotProposal } from 'lib/snapshot';
+import type { SnapshotProposal } from 'lib/snapshot/interfaces';
 import { percent } from 'lib/utilities/numbers';
 
 type Props = {

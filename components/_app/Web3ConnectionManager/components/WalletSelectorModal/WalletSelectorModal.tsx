@@ -36,7 +36,7 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
   const {
     setActivatingConnector,
     closeWalletSelectorModal,
-    openNetworkModal,
+    isWalletSelectorModalOpen,
     isConnectingIdentity,
     activatingConnector
   } = useWeb3ConnectionManager();
@@ -64,17 +64,16 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   // close the modal after signing in
   useEffect(() => {
-    if (active) {
+    if (active && isWalletSelectorModalOpen) {
       closeWalletSelectorModal();
     }
-  }, [active]);
+  }, [active, isWalletSelectorModalOpen]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
       closeWalletSelectorModal();
-      openNetworkModal();
     }
-  }, [error, openNetworkModal, closeWalletSelectorModal]);
+  }, [error, closeWalletSelectorModal]);
 
   const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
   log.info('Connect redirectUri', redirectUri);

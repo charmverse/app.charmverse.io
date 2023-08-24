@@ -21,7 +21,7 @@ export function SelectPreview({ sx, wrapColumn, value, options = [], name, size,
     .map((v) => options?.find((o) => (o as SelectOptionType).id === v))
     .filter(Boolean) as SelectOptionType[];
   return (
-    <Stack sx={sx} gap={name ? 0.5 : 0}>
+    <Stack data-test='select-preview' sx={sx} gap={name ? 0.5 : 0}>
       {name && (
         <Typography component='span' fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
           {name}

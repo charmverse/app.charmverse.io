@@ -298,6 +298,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
                           title={page.title}
+                          proposalPage={page}
                         />
                       )}
                       {(draftBounty || page.bountyId) && (
@@ -322,7 +323,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   </div>
                 </CharmEditor>
 
-                {proposalId && <PageComments page={page} permissions={pagePermissions} />}
+                {page.type === 'proposal' && <PageComments page={page} permissions={pagePermissions} />}
               </Container>
             </div>
           </ScrollContainer>

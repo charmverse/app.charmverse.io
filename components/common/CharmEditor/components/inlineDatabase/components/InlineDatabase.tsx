@@ -143,6 +143,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
         onPaste={stopPropagation}
       >
         <CenterPanel
+          currentRootPageId={pageId}
           disableUpdatingUrl
           showView={setCurrentViewId}
           onDeleteView={deleteView}

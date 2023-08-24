@@ -287,6 +287,7 @@ function Table(props: Props): JSX.Element {
             !activeView.fields.groupById &&
             !props.disableAddingCards && (
               <div
+                data-test='table-add-card'
                 className='octo-table-cell'
                 onClick={() => {
                   props.addCard('');

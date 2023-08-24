@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Alert, Box, MenuItem, ListItemIcon, ListItem, ListItemText, Tooltip, Typography, Link } from '@mui/material';
+import { Box, Link, ListItem, ListItemIcon, ListItemText, MenuItem, Tooltip, Typography } from '@mui/material';
 import Script from 'next/script';
 import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAut
 type Props = {
   activeCredential?: string;
   activeFormId?: string;
-  onSelect: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
+  onSelectSourceGoogleForm: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
 };
 
 export function GoogleFormsSource(props: Props) {
@@ -56,7 +56,7 @@ export function GoogleFormsSource(props: Props) {
         activeFormId={props.activeFormId}
         credential={selectedCredential}
         loginWithGoogle={loginWithGoogle}
-        onSelect={props.onSelect}
+        onSelectSourceGoogleForm={props.onSelectSourceGoogleForm}
       />
     );
   }
@@ -105,12 +105,12 @@ function GoogleFormSelect({
   activeFormId,
   credential,
   loginWithGoogle,
-  onSelect
+  onSelectSourceGoogleForm
 }: {
   activeFormId?: string;
   credential: CredentialItem;
   loginWithGoogle: (options: { hint?: string }) => void;
-  onSelect: Props['onSelect'];
+  onSelectSourceGoogleForm: Props['onSelectSourceGoogleForm'];
 }) {
   const { data: forms, error } = useSwr(`google-credentials/${credential.id}`, () =>
     charmClient.google.forms.getForms({ credentialId: credential.id })
@@ -123,7 +123,7 @@ function GoogleFormSelect({
       formName: form.name,
       formUrl: form.url
     };
-    onSelect({ sourceData, sourceType: 'google_form' });
+    onSelectSourceGoogleForm({ sourceData, sourceType: 'google_form' });
   }
 
   if (error) {

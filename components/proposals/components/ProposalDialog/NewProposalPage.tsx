@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
-import charmClient from 'charmClient';
+import { useCreateProposal } from 'charmClient/hooks/proposals';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
@@ -53,14 +53,13 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
 
+  const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
+
   usePreventReload(contentUpdated);
 
   const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
-
-  const [isCreatingProposal, setIsCreatingProposal] = useState(false);
-
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
@@ -92,43 +91,42 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         });
       } catch (error) {
         showMessage((error as Error).message, 'error');
+        return;
       }
-      setIsCreatingProposal(true);
-      const createdProposal = await charmClient.proposals
-        .createProposal({
-          authors: formInputs.authors,
-          categoryId: formInputs.categoryId,
-          pageProps: {
-            content: formInputs.content,
-            contentText: formInputs.contentText ?? '',
-            title: formInputs.title,
-            sourceTemplateId: formInputs.proposalTemplateId,
-            headerImage: formInputs.headerImage,
-            icon: formInputs.icon
-          },
-          evaluationType: formInputs.evaluationType,
-          rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
-          reviewers: formInputs.reviewers,
-          spaceId: currentSpace.id
-        })
-        .catch((err: any) => {
-          showMessage(err.message ?? 'Something went wrong', 'error');
-          throw err;
-        });
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { proposal, ...page } = createdProposal;
-      mutatePage(page);
-      mutate(`proposals/${currentSpace.id}`);
-      showProposal({
-        pageId: page.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-        }
+      const createdProposal = await createProposalTrigger({
+        authors: formInputs.authors,
+        categoryId: formInputs.categoryId,
+        pageProps: {
+          content: formInputs.content,
+          contentText: formInputs.contentText ?? '',
+          title: formInputs.title,
+          sourceTemplateId: formInputs.proposalTemplateId,
+          headerImage: formInputs.headerImage,
+          icon: formInputs.icon
+        },
+        evaluationType: formInputs.evaluationType,
+        rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
+        reviewers: formInputs.reviewers,
+        spaceId: currentSpace.id
+      }).catch((err: any) => {
+        showMessage(err.message ?? 'Something went wrong', 'error');
+        throw err;
       });
-      setUrlWithoutRerender(router.pathname, { id: page.id });
-      setContentUpdated(false);
-      setIsCreatingProposal(false);
+
+      if (createdProposal) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { proposal, ...page } = createdProposal;
+        mutatePage(page);
+        mutate(`/api/spaces/${currentSpace.id}/proposals`);
+        showProposal({
+          pageId: page.id,
+          onClose() {
+            setUrlWithoutRerender(router.pathname, { id: null });
+          }
+        });
+        setUrlWithoutRerender(router.pathname, { id: page.id });
+        setContentUpdated(false);
+      }
     }
   }
 
@@ -149,13 +147,15 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
     disabledTooltip = 'Category is required';
   } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
     disabledTooltip = 'Template is required';
+  } else if (formInputs.reviewers.length === 0) {
+    disabledTooltip = 'Reviewers are required';
   }
 
   return (
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-        <Container top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+        <Container data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
               placeholderText={
@@ -218,6 +218,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
               onClick={createProposal}
+              isLoading={isCreatingProposal}
+              data-test='create-proposal-button'
             >
               Create
             </Button>

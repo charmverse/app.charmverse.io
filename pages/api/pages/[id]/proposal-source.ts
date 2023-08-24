@@ -24,6 +24,11 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
   const boardPage = await prisma.page.findUnique({
     where: {
       id: pageId
+    },
+    select: {
+      id: true,
+      boardId: true,
+      spaceId: true
     }
   });
 
@@ -52,6 +57,11 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
   const boardPage = await prisma.page.findUnique({
     where: {
       id: pageId
+    },
+    select: {
+      id: true,
+      boardId: true,
+      spaceId: true
     }
   });
 
