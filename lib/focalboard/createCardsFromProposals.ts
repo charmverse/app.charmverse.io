@@ -5,16 +5,17 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type {
-  ProposalRubricCriteriaWithTypedParams,
-  ProposalRubricCriteriaAnswerWithTypedResponse
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
+import type { BoardFields } from './board';
+import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
@@ -124,11 +125,11 @@ export async function createCardsFromProposals({
         where: { id: block.id },
         data: {
           fields: {
-            ...(block.fields as any),
+            ...(block.fields as BoardViewFields),
             visiblePropertyIds: [
               ...new Set([
-                ...(block.fields as any).visiblePropertyIds,
-                ...(database.fields as any).cardProperties.map((p: IPropertyTemplate) => p.id)
+                ...(block.fields as BoardViewFields).visiblePropertyIds,
+                ...(database.fields as any as BoardFields).cardProperties.map((p) => p.id)
               ])
             ],
             sourceType: 'proposals'
@@ -143,7 +144,7 @@ export async function createCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(database))
+      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(database as any))
     },
     spaceId
   );

@@ -352,7 +352,7 @@ export function getAppUrl() {
 
   const port = window.location.port ? `:${window.location.port}` : '';
 
-  return getAppOriginURL({ port, protocol: window.location.protocol });
+  return getAppOriginURL({ port, protocol: window.location.protocol, host: window.location.host });
 }
 
 export function redirectToAppLogin() {

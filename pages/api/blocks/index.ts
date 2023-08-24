@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import {
   ActionNotPermittedError,
@@ -126,30 +127,24 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   if (data.length === 1 && data[0].type === 'card' && data[0].parentId) {
     const candidateParentId = data[0].parentId;
     const [candidateParentBoardPage, candidateParentProposalViewBlocks] = await Promise.all([
-      prisma.page.findUniqueOrThrow({
+      prisma.block.findUniqueOrThrow({
         where: {
           id: candidateParentId
         },
         select: {
-          type: true
+          type: true,
+          fields: true
         }
       }),
       prisma.block.findMany({
         where: {
           type: 'view',
-          rootId: candidateParentId,
-          fields: {
-            path: ['sourceType'],
-            equals: 'proposals'
-          }
+          rootId: candidateParentId
         }
       })
     ]);
 
-    if (
-      (candidateParentBoardPage?.type === 'board' || candidateParentBoardPage.type === 'inline_board') &&
-      candidateParentProposalViewBlocks.length > 0
-    ) {
+    if ((candidateParentBoardPage?.fields as any as BoardFields).sourceType === 'proposals') {
       if (data[0].id) {
         // Focalboard pre-emptively adds the card to the cardOrder prop. This prevents invalid property IDs building up in the cardOrder prop
         const viewsToClean = candidateParentProposalViewBlocks.filter((viewBlock) =>

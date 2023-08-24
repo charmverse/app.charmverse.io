@@ -9,7 +9,8 @@ import { RankedVoting } from 'components/proposals/components/SnapshotVoting/Ran
 import { SingleChoiceVoting } from 'components/proposals/components/SnapshotVoting/SingleChoiceVoting';
 import { WeightedVoting } from 'components/proposals/components/SnapshotVoting/WeightedVoting';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SnapshotProposal, SnapshotVote, VoteChoice } from 'lib/snapshot';
+import type { SnapshotVote } from 'lib/snapshot/getVotes';
+import type { SnapshotProposal, VoteChoice } from 'lib/snapshot/interfaces';
 
 export type SnapshotVotingProps = {
   snapshotProposal: SnapshotProposal;

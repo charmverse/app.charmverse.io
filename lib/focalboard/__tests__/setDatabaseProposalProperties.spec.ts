@@ -1,10 +1,11 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
+import type { Prisma, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
 import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import { InvalidStateError } from 'lib/middleware';
 
 import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
 
@@ -37,7 +38,7 @@ describe('setDatabaseProposalProperties()', () => {
         title: 'Example',
         type: 'board',
         updatedBy: user.id,
-        fields: {},
+        fields: { sourceType: 'proposals' } as Partial<BoardFields> as Prisma.InputJsonValue,
         space: { connect: { id: space.id } },
         user: { connect: { id: user.id } }
       }
@@ -102,7 +103,9 @@ describe('setDatabaseProposalProperties()', () => {
         title: 'Example',
         type: 'board',
         updatedBy: user.id,
-        fields: {},
+        fields: {
+          sourceType: 'proposals'
+        },
         space: { connect: { id: spaceWithRubrics.id } },
         user: { connect: { id: spaceUser.id } }
       }
@@ -170,8 +173,9 @@ describe('setDatabaseProposalProperties()', () => {
         type: 'board',
         updatedBy: user.id,
         fields: {
-          cardProperties: [{ id: uuid(), name: 'Text', type: 'text', options: [] } as IPropertyTemplate]
-        } as any,
+          cardProperties: [{ id: uuid(), name: 'Text', type: 'text', options: [] } as IPropertyTemplate],
+          sourceType: 'proposals'
+        } as Partial<BoardFields> as Prisma.InputJsonValue,
         space: { connect: { id: space.id } },
         user: { connect: { id: user.id } }
       }
@@ -252,7 +256,9 @@ describe('setDatabaseProposalProperties()', () => {
         title: 'Example',
         type: 'board',
         updatedBy: userInNewSpace.id,
-        fields: {},
+        fields: {
+          sourceType: 'proposals'
+        } as Partial<BoardFields> as Prisma.InputJsonValue,
         space: { connect: { id: spaceWithMultiCategory.id } },
         user: { connect: { id: userInNewSpace.id } }
       }
@@ -317,5 +323,32 @@ describe('setDatabaseProposalProperties()', () => {
     const newCategoryOption = categoryPropAfterUpdate?.options.find((opt) => opt.id === newCategory.id);
     expect(newCategoryOption?.id).toBe(newCategory.id);
     expect(newCategoryOption?.value).toBe(newCategory.title);
+  });
+
+  it('should throw an error if the database source is not of type proposals', async () => {
+    const rootId = uuid();
+
+    const databaseBlock = await prisma.block.create({
+      data: {
+        parentId: rootId,
+        rootId,
+        id: rootId,
+        schema: -1,
+        title: 'Example',
+        type: 'board',
+        updatedBy: user.id,
+        fields: {
+          sourceType: 'board_page'
+        } as Partial<BoardFields> as Prisma.InputJsonValue,
+        space: { connect: { id: space.id } },
+        user: { connect: { id: user.id } }
+      }
+    });
+
+    await expect(
+      setDatabaseProposalProperties({
+        databaseId: rootId
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 });

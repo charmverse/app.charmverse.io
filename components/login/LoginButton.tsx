@@ -37,6 +37,7 @@ export interface DialogProps {
   isOpen: boolean;
   redirectUrl?: string;
   onClose: () => void;
+  emailOnly?: boolean;
 }
 
 const StyledButton = styled(Button)`
@@ -54,9 +55,10 @@ const StyledButton = styled(Button)`
 type Props = {
   redirectUrl?: string;
   showSignup: boolean;
+  emailOnly?: boolean;
 };
 
-export function LoginButton({ redirectUrl, showSignup }: Props) {
+export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3AuthSig();
 
@@ -97,7 +99,7 @@ export function LoginButton({ redirectUrl, showSignup }: Props) {
       >
         Sign in
       </StyledButton>
-      <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
+      <LoginHandler emailOnly={emailOnly} redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
     </Box>
   );
 }
@@ -184,31 +186,36 @@ function LoginHandler(props: DialogProps) {
   return (
     <>
       <Dialog open={isOpen} onClose={close}>
-        {!loginMethod && (
-          <List sx={{ pt: 0, maxWidth: '400px' }}>
-            <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+        <List sx={{ pt: 0, maxWidth: '400px' }}>
+          {!loginMethod && !props.emailOnly && (
+            <>
+              <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
 
-            {/** Web 3 login methods */}
-            <ListItem>
-              <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
-            </ListItem>
-            {verifiableWalletDetected && (
+              {/** Web 3 login methods */}
               <ListItem>
-                <WalletSign
-                  buttonStyle={{ width: '100%' }}
-                  signSuccess={handleWeb3Login}
-                  enableAutosign={enableAutosign}
-                  onError={() => setEnableAutoSign(false)}
-                />
+                <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
               </ListItem>
-            )}
+              {verifiableWalletDetected && (
+                <ListItem>
+                  <WalletSign
+                    buttonStyle={{ width: '100%' }}
+                    signSuccess={handleWeb3Login}
+                    enableAutosign={enableAutosign}
+                    onError={() => setEnableAutoSign(false)}
+                  />
+                </ListItem>
+              )}
+            </>
+          )}
+          {!loginMethod && (
             <DialogTitle sx={{ mt: -1 }} textAlign='left'>
               Connect Account
             </DialogTitle>
+          )}
+          {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
 
-            <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />
-
-            {/* Google login method */}
+          {/* Google login method */}
+          {!loginMethod && (
             <ListItem>
               <ConnectorButton
                 onClick={handleGoogleLogin}
@@ -219,23 +226,24 @@ function LoginHandler(props: DialogProps) {
                 isLoading={false}
               />
             </ListItem>
-            {!isOnCustomDomain && (
-              <>
-                {/** Connect with email address */}
-                <ListItem>
-                  <ConnectorButton
-                    onClick={() => toggleEmailDialog('open')}
-                    name='Connect with email'
-                    icon={<EmailIcon />}
-                    disabled={false}
-                    isActive={false}
-                    isLoading={false}
-                  />
-                </ListItem>
-              </>
-            )}
-          </List>
-        )}
+          )}
+          {!isOnCustomDomain && !loginMethod && (
+            <>
+              {/** Connect with email address */}
+              <ListItem>
+                <ConnectorButton
+                  onClick={() => toggleEmailDialog('open')}
+                  name='Connect with email'
+                  icon={<EmailIcon />}
+                  disabled={false}
+                  isActive={false}
+                  isLoading={false}
+                />
+              </ListItem>
+            </>
+          )}
+        </List>
+
         {loginMethod === 'email' && (
           <Box m={2}>
             <CollectEmail

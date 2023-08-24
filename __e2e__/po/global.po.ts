@@ -5,11 +5,17 @@ import { baseUrl } from 'config/constants';
 export class GlobalPage {
   readonly dialog: Locator;
 
+  readonly closeModal: Locator;
+
   readonly openAsPageButton: Locator;
+
+  readonly databasePage: Locator;
 
   constructor(public page: Page) {
     this.dialog = page.locator('data-test=dialog');
+    this.closeModal = page.locator('data-test=close-modal');
     this.openAsPageButton = page.locator('data-test=open-as-page');
+    this.databasePage = this.page.locator('data-test=database-page');
   }
 
   async goToHomePage(domain?: string) {
