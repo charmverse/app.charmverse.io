@@ -58,19 +58,21 @@ async function migrateAllProposalDatabases() {
     }
   })
 
-  for (let i = 0; i < proposalDatabaseViews.length; i++) {
+  for (let i = 0; i < parentBoards.length; i++) {
     await prisma.block.update({
       where: {
-        id: proposalDatabaseViews[i].id,
+        id: parentBoards[i].id,
       },
       data: {
         fields: {
-          ...proposalDatabaseViews[i].fields as any,
+          ...parentBoards[i].fields as any,
           sourceType: 'proposals',
         }
       }
     })
+
+    console.log('Updated ', i + 1, '/', parentBoards.length, 'proposal databases')
   }
 }
 
-findNonCompliantProposalDatabases().then(() => console.log('done'));
+migrateAllProposalDatabases().then(() => console.log('done'));
