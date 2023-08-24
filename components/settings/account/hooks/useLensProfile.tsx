@@ -103,7 +103,7 @@ export function useLensProfile() {
     )
   ) {
     const { proposalPath, content, proposalTitle, publicationType } = params;
-    if (!lensProfile || !user?.publishToLensDefault || !space || !account) {
+    if (!lensProfile || !space || !account) {
       return;
     }
 
@@ -141,13 +141,13 @@ export function useLensProfile() {
 
       if (publicationType === 'post') {
         publicationResponse = await createPostPublication({
-          contentText: `Proposal ${proposalTitle} from ${space.name} is now open for feedback.\n\n${finalMarkdownContent}`,
+          contentText: `Proposal **${proposalTitle}** from **${space.name}** is now open for feedback.\n\n${finalMarkdownContent}`,
           proposalLink: `https://app.charmverse.io/${space.domain}/${proposalPath}`,
           lensProfile
         });
       } else {
         publicationResponse = await createCommentPublication({
-          contentText: `I just commented on ${proposalTitle} from ${space.name}\n\n${finalMarkdownContent}`,
+          contentText: `I just commented on **${proposalTitle}** from **${space.name}**\n\n${finalMarkdownContent}`,
           postId: params.lensPostId,
           lensProfile,
           commentLink: `https://app.charmverse.io/${space.domain}/${proposalPath}?commentId=${params.commentId}`

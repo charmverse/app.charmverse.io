@@ -3,7 +3,7 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
@@ -19,6 +19,7 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -45,6 +46,7 @@ export type ProposalPropertiesInput = {
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
+  publishToLens?: boolean;
 };
 
 type ProposalPropertiesProps = {
@@ -108,7 +110,7 @@ export function ProposalProperties({
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-
+  const { user } = useUser();
   const { proposalTemplates } = useProposalTemplates();
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
@@ -159,6 +161,12 @@ export function ProposalProperties({
       });
     }
   }
+
+  useEffect(() => {
+    setProposalFormInputs({
+      publishToLens: proposalFormInputs?.publishToLens ?? !!user?.publishToLensDefault
+    });
+  }, [user?.id, proposalFormInputs?.publishToLens]);
 
   function applyTemplate(templatePage: PageMeta) {
     if (templatePage && templatePage.proposalId) {
@@ -400,6 +408,33 @@ export function ProposalProperties({
             </Box>
           </Box>
 
+          {/* Publish to lens toggle */}
+          {user && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                // override align-items flex-start with inline style
+                style={{
+                  alignItems: 'center'
+                }}
+              >
+                <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+                <Switch
+                  disabled={proposalStatus !== 'draft'}
+                  checked={proposalFormInputs.publishToLens ?? false}
+                  onChange={(e) => {
+                    setProposalFormInputs({
+                      publishToLens: e.target.checked
+                    });
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+
           {/* Lens post link */}
           {proposalLensLink && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
@@ -413,7 +448,7 @@ export function ProposalProperties({
                   alignItems: 'center'
                 }}
               >
-                <PropertyLabel readOnly>Lens Link</PropertyLabel>
+                <PropertyLabel readOnly>Lens Post</PropertyLabel>
                 <Link href={`https://lenster.xyz/posts/${proposalLensLink}`} target='_blank' rel='noopener noreferrer'>
                   <Typography variant='body2' color='primary'>
                     {proposalLensLink}

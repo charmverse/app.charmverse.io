@@ -4,7 +4,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -76,7 +75,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, reviewers, categoryId, evaluationType } = req.body as UpdateProposalRequest;
+  const { authors, reviewers, categoryId, evaluationType, publishToLens } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -163,7 +162,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType });
+  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType, publishToLens });
 
   return res.status(200).end();
 }
