@@ -29,7 +29,6 @@ async function getReviewerPoolController(req: NextApiRequest, res: NextApiRespon
   const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
     resourceId
   });
-
   return res.status(200).json(reviewerPool);
 }
 

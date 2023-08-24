@@ -19,14 +19,14 @@ export function useDELETE<T>(path: string) {
   });
 }
 
-export function usePOST<T>(path: string) {
-  return useSWRMutation<unknown, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
-    return http.POST(url, arg);
+export function usePOST<T, U = unknown>(path: string) {
+  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
+    return http.POST<U>(url, arg);
   });
 }
 
-export function usePUT<T>(path: string) {
-  return useSWRMutation<unknown, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
-    return http.PUT(url, arg);
+export function usePUT<T, U = unknown>(path: string) {
+  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
+    return http.PUT<U>(url, arg);
   });
 }

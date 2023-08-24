@@ -30,10 +30,7 @@ export class DatabasePage extends GlobalPage {
 
   getTablePropertySelectLocator({ cardId }: { cardId?: string }) {
     return {
-      closedSelect: this.page
-        .locator(`data-test=database-row-${cardId}`)
-        .locator('data-test=closed-select-input')
-        .first(),
+      closedSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=select-preview').first(),
       openSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=autocomplete').first()
     };
   }

@@ -9,12 +9,9 @@ export class BountyBoardPage {
 
   readonly createBountyButton: Locator;
 
-  readonly pageDialog: Locator;
-
   constructor(page: Page) {
     this.page = page;
     this.createBountyButton = page.locator('data-test=create-suggest-bounty');
-    this.pageDialog = page.locator('data-test=dialog');
   }
 
   async goToBountyBoard(domain: string) {

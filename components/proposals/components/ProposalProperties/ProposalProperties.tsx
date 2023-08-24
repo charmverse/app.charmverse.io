@@ -369,6 +369,7 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
+                data-test='proposal-reviewer-select'
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}

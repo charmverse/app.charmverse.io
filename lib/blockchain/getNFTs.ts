@@ -2,6 +2,8 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import orderBy from 'lodash/orderBy';
 
+import { isTestEnv } from 'config/constants';
+
 import {
   supportedMainnets as supportedMainnetsByAlchemy,
   getNFTs as getNFTsFromAlchemy,
@@ -45,7 +47,9 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
           .map((chainId) =>
             wallets.map(({ id, address }) =>
               getNFTsFromAlchemy({ address, chainId, walletId: id }).catch((error) => {
-                log.error('Error requesting nfts from Alchemy', { address, chainId, error });
+                if (!isTestEnv) {
+                  log.error('Error requesting nfts from Alchemy', { address, chainId, error });
+                }
                 return [] as NFTData[];
               })
             )
@@ -60,7 +64,9 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
           .map((chainId) =>
             wallets.map(({ id, address }) =>
               getNFTsFromAnkr({ address, chainId, walletId: id }).catch((error) => {
-                log.error('Error requesting nfts from Ankr', { address, chainId, error });
+                if (!isTestEnv) {
+                  log.error('Error requesting nfts from Ankr', { address, chainId, error });
+                }
                 return [] as NFTData[];
               })
             )

@@ -37,7 +37,9 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features. Use generateUser instead
+ */
 export async function createUser({
   browserPage,
   address
@@ -54,7 +56,9 @@ export async function createUser({
     .then((res) => res.json());
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function createSpace({
   browserPage,
   permissionConfigurationMode,
@@ -87,7 +91,9 @@ export async function createSpace({
   }
 }
 
-// DEPRECATED - mock data should be generated directly, not using webapp features
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function getPages({
   browserPage,
   spaceId
@@ -100,7 +106,7 @@ export async function getPages({
 
 /**
  *
- * DEPRECATED - Use generateUserAndSpace instead. Mock data should be generated directly, not using webapp features
+ * @deprecated - Use generateUserAndSpace() instead. Mock data should be generated directly, not using webapp features
  *
  * @browserPage - the page object for the browser context that will execute the requests
  *
@@ -349,6 +355,7 @@ export async function generateUserAndSpace({
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space: Space;
+  const spaceId = v4();
 
   if (existingSpaceId) {
     space = await prisma.space.findUniqueOrThrow({
@@ -358,6 +365,7 @@ export async function generateUserAndSpace({
   } else {
     space = await prisma.space.create({
       data: {
+        id: spaceId,
         name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
@@ -377,6 +385,12 @@ export async function generateUserAndSpace({
             isAdmin,
             // skip onboarding for normal test users
             onboarded: skipOnboarding
+          }
+        },
+        permittedGroups: {
+          create: {
+            operations: ['reviewProposals'],
+            spaceId
           }
         }
       }
