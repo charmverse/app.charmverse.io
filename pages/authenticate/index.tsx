@@ -3,6 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import { LoginPageContent } from 'components/login';
@@ -24,13 +25,17 @@ export default function Authenticate() {
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
 
-  function redirectLoggedInUser() {
+  async function redirectLoggedInUser() {
     const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
+
+    // Use spaces might not be loaded yet, this ensures we have up to date data
+    const userSpaces = await charmClient.spaces.getSpaces();
+
     const domainFromRedirect = redirectPath.split('/')[1];
-    if (spaces?.length && domainFromRedirect && spaces.find((s) => s.domain === domainFromRedirect)) {
+    if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
       router.push(redirectPath);
-    } else if (spaces?.length) {
-      router.push(`/${spaces[0].domain}`);
+    } else if (userSpaces?.length) {
+      router.push(`/${userSpaces[0].domain}`);
     } else {
       router.push('/createSpace');
     }

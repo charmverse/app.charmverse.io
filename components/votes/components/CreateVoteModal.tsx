@@ -134,6 +134,7 @@ export function CreateVoteModal({
       footerActions={
         <Stack gap={2} flexDirection='row' alignItems='center'>
           <Button
+            data-test='create-vote-button'
             onClick={handleSubmit}
             sx={{
               alignSelf: 'flex-start'

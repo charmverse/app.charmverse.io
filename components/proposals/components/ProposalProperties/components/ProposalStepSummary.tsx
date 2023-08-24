@@ -109,12 +109,12 @@ export function ProposalStepSummary({
         gap={1}
       >
         <Stack gap={0.5}>
-          <Typography variant='h5' fontWeight='bold'>
-            {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : '-'}
+          <Typography variant='h5' fontWeight='bold' data-test='current-proposal-status'>
+            {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : '&nbsp;'}
             {archived ? <Chip sx={{ ml: 1 }} label='Archived' size='small' color='blue' /> : ''}
           </Typography>
           <Typography color='secondary' variant='body1'>
-            {proposalStatus ? proposalStatusDetails[proposalStatus] : '-'}
+            {proposalStatus ? proposalStatusDetails[proposalStatus] : '&nbsp;'}
           </Typography>
         </Stack>
 
@@ -146,6 +146,7 @@ export function ProposalStepSummary({
           {!!nextStatus && (
             <>
               <Button
+                data-test='next-status-button'
                 disabledTooltip={nextStatus === 'discussion' ? 'Select a reviewer to proceed' : undefined}
                 size='small'
                 color='primary'

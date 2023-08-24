@@ -17,7 +17,6 @@ if (isTestEnv) {
 
 async function register(req: NextApiRequest, res: NextApiResponse) {
   const { address, userId } = req.body;
-
   let user: LoggedInUser;
 
   try {

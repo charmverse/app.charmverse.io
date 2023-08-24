@@ -1,19 +1,17 @@
 import type { Theme } from '@mui/material';
-import { Box, Stack, Typography, useMediaQuery } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
-import charmClient from 'charmClient';
+import { useCreateProposal } from 'charmClient/hooks/proposals';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -54,16 +52,14 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
+
+  const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
+
   usePreventReload(contentUpdated);
 
   const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
-
-  const confirmationPopup = usePopupState({ variant: 'popover', popupId: 'create-proposal-confirmation' });
-
-  const [isCreatingProposal, setIsCreatingProposal] = useState(false);
-
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
@@ -95,44 +91,44 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         });
       } catch (error) {
         showMessage((error as Error).message, 'error');
+        return;
       }
       setIsCreatingProposal(true);
-      const createdProposal = await charmClient.proposals
-        .createProposal({
-          authors: formInputs.authors,
-          categoryId: formInputs.categoryId,
-          pageProps: {
-            content: formInputs.content,
-            contentText: formInputs.contentText ?? '',
-            title: formInputs.title,
-            sourceTemplateId: formInputs.proposalTemplateId,
-            headerImage: formInputs.headerImage,
-            icon: formInputs.icon
-          },
-          evaluationType: formInputs.evaluationType,
-          rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
-          reviewers: formInputs.reviewers,
-          spaceId: currentSpace.id,
-          publishToLens: formInputs.publishToLens
-        })
-        .catch((err: any) => {
-          showMessage(err.message ?? 'Something went wrong', 'error');
-          throw err;
-        });
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { proposal, ...page } = createdProposal;
-      mutatePage(page);
-      mutate(`/api/spaces/${currentSpace.id}/proposals`);
-      showProposal({
-        pageId: page.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-        }
+      const createdProposal = await createProposalTrigger({
+        authors: formInputs.authors,
+        categoryId: formInputs.categoryId,
+        pageProps: {
+          content: formInputs.content,
+          contentText: formInputs.contentText ?? '',
+          title: formInputs.title,
+          sourceTemplateId: formInputs.proposalTemplateId,
+          headerImage: formInputs.headerImage,
+          icon: formInputs.icon
+        },
+        evaluationType: formInputs.evaluationType,
+        rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
+        reviewers: formInputs.reviewers,
+        spaceId: currentSpace.id,
+        publishToLens: formInputs.publishToLens                                         
+      }).catch((err: any) => {
+        showMessage(err.message ?? 'Something went wrong', 'error');
+        throw err;
       });
-      setUrlWithoutRerender(router.pathname, { id: page.id });
-      setContentUpdated(false);
-      setIsCreatingProposal(false);
+
+      if (createdProposal) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { proposal, ...page } = createdProposal;
+        mutatePage(page);
+        mutate(`/api/spaces/${currentSpace.id}/proposals`);
+        showProposal({
+          pageId: page.id,
+          onClose() {
+            setUrlWithoutRerender(router.pathname, { id: null });
+          }
+        });
+        setUrlWithoutRerender(router.pathname, { id: page.id });
+        setContentUpdated(false);
+      }
     }
   }
 
@@ -153,13 +149,15 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
     disabledTooltip = 'Category is required';
   } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
     disabledTooltip = 'Template is required';
+  } else if (formInputs.reviewers.length === 0) {
+    disabledTooltip = 'Reviewers are required';
   }
 
   return (
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-        <Container top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+        <Container data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
               placeholderText={
@@ -221,23 +219,12 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             <Button
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
-              onClick={formInputs.reviewers.length < 1 ? confirmationPopup.open : createProposal}
+              onClick={createProposal}
+              isLoading={isCreatingProposal}
+              data-test='create-proposal-button'
             >
               Create
             </Button>
-            <ModalWithButtons
-              open={confirmationPopup.isOpen}
-              onClose={confirmationPopup.close}
-              buttonText='Ok'
-              onConfirm={confirmationPopup.close}
-              hideCancelButton
-              title='Assign a Reviewer to proceed'
-            >
-              <Typography>
-                The chosen Reviewer will perform a final examination, ensuring the proposal is ready for the
-                organization's {formInputs.evaluationType === 'vote' ? 'Vote' : 'Review'}.
-              </Typography>
-            </ModalWithButtons>
           </Stack>
         </Container>
       </div>

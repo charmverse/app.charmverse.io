@@ -110,7 +110,7 @@ test.describe.serial('View proposal', () => {
 
     await proposalListPage.getSidebarLink('proposals').click();
 
-    await proposalListPage.waitForProposalsList(space.domain);
+    await proposalListPage.waitForProposalsList();
 
     const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
     const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
@@ -130,7 +130,7 @@ test.describe.serial('View proposal', () => {
     await proposalListPage.goToHomePage();
 
     await proposalListPage.getSidebarLink('proposals').click();
-    await proposalListPage.waitForProposalsList(space.domain);
+    await proposalListPage.waitForProposalsList();
 
     const categoriesDropDown = proposalListPage.getProposalCategoryListButtonLocator();
 
@@ -159,7 +159,7 @@ test.describe.serial('View proposal', () => {
 
     await proposalListPage.goToHomePage();
     await proposalListPage.getSidebarLink('proposals').click();
-    await proposalListPage.waitForProposalsList(space.domain);
+    await proposalListPage.waitForProposalsList();
 
     // Check the rows content
     const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
@@ -180,11 +180,11 @@ test.describe.serial('View proposal', () => {
     });
 
     // Finish setup start interacting with the app
-    await proposalListPage.goToHomePage(space.domain);
+    await proposalListPage.goToHomePage();
 
     await proposalListPage.getSidebarLink('proposals').click();
 
-    await proposalListPage.waitForProposalsList(space.domain);
+    await proposalListPage.waitForProposalsList();
 
     // Select the row and open the page
     // Needed to reveal the button

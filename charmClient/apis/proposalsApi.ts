@@ -4,19 +4,13 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
-import type { PageWithProposal } from 'lib/pages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
-  createProposal(input: Omit<CreateProposalInput, 'userId'>) {
-    return http.POST<PageWithProposal>('/api/proposals', input);
-  }
-
   updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
     return http.PUT(`/api/proposals/${proposalId}`, rest);
   }

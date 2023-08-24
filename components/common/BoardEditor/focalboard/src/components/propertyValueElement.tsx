@@ -135,7 +135,7 @@ function PropertyValueElement(props: Props) {
   ) {
     propertyValueElement = (
       <TagSelect
-        data-test={`property-value-${propertyTemplate.type}`}
+        data-test='closed-select-input'
         canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
