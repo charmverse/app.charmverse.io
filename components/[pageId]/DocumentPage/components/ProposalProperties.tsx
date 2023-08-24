@@ -11,12 +11,14 @@ import {
   useGetProposalDetails
 } from 'charmClient/hooks/proposals';
 import { useTasks } from 'components/nexus/hooks/useTasks';
-import type { ProposalFormInputs } from 'components/proposals/components/ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import type { PageWithContent } from 'lib/pages';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -27,6 +29,7 @@ interface ProposalPropertiesProps {
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
   title?: string;
+  proposalPage: PageWithContent;
 }
 
 export function ProposalProperties({
@@ -37,12 +40,13 @@ export function ProposalProperties({
   snapshotProposalId,
   readOnly,
   isTemplate,
-  title
+  title,
+  proposalPage
 }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
   const { user } = useUser();
-
+  const { createPost } = useLensProfile();
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
@@ -62,7 +66,7 @@ export function ProposalProperties({
   const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
 
-  const proposalFormInputs: ProposalFormInputs = {
+  const proposalFormInputs: ProposalPropertiesInput = {
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
@@ -77,6 +81,9 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
+      if (newStatus === 'discussion' && proposalPage) {
+        await createPost(proposalPage);
+      }
       await Promise.all([
         refreshProposal(),
         refreshProposalFlowFlags(),
@@ -91,7 +98,7 @@ export function ProposalProperties({
     refreshProposal();
   }
 
-  async function onChangeRubricCriteria(rubricCriteria: ProposalFormInputs['rubricCriteria']) {
+  async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
     // @ts-ignore TODO: unify types for rubricCriteria
     await upsertRubricCriteria({ rubricCriteria });
     if (proposal?.status === 'evaluation_active') {
@@ -99,11 +106,18 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeProperties(values: ProposalFormInputs) {
-    await charmClient.proposals.updateProposal({
-      proposalId,
-      ...values
-    });
+  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
+    if (proposal) {
+      await charmClient.proposals.updateProposal({
+        proposalId,
+        authors: proposal.authors.map(({ userId }) => userId),
+        reviewers: proposal.reviewers.map((reviewer) => ({
+          id: reviewer.roleId ?? (reviewer.userId as string),
+          group: reviewer.roleId ? 'role' : 'user'
+        })),
+        ...values
+      });
+    }
     refreshProposal();
     refreshProposalFlowFlags(); // needs to run when reviewers change?
   }

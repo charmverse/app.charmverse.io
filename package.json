@@ -190,7 +190,7 @@
     "material-ui-popup-state": "^5.0.4",
     "millify": "^4.0.0",
     "mixpanel": "^0.17.0",
-    "mjml": "^4.13.0",
+    "mjml": "^4.14.1",
     "mjml-react": "^2.0.8",
     "msw-storybook-addon": "^1.8.0",
     "nanoevents": "^6.0.2",

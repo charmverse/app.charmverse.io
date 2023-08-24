@@ -56,8 +56,7 @@ export function MultiSigList() {
   return (
     <>
       <Legend
-        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-        marginTop={(theme) => theme.spacing(4)}
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4 }}
         id='multisig-section'
       >
         <Box component='span' display='flex' alignItems='center' gap={1}>

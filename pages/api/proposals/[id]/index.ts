@@ -7,7 +7,6 @@ import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/
 import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
@@ -73,7 +72,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   return res.status(200).json(proposal as ProposalWithUsersAndRubric);
 }
 
-async function updateProposalController(req: NextApiRequest, res: NextApiResponse<PageWithProposal>) {
+async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -166,12 +165,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
 
   await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType });
 
-  const updatedProposal = await getProposal({ proposalId: proposal.id });
-
-  // Don't allow fetching answers here
-  updatedProposal.proposal.rubricAnswers = [];
-
-  return res.status(200).send(updatedProposal);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

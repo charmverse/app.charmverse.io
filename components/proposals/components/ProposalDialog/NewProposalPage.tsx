@@ -1,16 +1,19 @@
 import type { Theme } from '@mui/material';
-import { Box, Stack, useMediaQuery } from '@mui/material';
+import { Box, Stack, Typography, useMediaQuery } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
-import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
+import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -23,14 +26,22 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalFormInputs } from '../ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalProperties';
 import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
 import { useProposalDialog } from './hooks/useProposalDialog';
 
+export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  headerImage: string | null;
+  icon: string | null;
+};
+
 type Props = {
-  setFormInputs: (params: Partial<ProposalFormInputs>) => void;
-  formInputs: ProposalFormInputs;
+  setFormInputs: (params: Partial<ProposalPageAndPropertiesInput>) => void;
+  formInputs: ProposalPageAndPropertiesInput;
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
@@ -43,12 +54,13 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const { mutatePage } = usePages();
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
-
   usePreventReload(contentUpdated);
 
   const { proposalTemplates } = useProposalTemplates();
 
   const router = useRouter();
+
+  const confirmationPopup = usePopupState({ variant: 'popover', popupId: 'create-proposal-confirmation' });
 
   const [isCreatingProposal, setIsCreatingProposal] = useState(false);
 
@@ -93,7 +105,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             content: formInputs.content,
             contentText: formInputs.contentText ?? '',
             title: formInputs.title,
-            sourceTemplateId: formInputs.proposalTemplateId
+            sourceTemplateId: formInputs.proposalTemplateId,
+            headerImage: formInputs.headerImage,
+            icon: formInputs.icon
           },
           evaluationType: formInputs.evaluationType,
           rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -108,7 +122,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { proposal, ...page } = createdProposal;
       mutatePage(page);
-      mutate(`proposals/${currentSpace.id}`);
+      mutate(`/api/spaces/${currentSpace.id}/proposals`);
       showProposal({
         pageId: page.id,
         onClose() {
@@ -143,7 +157,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   return (
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
-        <Container top={50} fullWidth={isSmallScreen}>
+        {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+        <Container top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
               placeholderText={
@@ -169,16 +184,14 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
-                headerImage={null}
-                icon={null}
+                headerImage={formInputs.headerImage}
+                icon={formInputs.icon}
                 readOnly={false}
                 updatedAt={new Date().toString()}
                 title={formInputs.title || ''}
                 // readOnly={readOnly || !!enableSuggestingMode}
                 setPage={(updatedPage) => {
-                  setFormInputs({
-                    title: updatedPage.title
-                  });
+                  setFormInputs(updatedPage);
                 }}
               />
               <div className='focalboard-body font-family-default'>
@@ -207,10 +220,23 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             <Button
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
-              onClick={createProposal}
+              onClick={formInputs.reviewers.length < 1 ? confirmationPopup.open : createProposal}
             >
               Create
             </Button>
+            <ModalWithButtons
+              open={confirmationPopup.isOpen}
+              onClose={confirmationPopup.close}
+              buttonText='Ok'
+              onConfirm={confirmationPopup.close}
+              hideCancelButton
+              title='Assign a Reviewer to proceed'
+            >
+              <Typography>
+                The chosen Reviewer will perform a final examination, ensuring the proposal is ready for the
+                organization's {formInputs.evaluationType === 'vote' ? 'Vote' : 'Review'}.
+              </Typography>
+            </ModalWithButtons>
           </Stack>
         </Container>
       </div>
