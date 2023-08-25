@@ -46,7 +46,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
-  assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'staging' ? 'https://cdn.charmverse.io' : undefined,
+  assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async generateBuildId() {
     return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
