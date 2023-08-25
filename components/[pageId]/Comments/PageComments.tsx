@@ -1,6 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
+import { useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
@@ -10,6 +11,7 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -20,6 +22,7 @@ type Props = {
 };
 
 export function PageComments({ page, permissions }: Props) {
+  const { user } = useUser();
   const {
     comments,
     commentSort,
@@ -39,6 +42,8 @@ export function PageComments({ page, permissions }: Props) {
   });
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
+  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
+
   const commentPermissions: CommentPermissions = {
     add_comment: permissions.comment ?? false,
     upvote: permissions.comment ?? false,
@@ -48,7 +53,7 @@ export function PageComments({ page, permissions }: Props) {
 
   async function createComment(comment: CommentContent) {
     const createdComment = await addComment(comment);
-    if (isProposal && proposal?.lensPostLink) {
+    if (isProposal && proposal?.lensPostLink && publishCommentsToLens) {
       await createLensComment({
         commentContent: comment.content as PageContent,
         commentId: createdComment.id,
@@ -66,7 +71,14 @@ export function PageComments({ page, permissions }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions.comment && <CommentForm handleCreateComment={createComment} />}
+      {permissions.comment && (
+        <CommentForm
+          publishToLens={publishCommentsToLens}
+          setPublishToLens={setPublishCommentsToLens}
+          showPublishToLens={!!page.proposalId && page.type === 'proposal' && !!proposal?.lensPostLink}
+          handleCreateComment={createComment}
+        />
+      )}
 
       {isLoadingComments ? (
         <Box height={100}>
