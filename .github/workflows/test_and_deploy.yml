@@ -254,7 +254,8 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
 
       - name: Update and Package background worker
         run: |
