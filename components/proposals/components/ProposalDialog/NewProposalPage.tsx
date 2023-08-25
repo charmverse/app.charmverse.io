@@ -107,7 +107,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
-        spaceId: currentSpace.id
+        spaceId: currentSpace.id,
+        publishToLens: formInputs.publishToLens
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

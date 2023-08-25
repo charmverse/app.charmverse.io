@@ -38,6 +38,13 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    setFormInputs((prevState) => ({
+      ...prevState,
+      publishToLens: !!user?.publishToLensDefault
+    }));
+  }, [user?.id]);
+
   function close() {
     onClose();
     setFormInputs(emptyState());
@@ -124,6 +131,7 @@ function emptyState({ userId }: { userId?: string } = {}): ProposalPageAndProper
     proposalTemplateId: null,
     reviewers: [],
     rubricCriteria: [],
-    title: ''
+    title: '',
+    publishToLens: false
   };
 }

@@ -15,10 +15,11 @@ import type { ProposalPropertiesInput } from 'components/proposals/components/Pr
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -46,7 +47,11 @@ export function ProposalProperties({
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
   const { user } = useUser();
-  const { createPost } = useLensProfile();
+  const { createLensPost } = useLensPublication({
+    proposalId,
+    proposalPath: proposalPage.path,
+    proposalTitle: proposalPage.title
+  });
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
@@ -71,6 +76,7 @@ export function ProposalProperties({
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     rubricCriteria: proposal?.rubricCriteria ?? [],
+    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
     reviewers:
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
@@ -81,8 +87,11 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      if (newStatus === 'discussion' && proposalPage) {
-        await createPost(proposalPage);
+      // If proposal is being published for the first time and publish to lens is enabled, create a lens post
+      if (newStatus === 'discussion' && proposalPage && proposal.publishToLens && !proposal.lensPostLink) {
+        await createLensPost({
+          proposalContent: proposalPage.content as PageContent
+        });
       }
       await Promise.all([
         refreshProposal(),
@@ -131,6 +140,7 @@ export function ProposalProperties({
 
   return (
     <ProposalPropertiesBase
+      proposalLensLink={proposal?.lensPostLink ?? undefined}
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}
