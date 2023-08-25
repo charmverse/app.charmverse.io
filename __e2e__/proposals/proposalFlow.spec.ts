@@ -8,7 +8,7 @@ import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('A user can create a proposal with a space-wide vote', () => {
+test.describe.serial('Proposal Flow', () => {
   // create reusable pages we can reuse between tests
   let proposalListPage: ProposalsListPage;
   let proposalPage: ProposalPage;
@@ -22,7 +22,7 @@ test.describe.serial('A user can create a proposal with a space-wide vote', () =
     proposalPage = new ProposalPage(page);
   });
 
-  test('An user creates a draft proposal', async () => {
+  test('A user can create a draft proposal', async () => {
     // Initial setup
     const { space, user } = await generateUserAndSpace();
 
@@ -79,7 +79,7 @@ test.describe.serial('A user can create a proposal with a space-wide vote', () =
     await expect(proposalRow).toBeVisible();
   });
 
-  test('An user moves draft proposal to feedback', async () => {
+  test('A user can move draft proposal to feedback', async () => {
     await proposalListPage.getProposalRowLocator(proposalId).click();
 
     await expect(proposalPage.dialog).toBeVisible();
@@ -89,21 +89,21 @@ test.describe.serial('A user can create a proposal with a space-wide vote', () =
     await proposalPage.confirmStatusButton.click();
     await expect(proposalPage.currentStatus).toHaveText(PROPOSAL_STATUS_LABELS.discussion);
   });
-  test('An user moves feedback to In Review', async () => {
+  test('A user can move feedback to In Review', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.review);
     await proposalPage.nextStatusButton.click();
     await proposalPage.confirmStatusButton.click();
     await expect(proposalPage.currentStatus).toHaveText(PROPOSAL_STATUS_LABELS.review);
   });
 
-  test('An user moves feedback to Reviewed', async () => {
+  test('A user can move feedback to Reviewed', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.reviewed);
     await proposalPage.nextStatusButton.click();
     await proposalPage.confirmStatusButton.click();
     await expect(proposalPage.currentStatus).toHaveText(PROPOSAL_STATUS_LABELS.reviewed);
   });
 
-  test('An user creates a vote', async () => {
+  test('A user can create a vote', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.vote_active);
     await proposalPage.nextStatusButton.click();
     await proposalPage.confirmStatusButton.click();

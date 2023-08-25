@@ -7,7 +7,7 @@ import { generateProposal } from 'testing/setupDatabase';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('A user can create a proposal with a space-wide vote', () => {
+test.describe.serial('Proposal templates', () => {
   // create reusable pages we can reuse between tests
   let proposalListPage: ProposalsListPage;
   let proposalPage: ProposalPage;
