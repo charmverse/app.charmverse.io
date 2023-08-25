@@ -43,16 +43,17 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
         spaceId: currentSpace.id,
         templateId
       });
+      createProposal({});
 
-      mutateProposals();
-      mutatePage(newProposal);
-      setUrlWithoutRerender(router.pathname, { id: newProposal.id });
-      showProposal({
-        pageId: newProposal.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-        }
-      });
+      // mutateProposals();
+      // mutatePage(newProposal);
+      // setUrlWithoutRerender(router.pathname, { id: newProposal.id });
+      // showProposal({
+      //   pageId: newProposal.id,
+      //   onClose() {
+      //     setUrlWithoutRerender(router.pathname, { id: null });
+      //   }
+      // });
     }
   }
 
@@ -75,11 +76,9 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   }
 
   async function onClickCreate() {
-    if (currentSpace) {
-      createProposal({
-        category: null
-      });
-    }
+    createProposal({
+      category: null
+    });
   }
 
   return (
@@ -90,7 +89,12 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
             <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
               {isXsScreen ? 'Create' : 'Create Proposal'}
             </Button>
-            <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
+            <Button
+              data-test='proposal-template-select'
+              size='small'
+              disabled={!canCreateProposal}
+              onClick={popupState.open}
+            >
               <KeyboardArrowDown />
             </Button>
           </ButtonGroup>

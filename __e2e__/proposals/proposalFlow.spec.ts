@@ -47,7 +47,7 @@ test.describe.serial('A user can create a proposal with a space-wide vote', () =
     await proposalListPage.goToProposals(space.domain);
     await proposalListPage.waitForProposalsList();
     await expect(proposalListPage.emptyState).toBeVisible();
-    await proposalListPage.clickNewProposalDialog();
+    await proposalListPage.createProposalButton.click();
 
     await proposalPage.waitForDialog();
     await expect(proposalPage.saveDraftButton).toBeDisabled();

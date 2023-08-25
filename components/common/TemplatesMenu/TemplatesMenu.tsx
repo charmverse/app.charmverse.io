@@ -84,6 +84,7 @@ export function TemplatesMenu({
         pages.map((page) => {
           return (
             <MenuItem
+              data-test={`select-option-${page.id}`}
               key={page.id}
               dense
               sx={{ display: 'flex', justifyContent: 'space-between' }}
