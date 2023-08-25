@@ -88,7 +88,12 @@ export function SpaceSettings({ space }: { space: Space }) {
     resolver: yupResolver(schema)
   });
 
-  const { register: registerNewTitle, watch: watchNewTitle } = useForm<{ newTitle: string }>({
+  const {
+    register: registerNewTitle,
+    watch: watchNewTitle,
+    reset: resetNewTitle,
+    setValue: setValueNewTitle
+  } = useForm<{ newTitle: string }>({
     defaultValues: { newTitle: '' },
     resolver: yupResolver(yup.object({ newTitle: yup.string().trim() }))
   });
@@ -301,7 +306,14 @@ export function SpaceSettings({ space }: { space: Space }) {
                               >
                                 {isHidden ? 'Show' : 'Hide'}
                               </MenuItem>,
-                              <MenuItem key='2' data-test='settings-feature-option-rename' {...bindTrigger(popupState)}>
+                              <MenuItem
+                                key='2'
+                                data-test='settings-feature-option-rename'
+                                onClick={(e) => {
+                                  setValueNewTitle('newTitle', title);
+                                  popupState.open(e);
+                                }}
+                              >
                                 Rename
                               </MenuItem>
                             ]}
@@ -326,9 +338,10 @@ export function SpaceSettings({ space }: { space: Space }) {
                                 newState[index] = { ...newState[index], title: newTitle };
                                 return [...newState];
                               });
+                              resetNewTitle();
                             }}
                           >
-                            <TextField {...registerNewTitle('newTitle')} defaultValue={title} fullWidth />
+                            <TextField {...registerNewTitle('newTitle')} fullWidth />
                           </ModalWithButtons>
                         </>
                       )}
