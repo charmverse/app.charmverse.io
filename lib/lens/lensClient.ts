@@ -4,8 +4,10 @@ import { isDevEnv } from 'config/constants';
 
 const isServer = typeof window === 'undefined';
 
+export const LensChain = isDevEnv ? 'MUMBAI' : 'POLYGON';
+
 const lensClient = new LensClient({
-  environment: !isDevEnv ? development : production,
+  environment: isDevEnv ? development : production,
   storage: {
     // Need to bind the functions to the window.localStorage object otherwise it throws illegal invocation error
     getItem: isServer

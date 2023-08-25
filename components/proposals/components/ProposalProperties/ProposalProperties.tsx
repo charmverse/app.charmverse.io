@@ -19,7 +19,6 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -103,14 +102,12 @@ export function ProposalProperties({
   title
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
-
   const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { user } = useUser();
   const { proposalTemplates } = useProposalTemplates();
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
@@ -161,12 +158,6 @@ export function ProposalProperties({
       });
     }
   }
-
-  useEffect(() => {
-    setProposalFormInputs({
-      publishToLens: proposalFormInputs?.publishToLens ?? !!user?.publishToLensDefault
-    });
-  }, [user?.id, proposalFormInputs?.publishToLens]);
 
   function applyTemplate(templatePage: PageMeta) {
     if (templatePage && templatePage.proposalId) {
@@ -410,31 +401,30 @@ export function ProposalProperties({
           </Box>
 
           {/* Publish to lens toggle */}
-          {user && (
-            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box
-                display='flex'
-                height='fit-content'
-                flex={1}
-                className='octo-propertyrow'
-                // override align-items flex-start with inline style
-                style={{
-                  alignItems: 'center'
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box
+              display='flex'
+              height='fit-content'
+              flex={1}
+              className='octo-propertyrow'
+              // override align-items flex-start with inline style
+              style={{
+                alignItems: 'center'
+              }}
+            >
+              <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+              <Switch
+                // only allow this when the proposal is being created
+                disabled={proposalId !== undefined}
+                checked={proposalFormInputs.publishToLens ?? false}
+                onChange={(e) => {
+                  setProposalFormInputs({
+                    publishToLens: e.target.checked
+                  });
                 }}
-              >
-                <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
-                <Switch
-                  disabled={proposalStatus !== 'draft'}
-                  checked={proposalFormInputs.publishToLens ?? false}
-                  onChange={(e) => {
-                    setProposalFormInputs({
-                      publishToLens: e.target.checked
-                    });
-                  }}
-                />
-              </Box>
+              />
             </Box>
-          )}
+          </Box>
 
           {/* Lens post link */}
           {proposalLensLink && (

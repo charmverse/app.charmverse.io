@@ -93,7 +93,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         showMessage((error as Error).message, 'error');
         return;
       }
-      setIsCreatingProposal(true);
       const createdProposal = await createProposalTrigger({
         authors: formInputs.authors,
         categoryId: formInputs.categoryId,
@@ -109,7 +108,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens                                         
+        publishToLens: formInputs.publishToLens
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

@@ -11,12 +11,10 @@ export type UpdateProposalRequest = {
   reviewers: ProposalReviewerInput[];
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
-  publishToLens?: boolean;
 };
 
 export async function updateProposal({
   proposalId,
-  publishToLens,
   authors,
   reviewers,
   categoryId,
@@ -27,15 +25,6 @@ export async function updateProposal({
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.proposal.update({
-      where: {
-        id: proposalId
-      },
-      data: {
-        publishToLens
-      }
-    });
-
     // Update category only when it is present in request payload
     if (categoryId) {
       await tx.proposal.update({

@@ -10,88 +10,51 @@ import type {
   RelayErrorFragment,
   Result
 } from '@lens-protocol/client';
-import type { Blockchain } from 'connectors/index';
 import { RPC } from 'connectors/index';
-import useSWR from 'swr';
 
-import { isDevEnv } from 'config/constants';
+import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createCommentPublication } from 'lib/lens/createCommentPublication';
 import { createPostPublication } from 'lib/lens/createPostPublication';
-import { lensClient } from 'lib/lens/lensClient';
+import { LensChain, lensClient } from 'lib/lens/lensClient';
 import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
-const CHAIN: Blockchain = !isDevEnv ? 'MUMBAI' : 'POLYGON';
+import { useLensProfile } from './useLensProfile';
+
+type LensPublicationResponse =
+  | Awaited<ReturnType<Publication['createDataAvailabilityPostViaDispatcher']>>
+  | Awaited<ReturnType<Publication['createDataAvailabilityPostTypedData']>>
+  | Awaited<ReturnType<Publication['createDataAvailabilityCommentTypedData']>>
+  | Awaited<ReturnType<Publication['createDataAvailabilityCommentViaDispatcher']>>;
 
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
 async function switchNetwork() {
-  return switchActiveNetwork(RPC[CHAIN].chainId);
+  return switchActiveNetwork(RPC[LensChain].chainId);
 }
 
-export function useLensProfile() {
+export function useLensPublication({
+  proposalId,
+  proposalPath,
+  proposalTitle
+}: {
+  proposalId: string;
+  proposalPath: string;
+  proposalTitle: string;
+}) {
   const { account, library, chainId } = useWeb3AuthSig();
-  const { user } = useUser();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { data: lensProfile, mutate } = useSWR(user && account ? ['lensProfile', account] : null, async () => {
-    if (!user || !account) {
-      return;
-    }
-
-    const isAuthenticated = await lensClient.authentication.isAuthenticated();
-    if (!isAuthenticated) {
-      return;
-    }
-
-    return fetchLensProfile();
-  });
-
-  async function fetchLensProfile() {
-    if (!user || !account) {
-      return null;
-    }
-
-    const lensProfiles = await lensClient.profile.fetchAll({
-      ownedBy: [account],
-      limit: 1
-    });
-
-    return lensProfiles.items[0] ?? null;
-  }
-
-  async function setupLensProfile() {
-    if (!user || !account) {
-      return null;
-    }
-
-    if (chainId !== RPC[CHAIN].chainId) {
-      await switchNetwork();
-    }
-
-    const isAuthenticated = await lensClient.authentication.isAuthenticated();
-    if (!isAuthenticated) {
-      const challenge = await lensClient.authentication.generateChallenge(account);
-      const web3Provider: Web3Provider = library;
-      const signature = await web3Provider.getSigner(account).signMessage(challenge);
-      await lensClient.authentication.authenticate(account, signature);
-    }
-    return mutate();
-  }
+  const { lensProfile } = useLensProfile();
+  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
 
   async function createPublication(
-    params: {
-      proposalId: string;
-      proposalPath: string;
-      proposalTitle: string;
-      content: PageContent;
-    } & (
+    params: { content: PageContent } & (
       | {
           publicationType: 'post';
         }
@@ -102,12 +65,13 @@ export function useLensProfile() {
         }
     )
   ) {
-    const { proposalPath, content, proposalTitle, publicationType } = params;
+    const { publicationType, content } = params;
+
     if (!lensProfile || !space || !account) {
       return;
     }
 
-    if (chainId !== RPC[CHAIN].chainId) {
+    if (chainId !== RPC[LensChain].chainId) {
       await switchNetwork();
     }
 
@@ -127,11 +91,7 @@ export function useLensProfile() {
     try {
       let publicationResponse: {
         dispatcherUsed: boolean;
-        data:
-          | Awaited<ReturnType<Publication['createDataAvailabilityPostViaDispatcher']>>
-          | Awaited<ReturnType<Publication['createDataAvailabilityPostTypedData']>>
-          | Awaited<ReturnType<Publication['createDataAvailabilityCommentTypedData']>>
-          | Awaited<ReturnType<Publication['createDataAvailabilityCommentViaDispatcher']>>;
+        data: LensPublicationResponse;
       };
 
       let broadcastResponse: Result<
@@ -210,22 +170,24 @@ export function useLensProfile() {
     return null;
   }
 
-  async function createPost(proposal: PageWithContent) {
+  async function createLensPost({ proposalContent }: { proposalContent: PageContent }) {
     const createdPost = (await createPublication({
-      proposalId: proposal.id,
-      proposalPath: proposal.path,
-      proposalTitle: proposal.title,
-      content: proposal.content as PageContent,
-      publicationType: 'post'
+      publicationType: 'post',
+      content: proposalContent
     })) as CreateDataAvailabilityPublicationResultFragment | CreatePostTypedDataFragment;
+
+    if (createdPost) {
+      await updateProposalLensProperties({
+        lensPostLink: createdPost.id
+      });
+    }
 
     return createdPost;
   }
 
-  async function createComment({
+  async function createLensComment({
     commentId,
     lensPostId,
-    proposal,
     commentContent
   }: {
     commentContent: PageContent;
@@ -234,9 +196,6 @@ export function useLensProfile() {
     lensPostId: string;
   }) {
     return createPublication({
-      proposalId: proposal.id,
-      proposalPath: proposal.path,
-      proposalTitle: proposal.title,
       content: commentContent,
       commentId,
       lensPostId,
@@ -245,9 +204,7 @@ export function useLensProfile() {
   }
 
   return {
-    lensProfile,
-    setupLensProfile,
-    createPost,
-    createComment
+    createLensPost,
+    createLensComment
   };
 }

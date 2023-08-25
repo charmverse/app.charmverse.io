@@ -8,7 +8,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
@@ -32,7 +32,11 @@ export function PageComments({ page, permissions }: Props) {
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
-  const { createComment: createLensComment } = useLensProfile();
+  const { createLensComment } = useLensPublication({
+    proposalId: page.proposalId ?? '',
+    proposalPath: page.path,
+    proposalTitle: page.title
+  });
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
   const commentPermissions: CommentPermissions = {
