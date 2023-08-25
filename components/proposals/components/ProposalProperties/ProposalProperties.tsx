@@ -4,6 +4,7 @@ import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } f
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
@@ -12,6 +13,7 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
@@ -20,6 +22,11 @@ import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
+import {
+  getProposalStatuses,
+  nextProposalStatusUpdateMessage,
+  previousProposalStatusUpdateMessage
+} from 'lib/proposal/proposalStatusTransition';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -107,6 +114,43 @@ export function ProposalProperties({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
 
   const { proposalTemplates } = useProposalTemplates();
+
+  const previousConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'previous-proposal-status-change-confirmation'
+  });
+  const nextConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'next-proposal-status-change-confirmation'
+  });
+
+  const statuses = getProposalStatuses(proposalFormInputs.evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
+  const nextStatus = statuses[currentStatusIndex + 1];
+  const previousStatus = statuses[currentStatusIndex - 1];
+  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
+  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
+
+  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
+    switch (newStatus) {
+      case 'draft':
+      case 'discussion':
+      case 'review':
+      case 'vote_active':
+      case 'evaluation_active':
+      case 'evaluation_closed':
+      case 'reviewed':
+        if (newStatus === previousStatus) {
+          previousConfirmationPopup.open();
+        } else if (newStatus === nextStatus) {
+          nextConfirmationPopup.open();
+        }
+        break;
+      default:
+        await updateProposalStatus?.(newStatus);
+        break;
+    }
+  }
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
@@ -260,8 +304,7 @@ export function ProposalProperties({
                   archived={archived}
                   proposalFlowFlags={proposalFlowFlags}
                   proposalStatus={proposalStatus}
-                  openVoteModal={openVoteModal}
-                  updateProposalStatus={updateProposalStatus}
+                  handleProposalStatusUpdate={handleProposalStatusUpdate}
                   evaluationType={proposalFormInputs.evaluationType}
                 />
               )}
@@ -290,8 +333,7 @@ export function ProposalProperties({
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
-                openVoteModal={openVoteModal}
-                updateProposalStatus={updateProposalStatus}
+                handleProposalStatusUpdate={handleProposalStatusUpdate}
                 evaluationType={proposalFormInputs.evaluationType}
               />
             </Box>
@@ -464,6 +506,28 @@ export function ProposalProperties({
           }}
         />
       </div>
+      <ModalWithButtons
+        open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
+        buttonText='Continue'
+        onClose={previousConfirmationPopup.close}
+        onConfirm={() => updateProposalStatus?.(previousStatus)}
+      >
+        <Typography>{previousConfirmationMessage}</Typography>
+      </ModalWithButtons>
+      <ModalWithButtons
+        open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
+        onClose={nextConfirmationPopup.close}
+        buttonText='Continue'
+        onConfirm={() => {
+          if (nextStatus === 'vote_active') {
+            openVoteModal?.();
+          } else {
+            updateProposalStatus?.(nextStatus);
+          }
+        }}
+      >
+        <Typography>{nextConfirmationMessage}</Typography>
+      </ModalWithButtons>
     </Box>
   );
 }

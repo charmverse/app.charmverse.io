@@ -5,10 +5,8 @@ import { ArrowBackIos } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Stack, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import { Button } from 'components/common/Button';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import {
   proposalStatusDetails,
   getProposalStatuses,
@@ -18,8 +16,7 @@ import {
 type Props = {
   proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalStatus?: ProposalWithUsers['status'];
-  openVoteModal?: () => void;
-  updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
+  handleProposalStatusUpdate: (newStatus: ProposalStatus) => Promise<void>;
   archived?: boolean | null;
   evaluationType?: ProposalEvaluationType;
 };
@@ -27,8 +24,7 @@ type Props = {
 export function ProposalStepSummary({
   proposalStatus,
   proposalFlowFlags,
-  openVoteModal,
-  updateProposalStatus,
+  handleProposalStatusUpdate,
   archived,
   evaluationType
 }: Props) {
@@ -36,68 +32,6 @@ export function ProposalStepSummary({
   const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
   const nextStatus = statuses[currentStatusIndex + 1];
   const previousStatus = statuses[currentStatusIndex - 1];
-  const previousConfirmationPopup = usePopupState({
-    variant: 'popover',
-    popupId: 'previous-proposal-status-change-confirmation'
-  });
-  const nextConfirmationPopup = usePopupState({
-    variant: 'popover',
-    popupId: 'next-proposal-status-change-confirmation'
-  });
-
-  function handleProposalStatusUpdate(newStatus: ProposalStatus) {
-    switch (newStatus) {
-      case 'draft':
-      case 'discussion':
-      case 'review':
-      case 'vote_active':
-      case 'evaluation_active':
-      case 'evaluation_closed':
-      case 'reviewed':
-        if (newStatus === previousStatus) {
-          previousConfirmationPopup.open();
-        } else if (newStatus === nextStatus) {
-          nextConfirmationPopup.open();
-        }
-        break;
-      default:
-        updateProposalStatus?.(newStatus);
-        break;
-    }
-  }
-
-  function previousProposalStatusUpdateMessage(status: ProposalStatus) {
-    switch (status) {
-      case 'draft':
-        return 'In the Draft stage, only authors and administrators can view and edit the proposal.';
-      case 'discussion':
-        return 'Rejecting this proposal will return it to the Discussion stage for further consideration.';
-      default:
-        return null;
-    }
-  }
-
-  function nextProposalStatusUpdateMessage(status: ProposalStatus) {
-    switch (status) {
-      case 'discussion':
-        return 'In the Feedback stage, Members can view and provide feedback on the proposal.';
-      case 'review':
-        return 'In the Review stage, the Proposal is visible to Members. Reviewer approval is required to proceed to the voting stage.';
-      case 'vote_active':
-        return 'Proceeding with this action will transition the proposal into the Voting stage.';
-      case 'evaluation_active':
-        return 'Proceeding with this action will transition the proposal into the Evaluation stage.';
-      case 'evaluation_closed':
-        return 'This will close the Evaluation. No additional Rubric answers will be accepted.';
-      case 'reviewed':
-        return "By approving this proposal, you authorize its advancement to the voting stage. Voting is initiated by one of the proposal's authors.";
-      default:
-        return null;
-    }
-  }
-
-  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
-  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
 
   return (
     <Stack flex={1}>
@@ -120,59 +54,33 @@ export function ProposalStepSummary({
 
         <Stack gap={0.5} direction='row' fontSize='10px'>
           {!!previousStatus && (
-            <>
-              <Button
-                sx={{ whiteSpace: 'nowrap' }}
-                size='small'
-                color='secondary'
-                startIcon={<ArrowBackIos fontSize='inherit' />}
-                disabled={!proposalFlowFlags?.[previousStatus]}
-                disableElevation
-                variant='outlined'
-                onClick={() => handleProposalStatusUpdate(previousStatus)}
-              >
-                {PROPOSAL_STATUS_LABELS[previousStatus]}
-              </Button>
-              <ModalWithButtons
-                open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
-                buttonText='Continue'
-                onClose={previousConfirmationPopup.close}
-                onConfirm={() => updateProposalStatus?.(previousStatus)}
-              >
-                <Typography>{previousConfirmationMessage}</Typography>
-              </ModalWithButtons>
-            </>
+            <Button
+              sx={{ whiteSpace: 'nowrap' }}
+              size='small'
+              color='secondary'
+              startIcon={<ArrowBackIos fontSize='inherit' />}
+              disabled={!proposalFlowFlags?.[previousStatus]}
+              disableElevation
+              variant='outlined'
+              onClick={() => handleProposalStatusUpdate(previousStatus)}
+            >
+              {PROPOSAL_STATUS_LABELS[previousStatus]}
+            </Button>
           )}
           {!!nextStatus && (
-            <>
-              <Button
-                data-test='next-status-button'
-                disabledTooltip={nextStatus === 'discussion' ? 'Select a reviewer to proceed' : undefined}
-                size='small'
-                color='primary'
-                disableElevation
-                sx={{ whiteSpace: 'nowrap' }}
-                endIcon={<ArrowForwardIos fontSize='inherit' />}
-                disabled={!proposalFlowFlags?.[nextStatus]}
-                onClick={() => handleProposalStatusUpdate(nextStatus)}
-              >
-                {PROPOSAL_STATUS_LABELS[nextStatus]}
-              </Button>
-              <ModalWithButtons
-                open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
-                onClose={nextConfirmationPopup.close}
-                buttonText='Continue'
-                onConfirm={() => {
-                  if (nextStatus === 'vote_active') {
-                    openVoteModal?.();
-                  } else {
-                    updateProposalStatus?.(nextStatus);
-                  }
-                }}
-              >
-                <Typography>{nextConfirmationMessage}</Typography>
-              </ModalWithButtons>
-            </>
+            <Button
+              data-test='next-status-button'
+              disabledTooltip={nextStatus === 'discussion' ? 'Select a reviewer to proceed' : undefined}
+              size='small'
+              color='primary'
+              disableElevation
+              sx={{ whiteSpace: 'nowrap' }}
+              endIcon={<ArrowForwardIos fontSize='inherit' />}
+              disabled={!proposalFlowFlags?.[nextStatus]}
+              onClick={() => handleProposalStatusUpdate(nextStatus)}
+            >
+              {PROPOSAL_STATUS_LABELS[nextStatus]}
+            </Button>
           )}
         </Stack>
       </Stack>

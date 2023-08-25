@@ -5,8 +5,7 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 export type StepperProps = {
   proposalStatus?: ProposalWithUsers['status'];
   archived?: boolean | null;
-  openVoteModal?: () => void;
-  updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
+  handleProposalStatusUpdate: (newStatus: ProposalStatus) => Promise<void>;
   proposalFlowPermissions?: ProposalFlowPermissionFlags;
   evaluationType?: ProposalEvaluationType;
 };
