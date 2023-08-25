@@ -18,7 +18,7 @@ import { useProposalDialog } from '../ProposalDialog/hooks/useProposalDialog';
 import { ProposalStatusChip } from '../ProposalStatusBadge';
 
 import { NoProposalsMessage } from './components/NoProposalsMessage';
-import ProposalActionsMenu from './components/ProposalActionsMenu';
+import { ProposalActionsMenu } from './components/ProposalActionsMenu';
 
 export function ProposalsTable({
   proposals,
@@ -92,7 +92,7 @@ export function ProposalsTable({
       {proposals.map((proposal) => {
         const { category } = proposal;
         const proposalPage = pages[proposal.id];
-        return proposalPage ? (
+        return (
           <GridContainer key={proposal.id}>
             <Grid data-test={`proposal-row-${proposal.id}`} item xs={6} md={5} sx={{ cursor: 'pointer' }}>
               <Box
@@ -125,20 +125,15 @@ export function ProposalsTable({
             <Grid item xs={4} md={2} display='flex' justifyContent='center'>
               <ProposalStatusChip status={proposal.status} />
             </Grid>
-            <Grid
-              item
-              xs={2}
-              md={2}
-              display='flex'
-              justifyContent='center'
-              sx={{ display: { xs: 'none', md: 'flex' } }}
-            >
+            <Grid item xs={2} md={2} justifyContent='center' sx={{ display: { xs: 'none', md: 'flex' } }}>
               {category ? <ProposalCategoryChip size='small' color={category.color} title={category.title} /> : '-'}
             </Grid>
             <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
-              <Tooltip arrow placement='top' title={`Created on ${formatDateTime(proposalPage.createdAt)}`}>
-                <span>{formatDate(proposalPage.createdAt)}</span>
-              </Tooltip>
+              {proposalPage && (
+                <Tooltip arrow placement='top' title={`Created on ${formatDateTime(proposalPage.createdAt)}`}>
+                  <span>{formatDate(proposalPage.createdAt)}</span>
+                </Tooltip>
+              )}
             </Grid>
             <Grid item xs={1} display='flex' justifyContent='flex-end'>
               <ProposalActionsMenu
@@ -149,7 +144,7 @@ export function ProposalsTable({
               />
             </Grid>
           </GridContainer>
-        ) : null;
+        );
       })}
     </>
   );

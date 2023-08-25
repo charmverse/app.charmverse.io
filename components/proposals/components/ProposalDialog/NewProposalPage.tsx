@@ -24,18 +24,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalProperties';
 import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
+import type { ProposalPageAndPropertiesInput } from './hooks/useProposalDialog';
 import { useProposalDialog } from './hooks/useProposalDialog';
-
-export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
-  title?: string; // title is saved to the same state that's used in ProposalPage
-  content?: PageContent | null;
-  contentText?: string;
-  headerImage: string | null;
-  icon: string | null;
-};
 
 type Props = {
   setFormInputs: (params: Partial<ProposalPageAndPropertiesInput>) => void;
@@ -43,6 +35,7 @@ type Props = {
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
+
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();

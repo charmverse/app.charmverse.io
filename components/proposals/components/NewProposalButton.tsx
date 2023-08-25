@@ -13,6 +13,7 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
@@ -38,12 +39,22 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
 
   async function createProposalFromTemplate(templateId: string) {
-    if (currentSpace) {
-      const newProposal = await charmClient.proposals.createProposalFromTemplate({
-        spaceId: currentSpace.id,
-        templateId
+    const proposalTemplate = proposalTemplatePages?.find((page) => page.id === templateId);
+    if (proposalTemplate) {
+      createProposal({
+        title: proposalTemplate.title,
+        contentText: proposalTemplate.contentText ?? '',
+        content: proposalTemplate.content as PageContent,
+        proposalTemplateId: templateId,
+        evaluationType: proposalTemplate.proposal.evaluationType,
+        authors: [],
+        categoryId: proposalTemplate.proposal.categoryId as string,
+        reviewers: proposalTemplate.proposal.reviewers.map((reviewer) => ({
+          group: reviewer.roleId ? 'role' : 'user',
+          id: (reviewer.roleId ?? reviewer.userId) as string
+        })),
+        rubricCriteria: proposalTemplate.proposal.rubricCriteria.map(({ id, ...criteria }) => criteria)
       });
-      createProposal({});
 
       // mutateProposals();
       // mutatePage(newProposal);

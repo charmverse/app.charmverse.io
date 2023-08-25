@@ -110,11 +110,11 @@ export function ProposalStepSummary({
       >
         <Stack gap={0.5}>
           <Typography variant='h5' fontWeight='bold' data-test='current-proposal-status'>
-            {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : '&nbsp;'}
+            {proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : <>&nbsp;</>}
             {archived ? <Chip sx={{ ml: 1 }} label='Archived' size='small' color='blue' /> : ''}
           </Typography>
           <Typography color='secondary' variant='body1'>
-            {proposalStatus ? proposalStatusDetails[proposalStatus] : '&nbsp;'}
+            {proposalStatus ? proposalStatusDetails[proposalStatus] : <>&nbsp;</>}
           </Typography>
         </Stack>
 
