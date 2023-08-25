@@ -56,11 +56,11 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
 
   let pageTitle = '';
   if (documentPage || staticPage) {
-    pageTitle = (documentPage || staticPage)?.title || '';
+    pageTitle = (documentPage || staticPage)?.title || 'Untitled';
+  } else if (forumCategoryPage) {
+    pageTitle = `Forum > ${forumCategoryPage?.name || 'Untitled'}`;
   } else if (!loadingPages) {
     pageTitle = 'No access';
-  } else if (forumCategoryPage) {
-    pageTitle = `Forum > ${forumCategoryPage?.name}`;
   }
   const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
 
@@ -95,7 +95,7 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
           isCategoryPage={!!forumCategoryPage}
         />
       </div>
-      <StyledTypography>{pageTitle || 'Untitled'}</StyledTypography>
+      <StyledTypography>{pageTitle}</StyledTypography>
     </NestedPageContainer>
   );
 }
