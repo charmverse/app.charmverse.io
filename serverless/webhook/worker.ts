@@ -38,7 +38,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         // If not 200 back, we throw an error
         if (response.status !== 200) {
-          // n8n-hl3y.onrender.com/webhook-test/7057e152-9b81-4844-add9-ff7007ea3765
+          // Add messageID to failed message array
           batchItemFailures.push({ itemIdentifier: record.messageId });
 
           // Throw the error so we can log it for debugging
