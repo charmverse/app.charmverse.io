@@ -75,7 +75,7 @@ export function TemplatesMenu({
       )}
 
       {pages?.length === 0 && (
-        <MenuItem dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <MenuItem disabled dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <ListItemText>No templates found</ListItemText>
         </MenuItem>
       )}
@@ -84,6 +84,7 @@ export function TemplatesMenu({
         pages.map((page) => {
           return (
             <MenuItem
+              data-test={`select-option-${page.id}`}
               key={page.id}
               dense
               sx={{ display: 'flex', justifyContent: 'space-between' }}

@@ -135,8 +135,7 @@ export function ProposalProperties({
 
   const readOnlyReviewers =
     readOnlyProperties ||
-    (isFromTemplateSource &&
-      !!proposalTemplates?.find((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
+    !!proposalTemplates?.some((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0);
 
   return (
     <ProposalPropertiesBase

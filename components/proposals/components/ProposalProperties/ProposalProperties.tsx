@@ -19,7 +19,6 @@ import { RubricResults } from 'components/proposals/components/ProposalPropertie
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -108,16 +107,11 @@ export function ProposalProperties({
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates = [] } = useProposalTemplates();
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-
-  const proposalTemplatePages = useMemo(() => {
-    return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
-  }, [pages]);
-
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -125,21 +119,14 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
-
-  const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, ProposalTemplate>);
-
-  const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
-    const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
-    if (!_proposal) {
-      return false;
-    } else if (!proposalCategoryId) {
-      return true;
-    }
-    return _proposal.categoryId === proposalCategoryId;
-  });
+  const templateOptions = proposalTemplates
+    .filter((_proposal) => {
+      if (!proposalCategoryId) {
+        return true;
+      }
+      return _proposal.categoryId === proposalCategoryId;
+    })
+    .map((template) => template.page);
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
@@ -489,7 +476,7 @@ export function ProposalProperties({
           secondaryButtonText='Go back'
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
-            const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
+            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
             if (templatePage) {
               applyTemplate(templatePage);
             }

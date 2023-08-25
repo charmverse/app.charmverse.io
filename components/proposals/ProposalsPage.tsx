@@ -73,7 +73,7 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  <NewProposalButton mutateProposals={mutateProposals} />
+                  <NewProposalButton />
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions

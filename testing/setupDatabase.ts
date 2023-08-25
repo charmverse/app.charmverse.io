@@ -942,6 +942,7 @@ export async function generateProposal({
   categoryId,
   userId,
   spaceId,
+  pageType = 'proposal',
   proposalStatus,
   evaluationType,
   authors,
@@ -955,6 +956,7 @@ export async function generateProposal({
   spaceId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
+  pageType?: PageType;
   proposalStatus: ProposalStatus;
   evaluationType?: ProposalEvaluationType;
   title?: string;
@@ -987,7 +989,7 @@ export async function generateProposal({
       },
       path: `path-${v4()}`,
       title,
-      type: 'proposal',
+      type: pageType,
       author: {
         connect: {
           id: userId
