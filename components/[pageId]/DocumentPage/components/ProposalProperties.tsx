@@ -76,7 +76,7 @@ export function ProposalProperties({
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     rubricCriteria: proposal?.rubricCriteria ?? [],
-    publishToLens: proposal?.publishToLens ?? !!user?.publishToLensDefault,
+    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
     reviewers:
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
@@ -87,7 +87,8 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      if (newStatus === 'discussion' && proposalPage && proposal.publishToLens) {
+      // If proposal is being published for the first time and publish to lens is enabled, create a lens post
+      if (newStatus === 'discussion' && proposalPage && proposal.publishToLens && !proposal.lensPostLink) {
         await createLensPost({
           proposalContent: proposalPage.content as PageContent
         });

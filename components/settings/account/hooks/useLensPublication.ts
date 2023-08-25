@@ -50,7 +50,7 @@ export function useLensPublication({
   const { account, library, chainId } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { lensProfile } = useLensProfile();
+  const { lensProfile, setupLensProfile } = useLensProfile();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
 
   async function createPublication(
@@ -65,10 +65,21 @@ export function useLensPublication({
         }
     )
   ) {
+    let _lensProfile = lensProfile;
     const { publicationType, content } = params;
 
-    if (!lensProfile || !space || !account) {
+    if (!space || !account) {
       return;
+    }
+
+    // If the user is not currently authenticated, try to authenticate them rather than doing nothing
+    if (!lensProfile) {
+      _lensProfile = await setupLensProfile();
+    }
+
+    // User doesn't have a profile or rejected signing the challenge
+    if (!_lensProfile) {
+      return null;
     }
 
     if (chainId !== RPC[LensChain].chainId) {
@@ -103,13 +114,13 @@ export function useLensPublication({
         publicationResponse = await createPostPublication({
           contentText: `Proposal **${proposalTitle}** from **${space.name}** is now open for feedback.\n\n${finalMarkdownContent}`,
           proposalLink: `https://app.charmverse.io/${space.domain}/${proposalPath}`,
-          lensProfile
+          lensProfile: _lensProfile
         });
       } else {
         publicationResponse = await createCommentPublication({
           contentText: `I just commented on **${proposalTitle}** from **${space.name}**\n\n${finalMarkdownContent}`,
           postId: params.lensPostId,
-          lensProfile,
+          lensProfile: _lensProfile,
           commentLink: `https://app.charmverse.io/${space.domain}/${proposalPath}?commentId=${params.commentId}`
         });
       }
