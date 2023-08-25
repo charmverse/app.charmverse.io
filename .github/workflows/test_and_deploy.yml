@@ -247,8 +247,10 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Package Webapp
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+      - name: Package Webapp and upload web assets to s3
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/
 
       - name: Update and Package background worker
         run: |
@@ -281,7 +283,7 @@ jobs:
           datadog-ci sourcemaps upload .next/static       \
             --service=webapp                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://app.charmverse.io/_next/static
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
