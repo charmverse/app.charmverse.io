@@ -256,7 +256,6 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
           aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
-
       - name: Update and Package background worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
