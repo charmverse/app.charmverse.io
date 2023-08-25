@@ -13,6 +13,7 @@ import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import { useGET, usePOST, usePUT } from './helpers';
 
@@ -63,4 +64,10 @@ export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) 
 
 export function useUpsertRubricCriteriaAnswer({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
+export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
+  return usePUT<Omit<UpdateProposalLensPropertiesRequest, 'proposalId'>>(
+    `/api/proposals/${proposalId}/update-lens-properties`
+  );
 }

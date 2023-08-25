@@ -1,4 +1,4 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalRubricCriteriaType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';

@@ -16,7 +16,8 @@ import {
   ListItemIcon
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import PopupState from 'material-ui-popup-state';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,6 +30,7 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
@@ -85,6 +87,17 @@ export function SpaceSettings({ space }: { space: Space }) {
     defaultValues: _getFormValues(space),
     resolver: yupResolver(schema)
   });
+
+  const {
+    register: registerNewTitle,
+    watch: watchNewTitle,
+    reset: resetNewTitle,
+    setValue: setValueNewTitle
+  } = useForm<{ newTitle: string }>({
+    defaultValues: { newTitle: '' },
+    resolver: yupResolver(yup.object({ newTitle: yup.string().trim() }))
+  });
+  const newTitle = watchNewTitle('newTitle');
 
   const {
     trigger: updateSpace,
@@ -272,34 +285,67 @@ export function SpaceSettings({ space }: { space: Space }) {
                       changeOptionsOrder(draggedProperty as Feature, droppedOnProperty as Feature)
                     }
                   >
-                    <SettingsItem
-                      sx={{ gap: 0 }}
-                      data-test={`settings-feature-item-${id}`}
-                      actions={[
-                        <MenuItem
-                          key='1'
-                          data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
-                          onClick={() => {
-                            setFeatures((prevState) => {
-                              const newState = [...prevState];
-                              const index = newState.findIndex((_feat) => _feat.id === id);
-                              newState[index] = { ...newState[index], isHidden: !newState[index].isHidden };
-                              return [...newState];
-                            });
-                          }}
-                        >
-                          {isHidden ? 'Show' : 'Hide'}
-                        </MenuItem>
-                      ]}
-                      disabled={!isAdmin}
-                      hidden={isHidden}
-                      text={
-                        <Box display='flex' gap={1}>
-                          <PageIcon icon={null} pageType={path} />
-                          {title}
-                        </Box>
-                      }
-                    />
+                    <PopupState variant='popover' popupId='features-rename'>
+                      {(popupState) => (
+                        <>
+                          <SettingsItem
+                            sx={{ gap: 0 }}
+                            data-test={`settings-feature-item-${id}`}
+                            actions={[
+                              <MenuItem
+                                key='1'
+                                data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
+                                onClick={() => {
+                                  setFeatures((prevState) => {
+                                    const newState = [...prevState];
+                                    const index = newState.findIndex((_feat) => _feat.id === id);
+                                    newState[index] = { ...newState[index], isHidden: !newState[index].isHidden };
+                                    return [...newState];
+                                  });
+                                }}
+                              >
+                                {isHidden ? 'Show' : 'Hide'}
+                              </MenuItem>,
+                              <MenuItem
+                                key='2'
+                                data-test='settings-feature-option-rename'
+                                onClick={(e) => {
+                                  setValueNewTitle('newTitle', title);
+                                  popupState.open(e);
+                                }}
+                              >
+                                Rename
+                              </MenuItem>
+                            ]}
+                            disabled={!isAdmin}
+                            hidden={isHidden}
+                            text={
+                              <Box display='flex' gap={1}>
+                                <PageIcon icon={null} pageType={path} />
+                                {title}
+                              </Box>
+                            }
+                          />
+                          <ModalWithButtons
+                            {...bindPopover(popupState)}
+                            title={`Rename ${title}`}
+                            buttonText='Continue'
+                            disabled={newTitle === '' || newTitle === title}
+                            onConfirm={() => {
+                              setFeatures((prevState) => {
+                                const newState = [...prevState];
+                                const index = newState.findIndex((_feat) => _feat.id === id);
+                                newState[index] = { ...newState[index], title: newTitle };
+                                return [...newState];
+                              });
+                              resetNewTitle();
+                            }}
+                          >
+                            <TextField {...registerNewTitle('newTitle')} fullWidth />
+                          </ModalWithButtons>
+                        </>
+                      )}
+                    </PopupState>
                   </DraggableListItem>
                 );
               })}

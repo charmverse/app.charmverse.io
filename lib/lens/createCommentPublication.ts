@@ -7,13 +7,15 @@ import { getUserLocale } from 'lib/utilities/browser';
 import { lensClient } from './lensClient';
 import { uploadToArweave } from './uploadToArweave';
 
-export async function createPostPublication({
+export async function createCommentPublication({
   lensProfile,
   contentText,
-  proposalLink
+  postId,
+  commentLink
 }: {
+  postId: string;
   contentText: string;
-  proposalLink: string;
+  commentLink: string;
   lensProfile: ProfileFragment;
 }) {
   const canUseRelay = lensProfile?.dispatcher?.canUseRelay;
@@ -21,11 +23,11 @@ export async function createPostPublication({
   const metadata: PublicationMetadataV2Input = {
     version: '2.0.0',
     metadata_id: uuid(),
-    content: `${contentText}\n\nView on CharmVerse ${proposalLink}`,
+    content: `${contentText}\n\nView on CharmVerse ${commentLink}`,
     external_url: `https://lenster.xyz/u/${lensProfile.handle}`,
     image: null,
     imageMimeType: null,
-    name: `Post by @${lensProfile.handle}`,
+    name: `Comment by @${lensProfile.handle}`,
     animation_url: null,
     mainContentFocus: PublicationMainFocus.TextOnly,
     attributes: [{ traitType: 'type', displayType: PublicationMetadataDisplayTypes.String, value: 'text_only' }],
@@ -40,11 +42,12 @@ export async function createPostPublication({
 
   const dataAvailabilityRequest = {
     from: lensProfile.id,
-    contentURI: `ar://${arweaveId}`
+    contentURI: `ar://${arweaveId}`,
+    commentOn: postId
   };
 
   if (canUseRelay) {
-    const dataAvailabilityPostViaDispatcher = await lensClient.publication.createDataAvailabilityPostViaDispatcher(
+    const dataAvailabilityPostViaDispatcher = await lensClient.publication.createDataAvailabilityCommentViaDispatcher(
       dataAvailabilityRequest
     );
     return {
@@ -53,8 +56,7 @@ export async function createPostPublication({
     };
   }
 
-  // No dispatcher was found so we need to manually sign the post publication transaction
-  const postTypedData = await lensClient.publication.createDataAvailabilityPostTypedData(dataAvailabilityRequest);
+  const postTypedData = await lensClient.publication.createDataAvailabilityCommentTypedData(dataAvailabilityRequest);
 
   return {
     dispatcherUsed: false,

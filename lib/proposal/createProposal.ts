@@ -29,6 +29,7 @@ export type CreateProposalInput = {
   spaceId: string;
   evaluationType?: ProposalEvaluationType;
   rubricCriteria?: RubricDataInput[];
+  publishToLens?: boolean;
 };
 
 export type CreatedProposal = {
@@ -45,7 +46,8 @@ export async function createProposal({
   authors,
   reviewers,
   evaluationType,
-  rubricCriteria
+  rubricCriteria,
+  publishToLens
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -76,6 +78,7 @@ export async function createProposal({
         status: proposalStatus,
         category: { connect: { id: categoryId } },
         evaluationType,
+        publishToLens,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))

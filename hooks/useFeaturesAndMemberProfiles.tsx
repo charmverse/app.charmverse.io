@@ -22,7 +22,8 @@ export const useFeaturesAndMembers = () => {
     const extendedFeatures = sortedFeatures.map(({ feature, ...restFeat }) => ({
       ...restFeat,
       id: feature,
-      isHidden: !!dbFeatures[feature]?.isHidden
+      isHidden: !!dbFeatures[feature]?.isHidden,
+      title: dbFeatures[feature]?.title || restFeat.title
     }));
 
     return extendedFeatures;

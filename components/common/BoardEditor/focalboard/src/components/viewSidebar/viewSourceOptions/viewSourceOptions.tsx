@@ -158,7 +158,19 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
             {allowedSourceOptions.includes('csv') && (
               <SourceType active={false} component='label' htmlFor='dbcsvfile'>
-                <input hidden type='file' id='dbcsvfile' name='dbcsvfile' accept='.csv' onChange={onCsvImport} />
+                <input
+                  hidden
+                  type='file'
+                  id='dbcsvfile'
+                  name='dbcsvfile'
+                  accept='.csv'
+                  onChange={(event) => {
+                    if (event.target.files && event.target.files[0]) {
+                      onCsvImport(event);
+                    }
+                    event.target.value = '';
+                  }}
+                />
                 <BsFiletypeCsv style={{ fontSize: 24 }} />
                 Import CSV
               </SourceType>
