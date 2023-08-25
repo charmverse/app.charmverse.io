@@ -4,7 +4,7 @@ import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues
 } from '@charmverse/core/permissions';
-import { Box } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { Typography } from 'components/common/Typography';
@@ -69,8 +69,15 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
   return (
     <Box display='block'>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='body2'>{assigneeLabel}</Typography>
-        {isGuest && <GuestChip />}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/** Only show the tooltip for very long names */}
+          <Tooltip title={assigneeLabel && assigneeLabel.length > 22 ? assigneeLabel : ''}>
+            <Typography sx={{ maxWidth: '190px', textOverflow: 'ellipsis', overflowX: 'hidden' }} variant='body2'>
+              {assigneeLabel}
+            </Typography>
+          </Tooltip>
+          {isGuest && <GuestChip />}
+        </div>
         <div style={{ width: '160px', textAlign: 'right' }}>
           <SmallSelect
             renderValue={(value) => {
