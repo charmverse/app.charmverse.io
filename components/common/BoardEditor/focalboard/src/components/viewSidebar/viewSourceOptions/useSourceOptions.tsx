@@ -111,7 +111,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
             showMessage('Importing your csv file...', 'info');
 
             try {
-              const view = await onCreateDatabase({ sourceType: 'board_page' });
+              const view = activeView ?? (await onCreateDatabase({ sourceType: 'board_page' }));
               await addNewCards({
                 board: rootBoard,
                 members,
@@ -127,8 +127,10 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
               showMessage('Your csv file was imported successfully', 'success');
             } catch (error) {
               log.error('CSV import failed', { spaceId, pageId, error });
-              showMessage((error as Error).message || 'Import failed', 'error');
+              showMessage((error as Error).message || 'There was an error importing your csv file.', 'warning');
             }
+          } else {
+            showMessage('There was an error importing your csv file.', 'warning');
           }
         }
       });
