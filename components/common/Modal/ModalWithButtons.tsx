@@ -43,6 +43,7 @@ export default function ModalWithButtons({
           </Button>
         )}
         <Button
+          data-test='modal-confirm-button'
           color='primary'
           sx={{
             mr: 0.5,

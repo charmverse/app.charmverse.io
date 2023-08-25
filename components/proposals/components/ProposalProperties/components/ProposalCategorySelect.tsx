@@ -28,6 +28,7 @@ export function ProposalCategorySelect({ disabled, options, value, onChange }: P
   }
   return (
     <TagSelect
+      data-test='proposal-category-select'
       wrapColumn
       readOnly={disabled}
       options={propertyOptions}

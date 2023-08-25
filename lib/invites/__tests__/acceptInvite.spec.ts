@@ -9,7 +9,7 @@ import { acceptInvite } from '../acceptInvite';
 let space: Space;
 let adminUser: User;
 let role: Role;
-let inviteLink: InviteLink;
+let inviteLinkWithRole: InviteLink;
 
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
@@ -19,7 +19,7 @@ beforeAll(async () => {
     createdBy: adminUser.id,
     spaceId: space.id
   });
-  inviteLink = await testUtilsMembers.generateInviteLink({
+  inviteLinkWithRole = await testUtilsMembers.generateInviteLink({
     spaceId: space.id,
     createdBy: adminUser.id,
     assignedRoleIds: [role.id]
@@ -36,7 +36,7 @@ describe('acceptInvite', () => {
     ).resolves.toBeNull();
 
     await acceptInvite({
-      inviteLinkId: inviteLink.id,
+      inviteLinkId: inviteLinkWithRole.id,
       userId: outsideUser.id
     });
 
@@ -55,15 +55,22 @@ describe('acceptInvite', () => {
     expect(spaceRole?.spaceRoleToRole[0].roleId).toBe(role.id);
   });
 
-  it('should not do anything if the user is already a member of the space', async () => {
+  it('should not do anything if the user is already a member or admin of the space', async () => {
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
+    const newSpaceAdmin = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: true });
+
     await acceptInvite({
-      inviteLinkId: inviteLink.id,
+      inviteLinkId: inviteLinkWithRole.id,
       userId: spaceMember.id
     });
 
-    const spaceRole = await prisma.spaceRole.findFirst({
+    await acceptInvite({
+      inviteLinkId: inviteLinkWithRole.id,
+      userId: newSpaceAdmin.id
+    });
+
+    const memberSpaceRole = await prisma.spaceRole.findFirst({
       where: {
         userId: spaceMember.id,
         spaceId: space.id
@@ -73,9 +80,80 @@ describe('acceptInvite', () => {
       }
     });
 
-    expect(spaceRole).toBeDefined();
+    const newAdminSpaceRole = await prisma.spaceRole.findFirst({
+      where: {
+        userId: newSpaceAdmin.id,
+        spaceId: space.id
+      },
+      include: {
+        spaceRoleToRole: true
+      }
+    });
+
+    expect(memberSpaceRole).toBeDefined();
     // No roles should hae been added
-    expect(spaceRole?.spaceRoleToRole.length).toBe(0);
+    expect(memberSpaceRole?.spaceRoleToRole.length).toBe(0);
+
+    expect(newAdminSpaceRole).toBeDefined();
+    // No roles should hae been added
+    expect(newAdminSpaceRole?.spaceRoleToRole.length).toBe(0);
+  });
+
+  it('should allow a guest user to become a member with attached roles the first time it is used', async () => {
+    const guest = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isGuest: true });
+
+    await acceptInvite({
+      inviteLinkId: inviteLinkWithRole.id,
+      userId: guest.id
+    });
+
+    const spaceRole = await prisma.spaceRole.findUniqueOrThrow({
+      where: {
+        spaceUser: {
+          spaceId: space.id,
+          userId: guest.id
+        }
+      },
+      include: {
+        spaceRoleToRole: true
+      }
+    });
+
+    expect(spaceRole?.isGuest).toBe(false);
+
+    expect(spaceRole?.spaceRoleToRole).toHaveLength(1);
+    expect(spaceRole?.spaceRoleToRole[0].roleId).toBe(role.id);
+
+    const otherRole = await testUtilsMembers.generateRole({
+      createdBy: adminUser.id,
+      spaceId: space.id
+    });
+
+    const newInviteLink = await testUtilsMembers.generateInviteLink({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      assignedRoleIds: [otherRole.id]
+    });
+
+    // Second round of invite accept now user is a member
+    await acceptInvite({
+      inviteLinkId: newInviteLink.id,
+      userId: guest.id
+    });
+
+    const spaceRoleAfterSecondAccept = await prisma.spaceRole.findUnique({
+      where: {
+        spaceUser: {
+          spaceId: space.id,
+          userId: guest.id
+        }
+      },
+      include: {
+        spaceRoleToRole: true
+      }
+    });
+
+    expect(spaceRoleAfterSecondAccept).toMatchObject(spaceRole);
   });
 
   it('should throw an error if the invite link has expired or exceeded its use count', async () => {

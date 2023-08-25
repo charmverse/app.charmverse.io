@@ -3,8 +3,9 @@ import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
+import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
+import { getUserProposalVotes } from 'lib/snapshot/getVotes';
 import { getVotingPower } from 'lib/snapshot/getVotingPower';
 import type { SnapshotProposal, VoteChoice } from 'lib/snapshot/interfaces';
 import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';

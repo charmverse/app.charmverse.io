@@ -1,16 +1,24 @@
-import type { Locator } from '@playwright/test';
+import type { Page, Locator } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
 import { GlobalPage } from './global.po';
 
 export class ProposalsListPage extends GlobalPage {
-  async goToProposals(domain: string) {
-    await this.page.goto(`${baseUrl}/${domain}/proposals`);
+  constructor(page: Page, public emptyState = page.locator('data-test=empty-state')) {
+    super(page);
   }
 
-  async waitForProposalsList(domain: string) {
-    await this.page.waitForURL(`${baseUrl}/${domain}/proposals`);
+  goToProposals(domain: string) {
+    return this.page.goto(`${baseUrl}/${domain}/proposals`);
+  }
+
+  waitForProposalsList() {
+    return this.page.waitForURL(/\/proposals$/);
+  }
+
+  clickNewProposalDialog() {
+    return this.page.click('data-test=new-proposal-button');
   }
 
   getProposalRowLocator(proposalId: string): Locator {

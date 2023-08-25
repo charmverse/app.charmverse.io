@@ -25,9 +25,10 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot';
-import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
+import { getSnapshotSpace } from 'lib/snapshot/getSpace';
+import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
+import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
