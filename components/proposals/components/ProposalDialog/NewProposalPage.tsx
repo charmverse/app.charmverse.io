@@ -61,9 +61,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
     }
   }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
 
-  const readOnlyReviewers =
-    isFromTemplateSource &&
-    !!proposalTemplates?.find((t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0);
+  const readOnlyReviewers = !!proposalTemplates?.some(
+    (t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0
+  );
 
   async function createProposal() {
     if (formInputs.categoryId && currentSpace) {
@@ -212,7 +212,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
               onClick={createProposal}
-              isLoading={isCreatingProposal}
+              loading={isCreatingProposal}
               data-test='create-proposal-button'
             >
               Create

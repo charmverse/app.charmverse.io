@@ -14,14 +14,14 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
 };
 
 type ProposalDialogContext = {
-  newProposal?: ProposalPageAndPropertiesInput;
+  newProposal?: Partial<ProposalPageAndPropertiesInput>;
   onClose?: () => void;
   pageId?: string;
 };
 
 type Context = {
   props: ProposalDialogContext;
-  createProposal: (newProposal: ProposalDialogContext['newProposal']) => void;
+  createProposal: (newProposal?: ProposalDialogContext['newProposal']) => void;
   hideProposal: () => void;
   showProposal: (context: ProposalDialogContext) => void;
 };
@@ -43,7 +43,7 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     setProps({});
   }
 
-  function createProposal(newProposal: ProposalDialogContext['newProposal']) {
+  function createProposal(newProposal: ProposalDialogContext['newProposal'] = {}) {
     setProps({ newProposal });
   }
 

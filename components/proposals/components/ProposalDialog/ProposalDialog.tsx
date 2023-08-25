@@ -5,19 +5,15 @@ import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
-import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import type { ProposalPageAndPropertiesInput } from './hooks/useProposalDialog';
@@ -25,7 +21,7 @@ import { NewProposalPage } from './NewProposalPage';
 
 interface Props {
   pageId?: string;
-  newProposal?: ProposalPageAndPropertiesInput;
+  newProposal?: Partial<ProposalPageAndPropertiesInput>;
   onClose: () => void;
 }
 
