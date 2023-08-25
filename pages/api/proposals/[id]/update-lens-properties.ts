@@ -20,7 +20,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { lensPostLink, publishToLens } = req.body as UpdateProposalLensPropertiesRequest;
+  const { lensPostLink } = req.body as UpdateProposalLensPropertiesRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -65,7 +65,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  await updateProposalLensProperties({ proposalId: proposal.id, lensPostLink, publishToLens });
+  await updateProposalLensProperties({ proposalId: proposal.id, lensPostLink });
 
   return res.status(200).end();
 }
