@@ -4,6 +4,8 @@ import { isDevEnv } from 'config/constants';
 
 const isServer = typeof window === 'undefined';
 
+export const LensChain = isDevEnv ? 'MUMBAI' : 'POLYGON';
+
 const lensClient = new LensClient({
   environment: isDevEnv ? development : production,
   storage: {

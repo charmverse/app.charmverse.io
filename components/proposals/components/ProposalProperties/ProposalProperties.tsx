@@ -3,13 +3,14 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { TabConfig } from 'components/common/MultiTabs';
@@ -44,9 +45,11 @@ export type ProposalPropertiesInput = {
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
+  publishToLens?: boolean;
 };
 
 type ProposalPropertiesProps = {
+  proposalLensLink?: string;
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
@@ -73,6 +76,7 @@ type ProposalPropertiesProps = {
 };
 
 export function ProposalProperties({
+  proposalLensLink,
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
@@ -98,14 +102,12 @@ export function ProposalProperties({
   title
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
-
   const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-
   const { proposalTemplates } = useProposalTemplates();
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
@@ -397,6 +399,55 @@ export function ProposalProperties({
               />
             </Box>
           </Box>
+
+          {/* Publish to lens toggle */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box
+              display='flex'
+              height='fit-content'
+              flex={1}
+              className='octo-propertyrow'
+              // override align-items flex-start with inline style
+              style={{
+                alignItems: 'center'
+              }}
+            >
+              <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+              <Switch
+                // only allow this when the proposal is being created
+                disabled={proposalId !== undefined}
+                checked={proposalFormInputs.publishToLens ?? false}
+                onChange={(e) => {
+                  setProposalFormInputs({
+                    publishToLens: e.target.checked
+                  });
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Lens post link */}
+          {proposalLensLink && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                // override align-items flex-start with inline style
+                style={{
+                  alignItems: 'center'
+                }}
+              >
+                <PropertyLabel readOnly>Lens Post</PropertyLabel>
+                <Link href={`https://lenster.xyz/posts/${proposalLensLink}`} target='_blank' rel='noopener noreferrer'>
+                  <Typography variant='body2' color='primary'>
+                    {proposalLensLink}
+                  </Typography>
+                </Link>
+              </Box>
+            </Box>
+          )}
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (

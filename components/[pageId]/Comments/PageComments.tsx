@@ -8,12 +8,14 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { CommentPermissions } from 'lib/comments';
+import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type Props = {
-  page: Pick<PageWithContent, 'type' | 'id'>;
+  page: PageWithContent;
   permissions: PagePermissionFlags;
 };
 
@@ -30,7 +32,11 @@ export function PageComments({ page, permissions }: Props) {
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
-
+  const { createLensComment } = useLensPublication({
+    proposalId: page.proposalId ?? '',
+    proposalPath: page.path,
+    proposalTitle: page.title
+  });
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
   const commentPermissions: CommentPermissions = {
@@ -40,6 +46,18 @@ export function PageComments({ page, permissions }: Props) {
     delete_comments: isAdmin
   };
 
+  async function createComment(comment: CommentContent) {
+    const createdComment = await addComment(comment);
+    if (isProposal && proposal?.lensPostLink) {
+      await createLensComment({
+        commentContent: comment.content as PageContent,
+        commentId: createdComment.id,
+        proposal: page,
+        lensPostId: proposal.lensPostLink
+      });
+    }
+  }
+
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
 
   if (hideComments) return null;
@@ -48,7 +66,7 @@ export function PageComments({ page, permissions }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions.comment && <CommentForm handleCreateComment={addComment} />}
+      {permissions.comment && <CommentForm handleCreateComment={createComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -64,7 +82,7 @@ export function PageComments({ page, permissions }: Props) {
                   permissions={commentPermissions}
                   comment={comment}
                   key={comment.id}
-                  handleCreateComment={addComment}
+                  handleCreateComment={createComment}
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={voteComment}

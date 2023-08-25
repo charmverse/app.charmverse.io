@@ -4,7 +4,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';

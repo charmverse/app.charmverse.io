@@ -27,6 +27,7 @@ export function usePageComments(pageId: string) {
     async (comment: CommentContent) => {
       const newComment = await charmClient.pages.createComment({ pageId, comment });
       mutate((existingComments) => (existingComments ? [...existingComments, newComment] : [newComment]));
+      return newComment;
     },
     [mutate, pageId]
   );
