@@ -43,7 +43,6 @@ export function NewProposalButton() {
     const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
     if (proposalTemplate) {
       createProposal({
-        title: proposalTemplate.page.title,
         contentText: proposalTemplate.page.contentText ?? '',
         content: proposalTemplate.page.content as PageContent,
         proposalTemplateId: templateId,
