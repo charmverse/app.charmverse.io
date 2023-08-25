@@ -3,6 +3,7 @@ export type Feature = 'member_directory' | 'proposals' | 'forum' | 'bounties';
 export type FeatureJson = {
   id: Feature;
   isHidden: boolean;
+  title?: string;
 };
 
 enum StaticPagesPath {
