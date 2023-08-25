@@ -8,7 +8,7 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { ThreadContainer } from '../inlineComment/inlineComment.components';
+import { ThreadContainer } from '../inlineComment/components/InlineCommentThread';
 
 import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';

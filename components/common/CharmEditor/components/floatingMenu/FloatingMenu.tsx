@@ -6,7 +6,7 @@ import reactDOM from 'react-dom';
 
 import { InlinePalletteFloatingMenu } from 'components/common/CharmEditor/components/inlinePalette/InlinePalletteFloatingMenu';
 
-import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
+import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
 import type { SubMenu } from './floating-menu';
