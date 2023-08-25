@@ -11,20 +11,15 @@ import {
 import type { StepperProps } from './interfaces';
 
 export function MobileStepper({
-  openVoteModal,
   proposalStatus,
-  updateProposalStatus,
+  handleProposalStatusUpdate,
   proposalFlowPermissions,
   archived,
   evaluationType
 }: StepperProps) {
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
-      if (newStatus === 'vote_active') {
-        openVoteModal?.();
-      } else {
-        updateProposalStatus?.(newStatus);
-      }
+      handleProposalStatusUpdate(newStatus);
     }
   }
   return (
