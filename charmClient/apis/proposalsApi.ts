@@ -1,10 +1,11 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalBlock, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
@@ -52,5 +53,21 @@ export class ProposalsApi {
 
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
+  }
+
+  getProposalBlocks(spaceId: string) {
+    return http.GET(`/api/spaces/${spaceId}/proposals/blocks`);
+  }
+
+  createProposalBlocks({ data, spaceId }: { data: ProposalBlockInput[]; spaceId: string }) {
+    return http.POST(`/api/spaces/${spaceId}/proposals/blocks`, data);
+  }
+
+  updateProposalBlocks({ data, spaceId }: { data: ProposalBlockUpdateInput[]; spaceId: string }) {
+    return http.PUT(`/api/spaces/${spaceId}/proposals/blocks`, data);
+  }
+
+  deleteProposalBlocks({ data, spaceId }: { data: string[]; spaceId: string }) {
+    return http.DELETE(`/api/spaces/${spaceId}/proposals/blocks`, data);
   }
 }
