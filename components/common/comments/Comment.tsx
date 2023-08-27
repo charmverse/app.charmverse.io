@@ -17,6 +17,7 @@ import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isDevEnv } from 'config/constants';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -48,6 +49,7 @@ type Props = {
   handleDeleteComment: (commentId: string) => Promise<void>;
   handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
   inlineCharmEditor?: boolean;
+  lensPostLink?: string | null;
 };
 
 export function Comment({
@@ -59,12 +61,15 @@ export function Comment({
   handleCreateComment,
   handleUpdateComment,
   handleDeleteComment,
-  handleVoteComment
+  handleVoteComment,
+  lensPostLink
 }: Props) {
+  const { user } = useUser();
+  const { lensProfile } = useLensProfile();
+  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
-  const { user } = useUser();
   const { getMemberById } = useMembers();
   const commentUser = getMemberById(comment.createdBy);
   const [isEditingComment, setIsEditingComment] = useState(false);
@@ -278,7 +283,11 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
+                publishToLens={publishCommentsToLens}
+                setPublishToLens={setPublishCommentsToLens}
+                showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
+                lensCommentLink={comment.lensCommentLink}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
               />

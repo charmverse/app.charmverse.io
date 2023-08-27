@@ -1,4 +1,4 @@
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -19,10 +19,18 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 export function CommentReply({
   commentId,
   handleCreateComment,
-  onCancelComment
+  onCancelComment,
+  setPublishToLens,
+  publishToLens,
+  showPublishToLens,
+  lensCommentLink
 }: {
+  lensCommentLink?: string;
+  showPublishToLens?: boolean;
+  publishToLens?: boolean;
+  setPublishToLens?: (publishToLens: boolean) => void;
   onCancelComment: () => void;
-  handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
+  handleCreateComment: (comment: CreateCommentPayload, lensCommentLin?: string) => Promise<void>;
   commentId: string;
 }) {
   const { user } = useUser();
@@ -36,11 +44,14 @@ export function CommentReply({
   }
 
   async function createCommentReply() {
-    await handleCreateComment({
-      content: postContent.doc,
-      contentText: postContent.rawText,
-      parentId: commentId
-    });
+    await handleCreateComment(
+      {
+        content: postContent.doc,
+        contentText: postContent.rawText,
+        parentId: commentId
+      },
+      publishToLens ? lensCommentLink : undefined
+    );
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -55,25 +66,38 @@ export function CommentReply({
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
-        <InlineCharmEditor
-          colorMode='dark'
-          style={{
-            minHeight: 100
-          }}
-          key={editorKey}
-          content={postContent.doc}
-          onContentChange={updateCommentContent}
-          placeholderText='What are your thoughts?'
-        />
+        <Stack gap={1} width='100%'>
+          <InlineCharmEditor
+            colorMode='dark'
+            style={{
+              minHeight: 100
+            }}
+            key={editorKey}
+            content={postContent.doc}
+            onContentChange={updateCommentContent}
+            placeholderText='What are your thoughts?'
+          />
+
+          <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
+            {showPublishToLens && (
+              <Stack flexDirection='row' gap={1} alignItems='center'>
+                <Typography variant='body2' color='text.secondary'>
+                  Publish to Lens
+                </Typography>
+                <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
+              </Stack>
+            )}
+            <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
+              <Button variant='outlined' color='secondary' onClick={onCancelComment}>
+                Cancel
+              </Button>
+              <Button disabled={!postContent.rawText} onClick={createCommentReply}>
+                Reply
+              </Button>
+            </Stack>
+          </Stack>
+        </Stack>
       </Box>
-      <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
-        <Button variant='outlined' color='secondary' onClick={onCancelComment}>
-          Cancel
-        </Button>
-        <Button disabled={!postContent.rawText} onClick={createCommentReply}>
-          Reply
-        </Button>
-      </Stack>
     </Stack>
   );
 }

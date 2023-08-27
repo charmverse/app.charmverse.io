@@ -25,14 +25,16 @@ export function CommentForm({
   disabled,
   placeholder,
   setPublishToLens,
-  publishToLens
+  publishToLens,
+  lensPostLink
 }: {
+  lensPostLink?: string | null;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
-  handleCreateComment: (comment: CommentContent) => Promise<void>;
+  handleCreateComment: (comment: CommentContent, lensPostLink?: string | null) => Promise<void>;
   disabled?: boolean;
   placeholder?: string;
 }) {
@@ -49,10 +51,13 @@ export function CommentForm({
   }
 
   async function createPostComment() {
-    await handleCreateComment({
-      content: postContent.doc,
-      contentText: postContent.rawText
-    });
+    await handleCreateComment(
+      {
+        content: postContent.doc,
+        contentText: postContent.rawText
+      },
+      publishToLens ? lensPostLink : undefined
+    );
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);

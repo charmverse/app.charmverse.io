@@ -21,7 +21,6 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createCommentPublication } from 'lib/lens/createCommentPublication';
 import { createPostPublication } from 'lib/lens/createPostPublication';
 import { LensChain, lensClient } from 'lib/lens/lensClient';
-import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
@@ -204,7 +203,6 @@ export function useLensPublication({
     commentContent
   }: {
     commentContent: PageContent;
-    proposal: PageWithContent;
     commentId: string;
     lensPostId: string;
   }) {

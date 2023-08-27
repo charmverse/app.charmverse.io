@@ -53,14 +53,14 @@ export function PageComments({ page, permissions }: Props) {
     delete_comments: isAdmin
   };
 
-  async function createComment(comment: CommentContent) {
+  // For root level comments lensPostId is the post's id and for replies it is the parent comment's id
+  async function createComment(comment: CommentContent, lensPostId?: string | null) {
     const createdComment = await addComment(comment);
-    if (isProposal && proposal?.lensPostLink && publishCommentsToLens) {
+    if (isProposal && proposal?.lensPostLink && lensPostId) {
       await createLensComment({
         commentContent: comment.content as PageContent,
         commentId: createdComment.id,
-        proposal: page,
-        lensPostId: proposal.lensPostLink
+        lensPostId
       });
     }
   }
@@ -83,6 +83,7 @@ export function PageComments({ page, permissions }: Props) {
             Boolean(proposal?.lensPostLink) &&
             Boolean(lensProfile)
           }
+          lensPostLink={proposal?.lensPostLink}
           handleCreateComment={createComment}
         />
       )}
@@ -105,6 +106,7 @@ export function PageComments({ page, permissions }: Props) {
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={voteComment}
+                  lensPostLink={proposal?.lensPostLink}
                 />
               ))}
             </Stack>
