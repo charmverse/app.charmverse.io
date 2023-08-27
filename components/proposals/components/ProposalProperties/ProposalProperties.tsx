@@ -449,6 +449,11 @@ export function ProposalProperties({
                         });
                       }}
                     />
+                    {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && (
+                      <Typography variant='body2' color='error'>
+                        Failed publishing to Lens
+                      </Typography>
+                    )}
                   </>
                 )}
               </Box>
