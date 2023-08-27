@@ -6,7 +6,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useGetAllReviewerUserIds, useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
+import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -51,6 +51,7 @@ export type ProposalPropertiesInput = {
 };
 
 type ProposalPropertiesProps = {
+  isPublishingToLens?: boolean;
   proposalLensLink?: string;
   archived?: boolean;
   canAnswerRubric?: boolean;
@@ -101,7 +102,8 @@ export function ProposalProperties({
   snapshotProposalId,
   userId,
   updateProposalStatus,
-  title
+  title,
+  isPublishingToLens
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [rubricView, setRubricView] = useState<number>(0);
@@ -115,9 +117,7 @@ export function ProposalProperties({
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({
-    proposalId: proposalId ?? ''
-  });
+
   const proposalTemplatePages = useMemo(() => {
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
   }, [pages]);
@@ -449,7 +449,7 @@ export function ProposalProperties({
                         });
                       }}
                     />
-                    {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && (
+                    {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && !isPublishingToLens && (
                       <Typography variant='body2' color='error'>
                         Failed publishing to Lens
                       </Typography>

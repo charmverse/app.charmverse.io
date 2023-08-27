@@ -52,9 +52,10 @@ export class PagesApi {
     pageId,
     id,
     content,
-    contentText
+    contentText,
+    lensCommentLink
   }: UpdateCommentInput & { pageId: string; id: string }): Promise<PageComment> {
-    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText });
+    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText, lensCommentLink });
   }
 
   deleteComment({ commentId, pageId }: { pageId: string; commentId: string }): Promise<void> {

@@ -13,6 +13,7 @@ import type {
 import { RPC } from 'connectors/index';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
+import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -52,6 +53,7 @@ export function useLensPublication({
   const { showMessage } = useSnackbar();
   const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
+  const { updateComment } = usePageComments(proposalId);
 
   async function createPublication(
     params: { content: PageContent } & (
@@ -206,12 +208,19 @@ export function useLensPublication({
     commentId: string;
     lensPostId: string;
   }) {
-    return createPublication({
+    const createdComment = (await createPublication({
       content: commentContent,
       commentId,
       lensPostId,
       publicationType: 'comment'
-    });
+    })) as CreateDataAvailabilityPublicationResultFragment | CreateCommentTypedDataFragment;
+
+    if (createdComment) {
+      await updateComment({
+        id: commentId,
+        lensCommentLink: createdComment.id
+      });
+    }
   }
 
   return {
