@@ -5,7 +5,6 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
@@ -35,13 +34,6 @@ export class ProposalsApi {
     categoryId: string;
   }): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId, categoryId });
-  }
-
-  createProposalFromTemplate({
-    spaceId,
-    templateId
-  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<PageWithPermissions> {
-    return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
   deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {

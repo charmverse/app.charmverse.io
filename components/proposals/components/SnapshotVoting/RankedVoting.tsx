@@ -68,7 +68,7 @@ export function RankedVoting({
   };
 
   return (
-    <Stack>
+    <Stack gap={2}>
       <Stack gap={0.5}>
         {selectedItems.map((selected, i) => (
           <DraggableRankedItem

@@ -3,12 +3,7 @@ import type { Comment } from '@charmverse/core/prisma';
 import * as http from 'adapters/http';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type {
-  MultipleThreadsInput,
-  ThreadCreate,
-  ThreadWithComments,
-  ThreadWithCommentsAndAuthors
-} from 'lib/threads/interfaces';
+import type { MultipleThreadsInput, ThreadWithComments, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 
 export class CommentsApi {
@@ -26,10 +21,6 @@ export class CommentsApi {
 
   getThreads(pageId: string): Promise<ThreadWithComments[] | ThreadWithCommentsAndAuthors[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
-  }
-
-  startThread(request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithComments | ThreadWithCommentsAndAuthors> {
-    return http.POST('/api/threads', request);
   }
 
   deleteThread(threadId: string) {

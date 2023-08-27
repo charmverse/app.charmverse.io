@@ -5,7 +5,12 @@ import { baseUrl } from 'config/constants';
 import { GlobalPage } from './global.po';
 
 export class ProposalsListPage extends GlobalPage {
-  constructor(page: Page, public emptyState = page.locator('data-test=empty-state')) {
+  constructor(
+    page: Page,
+    public emptyState = page.locator('data-test=empty-state'),
+    public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
+    public createProposalButton = page.locator('data-test=new-proposal-button')
+  ) {
     super(page);
   }
 
@@ -15,10 +20,6 @@ export class ProposalsListPage extends GlobalPage {
 
   waitForProposalsList() {
     return this.page.waitForURL(/\/proposals$/);
-  }
-
-  clickNewProposalDialog() {
-    return this.page.click('data-test=new-proposal-button');
   }
 
   getProposalRowLocator(proposalId: string): Locator {
@@ -35,5 +36,9 @@ export class ProposalsListPage extends GlobalPage {
 
   getProposalCategoryListButtonLocator() {
     return this.page.locator('data-test=proposal-view-options-desktop').locator(`data-test=proposal-category-list`);
+  }
+
+  getTemplateOptionLocator(pageId: string) {
+    return this.page.locator(`data-test=select-option-${pageId}`);
   }
 }

@@ -16,9 +16,8 @@ import { StepperIcon } from './StepperIcon';
 const lastStatuses = ['vote_closed', 'evaluation_closed'];
 
 export function DesktopStepper({
-  openVoteModal,
   proposalStatus,
-  updateProposalStatus,
+  handleProposalStatusUpdate,
   proposalFlowPermissions,
   archived,
   evaluationType
@@ -28,11 +27,7 @@ export function DesktopStepper({
 
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
-      if (newStatus === 'vote_active') {
-        openVoteModal?.();
-      } else {
-        updateProposalStatus?.(newStatus);
-      }
+      handleProposalStatusUpdate(newStatus);
     }
   }
 

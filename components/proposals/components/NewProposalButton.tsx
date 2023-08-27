@@ -13,6 +13,7 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
@@ -20,7 +21,7 @@ import { useProposalTemplates } from '../hooks/useProposalTemplates';
 
 import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
 
-export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+export function NewProposalButton() {
   const router = useRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { showProposal } = useProposalDialog();
@@ -33,25 +34,27 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { createProposal } = useProposalDialog();
-  const { proposalTemplatePages, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
+  const { proposalTemplates, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  const proposalTemplatePages = proposalTemplates?.map((template) => template.page);
 
   async function createProposalFromTemplate(templateId: string) {
-    if (currentSpace) {
-      const newProposal = await charmClient.proposals.createProposalFromTemplate({
-        spaceId: currentSpace.id,
-        templateId
-      });
-
-      mutateProposals();
-      mutatePage(newProposal);
-      setUrlWithoutRerender(router.pathname, { id: newProposal.id });
-      showProposal({
-        pageId: newProposal.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-        }
+    const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
+    if (proposalTemplate) {
+      createProposal({
+        contentText: proposalTemplate.page.contentText ?? '',
+        content: proposalTemplate.page.content as PageContent,
+        proposalTemplateId: templateId,
+        evaluationType: proposalTemplate.evaluationType,
+        headerImage: proposalTemplate.page.headerImage,
+        icon: proposalTemplate.page.icon,
+        categoryId: proposalTemplate.categoryId as string,
+        reviewers: proposalTemplate.reviewers.map((reviewer) => ({
+          group: reviewer.roleId ? 'role' : 'user',
+          id: (reviewer.roleId ?? reviewer.userId) as string
+        })),
+        rubricCriteria: proposalTemplate.rubricCriteria
       });
     }
   }
@@ -75,11 +78,7 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
   }
 
   async function onClickCreate() {
-    if (currentSpace) {
-      createProposal({
-        category: null
-      });
-    }
+    createProposal();
   }
 
   return (
@@ -90,7 +89,12 @@ export function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedM
             <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
               {isXsScreen ? 'Create' : 'Create Proposal'}
             </Button>
-            <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
+            <Button
+              data-test='proposal-template-select'
+              size='small'
+              disabled={!canCreateProposal}
+              onClick={popupState.open}
+            >
               <KeyboardArrowDown />
             </Button>
           </ButtonGroup>
