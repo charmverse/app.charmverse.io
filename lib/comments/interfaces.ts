@@ -1,4 +1,4 @@
-import type { Comment, User, Prisma } from '@charmverse/core/prisma';
+import type { Comment, Prisma } from '@charmverse/core/prisma';
 
 import type { UserPermissionFlags } from 'lib/permissions/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -45,7 +45,9 @@ export type CreateCommentInput = {
   parentId?: string;
 };
 
-export type UpdateCommentInput = CommentContent;
+export type UpdateCommentInput = CommentContent & {
+  lensCommentLink?: string;
+};
 
 export type CommentOperations = 'add_comment' | 'delete_comments' | 'upvote' | 'downvote';
 

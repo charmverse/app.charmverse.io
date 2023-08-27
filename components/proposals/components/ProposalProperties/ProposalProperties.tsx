@@ -6,7 +6,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
+import { useGetAllReviewerUserIds, useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -17,7 +17,9 @@ import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { isDevEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
@@ -109,11 +111,13 @@ export function ProposalProperties({
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const { proposalTemplates } = useProposalTemplates();
-
+  const { lensProfile } = useLensProfile();
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-
+  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({
+    proposalId: proposalId ?? ''
+  });
   const proposalTemplatePages = useMemo(() => {
     return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
   }, [pages]);
@@ -205,6 +209,14 @@ export function ProposalProperties({
 
     prevStatusRef.current = proposalStatus || '';
   }, [detailsExpanded, proposalStatus]);
+
+  let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
+  const isDraftStatus = proposalStatus === 'draft';
+  if (proposalLensLink) {
+    lensProposalPropertyState = 'show_link';
+  } else {
+    lensProposalPropertyState = lensProfile ? 'show_toggle' : 'hide';
+  }
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
     if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
@@ -400,34 +412,7 @@ export function ProposalProperties({
             </Box>
           </Box>
 
-          {/* Publish to lens toggle */}
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box
-              display='flex'
-              height='fit-content'
-              flex={1}
-              className='octo-propertyrow'
-              // override align-items flex-start with inline style
-              style={{
-                alignItems: 'center'
-              }}
-            >
-              <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
-              <Switch
-                // only allow this when the proposal is being created
-                disabled={proposalId !== undefined}
-                checked={proposalFormInputs.publishToLens ?? false}
-                onChange={(e) => {
-                  setProposalFormInputs({
-                    publishToLens: e.target.checked
-                  });
-                }}
-              />
-            </Box>
-          </Box>
-
-          {/* Lens post link */}
-          {proposalLensLink && (
+          {lensProposalPropertyState !== 'hide' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box
                 display='flex'
@@ -439,15 +424,37 @@ export function ProposalProperties({
                   alignItems: 'center'
                 }}
               >
-                <PropertyLabel readOnly>Lens Post</PropertyLabel>
-                <Link href={`https://lenster.xyz/posts/${proposalLensLink}`} target='_blank' rel='noopener noreferrer'>
-                  <Typography variant='body2' color='primary'>
-                    {proposalLensLink}
-                  </Typography>
-                </Link>
+                {lensProposalPropertyState === 'show_link' ? (
+                  <>
+                    <PropertyLabel readOnly>Lens Post</PropertyLabel>
+                    <Link
+                      href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${proposalLensLink}`}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      <Typography variant='body2' color='primary'>
+                        View on lens
+                      </Typography>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+                    <Switch
+                      disabled={proposalStatus !== 'draft'}
+                      checked={proposalFormInputs.publishToLens ?? false}
+                      onChange={(e) => {
+                        setProposalFormInputs({
+                          publishToLens: e.target.checked
+                        });
+                      }}
+                    />
+                  </>
+                )}
               </Box>
             </Box>
           )}
+
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (

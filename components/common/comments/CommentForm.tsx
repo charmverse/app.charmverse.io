@@ -89,24 +89,28 @@ export function CommentForm({
   }
 
   return (
-    <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form'>
-        <UserDisplay user={user} hideName={true} />
+    <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form' my={1}>
+      <UserDisplay user={user} hideName={true} />
+      <Stack gap={1} width='100%'>
         {editor}
-      </Box>
-      <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
-        {showPublishToLens && (
-          <Stack flexDirection='row' gap={1} alignItems='center'>
-            <Typography variant='caption' color='text.secondary'>
-              Publish to Lens
-            </Typography>
-            <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
-          </Stack>
-        )}
-        <Button data-test='post-comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
-          Comment
-        </Button>
+        <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
+          {showPublishToLens && (
+            <Stack flexDirection='row' gap={1} alignItems='center'>
+              <Typography variant='body2' color='text.secondary'>
+                Publish to Lens
+              </Typography>
+              <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
+            </Stack>
+          )}
+          <Button
+            data-test='post-comment-button'
+            disabled={!postContent.rawText || disabled}
+            onClick={createPostComment}
+          >
+            Comment
+          </Button>
+        </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 }

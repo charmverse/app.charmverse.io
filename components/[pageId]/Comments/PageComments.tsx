@@ -9,6 +9,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -23,6 +24,7 @@ type Props = {
 
 export function PageComments({ page, permissions }: Props) {
   const { user } = useUser();
+  const { lensProfile } = useLensProfile();
   const {
     comments,
     commentSort,
@@ -75,7 +77,12 @@ export function PageComments({ page, permissions }: Props) {
         <CommentForm
           publishToLens={publishCommentsToLens}
           setPublishToLens={setPublishCommentsToLens}
-          showPublishToLens={!!page.proposalId && page.type === 'proposal' && !!proposal?.lensPostLink}
+          showPublishToLens={
+            Boolean(page.proposalId) &&
+            page.type === 'proposal' &&
+            Boolean(proposal?.lensPostLink) &&
+            Boolean(lensProfile)
+          }
           handleCreateComment={createComment}
         />
       )}
