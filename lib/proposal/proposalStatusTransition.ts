@@ -69,3 +69,33 @@ export const proposalStatusDetails: Record<ProposalStatus, string> = {
   evaluation_active: 'Reviewers are evaluating this proposal',
   evaluation_closed: 'Evaluation is complete'
 };
+
+export function previousProposalStatusUpdateMessage(status: ProposalStatus) {
+  switch (status) {
+    case 'draft':
+      return 'In the Draft stage, only authors and administrators can view and edit the proposal.';
+    case 'discussion':
+      return 'Rejecting this proposal will return it to the Discussion stage for further consideration.';
+    default:
+      return null;
+  }
+}
+
+export function nextProposalStatusUpdateMessage(status: ProposalStatus) {
+  switch (status) {
+    case 'discussion':
+      return 'In the Feedback stage, Members can view and provide feedback on the proposal.';
+    case 'review':
+      return 'In the Review stage, the Proposal is visible to Members. Reviewer approval is required to proceed to the voting stage.';
+    case 'vote_active':
+      return 'Proceeding with this action will transition the proposal into the Voting stage.';
+    case 'evaluation_active':
+      return 'Proceeding with this action will transition the proposal into the Evaluation stage.';
+    case 'evaluation_closed':
+      return 'This will close the Evaluation. No additional Rubric answers will be accepted.';
+    case 'reviewed':
+      return "By approving this proposal, you authorize its advancement to the voting stage. Voting is initiated by one of the proposal's authors.";
+    default:
+      return null;
+  }
+}

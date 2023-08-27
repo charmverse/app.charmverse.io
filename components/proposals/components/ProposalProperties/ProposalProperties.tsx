@@ -4,6 +4,7 @@ import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } f
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
@@ -13,6 +14,7 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
@@ -21,8 +23,12 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isDevEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
+import {
+  getProposalStatuses,
+  nextProposalStatusUpdateMessage,
+  previousProposalStatusUpdateMessage
+} from 'lib/proposal/proposalStatusTransition';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -112,16 +118,49 @@ export function ProposalProperties({
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { proposalTemplates } = useProposalTemplates();
   const { lensProfile } = useLensProfile();
+  const { proposalTemplates = [] } = useProposalTemplates();
+
+  const previousConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'previous-proposal-status-change-confirmation'
+  });
+  const nextConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'next-proposal-status-change-confirmation'
+  });
+
+  const statuses = getProposalStatuses(proposalFormInputs.evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
+  const nextStatus = statuses[currentStatusIndex + 1];
+  const previousStatus = statuses[currentStatusIndex - 1];
+  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
+  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
+
+  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
+    switch (newStatus) {
+      case 'draft':
+      case 'discussion':
+      case 'review':
+      case 'vote_active':
+      case 'evaluation_active':
+      case 'evaluation_closed':
+      case 'reviewed':
+        if (newStatus === previousStatus) {
+          previousConfirmationPopup.open();
+        } else if (newStatus === nextStatus) {
+          nextConfirmationPopup.open();
+        }
+        break;
+      default:
+        await updateProposalStatus?.(newStatus);
+        break;
+    }
+  }
+
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-
-  const proposalTemplatePages = useMemo(() => {
-    return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
-  }, [pages]);
-
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -129,21 +168,14 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
-
-  const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, ProposalTemplate>);
-
-  const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
-    const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
-    if (!_proposal) {
-      return false;
-    } else if (!proposalCategoryId) {
-      return true;
-    }
-    return _proposal.categoryId === proposalCategoryId;
-  });
+  const templateOptions = proposalTemplates
+    .filter((_proposal) => {
+      if (!proposalCategoryId) {
+        return true;
+      }
+      return _proposal.categoryId === proposalCategoryId;
+    })
+    .map((template) => template.page);
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
@@ -274,8 +306,7 @@ export function ProposalProperties({
                   archived={archived}
                   proposalFlowFlags={proposalFlowFlags}
                   proposalStatus={proposalStatus}
-                  openVoteModal={openVoteModal}
-                  updateProposalStatus={updateProposalStatus}
+                  handleProposalStatusUpdate={handleProposalStatusUpdate}
                   evaluationType={proposalFormInputs.evaluationType}
                 />
               )}
@@ -304,8 +335,7 @@ export function ProposalProperties({
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
-                openVoteModal={openVoteModal}
-                updateProposalStatus={updateProposalStatus}
+                handleProposalStatusUpdate={handleProposalStatusUpdate}
                 evaluationType={proposalFormInputs.evaluationType}
               />
             </Box>
@@ -501,7 +531,7 @@ export function ProposalProperties({
           secondaryButtonText='Go back'
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
-            const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
+            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
             if (templatePage) {
               applyTemplate(templatePage);
             }
@@ -527,6 +557,28 @@ export function ProposalProperties({
           }}
         />
       </div>
+      <ModalWithButtons
+        open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
+        buttonText='Continue'
+        onClose={previousConfirmationPopup.close}
+        onConfirm={() => updateProposalStatus?.(previousStatus)}
+      >
+        <Typography>{previousConfirmationMessage}</Typography>
+      </ModalWithButtons>
+      <ModalWithButtons
+        open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
+        onClose={nextConfirmationPopup.close}
+        buttonText='Continue'
+        onConfirm={() => {
+          if (nextStatus === 'vote_active') {
+            openVoteModal?.();
+          } else {
+            updateProposalStatus?.(nextStatus);
+          }
+        }}
+      >
+        <Typography>{nextConfirmationMessage}</Typography>
+      </ModalWithButtons>
     </Box>
   );
 }

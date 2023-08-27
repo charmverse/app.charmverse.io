@@ -248,9 +248,13 @@ jobs:
               ' .ebextensions_websockets/00_env_vars.config
 
       - name: Package Webapp and upload web assets to s3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Update and Package background worker
         run: |
