@@ -103,7 +103,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
           </Box>
         </Grid>
         <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
-          <Image px={3} src={splashImage} sx={{ maxWidth: '100%' }} />
+          <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
       <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />

@@ -12,7 +12,7 @@ const ImageWrapper = styled(Box)`
 export default function Image({ src, ...props }: Props) {
   return (
     <ImageWrapper {...props}>
-      <NextImage alt='' src={src} />
+      <NextImage alt='' src={src} layout='responsive' />
     </ImageWrapper>
   );
 }
