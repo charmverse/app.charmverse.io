@@ -186,6 +186,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
                   <ProposalProperties
+                    isFromTemplate={isFromTemplateSource}
                     readOnlyRubricCriteria={isFromTemplateSource}
                     readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}

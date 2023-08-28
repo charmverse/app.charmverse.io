@@ -59,63 +59,73 @@ const StyledUserPropertyContainer = styled(Box, {
 function SelectedReviewers({
   value,
   readOnly,
+  readOnlyMessage,
   onRemove,
   wrapColumn
 }: {
   wrapColumn: boolean;
   readOnly: boolean;
+  readOnlyMessage?: string;
   value: GroupedOptionPopulated[];
   onRemove: (reviewerId: string) => void;
 }) {
   return (
-    <Stack flexDirection='row' gap={1} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
-      {value.map((reviewer) => {
-        return (
-          <Stack
-            alignItems='center'
-            flexDirection='row'
-            key={reviewer.id}
-            gap={0.5}
-            sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
-          >
-            {reviewer.group === 'user' && (
-              <>
-                <UserDisplay fontSize={14} avatarSize='xSmall' user={reviewer} wrapName={wrapColumn} />
-                {!readOnly && (
-                  <IconButton size='small' onClick={() => onRemove(reviewer.id)}>
+    <Tooltip title={readOnlyMessage}>
+      <Stack
+        display='inline-flex'
+        width='min-content'
+        flexDirection='row'
+        gap={1}
+        flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
+      >
+        {value.map((reviewer) => {
+          return (
+            <Stack
+              alignItems='center'
+              flexDirection='row'
+              key={reviewer.id}
+              gap={0.5}
+              sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
+            >
+              {reviewer.group === 'user' && (
+                <>
+                  <UserDisplay fontSize={14} avatarSize='xSmall' user={reviewer} wrapName={wrapColumn} />
+                  {!readOnly && (
+                    <IconButton size='small' onClick={() => onRemove(reviewer.id)}>
+                      <CloseIcon
+                        sx={{
+                          fontSize: 14
+                        }}
+                        cursor='pointer'
+                        color='secondary'
+                      />
+                    </IconButton>
+                  )}
+                </>
+              )}
+              {reviewer.group === 'role' && (
+                <Chip
+                  sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                  label={reviewer.name}
+                  // color={reviewer.color}
+                  key={reviewer.id}
+                  size='small'
+                  onDelete={readOnly ? undefined : () => onRemove(reviewer.id)}
+                  deleteIcon={
                     <CloseIcon
                       sx={{
                         fontSize: 14
                       }}
                       cursor='pointer'
-                      color='secondary'
                     />
-                  </IconButton>
-                )}
-              </>
-            )}
-            {reviewer.group === 'role' && (
-              <Chip
-                sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
-                label={reviewer.name}
-                // color={reviewer.color}
-                key={reviewer.id}
-                size='small'
-                onDelete={readOnly ? undefined : () => onRemove(reviewer.id)}
-                deleteIcon={
-                  <CloseIcon
-                    sx={{
-                      fontSize: 14
-                    }}
-                    cursor='pointer'
-                  />
-                }
-              />
-            )}
-          </Stack>
-        );
-      })}
-    </Stack>
+                  }
+                />
+              )}
+            </Stack>
+          );
+        })}
+      </Stack>
+    </Tooltip>
   );
 }
 
@@ -228,9 +238,13 @@ export function UserAndRoleSelect({
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
-            <Tooltip title={readOnlyMessage}>
-              <SelectedReviewers wrapColumn readOnly value={populatedValue} onRemove={removeReviewer} />
-            </Tooltip>
+            <SelectedReviewers
+              readOnlyMessage={readOnlyMessage}
+              wrapColumn
+              readOnly
+              value={populatedValue}
+              onRemove={removeReviewer}
+            />
           )}
         </Stack>
       </SelectPreviewContainer>

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { InputBase } from '@mui/material';
+import { InputBase, Tooltip } from '@mui/material';
 import React, { forwardRef, useRef } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -11,6 +11,7 @@ import { useEditable } from '../../focalboard/src/widgets/editable';
 export type TextInputProps = EditableProps & {
   multiline?: boolean;
   displayType?: PropertyValueDisplayType;
+  readOnlyMessage?: string;
   fullWidth?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
@@ -44,7 +45,17 @@ const StyledInput = styled(InputBase)`
 `;
 
 function Editable(
-  { multiline, columnRef, wrapColumn, displayType, fullWidth = true, sx, inputProps = {}, ..._props }: TextInputProps,
+  {
+    multiline,
+    columnRef,
+    wrapColumn,
+    displayType,
+    fullWidth = true,
+    sx,
+    inputProps = {},
+    readOnlyMessage,
+    ..._props
+  }: TextInputProps,
   ref: React.Ref<Focusable>
 ): JSX.Element {
   _props.className = 'octo-propertyvalue';
@@ -60,16 +71,18 @@ function Editable(
   // Keep it as before for card modal view
   if (displayType === 'details') {
     return (
-      <StyledInput
-        inputProps={{
-          ...inputProps,
-          className
-        }}
-        fullWidth={fullWidth}
-        sx={sx}
-        {...props}
-        multiline={multiline}
-      />
+      <Tooltip title={readOnlyMessage}>
+        <StyledInput
+          inputProps={{
+            ...inputProps,
+            className
+          }}
+          fullWidth={fullWidth}
+          sx={sx}
+          {...props}
+          multiline={multiline}
+        />
+      </Tooltip>
     );
   }
 

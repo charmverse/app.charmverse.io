@@ -39,7 +39,14 @@ export function SelectPreview({
         </Typography>
       )}
       <Tooltip title={readOnlyMessage}>
-        <Stack gap={0.5} flexDirection='row' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} overflow='hidden'>
+        <Stack
+          display='inline-flex'
+          width='min-content'
+          gap={0.5}
+          flexDirection='row'
+          flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
+          overflow='hidden'
+        >
           {valueOptions.length !== 0
             ? valueOptions.map((valueOption) => (
                 <Chip

@@ -404,7 +404,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
-                readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
+                readOnlyMessage={isFromTemplate ? 'Cannot change reviewers when using template' : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
@@ -422,7 +422,8 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
-                disabled={readOnlyProposalEvaluationType}
+                readOnly={readOnlyProposalEvaluationType}
+                readOnlyMessage={isFromTemplate ? 'Cannot change evaluation type when using template' : undefined}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
@@ -490,6 +491,7 @@ export function ProposalProperties({
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
+                    readOnlyMessage={isFromTemplate ? 'Cannot change rubric criteria when using template' : undefined}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
                     proposalStatus={proposalStatus}
