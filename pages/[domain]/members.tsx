@@ -1,11 +1,15 @@
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import MemberDirectoryPage from 'components/members/MemberDirectoryPage';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function MemberDirectory() {
-  setTitle('Member Directory');
+  const { features } = useFeaturesAndMembers();
+  const memberDirectoryTitle = features.find((f) => f.id === 'member_directory')?.title || 'Member Directory';
 
-  return <MemberDirectoryPage />;
+  setTitle(memberDirectoryTitle);
+
+  return <MemberDirectoryPage title={memberDirectoryTitle} />;
 }
 
 MemberDirectory.getLayout = getPageLayout;
