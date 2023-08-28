@@ -65,4 +65,8 @@ export class PagesApi {
   voteComment({ pageId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; pageId: string }) {
     return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
   }
+
+  syncPageComments({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
+    return http.POST(`/api/pages/${pageId}/sync-page-comments`);
+  }
 }
