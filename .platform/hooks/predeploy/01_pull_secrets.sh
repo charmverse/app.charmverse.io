@@ -22,11 +22,7 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
     env_bk_file_name=$(mktemp -t ._env_bk_XXXXX -p $APP_STAGING_DIR)
     cp $APP_STAGING_DIR/.env $env_bk_file_name
 
-    # # before we process the secrets, 
-    # # lets get any non-secret env variables from ebstalk_env_file and backup .env file to create a new $APP_STAGING_DIR/.env file
-    # #   returns true when there are no non-mustached lines so the script doesn't quit with -e option set
-    # grep -v -e "^\s*$" -e "^#" -e "pull:secretsmanager" --no-filename $ebstalk_env_file $env_bk_file_name > $APP_STAGING_DIR/.env || true
-
+    # Mark where .ebstalk.apps.env file ends before merging the two files together
     echo "## end ebstalk_env_file ##"  >> $ebstalk_env_file
 
     # Now start processing secrets
@@ -60,7 +56,9 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
                 secret_value="SECRET_NOT_FOUND"
             }
             echo "$env_var_name=\"$secret_value\"" >> $APP_STAGING_DIR/.env
-        else 
+        else
+            # no processing needed line doesn't look like a secret
+            # append directly to the new .env file
             echo $line >> $APP_STAGING_DIR/.env
         fi 
 
