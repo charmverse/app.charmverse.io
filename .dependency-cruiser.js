@@ -1,37 +1,38 @@
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
-    /* Custom rules */
-    {
-      name: 'no-direct-permissions-import',
-      severity: 'error',
-      comment:
-        'Permissions methods should not be imported directly.' +
-        'Use the injected permissions client instead from getPermissionsClient()',
-      from: {
-        path: ".*",
-        pathNot: "(lib/permissions|lib/bounties)"
-      },
-      to: {
-        //dependencyTypes: ['localmodule', 'local', 'aliased'],
-        path: "lib/permissions",
-        pathNot: ["lib/permissions/api"]
-        //path: "lib/permissions/.*",
-       // pathNot: "^pages/api/$1/.*"
-      }
-    },
-    /* rules from the 'recommended' preset: */
+    /* --------------------- CUSTOM RULES -------------------- */
     // {
-    //   name: 'no-circular',
-    //   severity: 'warn',
+    //   name: 'no-direct-permissions-import',
+    //   severity: 'error',
     //   comment:
-    //     'This dependency is part of a circular relationship. You might want to revise ' +
-    //     'your solution (i.e. use dependency inversion, make sure the modules have a single responsibility) ',
-    //   from: {},
+    //     'Permissions methods should not be imported directly.' +
+    //     'Use the injected permissions client instead from getPermissionsClient()',
+    //   from: {
+    //     path: ".*",
+    //     pathNot: "(lib/permissions|lib/bounties)"
+    //   },
     //   to: {
-    //     circular: true
+    //     //dependencyTypes: ['localmodule', 'local', 'aliased'],
+    //     path: "lib/permissions",
+    //     pathNot: ["lib/permissions/api"]
+    //     //path: "lib/permissions/.*",
+    //    // pathNot: "^pages/api/$1/.*"
     //   }
     // },
+    // ---------------------------- DEFAULT RULES ----------------------------
+    /* rules from the 'recommended' preset: */
+    {
+      name: 'no-circular',
+      severity: 'warn',
+      comment:
+        'This dependency is part of a circular relationship. You might want to revise ' +
+        'your solution (i.e. use dependency inversion, make sure the modules have a single responsibility) ',
+      from: {},
+      to: {
+        circular: true
+      }
+    },
     // {
     //   name: 'no-orphans',
     //   comment:
