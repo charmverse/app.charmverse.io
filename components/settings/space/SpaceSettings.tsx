@@ -549,7 +549,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'lens':
       return '/images/logos/lens_logo.svg';
     case 'summon':
-      return '/images/logos/game7_logo.svg';
+      return '/images/logos/summon_dark_mark.svg';
     default:
       return '';
   }
