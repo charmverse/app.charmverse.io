@@ -22,8 +22,8 @@ type IContext = {
   isLoading: boolean;
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
-  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
-  castVote: (voteId: string, option: string) => Promise<UserVote>;
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
+  castVote: (voteId: string, option: string | string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -53,7 +53,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const [parent, setParent] = useState<{ pageId?: string; postId?: string } | null>(null);
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
   const { mutate: mutateTasks, tasks: userTasks } = useTasks();
 
@@ -167,30 +167,47 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  async function castVote(voteId: string, choice: string) {
-    const userVote = await charmClient.votes.castVote(voteId, choice);
+  async function castVote(voteId: string, choice: string | string[]) {
+    const updatedChoice = Array.isArray(choice) ? choice : [choice];
+    const userVote = await charmClient.votes.castVote(voteId, updatedChoice);
+
     setVotes((_votes) => {
-      const vote = _votes[voteId];
+      const vote = { ..._votes[voteId] };
       if (vote && user) {
         const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
-        if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+        if (currentChoice?.length) {
+          // Remove previous choices
+          currentChoice.forEach((c) => {
+            vote.aggregatedResult[c] -= 1;
+          });
         } else {
           vote.totalVotes += 1;
         }
-        vote.aggregatedResult[choice] += 1;
-        _votes[voteId] = {
-          ...vote
-        };
+
+        vote.userChoice = updatedChoice;
+
+        if (updatedChoice.length > 0) {
+          // Add new choices
+          updatedChoice.forEach((c) => {
+            vote.aggregatedResult[c] += 1;
+          });
+        } else if (currentChoice && currentChoice.length) {
+          // User deselected all previous choices
+          vote.totalVotes = vote.totalVotes > 0 ? vote.totalVotes - 1 : 0;
+        }
+
+        _votes[voteId] = vote;
       }
+
       return { ..._votes };
     });
     removeVoteFromTask(voteId);
     return userVote;
   }
 
-  async function createVote(votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+  async function createVote(
+    votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>
+  ): Promise<ExtendedVote> {
     if (!user || !currentSpace) {
       throw new Error('Missing user or space');
     }

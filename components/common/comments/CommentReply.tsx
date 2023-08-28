@@ -1,7 +1,7 @@
 import { Stack, Box } from '@mui/material';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { CreateCommentPayload } from 'components/common/comments/interfaces';

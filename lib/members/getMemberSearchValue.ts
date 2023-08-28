@@ -31,7 +31,7 @@ export function getMemberSearchValue(
       if (Array.isArray(prop.value)) {
         return prop.value.map((val) => memberProperties[val as string] || val).join(' ');
       }
-      return typeof prop.value === 'string' ? memberProperties[prop.value] : prop.value;
+      return memberProperties[prop.value as string] || prop.value;
     })
     .join(' ');
 

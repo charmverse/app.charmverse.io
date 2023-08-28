@@ -8,7 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import Link from 'components/common/Link';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -45,7 +45,7 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
 ];
 
 export default function BountiesPage({ publicMode = false, bounties }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const router = useRouter();
 
   const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
@@ -168,7 +168,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
           {bounties.length === 0 ? (
             <EmptyStateVideo
               description='Getting started with bounties'
-              videoTitle='Bounties | Getting started with Charmverse'
+              videoTitle='Bounties | Getting started with CharmVerse'
               videoUrl='https://tiny.charmverse.io/bounties'
             />
           ) : currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (

@@ -52,11 +52,6 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
     margin-top: 0;
     width: fit-content;
     min-width: 100%;
-
-    // Hide calculations footer
-    .CalculationRow {
-      display: none;
-    }
   }
 
   // remove extra padding on Kanban view
@@ -148,6 +143,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
         onPaste={stopPropagation}
       >
         <CenterPanel
+          currentRootPageId={pageId}
           disableUpdatingUrl
           showView={setCurrentViewId}
           onDeleteView={deleteView}

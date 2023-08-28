@@ -40,6 +40,7 @@ class CardFilter {
       return false;
     }
     Utils.assert(filterGroup.operation === 'and');
+
     for (const filter of filters) {
       if (isAFilterGroupInstance(filter)) {
         if (!this.isFilterGroupMet(filter, templates, card)) {

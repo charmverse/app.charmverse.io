@@ -6,22 +6,22 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import SvgIcon from '@mui/material/SvgIcon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
-import Button from 'components/common/Button';
-import Link from 'components/common/Link';
+import { Button } from 'components/common/Button';
+import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
+import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
+import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
-import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { CollectEmail } from './CollectEmail';
 import { LoginErrorModal } from './LoginErrorModal';
@@ -37,6 +37,7 @@ export interface DialogProps {
   isOpen: boolean;
   redirectUrl?: string;
   onClose: () => void;
+  emailOnly?: boolean;
 }
 
 const StyledButton = styled(Button)`
@@ -51,7 +52,13 @@ const StyledButton = styled(Button)`
   }
 `;
 
-export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
+type Props = {
+  redirectUrl?: string;
+  showSignup: boolean;
+  emailOnly?: boolean;
+};
+
+export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3AuthSig();
 
@@ -73,13 +80,26 @@ export function LoginButton({ redirectUrl }: { redirectUrl?: string }) {
       justifyContent={{ xs: 'center', md: 'flex-start' }}
       py={{ xs: 2, md: 0 }}
     >
-      <StyledButton size='large' onClick={handleClickOpen} data-test='universal-connect-button' color='primary'>
-        Sign up
-      </StyledButton>
-      <StyledButton size='large' onClick={handleClickOpen} variant='outlined'>
+      {showSignup && (
+        <StyledButton
+          size='large'
+          onClick={handleClickOpen}
+          data-test='universal-connect-button'
+          color='primary'
+          disableElevation={false}
+        >
+          Sign up
+        </StyledButton>
+      )}
+      <StyledButton
+        color={!showSignup ? 'primary' : 'secondary'}
+        size='large'
+        onClick={handleClickOpen}
+        variant={showSignup ? 'outlined' : undefined}
+      >
         Sign in
       </StyledButton>
-      <LoginHandler redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
+      <LoginHandler emailOnly={emailOnly} redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
     </Box>
   );
 }
@@ -90,8 +110,9 @@ function LoginHandler(props: DialogProps) {
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
   const router = useRouter();
-  const returnUrl = router.query.returnUrl;
+  const returnUrl = typeof router.query.returnUrl === 'string' ? router.query.returnUrl : undefined;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
+  const { isOnCustomDomain } = useCustomDomain();
 
   const [showLoginError, setShowLoginError] = useState(false);
 
@@ -99,20 +120,16 @@ function LoginHandler(props: DialogProps) {
 
   const sendingMagicLink = useRef(false);
 
-  const { loginWithGoogle, requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { requestMagicLinkViaFirebase } = useFirebaseAuth();
+  const { loginWithGooglePopup } = useGoogleLogin();
   const { verifiableWalletDetected } = useWeb3AuthSig();
-  async function handleLogin(loggedInUser: AnyIdLogin) {
+  async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
-
   async function handleGoogleLogin() {
-    try {
-      const googleLoginResult = await loginWithGoogle();
-      handleLogin(googleLoginResult);
-    } catch (err) {
-      handleLoginError(err);
-    }
+    const onSuccess = () => handleLogin({ identityType: 'Google' });
+    return loginWithGooglePopup({ onSuccess });
   }
 
   async function handleMagicLinkRequest(email: string) {
@@ -169,53 +186,36 @@ function LoginHandler(props: DialogProps) {
   return (
     <>
       <Dialog open={isOpen} onClose={close}>
-        {!loginMethod && (
-          <List sx={{ pt: 0, maxWidth: '400px' }}>
-            <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+        <List sx={{ pt: 0, maxWidth: '400px' }}>
+          {!loginMethod && !props.emailOnly && (
+            <>
+              <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
 
-            {/** Web 3 login methods */}
-            <ListItem>
-              <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
-            </ListItem>
-            {verifiableWalletDetected && (
+              {/** Web 3 login methods */}
               <ListItem>
-                <WalletSign
-                  buttonStyle={{ width: '100%' }}
-                  signSuccess={handleWeb3Login}
-                  enableAutosign={enableAutosign}
-                  onError={() => setEnableAutoSign(false)}
-                />
+                <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
               </ListItem>
-            )}
-
+              {verifiableWalletDetected && (
+                <ListItem>
+                  <WalletSign
+                    buttonStyle={{ width: '100%' }}
+                    signSuccess={handleWeb3Login}
+                    enableAutosign={enableAutosign}
+                    onError={() => setEnableAutoSign(false)}
+                  />
+                </ListItem>
+              )}
+            </>
+          )}
+          {!loginMethod && (
             <DialogTitle sx={{ mt: -1 }} textAlign='left'>
               Connect Account
             </DialogTitle>
+          )}
+          {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
 
-            <Link
-              data-test='connect-discord'
-              href={
-                typeof window !== 'undefined'
-                  ? `/api/discord/oauth?type=login&redirect=${returnUrl ?? redirectUrl ?? '/'}`
-                  : ''
-              }
-            >
-              <ListItem>
-                <ConnectorButton
-                  name='Connect with Discord'
-                  disabled={false}
-                  isActive={false}
-                  isLoading={false}
-                  icon={
-                    <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2' }}>
-                      <DiscordIcon />
-                    </SvgIcon>
-                  }
-                />
-              </ListItem>
-            </Link>
-
-            {/* Google login method */}
+          {/* Google login method */}
+          {!loginMethod && (
             <ListItem>
               <ConnectorButton
                 onClick={handleGoogleLogin}
@@ -226,20 +226,24 @@ function LoginHandler(props: DialogProps) {
                 isLoading={false}
               />
             </ListItem>
+          )}
+          {!isOnCustomDomain && !loginMethod && (
+            <>
+              {/** Connect with email address */}
+              <ListItem>
+                <ConnectorButton
+                  onClick={() => toggleEmailDialog('open')}
+                  name='Connect with email'
+                  icon={<EmailIcon />}
+                  disabled={false}
+                  isActive={false}
+                  isLoading={false}
+                />
+              </ListItem>
+            </>
+          )}
+        </List>
 
-            {/** Connect with email address */}
-            <ListItem>
-              <ConnectorButton
-                onClick={() => toggleEmailDialog('open')}
-                name='Connect with email'
-                icon={<EmailIcon />}
-                disabled={false}
-                isActive={false}
-                isLoading={false}
-              />
-            </ListItem>
-          </List>
-        )}
         {loginMethod === 'email' && (
           <Box m={2}>
             <CollectEmail

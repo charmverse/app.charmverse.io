@@ -1,35 +1,34 @@
-import { Alert, Grid, Link, Tooltip, Typography, Stack } from '@mui/material';
-import useSWRImmutable from 'swr/immutable';
+import { Alert, Grid, Link, Stack, Tooltip, Typography } from '@mui/material';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import { transformPoap } from 'lib/blockchain/transformPoap';
 
-export function PoapsList({ userId }: { userId: string }) {
-  const {
-    data: poaps = [],
-    isLoading: isFetchingPoaps,
-    error
-  } = useSWRImmutable(`/poaps/${userId}`, () => {
-    return charmClient.getUserPoaps(userId);
-  });
-
+export function PoapsList({
+  poapsError,
+  isFetchingPoaps,
+  poaps
+}: {
+  poapsError?: any;
+  isFetchingPoaps?: boolean;
+  poaps: ExtendedPoap[];
+}) {
   const sortedPoapData = poaps.sort((p1, p2) => (p1.created > p2.created ? -1 : 1));
 
   return (
     <Stack gap={1} data-test='member-profile-poap-list'>
       <Typography variant='h6'>Recent POAPs</Typography>
-      {error && (
+      {poapsError && (
         <Grid item>
           <Alert severity='error'>Failed to fetch your poaps</Alert>
         </Grid>
       )}
-      {!error &&
+      {!poapsError &&
         (isFetchingPoaps ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
             {sortedPoapData.length !== 0 ? (
               sortedPoapData.slice(0, 5).map((poap) => {
                 const poapData = transformPoap(poap);

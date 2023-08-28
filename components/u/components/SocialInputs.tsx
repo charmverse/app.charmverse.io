@@ -24,12 +24,7 @@ export const schema = yup.object({
     .ensure()
     .trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i, 'Invalid GitHub link'),
-  discordUsername: yup
-    .string()
-    .notRequired()
-    .ensure()
-    .trim()
-    .matches(/^$|^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4})/, 'Invalid Discord username'),
+  discordUsername: yup.string().notRequired().ensure().trim(),
   linkedinURL: yup
     .string()
     .notRequired()

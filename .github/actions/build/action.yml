@@ -52,6 +52,12 @@ inputs:
   NEXT_PUBLIC_STRIPE_PUBLIC_KEY:
     description: "..."
     required: false
+  NEXT_PUBLIC_WALLETCONNECT_PROJECTID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_BUILD_ID:
+    description: "..."
+    required: false
 
 runs:
   using: "composite"
@@ -62,8 +68,6 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
-    - run: echo '${{ env.GIT_DIFF }}'
-      shell: bash
     - name: Cache build
       id: cache_build
       uses: actions/cache@v3
@@ -96,3 +100,6 @@ runs:
         NEXT_PUBLIC_GOOGLE_APP_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_APP_ID }}
         NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ inputs.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE }}
         NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ inputs.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
+        NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ inputs.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
+        NEXT_PUBLIC_BUILD_ID: ${{ inputs.NEXT_PUBLIC_BUILD_ID }}
+

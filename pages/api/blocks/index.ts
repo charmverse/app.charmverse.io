@@ -5,6 +5,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import type { BoardFields } from 'lib/focalboard/board';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import {
   ActionNotPermittedError,
   InvalidStateError,
@@ -19,7 +21,9 @@ import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
@@ -38,7 +42,10 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   url.hash = '';
   url.search = '';
   const pathnameParts = referer ? url.pathname.split('/') : [];
-  const spaceDomain = getValidSubdomain(req.headers.host) || pathnameParts[1];
+  const domain = getValidSubdomain(req.headers.host) || pathnameParts[1];
+  const customDomain = getValidCustomDomain(req.headers.host);
+  const spaceDomain = customDomain || domain;
+
   if (!spaceDomain) {
     throw new InvalidStateError('invalid referrer url');
   }
@@ -64,11 +71,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
     // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
     // WARNING: patchBlock api method does not pass in spaceId, so this is needed.
     if (!spaceId) {
-      const space = await prisma.space.findUnique({
-        where: {
-          domain: spaceDomain
-        }
-      });
+      const space = await getSpaceByDomain(spaceDomain);
       spaceId = space?.id;
     }
 
@@ -98,7 +101,10 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  let spaceDomain = getValidSubdomain(req.headers.host);
+  const domain = getValidSubdomain(req.headers.host);
+  const customDomain = getValidCustomDomain(req.headers.host);
+  let spaceDomain = customDomain || domain;
+
   if (!spaceDomain) {
     spaceDomain = referer ? url.pathname.split('/')[1] : null;
   }
@@ -106,15 +112,65 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   if (!spaceDomain) {
     return res.status(200).json(data);
   }
-  const space = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: spaceDomain
-    }
-  });
+
+  const space = await getSpaceByDomain(spaceDomain);
+  if (!space) {
+    throw new NotFoundError('space not found');
+  }
 
   const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId: space.id });
   if (error) {
     throw new UnauthorisedActionError();
+  }
+
+  // Make sure we can't create a card in a proposals database
+  if (data.length === 1 && data[0].type === 'card' && data[0].parentId) {
+    const candidateParentId = data[0].parentId;
+    const [candidateParentBoardPage, candidateParentProposalViewBlocks] = await Promise.all([
+      prisma.block.findUniqueOrThrow({
+        where: {
+          id: candidateParentId
+        },
+        select: {
+          type: true,
+          fields: true
+        }
+      }),
+      prisma.block.findMany({
+        where: {
+          type: 'view',
+          rootId: candidateParentId
+        }
+      })
+    ]);
+
+    if ((candidateParentBoardPage?.fields as any as BoardFields).sourceType === 'proposals') {
+      if (data[0].id) {
+        // Focalboard pre-emptively adds the card to the cardOrder prop. This prevents invalid property IDs building up in the cardOrder prop
+        const viewsToClean = candidateParentProposalViewBlocks.filter((viewBlock) =>
+          (viewBlock.fields as BoardViewFields).cardOrder.includes(data[0].id as string)
+        );
+        if (viewsToClean.length > 0) {
+          await prisma.$transaction(
+            viewsToClean.map((viewBlock) =>
+              prisma.block.update({
+                where: {
+                  id: viewBlock.id
+                },
+                data: {
+                  fields: {
+                    ...(viewBlock.fields as any),
+                    cardOrder: (viewBlock.fields as BoardViewFields).cardOrder.filter((cardId) => cardId !== data[0].id)
+                  }
+                }
+              })
+            )
+          );
+        }
+      }
+
+      throw new InvalidStateError(`You can't create a card in a proposals database`);
+    }
   }
 
   const newBlocks = data.map((block) => ({
@@ -256,7 +312,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     })()
   ]);
 
-  return res.status(200).json(newBlocks);
+  return res.status(201).json(newBlocks);
 }
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {

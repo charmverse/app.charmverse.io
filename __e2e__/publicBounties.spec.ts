@@ -67,7 +67,8 @@ test.describe.serial('Make a bounties page public and visit it', async () => {
         },
         {
           permissionLevel: 'view',
-          public: true
+          public: true,
+          allowDiscovery: true
         }
       ]
     });

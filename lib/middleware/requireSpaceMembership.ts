@@ -7,8 +7,17 @@ import type { ISystemError } from 'lib/utilities/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
+declare module 'http' {
+  interface IncomingMessage {
+    isAdmin: boolean;
+    isGuest: boolean;
+  }
+}
+
 /**
- * Allow an endpoint to be consumed if it originates from a share page
+ * Allow an endpoint to be consumed if a user is a space member
+ *
+ * Also sets isAdmin status on the request
  */
 export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey?: string } = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
@@ -56,6 +65,8 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
     if (options.adminOnly && spaceRole.isAdmin !== true) {
       throw new AdministratorOnlyError();
     } else {
+      req.isAdmin = spaceRole.isAdmin;
+      req.isGuest = !spaceRole.isAdmin && spaceRole.isGuest;
       next();
     }
   };

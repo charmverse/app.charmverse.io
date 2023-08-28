@@ -9,7 +9,8 @@ import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';
 import { config } from './config';
-import { DocumentEventHandler } from './documentEvents';
+import { docRooms } from './documentEvents/docRooms';
+import { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ServerMessage } from './interfaces';
 import { SpaceEventHandler } from './spaceEvents';
 
@@ -44,7 +45,7 @@ export class WebsocketBroadcaster {
 
     // Define listeners
     io.on('connect', (socket) => {
-      new SpaceEventHandler(socket).init();
+      new SpaceEventHandler(socket, docRooms).init();
 
       // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
       // so we only need to keep track of the number of clients connected to the root namespace
@@ -66,7 +67,7 @@ export class WebsocketBroadcaster {
       .use(authOnConnect)
       .on('connect', (socket) => {
         log.debug('[ws] Web socket namespace /editor connected', { socketId: socket.id, userId: socket.data.user.id });
-        new DocumentEventHandler(socket).init();
+        new DocumentEventHandler(socket, docRooms).init();
       });
   }
 
@@ -96,6 +97,9 @@ export class WebsocketBroadcaster {
 
     if (!spaceRole) {
       socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
+      return;
+    } else if (spaceRole.isGuest && roomId === spaceRole.spaceId) {
+      socket.send(new SpaceMembershipRequiredError(`Guests cannot subscribe to room events ${roomId}`));
       return;
     }
 

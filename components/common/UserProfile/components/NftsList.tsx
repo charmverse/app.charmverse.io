@@ -1,72 +1,73 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Alert, Grid, Link, Tooltip, Typography, Stack } from '@mui/material';
+import { Alert, Grid, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import type { KeyedMutator } from 'swr';
 
-import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import type { NftData } from 'lib/blockchain/interfaces';
-import { transformNft } from 'lib/blockchain/transformNft';
+import type { NFTData } from 'lib/blockchain/getNFTs';
 
 import { NftAvatarGalleryPopup } from './NftAvatarGallery/NftAvatarGalleryPopup';
-import { ProfileItemContainer, NonPinnedItem } from './ProfileItemContainer';
+import { NonPinnedItem, ProfileItemContainer } from './ProfileItemContainer';
 import { updateProfileItem } from './utils';
 
 const totalShownNfts = 5;
 
-type Props = { userId: string; readOnly?: boolean };
+type Props = {
+  userId: string;
+  readOnly?: boolean;
+  isFetchingNfts?: boolean;
+  mutateNfts: KeyedMutator<NFTData[]>;
+  nftsError?: any;
+  nfts: NFTData[];
+};
 
-export function NftsList({ userId, readOnly = false }: Props) {
+export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts, nfts, nftsError }: Props) {
   const { user: currentUser } = useUser();
   const [showingNftGallery, setIsShowingNftGallery] = useState(false);
-  const {
-    data: nfts = [],
-    mutate: mutateNfts,
-    isLoading: isFetchingNfts,
-    error
-  } = useSWRImmutable(`/nfts/${userId}`, () => {
-    return charmClient.blockchain.listNFTs(userId);
-  });
+
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const emptyNftsCount = totalShownNfts - pinnedNfts.length;
 
-  async function updateNft(nft: NftData) {
-    await updateProfileItem<NftData>(nft, 'nft', nft.walletId, mutateNfts);
+  async function updateNft(nft: NFTData) {
+    await updateProfileItem<NFTData>(nft, 'nft', nft.walletId, mutateNfts);
     setIsShowingNftGallery(false);
   }
 
   return (
     <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>
-      {error && (
+      {nftsError && (
         <Grid item>
           <Alert severity='error'>Failed to fetch your NFTs</Alert>
         </Grid>
       )}
-      {!error &&
+      {!nftsError &&
         (isFetchingNfts ? (
           <LoadingComponent isLoading />
         ) : (
-          <Stack gap={2} display='flex' flexDirection='row'>
-            {pinnedNfts
-              .sort((nft1, nft2) => (nft1.title > nft2.title ? 1 : -1))
-              .map((nft) => {
-                const nftData = transformNft(nft);
-                return (
-                  <ProfileItemContainer key={nft.id}>
-                    {!readOnly && (
-                      <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
-                    )}
-                    <Tooltip title={nftData.title}>
-                      <Link href={nftData.link} target='_blank' display='flex'>
-                        <Avatar size='large' isNft avatar={nftData.image} />
-                      </Link>
-                    </Tooltip>
-                  </ProfileItemContainer>
-                );
-              })}
+          <Stack gap={2} display='flex' flexDirection='row' flexWrap='wrap'>
+            {pinnedNfts.length === 0 && readOnly ? (
+              <Typography color='secondary'>No pinned NFTs</Typography>
+            ) : (
+              pinnedNfts
+                .sort((nft1, nft2) => (nft1.title > nft2.title ? 1 : -1))
+                .map((nft) => {
+                  return (
+                    <ProfileItemContainer key={nft.id}>
+                      {!readOnly && (
+                        <CancelIcon color='error' fontSize='small' className='icons' onClick={() => updateNft(nft)} />
+                      )}
+                      <Tooltip title={nft.title}>
+                        <Link href={nft.link} target='_blank' display='flex'>
+                          <Avatar size='large' isNft avatar={nft.image ?? nft.imageThumb} />
+                        </Link>
+                      </Tooltip>
+                    </ProfileItemContainer>
+                  );
+                })
+            )}
             {currentUser?.id === userId && emptyNftsCount !== 0 ? (
               <Tooltip title='Add upto 5 NFTs'>
                 <div>

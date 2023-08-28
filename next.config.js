@@ -4,6 +4,7 @@ const path = require('node:path');
 
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
+const uuid = require('uuid');
 const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
@@ -30,6 +31,10 @@ const config = {
     esmExternals: false
     //    externalDir: true
   },
+
+  images: {
+    domains: ['cdn.charmverse.io']
+  },
   transpilePackages: esmModules,
   modularizeImports: {
     '@mui/material': {
@@ -38,9 +43,17 @@ const config = {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}'
     },
+    '@mui/system': {
+      transform: '@mui/system/{{member}}'
+    },
     lodash: {
       transform: 'lodash/{{member}}'
     }
+  },
+  assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
+  productionBrowserSourceMaps: true,
+  async generateBuildId() {
+    return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
   },
   async redirects() {
     return [
@@ -61,6 +74,11 @@ const config = {
       },
       {
         source: '/profile',
+        destination: '/',
+        permanent: true
+      },
+      {
+        source: '/u/:path*',
         destination: '/',
         permanent: true
       },
@@ -168,18 +186,15 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/websockets.ts',
+            websockets: './background/initWebsockets.ts',
             countSpaceData: './scripts/countSpaceData.ts',
-            importFromDiscourse: './scripts/importFromDiscourse.ts'
+            importFromDiscourse: './scripts/importFromDiscourse.ts',
+            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };
     }
-    _config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.NEXT_PUBLIC_BUILD_ID': `"${buildId}"`
-      })
-    );
+
     return _config;
   }
 };

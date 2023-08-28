@@ -38,6 +38,7 @@ type EditorProps = {
   enableSuggestionMode: boolean;
   onDocLoaded?: () => void;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  onCommentUpdate?: VoidFunction;
 };
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -81,15 +82,21 @@ export class FidusEditor {
 
   onDocLoaded: NonNullable<EditorProps['onDocLoaded']> = () => {};
 
+  onCommentUpdate: VoidFunction = () => {};
+
   onParticipantUpdate: NonNullable<EditorProps['onParticipantUpdate']> = () => {};
 
-  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate }: EditorProps) {
+  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate, onCommentUpdate }: EditorProps) {
     this.user = user;
     if (onDocLoaded) {
       this.onDocLoaded = onDocLoaded;
     }
     if (onParticipantUpdate) {
       this.onParticipantUpdate = onParticipantUpdate;
+    }
+
+    if (onCommentUpdate) {
+      this.onCommentUpdate = onCommentUpdate;
     }
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -144,6 +151,7 @@ export class FidusEditor {
             // define .sessionIds on each participant
             const participants = this.mod.collab.updateParticipantList(data.participant_list);
             if (resubscribed) {
+              log.debug('Check version after getting connections message', { pageId: this.docInfo.id });
               // check version if only reconnected after being offline
               this.mod.collab.doc.checkVersion(); // check version to sync the doc
               resubscribed = false;
@@ -156,7 +164,7 @@ export class FidusEditor {
             try {
               this.mod.collab.doc.receiveDocument(data);
             } catch (error) {
-              log.error('Error loading document from sockets', { error });
+              log.error('Error loading document from sockets', { data, error, pageId: this.docInfo.id });
               onError(error as Error);
             }
             // console.log('received doc');
@@ -172,23 +180,32 @@ export class FidusEditor {
           case 'selection_change':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after selection change', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
             this.mod.collab.doc.receiveSelectionChange(data);
             break;
-          case 'diff':
+          case 'diff': {
             if (data.cid === this.client_id) {
               // The diff origins from the local user.
               this.mod.collab.doc.confirmDiff(data.rid);
               return;
             }
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after diff', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
             this.mod.collab.doc.receiveDiff(data);
+            const isCommentUpdate = data.ds.find(
+              (step) => step.stepType === 'addMark' && step.mark?.type === 'inline-comment'
+            );
+            if (isCommentUpdate) {
+              this.onCommentUpdate();
+            }
             break;
+          }
           case 'confirm_diff':
             this.mod.collab.doc.confirmDiff(data.rid);
             break;
@@ -206,33 +223,6 @@ export class FidusEditor {
             break;
         }
       }
-      // failedAuth: () => {
-      //   if (this.view.state.plugins.length && sendableSteps(this.view.state) && this.ws.connectionCount > 0) {
-      //     this.ws.online = false; // To avoid Websocket trying to reconnect.
-      //     new ExportFidusFile(
-      //       this.getDoc({ use_current_view: true }),
-      //       this.mod.db.bibDB,
-      //       this.mod.db.imageDB
-      //     );
-      //     const sessionDialog = new Dialog({
-      //       title: gettext('Session Expired'),
-      //       id: 'session_expiration_dialog',
-      //       body: gettext('Your session expired while you were offline, so we cannot save your work to the server any longer, and it is downloaded to your computer instead. Please consider importing it into a new document.'),
-      //       buttons: [{
-      //         text: gettext('Proceed to Login page'),
-      //         classes: 'fw-dark',
-      //         click: () => {
-      //           window.location.href = '/';
-      //         }
-      //       }],
-      //       canClose: false
-      //     });
-      //     sessionDialog.open();
-      //   }
-      //   else {
-      //     window.location.href = '/';
-      //   }
-      // }
     });
 
     this.initEditor(view);

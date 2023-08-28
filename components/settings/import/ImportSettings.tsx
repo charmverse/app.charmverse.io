@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { SiDiscourse } from 'react-icons/si';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { ImportZippedMarkdown } from 'components/common/ImportZippedMarkdown';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
@@ -15,7 +15,7 @@ import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useNotionImport } from 'hooks/useNotionImport';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import NotionIcon from 'public/images/notion_logo.svg';
+import NotionIcon from 'public/images/logos/notion_logo.svg';
 
 export function ImportSettings({ space }: { space: Space }) {
   const { loading } = useNotionImport();

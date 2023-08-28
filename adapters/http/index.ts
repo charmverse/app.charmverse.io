@@ -38,7 +38,12 @@ export function DELETE<T>(
 export function POST<T>(
   requestURL: string,
   data: Params | string = {},
-  { headers = {}, noHeaders, skipStringifying }: { headers?: any; noHeaders?: boolean; skipStringifying?: boolean } = {}
+  {
+    headers = {},
+    noHeaders,
+    skipStringifying,
+    credentials = 'include'
+  }: { credentials?: RequestCredentials; headers?: any; noHeaders?: boolean; skipStringifying?: boolean } = {}
 ): Promise<T> {
   return fetch<T>(requestURL, {
     body: !skipStringifying ? JSON.stringify(data) : (data as string),
@@ -50,7 +55,7 @@ export function POST<T>(
           'Content-Type': 'application/json',
           ...headers
         }),
-    credentials: 'include'
+    credentials
   });
 }
 

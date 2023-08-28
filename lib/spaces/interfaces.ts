@@ -1,5 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 
+import type { DomainCertificateDetails } from 'lib/aws/interfaces';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 // This type is unused for now. We are returning the full space document to the user.
@@ -9,4 +10,12 @@ export type PublicSpaceInfo = Pick<Space, 'domain' | 'id'>;
 
 export type SpaceWithGates = Space & {
   tokenGates: TokenGateWithRoles[];
+};
+
+export type CustomDomainVerification = {
+  isRedirectVerified: boolean;
+  isCertificateVerified: boolean;
+  isCertificateAttached: boolean;
+  isCustomDomainVerified: boolean;
+  certificateDetails: DomainCertificateDetails | null;
 };

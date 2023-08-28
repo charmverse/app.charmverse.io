@@ -3,10 +3,10 @@ import type { MenuItemProps } from '@mui/material/MenuItem';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
-import { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
 
 import { getSpaceUrl } from 'lib/utilities/browser';
+
+import DraggableListItem from '../DraggableListItem';
 
 import WorkspaceAvatar from './WorkspaceAvatar';
 
@@ -16,54 +16,19 @@ interface SpaceListItemProps extends MenuItemProps {
 }
 
 export default function SpaceListItem({ space, changeOrderHandler, selected, disabled }: SpaceListItemProps) {
-  const ref = useRef<HTMLAnchorElement>(null);
-
-  const [, drag] = useDrag(() => ({
-    type: 'spaceItem',
-    item: space,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-
-  const [{ isOver, canDrop }, drop] = useDrop(
-    () => ({
-      accept: 'spaceItem',
-      drop: async (droppedProperty: Space, monitor) => {
-        const didDrop = monitor.didDrop();
-
-        if (didDrop) {
-          return;
-        }
-
-        if (droppedProperty.id !== space.id) {
-          await changeOrderHandler(droppedProperty.id, space.id);
-        }
-      },
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop()
-      })
-    }),
-    [space, changeOrderHandler]
-  );
-
-  drag(drop(ref));
-
   return (
-    <MenuItem
-      key={space.domain}
-      component={NextLink}
-      href={getSpaceUrl(space.domain)}
-      sx={{ ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active' }) }}
-      ref={ref}
-      selected={selected}
-      disabled={disabled}
-    >
-      <WorkspaceAvatar name={space.name} image={space.spaceImage} />
-      <Typography noWrap ml={1}>
-        {space.name}
-      </Typography>
-    </MenuItem>
+    <DraggableListItem name='spaceItem' itemId={space.id} changeOrderHandler={changeOrderHandler} key={space.domain}>
+      <MenuItem
+        component={NextLink}
+        href={getSpaceUrl({ domain: space.domain, customDomain: space.customDomain })}
+        selected={selected}
+        disabled={disabled}
+      >
+        <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+        <Typography noWrap ml={1}>
+          {space.name}
+        </Typography>
+      </MenuItem>
+    </DraggableListItem>
   );
 }

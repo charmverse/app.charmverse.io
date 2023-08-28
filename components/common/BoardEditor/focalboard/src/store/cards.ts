@@ -270,6 +270,10 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
         } else {
           // Text-based sort
 
+          if (typeof aValue === 'number' || typeof bValue === 'number') {
+            return a > b ? -1 : 1;
+          }
+
           if (aValue.length > 0 && bValue.length <= 0) {
             return -1;
           }
@@ -360,6 +364,7 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; bo
       const cardProperties: IPropertyTemplate[] = hasTitleProperty
         ? board.fields.cardProperties
         : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+
       if (view.fields.filter) {
         result = CardFilter.applyFilterGroup(
           view.fields.filter,

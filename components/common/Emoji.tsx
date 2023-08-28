@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';
@@ -54,17 +55,20 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
 
 // Use system font for Mac OS, but Twitter emojis for everyone else
 export function getTwitterEmoji(emoji: string): string | null {
-  if (isMac()) return null;
-
-  // @ts-ignore - library type is incorrect
-  const html = twemoji.parse(emoji, {
-    // the original maxCDN went down Jan 11, 2023
-    base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
-    folder: 'svg',
-    ext: '.svg'
-  }) as string;
-  const match = /<img.*?src="(.*?)"/.exec(html);
-  return match ? match[1] : null;
+  if (isMac() || !emoji) return null;
+  try {
+    const html = twemoji.parse(emoji, {
+      // the original maxCDN went down Jan 11, 2023
+      base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
+      folder: 'svg',
+      ext: '.svg'
+    }) as string;
+    const match = /<img.*?src="(.*?)"/.exec(html);
+    return match ? match[1] : null;
+  } catch (error) {
+    log.error('Could not parse emoji', { emoji, error });
+    return null;
+  }
 }
 
 function EmojiIcon({
@@ -74,7 +78,15 @@ function EmojiIcon({
 }: ComponentProps<typeof Emoji> & { icon: string | ReactNode; size?: ImgSize }) {
   let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
-    iconContent = <img src={icon} />;
+    iconContent = (
+      <img
+        src={icon}
+        // Transferred from notion
+        style={{
+          objectFit: 'cover'
+        }}
+      />
+    );
   } else if (typeof icon === 'string') {
     const twemojiImage = getTwitterEmoji(icon);
     if (twemojiImage) {

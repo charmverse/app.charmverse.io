@@ -1,30 +1,32 @@
-import type { Node } from '@bangle.dev/pm';
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
+import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import { relay } from '../relay';
 
+import type { DocumentRoom } from './docRooms';
 import type {
-  Participant,
-  ProsemirrorJSONStep,
-  WrappedSocketMessage,
-  ClientMessage,
-  ServerDocDataMessage,
   ClientCheckVersionMessage,
   ClientDiffMessage,
+  ClientMessage,
   ClientSelectionMessage,
+  Participant,
+  PatchError,
+  ProsemirrorJSONStep,
+  ServerDocDataMessage,
   ServerMessage,
-  PatchError
+  WrappedSocketMessage
 } from './interfaces';
 
 const log = getLogger('ws-docs');
@@ -34,24 +36,6 @@ type SocketSessionData = AuthenticatedSocketData & {
   isOwner?: boolean;
   permissions: Partial<PagePermissionFlags>;
 };
-
-type DocumentRoom = {
-  // eslint-disable-next-line no-use-before-define
-  participants: Map<string, DocumentEventHandler>;
-  doc: {
-    id: string;
-    version: number;
-    content: any;
-    type: string;
-    galleryImage: string | null;
-    hasContent: boolean;
-    diffs: ClientDiffMessage[];
-  };
-  lastSavedVersion?: number;
-  node: Node;
-};
-
-const docRooms = new Map<string | undefined, DocumentRoom>();
 
 export class DocumentEventHandler {
   id: string;
@@ -70,6 +54,8 @@ export class DocumentEventHandler {
     lastTen: []
   };
 
+  docRooms: Map<string | undefined, DocumentRoom> = new Map();
+
   // store session data on the socket from socket-io
   getSession() {
     return this.socket.data as SocketSessionData;
@@ -77,11 +63,12 @@ export class DocumentEventHandler {
 
   getSessionMeta() {
     const session = this.getSession();
-    const docRoom = docRooms.get(session.documentId);
+    const docRoom = this.docRooms.get(session.documentId);
     return {
       socketId: this.id,
       userId: session.user?.id,
       pageId: session.documentId,
+      spaceId: docRoom?.doc.spaceId,
       pageVersion: docRoom?.doc.version,
       serverMessages: this.messages.server,
       clientMessages: this.messages.client
@@ -94,7 +81,7 @@ export class DocumentEventHandler {
 
   getDocumentRoom() {
     const docId = this.getSession().documentId;
-    return docRooms.get(docId);
+    return this.docRooms.get(docId);
   }
 
   getDocumentRoomOrThrow() {
@@ -105,10 +92,10 @@ export class DocumentEventHandler {
     return room;
   }
 
-  constructor(socket: Socket) {
+  constructor(socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
     this.id = socket.id;
     this.socket = socket;
-
+    this.docRooms = docRooms;
     // set up socket data
     // this.socket.data.user is set by the authentication middleware
     this.socket.data.permissions = {}; // set empty permissions
@@ -139,6 +126,7 @@ export class DocumentEventHandler {
 
   async onMessage(message: WrappedSocketMessage<ClientMessage>) {
     const logData = this.getSessionMeta();
+
     // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
@@ -158,6 +146,11 @@ export class DocumentEventHandler {
         ...logData,
         message
       });
+      // Dont know how it gets out of sync, but sometimes these are not in fact duplicate messages. And the user ends up losing all their changes as each new one is ignored.
+      // check if there are at least a few updates and ask the user to refresh
+      if (message.type === 'diff' && message.ds.length > 30) {
+        this.sendError('Your version of this document is out of sync with the server. Please refresh the page.');
+      }
       return;
     } else if (message.c > this.messages.client + 1) {
       log.warn('Request resent of lost messages from client', {
@@ -170,7 +163,7 @@ export class DocumentEventHandler {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.warn('Resend messages to client', { message, ...logData });
+      log.warn('Resend messages to client', { message, messagesToSend: this.messages.lastTen.length, ...logData });
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -187,6 +180,7 @@ export class DocumentEventHandler {
         message,
         ...logData
       });
+      this.sendError('There was an error saving changes do your document. Please reload and try again.');
     }
   }
 
@@ -209,7 +203,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    if (!docRooms.has(session.documentId)) {
+    if (!this.docRooms.has(session.documentId)) {
       log.error('Ignoring message from closed document - this is unusual', {
         socketId: this.id,
         message,
@@ -271,7 +265,7 @@ export class DocumentEventHandler {
 
       this.setSession({ documentId: pageId, permissions });
 
-      const docRoom = docRooms.get(pageId);
+      const docRoom = this.docRooms.get(pageId);
       if (docRoom && docRoom.participants.size > 0) {
         log.debug('Join existing document room', {
           pageId,
@@ -297,6 +291,7 @@ export class DocumentEventHandler {
         const room: DocumentRoom = {
           doc: {
             id: page.id,
+            spaceId: page.spaceId,
             content,
             type: page.type,
             galleryImage: page.galleryImage,
@@ -307,7 +302,7 @@ export class DocumentEventHandler {
           node: getNodeFromJson(content),
           participants
         };
-        docRooms.set(pageId, room);
+        this.docRooms.set(pageId, room);
       }
 
       this.sendMessage({ type: 'subscribed' });
@@ -318,7 +313,7 @@ export class DocumentEventHandler {
           socketId: this.id,
           pageId,
           userId,
-          pageVersion: docRooms.get(pageId)?.doc.version
+          pageVersion: this.docRooms.get(pageId)?.doc.version
         });
       }
       this.handleParticipantUpdate();
@@ -361,26 +356,47 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoom();
     if (message.v === room?.doc.version) {
       this.sendUpdatesToOthers(message);
+    } else {
+      log.debug('Ignoring selection change because version is out of date', {
+        socketId: this.id,
+        pageId: room?.doc.id,
+        version: message.v,
+        docVersion: room?.doc.version,
+        userId: this.getSession().user.id
+      });
     }
   }
 
   // We need to filter out marks from the suggested-tooltip plugin (supports mentions, slash command, etc). This way the tooltip doesn't show up for others.
   // (Not sure this is the best fix, but it's the only way I could think of for now)
   removeTooltipMarks(diff: ProsemirrorJSONStep) {
-    if (diff.slice?.content?.[0]?.marks?.length) {
-      diff.slice.content[0].marks = diff.slice.content[0].marks.filter((mark) => !mark.attrs?.trigger);
+    const content = diff.slice?.content;
+    if (content) {
+      for (const node of content) {
+        if (node.marks?.length) {
+          node.marks = node.marks.filter((mark) => !mark.attrs?.trigger);
+        }
+      }
     }
     return diff;
   }
 
-  async handleDiff(message: WrappedSocketMessage<ClientDiffMessage>) {
+  // sendMessageToActor is used when we want to send the diff to all other participants, but not the actor
+  async handleDiff(
+    message: WrappedSocketMessage<ClientDiffMessage>,
+    { socketEvent }: { socketEvent?: 'page_created' | 'page_restored' | 'page_deleted' | 'page_reordered' | null } = {
+      socketEvent: null
+    }
+  ) {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
+    const session = this.getSession();
     const logMeta = {
       socketId: this.id,
-      userId: this.getSession().user.id,
+      userId: session.user.id,
       pageId: room.doc.id,
+      spaceId: room.doc.spaceId,
       v: clientV,
       c: message.c,
       s: message.s,
@@ -389,10 +405,61 @@ export class DocumentEventHandler {
       serverS: this.messages.server
     };
     log.debug('Handling change event', logMeta);
+    const deletedPageIds: string[] = [];
+    const restoredPageIds: string[] = [];
+
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
+        // Go through the diffs and see if any of them are for deleting a page.
+        try {
+          for (const ds of message.ds) {
+            if (ds.stepType === 'replace') {
+              // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
+              // We don't need to restore the page if it was created by the user manually
+              if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
+                ds.slice.content.forEach((node) => {
+                  if (node && node.type === 'page' && node.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
+                    // pagePath is null when the page is not a linked page
+                    if (pageId && pageType === null && pagePath === null) {
+                      restoredPageIds.push(node.attrs?.id);
+                    }
+                  }
+                });
+              } else if (ds.from + 1 === ds.to) {
+                // deleted using row action menu
+                const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
+                if (node && node.attrs && node.type === 'page') {
+                  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
+                  if (pageId && pageType === null && pagePath === null) {
+                    deletedPageIds.push(pageId);
+                  }
+                }
+              } else {
+                // deleted using multi line selection
+                // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
+                room.node.nodesBetween(ds.from, ds.to, (_node) => {
+                  const jsonNode = _node.toJSON() as PageContent;
+                  if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
+                    if (pageId && pageType === null && pagePath === null) {
+                      deletedPageIds.push(pageId);
+                    }
+                  }
+                });
+              }
+            }
+          }
+        } catch (error) {
+          log.warn('Error looping through nodes for page meta', {
+            error,
+            docSize: room.node.nodeSize,
+            ds: message.ds,
+            ...logMeta
+          });
+        }
 
         try {
           const updatedNode = applyStepsToNode(message.ds, room.node);
@@ -409,14 +476,38 @@ export class DocumentEventHandler {
         }
       }
       room.doc.diffs.push(message);
-      room.doc.diffs = room.doc.diffs.slice(this.historyLength);
+      room.doc.diffs = room.doc.diffs.slice(0 - this.historyLength);
       room.doc.version += 1;
-      if (room.doc.version % this.docSaveInterval === 0) {
-        await this.saveDocument();
+      try {
+        await this.saveDiff(message);
+        if (room.doc.version % this.docSaveInterval === 0) {
+          await this.saveDocument();
+        }
+
+        if (deletedPageIds.length && socketEvent !== 'page_reordered') {
+          await archivePages({
+            pageIds: deletedPageIds,
+            userId: session.user.id,
+            spaceId: room.doc.spaceId,
+            archive: true
+          });
+        }
+
+        if (restoredPageIds.length && socketEvent !== 'page_reordered') {
+          await archivePages({
+            pageIds: restoredPageIds,
+            userId: session.user.id,
+            spaceId: room.doc.spaceId,
+            archive: false
+          });
+        }
+
+        this.confirmDiff(message.rid);
+        this.sendUpdatesToOthers(message, !!socketEvent);
+      } catch (error) {
+        log.error('Error when saving changes to the db', { error, ...logMeta });
+        this.sendError('There was an error saving your changes! Please refresh and try again.');
       }
-      await this.saveDiff(message);
-      this.confirmDiff(message.rid);
-      this.sendUpdatesToOthers(message);
     } else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
         // We have enough diffs stored to fix it.
@@ -424,12 +515,12 @@ export class DocumentEventHandler {
         log.debug('Client is behind. Resend document diffs', {
           ...logMeta,
           roomDiffs: room.doc.diffs.length,
-          diffsToSend
+          diffsToSend: diffsToSend * -1
         });
         const messages = room.doc.diffs.slice(diffsToSend);
         for (const m of messages) {
           const newMessage = { ...m, server_fix: true };
-          await this.sendMessage(newMessage);
+          this.sendMessage(newMessage);
         }
       } else {
         log.debug('Unfixable: Client is too far behind to process update. Resend document', logMeta);
@@ -447,7 +538,7 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room?.doc.version;
-    const logData = { clientV, serverV, pageId: room?.doc.id, userId: session.user.id };
+    const logData = { clientV, serverV, pageId: room?.doc.id, spaceId: room?.doc.spaceId, userId: session.user.id };
     log.debug('Check version of document', logData);
     if (clientV === serverV) {
       this.sendMessage({ type: 'confirm_version', v: clientV });
@@ -473,10 +564,15 @@ export class DocumentEventHandler {
     const toSend = this.messages.server - from;
     this.messages.server -= toSend;
     if (toSend > this.messages.lastTen.length) {
-      log.warn('Unfixable: Too many messages to resend. Send full document', this.getSessionMeta());
+      log.warn('Unfixable: Too many messages to resend. Send full document', {
+        toSend,
+        from,
+        ...this.getSessionMeta()
+      });
       this.unfixable();
     } else {
-      for (const message of this.messages.lastTen.slice(-toSend)) {
+      const lastTen = this.messages.lastTen.slice(-toSend);
+      for (const message of lastTen) {
         this.sendMessage(message);
       }
     }
@@ -527,7 +623,7 @@ export class DocumentEventHandler {
       s: this.messages.server
     };
     this.messages.lastTen.push(message);
-    this.messages.lastTen = this.messages.lastTen.slice(-10);
+    this.messages.lastTen = this.messages.lastTen.slice(-30); // changed from 10 to 30 to be safe
     try {
       this.socket.emit(this.socketEvent, wrappedMessage);
     } catch (err) {
@@ -553,15 +649,23 @@ export class DocumentEventHandler {
     }
   }
 
-  sendUpdatesToOthers(message: ClientMessage | ServerMessage) {
-    this.sendUpdates({ message, senderId: this.id });
+  sendUpdatesToOthers(message: ClientMessage | ServerMessage, sendMessageToActor?: boolean) {
+    this.sendUpdates({ message, senderId: this.id, sendMessageToActor });
   }
 
-  sendUpdates({ message, senderId }: { message: ClientMessage | ServerMessage; senderId?: string }) {
+  sendUpdates({
+    message,
+    senderId,
+    sendMessageToActor
+  }: {
+    message: ClientMessage | ServerMessage;
+    senderId?: string;
+    sendMessageToActor?: boolean;
+  }) {
     // log.debug(`Broadcasting message "${message.type}" to room`, { pageId: this.getSession().documentId });
     const room = this.getDocumentRoomOrThrow();
     for (const [, participant] of room.participants) {
-      if (participant.id !== senderId) {
+      if (participant.id !== senderId || sendMessageToActor) {
         participant.sendMessage(message);
       }
     }
@@ -572,7 +676,12 @@ export class DocumentEventHandler {
     if (room) {
       room.participants.delete(this.id);
       if (room.participants.size === 0) {
-        docRooms.delete(room.doc.id);
+        // Cleanup: add a little delay in case some edits were sent at the same time the user disconnected
+        setTimeout(() => {
+          if (room.participants.size === 0) {
+            this.docRooms.delete(room.doc.id);
+          }
+        }, 100);
       } else {
         this.sendParticipantList();
       }
@@ -600,7 +709,7 @@ export class DocumentEventHandler {
       return;
     }
 
-    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
+    log.debug('Saving document to db', { pageId: room.doc.id, spaceId: room.doc.spaceId });
 
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed

@@ -5,11 +5,13 @@ import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { baseUrl } from 'config/constants';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
@@ -35,7 +37,9 @@ export async function logoutBrowserUser({ browserPage }: { browserPage: BrowserP
   await browserPage.request.post(`${baseUrl}/api/session/logout`);
 }
 
-// Note: the endpoint creates a user when wallet address is provided
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features. Use generateUser instead
+ */
 export async function createUser({
   browserPage,
   address
@@ -52,6 +56,9 @@ export async function createUser({
     .then((res) => res.json());
 }
 
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function createSpace({
   browserPage,
   permissionConfigurationMode,
@@ -84,6 +91,9 @@ export async function createSpace({
   }
 }
 
+/**
+ * @deprecated - mock data should be generated directly, not using webapp features
+ */
 export async function getPages({
   browserPage,
   spaceId
@@ -95,9 +105,15 @@ export async function getPages({
 }
 
 /**
+ *
+ * @deprecated - Use generateUserAndSpace() instead. Mock data should be generated directly, not using webapp features
+ *
  * @browserPage - the page object for the browser context that will execute the requests
  *
  * @isOnboarded Default to true so all user / space pairs start as onboarded, and the tester can focus on the happy path they are targeting
+ *
+ *
+ * By Default, the user created with this method will be a space admin
  *
  * Returns a user and space along with this space's pages
  */
@@ -339,6 +355,7 @@ export async function generateUserAndSpace({
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space: Space;
+  const spaceId = v4();
 
   if (existingSpaceId) {
     space = await prisma.space.findUniqueOrThrow({
@@ -348,6 +365,7 @@ export async function generateUserAndSpace({
   } else {
     space = await prisma.space.create({
       data: {
+        id: spaceId,
         name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
@@ -359,12 +377,20 @@ export async function generateUserAndSpace({
         publicBountyBoard,
         updatedBy: user.id,
         updatedAt: new Date().toISOString(),
+        memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
+        features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
         spaceRoles: {
           create: {
             userId: user.id,
             isAdmin,
             // skip onboarding for normal test users
             onboarded: skipOnboarding
+          }
+        },
+        permittedGroups: {
+          create: {
+            operations: ['reviewProposals'],
+            spaceId
           }
         }
       }

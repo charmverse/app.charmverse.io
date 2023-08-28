@@ -1,7 +1,8 @@
+import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
-import { Autocomplete, Popper, TextField } from '@mui/material';
-import { createRef, useCallback, useEffect, useState } from 'react';
+import { Autocomplete, Popover, TextField } from '@mui/material';
+import { createRef, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -12,6 +13,10 @@ interface IMembersFilter {
   mode: 'include' | 'exclude';
   userIds: string[];
 }
+
+const StyledAutocomplete = styled(Autocomplete)`
+  min-width: 150px;
+` as typeof Autocomplete;
 
 function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {
@@ -33,35 +38,31 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   disableCloseOnSelect?: boolean;
   openOnFocus?: boolean;
   allowEmail?: boolean;
+  inputVariant?: 'standard' | 'outlined' | 'filled';
 }
 
 export function InputSearchMemberBase({
   filter,
   options,
-  disableCloseOnSelect,
   placeholder,
   openOnFocus = false,
+  inputVariant,
+  allowEmail,
   ...props
 }: Props) {
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
-  const PopperComponent = useCallback((popperProps: PopperProps) => {
-    return <Popper {...popperProps} sx={{ ...popperProps.sx, minWidth: 300 }} />;
-  }, []);
-
   return (
-    <Autocomplete
-      disabled={options.length === 0 && !props.allowEmail}
-      disableCloseOnSelect={disableCloseOnSelect}
+    <StyledAutocomplete
+      disabled={options.length === 0 && !allowEmail}
       loading={options.length === 0}
-      sx={{ minWidth: 150 }}
       options={filteredOptions}
       autoHighlight
       // freeSolo={props.allowEmail}
       getOptionDisabled={(option) => option.id === 'email' && !isValidEmail(option.username)}
       onInputChange={(_event, value) => {
-        if (props.allowEmail) {
+        if (allowEmail) {
           const emailOption = filteredOptions.find((opt) => opt.id === 'email');
 
           if (emailOption && !value) {
@@ -78,6 +79,7 @@ export function InputSearchMemberBase({
           }
         }
       }}
+      // PopperComponent={DropdownPopper}
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => (user as Member)?.username}
       renderOption={(_props, user) => (
@@ -89,18 +91,20 @@ export function InputSearchMemberBase({
         />
       )}
       noOptionsText='No options available'
-      PopperComponent={PopperComponent}
+      openOnFocus={openOnFocus}
       renderInput={(params) => (
+        // @ts-ignore - MUI types are wrong
         <TextField
           {...params}
-          //          ref={inputRef}
           placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
-          inputProps={{
-            ...params.inputProps
+          InputProps={{
+            ...params.InputProps,
+            disableUnderline: true
           }}
           inputRef={inputRef}
+          variant={inputVariant}
         />
       )}
       {...props}
@@ -158,6 +162,7 @@ interface IInputSearchMemberMultipleProps
   filter?: IMembersFilter;
   disableCloseOnSelect?: boolean;
   allowEmail?: boolean;
+  inputVariant?: 'standard' | 'outlined' | 'filled';
 }
 
 export function InputSearchMemberMultiple({
@@ -166,8 +171,9 @@ export function InputSearchMemberMultiple({
   defaultValue,
   ...props
 }: IInputSearchMemberMultipleProps) {
-  const { members } = useMembers();
-  const [value, setValue] = useState<Member[]>([]);
+  const { members, membersRecord } = useMembers();
+  const defaultMembers = (defaultValue || []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const [value, setValue] = useState<Member[]>(defaultMembers);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
@@ -179,12 +185,12 @@ export function InputSearchMemberMultiple({
 
   useEffect(() => {
     if (defaultValue && value.length === 0) {
-      const defaultMembers = members.filter((member) => {
-        return defaultValue.includes(member.id);
-      });
-      setValue(defaultMembers);
+      const _defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
+      if (_defaultMembers.length > 0) {
+        setValue(_defaultMembers);
+      }
     }
-  }, [defaultValue, members]);
+  }, [defaultValue, membersRecord]);
 
   return (
     <InputSearchMemberBase
@@ -194,6 +200,7 @@ export function InputSearchMemberMultiple({
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
       options={members}
     />

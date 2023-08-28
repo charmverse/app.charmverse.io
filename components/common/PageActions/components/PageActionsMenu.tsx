@@ -11,6 +11,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 
+import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
 
@@ -89,6 +90,12 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
+      {page.type === 'proposal' && (
+        <MenuItem>
+          <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
+        </MenuItem>
+      )}
+
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
@@ -98,6 +105,7 @@ export function PageActionsMenu({
         />
       )}
       <CopyPageLinkAction path={`/${page.path}`} />
+
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>

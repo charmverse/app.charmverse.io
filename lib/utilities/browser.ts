@@ -1,7 +1,8 @@
-import { baseUrl } from 'config/constants';
+import { baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
+import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
@@ -173,14 +174,10 @@ export function setCookie({
   expiresInDays: number;
 }) {
   const expires = new Date();
-  const domain = isLocalhostAlias() ? undefined : `Domain=${getAppApexDomain()};`;
   const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
 
   expires.setDate(expires.getDate() + expiresInDays);
-
-  document.cookie = `${name}=${encodeURIComponent(
-    value
-  )}; ${domain} expires=${expires.toUTCString()}; path=/; ${secure}}`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {
@@ -247,8 +244,28 @@ export function getSubdomainPath(path: string, config?: { domain: string; custom
   return path;
 }
 
-export function getSpaceUrl(domain: string) {
+export function getSpaceUrl(config: { domain: string; customDomain?: string | null }) {
+  const { domain } = config;
   const subdomain = getValidSubdomain();
+  const customDomain = getValidCustomDomain();
+
+  if (isLocalhostAlias()) {
+    return `/${domain}`;
+  }
+
+  // we are on proper space custom domain
+  if (customDomain && config.customDomain && customDomain === config.customDomain) {
+    return '/';
+  }
+
+  // we are on custom domain but we want to redirect to a different space
+  if (customDomain) {
+    // TODO: enable subdomains
+    return getDefaultSpaceUrl({ domain });
+  }
+
+  // TODO - redirect to different custom domain
+
   if (!subdomain) return `/${domain}`;
   if (subdomain === domain) return '/';
 
@@ -270,8 +287,93 @@ export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
         ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
         : window.location.origin;
 
-    return origin + getSubdomainPath(absolutePath);
+    return origin + getSubdomainPath(absolutePath, { domain: spaceDomain || '', customDomain: getValidCustomDomain() });
   }
 
   return absolutePath;
+}
+
+export function getCustomDomainUrl(customDomain: string, path = '/') {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${customDomain}${path}`;
+  }
+
+  const protocol = isDevEnv ? 'http:' : 'https:';
+
+  return `${protocol}//${customDomain}${path}`;
+}
+
+export function getDefaultSpaceUrl({
+  domain,
+  path = '/',
+  useSubdomain = false
+}: {
+  domain: string;
+  path?: string;
+  useSubdomain?: boolean;
+}) {
+  let protocol = isDevEnv ? 'http:' : 'https:';
+  let port = '';
+  const appDomain = getAppApexDomain();
+
+  if (typeof window !== 'undefined') {
+    protocol = window.location.protocol;
+    port = window.location.port ? `:${window.location.port}` : '';
+  }
+
+  if (appDomain) {
+    return useSubdomain
+      ? `${protocol}//${domain}.${appDomain}${port}${path}`
+      : `${protocol}//app.${appDomain}${port}/${domain}${path}`;
+  }
+
+  return `/${domain}${path}`;
+}
+
+export function shouldRedirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const isSubdomainUrl = !!getValidSubdomain();
+  const appDomain = getAppApexDomain();
+
+  return isSubdomainUrl && !!appDomain;
+}
+
+export function getAppUrl() {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  if (isLocalhostAlias()) {
+    return new URL(window.location.origin);
+  }
+
+  const port = window.location.port ? `:${window.location.port}` : '';
+
+  return getAppOriginURL({ port, protocol: window.location.protocol, host: window.location.host });
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appUrl = getAppUrl();
+
+  if (appUrl) {
+    const returnUrl = window.location.href;
+
+    appUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = appUrl.toString();
+
+    return true;
+  }
+
+  return false;
+}
+
+export function getUserLocale() {
+  return typeof navigator !== 'undefined' && navigator?.languages?.length ? navigator.languages[0] : navigator.language;
 }

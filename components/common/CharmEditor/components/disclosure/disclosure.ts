@@ -18,11 +18,15 @@ function summarySpec(): RawSpecs {
       group: 'block',
       parseDOM: [{ tag: 'summary' }],
       toDOM: (): DOMOutputSpec => {
-        return ['summary'];
+        return ['summary', 0];
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        state.text(node.textContent, false);
+        state.ensureNewLine();
+        state.closeBlock(node);
+      }
     }
   };
 }
@@ -41,7 +45,11 @@ function detailsSpec(): RawSpecs {
       }
     },
     markdown: {
-      toMarkdown: () => null
+      toMarkdown: (state, node) => {
+        state.text(node.textContent, false);
+        state.ensureNewLine();
+        state.closeBlock(node);
+      }
     }
   };
 }

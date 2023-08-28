@@ -4,6 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
+import type { ProposalWithUsersAndRubric } from './interface';
+
 /**
  *
  * @param param0
@@ -23,7 +25,9 @@ export async function getProposal({
         include: {
           authors: true,
           reviewers: true,
-          category: true
+          category: true,
+          rubricAnswers: true,
+          rubricCriteria: true
         }
       },
       permissions: {
@@ -38,5 +42,7 @@ export async function getProposal({
     throw new DataNotFoundError(`Proposal with id ${proposalId} not found`);
   }
 
-  return proposalPage;
+  (proposalPage as any as PageWithProposal).proposal.page = { sourceTemplateId: proposalPage?.sourceTemplateId };
+
+  return proposalPage as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
 }

@@ -49,7 +49,7 @@
 //   getIdentityIcon: jest.fn()
 // }));
 
-// jest.mock('public/images/discord_logo.svg', () => ({
+// jest.mock('public/images/logos/discord_logo.svg', () => ({
 //   __esModule: true,
 //   default: () => null
 // }));

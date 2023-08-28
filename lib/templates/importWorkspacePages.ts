@@ -3,7 +3,8 @@ import path from 'node:path';
 
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Prisma, Page } from '@charmverse/core/prisma';
+import type { Page } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4, validate } from 'uuid';
 
@@ -358,7 +359,7 @@ export async function generateImportWorkspacePages({
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
-          spaceId: space.id,
+          spaceId: bountyPermission.spaceId ? space.id : null,
           bountyId: oldNewPageIdHashMap[node.id]
         });
       });
@@ -412,7 +413,9 @@ export async function generateImportWorkspacePages({
             ...vote,
             createdBy: space.createdBy,
             pageId: oldNewPageIdHashMap[pageVote.pageId],
-            id: extractedPoll.newPollId as string
+            id: extractedPoll.newPollId as string,
+            content: vote.content ?? Prisma.DbNull,
+            contentText: vote.contentText
           });
 
           voteOptions.forEach((voteOption) => {

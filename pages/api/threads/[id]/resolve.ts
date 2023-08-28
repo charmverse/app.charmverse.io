@@ -9,6 +9,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -51,7 +52,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
   }
 
   if (typeof req.body.resolved === 'boolean') {
-    const updated = await toggleThreadStatus({
+    const updatedThread = await toggleThreadStatus({
       id: threadId,
       status: req.body.resolved === true ? 'closed' : 'open'
     });
@@ -62,7 +63,18 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
         spaceId: thread.spaceId
       });
     }
-    return res.status(200).json(updated);
+
+    relay.broadcast(
+      {
+        type: 'threads_updated',
+        payload: {
+          pageId: thread.pageId,
+          threadId
+        }
+      },
+      thread.spaceId
+    );
+    return res.status(200).json(updatedThread);
   }
   // Empty update for now as we are only updating the resolved status
   else {

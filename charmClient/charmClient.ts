@@ -2,9 +2,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
-  PagePermissionFlags,
-  PagePermissionWithSource,
-  PermissionCompute
+  PagePermissionWithSource
 } from '@charmverse/core/permissions';
 import type {
   ApiPageKey,
@@ -18,7 +16,6 @@ import type {
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe,
   UserWallet
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors';
@@ -26,6 +23,9 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 import * as http from 'adapters/http';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -34,12 +34,10 @@ import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -48,6 +46,7 @@ import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { GnosisSafeApi } from './apis/gnosisSafeApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
@@ -56,6 +55,7 @@ import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { PublicProfileApi } from './apis/publicProfileApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
@@ -96,6 +96,8 @@ class CharmClient {
 
   profile = new ProfileApi();
 
+  publicProfile = new PublicProfileApi();
+
   proposals = new ProposalsApi();
 
   roles = new RolesApi();
@@ -118,8 +120,10 @@ class CharmClient {
 
   subscription = new SubscriptionApi();
 
+  gnosisSafe = new GnosisSafeApi();
+
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
@@ -138,10 +142,6 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
-  getUserByPath(path: string) {
-    return http.GET<PublicUser>(`/api/public/profile/${path}`);
-  }
-
   createUser({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
       address,
@@ -151,10 +151,6 @@ class CharmClient {
 
   updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
-  }
-
-  checkPublicProfilePath(path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails() {
@@ -221,44 +217,32 @@ class CharmClient {
     return http.PUT<FavoritePage[]>('/api/profile/favorites', favorites);
   }
 
-  setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
-    return http.POST('/api/profile/gnosis-safes', wallets);
-  }
-
-  getMyGnosisSafes(): Promise<UserGnosisSafe[]> {
-    return http.GET('/api/profile/gnosis-safes');
-  }
-
-  updateMyGnosisSafe(wallet: { id: string; name?: string; isHidden?: boolean }): Promise<UserGnosisSafe[]> {
-    return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
-  }
-
-  deleteMyGnosisSafe(walletId: string) {
-    return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
-  }
-
   getPublicPage(pageIdOrPath: string) {
     return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.PUT<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
@@ -416,7 +400,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
@@ -435,19 +419,16 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  computeUserPagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
-    return http.GET('/api/permissions/query', request);
-  }
-
   listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
     return http.GET('/api/permissions', { pageId });
   }
 
   createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
     return http.POST('/api/permissions', permission);
+  }
+
+  updatePermission(body: PermissionResource & { pageId: string; allowDiscovery: boolean }): Promise<any> {
+    return http.PUT('/api/permissions', body);
   }
 
   deletePermission(query: PermissionResource): Promise<boolean> {
@@ -484,6 +465,17 @@ class CharmClient {
 
   createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
     return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
+  }
+
+  testSpaceWebhook({ spaceId, webhookUrl }: { spaceId: string; webhookUrl: string }) {
+    return http.POST<{ status: number }>(`/api/spaces/${spaceId}/test-webhook`, { webhookUrl });
+  }
+
+  resizeImage(formData: FormData) {
+    return http.POST<{ url: string }>('/api/image/resize', formData, {
+      noHeaders: true,
+      skipStringifying: true
+    });
   }
 }
 

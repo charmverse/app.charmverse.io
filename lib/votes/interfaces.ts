@@ -6,7 +6,7 @@ export const DEFAULT_THRESHOLD = 50;
 
 export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as const;
 
-export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'postId' | 'pageId'> {
+export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'postId' | 'pageId' | 'description'> {
   pageId?: string | null;
   postId?: string | null;
   voteOptions: string[];
@@ -16,12 +16,12 @@ export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'pos
 export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;
 
 export interface UserVoteDTO {
-  choice: string;
+  choice: string | string[];
 }
 export interface ExtendedVote extends Vote {
   aggregatedResult: Record<string, number>;
   voteOptions: VoteOptions[];
-  userChoice: null | string;
+  userChoice: null | string[];
   totalVotes: number;
 }
 

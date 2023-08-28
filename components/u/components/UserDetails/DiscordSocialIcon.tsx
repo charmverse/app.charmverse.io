@@ -1,17 +1,21 @@
-import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, SvgIcon, Tooltip, Typography, Stack } from '@mui/material';
 import React, { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 export function DiscordSocialIcon({
   username,
   showLogo = true,
-  showUsername = false
+  showUsername = false,
+  showLabel = false,
+  direction = 'row'
 }: {
+  showLabel?: boolean;
   username: string;
   showLogo?: boolean;
   showUsername?: boolean;
+  direction?: 'row' | 'column';
 }) {
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
 
@@ -29,14 +33,19 @@ export function DiscordSocialIcon({
     >
       <Box sx={{ display: 'initial', cursor: 'pointer' }}>
         <CopyToClipboard text={username} onCopy={onDiscordUsernameCopy}>
-          <Box>
+          <Stack direction={direction} alignItems='center' spacing={0.5}>
             {showLogo && (
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
+              <SvgIcon viewBox='0 0 70 70' sx={{ color: '#5865F2', height: '22px' }}>
                 <DiscordIcon />
               </SvgIcon>
             )}
+            {showLabel && (
+              <Typography variant='body2' fontWeight='bold'>
+                Discord:
+              </Typography>
+            )}
             {showUsername && <Typography variant='body2'>{username}</Typography>}
-          </Box>
+          </Stack>
         </CopyToClipboard>
       </Box>
     </Tooltip>

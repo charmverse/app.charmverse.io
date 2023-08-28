@@ -274,13 +274,13 @@ img.ProseMirror-separator {
 
 // nested list styles
 ul li {
-  li {
+  ul li {
     list-style-type: circle;
 
-    li {
+    ul li {
       list-style-type: square;
 
-      li {
+      ul li {
         list-style-type: disc;
       }
     }
@@ -288,13 +288,13 @@ ul li {
 }
 
 ol li {
-  li {
+  ol li {
     list-style-type: lower-alpha;
 
-    li {
+    ol li {
       list-style-type: lower-roman;
 
-      li {
+      ol li {
         list-style-type: circle;
       }
     }
@@ -380,7 +380,7 @@ ol li {
 .bangle-editor ul:not(.MuiList-root) {
   list-style-type: disc;
   list-style-position: outside;
-  padding-left: 1.5rem;
+  padding-left: 24px;
 }
 
 .bangle-editor ul,
@@ -487,16 +487,17 @@ ol li {
 // handles on the side of each row
 .row-handle {
   display: initial;
-  left: 20px;
+  left: 0px;
   top: -1000px;
   position: absolute;
-  width: 30px;
+  width: 56px;
   height: 24px;
   margin-top: 5px;
-  opacity: 0;
+  // opacity: 0;
   transition: opacity 0.2s ease-in-out;
 
   .charm-drag-handle {
+    display: flex;
     cursor: grab;
     opacity: 0.5;
     transition: opacity 0.2s ease-in-out;
@@ -511,6 +512,19 @@ ol li {
   &:hover {
     .row-handle {
       opacity: 1;
+    }
+  }
+}
+
+.charm-column-row {
+  @media (max-width: 600px) {
+    flex-direction: column !important;
+
+    .charm-column {
+      flex: 1 1 auto !important;
+    }
+    .charm-column-resizer {
+      display: none;
     }
   }
 }
@@ -549,3 +563,66 @@ ol li {
   position: relative;
   top: 3px;
 }
+
+/** Begin Resizable columns **/
+
+.charm-column {
+  border-radius: 4px;
+  padding: 8px 0;
+  position: relative;
+  overflow: hidden; // this is also set by the column-resizer library
+
+  &::before {
+    content: '';
+    opacity: 0.4;
+    transition: background-color 250ms ease-in-out;
+    border-radius: 2px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    z-index: -1; // make the background appear behind children
+  }
+  &:hover::before {
+    background-color: var(--background-light);
+  }
+
+  & .bangle-nv-content p {
+    overflow-wrap: anywhere;
+  }
+}
+
+.charm-column-resizer {
+  cursor: col-resize;
+  position: relative;
+  flex: 0 0 50px; //  this is the bar width, also set by the column-resizer library
+  > div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px; // extend outside boundary to give more space to detect the cursor
+    right: -10px;
+    > div {
+      height: 100%;
+      width: 4px;
+      margin: 0 auto;
+      padding: 4px 0;
+    }
+    &:hover > div {
+      background-color: var(--input-border);
+    }
+  }
+}
+
+.read-only {
+  .charm-column > .bangle-nv-container:hover {
+    background-color: transparent;
+  }
+  .charm-column-resizer {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/** End columns **/

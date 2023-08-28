@@ -1,22 +1,24 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { communityProduct, defaultFreeTrialBlockQuota } from 'lib/subscription/constants';
+import { createProSubscription } from 'lib/subscription/createProSubscription';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { subscribeToAllEvents, createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
@@ -25,6 +27,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
+import { countSpaceBlocksAndSave } from './countSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
@@ -57,10 +60,9 @@ export async function createWorkspace({
   webhookUrl,
   userId,
   spaceTemplate = 'default',
-  extraAdmins = [],
-  skipTracking
+  extraAdmins = []
 }: CreateSpaceProps) {
-  let domain = spaceData.domain;
+  let domain = spaceData.domain?.toLowerCase();
 
   if (!domain) {
     domain = await getAvailableDomainName(spaceData.name);
@@ -96,6 +98,9 @@ export async function createWorkspace({
       webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
+      blockQuota: defaultFreeTrialBlockQuota,
+      memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
+      features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -233,17 +238,33 @@ export async function createWorkspace({
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
+  try {
+    await createProSubscription({
+      //    billingEmail: undefined as any,
+      period: 'monthly',
+      spaceId: space.id,
+      name: spaceData.name,
+      freeTrial: true,
+      blockQuota: defaultFreeTrialBlockQuota
+    });
+  } catch (err) {
+    log.error('Error creating pro subscription', {
+      error: err,
+      spaceId: space.id,
+      productId: communityProduct.id,
+      period: 'monthly'
+    });
+  }
+
   // Add default subscriptions
   if (webhookUrl) {
     await subscribeToAllEvents({ spaceId: space.id, userId });
   }
 
-  if (!skipTracking) {
-    logSpaceCreation(space);
-    updateTrackGroupProfile(space);
-    updateTrackUserProfileById(userId);
-    trackUserAction('create_new_workspace', { userId, spaceId: space.id, template: spaceTemplate });
-  }
+  // Generate the first count
+  await countSpaceBlocksAndSave({ spaceId: space.id });
+
+  logSpaceCreation(space);
 
   return updatedSpace;
 }

@@ -1,7 +1,7 @@
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
@@ -18,12 +18,18 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentForm({
+  showPublishToLens,
   handleCreateComment,
   initialValue,
   inlineCharmEditor,
   disabled,
-  placeholder
+  placeholder,
+  setPublishToLens,
+  publishToLens
 }: {
+  publishToLens?: boolean;
+  setPublishToLens?: (publishToLens: boolean) => void;
+  showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
@@ -88,16 +94,19 @@ export function CommentForm({
         <UserDisplay user={user} hideName={true} />
         {editor}
       </Box>
-      <Button
-        data-test='post-comment-button'
-        sx={{
-          alignSelf: 'flex-end'
-        }}
-        disabled={!postContent.rawText || disabled}
-        onClick={createPostComment}
-      >
-        Comment
-      </Button>
+      <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
+        {showPublishToLens && (
+          <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Typography variant='caption' color='text.secondary'>
+              Publish to Lens
+            </Typography>
+            <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
+          </Stack>
+        )}
+        <Button data-test='post-comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
+          Comment
+        </Button>
+      </Stack>
     </Stack>
   );
 }

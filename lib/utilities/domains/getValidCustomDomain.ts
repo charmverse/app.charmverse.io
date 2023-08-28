@@ -2,6 +2,10 @@ import { getValidDefaultHost } from 'lib/utilities/domains/getValidDefaultHost';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
 export function getValidCustomDomain(host?: string | null) {
+  if (process.env.DISABLE_SUBDOMAINS === 'true') {
+    return null;
+  }
+
   if (!host && typeof window !== 'undefined') {
     // On client side, get the host from window
     host = window.location.host;
@@ -11,14 +15,19 @@ export function getValidCustomDomain(host?: string | null) {
     return null;
   }
 
-  const defaultHost = getValidDefaultHost(host);
+  const hostname = host?.split(':')[0];
+
+  if (hostname && !/[a-z]/i.test(hostname)) {
+    // hostname is an IP address - case not supported
+    return null;
+  }
+
+  const defaultHost = getValidDefaultHost(hostname);
 
   if (defaultHost) {
     // app runs on default domain so space does not use custom domain
     return null;
   }
 
-  const customDomain = host?.split(':')[0];
-
-  return customDomain || null;
+  return hostname || null;
 }

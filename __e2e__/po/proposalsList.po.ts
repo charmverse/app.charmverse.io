@@ -1,16 +1,25 @@
-import type { Locator } from '@playwright/test';
+import type { Page, Locator } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
 import { GlobalPage } from './global.po';
 
 export class ProposalsListPage extends GlobalPage {
-  async goToProposals(domain: string) {
-    await this.page.goto(`${baseUrl}/${domain}/proposals`);
+  constructor(
+    page: Page,
+    public emptyState = page.locator('data-test=empty-state'),
+    public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
+    public createProposalButton = page.locator('data-test=new-proposal-button')
+  ) {
+    super(page);
   }
 
-  async waitForProposalsList(domain: string) {
-    await this.page.waitForURL(`${baseUrl}/${domain}/proposals`);
+  goToProposals(domain: string) {
+    return this.page.goto(`${baseUrl}/${domain}/proposals`);
+  }
+
+  waitForProposalsList() {
+    return this.page.waitForURL(/\/proposals$/);
   }
 
   getProposalRowLocator(proposalId: string): Locator {
@@ -19,5 +28,17 @@ export class ProposalsListPage extends GlobalPage {
 
   getProposalRowOpenLocator(proposalId: string): Locator {
     return this.page.locator(`data-test=open-proposal-${proposalId}`);
+  }
+
+  getProposalCategoryLocator(categoryId: string) {
+    return this.page.locator(`data-test=proposal-category-${categoryId}`);
+  }
+
+  getProposalCategoryListButtonLocator() {
+    return this.page.locator('data-test=proposal-view-options-desktop').locator(`data-test=proposal-category-list`);
+  }
+
+  getTemplateOptionLocator(pageId: string) {
+    return this.page.locator(`data-test=select-option-${pageId}`);
   }
 }

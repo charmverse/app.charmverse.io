@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
@@ -66,7 +65,7 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
 
   sortedVotes.forEach((vote) => {
     const voteStatus = calculateVoteStatus(vote);
-    const userVotes = vote.userVotes;
+    const userVotes = vote.userVotes.filter((uv) => !!uv.choice || uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
       userVotes,

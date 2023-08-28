@@ -15,12 +15,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../../components/properties/TextInput';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -43,6 +43,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
+  readOnlyTitle?: boolean;
 };
 
 export const columnWidth = (
@@ -71,7 +72,7 @@ function TableRow(props: Props) {
     pageUpdatedBy,
     saveTitle
   } = props;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -132,12 +133,13 @@ function TableRow(props: Props) {
     onChange: (newTitle: string) => setTitle(newTitle),
     onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
     onCancel: () => setTitle(card.title || ''),
-    readOnly: props.readOnly,
+    readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
 
   return (
     <div
+      data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}
@@ -181,6 +183,9 @@ function TableRow(props: Props) {
             </Box>
           );
         }
+
+        const columnRef = columnRefs.get(template.id);
+
         return (
           <div
             className='octo-table-cell'
@@ -189,7 +194,7 @@ function TableRow(props: Props) {
               alignItems: 'flex-start',
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
             }}
-            ref={columnRefs.get(template.id)}
+            ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             {!props.readOnly && templateIndex === 0 && (
@@ -199,6 +204,7 @@ function TableRow(props: Props) {
             )}
             <PropertyValueElement
               readOnly={props.readOnly}
+              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               board={board}
               showEmptyPlaceholder={false}
@@ -206,6 +212,7 @@ function TableRow(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               displayType='table'
+              columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
             />
           </div>

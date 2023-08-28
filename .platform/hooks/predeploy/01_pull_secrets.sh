@@ -30,7 +30,7 @@ if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
     # Now start processing secrets
     secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
     # looping through secrets requested in .env file
-    grep "pull:secretsmanager" $ebstalk_env_file | while read -r line; do
+    grep "pull:secretsmanager" $ebstalk_env_file | sort | while read -r line; do
         [[ $line =~ $secrets_pattern ]] && { 
             export env_var_name=${BASH_REMATCH[1]}
             secret_name=${BASH_REMATCH[2]}

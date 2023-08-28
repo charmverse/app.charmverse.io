@@ -23,7 +23,7 @@ export class VotesApi {
     return http.DELETE(`/api/votes/${voteId}`);
   }
 
-  castVote(voteId: string, choice: string) {
+  castVote(voteId: string, choice: string | string[]) {
     return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
       choice
     });

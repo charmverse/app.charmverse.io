@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useBounties } from 'hooks/useBounties';
 import { useMembers } from 'hooks/useMembers';
@@ -27,6 +27,7 @@ import { fontClassName } from 'theme/fonts';
 import { exportMarkdown } from '../utils/exportMarkdown';
 
 import { AddToFavoritesAction } from './AddToFavoritesAction';
+import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { BountyActions } from './BountyActions';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DocumentHistory } from './DocumentHistory';
@@ -122,9 +123,9 @@ export function DocumentPageActionList({
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const { getCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-  const proposalCategoriesWithCreateAllowed = getCategoriesWithCreatePermission();
-  const canCreateProposal = proposalCategoriesWithCreateAllowed.length > 0;
+  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+
+  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -313,8 +314,17 @@ export function DocumentPageActionList({
           <Divider />
         </>
       )}
+
       <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
-      {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
+      {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
+      {undoEditorChanges && (
+        <UndoAction
+          onClick={undoEditorChanges}
+          disabled={!pagePermissions?.edit_content}
+          // Ensure alignment of undo icon since internal structure is different
+          listItemStyle={{ mr: '-3px' }}
+        />
+      )}
       <Divider />
       <PublishToSnapshot
         pageId={pageId}

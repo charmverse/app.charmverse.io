@@ -17,6 +17,7 @@ type SelectProps = {
   options?: SelectOptionType[];
   disabled?: boolean;
   canEditOptions?: boolean;
+  noOptionsText?: string;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
@@ -48,6 +49,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       placeholder,
       className,
       forcePopupIcon = 'auto',
+      noOptionsText,
       ...inputProps
     },
     ref
@@ -105,6 +107,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     return (
       <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
         <Autocomplete
+          data-test='autocomplete'
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}
@@ -142,10 +145,16 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               // eslint-disable-next-line react/jsx-key
-              <Chip {...getTagProps({ index })} size='small' label={option.name} color={option.color} />
+              <Chip
+                {...getTagProps({ index })}
+                style={{ margin: 0 }} // margin is added when dropdown is open for some reason, making the input height increase
+                size='small'
+                label={option.name}
+                color={option.color}
+              />
             ))
           }
-          noOptionsText='No options available'
+          noOptionsText={noOptionsText || 'No options available'}
           renderInput={(params) => (
             <TextField
               inputRef={inputRef}

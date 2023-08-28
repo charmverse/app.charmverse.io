@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 
-import type { ProposalWithCommentsAndUsers, ProposalWithUsers } from './interface';
+import type { ProposalWithCommentsAndUsers } from './interface';
 
 export type ListProposalsRequest = {
   spaceId: string;

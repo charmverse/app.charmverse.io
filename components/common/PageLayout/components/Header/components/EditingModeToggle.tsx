@@ -4,7 +4,7 @@ import { IconButton, useMediaQuery, ListItemIcon, ListItemText, Menu, MenuItem, 
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { memo } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCharmEditor, EDIT_MODE_CONFIG } from 'hooks/useCharmEditor';
 import type { EditMode } from 'hooks/useCharmEditor';
 

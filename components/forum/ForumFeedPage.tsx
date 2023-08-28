@@ -30,7 +30,7 @@ import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
   const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();
@@ -117,7 +117,7 @@ export function ForumPage() {
     }
   }
   useEffect(() => {
-    if (typeof router.query.postId === 'string') {
+    if (router.isReady && typeof router.query.postId === 'string') {
       showPost({
         postId: router.query.postId,
         onClose() {
@@ -125,7 +125,7 @@ export function ForumPage() {
         }
       });
     }
-  }, [router.query.postId]);
+  }, [router.isReady, router.query.postId]);
 
   useEffect(() => {
     if (currentSpace) {

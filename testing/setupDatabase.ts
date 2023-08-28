@@ -10,8 +10,8 @@ import type {
   Page,
   Post,
   PostComment,
-  Prisma,
   ProposalStatus,
+  ProposalEvaluationType,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -21,18 +21,22 @@ import type {
   Vote,
   WorkspaceEvent
 } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { DataSourceType } from 'lib/focalboard/board';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -43,8 +47,6 @@ import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generateBoardStub';
-
-type PageWithProposal = Page & { proposal: ProposalWithUsers };
 
 export async function generateSpaceUser({
   spaceId,
@@ -231,9 +233,9 @@ export async function generateBounty({
   contentText = '',
   spaceId,
   createdBy,
-  status,
+  status = 'open',
   maxSubmissions,
-  approveSubmitters,
+  approveSubmitters = false,
   title = 'Example',
   rewardToken = 'ETH',
   rewardAmount = 1,
@@ -243,8 +245,10 @@ export async function generateBounty({
   page = {},
   type = 'bounty',
   id
-}: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> &
-  Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> &
+}: Pick<Bounty, 'createdBy' | 'spaceId'> &
+  Partial<
+    Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'status' | 'approveSubmitters'>
+  > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
@@ -673,7 +677,9 @@ export async function createVote({
   status = 'InProgress',
   title = 'Vote Title',
   context = 'inline',
-  description = null
+  content,
+  contentText = null,
+  maxChoices = 1
 }: Partial<Vote> &
   Pick<Vote, 'spaceId' | 'createdBy'> & {
     pageId?: string | null;
@@ -728,7 +734,9 @@ export async function createVote({
         }
       },
       type: 'Approval',
-      description
+      content: content ?? Prisma.DbNull,
+      contentText,
+      maxChoices
     },
     include: {
       voteOptions: true
@@ -821,7 +829,9 @@ export async function createProposalWithUsers({
         include: {
           authors: true,
           reviewers: true,
-          category: true
+          category: true,
+          rubricAnswers: true,
+          rubricCriteria: true
         }
       }
     }
@@ -932,7 +942,9 @@ export async function generateProposal({
   categoryId,
   userId,
   spaceId,
+  pageType = 'proposal',
   proposalStatus,
+  evaluationType,
   authors,
   reviewers,
   deletedAt = null,
@@ -944,7 +956,9 @@ export async function generateProposal({
   spaceId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
+  pageType?: PageType;
   proposalStatus: ProposalStatus;
+  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
@@ -975,7 +989,7 @@ export async function generateProposal({
       },
       path: `path-${v4()}`,
       title,
-      type: 'proposal',
+      type: pageType,
       author: {
         connect: {
           id: userId
@@ -993,6 +1007,7 @@ export async function generateProposal({
           category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
+          evaluationType,
           status: proposalStatus,
           space: {
             connect: {
@@ -1050,14 +1065,31 @@ export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
-  cardCount
+  cardCount,
+  views,
+  addPageContent,
+  viewDataSource,
+  boardPageType
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  views?: number;
+  viewDataSource?: DataSourceType;
+  addPageContent?: boolean;
+  boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
-  const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
+  const { pageArgs, blockArgs } = boardWithCardsArgs({
+    createdBy,
+    spaceId,
+    parentId,
+    cardCount,
+    views,
+    addPageContent,
+    viewDataSource,
+    boardPageType
+  });
 
   const pagePermissions = pageArgs.map((createArg) => ({
     pageId: createArg.data.id as string,

@@ -1,4 +1,4 @@
-import type { PageMeta, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
+import type { PageMeta, PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
@@ -17,6 +17,7 @@ import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { NewPageInput, PagesMap } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
@@ -25,7 +26,7 @@ import { isTruthy } from 'lib/utilities/types';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
-function mapPageToMenuNode(page: PageWithPermissions): MenuNode {
+function mapPageToMenuNode(page: PageMeta): MenuNode {
   return {
     id: page.id,
     title: page.title,
@@ -43,7 +44,7 @@ function mapPageToMenuNode(page: PageWithPermissions): MenuNode {
 
 export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
   return Object.values(pageMap)
-    .filter((page): page is PageWithPermissions =>
+    .filter((page): page is PageMeta =>
       isTruthy(
         page &&
           (page.type === 'board' ||
@@ -72,7 +73,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const { pages, setPages, mutatePage } = usePages();
 
   const currentPage = usePageFromPath();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space?.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
@@ -80,7 +81,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const pagesArray: MenuNode[] = isFavorites
     ? Object.values(pages)
-        .filter((page): page is PageWithPermissions => isTruthy(page))
+        .filter((page): page is PageMeta => isTruthy(page))
         .map(mapPageToMenuNode)
     : filterVisiblePages(pages);
 
@@ -120,6 +121,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         reorderFavorites({ reorderId: droppedItem.id, nextSiblingId: containerItem.id });
         return;
       }
+
       const parentId = containerItem.parentId;
 
       setPages((_pages) => {
@@ -127,7 +129,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           .filter(isTruthy)
           .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
         const siblings = pageTree.sortNodes(unsortedSiblings);
-
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {
           throw new Error('cannot find dropped page');
@@ -137,11 +138,12 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         siblings.splice(originIndex, 0, droppedPage);
         siblings.forEach((page, _index) => {
           page.index = _index;
-          page.parentId = parentId;
+          page.parentId = parentId ?? null;
           charmClient.pages.updatePage({
             id: page.id,
             index: _index,
-            parentId
+            // If there is no parentId, the page was dropped at the root level
+            parentId: parentId ?? null
           });
         });
         siblings.forEach((page) => {
@@ -154,6 +156,19 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             };
           }
         });
+
+        // dropped on root level, so remove child page reference in parent's content
+        if (droppedItem.parentId !== containerItem.parentId) {
+          emitSocketMessage({
+            type: 'page_reordered',
+            payload: {
+              pageId: droppedItem.id,
+              currentParentId: droppedItem.parentId,
+              newParentId: containerItem.parentId,
+              newIndex: droppedItem.index
+            }
+          });
+        }
 
         return { ..._pages };
       });
@@ -190,6 +205,18 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       const parentId = (containerItem as MenuNode)?.id ?? null;
 
       mutatePage({ id: droppedItem.id, parentId });
+
+      if (parentId) {
+        emitSocketMessage({
+          type: 'page_reordered',
+          payload: {
+            pageId: droppedItem.id,
+            currentParentId: droppedItem.parentId,
+            newParentId: containerItem.id,
+            newIndex: droppedItem.index
+          }
+        });
+      }
 
       charmClient.pages
         .updatePage({

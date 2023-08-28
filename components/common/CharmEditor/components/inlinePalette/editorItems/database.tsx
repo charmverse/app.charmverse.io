@@ -40,22 +40,28 @@ export function items({
             if (view) {
               rafCommandExec(view, (_state, _dispatch) => {
                 // The page must be created before the node can be created
-                addPage({
-                  type: 'inline_linked_board',
-                  parentId: currentPageId,
-                  spaceId: space.id,
-                  createdBy: userId
-                }).then(({ page }) => {
-                  const node = _state.schema.nodes.inlineDatabase.create({
-                    pageId: page.id
-                  });
+                addPage(
+                  {
+                    type: 'inline_linked_board',
+                    parentId: currentPageId,
+                    spaceId: space.id,
+                    createdBy: userId
+                  },
+                  {
+                    trigger: 'editor',
+                    cb: ({ page }) => {
+                      const node = _state.schema.nodes.inlineDatabase.create({
+                        pageId: page.id
+                      });
 
-                  if (_dispatch && isAtBeginningOfLine(state)) {
-                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
-                    return true;
+                      if (_dispatch && isAtBeginningOfLine(state)) {
+                        _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
+                        return true;
+                      }
+                      return insertNode(_state, _dispatch, node);
+                    }
                   }
-                  return insertNode(_state, _dispatch, node);
-                });
+                );
                 return true;
               });
             }
@@ -95,22 +101,28 @@ export function items({
         // Execute the animation
         if (view) {
           rafCommandExec(view, (_state, _dispatch) => {
-            addPage({
-              type: 'inline_linked_board',
-              parentId: currentPageId,
-              spaceId: space.id,
-              createdBy: userId
-            }).then(({ page }) => {
-              const node = _state.schema.nodes.inlineDatabase.create({
-                pageId: page.id
-              });
+            addPage(
+              {
+                type: 'inline_linked_board',
+                parentId: currentPageId,
+                spaceId: space.id,
+                createdBy: userId
+              },
+              {
+                trigger: 'editor',
+                cb: ({ page }) => {
+                  const node = _state.schema.nodes.inlineDatabase.create({
+                    pageId: page.id
+                  });
 
-              if (_dispatch && isAtBeginningOfLine(state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
-                return true;
+                  if (_dispatch && isAtBeginningOfLine(state)) {
+                    _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
+                    return true;
+                  }
+                  return insertNode(_state, _dispatch, node);
+                }
               }
-              return insertNode(_state, _dispatch, node);
-            });
+            );
             return true;
           });
         }

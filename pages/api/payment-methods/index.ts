@@ -7,6 +7,7 @@ import nc from 'next-connect';
 import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { isUniqueConstraintError } from 'lib/utilities/errors/prisma';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -80,8 +81,7 @@ async function createPaymentMethod(req: NextApiRequest, res: NextApiResponse<Pay
 
     return res.status(200).json(paymentMethod);
   } catch (err) {
-    // P2002 is thrown by prisma when a duplicate write fails
-    if ((err as any).code === 'P2002') {
+    if (isUniqueConstraintError(err)) {
       throw new InvalidInputError('A payment method with this contract address and chain ID already exists.');
     }
     throw err;

@@ -1,42 +1,57 @@
+import { log } from '@charmverse/core/log';
+import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
+import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
+import { usePage } from 'hooks/usePage';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { PageWithContent } from 'lib/pages';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
-import type { ProposalFormInputs } from '../interfaces';
-
-import { ProposalPage } from './ProposalPage';
+import type { ProposalPageAndPropertiesInput } from './hooks/useProposalDialog';
+import { NewProposalPage } from './NewProposalPage';
 
 interface Props {
-  isLoading: boolean;
+  pageId?: string;
+  newProposal?: Partial<ProposalPageAndPropertiesInput>;
   onClose: () => void;
-  page?: PageWithContent | null;
 }
 
-export function ProposalDialog({ page, isLoading, onClose }: Props) {
+export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   const mounted = useRef(false);
   const router = useRouter();
+  const { updatePage } = usePages();
   const { user } = useUser();
-  const [formInputs, setFormInputs] = useState<ProposalFormInputs>({
-    title: '',
-    content: null,
-    contentText: '',
-    categoryId: null,
-    authors: user ? [user.id] : [],
-    reviewers: [],
-    proposalTemplateId: null
-  });
+  const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
+  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
+    emptyState({ ...newProposal, userId: user?.id })
+  );
+
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  const isLoading = !!pageId && isPageLoading;
+  const readOnly = page?.permissionFlags.edit_content === false;
+
+  const savePage = useCallback(
+    debouncePromise(async (updates: Partial<Page>) => {
+      if (!page || !mounted.current) {
+        return;
+      }
+      updatePage({ id: page.id, ...updates }).catch((err: any) => {
+        log.error('Error saving page', err);
+      });
+    }, 500),
+    [page]
+  );
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -46,17 +61,16 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    setFormInputs((prevState) => ({
+      ...prevState,
+      publishToLens: !!user?.publishToLensDefault
+    }));
+  }, [user?.id]);
+
   function close() {
     onClose();
-    setFormInputs({
-      title: '',
-      content: null,
-      contentText: '',
-      categoryId: null,
-      authors: [],
-      reviewers: [],
-      proposalTemplateId: null
-    });
+    setFormInputs(emptyState());
     setContentUpdated(false);
     setShowConfirmDialog(false);
   }
@@ -73,7 +87,7 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         }
       }}
       toolbar={
-        page ? (
+        pageId ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
               data-test='open-as-page'
@@ -91,9 +105,9 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         )
       }
       toolsMenu={
-        page ? (
+        pageId ? (
           <Stack flexDirection='row' gap={1}>
-            <FullPageActionsMenuButton page={page} onDelete={close} />
+            <FullPageActionsMenuButton pageId={pageId} onDelete={close} />
           </Stack>
         ) : null
       }
@@ -101,13 +115,14 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
       {isLoading ? (
         <LoadingComponent isLoading />
       ) : page ? (
-        <EditorPage pageId={page.id} />
+        // Document page is used in a few places, so it is responsible for retrieving its own permissions
+        <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
       ) : (
-        <ProposalPage
+        <NewProposalPage
           formInputs={formInputs}
           setFormInputs={(_formInputs) => {
             setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+            setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
           }}
           contentUpdated={contentUpdated}
           setContentUpdated={setContentUpdated}
@@ -120,10 +135,31 @@ export function ProposalDialog({ page, isLoading, onClose }: Props) {
         title='Unsaved changes'
         open={showConfirmDialog}
         buttonText='Discard'
-        secondaryButtonText='Go back'
+        secondaryButtonText='Cancel'
         question='Are you sure you want to close this proposal? You have unsaved changes'
         onConfirm={close}
       />
     </Dialog>
   );
+}
+
+function emptyState({
+  userId,
+  ...inputs
+}: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
+  return {
+    categoryId: null,
+    content: null,
+    contentText: '',
+    headerImage: null,
+    icon: null,
+    evaluationType: 'vote',
+    proposalTemplateId: null,
+    reviewers: [],
+    rubricCriteria: [],
+    title: '',
+    publishToLens: false,
+    ...inputs,
+    authors: userId ? [userId] : []
+  };
 }

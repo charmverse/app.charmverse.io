@@ -1,4 +1,4 @@
-import type { AuthSig } from 'lit-js-sdk';
+import type { AuthSig } from '@lit-protocol/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

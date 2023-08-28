@@ -18,7 +18,7 @@ export interface FailedImportsError {
   pageId: string;
   type: 'page' | 'database';
   title: string;
-  blocks: [string, number][][];
+  blocks: [string, string][];
 }
 
 export type CreatePageInput = {

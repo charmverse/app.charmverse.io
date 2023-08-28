@@ -2,7 +2,7 @@ import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
-import type { Plugin, PluginKey } from '@bangle.dev/pm';
+import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -17,6 +18,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -48,6 +50,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
   initialContent?: any;
   enableComments?: boolean;
+  onConnectionError?: (error: Error) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -69,7 +72,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     trackChanges = false,
     onParticipantUpdate = () => {},
     readOnly = false,
-    enableComments = true
+    enableComments = true,
+    onConnectionError
   },
   ref
 ) {
@@ -78,7 +82,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
-  const [isLoading, setIsLoading] = useState(enableFidusEditor);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
@@ -99,7 +102,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
-
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');
   }
@@ -115,11 +117,18 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(_editor: CoreBangleEditor, error: Error) {
-    showMessage(error.message, 'warning');
-    log.error('[ws/ceditor]: Error message displayed to user', { error });
-    if (isLoading) {
-      setIsLoading(false);
+  function _onError(_editor: CoreBangleEditor, error: Error) {
+    if (onConnectionError) {
+      onConnectionError(error);
+    } else {
+      // for now, just use a standard error message to be over-cautious
+      showMessage(error.message, 'warning');
+    }
+    log.error('[ws/ceditor]: Error message displayed to user', {
+      pageId,
+      error
+    });
+    if (isLoadingRef.current) {
       isLoadingRef.current = false;
       setEditorContent(_editor, initialContent);
     }
@@ -166,7 +175,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
 
     if (isContentControlled) {
-      setIsLoading(false);
+      isLoadingRef.current = false;
     } else if (useSockets) {
       if (authResponse) {
         log.info('Init FidusEditor');
@@ -175,20 +184,20 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           docId: pageId,
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
-            setIsLoading(false);
             isLoadingRef.current = false;
+          },
+          onCommentUpdate: () => {
+            mutate(getThreadsKey(pageId));
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, (error) => onError(_editor, error));
+        fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
-        setIsLoading(false);
         isLoadingRef.current = false;
         setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
-      setIsLoading(false);
       isLoadingRef.current = false;
       setEditorContent(_editor, initialContent);
     }
@@ -208,6 +217,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
+
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}
@@ -215,10 +225,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className='bangle-editor-core'
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '200px' : undefined, cursor: readOnly ? 'default' : 'text' }}
-        onClick={() => !readOnly && editor?.view.focus()}
+        style={{
+          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
+          cursor: readOnly ? 'default' : 'text'
+        }}
+        // onClick={() => !readOnly && editor?.view.focus()}
       >
-        <StyledLoadingComponent isLoading={showLoader && isLoading} />
+        <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
       </div>
       {nodeViews.map((nodeView) => {

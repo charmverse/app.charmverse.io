@@ -58,5 +58,5 @@ function getSessionFromSocket(socket: Socket) {
   const req = new IncomingMessage();
   req.headers = socket.handshake.headers;
   const res = new ServerResponse(req);
-  return getIronSession(req, res, getIronOptions(req));
+  return getIronSession(req, res, getIronOptions());
 }

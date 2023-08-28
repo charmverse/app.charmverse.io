@@ -67,13 +67,15 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choice: '',
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choice).toBe('');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 
@@ -96,7 +98,7 @@ describe('POST /api/v1/proposals/vote', () => {
         .send({
           proposalId: proposal.id,
           userId: user.id,
-          choice: '1'
+          choice: ['1']
         })
         .expect(200)
     ).body as PublicApiProposal[];
@@ -105,13 +107,15 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choice: '',
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choice).toBe('');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 
@@ -129,7 +133,8 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: proposal.id,
         userId: user.id,
-        choice: '1'
+        choice: '',
+        choices: ['1']
       })
       .expect(401);
   });
@@ -149,7 +154,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: v4(),
         userId: user.id,
-        choice: '1'
+        choice: ['1']
       })
       .expect(404);
 

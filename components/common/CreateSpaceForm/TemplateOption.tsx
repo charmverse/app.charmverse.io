@@ -1,8 +1,9 @@
+import styled from '@emotion/styled';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 
 type TemplateOptionProps = {
   icon?: ReactNode;
@@ -11,13 +12,21 @@ type TemplateOptionProps = {
   'data-test'?: string;
 };
 
+const StyledButton = styled(Button)`
+  justify-content: space-between;
+  svg {
+    height: 48px;
+    width: 48px;
+  }
+`;
+
 export function TemplateOption({ icon, label, ...props }: TemplateOptionProps) {
   return (
-    <Button
+    <StyledButton
       {...props}
       color='secondary'
       variant='outlined'
-      sx={{ justifyContent: 'space-between', py: 2 }}
+      sx={{ py: 1 }}
       fullWidth
       endIcon={<KeyboardArrowRight />}
       size='large'
@@ -28,6 +37,6 @@ export function TemplateOption({ icon, label, ...props }: TemplateOptionProps) {
           {label}
         </Typography>
       </Box>
-    </Button>
+    </StyledButton>
   );
 }

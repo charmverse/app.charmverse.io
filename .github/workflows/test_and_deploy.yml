@@ -8,6 +8,11 @@ on:
     branches: [main]
   pull_request:
     branches: ['**']
+  workflow_dispatch:
+    inputs:
+      core_pkg_version:
+        description: 'Core pkg version to update to'
+        required: true
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
@@ -16,29 +21,32 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
+      - name: Print Triggering event context payload
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
+        run: |
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
-
-      - name: Debug
-        shell: bash
-        run: echo -e "Debug" && pwd && ls -a
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-
-      # We might even delete this step since CI seems to work without it
-      - name: Provision API key
-        run: eval `ssh-agent -s` && ssh-add - <<< '${{ secrets.PERMISSIONS_API_SSH_KEY }}';
-
-      - name: Build and install API
-        uses: ./.github/actions/build_permissions_api
-        with:
-          GITHUB_SSH_KEY: ${{ secrets.PERMISSIONS_API_SSH_KEY }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
@@ -56,11 +64,14 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -86,7 +97,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 5
+      max-parallel: 7
       fail-fast: false
       matrix:
         include:
@@ -109,6 +120,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -123,7 +136,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      - name: Run permissions api docker image 
+      - name: Run permissions api docker image
         id: run_permissions_api
         run: |
           docker inspect postgres
@@ -135,6 +148,7 @@ jobs:
                      -p "3001:3001"     \
                      -e HOST=0.0.0.0    \
                      -e PORT=3001       \
+                     -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
                      --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
@@ -142,16 +156,17 @@ jobs:
 
           until curl localhost:3001/api/health; do
             docker ps
-            docker logs permissions-api 
+            docker logs permissions-api
             docker inspect permissions-api
             echo "permission api not up...sleeping"
             sleep 10
-          done 
+          done
 
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -159,6 +174,8 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
@@ -169,6 +186,15 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+          commit_core_pkg_upgrade: true
+
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Build app
         uses: ./.github/actions/build
@@ -190,8 +216,11 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
       - name: Build and Push Docker image
+        id: docker_build_push
         uses: ./.github/actions/build_docker_image
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -218,8 +247,14 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Package Webapp
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+      - name: Package Webapp and upload web assets to s3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Update and Package background worker
         run: |
@@ -231,7 +266,7 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-      - name: Deploy to Beanstalk
+      - name: Deploy webapp to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -243,6 +278,16 @@ jobs:
           deployment_package: deploy.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
+            --service=webapp                              \
+            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21

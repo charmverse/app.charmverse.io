@@ -524,7 +524,7 @@ async function getBoardPersonPropertyMentions({
     const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
     const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
     const space = spaceRecord[card.spaceId];
-    if (space && card.page && personPropertyValue.includes(userId) && userId !== card.user.id) {
+    if (space && card.page && (personPropertyValue as string[]).includes(userId) && userId !== card.user.id) {
       discussionUserIds.push(personPropertyId);
       // Need to push author of card to fetch information
       discussionUserIds.push(card.user.id);
@@ -636,7 +636,7 @@ export type ProposalDiscussionNotificationsContext = {
   proposals: ProposalWithCommentsAndUsers[];
 };
 
-export async function getProposalDiscussionTasks({
+async function getProposalDiscussionTasks({
   spaceIds,
   userId,
   spaceRecord,

@@ -8,8 +8,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
-import Button from 'components/common/Button';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { Button } from 'components/common/Button';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BountyWithDetails } from 'lib/bounties';
 
@@ -28,9 +28,9 @@ export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refre
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: editableCheck } = useSWR(!isPublicSpace ? `bounty-editable-${bounty.id}` : null, () =>
+  const { data: editableCheck } = useSWR(!isFreeSpace ? `bounty-editable-${bounty.id}` : null, () =>
     charmClient.bounties.isBountyEditable(bounty.id)
   );
   function restrictPermissions() {
@@ -71,7 +71,7 @@ export function BountyPropertiesHeader({ readOnly = false, bounty, pageId, refre
       </Grid>
 
       {/* Warning for applicants */}
-      {!!editableCheck?.editable && !isPublicSpace && !readOnly && (
+      {!!editableCheck?.editable && !isFreeSpace && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}

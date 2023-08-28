@@ -561,7 +561,7 @@ class Mutator {
   changePropertyValue(
     card: Card,
     propertyId: string,
-    value?: string | string[],
+    value?: string | string[] | number,
     description = 'change property',
     mutate = true
   ) {
@@ -631,7 +631,8 @@ class Mutator {
 
         for (const card of cards) {
           const oldValue = Array.isArray(card.fields.properties[propertyTemplate.id])
-            ? card.fields.properties[propertyTemplate.id].length > 0 && card.fields.properties[propertyTemplate.id][0]
+            ? (card.fields.properties[propertyTemplate.id] as string[]).length > 0 &&
+              (card.fields.properties[propertyTemplate.id] as string[])[0]
             : card.fields.properties[propertyTemplate.id];
           if (oldValue) {
             const newValue = isNewTypeSelectOrMulti

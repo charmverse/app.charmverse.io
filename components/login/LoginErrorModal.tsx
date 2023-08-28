@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import { charmverseDiscordInvite } from 'config/constants';

@@ -13,12 +13,13 @@ import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
@@ -197,7 +198,7 @@ interface PageLinkProps {
   children?: ReactNode;
   href: string;
   label?: string;
-  labelIcon?: React.ReactNode;
+  labelIcon?: ReactNode;
   isEmptyContent?: boolean;
   pageType: Page['type'];
   pageId?: string;
@@ -217,9 +218,14 @@ export function PageLink({
   onClick
 }: PageLinkProps) {
   const popupState = usePopupState({
-    popupId: 'page-emoji',
+    popupId: `page-emoji-${pageId}`,
     variant: 'popover'
   });
+
+  const [iconClicked, setIconClicked] = useState(false);
+  const { data: permissions } = useSWRImmutable(iconClicked && pageId ? `check-page-permissions-${pageId}` : null, () =>
+    charmClient.permissions.pages.computePagePermissions({ pageIdOrPath: pageId as string })
+  );
 
   const isempty = !label;
 
@@ -231,8 +237,12 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
-
   const triggerState = bindTrigger(popupState);
+
+  function handleIconClicked(ev: any) {
+    triggerState.onClick(ev);
+    setIconClicked(ev);
+  }
 
   return (
     <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
@@ -242,14 +252,17 @@ export function PageLink({
           isEditorEmpty={isEmptyContent}
           icon={labelIcon}
           {...triggerState}
-          onClick={showPicker ? triggerState.onClick : undefined}
+          onClick={showPicker ? handleIconClicked : undefined}
         />
       </span>
       <PageTitle hasContent={isempty} onClick={onClick}>
         {isempty ? 'Untitled' : label}
       </PageTitle>
       {children}
-      {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
+      {/* check for strict false so that we optimistically show the popup in the normal case */}
+      {showPicker && pageId && permissions?.edit_content !== false && (
+        <EmojiMenu popupState={popupState} pageId={pageId} />
+      )}
     </PageAnchor>
   );
 }
@@ -270,7 +283,7 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
         e.stopPropagation();
       }}
     >
-      <EmojiPicker onSelect={onSelectEmoji} />
+      <CustomEmojiPicker onUpdate={onSelectEmoji} />
     </Menu>
   );
 }
@@ -389,11 +402,11 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const router = useRouter();
   const deletePageDisabled = !pagePermissions?.delete;
   const page = pages[pageId];
-
   async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
+
     const board = boards.find((b) => b.id === page?.id);
     const newPage = await deletePage({
       board,

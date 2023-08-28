@@ -3,9 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createCardsFromProposals } from 'lib/focalboard/createCardsFromProposals';
+import { updateCardsFromProposals } from 'lib/focalboard/updateCardsFromProposals';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { createCardsFromProposals } from 'lib/pages/createCardsFromProposals';
-import { updateCardsFromProposals } from 'lib/pages/updateCardsFromProposals';
 import { computePagePermissions } from 'lib/permissions/pages/computePagePermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -24,6 +24,11 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
   const boardPage = await prisma.page.findUnique({
     where: {
       id: pageId
+    },
+    select: {
+      id: true,
+      boardId: true,
+      spaceId: true
     }
   });
 
@@ -52,6 +57,11 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
   const boardPage = await prisma.page.findUnique({
     where: {
       id: pageId
+    },
+    select: {
+      id: true,
+      boardId: true,
+      spaceId: true
     }
   });
 

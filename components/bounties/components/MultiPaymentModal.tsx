@@ -17,15 +17,16 @@ import { getChainById } from 'connectors';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import useImportSafes from 'hooks/useImportSafes';
+import { useImportSafes } from 'hooks/useImportSafes';
 import { useMembers } from 'hooks/useMembers';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -39,6 +40,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { importSafes } = useImportSafes();
   const { onClick } = useSettingsDialog();
+  const gnosisSigner = useGnosisSigner();
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
@@ -69,10 +71,10 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const { getMemberById } = useMembers();
 
   useEffect(() => {
-    if (transactions.length) {
-      importSafes();
+    if (gnosisSigner && transactions.length) {
+      importSafes(gnosisSigner);
     }
-  }, [transactions.length]);
+  }, [!!gnosisSigner, transactions.length]);
 
   useEffect(() => {
     const applicationIds = transactions.map((trans) => trans.applicationId);

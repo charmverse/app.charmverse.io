@@ -12,33 +12,38 @@ import { DatabasePageActionList } from 'components/common/PageActions/components
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { ForumPostActionList } from 'components/common/PageActions/components/ForumPostActionList';
+import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 type Props = {
+  pageId?: string;
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
   insideModal?: boolean;
   onDelete?: VoidFunction;
 };
 
-export function FullPageActionsMenuButton({ page, post, insideModal, onDelete }: Props) {
+export function FullPageActionsMenuButton({ pageId, page: pageProp, post, insideModal, onDelete }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
+  const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
   const pageMenuAnchor = useRef();
   const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const { permissions: pagePermissions } = usePagePermissions({
-    pageIdOrPath: page ? page.id : (null as any)
+    pageIdOrPath: pageId || (pageProp ? pageProp.id : null)
   });
   const postPermissions = usePostPermissions({
     postIdOrPath: post?.id,
     isNewPost: !post
   });
-  const currentPageOrPostId = page?.id ?? post?.id;
+  const currentPageOrPostId = pageId ?? pageProp?.id ?? post?.id;
+
+  const page = pageFromId || pageProp;
 
   const isBasePageDocument = documentTypes.includes(page?.type as PageType);
   const isBasePageDatabase = /board/.test(page?.type ?? '');

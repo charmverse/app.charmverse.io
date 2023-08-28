@@ -4,11 +4,10 @@ import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
-import { ProposalBanner } from 'components/common/Banners/ProposalBanner';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
@@ -31,9 +30,11 @@ import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
+import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
-import PageHeader from './components/PageHeader';
+import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
+import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
 export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
@@ -85,6 +86,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
+  const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
@@ -108,12 +110,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       });
     }
   }, [printRef, _printRef]);
-
-  const cannotComment = readOnly || !pagePermissions.comment;
-
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
-
-  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
   const card = useAppSelector((state) => {
     if (page.cardId) {
@@ -143,32 +139,50 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const activeView = boardViews[0];
 
-  let pageTop = 100;
-  if (page.headerImage) {
-    pageTop = 50;
-    if (page.icon) {
-      pageTop = 80;
-    }
-  } else if (page.icon) {
-    pageTop = 200;
-  }
+  const pageTop = getPageTop(page);
 
   const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
 
-  const showPageActionSidebar = currentPageActionDisplay !== null && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
+
+  const cannotComment = readOnly || !pagePermissions.comment;
+
+  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
+  const isPageTemplate = page.type.includes('template');
+  const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
+  const showPageActionSidebar =
+    currentPageActionDisplay !== null && !insideModal && (currentPageActionDisplay !== 'comments' || enableComments);
+
+  const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
+
+  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
 
+  function onConnectionError(error: Error) {
+    setConnectionError(error);
+  }
+
+  // reset error whenever page id changes
+  useEffect(() => {
+    setConnectionError(null);
+  }, [page.id]);
+
   return (
     <>
       {!!page?.deletedAt && (
         <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
-          <PageDeleteBanner pageId={page.id} />
+          <PageDeleteBanner pageType={page.type} pageId={page.id} />
+        </StyledBannerContainer>
+      )}
+      {connectionError && (
+        <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
+          <PageConnectionBanner />
         </StyledBannerContainer>
       )}
       {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
@@ -203,18 +217,20 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       ? `Describe the bounty. Type '/' to see the list of available commands`
                       : undefined
                   }
-                  key={page.id + editMode + String(pagePermissions?.edit_content)}
+                  key={editorKey}
                   content={page.content as PageContent}
-                  readOnly={readOnly}
+                  readOnly={readOnly || !!page.syncWithPageId}
                   autoFocus={false}
                   pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
                   pageId={page.id}
                   disablePageSpecificFeatures={isSharedPage}
                   enableSuggestingMode={enableSuggestingMode}
                   enableVoting={page.type !== 'proposal'}
+                  enableComments={enableComments}
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
+                  onConnectionError={onConnectionError}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{
@@ -232,6 +248,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     updatedAt={page.updatedAt.toString()}
                     readOnly={readOnly || !!enableSuggestingMode}
                     setPage={savePage}
+                    readOnlyTitle={!!page.syncWithPageId}
                   />
                   {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                     <Box my={2} className='font-family-default'>
@@ -258,6 +275,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       {card && board && (
                         <>
                           <CardDetailProperties
+                            syncWithPageId={page.syncWithPageId}
                             board={board}
                             card={card}
                             cards={cards}
@@ -279,6 +297,8 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           refreshPagePermissions={refreshPage}
                           readOnly={readonlyProposalProperties}
                           isTemplate={page.type === 'proposal_template'}
+                          title={page.title}
+                          proposalPage={page}
                         />
                       )}
                       {(draftBounty || page.bountyId) && (
@@ -303,7 +323,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   </div>
                 </CharmEditor>
 
-                {proposalId && <PageComments page={page} permissions={pagePermissions} />}
+                {page.type === 'proposal' && <PageComments page={page} permissions={pagePermissions} />}
               </Container>
             </div>
           </ScrollContainer>

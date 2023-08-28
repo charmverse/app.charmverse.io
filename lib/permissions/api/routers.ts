@@ -37,7 +37,7 @@ export type SpaceSubscriptionInfo = {
 function getEngine(input: Pick<Space, 'paidTier' | 'id'>): SpaceSubscriptionInfo {
   return {
     spaceId: input.id,
-    tier: input.paidTier ?? 'pro'
+    tier: input.paidTier ?? 'community'
   };
 }
 
@@ -324,6 +324,31 @@ export async function isVoteSpaceOptedIn({ resourceId }: Resource): Promise<Spac
   return getEngine(vote.space);
 }
 
+export async function isRoleSpaceOptedIn({ resourceId }: Resource): Promise<SpaceSubscriptionInfo> {
+  if (!stringUtils.isUUID(resourceId)) {
+    throw new InvalidInputError(`Invalid resourceId: ${resourceId}`);
+  }
+  const role = await prisma.role.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      space: {
+        select: {
+          id: true,
+          paidTier: true
+        }
+      }
+    }
+  });
+
+  if (!role) {
+    throw new DataNotFoundError(`Role with id ${resourceId} not found`);
+  }
+
+  return getEngine(role.space);
+}
+
 export type ResourceIdEntity =
   | 'space'
   | 'post'
@@ -335,7 +360,8 @@ export type ResourceIdEntity =
   | 'page'
   | 'pagePermission'
   | 'bounty'
-  | 'vote';
+  | 'vote'
+  | 'role';
 export type GetPermissionClient = {
   resourceId: string;
   resourceIdType: ResourceIdEntity;
@@ -368,6 +394,8 @@ export async function checkSpaceSpaceSubscriptionInfo({
       ? isBountySpaceOptedIn
       : resourceIdType === 'vote'
       ? isVoteSpaceOptedIn
+      : resourceIdType === 'role'
+      ? isRoleSpaceOptedIn
       : null;
 
   if (!engineResolver) {
@@ -378,25 +406,27 @@ export async function checkSpaceSpaceSubscriptionInfo({
 
   return engine;
 }
+export type SpacePermissionsClient = {
+  type: PermissionsEngine;
+  client: PermissionsClient | PremiumPermissionsClient;
+  spaceId: string;
+};
 
 /**
  * Get correct permissions client for a specific space, return premium client if space is paid subscriber
  * */
-export async function getPermissionsClient(
-  request: GetPermissionClient
-): Promise<{ type: 'free' | 'premium'; client: PermissionsClient | PremiumPermissionsClient }>;
 export async function getPermissionsClient({
   resourceId,
   resourceIdType = 'space'
-}: GetPermissionClient): Promise<{ type: PermissionsEngine; client: PermissionsClient | PremiumPermissionsClient }> {
+}: GetPermissionClient): Promise<SpacePermissionsClient> {
   const spaceInfo = await checkSpaceSpaceSubscriptionInfo({
     resourceId,
     resourceIdType
   });
 
   if (spaceInfo.tier !== 'free') {
-    return { type: 'premium', client: premiumPermissionsApiClient };
+    return { type: 'premium', client: premiumPermissionsApiClient, spaceId: spaceInfo.spaceId };
   } else {
-    return { type: 'free', client: publicClient };
+    return { type: 'free', client: publicClient, spaceId: spaceInfo.spaceId };
   }
 }

@@ -17,8 +17,19 @@ import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
  */
 
 async function search() {
-  const tasks = await getDiscussionTasks('cb9a5ede-6ff7-4eaa-9c23-91e684e23aed');
-  console.log('tasks', tasks);
+
+  const acc = await prisma.user.findMany({
+    where: {
+      username: {
+        contains: '0x036'
+      } 
+    }
+  })
+
+
+  console.log(JSON.stringify({acc}, null, 2))
+  // const tasks = await getDiscussionTasks('cb9a5ede-6ff7-4eaa-9c23-91e684e23aed');
+  // console.log('tasks', tasks);
   // await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2));
 }
 

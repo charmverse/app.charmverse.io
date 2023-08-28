@@ -35,6 +35,8 @@ describe('getProposal', () => {
       expect.objectContaining<PageWithProposal>({
         ...page,
         proposal: {
+          lensPostLink: null,
+          publishToLens: null,
           authors: [],
           category: proposalCategory,
           categoryId: proposalCategory.id,
@@ -45,7 +47,14 @@ describe('getProposal', () => {
           reviewers: [],
           snapshotProposalExpiry: null,
           spaceId: space.id,
-          status: expect.any(String)
+          status: proposal.status,
+          archived: expect.any(Boolean),
+          evaluationType: 'vote',
+          rubricAnswers: [],
+          rubricCriteria: [],
+          page: {
+            sourceTemplateId: null
+          }
         }
       })
     );

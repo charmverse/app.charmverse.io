@@ -1,51 +1,49 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { useEffect } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { NewProposalButton } from 'components/votes/components/NewProposalButton';
+import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
-import { usePages } from 'hooks/usePages';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { ProposalDialogProvider } from './components/ProposalDialog/hooks/useProposalDialog';
 import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
-import { ProposalsTable } from './components/ProposalsTable';
-import { ProposalsViewOptions } from './components/ProposalsViewOptions';
+import { ProposalsTable } from './components/ProposalsTable/ProposalsTable';
+import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage() {
   const { categories = [] } = useProposalCategories();
-  const { pages } = usePages();
-  const currentSpace = useCurrentSpace();
-  const { isPublicSpace } = useIsPublicSpace();
+  const { space: currentSpace } = useCurrentSpace();
+  const { isFreeSpace } = useIsFreeSpace();
+
   const {
-    data,
-    mutate: mutateProposals,
+    filteredProposals,
+    statusFilter,
+    setStatusFilter,
+    categoryIdFilter,
+    setCategoryIdFilter,
+    proposals,
+    mutateProposals,
     isLoading
-  } = useSWR(currentSpace ? `proposals/${currentSpace.id}` : null, () =>
-    charmClient.proposals.getProposalsBySpace({ spaceId: currentSpace!.id })
-  );
-  const { filteredProposals, statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter } = useProposals(
-    data ?? []
-  );
+  } = useProposals();
   useEffect(() => {
     if (currentSpace?.id) {
       charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
     }
   }, [currentSpace?.id]);
 
-  const loadingData = !data;
+  const loadingData = !proposals;
 
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
 
-  const canSeeProposals = hasAccess || isPublicSpace || currentSpace?.publicProposals === true;
+  const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
 
   if (isLoadingAccess) {
     return null;
@@ -75,7 +73,7 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  <NewProposalButton mutateProposals={mutateProposals} />
+                  <NewProposalButton />
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
@@ -84,6 +82,8 @@ export function ProposalsPage() {
                       categoryIdFilter={categoryIdFilter}
                       setCategoryIdFilter={setCategoryIdFilter}
                       categories={categories}
+                      // Playwright-specific
+                      testKey='desktop'
                     />
                   </Box>
                 </Box>
@@ -103,19 +103,23 @@ export function ProposalsPage() {
 
           {loadingData ? (
             <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent isLoading size={50} />
+              <LoadingComponent height={500} isLoading size={50} />
             </Grid>
           ) : (
             <Grid item xs={12} sx={{ mt: 5 }}>
-              {data?.length === 0 && (
+              {proposals?.length === 0 && (
                 <EmptyStateVideo
                   description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with Charmverse'
+                  videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}
-              {data?.length > 0 && (
-                <ProposalsTable isLoading={isLoading} proposals={filteredProposals} mutateProposals={mutateProposals} />
+              {proposals?.length > 0 && (
+                <ProposalsTable
+                  isLoading={isLoading}
+                  proposals={filteredProposals ?? []}
+                  mutateProposals={mutateProposals}
+                />
               )}
             </Grid>
           )}

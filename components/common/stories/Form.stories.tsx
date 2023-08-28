@@ -1,7 +1,9 @@
-import { Box, Grid, Paper } from '@mui/material';
+import { Box, Grid, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
+import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { SocialInputs } from 'components/u/components/SocialInputs';
@@ -9,7 +11,6 @@ import { TimezoneAutocomplete } from 'components/u/components/TimezoneAutocomple
 import UserDescription from 'components/u/components/UserDescription';
 import type { Social } from 'components/u/interfaces';
 
-import Button from '../Button';
 import type { SelectOptionType } from '../form/fields/Select/interfaces';
 
 export default {
@@ -145,5 +146,32 @@ export function InputFields() {
         />
       </Box>
     </Paper>
+  );
+}
+
+export function NumericField() {
+  const [val1, setVal1] = useState(10);
+  const [val2, setVal2] = useState(3);
+
+  return (
+    <Stack gap={4}>
+      <Stack alignItems='flex-start'>
+        <Typography variant='subtitle1'>Numeric field</Typography>
+
+        <NumericFieldWithButtons value={val1} onChange={setVal1} />
+      </Stack>
+
+      <Stack alignItems='flex-start'>
+        <Typography variant='subtitle1'>Numeric field with min 1 and max 5</Typography>
+
+        <NumericFieldWithButtons value={val2} onChange={setVal2} min={1} max={5} />
+      </Stack>
+
+      <Stack alignItems='flex-start'>
+        <Typography variant='subtitle1'>Disabled field</Typography>
+
+        <NumericFieldWithButtons value={5} onChange={() => {}} disabled />
+      </Stack>
+    </Stack>
   );
 }

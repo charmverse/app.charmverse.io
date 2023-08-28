@@ -1,10 +1,11 @@
 import type { ProposalCategory, ProposalReviewer, Space, User } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -79,15 +80,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
     const adminCookie = await loginUser(adminUser.id);
 
-    const role = await testUtilsMembers.generateRole({
-      spaceId: adminSpace.id,
-      createdBy: adminUser.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -100,14 +95,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${page.proposalId}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
+    const updated = await getProposal({ proposalId: page.proposalId! });
     // Make sure update went through
     expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>([
       {
@@ -188,15 +182,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${proposalTemplate.id}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${proposalTemplate.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: proposalTemplate.id });
     expect(updated.proposal?.reviewers).toHaveLength(2);
     expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
@@ -213,8 +206,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

@@ -4,11 +4,13 @@ import { Box, Menu, Popover, Tooltip } from '@mui/material';
 import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import Button from 'components/common/Button';
+import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -29,6 +31,7 @@ import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
+  currentRootPageId: string; // The current page ID from which this header is being viewed (Could be the database ID, or a page ID if this is an inline database )
   activeBoard?: Board;
   activeView?: BoardView;
   views: BoardView[];
@@ -49,7 +52,7 @@ type Props = {
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
-  toggleViewOptions: (enable?: boolean) => void;
+  toggleViewOptions: (open?: boolean) => void;
 };
 
 function ViewHeader(props: Props) {
@@ -67,11 +70,22 @@ function ViewHeader(props: Props) {
     toggleViewOptions,
     viewsBoard,
     activeBoard,
+    currentRootPageId,
     onClickNewView,
     activeView,
     cards,
     dateDisplayProperty
   } = props;
+
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${activeBoard?.id}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+  useEffect(() => {
+    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+      updateProposalSource({ pageId: currentRootPageId });
+    }
+  }, [currentRootPageId, activeBoard?.fields.sourceType, activeBoard?.id]);
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
@@ -110,7 +124,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
-        viewIds={activeBoard?.fields.viewIds ?? []}
+        viewIds={viewsBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -122,7 +136,7 @@ function ViewHeader(props: Props) {
             activeView={activeView}
             views={views}
             showView={showView}
-            onClickIcon={onClickNewView}
+            onClick={onClickNewView}
           />
         </Box>
       )}
@@ -217,7 +231,12 @@ function ViewHeader(props: Props) {
         {props.embeddedBoardPath && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
+              <span>
+                <IconButton
+                  icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                  style={{ width: '32px' }}
+                />
+              </span>
             </Tooltip>
           </Link>
         )}
@@ -230,7 +249,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && (
+            {!props.readOnlySourceData && activeBoard?.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

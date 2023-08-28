@@ -1,17 +1,11 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { Prisma, ProposalStatus, SpaceRole } from '@charmverse/core/prisma';
+import type { Prisma, ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import type { ListProposalsRequest, ProposalWithCommentsAndUsers, ProposalWithUsers } from '@charmverse/core/proposals';
 import uniqBy from 'lodash/uniqBy';
 
-function isReviewerOrAuthorQuery({
-  userId,
-  spaceRole
-}: {
-  userId: string;
-  spaceRole: SpaceRole;
-}): Prisma.ProposalWhereInput[] {
+function isAuthorQuery({ userId }: { userId: string }): Prisma.ProposalWhereInput[] {
   return [
     {
       createdBy: userId
@@ -20,26 +14,6 @@ function isReviewerOrAuthorQuery({
       authors: {
         some: {
           userId
-        }
-      }
-    },
-    {
-      reviewers: {
-        some: {
-          OR: [
-            {
-              userId
-            },
-            {
-              role: {
-                spaceRolesToRole: {
-                  some: {
-                    spaceRoleId: spaceRole.id
-                  }
-                }
-              }
-            }
-          ]
         }
       }
     }
@@ -71,7 +45,7 @@ export async function getAccessibleProposals({
   if (spaceRole?.isAdmin) {
     return prisma.proposal.findMany({
       where: {
-        OR: onlyAssigned ? isReviewerOrAuthorQuery({ userId: userId as string, spaceRole }) : undefined,
+        OR: onlyAssigned ? isAuthorQuery({ userId: userId as string }) : undefined,
         spaceId,
         categoryId: requestedCategoryIds ? generateCategoryIdQuery(requestedCategoryIds) : undefined
       },
@@ -82,12 +56,12 @@ export async function getAccessibleProposals({
   const orQuery: Prisma.ProposalWhereInput[] = [];
 
   if (spaceRole && onlyAssigned) {
-    orQuery.push(...isReviewerOrAuthorQuery({ userId: userId as string, spaceRole }));
+    orQuery.push(...isAuthorQuery({ userId: userId as string }));
   } else if (spaceRole) {
     orQuery.push(
       ...[
         {
-          OR: isReviewerOrAuthorQuery({ userId: userId as string, spaceRole })
+          OR: isAuthorQuery({ userId: userId as string })
         },
         {
           status: {

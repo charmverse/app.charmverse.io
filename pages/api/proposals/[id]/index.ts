@@ -5,8 +5,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { getProposal } from 'lib/proposal/getProposal';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -20,7 +20,7 @@ handler
   .put(updateProposalController)
   .get(getProposalController);
 
-async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user?.id;
 
@@ -29,9 +29,12 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
+      rubricAnswers: true,
+      rubricCriteria: true,
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      page: { select: { sourceTemplateId: true } }
     }
   });
 
@@ -47,14 +50,32 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     throw new NotFoundError();
   }
 
-  return res.status(200).json(proposal);
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId: proposal.spaceId,
+    userId
+  });
+
+  const reviewerIds =
+    !spaceRole || spaceRole.isAdmin
+      ? []
+      : await getAllReviewerUserIds({
+          proposalId: proposal.id
+        });
+
+  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
+
+  if (!canSeeAnswers) {
+    proposal.rubricAnswers = [];
+  }
+
+  return res.status(200).json(proposal as ProposalWithUsersAndRubric);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, reviewers, categoryId } = req.body as UpdateProposalRequest;
+  const { authors, reviewers, categoryId, evaluationType } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -63,6 +84,8 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     include: {
       authors: true,
       reviewers: true,
+      rubricAnswers: true,
+      rubricCriteria: true,
       page: {
         select: {
           type: true
@@ -109,10 +132,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
             : proposalReviewer.userId === updatedReviewer.id;
         })
     );
-
     if (newReviewers.length > 0) {
       const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
-        resourceId: proposal.id
+        resourceId: proposal.categoryId as string
       });
       for (const reviewer of newReviewers) {
         if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
@@ -140,11 +162,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId });
+  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType });
 
-  const updatedProposal = await getProposal({ proposalId: proposal.id });
-
-  return res.status(200).send(updatedProposal);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

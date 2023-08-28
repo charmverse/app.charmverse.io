@@ -1,9 +1,10 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
+import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 
 import type { Block } from 'lib/focalboard/block';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -13,7 +14,7 @@ export type SealedUserId = {
   userId: string;
 };
 
-export type SocketAuthReponse = {
+export type SocketAuthResponse = {
   authToken: string;
 };
 
@@ -98,10 +99,69 @@ type SubscribeToWorkspace = {
   type: 'subscribe';
   payload: {
     spaceId: string;
-  } & SocketAuthReponse;
+  } & SocketAuthResponse;
 };
 
-export type ClientMessage = SubscribeToWorkspace;
+type PageDeleted = {
+  type: 'page_deleted';
+  payload: Resource;
+};
+
+type PageRestored = {
+  type: 'page_restored';
+  payload: Resource;
+};
+
+export type PageCreated = {
+  type: 'page_created';
+  payload: Partial<Prisma.PageUncheckedCreateInput> &
+    Pick<
+      Prisma.PageUncheckedCreateInput,
+      'boardId' | 'content' | 'contentText' | 'path' | 'title' | 'type' | 'spaceId'
+    >;
+};
+
+type PageReordered = {
+  type: 'page_reordered';
+  payload: {
+    pageId: string;
+    currentParentId: string | null;
+    newParentId: string | null;
+    newIndex: number;
+  };
+};
+
+type SpaceSubscriptionUpdated = {
+  type: 'space_subscription';
+  payload: {
+    type: 'activated' | 'cancelled' | 'updated';
+    paidTier: SubscriptionTier | null;
+  };
+};
+
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+    failedImports: FailedImportsError[];
+  };
+};
+
+type ThreadsUpdated = {
+  type: 'threads_updated';
+  payload: {
+    threadId: string;
+    pageId: string;
+  };
+};
+
+type PagesRestored = {
+  type: 'pages_restored';
+  payload: Resource[];
+};
+
+export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
 
 export type ServerMessage =
   | BlocksUpdated
@@ -116,7 +176,11 @@ export type ServerMessage =
   | VotesUpdated
   | PostPublished
   | PostUpdated
-  | PostDeleted;
+  | PostDeleted
+  | ThreadsUpdated
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted
+  | PagesRestored;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

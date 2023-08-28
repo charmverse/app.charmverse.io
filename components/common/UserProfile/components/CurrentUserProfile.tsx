@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/u/components/UserDetails/UserDetailsForm';
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
@@ -19,6 +19,7 @@ import { UserProfileDialog } from '../UserProfileDialog';
 
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 import { OnboardingEmailForm } from './OnboardingEmailForm';
+import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 type Step = 'email_step' | 'profile_step';
 
@@ -32,7 +33,7 @@ export function CurrentUserProfile({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
 
   const [userDetails, setUserDetails] = useState<EditableFields>({});
@@ -98,7 +99,8 @@ export function CurrentUserProfile({
     if (currentStep === 'email_step') {
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
-      title = `Welcome to ${currentSpace.name}! Set up your profile`;
+      // wrap hyphens with word joiner so that it doesn't wrap: https://en.wikipedia.org/wiki/Word_joiner
+      title = `Welcome to ${currentSpace.name.replace(/-/g, '\ufeff-\ufeff')}! Set up your profile`;
     }
   }
 
@@ -121,8 +123,10 @@ export function CurrentUserProfile({
             refreshPropertyValues={refreshPropertyValues}
             onChange={onMemberDetailsChange}
             userId={currentUser.id}
-            showBlockchainData
+            showCollectionOptions
           />
+          <Legend mt={4}>Profiles</Legend>
+          <ProfileWidgets userId={currentUser.id} />
           <Box display='flex' justifyContent='flex-end' mt={2}>
             <Button disableElevation size='large' onClick={saveForm}>
               Save

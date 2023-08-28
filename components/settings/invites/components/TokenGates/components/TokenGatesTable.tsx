@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -10,7 +11,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
@@ -26,6 +26,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
 import TestConnectionModal from './TestConnectionModal';
@@ -67,7 +68,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
@@ -107,7 +108,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           })
         )
       );
-      setDescriptions(results);
+      setDescriptions(results.filter(isTruthy));
     }
     main();
   }, [tokenGates]);
@@ -203,11 +204,6 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                   >
                     {descriptions[tokenGateIndex]}
                   </Typography>
-                  {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='caption' sx={{ mt: 1 }}>
-                      -- OR --
-                    </Typography>
-                  )}
                 </TableCell>
                 <TableCell>
                   <TokenGateRolesSelect

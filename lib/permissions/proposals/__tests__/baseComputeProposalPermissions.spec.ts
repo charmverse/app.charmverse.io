@@ -2,11 +2,11 @@ import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { proposalOperations } from '@charmverse/core/permissions';
 import type { ProposalCategory, ProposalOperation, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { ProposalNotFoundError } from 'lib/proposal/errors';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { baseComputeProposalPermissions } from '../computeProposalPermissions';
@@ -66,7 +66,16 @@ beforeAll(async () => {
 });
 
 // Defining these here so that the test is more resilient against future changes
-const authorPermissions: ProposalOperation[] = ['view', 'comment', 'vote', 'create_vote', 'edit', 'delete'];
+const authorPermissions: ProposalOperation[] = [
+  'view',
+  'comment',
+  'vote',
+  'create_vote',
+  'edit',
+  'delete',
+  'archive',
+  'unarchive'
+];
 const reviewerPermissions: ProposalOperation[] = ['view', 'comment', 'review'];
 
 const spaceMemberPermisions: Pick<ProposalPermissionFlags, 'view' | 'comment' | 'vote'> = {
@@ -76,7 +85,7 @@ const spaceMemberPermisions: Pick<ProposalPermissionFlags, 'view' | 'comment' | 
 };
 
 describe('computeProposalPermissions - base', () => {
-  it('should allow the author to view, edit, comment, vote, create_vote and delete the proposal', async () => {
+  it('should allow the author to view, edit, comment, vote, create_vote, delete, archive and unarchive the proposal', async () => {
     const permissions = await baseComputeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalAuthor.id
@@ -120,13 +129,16 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       review: false,
+      evaluate: false,
       vote: false,
+      archive: false,
+      unarchive: false,
       // Proposal is always public
       view: true
     });
   });
 
-  it('should allow the reviewer to review the proposal', async () => {
+  it('should allow the reviewer to review and evaluate the proposal', async () => {
     const permissions = await baseComputeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalReviewer.id
@@ -135,10 +147,13 @@ describe('computeProposalPermissions - base', () => {
     expect(permissions).toMatchObject<ProposalPermissionFlags>({
       ...spaceMemberPermisions,
       review: true,
+      evaluate: true,
       edit: false,
       make_public: false,
       delete: false,
-      create_vote: false
+      create_vote: false,
+      archive: false,
+      unarchive: false
     });
   });
 
@@ -165,7 +180,10 @@ describe('computeProposalPermissions - base', () => {
       delete: false,
       edit: false,
       make_public: false,
-      review: false
+      review: false,
+      evaluate: false,
+      archive: false,
+      unarchive: false
     });
   });
 
@@ -183,7 +201,10 @@ describe('computeProposalPermissions - base', () => {
       delete: true,
       edit: true,
       review: true,
-      make_public: false
+      evaluate: true,
+      make_public: false,
+      archive: true,
+      unarchive: true
     });
   });
 
@@ -201,7 +222,10 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       review: false,
+      evaluate: false,
       vote: false,
+      archive: false,
+      unarchive: false,
       view: true
     });
   });

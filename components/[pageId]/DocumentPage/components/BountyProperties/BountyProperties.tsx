@@ -11,16 +11,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import CharmButton from 'components/common/Button';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { Button } from 'components/common/Button';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
-import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsPublicSpace } from 'hooks/useIsPublicSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -62,9 +62,9 @@ export default function BountyProperties(props: {
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>();
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
-  const { isPublicSpace } = useIsPublicSpace();
+  const { isFreeSpace } = useIsFreeSpace();
 
   const { user } = useUser();
   const isRewardAmountInvalid = useMemo(
@@ -251,7 +251,7 @@ export default function BountyProperties(props: {
             alignSelf: 'center'
           }}
         >
-          <Button>Reward</Button>
+          <ButtonBoard>Reward</ButtonBoard>
         </div>
         <Tabs
           indicatorColor={readOnly ? 'secondary' : 'primary'}
@@ -284,7 +284,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Chain</Button>
+              <ButtonBoard>Chain</ButtonBoard>
             </div>
             <InputSearchBlockchain
               disabled={readOnly}
@@ -293,7 +293,7 @@ export default function BountyProperties(props: {
               sx={{
                 width: '100%'
               }}
-              onChange={async (chainId) => {
+              onChange={(chainId) => {
                 const newNativeCurrency = refreshCryptoList(chainId);
                 applyBountyUpdates({
                   chainId,
@@ -311,7 +311,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Token</Button>
+              <ButtonBoard>Token</ButtonBoard>
             </div>
             <InputSearchCrypto
               disabled={readOnly || !isTruthy(currentBounty?.chainId)}
@@ -340,7 +340,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Amount</Button>
+              <ButtonBoard>Amount</ButtonBoard>
             </div>
             <TextField
               data-test='bounty-property-amount'
@@ -353,7 +353,8 @@ export default function BountyProperties(props: {
               size='small'
               onChange={updateBountyAmount}
               inputProps={{
-                step: 0.01
+                step: 0.01,
+                style: { height: 'auto' }
               }}
               error={isRewardAmountInvalid}
               helperText={
@@ -402,7 +403,7 @@ export default function BountyProperties(props: {
         }}
       >
         <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>Advanced settings</Button>
+          <ButtonBoard>Advanced settings</ButtonBoard>
         </div>
         <Tooltip title={isShowingAdvancedSettings ? 'Hide advanced settings' : 'Expand advanced settings'}>
           <IconButton size='small'>
@@ -417,7 +418,7 @@ export default function BountyProperties(props: {
       <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
         <div className='octo-propertyrow'>
           <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Require applications</Button>
+            <ButtonBoard>Require applications</ButtonBoard>
           </div>
           <Switch
             isOn={Boolean(currentBounty?.approveSubmitters)}
@@ -430,7 +431,7 @@ export default function BountyProperties(props: {
             readOnly={readOnly}
           />
         </div>
-        {!isPublicSpace && (
+        {!isFreeSpace && (
           <div
             className='octo-propertyrow'
             style={{
@@ -441,7 +442,7 @@ export default function BountyProperties(props: {
               className='octo-propertyname octo-propertyname--readonly'
               style={{ alignSelf: 'baseline', paddingTop: 8 }}
             >
-              <Button>Applicant role(s)</Button>
+              <ButtonBoard>Applicant role(s)</ButtonBoard>
             </div>
             <div style={{ width: '100%' }}>
               <InputSearchRoleMultiple
@@ -487,7 +488,7 @@ export default function BountyProperties(props: {
           }}
         >
           <div className='octo-propertyname octo-propertyname--readonly'>
-            <Button>Submission limit</Button>
+            <ButtonBoard>Submission limit</ButtonBoard>
           </div>
           <Switch
             isOn={capSubmissions}
@@ -509,14 +510,14 @@ export default function BountyProperties(props: {
             }}
           >
             <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Max submissions</Button>
+              <ButtonBoard>Max submissions</ButtonBoard>
             </div>
             <TextField
               required
               defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
-              inputProps={{ step: 1, min: 1 }}
+              inputProps={{ step: 1, min: 1, style: { height: 'auto' } }}
               sx={{
                 width: '100%'
               }}
@@ -559,46 +560,36 @@ export default function BountyProperties(props: {
             flexGrow: 1
           }}
         >
-          <div
-            className='octo-propertyname octo-propertyname--readonly'
-            style={{ alignSelf: 'baseline', paddingTop: 12 }}
-          >
-            <Button>Reviewer</Button>
+          <div className='octo-propertyname octo-propertyname--readonly' style={{ alignSelf: 'baseline' }}>
+            <ButtonBoard>Reviewer</ButtonBoard>
           </div>
-          <div style={{ width: '100%' }}>
-            <InputSearchReviewers
-              disabled={readOnly}
-              readOnly={readOnly}
-              value={bountyPermissions?.reviewer ?? []}
-              disableCloseOnSelect={true}
-              onChange={async (e, options) => {
-                const roles = options.filter((option) => option.group === 'role');
-                const members = options.filter((option) => option.group === 'user');
-                await applyBountyUpdates({
-                  permissions: rollupPermissions({
-                    assignedRoleSubmitters,
-                    selectedReviewerRoles: roles.map((role) => role.id),
-                    selectedReviewerUsers: members.map((member) => member.id),
-                    spaceId: space!.id
-                  })
-                });
-                if (currentBounty?.id) {
-                  await refreshBountyPermissions(currentBounty.id);
-                }
-              }}
-              excludedIds={[...selectedReviewerUsers, ...selectedReviewerRoles]}
-              sx={{
-                width: '100%'
-              }}
+          <UserAndRoleSelect
+            readOnly={readOnly}
+            value={bountyPermissions?.reviewer ?? []}
+            variant='outlined'
+            onChange={async (options) => {
+              const roles = options.filter((option) => option.group === 'role');
+              const members = options.filter((option) => option.group === 'user');
+              await applyBountyUpdates({
+                permissions: rollupPermissions({
+                  assignedRoleSubmitters,
+                  selectedReviewerRoles: roles.map((role) => role.id),
+                  selectedReviewerUsers: members.map((member) => member.id),
+                  spaceId: space!.id
+                })
+              });
+              if (currentBounty?.id) {
+                await refreshBountyPermissions(currentBounty.id);
+              }
+            }}
+          />
+          {bountyPagePermissions && bountyPermissions && (
+            <MissingPagePermissions
+              target='reviewer'
+              bountyPermissions={bountyPermissions}
+              pagePermissions={bountyPagePermissions}
             />
-            {bountyPagePermissions && bountyPermissions && (
-              <MissingPagePermissions
-                target='reviewer'
-                bountyPermissions={bountyPermissions}
-                pagePermissions={bountyPagePermissions}
-              />
-            )}
-          </div>
+          )}
         </div>
       </Box>
 
@@ -606,12 +597,12 @@ export default function BountyProperties(props: {
 
       {draftBounty && !bountyFromContext && (
         <Box display='flex' gap={2} my={2}>
-          <CharmButton color='primary' onClick={confirmNewBounty}>
+          <Button color='primary' onClick={confirmNewBounty}>
             Confirm new bounty
-          </CharmButton>
-          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
+          </Button>
+          <Button color='secondary' variant='outlined' onClick={cancelDraftBounty}>
             Cancel
-          </CharmButton>
+          </Button>
         </Box>
       )}
 
@@ -675,21 +666,21 @@ function rollupPermissions({
   assignedRoleSubmitters: string[];
   spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
-  const reviewers = [
+  const reviewers: BountyPermissions['reviewer'] = [
     ...selectedReviewerUsers.map((uid) => {
       return {
         id: uid,
-        group: 'user'
-      } as TargetPermissionGroup;
+        group: 'user' as const
+      };
     }),
     ...selectedReviewerRoles.map((uid) => {
       return {
         id: uid,
-        group: 'role'
-      } as TargetPermissionGroup;
+        group: 'role' as const
+      };
     })
   ];
-  const submitters: TargetPermissionGroup[] =
+  const submitters: BountyPermissions['submitter'] =
     assignedRoleSubmitters.length !== 0
       ? assignedRoleSubmitters.map((uid) => {
           return {

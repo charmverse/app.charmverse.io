@@ -5,9 +5,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
@@ -57,6 +58,7 @@ export function Comment({
   handleDeleteComment,
   handleVoteComment
 }: Props) {
+  const router = useRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -67,9 +69,10 @@ export function Comment({
     doc: comment.content as PageContent,
     rawText: comment.contentText
   });
+  const commentContainerRef = useRef<HTMLElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
   const { showUserProfile } = useUserProfile();
-
+  const { commentId } = router.query as { commentId: string | null };
   async function saveCommentContent() {
     await handleUpdateComment({
       id: comment.id,
@@ -110,6 +113,16 @@ export function Comment({
     await handleDeleteComment(comment.id);
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (commentId && commentId === comment.id && commentContainerRef.current) {
+        commentContainerRef.current.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    }, 1500);
+  }, [commentId, commentContainerRef, comment.id]);
+
   const isCommentAuthor = comment.createdBy === user?.id;
   const canEditComment = isCommentAuthor;
   const canDeleteComment = (permissions?.delete_comments || isCommentAuthor) && !deletingDisabled;
@@ -140,7 +153,7 @@ export function Comment({
   }, [inlineCharmEditor, commentEditContent, updateCommentContent]);
 
   return (
-    <Stack my={1} position='relative'>
+    <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
       <StyledStack data-test={`post-comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>

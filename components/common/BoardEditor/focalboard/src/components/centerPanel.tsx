@@ -1,40 +1,34 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 
-import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import Papa from 'papaparse';
-import type { ChangeEvent } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
-import { PageWebhookBanner } from 'components/common/Banners/PageWebhookBanner';
-import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
+import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
   getViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { addNewCards, isValidCsvResult } from 'components/common/PageActions/utils/databasePageOptions';
-import { webhookBaseUrl } from 'config/constants';
+import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -44,11 +38,10 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
+import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -69,6 +62,7 @@ type Props = WrappedComponentProps &
   // eslint-disable-next-line no-use-before-define
   PropsFromRedux & {
     board: Board;
+    currentRootPageId: string;
     embeddedBoardPath?: string;
     // cards: Card[]
     activeView?: BoardView;
@@ -91,7 +85,7 @@ type Props = WrappedComponentProps &
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  showSettings: 'create-linked-view' | 'view-options' | null;
+  showSettings: 'view-options' | null;
 };
 
 function CenterPanel(props: Props) {
@@ -103,11 +97,10 @@ function CenterPanel(props: Props) {
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     showSettings: null
   });
-
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages, refreshPage, updatePage } = usePages();
   const { members } = useMembers();
   const { showMessage } = useSnackbar();
@@ -115,6 +108,7 @@ function CenterPanel(props: Props) {
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
+  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = board.id;
@@ -131,6 +125,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({
       boardId: activeBoard?.id || '',
@@ -140,22 +135,30 @@ function CenterPanel(props: Props) {
   );
 
   useEffect(() => {
-    if (views.length === 0 && !activeView) {
-      setState((s) => ({ ...s, showSettings: 'create-linked-view' }));
-    } else if (activeView) {
+    if (activeView) {
       setState((s) => ({ ...s, showSettings: null }));
     }
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = _cards
-    .map((card) => ({ card, page: pages[card.id]! }))
-    .filter(({ page }) => !!page && !page.deletedAt);
-  const sortedCardPages = activeView && activeBoard ? sortCards(cardPages, activeBoard, activeView, members) : [];
-  const cards = sortedCardPages.map(({ card }) => card);
+  const cardPages: CardPage[] = useMemo(
+    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
+    [_cards, pages]
+  );
+  const isActiveView = !!(activeView && activeBoard);
+  const cards = useMemo(() => {
+    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
+    return sortedCardPages.map(({ card }) => card);
+  }, [cardPages, isActiveView]);
 
   let groupByProperty = _groupByProperty;
-  if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
+  if (
+    (!groupByProperty ||
+      (_groupByProperty?.type !== 'select' &&
+        _groupByProperty?.type !== 'proposalCategory' &&
+        _groupByProperty?.type !== 'proposalStatus')) &&
+    activeView?.fields.viewType === 'board'
+  ) {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
   }
   let dateDisplayProperty = _dateDisplayProperty;
@@ -329,7 +332,9 @@ function CenterPanel(props: Props) {
         showCard(card.id);
       }
 
-      e.stopPropagation();
+      if (activeView?.fields.viewType !== 'table') {
+        e.stopPropagation();
+      }
     },
     [activeView]
   );
@@ -365,7 +370,7 @@ function CenterPanel(props: Props) {
   ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
-      unassignedOptionIds = groupByProperty.options
+      unassignedOptionIds = (groupByProperty.options ?? [])
         .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
         .map((o: IPropertyOption) => o.id);
     }
@@ -380,40 +385,11 @@ function CenterPanel(props: Props) {
     const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
-
-  async function selectViewSource(
-    fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>,
-    sourceBoard?: Board
-  ) {
-    const _board = {
-      // use parentBoard props like id and rootId by default
-      ...board,
-      // use fields from the linked board so that fields like 'visiblePropertyIds' are accurate
-      fields: sourceBoard?.fields || board.fields
-    };
-    const view = createTableView(_board);
-    view.id = uuid();
-    view.fields.sourceData = fields.sourceData;
-    view.fields.sourceType = fields.sourceType;
-    view.fields.linkedSourceId = fields.linkedSourceId;
-    await mutator.insertBlock(view);
-    showView(view.id);
-  }
-
-  async function createDatabase() {
-    if (!boardPageType) {
-      throw new Error('No board page type exists');
-    }
-    const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
-    showView(view.id);
-    return view;
-  }
-
   function openSelectSource() {
     showView('');
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
-      setState({ ...state, showSettings: 'create-linked-view' });
+      setState({ ...state, showSettings: 'view-options' });
     });
   }
 
@@ -449,69 +425,23 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const onCsvImport = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (board && event.target.files && event.target.files[0]) {
-      Papa.parse(event.target.files[0], {
-        header: true,
-        skipEmptyLines: true,
-        worker: event.target.files[0].size > 100000, // 100kb
-        delimiter: '\n', // fallback for a csv with 1 column
-        complete: async (results) => {
-          if (results.errors && results.errors[0]) {
-            log.warn('CSV import failed', { spaceId: space?.id, pageId: board.id, error: results.errors[0] });
-            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
-            return;
-          }
+  const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
 
-          if (isValidCsvResult(results)) {
-            if (!user || !space) {
-              throw new Error(
-                'An error occured while importing. Please verify you have a valid user, space and board.'
-              );
-            }
+  const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
-            const spaceId = space?.id;
-            const pageId = board.id;
+  const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
 
-            showMessage('Importing your csv file...', 'info');
-
-            try {
-              const view = await createDatabase();
-              await addNewCards({
-                board,
-                members,
-                results,
-                spaceId: space?.id,
-                userId: user.id,
-                views: [view]
-              });
-
-              if (spaceId) {
-                charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
-              }
-              showMessage('Your csv file was imported successfully', 'success');
-            } catch (error) {
-              log.error('CSV import failed', { spaceId, pageId, error });
-              showMessage((error as Error).message || 'Import failed', 'error');
-            }
-          }
-        }
-      });
-    }
-  };
-
-  const isLoadingSourceData =
-    !activeBoard && state.showSettings !== 'create-linked-view' && (!views || views.length === 0);
+  const disableAddingNewCards = boardSourceType === 'proposals';
 
   return (
     <>
-      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={boardPage.id} />}
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageType={boardPage.type} pageId={boardPage.id} />}
       {keys?.map((key) =>
         activeBoardId === key.pageId ? (
           <PageWebhookBanner
             key={key.apiKey}
             type={key.type}
-            url={`${webhookBaseUrl}/${key?.apiKey}`}
+            url={`${window.location.origin}/${webhookEndpoint}/${key?.apiKey}`}
             sx={{
               ...(isEmbedded && {
                 border: (theme) => `2px solid ${theme.palette.text.primary}`,
@@ -553,6 +483,7 @@ function CenterPanel(props: Props) {
           )}
           {(activePage || activeBoard) && (
             <ViewHeader
+              currentRootPageId={props.currentRootPageId}
               onDeleteView={props.onDeleteView}
               maxTabsShown={props.maxTabsShown}
               disableUpdatingUrl={props.disableUpdatingUrl}
@@ -628,14 +559,12 @@ function CenterPanel(props: Props) {
                     {activePage?.title || 'Untitled'}
                   </Button>
                 )}
-              {!activeView && state.showSettings === 'create-linked-view' && (
+              {!activeView && board && (views.length === 0 || isLinkedDatabase) && (
                 <CreateLinkedView
-                  readOnly={props.readOnly}
-                  onSelect={selectViewSource}
+                  rootBoard={board}
+                  views={views}
+                  showView={showView}
                   // if it links to deleted db page then the board can't be inline_board type
-                  onCreate={views.length === 0 ? createDatabase : undefined}
-                  onCsvImport={onCsvImport}
-                  pageId={props.page?.id}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'board' && (
@@ -651,6 +580,8 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   addCard={addCard}
                   showCard={showCard}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'table' && (
@@ -668,6 +599,8 @@ function CenterPanel(props: Props) {
                   showCard={showCard}
                   addCard={addCard}
                   onCardClicked={cardClicked}
+                  disableAddingCards={disableAddingNewCards}
+                  readOnlyTitle={readOnlyTitle}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'calendar' && (
@@ -681,6 +614,7 @@ function CenterPanel(props: Props) {
                   addCard={(properties: Record<string, string>) => {
                     addCard('', true, properties);
                   }}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {activeBoard && activeView?.fields.viewType === 'gallery' && (
@@ -692,21 +626,24 @@ function CenterPanel(props: Props) {
                   onCardClicked={cardClicked}
                   selectedCardIds={state.selectedCardIds}
                   addCard={(show) => addCard('', show)}
+                  disableAddingCards={disableAddingNewCards}
                 />
               )}
               {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
             </Box>
-            {activeView && (
-              <ViewSidebar
-                board={activeBoard}
-                pageId={activePage?.id}
-                parentBoard={board}
-                view={activeView}
-                isOpen={state.showSettings === 'view-options'}
-                closeSidebar={closeSettings}
-                groupByProperty={groupByProperty}
-              />
-            )}
+
+            <ViewSidebar
+              views={views}
+              page={props.page}
+              board={activeBoard}
+              pageId={activePage?.id}
+              rootBoard={board}
+              view={activeView}
+              isOpen={state.showSettings === 'view-options'}
+              closeSidebar={closeSettings}
+              groupByProperty={groupByProperty}
+              showView={showView}
+            />
           </Box>
         </div>
       </div>
@@ -723,7 +660,7 @@ export function groupCardsByOptions(
 
   for (const optionId of optionIds) {
     if (optionId) {
-      const option = groupByProperty?.options.find((o) => o.id === optionId);
+      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
       if (groupByProperty && option) {
         const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty.id]);
         const group: BoardGroup = {
@@ -737,7 +674,7 @@ export function groupCardsByOptions(
       // Empty group
       const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
+        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },

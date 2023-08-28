@@ -68,6 +68,41 @@ export class CdkDeployStack extends Stack {
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
       },
       {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'HealthCheckPath',
+        value: '/health_check'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Port',
+        value: '3002'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Protocol',
+        value: 'HTTP'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'ListenerEnabled',
+        value: 'true'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'Protocol',
+        value: 'HTTPS'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'SSLCertificateArns',
+        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'DefaultProcess',
+        value: 'websocket'
+      },
+      {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
@@ -86,12 +121,12 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'Custom Availability Zones',
-        value: 'us-east-1a,us-east-1b,us-east-1c'
+        value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
       },
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3.small'
+        value: 't3a.small,t3.small'
       },
       {
         // ALB health check

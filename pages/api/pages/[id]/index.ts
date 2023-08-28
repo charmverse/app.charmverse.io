@@ -163,6 +163,8 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
+  log.info(`Update page success`, { pageId, userId });
+
   return res.status(200).end();
 }
 

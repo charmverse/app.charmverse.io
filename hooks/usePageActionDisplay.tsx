@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import { useCurrentPage } from 'hooks/useCurrentPage';
@@ -31,6 +31,7 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] =
     useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
+  const commentPageActionToggledOnce = useRef<boolean>(false);
 
   function updatePageActionDisplay() {
     const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
@@ -45,9 +46,11 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       )?.data as ThreadWithCommentsAndAuthors[] | undefined;
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       if (
-        highlightedCommentId ||
-        (isLargeScreen && cachedInlineCommentData?.find((thread) => thread && !thread.resolved))
+        !commentPageActionToggledOnce.current &&
+        (highlightedCommentId ||
+          (isLargeScreen && cachedInlineCommentData?.some((thread) => thread && !thread.resolved)))
       ) {
+        commentPageActionToggledOnce.current = true;
         return setCurrentPageActionDisplay('comments');
       } else {
         return setCurrentPageActionDisplay(null);

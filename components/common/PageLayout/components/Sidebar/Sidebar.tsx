@@ -15,10 +15,12 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
+import { BlockCounts } from 'components/settings/subscription/BlockCounts';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -38,7 +40,6 @@ import TrashModal from '../TrashModal';
 
 import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
-import { STATIC_PAGES } from './utils/staticPages';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -129,10 +130,10 @@ interface SidebarProps {
   navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
+export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -184,12 +185,12 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             <PageNavigation isFavorites rootPageIds={favoritePageIds} />
           </Box>
         )}
-        <WorkspaceLabel>
+        <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
-              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+              <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
             </div>
           )}
         </WorkspaceLabel>
@@ -219,14 +220,22 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             icon={<DeleteOutlinedIcon fontSize='small' />}
             label='Trash'
           />
+          <Box my={2} />
+
+          {
+            // Don't show block counts for free or entreprise spaces
+            space?.paidTier === 'community' && (
+              <Box ml={2}>
+                <BlockCounts />
+              </Box>
+            )
+          }
         </Box>
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, navAction, addPage, isLoadingAccess]);
+  }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
-  if (isLoadingAccess) {
-    return null;
-  }
+  const { features } = useFeaturesAndMembers();
 
   return (
     <SidebarContainer>
@@ -263,36 +272,42 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              {showMemberFeatures && (
-                <SidebarBox
-                  onClick={() => handleModalClick('invites')}
-                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                  label='Invites'
-                />
-              )}
-              <Divider sx={{ mx: 2, my: 1 }} />
-              {STATIC_PAGES.map((page) => {
-                if (
-                  !space.hiddenFeatures.includes(page.feature) &&
-                  (showMemberFeatures ||
-                    // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                    (page.path === 'forum' && categories.length > 0))
-                ) {
-                  return (
-                    <SidebarLink
-                      key={page.path}
-                      href={`/${space.domain}/${page.path}`}
-                      active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                      icon={<PageIcon icon={null} pageType={page.path} />}
-                      label={page.title}
-                      onClick={navAction}
-                      data-test={`sidebar-link-${page.path}`}
-                    />
-                  );
-                }
 
-                return null;
-              })}
+              {!isLoadingAccess && (
+                <>
+                  {showMemberFeatures && (
+                    <SidebarBox
+                      onClick={() => handleModalClick('invites')}
+                      icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                      label='Invites'
+                    />
+                  )}
+                  <Divider sx={{ mx: 2, my: 1 }} />
+                  {features
+                    .filter((feat) => !feat.isHidden)
+                    .map((feat) => {
+                      if (
+                        showMemberFeatures ||
+                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                        (feat.path === 'forum' && categories.length > 0)
+                      ) {
+                        return (
+                          <SidebarLink
+                            key={feat.path}
+                            href={`/${space.domain}/${feat.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
+                            icon={<PageIcon icon={null} pageType={feat.path} />}
+                            label={feat.title}
+                            onClick={navAction}
+                            data-test={`sidebar-link-${feat.path}`}
+                          />
+                        );
+                      }
+
+                      return null;
+                    })}
+                </>
+              )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>

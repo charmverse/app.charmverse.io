@@ -1,25 +1,15 @@
 import { Box, Card, Grid, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
-import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import Image from 'components/common/Image';
 import { Container } from 'components/login/components/LoginLayout';
 import Footer from 'components/login/Footer';
-import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import { useSpaces } from 'hooks/useSpaces';
 import splashImage from 'public/images/artwork/world.png';
 
 export default function CreateSpace() {
   const { spaces, isLoaded } = useSpaces();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (spaces.length > 0) {
-      router.push(getDefaultWorkspaceUrl(spaces));
-    }
-  }, [spaces]);
 
   if (!spaces || !isLoaded) {
     return null;
@@ -66,7 +56,7 @@ export default function CreateSpace() {
               justifyContent: 'center'
             }}
           >
-            <Image px={3} maxWidth={{ xs: 300, md: 'none' }} src={splashImage} />
+            <Image px={3} maxWidth={{ xs: 300, md: '100%' }} src={splashImage} />
           </Grid>
         </Grid>
       </Container>

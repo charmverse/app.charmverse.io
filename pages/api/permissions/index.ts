@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues,
@@ -22,7 +21,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  //  .use(requireSpaceMembership)
   .get(
     requirePaidPermissionsSubscription({ key: 'pageId', location: 'query', resourceIdType: 'page' }),
     findPagePermissions
@@ -57,8 +55,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     resourceId: pageId,
     userId: req.session.user.id
   });
-
-  console.log({ computedPermissions });
 
   if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');
@@ -122,7 +118,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   return res.status(201).json(createdPermission);
 }
-
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
   const { permissionId } = (req.query || req.body) as PermissionResource;
 

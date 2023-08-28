@@ -17,14 +17,16 @@ describe('createVote', () => {
     const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: null,
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
       title: 'First vote',
       type: 'Approval',
       context: 'inline',
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1
     });
     expect(createdVote).toMatchObject(
       expect.objectContaining({
@@ -54,28 +56,32 @@ describe('createVote', () => {
     await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
-      description: null,
+      content: null,
+      contentText: '',
       pageId: page.id,
       spaceId: space.id,
       threshold: 50,
       title: 'First vote',
       type: 'Approval',
       context: 'proposal',
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 2
     });
 
     await expect(
       createVoteService({
         createdBy: user.id,
         deadline: new Date(),
-        description: null,
+        content: null,
+        contentText: '',
         pageId: page.id,
         spaceId: space.id,
         threshold: 50,
         title: 'First vote',
         type: 'Approval',
         context: 'proposal',
-        voteOptions: ['1', '2', '3']
+        voteOptions: ['1', '2', '3'],
+        maxChoices: 3
       })
     ).rejects.toBeInstanceOf(DuplicateDataError);
   });

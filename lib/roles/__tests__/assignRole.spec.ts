@@ -11,7 +11,7 @@ import {
 } from 'testing/setupDatabase';
 
 import { ExpectedAnError } from '../../../testing/errors';
-import { DataNotFoundError, InsecureOperationError } from '../../utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '../../utilities/errors';
 
 let user: User;
 let space: Space;
@@ -107,6 +107,25 @@ describe('assignRole', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
+  });
+
+  it('should fail if the summon role is being assigned', async () => {
+    const { user: adminUser, space: spaceWithGuest } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const role = await generateRole({
+      spaceId: spaceWithGuest.id,
+      createdBy: adminUser.id,
+      source: 'summon'
+    });
+
+    await expect(
+      assignRole({
+        roleId: role.id,
+        userId: user.id
+      })
+    ).rejects.toThrow(UndesirableOperationError);
   });
 
   it('should fail if the user does not exist', async () => {

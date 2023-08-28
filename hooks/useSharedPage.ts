@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
@@ -11,6 +11,8 @@ const BOUNTIES_PATH = '/[domain]/bounties';
 const DOCUMENT_PATH = '/[domain]/[pageId]';
 const FORUM_PATH = '/[domain]/forum';
 const PUBLIC_PAGE_PATHS = [BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH, PROPOSALS_PATH];
+
+type PublicPageType = 'forum' | 'proposals' | 'bounties';
 
 export const useSharedPage = () => {
   const { pathname, query, isReady: isRouterReady } = useRouter();
@@ -52,18 +54,23 @@ export const useSharedPage = () => {
     }
 
     return !loadedSpace;
-  }, [spacesLoaded, isPublicPath, spaces, spaceDomain]);
+  }, [spacesLoaded, isPublicPath, loadedSpace]);
+
   const {
     data: publicPage,
     isLoading: isPublicPageLoading,
     error: publicPageError
-  } = useSWR(shouldLoadPublicPage ? `public/${pageKey}` : null, () => charmClient.getPublicPage(pageKey || ''));
+  } = useSWRImmutable(shouldLoadPublicPage ? `public/${pageKey}` : null, () =>
+    charmClient.getPublicPage(pageKey || '')
+  );
 
   const {
     data: space,
     isLoading: isSpaceLoading,
     error: spaceError
-  } = useSWR(spaceDomain ? `space/${spaceDomain}` : null, () => charmClient.spaces.searchByDomain(spaceDomain || ''));
+  } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
+    charmClient.spaces.searchByDomain(spaceDomain || '')
+  );
 
   const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';
@@ -80,7 +87,15 @@ export const useSharedPage = () => {
     hasError,
     hasSharedPageAccess,
     publicSpace: space,
-    publicPage
+    isPublicPath,
+    publicPage,
+    publicPageType: (isBountiesPath
+      ? 'bounties'
+      : isProposalsPath
+      ? 'proposals'
+      : isForumPath
+      ? 'forum'
+      : null) as PublicPageType | null
   };
 };
 
