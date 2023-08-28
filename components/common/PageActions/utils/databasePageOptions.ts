@@ -309,8 +309,10 @@ export function transformApiPageKeysCsvData(
 export function transformCsvResults(results: ParseResult<Record<string, string>>, customTitle?: string) {
   const csvData = results.data.map((csvRow) => {
     const [key, value] = Object.entries(csvRow)[0];
-    csvRow[titleColumnName] = customTitle || value;
-    delete csvRow[key];
+    if (key !== titleColumnName) {
+      csvRow[titleColumnName] = customTitle || value;
+      delete csvRow[key];
+    }
     return csvRow;
   });
   const headers = results.meta.fields || [];

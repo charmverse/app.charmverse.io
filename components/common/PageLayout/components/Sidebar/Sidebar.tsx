@@ -20,6 +20,7 @@ import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -39,7 +40,6 @@ import TrashModal from '../TrashModal';
 
 import { sidebarItemStyles, SidebarLink } from './SidebarButton';
 import SidebarSubmenu from './SidebarSubmenu';
-import { STATIC_PAGES } from './utils/staticPages';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -185,12 +185,12 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             <PageNavigation isFavorites rootPageIds={favoritePageIds} />
           </Box>
         )}
-        <WorkspaceLabel>
+        <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
-              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+              <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
             </div>
           )}
         </WorkspaceLabel>
@@ -234,6 +234,8 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
       </>
     );
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
+
+  const { features } = useFeaturesAndMembers();
 
   return (
     <SidebarContainer>
@@ -281,28 +283,29 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                     />
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
-                  {STATIC_PAGES.map((page) => {
-                    if (
-                      !space.hiddenFeatures.includes(page.feature) &&
-                      (showMemberFeatures ||
+                  {features
+                    .filter((feat) => !feat.isHidden)
+                    .map((feat) => {
+                      if (
+                        showMemberFeatures ||
                         // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                        (page.path === 'forum' && categories.length > 0))
-                    ) {
-                      return (
-                        <SidebarLink
-                          key={page.path}
-                          href={`/${space.domain}/${page.path}`}
-                          active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                          icon={<PageIcon icon={null} pageType={page.path} />}
-                          label={page.title}
-                          onClick={navAction}
-                          data-test={`sidebar-link-${page.path}`}
-                        />
-                      );
-                    }
+                        (feat.path === 'forum' && categories.length > 0)
+                      ) {
+                        return (
+                          <SidebarLink
+                            key={feat.path}
+                            href={`/${space.domain}/${feat.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
+                            icon={<PageIcon icon={null} pageType={feat.path} />}
+                            label={feat.title}
+                            onClick={navAction}
+                            data-test={`sidebar-link-${feat.path}`}
+                          />
+                        );
+                      }
 
-                    return null;
-                  })}
+                      return null;
+                    })}
                 </>
               )}
             </Box>

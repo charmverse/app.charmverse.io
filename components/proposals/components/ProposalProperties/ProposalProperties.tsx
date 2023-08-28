@@ -1,187 +1,232 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { Page, Proposal, ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
-import { PropertyLabel } from 'components/common/BoardEditor/components/PropertyLabel';
-import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
+import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import Link from 'components/common/Link';
+import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import type { TabConfig } from 'components/common/MultiTabs';
+import MultiTabs from 'components/common/MultiTabs';
+import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useRoles } from 'hooks/useRoles';
-import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
-import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
+import {
+  getProposalStatuses,
+  nextProposalStatusUpdateMessage,
+  previousProposalStatusUpdateMessage
+} from 'lib/proposal/proposalStatusTransition';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
-import { InputSearchReviewers } from './components/InputSearchReviewers';
-import ProposalCategoryInput from './components/ProposalCategoryInput';
+import { ProposalCategorySelect } from './components/ProposalCategorySelect';
+import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
+import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaInput';
+import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteriaInput';
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
-import ProposalTemplateInput from './components/ProposalTemplateInput';
+import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
+import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
-export type ProposalFormInputs = {
-  title?: string; // title is saved to the same state that's used in ProposalPage
+export type ProposalPropertiesInput = {
   content?: PageContent | null;
-  contentText?: string;
-  // id?: string;
+  contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalTemplateId?: string | null;
+  evaluationType: ProposalEvaluationType;
+  rubricCriteria: RangeProposalCriteria[];
+  publishToLens?: boolean;
 };
 
-interface ProposalPropertiesProps {
+type ProposalPropertiesProps = {
+  proposalLensLink?: string;
   archived?: boolean;
-  canUpdateProposalProperties?: boolean;
+  canAnswerRubric?: boolean;
+  canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
-  isTemplate: boolean;
+  onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
+  onChangeRubricCriteriaAnswer?: () => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
-  proposalFormInputs: ProposalFormInputs;
+  proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
-  readOnly?: boolean;
-  setProposalFormInputs: (values: ProposalFormInputs) => void;
+  readOnlyAuthors?: boolean;
+  readOnlyReviewers?: boolean;
+  readOnlyProposalEvaluationType?: boolean;
+  readOnlyRubricCriteria?: boolean;
+  rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  rubricCriteria?: ProposalRubricCriteria[];
+  setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
+  showStatus?: boolean;
   snapshotProposalId?: string | null;
+  userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
-}
+  title: string;
+};
 
 export function ProposalProperties({
+  proposalLensLink,
   archived,
-  canUpdateProposalProperties,
+  canAnswerRubric,
+  canViewRubricAnswers,
   disabledCategoryInput,
-  isTemplate,
+  onChangeRubricCriteria,
+  onChangeRubricCriteriaAnswer,
   proposalFormInputs,
   pageId,
   proposalId,
   proposalFlowFlags,
   proposalStatus,
-  readOnly,
+  readOnlyAuthors,
+  readOnlyProposalEvaluationType,
+  readOnlyReviewers,
+  readOnlyRubricCriteria,
+  rubricAnswers = [],
+  rubricCriteria,
   setProposalFormInputs,
+  showStatus,
   snapshotProposalId,
-  updateProposalStatus
+  userId,
+  updateProposalStatus,
+  title
 }: ProposalPropertiesProps) {
-  const { categories } = useProposalCategories();
-
+  const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
+  const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
-  const { space: currentSpace } = useCurrentSpace();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const { members } = useMembers();
-  const { roles = [] } = useRoles();
-  const { user } = useUser();
-  const { data: proposalTemplates = [] } = useSWR(
-    () => (currentSpace ? `proposals-templates/${currentSpace.id}` : null),
-    () => charmClient.proposals.getProposalTemplatesBySpace({ spaceId: currentSpace!.id })
+  const { proposalTemplates = [] } = useProposalTemplates();
+
+  const previousConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'previous-proposal-status-change-confirmation'
+  });
+  const nextConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'next-proposal-status-change-confirmation'
+  });
+
+  const statuses = getProposalStatuses(proposalFormInputs.evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
+  const nextStatus = statuses[currentStatusIndex + 1];
+  const previousStatus = statuses[currentStatusIndex - 1];
+  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
+  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
+
+  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
+    switch (newStatus) {
+      case 'draft':
+      case 'discussion':
+      case 'review':
+      case 'vote_active':
+      case 'evaluation_active':
+      case 'evaluation_closed':
+      case 'reviewed':
+        if (newStatus === previousStatus) {
+          previousConfirmationPopup.open();
+        } else if (newStatus === nextStatus) {
+          nextConfirmationPopup.open();
+        }
+        break;
+      default:
+        await updateProposalStatus?.(newStatus);
+        break;
+    }
+  }
+
+  const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
+    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-
-  const proposalTemplatePages = useMemo(() => {
-    return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
-  }, [pages]);
-
-  const proposalsRecord = proposalTemplates.reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, Proposal & { page: Page }>);
-
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
-  const isProposalAuthor = user && proposalAuthorIds.some((authorId) => authorId === user.id);
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
+  const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
+  const templateOptions = proposalTemplates
+    .filter((_proposal) => {
+      if (!proposalCategoryId) {
+        return true;
+      }
+      return _proposal.categoryId === proposalCategoryId;
+    })
+    .map((template) => template.page);
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
     : null;
 
-  const isProposalReviewer =
-    user &&
-    proposalReviewers.some((reviewer) => {
-      if (reviewer.group === 'user') {
-        return reviewer.id === user.id;
-      }
-      return user.spaceRoles.some((spaceRole) =>
-        spaceRole.spaceRoleToRole.some(({ roleId }) => roleId === reviewer.id)
-      );
-    });
-
-  const reviewerOptionsRecord: Record<
-    string,
-    ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)
-  > = {};
-
-  const currentUserGroups: ProposalUserGroup[] = [];
-  if (isProposalAuthor) {
-    currentUserGroups.push('author');
-  }
-
-  if (isProposalReviewer) {
-    currentUserGroups.push('reviewer');
-  }
-
-  members.forEach((member) => {
-    reviewerOptionsRecord[member.id] = {
-      ...member,
-      group: 'user'
-    };
-  });
-
-  (roles ?? []).forEach((role) => {
-    reviewerOptionsRecord[role.id] = {
-      ...role,
-      group: 'role'
-    };
-  });
-
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
       setProposalFormInputs({
-        ...proposalFormInputs,
         categoryId: updatedCategory.id,
+        proposalTemplateId: null
+      });
+    } else if (!updatedCategory) {
+      setProposalFormInputs({
+        categoryId: null,
         proposalTemplateId: null
       });
     }
   }
 
-  function onChangeTemplate(templatePage: PageMeta | null) {
+  function applyTemplate(templatePage: PageMeta) {
     if (templatePage && templatePage.proposalId) {
       // Fetch the proposal page to get its content
-      const proposalTemplate = proposalTemplates.find(
+      const proposalTemplate = proposalTemplates?.find(
         (_proposalTemplate) => _proposalTemplate.page.id === templatePage.id
       );
       if (proposalTemplate) {
         setProposalFormInputs({
-          ...proposalFormInputs,
+          categoryId: proposalTemplate.categoryId,
           content: proposalTemplate.page.content as PageContent,
           contentText: proposalTemplate.page.contentText,
           reviewers: proposalTemplate.reviewers.map((reviewer) => ({
             group: reviewer.roleId ? 'role' : 'user',
             id: reviewer.roleId ?? (reviewer.userId as string)
           })),
-          proposalTemplateId: templatePage.id
+          proposalTemplateId: templatePage.id,
+          evaluationType: proposalTemplate.evaluationType,
+          rubricCriteria: proposalTemplate.rubricCriteria
         });
       }
     }
   }
 
+  function clearTemplate() {
+    setProposalFormInputs({
+      proposalTemplateId: null
+    });
+  }
+
   function openVoteModal() {
     setIsVoteModalOpen(true);
+  }
+
+  function onSubmitEvaluation() {
+    onChangeRubricCriteriaAnswer?.();
+    // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
+    setRubricView(1);
   }
 
   useEffect(() => {
@@ -191,221 +236,336 @@ export function ProposalProperties({
 
     prevStatusRef.current = proposalStatus || '';
   }, [detailsExpanded, proposalStatus]);
+
+  const evaluationTabs = useMemo<TabConfig[]>(() => {
+    if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
+      return [];
+    }
+    const tabs = [
+      canAnswerRubric &&
+        ([
+          'Evaluate',
+          <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
+            <RubricEvaluationForm
+              proposalId={proposalId!}
+              answers={myRubricAnswers}
+              criteriaList={rubricCriteria!}
+              onSubmit={onSubmitEvaluation}
+            />
+          </LoadingComponent>
+        ] as TabConfig),
+      canViewRubricAnswers &&
+        ([
+          'Results',
+          <LoadingComponent key='results' isLoading={!rubricCriteria}>
+            <RubricResults
+              answers={rubricAnswers}
+              criteriaList={rubricCriteria || []}
+              reviewerUserIds={reviewerUserIds ?? []}
+              title={title}
+            />
+          </LoadingComponent>,
+          { sx: { p: 0 } }
+        ] as TabConfig)
+    ].filter(isTruthy);
+    return tabs;
+  }, [canAnswerRubric, canViewRubricAnswers, rubricAnswers, myRubricAnswers, reviewerUserIds, rubricCriteria]);
+
   return (
     <Box
-      className='octo-propertylist'
+      className='CardDetail content'
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
+        },
+        '.octo-propertyname .Button': {
+          paddingLeft: 0
         }
       }}
       mt={2}
     >
-      {!isTemplate && (
-        <>
-          <Grid container mb={2}>
-            <ProposalStepSummary
-              archived={archived}
-              proposalFlowFlags={proposalFlowFlags}
-              proposalStatus={proposalStatus}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
+      <div className='octo-propertylist'>
+        {showStatus && (
+          <>
+            <Grid container mb={2}>
+              {!isNewProposal && (
+                <ProposalStepSummary
+                  archived={archived}
+                  proposalFlowFlags={proposalFlowFlags}
+                  proposalStatus={proposalStatus}
+                  handleProposalStatusUpdate={handleProposalStatusUpdate}
+                  evaluationType={proposalFormInputs.evaluationType}
+                />
+              )}
+            </Grid>
 
-          <Stack
-            direction='row'
-            gap={4}
-            alignItems='center'
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setDetailsExpanded((v) => !v)}
-          >
-            <Typography variant='subtitle1'>Additional information</Typography>
-            <IconButton size='small'>
-              <KeyboardArrowDown
-                fontSize='small'
-                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
-              />
-            </IconButton>
-          </Stack>
-        </>
-      )}
-      <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-        {!isTemplate && (
-          <Grid container mb={2} mt={2}>
-            <ProposalStepper
-              proposalFlowPermissions={proposalFlowFlags}
-              proposalStatus={proposalStatus}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
+            <Stack
+              direction='row'
+              gap={1}
+              alignItems='center'
+              sx={{ cursor: 'pointer' }}
+              onClick={() => setDetailsExpanded((v) => !v)}
+            >
+              <Typography fontWeight='bold'>Details</Typography>
+              <IconButton size='small'>
+                <KeyboardArrowDown
+                  fontSize='small'
+                  sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
+                />
+              </IconButton>
+            </Stack>
+          </>
         )}
-        <Grid container mb={2}>
-          <Grid item xs={8}>
-            <Box display='flex' gap={1} alignItems='center'>
-              <Typography fontWeight='bold'>Proposal information</Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
-        {/* Select a category */}
-        <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Category</PropertyLabel>
-            <Box display='flex' flex={1}>
-              <ProposalCategoryInput
-                disabled={disabledCategoryInput}
-                options={categories || []}
-                value={proposalCategory ?? null}
-                onChange={onChangeCategory}
+        <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
+          {showStatus && (
+            <Box mt={2} mb={2}>
+              <ProposalStepper
+                proposalFlowPermissions={proposalFlowFlags}
+                proposalStatus={proposalStatus}
+                handleProposalStatusUpdate={handleProposalStatusUpdate}
+                evaluationType={proposalFormInputs.evaluationType}
               />
             </Box>
-          </Box>
-        </Box>
+          )}
 
-        {/* Select a template */}
-        {!isTemplate && isNewProposal && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+          {/* Select a category */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Template</PropertyLabel>
+              <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
-                <ProposalTemplateInput
-                  options={
-                    proposalTemplatePages.filter((proposalTemplate) => {
-                      if (!proposalTemplate.proposalId) {
-                        return false;
-                      }
-
-                      const _proposal = proposalsRecord[proposalTemplate.proposalId];
-                      if (!_proposal) {
-                        return false;
-                      }
-
-                      return _proposal.categoryId === proposalCategory?.id;
-                    }) || []
-                  }
-                  value={proposalTemplatePage ?? null}
-                  onChange={(page) => {
-                    if (proposalFormInputs.contentText?.length === 0) {
-                      onChangeTemplate(page);
-                    } else {
-                      setSelectedProposalTemplateId(page?.id ?? null);
-                    }
-                  }}
+                <ProposalCategorySelect
+                  disabled={disabledCategoryInput}
+                  options={proposalCategoriesWithCreatePermission || []}
+                  value={proposalCategory ?? null}
+                  onChange={onChangeCategory}
                 />
               </Box>
             </Box>
           </Box>
-        )}
 
-        {/* Select authors */}
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <PropertyLabel readOnly>Author</PropertyLabel>
-            <div style={{ width: '100%' }}>
-              <InputSearchMemberBase
-                filterSelectedOptions
-                multiple
-                placeholder='Select authors'
-                value={members.filter((member) => proposalAuthorIds.some((authorId) => member.id === authorId))}
-                disableCloseOnSelect
-                onChange={async (_, _members) => {
-                  // Must have atleast one author of proposal
-                  if ((_members as Member[]).length !== 0) {
+          {/* Select a template */}
+          {isNewProposal && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly>Template</PropertyLabel>
+                <Box display='flex' flex={1}>
+                  <ProposalTemplateSelect
+                    options={templateOptions}
+                    value={proposalTemplatePage ?? null}
+                    onChange={(template) => {
+                      if (template === null) {
+                        clearTemplate();
+                        // if user has not updated the content, then just overwrite everything
+                      } else if (proposalFormInputs.contentText?.length === 0) {
+                        applyTemplate(template);
+                      } else {
+                        // set value to trigger a prompt
+                        setSelectedProposalTemplateId(template?.id ?? null);
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* Select authors */}
+          <Box justifyContent='space-between' gap={2} alignItems='center'>
+            <div
+              className='octo-propertyrow'
+              style={{
+                display: 'flex',
+                height: 'fit-content',
+                flexGrow: 1
+              }}
+            >
+              <PropertyLabel readOnly>Author</PropertyLabel>
+              <Box display='flex' flex={1}>
+                <UserSelect
+                  memberIds={proposalAuthorIds}
+                  readOnly={readOnlyAuthors}
+                  onChange={(authors) => {
                     setProposalFormInputs({
-                      ...proposalFormInputs,
-                      authors: (_members as Member[]).map((member) => member.id)
+                      authors
                     });
-                  }
-                }}
-                disabled={readOnly}
-                readOnly={readOnly || canUpdateProposalProperties === false}
-                options={members}
-                sx={{
-                  width: '100%'
-                }}
-              />
+                  }}
+                  wrapColumn
+                  showEmptyPlaceholder
+                />
+              </Box>
             </div>
-          </div>
-        </Box>
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <PropertyLabel readOnly>Reviewer</PropertyLabel>
-            <div style={{ width: '100%' }}>
-              <InputSearchReviewers
-                disabled={readOnly}
-                readOnly={readOnly || canUpdateProposalProperties === false}
-                value={proposalReviewers.map((reviewer) => reviewerOptionsRecord[reviewer.id])}
-                disableCloseOnSelect
-                excludedIds={proposalReviewers.map((reviewer) => reviewer.id)}
-                onChange={async (e, options) => {
-                  setProposalFormInputs({
-                    ...proposalFormInputs,
+          </Box>
+          {/* Select reviewers */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Reviewer</PropertyLabel>
+              <UserAndRoleSelect
+                data-test='proposal-reviewer-select'
+                readOnly={readOnlyReviewers}
+                value={proposalReviewers}
+                proposalCategoryId={proposalFormInputs.categoryId}
+                onChange={async (options) => {
+                  await setProposalFormInputs({
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
-                }}
-                sx={{
-                  width: '100%'
+                  refreshReviewerIds();
                 }}
               />
-            </div>
-          </div>
-        </Box>
-      </Collapse>
+            </Box>
+          </Box>
+          {/* Select valuation type */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <ProposalEvaluationTypeSelect
+                disabled={readOnlyProposalEvaluationType}
+                value={proposalFormInputs.evaluationType}
+                onChange={(evaluationType) => {
+                  setProposalFormInputs({
+                    evaluationType
+                  });
+                }}
+              />
+            </Box>
+          </Box>
 
-      <ConfirmDeleteModal
-        onClose={() => {
-          setSelectedProposalTemplateId(null);
-        }}
-        open={!!selectedProposalTemplateId}
-        title='Overwriting your content'
-        buttonText='Overwrite'
-        secondaryButtonText='Go back'
-        question='Are you sure you want to overwrite your current content with the proposal template content?'
+          {/* Publish to lens toggle */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box
+              display='flex'
+              height='fit-content'
+              flex={1}
+              className='octo-propertyrow'
+              // override align-items flex-start with inline style
+              style={{
+                alignItems: 'center'
+              }}
+            >
+              <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+              <Switch
+                // only allow this when the proposal is being created
+                disabled={proposalId !== undefined}
+                checked={proposalFormInputs.publishToLens ?? false}
+                onChange={(e) => {
+                  setProposalFormInputs({
+                    publishToLens: e.target.checked
+                  });
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Lens post link */}
+          {proposalLensLink && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                // override align-items flex-start with inline style
+                style={{
+                  alignItems: 'center'
+                }}
+              >
+                <PropertyLabel readOnly>Lens Post</PropertyLabel>
+                <Link href={`https://lenster.xyz/posts/${proposalLensLink}`} target='_blank' rel='noopener noreferrer'>
+                  <Typography variant='body2' color='primary'>
+                    {proposalLensLink}
+                  </Typography>
+                </Link>
+              </Box>
+            </Box>
+          )}
+          {/* Select rubric criteria */}
+
+          {proposalFormInputs.evaluationType === 'rubric' && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+                <Box display='flex' flex={1} flexDirection='column'>
+                  <ProposalRubricCriteriaInput
+                    readOnly={readOnlyRubricCriteria}
+                    value={proposalFormInputs.rubricCriteria}
+                    onChange={onChangeRubricCriteria}
+                    proposalStatus={proposalStatus}
+                    answers={rubricAnswers ?? []}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </Collapse>
+        <Divider
+          sx={{
+            my: 2
+          }}
+        />
+
+        {evaluationTabs.length > 0 && (
+          <Card variant='outlined' sx={{ my: 2 }}>
+            <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
+          </Card>
+        )}
+
+        <ConfirmDeleteModal
+          onClose={() => {
+            setSelectedProposalTemplateId(null);
+          }}
+          open={!!selectedProposalTemplateId}
+          title='Overwriting your content'
+          buttonText='Overwrite'
+          secondaryButtonText='Go back'
+          question='Are you sure you want to overwrite your current content with the proposal template content?'
+          onConfirm={() => {
+            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
+            if (templatePage) {
+              applyTemplate(templatePage);
+            }
+            setSelectedProposalTemplateId(null);
+          }}
+        />
+        <CreateVoteModal
+          proposalFlowFlags={proposalFlowFlags}
+          proposal={voteProposal}
+          pageId={pageId}
+          snapshotProposalId={snapshotProposalId || null}
+          open={isVoteModalOpen}
+          onCreateVote={() => {
+            setIsVoteModalOpen(false);
+            updateProposalStatus?.('vote_active');
+          }}
+          onPublishToSnapshot={() => {
+            setIsVoteModalOpen(false);
+            updateProposalStatus?.('vote_active');
+          }}
+          onClose={() => {
+            setIsVoteModalOpen?.(false);
+          }}
+        />
+      </div>
+      <ModalWithButtons
+        open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
+        buttonText='Continue'
+        onClose={previousConfirmationPopup.close}
+        onConfirm={() => updateProposalStatus?.(previousStatus)}
+      >
+        <Typography>{previousConfirmationMessage}</Typography>
+      </ModalWithButtons>
+      <ModalWithButtons
+        open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
+        onClose={nextConfirmationPopup.close}
+        buttonText='Continue'
         onConfirm={() => {
-          const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
-          onChangeTemplate(templatePage ?? null);
-          setSelectedProposalTemplateId(null);
+          if (nextStatus === 'vote_active') {
+            openVoteModal?.();
+          } else {
+            updateProposalStatus?.(nextStatus);
+          }
         }}
-      />
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
-      <CreateVoteModal
-        proposalFlowFlags={proposalFlowFlags}
-        proposal={voteProposal}
-        pageId={pageId}
-        snapshotProposalId={snapshotProposalId || null}
-        open={isVoteModalOpen}
-        onCreateVote={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onPublishToSnapshot={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onClose={() => {
-          setIsVoteModalOpen?.(false);
-        }}
-      />
+      >
+        <Typography>{nextConfirmationMessage}</Typography>
+      </ModalWithButtons>
     </Box>
   );
 }

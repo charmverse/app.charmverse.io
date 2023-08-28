@@ -7,7 +7,10 @@ import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 
 export type UpdateableSpaceFields = Partial<
-  Pick<Space, 'notifyNewProposals' | 'hiddenFeatures' | 'domain' | 'name' | 'spaceImage'>
+  Pick<
+    Space,
+    'notifyNewProposals' | 'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles'
+  >
 >;
 
 export async function updateSpace(spaceId: string, updates: UpdateableSpaceFields): Promise<Space> {
@@ -36,7 +39,9 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       name: updates.name,
       spaceImage: updates.spaceImage,
       notifyNewProposals: updates.notifyNewProposals,
-      hiddenFeatures: updates.hiddenFeatures
+      hiddenFeatures: updates.hiddenFeatures,
+      features: updates.features,
+      memberProfiles: updates.memberProfiles
     }
   });
 

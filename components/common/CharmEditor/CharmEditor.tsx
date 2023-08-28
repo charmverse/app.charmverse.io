@@ -38,7 +38,7 @@ import fiduswriterStyles from './components/fiduswriter/styles';
 import { File } from './components/file/File';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as iframe from './components/iframe';
-import InlineCommentThread from './components/inlineComment/inlineComment.components';
+import { InlineCommentThread } from './components/inlineComment/components/InlineCommentThread';
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
@@ -351,6 +351,7 @@ function CharmEditor({
       // console.log('destroy charmeditor');
     };
   }, [editorRef.current]);
+
   return (
     <StyledReactBangleEditor
       colorMode={colorMode}

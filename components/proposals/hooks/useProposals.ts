@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import type { ProposalStatusFilter } from 'components/proposals/components/ProposalViewOptions/ProposalsViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -10,20 +10,14 @@ import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 export function useProposals() {
   const [statusFilter, setStatusFilter] = useState<ProposalStatusFilter>('all');
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
-  const { pages } = usePages();
+  const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
-  const {
-    data: proposals,
-    mutate: mutateProposals,
-    isLoading
-  } = useSWR(space ? `proposals/${space.id}` : null, () =>
-    charmClient.proposals.getProposalsBySpace({ spaceId: space!.id })
-  );
+  const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
   // filter out deleted and templates
-  let filteredProposals = proposals?.filter(
-    (proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal'
-  );
+  let filteredProposals = proposals
+    ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')
+    : [];
   if (statusFilter === 'archived') {
     filteredProposals = filteredProposals?.filter((p) => !!p.archived);
     // Never show archived proposals within the other statuses list
@@ -70,7 +64,7 @@ export function useProposals() {
     setStatusFilter,
     setCategoryIdFilter,
     mutateProposals,
-    isLoading,
+    isLoading: isLoading || loadingPages,
     archiveProposal
   };
 }

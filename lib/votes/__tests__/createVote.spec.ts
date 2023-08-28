@@ -25,7 +25,8 @@ describe('createVote', () => {
       title: 'First vote',
       type: 'Approval',
       context: 'inline',
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1
     });
     expect(createdVote).toMatchObject(
       expect.objectContaining({
@@ -63,7 +64,8 @@ describe('createVote', () => {
       title: 'First vote',
       type: 'Approval',
       context: 'proposal',
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 2
     });
 
     await expect(
@@ -78,7 +80,8 @@ describe('createVote', () => {
         title: 'First vote',
         type: 'Approval',
         context: 'proposal',
-        voteOptions: ['1', '2', '3']
+        voteOptions: ['1', '2', '3'],
+        maxChoices: 3
       })
     ).rejects.toBeInstanceOf(DuplicateDataError);
   });

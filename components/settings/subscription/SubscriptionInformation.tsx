@@ -134,6 +134,7 @@ export function SubscriptionInformation({
     {
       onSuccess() {
         refetchSpaceSubscription();
+        refreshCurrentSpace();
         showMessage('You have successfully switch to free tier!', 'success');
       },
       onError(err) {

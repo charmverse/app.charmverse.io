@@ -39,22 +39,29 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
     throw new UnauthorisedActionError(`You cannot accept this invite.`);
   }
 
-  const spaceRole = await prisma.spaceRole.findFirst({
+  const existingSpaceRole = await prisma.spaceRole.findFirst({
     where: {
       userId,
       spaceId: invite.spaceId
     }
   });
-
   // We don't need to do anything if they are already a member of the space
-  if (spaceRole) {
+  if (existingSpaceRole && (!existingSpaceRole?.isGuest || existingSpaceRole?.isAdmin)) {
     return;
+    // Allow guest to become member
   }
 
   // Only proceed if they are not a member of the space
   log.info('User joined space via invite', { spaceId: invite.spaceId, userId });
-  const createdSpaceRole = await prisma.spaceRole.create({
-    data: {
+  const targetSpaceRole = await prisma.spaceRole.upsert({
+    where: {
+      spaceUser: {
+        userId,
+        spaceId: invite.spaceId
+      }
+    },
+    create: {
+      isGuest: false,
       space: {
         connect: {
           id: invite.spaceId
@@ -66,9 +73,12 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
         }
       },
       joinedViaLink: true
+    },
+    update: {
+      isGuest: false
     }
   });
-  logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
+  logInviteAccepted({ spaceId: targetSpaceRole.spaceId });
 
   updateTrackUserProfileById(userId);
   trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
@@ -94,13 +104,13 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
       prisma.spaceRoleToRole.upsert({
         where: {
           spaceRoleId_roleId: {
-            spaceRoleId: createdSpaceRole.id,
+            spaceRoleId: targetSpaceRole.id,
             roleId
           }
         },
         create: {
           roleId,
-          spaceRoleId: createdSpaceRole.id
+          spaceRoleId: targetSpaceRole.id
         },
         update: {}
       })

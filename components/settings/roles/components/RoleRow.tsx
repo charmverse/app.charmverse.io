@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { IconButton, ListItemIcon, Menu, MenuItem, SvgIcon, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
@@ -10,7 +10,8 @@ import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import GuildXYZIcon from 'public/images/guild_logo.svg';
+import CollabLandIcon from 'public/images/logos/collabland_logo.svg';
+import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
 import SummonDarkIcon from 'public/images/logos/summon_dark_mark.svg';
 import SummonLightIcon from 'public/images/logos/summon_light_mark.svg';
 
@@ -39,15 +40,14 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
 
   let descriptionIcon: ReactNode = null;
   let description: ReactNode = null;
-
   if (role.source === 'collabland') {
-    descriptionIcon = <GuildXYZIcon />;
+    descriptionIcon = CollabLandIcon;
     description = <>This role is managed by Collab.land. Visit https://collab.land/ to modify this role</>;
   } else if (role.source === 'guild_xyz') {
-    descriptionIcon = <GuildXYZIcon />;
+    descriptionIcon = GuildXYZIcon;
     description = <>This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role</>;
   } else if (role.source === 'summon') {
-    descriptionIcon = theme.palette.mode === 'dark' ? <SummonLightIcon /> : <SummonDarkIcon />;
+    descriptionIcon = theme.palette.mode === 'dark' ? SummonLightIcon : SummonDarkIcon;
     description = <>This role is managed by Summon</>;
   }
 

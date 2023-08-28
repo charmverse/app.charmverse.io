@@ -453,7 +453,7 @@ function ViewTabs(props: ViewTabsProps) {
               showView={showView}
               showLabel={true}
               onClose={handleClose}
-              onClickIcon={props.onClickNewView}
+              onClick={props.onClickNewView}
             />
           )}
         </Box>

@@ -6,11 +6,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
-import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -18,8 +18,9 @@ import { publishIncrementalUpdate } from 'components/common/BoardEditor/publishe
 import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { createTableView } from 'lib/focalboard/tableView';
 
 import { Constants } from '../constants';
 import mutator from '../mutator';
@@ -31,10 +32,9 @@ import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
 import { typeDisplayName } from '../widgets/propertyMenu';
 
-function getViewSource({ source, views }: { source?: ViewSourceType; views: BoardView[] }): ViewSourceType | undefined {
-  return views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : source;
-}
-
+/**
+ * @onClick // Default behaviour is to show a dropdown with views. If this provided, then onClick will be handled externally
+ */
 type AddViewProps = {
   board: Board;
   activeView?: BoardView;
@@ -43,7 +43,7 @@ type AddViewProps = {
   showLabel?: boolean;
   showView: (viewId: string) => void;
   sx?: SxProps<Theme>;
-  onClickIcon?: () => void; // override the icon click
+  onClick?: () => void; // override the icon click
   onClose?: () => void;
 };
 
@@ -81,7 +81,6 @@ function AddViewMenu(props: AddViewProps) {
     view.parentId = board.id;
     view.rootId = board.rootId;
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -113,9 +112,8 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView } = props;
 
     Utils.log('addview-table');
-    const view = createTableView({ board, activeView, intl, views: props.views });
+    const view = createTableView({ board, activeView });
     view.id = uuid();
-    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -155,7 +153,6 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -192,7 +189,6 @@ function AddViewMenu(props: AddViewProps) {
     view.rootId = board.rootId;
     view.fields.visiblePropertyIds = [Constants.titleColumnId];
     view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-    view.fields.sourceType = getViewSource({ source: view.fields.sourceType, views: props.views });
 
     const oldViewId = activeView?.id;
 
@@ -238,8 +234,8 @@ function AddViewMenu(props: AddViewProps) {
   }, [viewIds, props.board, props.activeView, props.intl, showView]);
 
   function onClickIcon(e: MouseEvent) {
-    if (props.onClickIcon) {
-      props.onClickIcon();
+    if (props.onClick) {
+      props.onClick();
       closePopup();
     } else {
       popupState.open(e);
@@ -293,28 +289,4 @@ function AddViewMenu(props: AddViewProps) {
     </>
   );
 }
-
-type CreateViewProps = {
-  board: Board;
-  views: BoardView[];
-  activeView?: BoardView;
-  intl?: IntlShape;
-  dataSourceType?: ViewSourceType;
-};
-
-export function createTableView({ board, activeView, intl, dataSourceType, views }: CreateViewProps) {
-  const view = createBoardView(activeView);
-  view.title = '';
-  view.fields.viewType = 'table';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
-  view.fields.columnWidths = {};
-  view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-  view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
-  view.fields.sourceType = views.some((v) => v.fields.sourceType === 'proposals') ? 'proposals' : dataSourceType;
-
-  return view;
-}
-
 export default injectIntl(AddViewMenu);

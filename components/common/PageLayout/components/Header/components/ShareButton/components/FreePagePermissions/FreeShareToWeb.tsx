@@ -1,5 +1,5 @@
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePage } from 'hooks/usePage';
-import { useProposal } from 'hooks/useProposal';
 
 import ShareToWeb from '../common/ShareToWeb';
 
@@ -10,7 +10,7 @@ type Props = {
 export default function FreeShareToWeb({ pageId }: Props) {
   const { page: currentPage } = usePage({ pageIdOrPath: pageId });
 
-  const { proposal } = useProposal({ proposalId: currentPage?.proposalId });
+  const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
 
   const shareAlertMessage =
     currentPage?.type === 'proposal' && proposal?.status === 'draft'
@@ -25,5 +25,13 @@ export default function FreeShareToWeb({ pageId }: Props) {
     // All proposals beyond draft are public
     (currentPage?.type === 'proposal' && proposal?.status !== 'draft');
 
-  return <ShareToWeb disabled pageId={pageId} toggleChecked={isChecked} shareAlertMessage={shareAlertMessage} />;
+  return (
+    <ShareToWeb
+      disabled
+      pageId={pageId}
+      shareChecked={isChecked}
+      discoveryChecked={false}
+      shareAlertMessage={shareAlertMessage}
+    />
+  );
 }

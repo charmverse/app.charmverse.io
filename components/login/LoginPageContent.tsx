@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import Image from 'components/common/Image';
@@ -18,9 +19,10 @@ import { LoginErrorModal } from './LoginErrorModal';
 type Props = {
   hideLoginOptions?: boolean;
   isLoggingIn?: boolean;
+  children?: ReactNode;
 };
 
-export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
+export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
@@ -95,8 +97,9 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               justifyContent={{ xs: 'center', md: 'flex-start' }}
             >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
-              {!hideLoginOptions && <LoginButton />}
+              {!hideLoginOptions && <LoginButton showSignup />}
             </Box>
+            {children}
           </Box>
         </Grid>
         <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>

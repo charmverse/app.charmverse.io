@@ -4,6 +4,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { useEffect } from 'react';
 
 interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -33,18 +34,30 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-interface MultiTabsProps {
-  tabs: [string, React.ReactNode, { sx?: SxProps }?][];
+export type TabConfig = [string, React.ReactNode, { sx?: SxProps }?];
+
+type MultiTabsProps = {
+  tabs: TabConfig[];
   disabled?: boolean;
   tabPanelSx?: SxProps;
-}
+  // allow for controlled tab
+  activeTab?: number;
+  setActiveTab?: (tabIndex: number) => void;
+};
 
 export default function MultiTabs(props: MultiTabsProps) {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState<any>(0);
   const { tabs, disabled = false, tabPanelSx = {} } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
     setValue(newValue);
+    props.setActiveTab?.(newValue);
   };
+
+  useEffect(() => {
+    if (typeof props.activeTab !== 'undefined') {
+      setValue(props.activeTab);
+    }
+  }, [props.activeTab]);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -63,6 +76,7 @@ export default function MultiTabs(props: MultiTabsProps) {
               }}
               key={tabLabel}
               label={tabLabel}
+              data-test={`${tabLabel}-tab`}
             />
           ))}
         </Tabs>
@@ -71,7 +85,14 @@ export default function MultiTabs(props: MultiTabsProps) {
         const sxProps = _props?.sx ?? ({} as SxProps);
         return (
           /* eslint-disable-next-line */
-          <TabPanel value={value} label={tabLabel} sx={{ ...tabPanelSx, ...sxProps } as SxProps} index={tabIndex} key={tabIndex}>
+          <TabPanel
+            value={value}
+            label={tabLabel}
+            sx={{ ...tabPanelSx, ...sxProps } as SxProps}
+            index={tabIndex}
+            // eslint-disable-next-line react/no-array-index-key
+            key={tabIndex}
+          >
             {tabComponent}
           </TabPanel>
         );

@@ -1,6 +1,6 @@
 import { Box, Card, Grid, Typography } from '@mui/material';
 
-import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import Image from 'components/common/Image';
 import { Container } from 'components/login/components/LoginLayout';
@@ -56,7 +56,7 @@ export default function CreateSpace() {
               justifyContent: 'center'
             }}
           >
-            <Image px={3} maxWidth={{ xs: 300, md: 'none' }} src={splashImage} />
+            <Image px={3} maxWidth={{ xs: 300, md: '100%' }} src={splashImage} />
           </Grid>
         </Grid>
       </Container>

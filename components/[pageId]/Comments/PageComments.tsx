@@ -1,23 +1,28 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
+import { useState } from 'react';
 
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
+import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { CommentPermissions } from 'lib/comments';
+import { useUser } from 'hooks/useUser';
+import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type Props = {
-  page: Pick<PageWithContent, 'type' | 'id'>;
+  page: PageWithContent;
   permissions: PagePermissionFlags;
 };
 
 export function PageComments({ page, permissions }: Props) {
+  const { user } = useUser();
   const {
     comments,
     commentSort,
@@ -30,8 +35,14 @@ export function PageComments({ page, permissions }: Props) {
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
+  const { createLensComment } = useLensPublication({
+    proposalId: page.proposalId ?? '',
+    proposalPath: page.path,
+    proposalTitle: page.title
+  });
+  const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
-  const { proposal } = useProposalDetails(isProposal ? page.id : null);
+  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
 
   const commentPermissions: CommentPermissions = {
     add_comment: permissions.comment ?? false,
@@ -39,6 +50,18 @@ export function PageComments({ page, permissions }: Props) {
     downvote: permissions.comment ?? false,
     delete_comments: isAdmin
   };
+
+  async function createComment(comment: CommentContent) {
+    const createdComment = await addComment(comment);
+    if (isProposal && proposal?.lensPostLink && publishCommentsToLens) {
+      await createLensComment({
+        commentContent: comment.content as PageContent,
+        commentId: createdComment.id,
+        proposal: page,
+        lensPostId: proposal.lensPostLink
+      });
+    }
+  }
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
 
@@ -48,7 +71,14 @@ export function PageComments({ page, permissions }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions.comment && <CommentForm handleCreateComment={addComment} />}
+      {permissions.comment && (
+        <CommentForm
+          publishToLens={publishCommentsToLens}
+          setPublishToLens={setPublishCommentsToLens}
+          showPublishToLens={!!page.proposalId && page.type === 'proposal' && !!proposal?.lensPostLink}
+          handleCreateComment={createComment}
+        />
+      )}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -64,7 +94,7 @@ export function PageComments({ page, permissions }: Props) {
                   permissions={commentPermissions}
                   comment={comment}
                   key={comment.id}
-                  handleCreateComment={addComment}
+                  handleCreateComment={createComment}
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={voteComment}

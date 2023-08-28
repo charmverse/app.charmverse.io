@@ -6,7 +6,14 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
-export const proposalPropertyTypesList = ['proposalUrl', 'proposalStatus', 'proposalCategory'] as const;
+export const proposalPropertyTypesList = [
+  'proposalUrl',
+  'proposalStatus',
+  'proposalCategory',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal',
+  'proposalEvaluationAverage'
+] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
 export type PropertyType =
@@ -45,8 +52,8 @@ export const propertyTypesList: PropertyType[] = [
   ...proposalPropertyTypesList
 ];
 
-interface IPropertyOption {
-  id: string;
+interface IPropertyOption<T = string> {
+  id: T;
   value: string;
   color: string;
 }
@@ -60,6 +67,16 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
 };
 
+export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
+
+export type GoogleFormSourceData = {
+  credentialId: string;
+  boardId?: string; // the board which contains the blocks that are synced from this form
+  formId: string;
+  formName: string;
+  formUrl: string;
+};
+
 export type BoardFields = {
   icon: string;
   description: PageContent;
@@ -68,6 +85,10 @@ export type BoardFields = {
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
   viewIds: string[];
+  // Currently only for boards of type proposal
+  sourceType?: DataSourceType;
+  // Currently unused. We will migrate Google Data here in a subsequent PR
+  sourceData?: GoogleFormSourceData;
 };
 
 type Board = Block & {

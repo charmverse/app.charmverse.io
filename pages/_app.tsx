@@ -27,6 +27,7 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
@@ -46,15 +47,11 @@ import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
+import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
 import '@skiff-org/prosemirror-tables/style/tables.css';
-import '@bangle.dev/tooltip/style.css';
-import 'prosemirror-menu/style/menu.css';
-import 'theme/@bangle.dev/styles.scss';
-import 'theme/prosemirror-tables/prosemirror-tables.scss';
-import 'theme/print.scss';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
@@ -81,8 +78,8 @@ import 'components/common/BoardEditor/focalboard/src/components/table/table.scss
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
+import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -95,11 +92,6 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
-import 'theme/focalboard/focalboard.button.scss';
-import 'theme/focalboard/focalboard.main.scss';
-import 'react-resizable/css/styles.css';
-import 'theme/lit-protocol/lit-protocol.scss';
-import 'theme/styles.scss';
 import 'lib/lit-protocol-modal/index.css';
 import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
 import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
@@ -123,6 +115,15 @@ import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleCondit
 import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css';
 import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
+import 'prosemirror-menu/style/menu.css';
+import 'react-resizable/css/styles.css';
+import 'theme/@bangle.dev/styles.scss';
+import 'theme/focalboard/focalboard.button.scss';
+import 'theme/focalboard/focalboard.main.scss';
+import 'theme/lit-protocol/lit-protocol.scss';
+import 'theme/print.scss';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
+import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 type NextPageWithLayout = NextPage & {
@@ -169,6 +170,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
     return (
       <BaseAuthenticateProviders>
         <Component {...pageProps} />
+        <Snackbar />
       </BaseAuthenticateProviders>
     );
   }
@@ -234,25 +236,27 @@ function DataProviders({ children }: { children: ReactNode }) {
             <Web3ConnectionManager>
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <PostCategoriesProvider>
-                    <IsSpaceMemberProvider>
-                      <WebSocketClientProvider>
-                        <MembersProvider>
-                          <BountiesProvider>
-                            <PaymentMethodsProvider>
-                              <PagesProvider>
-                                <MemberPropertiesProvider>
-                                  <UserProfileProvider>
-                                    <PageTitleProvider>{children}</PageTitleProvider>
-                                  </UserProfileProvider>
-                                </MemberPropertiesProvider>
-                              </PagesProvider>
-                            </PaymentMethodsProvider>
-                          </BountiesProvider>
-                        </MembersProvider>
-                      </WebSocketClientProvider>
-                    </IsSpaceMemberProvider>
-                  </PostCategoriesProvider>
+                  <CurrentSpaceProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <PaymentMethodsProvider>
+                                <PagesProvider>
+                                  <MemberPropertiesProvider>
+                                    <UserProfileProvider>
+                                      <PageTitleProvider>{children}</PageTitleProvider>
+                                    </UserProfileProvider>
+                                  </MemberPropertiesProvider>
+                                </PagesProvider>
+                              </PaymentMethodsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
+                  </CurrentSpaceProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>

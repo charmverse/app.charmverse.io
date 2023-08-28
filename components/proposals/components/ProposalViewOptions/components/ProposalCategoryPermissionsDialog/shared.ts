@@ -6,8 +6,9 @@ export type BulkRoleProposalCategoryPermissionUpsert = {
 };
 
 export const proposalCategoryPermissionLabels: Record<ProposalCategoryPermissionLevel, string> = {
-  full_access: 'Create, Vote & Comment',
+  full_access: 'Propose, Comment & Decide',
+  create_comment: 'Propose & Comment',
   view_comment_vote: 'Vote & Comment',
   view_comment: 'Comment',
-  view: 'View'
+  view: 'View only'
 } as const;

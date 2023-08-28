@@ -70,7 +70,7 @@ export function SharedPage({ publicPage }: Props) {
     };
   }, [publicPage?.page.id]);
 
-  const currentPage = pages?.[basePageId];
+  const currentPage = publicPage?.page ?? pages?.[basePageId];
 
   if (!currentPage && publicPage) {
     return <LoadingComponent isLoading />;

@@ -15,7 +15,7 @@ import Legend from 'components/settings/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useNotionImport } from 'hooks/useNotionImport';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import NotionIcon from 'public/images/notion_logo.svg';
+import NotionIcon from 'public/images/logos/notion_logo.svg';
 
 export function ImportSettings({ space }: { space: Space }) {
   const { loading } = useNotionImport();

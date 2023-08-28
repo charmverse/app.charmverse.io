@@ -15,7 +15,7 @@ export function usePageComments(pageId: string) {
   const comments = useMemo(() => {
     if (data) {
       return sortComments({
-        comments: processComments(data),
+        comments: processComments({ comments: data, sort: commentSort }),
         sort: commentSort
       });
     }
@@ -27,6 +27,7 @@ export function usePageComments(pageId: string) {
     async (comment: CommentContent) => {
       const newComment = await charmClient.pages.createComment({ pageId, comment });
       mutate((existingComments) => (existingComments ? [...existingComments, newComment] : [newComment]));
+      return newComment;
     },
     [mutate, pageId]
   );

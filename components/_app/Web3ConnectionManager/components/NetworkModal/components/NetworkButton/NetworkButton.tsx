@@ -10,7 +10,7 @@ import { greyColor2 } from 'theme/colors';
 
 type Props = {
   chain: Blockchain;
-  requestNetworkChange: () => void;
+  requestNetworkChange: () => void | Promise<void>;
 };
 
 const ImageIcon = styled.img`

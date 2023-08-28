@@ -10,12 +10,12 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
 import { charmverseDiscordInvite } from 'config/constants';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 import { Container } from './components/LoginLayout';
 
 const Background = styled(Box)`
-  background-color: ${({ theme }) => theme.palette.background.dark};
+  background-color: ${({ theme }) => theme.palette.background.light};
   flex-grow: 1;
 `;
 
@@ -48,7 +48,7 @@ const StyledIconButton = styled(IconButton)`
 export default function Footer() {
   return (
     <Background mt={6} sx={{ flexGrow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-      <Container py={9} px={3}>
+      <Container pt={5} pb={9} px={3}>
         <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
             <LinkHeader>Links</LinkHeader>

@@ -3,10 +3,10 @@ import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';
 
 // Import hooks to mock
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { useProposal } from 'hooks/useProposal';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 import PaidShareToWeb from '../PaidShareToWeb';
@@ -20,8 +20,8 @@ jest.mock('next/router', () => ({
     asPath: ''
   }))
 }));
-jest.mock('hooks/useProposal', () => ({
-  useProposal: jest.fn(() => ({
+jest.mock('charmClient/hooks/proposals', () => ({
+  useGetProposalDetails: jest.fn(() => ({
     proposal: null
   }))
 }));
@@ -59,8 +59,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    let toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    let toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeChecked();
@@ -86,11 +86,11 @@ describe('PaidShareToWeb', () => {
       />
     );
 
-    toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveTextContent('Unpublish');
     expect(toggle).not.toBeDisabled();
   });
 
@@ -105,8 +105,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeDisabled();
@@ -123,8 +123,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).toBeDisabled();
@@ -136,8 +136,8 @@ describe('PaidShareToWeb', () => {
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<Partial<ReturnType<typeof useProposal>>>).mockReturnValueOnce({
-      proposal: {
+    (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
+      data: {
         status: 'draft'
       } as any
     });
@@ -158,11 +158,11 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveTextContent('Publish to web');
     expect(toggle).toBeDisabled();
   });
 
@@ -172,8 +172,8 @@ describe('PaidShareToWeb', () => {
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
       permissions: new AvailablePagePermissions().full
     });
-    (useProposal as jest.Mock<Partial<ReturnType<typeof useProposal>>>).mockReturnValueOnce({
-      proposal: {
+    (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
+      data: {
         status: 'discussion'
       } as any
     });
@@ -194,11 +194,11 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveTextContent('Unpublish');
     expect(toggle).toBeDisabled();
   });
 
@@ -225,8 +225,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeDisabled();

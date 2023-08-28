@@ -1,9 +1,12 @@
 import { v4 as uuid } from 'uuid';
 
+import { deterministicRandomName } from 'lib/utilities/randomName';
 import type { LoggedInUser } from 'models';
 
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
+  const id = uuid();
   return {
+    publishToLensDefault: false,
     id: uuid(),
     avatar: null,
     avatarChain: null,
@@ -17,7 +20,7 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
     emailNewsletter: false,
     emailNotifications: false,
     identityType: 'Wallet',
-    username: uuid(),
+    username: deterministicRandomName(id),
     path: uuid(),
     spacesOrder: [],
     xpsEngineId: null,

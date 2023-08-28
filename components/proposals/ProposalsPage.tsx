@@ -6,7 +6,7 @@ import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { NewProposalButton } from 'components/votes/components/NewProposalButton';
+import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -73,7 +73,7 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  <NewProposalButton mutateProposals={mutateProposals} />
+                  <NewProposalButton />
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
@@ -103,14 +103,14 @@ export function ProposalsPage() {
 
           {loadingData ? (
             <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent isLoading size={50} />
+              <LoadingComponent height={500} isLoading size={50} />
             </Grid>
           ) : (
             <Grid item xs={12} sx={{ mt: 5 }}>
               {proposals?.length === 0 && (
                 <EmptyStateVideo
                   description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with Charmverse'
+                  videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}

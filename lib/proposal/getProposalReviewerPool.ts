@@ -1,9 +1,9 @@
-import { ProposalNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import type { ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getProposalReviewerPool({ resourceId }: Resource): Promise<ProposalReviewerPool> {
-  const proposal = await prisma.proposal.findUnique({
+  const category = await prisma.proposalCategory.findUnique({
     where: {
       id: resourceId
     },
@@ -12,13 +12,15 @@ export async function getProposalReviewerPool({ resourceId }: Resource): Promise
     }
   });
 
-  if (!proposal) {
-    throw new ProposalNotFoundError(resourceId);
+  if (!category) {
+    throw new DataNotFoundError(`Proposal category with id ${resourceId} not found`);
   }
+
+  const spaceId = category.spaceId;
 
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      spaceId: proposal.spaceId
+      spaceId
     },
     select: {
       userId: true

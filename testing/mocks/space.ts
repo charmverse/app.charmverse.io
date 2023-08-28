@@ -1,6 +1,9 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { memberProfileNames } from 'lib/profile/memberProfiles';
+
 export const createMockSpace = (space?: Partial<Space>): Space => {
   const newUserId = uuid();
   return {
@@ -32,6 +35,8 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     webhookSigningSecret: null,
     publicProposals: null,
     hiddenFeatures: [],
+    features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
+    memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
     isCustomDomainVerified: null,
     ...space
   } as any;

@@ -1,22 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import type { UserVote } from '@charmverse/core/prisma';
+import { VoteType, type UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import {
-  Box,
-  Button,
-  Card,
-  Chip,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  List,
-  ListItem,
-  ListItemText,
-  Radio,
-  RadioGroup,
-  Typography
-} from '@mui/material';
+import { Box, Button, Card, Chip, Divider, FormControl, List, ListItem, ListItemText, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -26,12 +12,15 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
+import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Modal from 'components/common/Modal';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
@@ -43,7 +32,7 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choice: string) => Promise<UserVote>;
+  castVote: (voteId: string, choice: string | string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -68,7 +57,8 @@ export function VoteDetail({
   isProposal,
   disableVote
 }: VoteDetailProps) {
-  const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult } = vote;
+  const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult, type, maxChoices } =
+    vote;
   const { user } = useUser();
   const view = useEditorViewContext();
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
@@ -76,6 +66,7 @@ export function VoteDetail({
   );
   const { mutate: refetchTasks } = useTasks();
   const { getMemberById } = useMembers();
+  const showPageContent = content && !checkIsContentEmpty(content as PageContent);
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -95,9 +86,41 @@ export function VoteDetail({
 
   const hasPassedDeadline = new Date(deadline) < new Date();
   const userVoteChoice =
-    userVotes && user ? userVotes.find((userVote) => userVote.userId === user.id)?.choice ?? userChoice : userChoice;
+    userVotes && user ? userVotes.find((userVote) => userVote.userId === user.id)?.choices ?? userChoice : userChoice;
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
+
+  const onVoteChange = async (v: string | string[]) => {
+    if (!user) {
+      return;
+    }
+
+    const userVote = await castVote(id, v);
+    refetchTasks();
+    mutate(
+      (_userVotes) => {
+        if (_userVotes) {
+          const existingUserVoteIndex = _userVotes.findIndex((_userVote) => _userVote.userId === user.id);
+          // User already voted
+          if (existingUserVoteIndex !== -1) {
+            _userVotes.splice(existingUserVoteIndex, 1);
+          }
+
+          return [
+            {
+              ...userVote,
+              user
+            },
+            ..._userVotes
+          ];
+        }
+        return undefined;
+      },
+      {
+        revalidate: false
+      }
+    );
+  };
 
   function removeFromPage(voteId: string) {
     if (view) {
@@ -106,7 +129,7 @@ export function VoteDetail({
   }
 
   return (
-    <VotesWrapper detailed={detailed} id={`vote.${vote.id}`}>
+    <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
           {!isProposal ? title : 'Poll on this proposal'}
@@ -126,7 +149,7 @@ export function VoteDetail({
         </Typography>
         <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
-      {content && (
+      {showPageContent && (
         <Box my={1} mb={2}>
           <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
@@ -137,59 +160,29 @@ export function VoteDetail({
         title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
       >
         <StyledFormControl>
-          <RadioGroup name={vote.id} value={userVoteChoice}>
-            {voteOptions.map((voteOption) => (
-              <FormControlLabel
-                key={voteOption.name}
-                control={<Radio size='small' />}
-                disabled={isVotingClosed(vote) || !user || !!disableVote}
-                value={voteOption.name}
-                label={
-                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                    <span>{voteOption.name}</span>
-                    <Typography variant='subtitle1' color='secondary' component='span'>
-                      {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
-                        2
-                      )}
-                      %
-                    </Typography>
-                  </Box>
-                }
-                disableTypography
-                onChange={async () => {
-                  if (user) {
-                    const userVote = await castVote(id, voteOption.name);
-                    refetchTasks();
-                    mutate(
-                      (_userVotes) => {
-                        if (_userVotes) {
-                          const existingUserVoteIndex = _userVotes.findIndex(
-                            (_userVote) => _userVote.userId === user.id
-                          );
-                          // User already voted
-                          if (existingUserVoteIndex !== -1) {
-                            _userVotes.splice(existingUserVoteIndex, 1);
-                          }
+          {(type === VoteType.Approval || type === VoteType.SingleChoice) && (
+            <SingleChoiceForm
+              value={userVoteChoice?.[0]}
+              voteOptions={voteOptions}
+              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              totalVotes={totalVotes}
+              aggregatedResult={aggregatedResult}
+              onChange={onVoteChange}
+            />
+          )}
 
-                          return [
-                            {
-                              ...userVote,
-                              user
-                            },
-                            ..._userVotes
-                          ];
-                        }
-                        return undefined;
-                      },
-                      {
-                        revalidate: false
-                      }
-                    );
-                  }
-                }}
-              />
-            ))}
-          </RadioGroup>
+          {type === VoteType.MultiChoice && (
+            <MultiChoiceForm
+              value={userVoteChoice}
+              voteOptions={voteOptions}
+              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              totalVotes={totalVotes}
+              aggregatedResult={aggregatedResult}
+              onChange={onVoteChange}
+              maxChoices={maxChoices}
+              hasPassedDeadline={hasPassedDeadline}
+            />
+          )}
         </StyledFormControl>
       </Tooltip>
       {!detailed && (
@@ -220,6 +213,12 @@ export function VoteDetail({
         <List>
           {userVotes.map((userVote) => {
             const member = getMemberById(userVote.user.id);
+            const choices = userVote.choice ? [userVote.choice] : userVote.choices;
+
+            if (!choices.length) {
+              return null;
+            }
+
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem
@@ -241,7 +240,7 @@ export function VoteDetail({
                     }
                   />
                   <Typography fontWeight={500} color='secondary'>
-                    {userVote.choice}
+                    {choices.join(', ')}
                   </Typography>
                 </ListItem>
                 <Divider />

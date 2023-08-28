@@ -31,6 +31,7 @@ function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPag
 const templates: Omit<ExportedPage, StandardFields>[] = [
   {
     title: 'Grants',
+    sourceTemplateId: null,
     content: {
       type: 'doc',
       content: [
@@ -486,11 +487,14 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'ab2fde3d-2a3c-420a-a460-cd106a0c289f',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
@@ -500,6 +504,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedAt: null,
       categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
+      evaluationType: 'vote',
       category: {
         id: '4532b730-f8fa-4925-a056-4d1b175d0d67',
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
@@ -1619,15 +1624,20 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
+    sourceTemplateId: null,
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: '648cd168-771a-40d9-a5c7-44699b8f1337',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
@@ -2037,15 +2047,20 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
+    sourceTemplateId: null,
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'e4cad114-c6a4-4516-82a7-6eca8208f31e',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
@@ -2381,15 +2396,20 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'a36b0073-7ebc-4c55-8d22-3918b5226e0a',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
@@ -3069,15 +3089,20 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: '17fafdb0-6030-43b3-8a0c-c2f64b240810',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
@@ -3757,15 +3782,20 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'b61aae93-96a0-4988-8aba-cc70bd968b37',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
       archived: false,

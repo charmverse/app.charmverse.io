@@ -4,19 +4,22 @@ import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/focalboard/src/components/properties/SelectProperty/SelectProperty';
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../components/properties/TextInput';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
-import { TextInput } from '../widgets/TextInput';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -24,12 +27,12 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import { UserProperty } from './properties/user/user';
 
 type Props = {
   board: Board;
   readOnly: boolean;
   card: Card;
+  syncWithPageId?: string | null;
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
@@ -40,11 +43,39 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
 };
 
+/**
+ * Hide these values if user is not an evalutor for the proposal
+ */
+const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
+  'proposalEvaluationAverage',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal'
+];
+
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
+  const {
+    card,
+    syncWithPageId,
+    propertyTemplate,
+    readOnly,
+    showEmptyPlaceholder,
+    board,
+    updatedBy,
+    updatedAt,
+    displayType
+  } = props;
+
+  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
+    useProposalsWhereUserIsEvaluator({
+      spaceId:
+        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
+          ? board.spaceId
+          : undefined
+    });
+
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
@@ -56,7 +87,6 @@ function PropertyValueElement(props: Props) {
     : '';
   const router = useRouter();
   const domain = router.query.domain as string;
-  const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
@@ -104,7 +134,9 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalStatus'
   ) {
     propertyValueElement = (
-      <SelectProperty
+      <TagSelect
+        data-test='closed-select-input'
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
@@ -129,12 +161,16 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.type === 'person') {
+  } else if (propertyTemplate.type === 'person' || propertyTemplate.type === 'proposalEvaluatedBy') {
     propertyValueElement = (
-      <UserProperty
+      <UserSelect
         displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        readOnly={
+          readOnly ||
+          (displayType !== 'details' && displayType !== 'table') ||
+          propertyTemplate.type === 'proposalEvaluatedBy'
+        }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -206,11 +242,15 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = <TextInput {...commonProps} />;
     }
-  } else if (propertyTemplate.type === 'proposalUrl' && typeof finalDisplayValue === 'string') {
-    const proposalUrl = getAbsolutePath(`/${finalDisplayValue}`, domain);
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${displayValue}`, domain);
     propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
   } else if (propertyValueElement === null) {
-    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+    propertyValueElement = (
+      <div className='octo-propertyvalue'>
+        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+      </div>
+    );
   }
 
   const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);
@@ -221,6 +261,16 @@ function PropertyValueElement(props: Props) {
     return null;
   }
 
+  // Explicitly hide the value for this proposal
+  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
+    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId]) {
+      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
+    } else if (syncWithPageId && !!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId]) {
+      return propertyValueElement;
+    } else {
+      return null;
+    }
+  }
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>

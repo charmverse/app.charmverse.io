@@ -1,5 +1,4 @@
 import { DateUtils } from 'react-day-picker';
-import type { IntlShape } from 'react-intl';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
@@ -9,7 +8,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
-import type { FilterCondition } from 'lib/focalboard/filterClause';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createCommentBlock } from './blocks/commentBlock';
@@ -20,7 +18,7 @@ import { Utils } from './utils';
 class OctoUtils {
   static propertyDisplayValue(
     block: Block,
-    propertyValue: string | string[] | undefined,
+    propertyValue: string | string[] | undefined | number,
     propertyTemplate: IPropertyTemplate,
     formatter: {
       date: (date: Date | string) => string;
@@ -28,7 +26,7 @@ class OctoUtils {
     }
   ) {
     const { date: formatDate, dateTime: formatDateTime } = formatter;
-    let displayValue: string | string[] | undefined;
+    let displayValue: string | string[] | undefined | number;
     switch (propertyTemplate.type) {
       case 'select': {
         // The property value is the id of the template
@@ -39,7 +37,7 @@ class OctoUtils {
         break;
       }
       case 'multiSelect': {
-        if (propertyValue?.length) {
+        if (Array.isArray(propertyValue)) {
           const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
           displayValue = options.map((o) => o.value);
         }

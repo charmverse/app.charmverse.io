@@ -118,7 +118,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   return res.status(201).json(createdPermission);
 }
-
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
   const { permissionId } = (req.query || req.body) as PermissionResource;
 

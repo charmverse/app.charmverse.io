@@ -1,7 +1,8 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { ViewSourceType } from 'lib/focalboard/boardView';
+import type { BoardFields, DataSourceType } from 'lib/focalboard/board';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -33,7 +34,7 @@ export function boardWithCardsArgs({
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
-  viewDataSource?: ViewSourceType;
+  viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
@@ -136,7 +137,7 @@ export function boardWithCardsArgs({
         createdBy,
         updatedAt: '2022-09-14T14:13:05.326Z',
         updatedBy: createdBy,
-        title: 'How to web3 in Uni? ',
+        title: 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [
@@ -216,9 +217,10 @@ export function boardWithCardsArgs({
         type: 'board',
         title: 'My blog',
         fields: {
+          sourceType: viewDataSource,
           icon: '📝',
           isTemplate: false,
-          description: '',
+          description: undefined,
           headerImage: null,
           cardProperties: [
             {
@@ -251,8 +253,8 @@ export function boardWithCardsArgs({
             }
           ],
           showDescription: false,
-          columnCalculations: []
-        }
+          columnCalculations: {}
+        } as Partial<BoardFields>
       },
       views: [] as Block[]
     }
@@ -295,7 +297,8 @@ export function boardWithCardsArgs({
           operation: 'and'
         },
         viewType: 'gallery',
-        sourceType: viewDataSource,
+        // Leave out view datasource from the views since we are migrating proposals
+        sourceType: viewDataSource === 'proposals' ? undefined : viewDataSource,
         cardOrder: [cardIds[1], cardIds[0]],
         sortOptions: [],
         columnWidths: {},
@@ -306,7 +309,7 @@ export function boardWithCardsArgs({
         columnCalculations: {},
         kanbanCalculations: {},
         visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
-      }
+      } as Partial<BoardFields> as any
     });
   }
 

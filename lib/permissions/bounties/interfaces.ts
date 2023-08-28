@@ -15,15 +15,19 @@ export type BountyPermissionAssignment = {
   assignee: TargetPermissionGroup;
 } & Resource;
 
-// The set of all permissions for an individual bounty
-export type BountyPermissions = { [key in BountyPermissionLevel]: TargetPermissionGroup[] };
-
 // Groups that can be assigned to various bounty actions
 export type BountyReviewer = Extract<AssignablePermissionGroupsWithPublic, 'role' | 'user'>;
 
 export type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'space' | 'role'>;
 
 export type BountyPermissionGroup = TargetPermissionGroup<BountyReviewer | BountySubmitter>;
+
+// The set of all permissions for an individual bounty
+export type BountyPermissions = {
+  reviewer: TargetPermissionGroup<BountyReviewer>[];
+  creator: TargetPermissionGroup[];
+  submitter: TargetPermissionGroup<BountySubmitter>[];
+};
 
 export interface AssignedBountyPermissions {
   bountyPermissions: BountyPermissions;
