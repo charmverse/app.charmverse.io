@@ -511,7 +511,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      properties: {}
+      fields: {}
     }
   },
   {
@@ -1650,7 +1650,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      properties: {}
+      fields: {}
     }
   },
   {
@@ -2074,7 +2074,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      properties: {}
+      fields: {}
     }
   },
   {
@@ -2424,7 +2424,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Protocol',
         color: 'pink'
       },
-      properties: {}
+      fields: {}
     }
   },
   {
@@ -3118,7 +3118,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Metagoverance',
         color: 'pink'
       },
-      properties: {}
+      fields: {}
     }
   },
   {
@@ -3812,7 +3812,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Metagoverance',
         color: 'pink'
       },
-      properties: {}
+      fields: {}
     }
   }
 ];

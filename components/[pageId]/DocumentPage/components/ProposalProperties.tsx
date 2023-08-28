@@ -82,7 +82,7 @@ export function ProposalProperties({
         group: reviewer.roleId ? 'role' : 'user',
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
-    properties: typeof proposal?.properties === 'object' ? proposal.properties : {}
+    fields: typeof proposal?.fields === 'object' ? proposal.fields : {}
   };
 
   async function updateProposalStatus(newStatus: ProposalStatus) {

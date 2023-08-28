@@ -1,6 +1,7 @@
 import { ProposalBlockType } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { PropertyType } from 'lib/focalboard/board';
 import { createBlock } from 'lib/proposal/blocks/createBlock';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
 import { updateBlock } from 'lib/proposal/blocks/updateBlock';
@@ -19,13 +20,13 @@ describe('proposal blocks - updateBlock', () => {
           {
             id: v4(),
             name: 'title',
-            type: 'string',
+            type: 'string' as PropertyType,
             options: []
           },
           {
             id: v4(),
             name: 'tag',
-            type: 'select',
+            type: 'select' as PropertyType,
             options: [
               { id: v4(), color: 'red', value: 'apple' },
               { id: v4(), color: 'blue', value: 'orange' }
@@ -50,7 +51,7 @@ describe('proposal blocks - updateBlock', () => {
           {
             id: v4(),
             name: 'tagz',
-            type: 'select',
+            type: 'select' as PropertyType,
             options: [
               { id: v4(), color: 'red', value: 'apple' },
               { id: v4(), color: 'blue', value: 'orange' }
@@ -83,13 +84,13 @@ describe('proposal blocks - updateBlock', () => {
           {
             id: v4(),
             name: 'title',
-            type: 'string',
+            type: 'string' as PropertyType,
             options: []
           },
           {
             id: v4(),
             name: 'tag',
-            type: 'select',
+            type: 'select' as PropertyType,
             options: [
               { id: v4(), color: 'red', value: 'apple' },
               { id: v4(), color: 'blue', value: 'orange' }
@@ -108,13 +109,13 @@ describe('proposal blocks - updateBlock', () => {
           {
             id: v4(),
             name: 'title2',
-            type: 'string',
+            type: 'string' as PropertyType,
             options: []
           },
           {
             id: v4(),
             name: 'tag2',
-            type: 'select',
+            type: 'select' as PropertyType,
             options: [
               { id: v4(), color: 'red', value: 'apple2' },
               { id: v4(), color: 'blue', value: 'orange2' }

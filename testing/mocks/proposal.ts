@@ -22,7 +22,7 @@ export function createMockProposal(input: Partial<ProposalWithUsersAndRubric> = 
     snapshotProposalExpiry: null,
     spaceId: '',
     status: 'draft',
-    properties: {},
+    fields: {},
     ...input
   };
 }

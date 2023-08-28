@@ -394,7 +394,7 @@ export async function generateImportWorkspacePages({
         createdBy: space.createdBy,
         status: 'draft',
         id: oldNewPageIdHashMap[node.id],
-        properties: proposal.properties || {}
+        fields: proposal.fields || {}
       });
       pageArgs.push(newPageContent);
     }

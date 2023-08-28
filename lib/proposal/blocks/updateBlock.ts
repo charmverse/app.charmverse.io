@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { ProposalBlockUpdateInput } from 'lib/proposal/blocks/interfaces';
@@ -25,6 +25,7 @@ export function updateBlock({
     },
     data: {
       ...data,
+      fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
       updatedBy: userId
     }
   });

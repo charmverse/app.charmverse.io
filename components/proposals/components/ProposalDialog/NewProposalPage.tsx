@@ -204,9 +204,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
                         rubricCriteria
                       });
                     }}
-                    // custom properties
-                    updatedAt={new Date().toString()}
-                    updatedById={user?.id}
                   />
                 </div>
               </div>

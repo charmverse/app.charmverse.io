@@ -88,7 +88,7 @@ export function NewProposal() {
       }
     ],
     title: 'A simple proposition',
-    properties: {}
+    fields: {}
   });
 
   return (

@@ -159,7 +159,7 @@ function emptyState({
     rubricCriteria: [],
     title: '',
     publishToLens: false,
-    properties: {},
+    fields: {},
     ...inputs,
     authors: userId ? [userId] : []
   };
