@@ -72,14 +72,9 @@ export function usePageComments(pageId: string) {
   const syncPageComments = useCallback(async () => {
     const newComments = await charmClient.pages.syncPageComments({ pageId });
 
-    mutate(
-      () => {
-        return newComments;
-      },
-      {
-        revalidate: false
-      }
-    );
+    mutate(() => newComments, {
+      revalidate: false
+    });
   }, [mutate, pageId]);
 
   return {

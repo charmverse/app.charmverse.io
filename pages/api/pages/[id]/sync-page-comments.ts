@@ -6,6 +6,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { syncPageComments } from 'lib/pages/comments/syncPageComments';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -39,6 +40,7 @@ async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResp
       id: pageId
     },
     select: {
+      spaceId: true,
       proposal: {
         select: {
           lensPostLink: true
@@ -52,7 +54,9 @@ async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResp
     throw new Error("Proposal not found or it hasn't been posted in Lens yet");
   }
 
-  const pageCommentsWithVotes = await syncPageComments({ pageId, lensPostLink, userId });
+  const pageCommentsWithVotes = await syncPageComments({ spaceId: page.spaceId, pageId, lensPostLink, userId });
 
   res.status(200).json(pageCommentsWithVotes);
 }
+
+export default withSessionRoute(handler);

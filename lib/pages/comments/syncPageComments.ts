@@ -1,7 +1,5 @@
-import type { User } from '@charmverse/core/prisma-client';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
-import type { CommentFragment, ProfileFragment } from '@lens-protocol/client';
-import { PublicationTypes } from '@lens-protocol/client';
+import type { CommentFragment } from '@lens-protocol/client';
 
 import { lensClient } from 'lib/lens/lensClient';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
@@ -9,13 +7,77 @@ import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { listPageComments } from './listPageComments';
 
 const usernameSuffix = 'lens-imported';
-const pathSuffix = '-lens-bot';
+const pathSuffix = 'lens-bot';
+
+const MAX_COMMENT_DEPTH = 5;
+
+type CommentFragmentWithMeta = CommentFragment & { parentId: string; depth: number };
+
+async function fetchLensComments({
+  depth = 1,
+  parentId
+}: {
+  parentId: string;
+  depth: number;
+}): Promise<CommentFragmentWithMeta[]> {
+  if (depth === MAX_COMMENT_DEPTH) {
+    return [];
+  }
+
+  const comments: CommentFragmentWithMeta[] = [];
+
+  let publicationFetchAllResponse = await lensClient.publication.fetchAll({
+    commentsOf: parentId
+  });
+
+  if (publicationFetchAllResponse.items.length === 0) {
+    return [];
+  }
+
+  comments.push(
+    ...(publicationFetchAllResponse.items.map((comment) => ({
+      ...comment,
+      depth,
+      parentId
+    })) as CommentFragmentWithMeta[])
+  );
+
+  while (publicationFetchAllResponse.pageInfo.next) {
+    publicationFetchAllResponse = await lensClient.publication.fetchAll({
+      cursor: publicationFetchAllResponse.pageInfo.next,
+      commentsOf: parentId
+    });
+
+    comments.push(
+      ...(publicationFetchAllResponse.items.map((comment) => ({
+        ...comment,
+        depth,
+        parentId
+      })) as CommentFragmentWithMeta[])
+    );
+  }
+
+  const nestedCommentsPromises = comments.map(async (comment) => {
+    const nestedComments = await fetchLensComments({
+      depth: depth + 1,
+      parentId: comment.id
+    });
+    return [comment, ...nestedComments];
+  });
+
+  const nestedComments = await Promise.all(nestedCommentsPromises);
+
+  // Sort based on ascending order of depth
+  return nestedComments.flat().sort((a, b) => a.depth - b.depth);
+}
 
 export async function syncPageComments({
   userId,
   pageId,
-  lensPostLink
+  lensPostLink,
+  spaceId
 }: {
+  spaceId: string;
   pageId: string;
   userId: string;
   lensPostLink: string;
@@ -29,86 +91,64 @@ export async function syncPageComments({
     currentCharmVerseComments.filter((comment) => comment.lensCommentLink).map((comment) => comment.lensCommentLink)
   );
 
-  let allLensComments: CommentFragment[] = [];
-
-  const lensComments = await lensClient.publication.fetchAll({
-    publicationTypes: [PublicationTypes.Comment],
-    publicationIds: [lensPostLink]
+  const lensComments = await fetchLensComments({
+    depth: 1,
+    parentId: lensPostLink
   });
 
-  allLensComments.push(...(lensComments.items as CommentFragment[]));
+  const lensCommentIdCharmverseCommentIdRecord: Record<string, string> = {};
 
-  while (lensComments.pageInfo.next) {
-    const nextComments = await lensClient.publication.fetchAll({
-      publicationTypes: [PublicationTypes.Comment],
-      publicationIds: [lensPostLink],
-      cursor: lensComments.pageInfo.next
-    });
-    allLensComments.push(...(nextComments.items as CommentFragment[]));
-  }
+  for (const lensComment of lensComments) {
+    if (!commentIdsPublishedToLens.has(lensComment.id)) {
+      const lensUserHandle = lensComment.profile.handle.toLowerCase();
+      let charmVerseUser = await prisma.user.findFirst({
+        where: {
+          username: `${lensUserHandle}-${usernameSuffix}`
+        },
+        select: {
+          id: true
+        }
+      });
 
-  // Filter out the lens comments which have been already publish from charmVerse
-  allLensComments = allLensComments.filter((lensComment) => !commentIdsPublishedToLens.has(lensComment.id));
-
-  // Keep track of the lens comment id and the lens user handle
-  const lensCommentIdUserHandleRecord: Record<string, string> = {};
-
-  // Keep track of the lens user handle and their charmverse user id
-  const lensUserHandleUserIdRecord: Record<string, string> = {};
-
-  // keep track of lens user handle and their lens profile
-  const lensUserHandleProfileRecord: Record<string, ProfileFragment> = {};
-
-  // Keep track of all the lens users who have commented on the proposal
-  const lensUserProfiles: ProfileFragment[] = [];
-  const lensUserHandles = new Set<string>();
-
-  // lens user handles
-  allLensComments.forEach((lensComment) => {
-    if (!lensUserHandles.has(lensComment.profile.handle)) {
-      lensUserHandles.add(lensComment.profile.handle);
-      lensUserHandleProfileRecord[lensComment.profile.handle] = lensComment.profile;
-      lensUserProfiles.push(lensComment.profile);
-    }
-  });
-
-  // Check for their corresponding charmVerse users
-  const existingLensUsersInCharmVerse = await prisma.user.findMany({
-    where: {
-      username: {
-        in: [...lensUserHandles].map((lensUserHandle) => `${lensUserHandle}-${usernameSuffix}`)
+      if (!charmVerseUser) {
+        charmVerseUser = await prisma.user.create({
+          data: {
+            username: `${lensUserHandle}-${usernameSuffix}`,
+            path: `${lensUserHandle}-${pathSuffix}`,
+            isBot: true,
+            avatar:
+              lensComment.profile.coverPicture?.__typename === 'MediaSet'
+                ? lensComment.profile.coverPicture.original.url
+                : lensComment.profile.coverPicture?.__typename === 'NftImage'
+                ? lensComment.profile.coverPicture.uri
+                : null,
+            spaceRoles: {
+              create: {
+                spaceId
+              }
+            }
+          },
+          select: {
+            id: true
+          }
+        });
       }
+
+      const charmverseComment = await prisma.pageComment.create({
+        data: {
+          pageId,
+          createdBy: charmVerseUser.id,
+          contentText: lensComment.metadata.content ? lensComment.metadata.content : '',
+          content: lensComment.metadata.content ? parseMarkdown(lensComment.metadata.content) : Prisma.JsonNull,
+          lensCommentLink: lensComment.id,
+          // Since we are sorting by depth, parent will always be created before child and thus will be in the record
+          parentId:
+            lensPostLink === lensComment.parentId ? null : lensCommentIdCharmverseCommentIdRecord[lensComment.parentId]
+        }
+      });
+
+      lensCommentIdCharmverseCommentIdRecord[lensComment.id] = charmverseComment.id;
     }
-  });
-
-  existingLensUsersInCharmVerse.forEach((existingLensUser) => {
-    const lensHandle = existingLensUser.username.replace(`-${usernameSuffix}`, '');
-    lensUserHandleUserIdRecord[lensHandle] = existingLensUser.id;
-  });
-
-  // Create the users who don't exist in charmVerse
-
-  for (const lensComment of allLensComments) {
-    lensCommentIdUserHandleRecord[lensComment.id] = lensComment.profile.handle;
-  }
-
-  const commentCreateInputs: Prisma.PageCommentCreateManyInput[] = [];
-
-  for (const lensComment of allLensComments) {
-    const lensUserHandle = lensCommentIdUserHandleRecord[lensComment.id];
-    const charmVerseUserId = lensUserHandleUserIdRecord[lensUserHandle];
-    commentCreateInputs.push({
-      pageId,
-      createdBy: charmVerseUserId,
-      contentText: lensComment.metadata.content ? lensComment.metadata.content : '',
-      content: lensComment.metadata.content ? parseMarkdown(lensComment.metadata.content) : Prisma.JsonNull
-    });
-  }
-
-  if (commentCreateInputs.length) {
-    await prisma.pageComment.createMany({
-      data: commentCreateInputs
-    });
   }
 
   return listPageComments({
