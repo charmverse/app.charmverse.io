@@ -234,7 +234,7 @@ module.exports = {
     /* pattern specifying which files to include (regular expression)
        dependency-cruiser will skip everything not matching this pattern
     */
-    // includeOnly : '',
+    includeOnly : '^(pages|lib|components)',
 
     /* dependency-cruiser will include modules matching against the focus
        regular expression in its output, as well as their neighbours (direct
