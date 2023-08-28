@@ -9,8 +9,7 @@ import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
-import { useDeletePermissions } from 'charmClient/hooks/permissions';
+import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -68,7 +67,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
   const { space } = useCurrentSpace();
   const { mutateMembers: refreshMembers } = useMembers();
   const { trigger: deletePermission } = useDeletePermissions();
-
+  const { trigger: createPermission } = useCreatePermissions();
   const { open, isOpen, close } = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const spaceLevelPermission = pagePermissions.find(
@@ -93,7 +92,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
     );
 
     if (!existingPermission || existingPermission.permissionLevel !== permissionLevel) {
-      await charmClient.createPermission({
+      await createPermission({
         pageId,
         permission: {
           permissionLevel,

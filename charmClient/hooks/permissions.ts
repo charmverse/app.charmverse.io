@@ -9,7 +9,7 @@ import { useDELETE, useGET, usePOST } from './helpers';
 
 // Getters
 
-export function useGetPermissions(pageId?: string) {
+export function useGetPermissions(pageId?: string | null) {
   return useGET<AssignedPagePermission[]>(pageId ? '/api/permissions' : null);
 }
 
