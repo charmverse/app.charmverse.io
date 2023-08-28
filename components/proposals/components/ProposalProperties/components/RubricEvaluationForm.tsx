@@ -76,7 +76,8 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
 
   async function saveForm(values: FormInput) {
     if (proposalId) {
-      const filteredAnswers = values.answers.filter((answer) => !!(answer.response as any)?.score);
+      // answers are optional - filter out ones with no score
+      const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
       await upsertRubricCriteriaAnswer({
         // @ts-ignore -  TODO: make answer types match
         answers: filteredAnswers
