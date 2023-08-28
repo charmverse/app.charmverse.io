@@ -103,7 +103,7 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeRubricCriteriaAnswer() {
+  async function onSaveRubricCriteriaAnswers() {
     refreshProposal();
   }
 
@@ -162,7 +162,7 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
-      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
+      onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}

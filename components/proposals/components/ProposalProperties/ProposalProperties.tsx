@@ -62,7 +62,7 @@ type ProposalPropertiesProps = {
   disabledCategoryInput?: boolean;
   isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  onChangeRubricCriteriaAnswer?: () => void;
+  onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -90,7 +90,7 @@ export function ProposalProperties({
   disabledCategoryInput,
   isFromTemplate,
   onChangeRubricCriteria,
-  onChangeRubricCriteriaAnswer,
+  onSaveRubricCriteriaAnswers,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -226,7 +226,7 @@ export function ProposalProperties({
   }
 
   function onSubmitEvaluation() {
-    onChangeRubricCriteriaAnswer?.();
+    onSaveRubricCriteriaAnswers?.();
     // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
     setRubricView(1);
   }

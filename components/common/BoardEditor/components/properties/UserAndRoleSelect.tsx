@@ -70,7 +70,7 @@ function SelectedReviewers({
   onRemove: (reviewerId: string) => void;
 }) {
   return (
-    <Tooltip title={readOnlyMessage}>
+    <Tooltip title={readOnlyMessage ?? null}>
       <Stack
         display='inline-flex'
         width='min-content'
