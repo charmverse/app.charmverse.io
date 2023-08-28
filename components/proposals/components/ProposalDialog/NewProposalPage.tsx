@@ -137,8 +137,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
-  } else if (checkIsContentEmpty(formInputs.content)) {
-    disabledTooltip = 'Content is required';
   } else if (!formInputs.categoryId) {
     disabledTooltip = 'Category is required';
   } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
@@ -190,6 +188,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
                   <ProposalProperties
+                    isFromTemplate={isFromTemplateSource}
                     readOnlyRubricCriteria={isFromTemplateSource}
                     readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}

@@ -31,6 +31,10 @@ const config = {
     esmExternals: false
     //    externalDir: true
   },
+
+  images: {
+    domains: ['cdn.charmverse.io']
+  },
   transpilePackages: esmModules,
   modularizeImports: {
     '@mui/material': {
