@@ -45,7 +45,7 @@ const CopyButton = styled((props: any) => <MuiButton color='secondary' variant='
 
 export type ShareToWebProps = {
   disabled: boolean;
-  isLoading: boolean;
+  isLoading?: boolean;
   shareChecked: boolean;
   discoveryChecked: boolean;
   pageId: string;
