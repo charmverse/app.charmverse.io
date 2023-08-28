@@ -60,6 +60,7 @@ type ProposalPropertiesProps = {
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
+  isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onChangeRubricCriteriaAnswer?: () => void;
   pageId?: string;
@@ -87,6 +88,7 @@ export function ProposalProperties({
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
+  isFromTemplate,
   onChangeRubricCriteria,
   onChangeRubricCriteriaAnswer,
   proposalFormInputs,
@@ -334,7 +336,8 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
-                  disabled={disabledCategoryInput}
+                  readOnly={disabledCategoryInput}
+                  readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
@@ -401,6 +404,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
+                readOnlyMessage={isFromTemplate ? 'Cannot change reviewers when using template' : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
@@ -418,7 +422,8 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
-                disabled={readOnlyProposalEvaluationType}
+                readOnly={readOnlyProposalEvaluationType}
+                readOnlyMessage={isFromTemplate ? 'Cannot change evaluation type when using template' : undefined}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
@@ -486,6 +491,7 @@ export function ProposalProperties({
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
+                    readOnlyMessage={isFromTemplate ? 'Cannot change rubric criteria when using template' : undefined}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
                     proposalStatus={proposalStatus}

@@ -23,6 +23,7 @@ export type RangeProposalCriteria = {
 
 type Props = {
   readOnly?: boolean;
+  readOnlyMessage?: string;
   proposalStatus?: ProposalStatus;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
@@ -55,7 +56,14 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposalStatus, answers }: Props) {
+export function ProposalRubricCriteriaInput({
+  readOnly,
+  readOnlyMessage,
+  value,
+  onChange,
+  proposalStatus,
+  answers
+}: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
@@ -142,6 +150,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
                   onChange={(title) => setCriteriaProperty(criteria.id, { title })}
                   placeholderText='Add a label...'
                   readOnly={readOnly}
+                  readOnlyMessage={readOnlyMessage}
                   value={criteria.title}
                 />
                 <TextInput
@@ -164,6 +173,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
                             });
                           }}
                           readOnly={readOnly}
+                          readOnlyMessage={readOnlyMessage}
                           value={criteria.parameters.min}
                         />
                         <Typography
@@ -189,6 +199,7 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
                             });
                           }}
                           readOnly={readOnly}
+                          readOnlyMessage={readOnlyMessage}
                           value={criteria.parameters.max}
                         />
                         <Typography
@@ -242,6 +253,7 @@ export function IntegerInput({
   value,
   onChange,
   readOnly,
+  readOnlyMessage,
   inputProps,
   maxWidth,
   sx
@@ -249,6 +261,7 @@ export function IntegerInput({
   value?: number | string | null;
   onChange: (num: number | null) => void;
   readOnly?: boolean;
+  readOnlyMessage?: string;
   inputProps?: any;
   maxWidth?: number;
   sx?: any;
@@ -260,6 +273,7 @@ export function IntegerInput({
       inputProps={{ type: 'number', ...inputProps }}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
+      readOnlyMessage={readOnlyMessage}
       sx={{
         input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
         ...sx

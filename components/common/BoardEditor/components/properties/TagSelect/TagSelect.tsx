@@ -90,6 +90,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 
 type Props = {
   readOnly?: boolean;
+  readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
   noOptionsText?: string;
@@ -106,6 +107,7 @@ type Props = {
 
 export function TagSelect({
   readOnly,
+  readOnlyMessage,
   canEditOptions = false,
   options,
   propertyValue,
@@ -171,6 +173,7 @@ export function TagSelect({
       <SelectPreviewContainer data-test={dataTest} onClick={onEdit} displayType={displayType} readOnly={readOnly}>
         <SelectPreview
           readOnly={readOnly}
+          readOnlyMessage={readOnlyMessage}
           sx={{ height: '100%' }}
           wrapColumn={wrapColumn}
           value={selectValue}
