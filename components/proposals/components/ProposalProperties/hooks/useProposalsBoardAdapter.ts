@@ -12,7 +12,6 @@ import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 
 type Props = {
   proposal: { spaceId?: string; id?: string } & ProposalFields;
-  onChange?: (values: ProposalFields) => void;
 };
 
 export function useProposalsBoardAdapter({ proposal }: Props) {

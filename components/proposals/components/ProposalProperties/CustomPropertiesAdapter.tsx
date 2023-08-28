@@ -1,4 +1,5 @@
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import { usePropertiesMutator } from 'components/proposals/components/ProposalProperties/hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -11,7 +12,8 @@ type Props = {
 
 export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props) {
   const { user } = useUser();
-  const { board, card, cards, activeView, views, proposalPage } = useProposalsBoardAdapter({ proposal, onChange });
+  const { board, card, cards, activeView, views, proposalPage } = useProposalsBoardAdapter({ proposal });
+  const mutator = usePropertiesMutator({ proposal, onChange });
 
   return (
     <CardDetailProperties
@@ -23,6 +25,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props)
       readOnly={!!readOnly}
       pageUpdatedAt={proposalPage?.updatedAt.toString() || new Date().toString()}
       pageUpdatedBy={proposalPage?.updatedBy || user?.id || ''}
+      // mutator={mutator}
     />
   );
 }
