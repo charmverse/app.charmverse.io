@@ -135,8 +135,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   let disabledTooltip = '';
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
-  } else if (checkIsContentEmpty(formInputs.content)) {
-    disabledTooltip = 'Content is required';
   } else if (!formInputs.categoryId) {
     disabledTooltip = 'Category is required';
   } else if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {

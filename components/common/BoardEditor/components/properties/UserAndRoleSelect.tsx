@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField } from '@mui/material';
+import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useGetReviewerPool } from 'charmClient/hooks/proposals';
@@ -124,6 +124,7 @@ type Props = {
   onChange: (value: GroupedOptionPopulated[]) => void;
   proposalCategoryId?: string | null;
   readOnly?: boolean;
+  readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
   value: GroupedOption[];
   variant?: 'outlined' | 'standard';
@@ -135,6 +136,7 @@ export function UserAndRoleSelect({
   onChange,
   proposalCategoryId,
   readOnly,
+  readOnlyMessage,
   showEmptyPlaceholder = true,
   variant = 'standard',
   value: inputValue,
@@ -226,7 +228,9 @@ export function UserAndRoleSelect({
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
-            <SelectedReviewers wrapColumn readOnly value={populatedValue} onRemove={removeReviewer} />
+            <Tooltip title={readOnlyMessage}>
+              <SelectedReviewers wrapColumn readOnly value={populatedValue} onRemove={removeReviewer} />
+            </Tooltip>
           )}
         </Stack>
       </SelectPreviewContainer>

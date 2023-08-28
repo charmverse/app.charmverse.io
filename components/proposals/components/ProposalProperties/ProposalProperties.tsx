@@ -60,6 +60,7 @@ type ProposalPropertiesProps = {
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
+  isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onChangeRubricCriteriaAnswer?: () => void;
   pageId?: string;
@@ -87,6 +88,7 @@ export function ProposalProperties({
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
+  isFromTemplate,
   onChangeRubricCriteria,
   onChangeRubricCriteriaAnswer,
   proposalFormInputs,
@@ -334,7 +336,8 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
-                  disabled={disabledCategoryInput}
+                  readOnly={disabledCategoryInput}
+                  readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
@@ -401,6 +404,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
+                readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
