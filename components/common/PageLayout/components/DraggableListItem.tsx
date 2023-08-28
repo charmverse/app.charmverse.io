@@ -55,7 +55,7 @@ export default function DraggableListItem({
   return (
     <Box
       sx={{
-        ...(isOver && canDrop && { borderTopWidth: 2, borderStyle: 'solid', borderColor: 'action.active', ...sx })
+        ...(isOver && canDrop && !disabled && { ...sx })
       }}
       ref={disabled ? undefined : ref}
       {...restProps}

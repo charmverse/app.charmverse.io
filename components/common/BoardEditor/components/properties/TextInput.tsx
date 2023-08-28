@@ -60,7 +60,7 @@ function Editable(
 ): JSX.Element {
   _props.className = 'octo-propertyvalue';
   const elementRef = useRef<HTMLTextAreaElement>(null);
-  const { className, ...props } = useEditable(_props, ref, elementRef);
+  const { className, title, ...props } = useEditable(_props, ref, elementRef);
   const memoizedHeight = React.useMemo(() => {
     if (wrapColumn && columnRef?.current) {
       return `${columnRef?.current?.clientHeight}px`;
@@ -71,7 +71,7 @@ function Editable(
   // Keep it as before for card modal view
   if (displayType === 'details') {
     return (
-      <Tooltip title={readOnlyMessage}>
+      <Tooltip title={readOnlyMessage ?? null}>
         <StyledInput
           inputProps={{
             ...inputProps,

@@ -71,13 +71,15 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
     }
     // resolver: yupResolver(schema(hasCustomReward))
   });
+
   const { fields } = useFieldArray({ control, name: 'answers' });
 
   async function saveForm(values: FormInput) {
     if (proposalId) {
+      const filteredAnswers = values.answers.filter((answer) => !!(answer.response as any)?.score);
       await upsertRubricCriteriaAnswer({
         // @ts-ignore -  TODO: make answer types match
-        answers: values.answers
+        answers: filteredAnswers
       });
       onSubmit(values);
     }
