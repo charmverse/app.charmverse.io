@@ -45,6 +45,7 @@ const CopyButton = styled((props: any) => <MuiButton color='secondary' variant='
 
 export type ShareToWebProps = {
   disabled: boolean;
+  isLoading: boolean;
   shareChecked: boolean;
   discoveryChecked: boolean;
   pageId: string;
@@ -58,6 +59,7 @@ export default function ShareToWeb({
   shareChecked,
   discoveryChecked,
   disabled,
+  isLoading,
   pageId,
   handlePublish,
   handleDiscovery,
@@ -121,7 +123,7 @@ export default function ShareToWeb({
             data-test='share-link'
             fullWidth
             disabled
-            value={shareLink}
+            value={shareLink || ''}
             endAdornment={
               <CopyToClipboard data-test='copy-button' text={shareLink ?? ''} onCopy={onCopy}>
                 <InputAdornment position='end'>
@@ -156,7 +158,7 @@ export default function ShareToWeb({
       )}
       <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
         <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
-          <Button onClick={handlePublish} disabled={disabled} data-test='toggle-public-page'>
+          <Button onClick={handlePublish} disabled={disabled} data-test='toggle-public-page' loading={isLoading}>
             {shareChecked ? 'Unpublish' : 'Publish to web'}
           </Button>
         </Tooltip>

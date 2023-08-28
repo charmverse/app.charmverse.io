@@ -10,6 +10,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
+import { useDeletePermissions } from 'charmClient/hooks/permissions';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -66,6 +67,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
   const { page } = usePage({ pageIdOrPath: pageId });
   const { space } = useCurrentSpace();
   const { mutateMembers: refreshMembers } = useMembers();
+  const { trigger: deletePermission } = useDeletePermissions();
 
   const { open, isOpen, close } = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
@@ -104,7 +106,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
 
   async function removePermission(permissionId: string) {
     if (permissionId) {
-      await charmClient.deletePermission({ permissionId });
+      await deletePermission({ permissionId });
       refreshPermissions();
     }
   }
