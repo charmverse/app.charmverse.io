@@ -54,7 +54,8 @@ describe('getProposal', () => {
           rubricCriteria: [],
           page: {
             sourceTemplateId: null
-          }
+          },
+          properties: {}
         }
       })
     );

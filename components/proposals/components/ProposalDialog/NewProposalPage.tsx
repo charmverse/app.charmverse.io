@@ -18,6 +18,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -39,6 +40,7 @@ type Props = {
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+  const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
   const [, { width: containerWidth }] = useElementSize();
@@ -202,6 +204,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
                         rubricCriteria
                       });
                     }}
+                    // custom properties
+                    updatedAt={new Date().toString()}
+                    updatedById={user?.id}
                   />
                 </div>
               </div>

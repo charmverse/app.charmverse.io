@@ -1,29 +1,27 @@
 import { useTheme } from '@emotion/react';
-import { Box, Menu } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Menu, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
+import Calculations from 'components/common/BoardEditor/focalboard/src/components/calculations/calculations';
+import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { typeDisplayName } from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
+import { PropertyTypes } from 'components/common/BoardEditor/focalboard/src/widgets/propertyTypes';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
-import mutator from '../../mutator';
-import { IDType, Utils } from '../../utils';
-import Button from '../../widgets/buttons/button';
-import { typeDisplayName } from '../../widgets/propertyMenu';
-import { PropertyTypes } from '../../widgets/propertyTypes';
-import Calculations from '../calculations/calculations';
-
 type Props = {
-  board: Board;
   syncWithPageId?: string | null;
   card: Card;
   cards: Card[];
@@ -34,8 +32,32 @@ type Props = {
   pageUpdatedAt: string;
 };
 
+export const PropertyNameContainer = styled(Stack)`
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover .icons {
+    opacity: 1;
+    transition: opacity 150ms ease-in-out;
+  }
+
+  & .icons {
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    left: -25px;
+    cursor: pointer;
+    transition: opacity 150ms ease-in-out;
+  }
+`;
+
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, syncWithPageId } = props;
+  const { proposalPropertiesBlock, createProperty, updateProperty, deleteProperty, updateBlock } = useProposalBlocks();
+  const fields = proposalPropertiesBlock?.fields;
+  const properties = fields?.properties || [];
+
+  const { card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, syncWithPageId } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -45,11 +67,11 @@ function CardDetailProperties(props: Props) {
   const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
-    const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
+    const newProperty = fields?.properties.find((property) => property.id === newTemplateId);
     if (newProperty) {
       setNewTemplateId('');
     }
-  }, [newTemplateId, board.fields.cardProperties]);
+  }, [newTemplateId, fields?.properties]);
 
   const [confirmationDialogBox, setConfirmationDialogBox] = useState<{
     heading: string;
@@ -65,25 +87,44 @@ function CardDetailProperties(props: Props) {
 
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
 
+  const createNewProperty = useCallback(
+    async (type: PropertyType) => {
+      const template: IPropertyTemplate = {
+        id: Utils.createGuid(IDType.BlockID),
+        name: typeDisplayName(intl, type),
+        type,
+        options: []
+      };
+
+      const templateId = await createProperty(template);
+
+      if (templateId) {
+        setNewTemplateId(templateId);
+        addPropertyPopupState.close();
+      }
+    },
+    [addPropertyPopupState, createProperty, intl]
+  );
+
   const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
-    const cardPropertyIds = [...board.fields.cardProperties.map((cardProperty) => cardProperty.id)];
-    const destIndex = cardPropertyIds.indexOf(destinationProperty.id);
-    const srcIndex = cardPropertyIds.indexOf(sourceProperty.id);
-    cardPropertyIds.splice(srcIndex, 1);
-    cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
-    await charmClient.patchBlock(
-      board.id,
-      {
-        updatedFields: {
-          cardProperties: cardPropertyIds
-            .map((cardPropertyId) =>
-              board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId)
-            )
-            .filter(isTruthy)
-        }
-      },
-      () => {}
-    );
+    const arr = [...properties.map((property) => property.id)];
+    const destIndex = arr.indexOf(destinationProperty.id);
+    const srcIndex = arr.indexOf(sourceProperty.id);
+    // reorder the properties
+    [arr[srcIndex], arr[destIndex]] = [arr[destIndex], arr[srcIndex]];
+
+    const udpdatedProperties = arr
+      .map((cardPropertyId) => properties.find((cardProperty) => cardProperty.id === cardPropertyId))
+      .filter(isTruthy);
+
+    if (proposalPropertiesBlock) {
+      const oldFields = proposalPropertiesBlock.fields || {};
+
+      await updateBlock({
+        ...proposalPropertiesBlock,
+        fields: { ...oldFields, properties: udpdatedProperties }
+      });
+    }
   };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(
@@ -102,7 +143,8 @@ function CardDetailProperties(props: Props) {
 
     // if no card has this value set delete the property directly without warning
     if (affectsNumOfCards === '0') {
-      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+      updateProperty({ ...propertyTemplate, type: newType, name: newName });
+
       return;
     }
 
@@ -149,7 +191,7 @@ function CardDetailProperties(props: Props) {
       onConfirm: async () => {
         setShowConfirmationDialog(false);
         try {
-          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+          await updateProperty({ ...propertyTemplate, type: newType, name: newName });
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }
@@ -191,7 +233,8 @@ function CardDetailProperties(props: Props) {
         const deletingPropName = propertyTemplate.name;
         setShowConfirmationDialog(false);
         try {
-          await mutator.deleteProperty(board, views, cards, propertyTemplate.id);
+          await deleteProperty(propertyTemplate.id);
+
           showMessage(
             intl.formatMessage(
               { id: 'CardDetailProperty.property-deleted', defaultMessage: 'Deleted {propertyName} Successfully!' },
@@ -222,44 +265,28 @@ function CardDetailProperties(props: Props) {
   }
 
   const propertyTypes = useMemo(
-    () =>
-      activeView && (
-        <PropertyTypes
-          isMobile={isSmallScreen}
-          onClick={async (type) => {
-            const template: IPropertyTemplate = {
-              id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
-              type,
-              options: []
-            };
-            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            setNewTemplateId(templateId);
-            addPropertyPopupState.close();
-          }}
-        />
-      ),
-    [mutator, board, activeView, isSmallScreen]
+    () => activeView && <PropertyTypes isMobile={isSmallScreen} onClick={createNewProperty} />,
+    [activeView, isSmallScreen, createNewProperty]
   );
 
   return (
     <div className='octo-propertylist'>
-      {board.fields.cardProperties.map((propertyTemplate) => {
+      {properties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
             syncWithPageId={syncWithPageId}
             onDrop={onDrop}
             key={propertyTemplate.id}
-            board={board}
+            board={{} as any} // TODO - fix
             card={card}
-            deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
-            onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+            deleteDisabledMessage={getDeleteDisabled(propertyTemplate as IPropertyTemplate)}
+            onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate as IPropertyTemplate)}
             onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate as IPropertyTemplate);
             }}
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
-            property={propertyTemplate}
+            property={propertyTemplate as IPropertyTemplate}
             readOnly={props.readOnly}
           />
         );
@@ -317,4 +344,4 @@ function CardDetailProperties(props: Props) {
   );
 }
 
-export default React.memo(CardDetailProperties);
+export const ProposalCustomProperties = React.memo(CardDetailProperties);

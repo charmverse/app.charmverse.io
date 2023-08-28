@@ -81,7 +81,8 @@ export function ProposalProperties({
       proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
         id: reviewer.roleId ?? (reviewer.userId as string)
-      })) ?? []
+      })) ?? [],
+    properties: typeof proposal?.properties === 'object' ? proposal.properties : {}
   };
 
   async function updateProposalStatus(newStatus: ProposalStatus) {

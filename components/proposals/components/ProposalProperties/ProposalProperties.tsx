@@ -8,6 +8,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
+import { ProposalCustomProperties } from 'components/common/BoardEditor/components/cardProperties/ProposalCustomProperties';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -52,6 +53,7 @@ export type ProposalPropertiesInput = {
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
+  properties: Record<string, any> | undefined | null;
 };
 
 type ProposalPropertiesProps = {
@@ -79,6 +81,8 @@ type ProposalPropertiesProps = {
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   title: string;
+  updatedAt?: string;
+  updatedById?: string;
 };
 
 export function ProposalProperties({
@@ -105,7 +109,9 @@ export function ProposalProperties({
   snapshotProposalId,
   userId,
   updateProposalStatus,
-  title
+  title,
+  updatedAt,
+  updatedById
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [rubricView, setRubricView] = useState<number>(0);
@@ -495,6 +501,18 @@ export function ProposalProperties({
               </Box>
             </Box>
           )}
+
+          <ProposalCustomProperties
+            readOnly={!!readOnlyAuthors}
+            pageUpdatedBy={updatedById || ''}
+            pageUpdatedAt={updatedAt || ''}
+            card={{ fields: { properties: {} } } as any} // TODO - add this to form
+            // Not used for now, need those for compatibility with ProposalCustomProperties
+            // We might utilise those props when we add custom views to proposals
+            cards={[]}
+            views={[]}
+            activeView={{} as any}
+          />
         </Collapse>
         <Divider
           sx={{
