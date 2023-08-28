@@ -16,9 +16,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership())
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getProposalBlocksHandler)
-  .use(requireSpaceMembership({ adminOnly: true }))
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createProposalBlocksHandler)
   .put(updateProposalBlocksHandler)
   .delete(deleteProposalBlocksHandler);
