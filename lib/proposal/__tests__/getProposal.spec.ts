@@ -55,7 +55,7 @@ describe('getProposal', () => {
           page: {
             sourceTemplateId: null
           },
-          fields: {}
+          fields: null
         }
       })
     );
