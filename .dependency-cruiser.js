@@ -38,11 +38,12 @@ module.exports = {
       comment:
         'This dependency is part of a circular relationship. You might want to revise ' +
         'your solution (i.e. use dependency inversion, make sure the modules have a single responsibility) ',
-      from: { path: 'components' },
+      from: {},
       to: {
-        circular: true
+        circular: true,
+        path: '^components'
       }
-    }
+    },
     /* rules from the 'recommended' preset: */
     // {
     //   name: 'no-orphans',
