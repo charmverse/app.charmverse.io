@@ -82,7 +82,7 @@ runs:
     - name: Build
       shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
-      run: npm run verifydeps && npm run build
+      run: npm run build
       env:
         NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
         NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
