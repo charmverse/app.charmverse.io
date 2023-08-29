@@ -46,7 +46,7 @@ const StyledTypography = styled(Typography)`
 export default function NestedPage({ node, currentPageId, getPos }: NodeViewProps & { currentPageId?: string }) {
   const { space } = useCurrentSpace();
   const view = useEditorViewContext();
-  const { pages } = usePages();
+  const { pages, loadingPages } = usePages();
   const { categories } = useForumCategories();
   const documentPage = pages[node.attrs.id];
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
@@ -54,8 +54,14 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
 
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
 
-  const pageTitle =
-    (documentPage || staticPage)?.title || (forumCategoryPage ? `Forum > ${forumCategoryPage?.name}` : '');
+  let pageTitle = '';
+  if (documentPage || staticPage) {
+    pageTitle = (documentPage || staticPage)?.title || 'Untitled';
+  } else if (forumCategoryPage) {
+    pageTitle = `Forum > ${forumCategoryPage?.name || 'Untitled'}`;
+  } else if (!loadingPages) {
+    pageTitle = 'No access';
+  }
   const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
 
   const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
@@ -89,7 +95,7 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
           isCategoryPage={!!forumCategoryPage}
         />
       </div>
-      <StyledTypography>{typeof pageTitle === 'string' ? pageTitle || 'Untitled' : 'No access'}</StyledTypography>
+      <StyledTypography>{pageTitle}</StyledTypography>
     </NestedPageContainer>
   );
 }

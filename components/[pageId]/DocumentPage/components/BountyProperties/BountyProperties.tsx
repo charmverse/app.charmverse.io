@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -22,7 +23,6 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import type {
@@ -73,9 +73,7 @@ export default function BountyProperties(props: {
   );
   const [autoTabSwitchDone, setAutoTabSwitchDone] = useState(false);
 
-  const { pagePermissions: bountyPagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId
-  });
+  const { data: bountyPagePermissions, mutate: refreshPermissions } = useGetPermissions(pageId);
 
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab

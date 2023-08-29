@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
+
+import { ApiError } from './errors';
 
 type RequiredKey<T> = keyof T | { key: keyof T; truthy: boolean };
 

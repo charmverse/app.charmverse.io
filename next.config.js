@@ -31,6 +31,10 @@ const config = {
     esmExternals: false
     //    externalDir: true
   },
+
+  images: {
+    domains: ['cdn.charmverse.io']
+  },
   transpilePackages: esmModules,
   modularizeImports: {
     '@mui/material': {
@@ -46,6 +50,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
+  assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async generateBuildId() {
     return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
@@ -181,10 +186,10 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/initWebsockets.ts',
-            countSpaceData: './scripts/countSpaceData.ts',
-            importFromDiscourse: './scripts/importFromDiscourse.ts',
-            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
+            websockets: './background/initWebsockets.ts'
+            // countSpaceData: './scripts/countSpaceData.ts',
+            // importFromDiscourse: './scripts/importFromDiscourse.ts',
+            // updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };

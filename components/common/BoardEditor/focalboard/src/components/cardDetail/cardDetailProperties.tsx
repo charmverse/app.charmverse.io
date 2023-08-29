@@ -22,8 +22,9 @@ import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import PropertyMenu, { typeDisplayName } from '../../widgets/propertyMenu';
+import PropertyMenu from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 import Calculations from '../calculations/calculations';
 import PropertyValueElement from '../propertyValueElement';
 

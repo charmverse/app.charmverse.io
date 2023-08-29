@@ -46,7 +46,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        log.error(`Error in processing SQS Worker`, { body, record });
+        log.error(`Error in processing SQS Worker`, { body, error: e, record });
 
         batchItemFailures.push({ itemIdentifier: record.messageId });
       }

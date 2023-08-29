@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
@@ -9,6 +9,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -23,6 +24,7 @@ type Props = {
 
 export function PageComments({ page, permissions }: Props) {
   const { user } = useUser();
+  const { lensProfile } = useLensProfile();
   const {
     comments,
     commentSort,
@@ -31,7 +33,8 @@ export function PageComments({ page, permissions }: Props) {
     addComment,
     updateComment,
     deleteComment,
-    voteComment
+    voteComment,
+    syncPageComments
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
@@ -40,6 +43,7 @@ export function PageComments({ page, permissions }: Props) {
     proposalPath: page.path,
     proposalTitle: page.title
   });
+  const [isPublishingComments, setPublishingComments] = useState(false);
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
@@ -51,17 +55,25 @@ export function PageComments({ page, permissions }: Props) {
     delete_comments: isAdmin
   };
 
-  async function createComment(comment: CommentContent) {
+  // For root level comments lensPostId is the post's id and for replies it is the parent comment's id
+  async function createComment(comment: CommentContent, lensPostId?: string | null) {
     const createdComment = await addComment(comment);
-    if (isProposal && proposal?.lensPostLink && publishCommentsToLens) {
+    if (isProposal && proposal?.lensPostLink && lensPostId && !isPublishingComments) {
+      setPublishingComments(true);
       await createLensComment({
         commentContent: comment.content as PageContent,
         commentId: createdComment.id,
-        proposal: page,
-        lensPostId: proposal.lensPostLink
+        lensPostId
       });
+      setPublishingComments(false);
     }
   }
+
+  useEffect(() => {
+    if (page.type === 'proposal' && proposal && proposal.lensPostLink) {
+      syncPageComments();
+    }
+  }, [page.id, proposal?.lensPostLink]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
 
@@ -73,9 +85,16 @@ export function PageComments({ page, permissions }: Props) {
 
       {permissions.comment && (
         <CommentForm
+          isPublishingComments={isPublishingComments}
           publishToLens={publishCommentsToLens}
           setPublishToLens={setPublishCommentsToLens}
-          showPublishToLens={!!page.proposalId && page.type === 'proposal' && !!proposal?.lensPostLink}
+          showPublishToLens={
+            Boolean(page.proposalId) &&
+            page.type === 'proposal' &&
+            Boolean(proposal?.lensPostLink) &&
+            Boolean(lensProfile)
+          }
+          lensPostLink={proposal?.lensPostLink}
           handleCreateComment={createComment}
         />
       )}
@@ -98,6 +117,7 @@ export function PageComments({ page, permissions }: Props) {
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={voteComment}
+                  lensPostLink={proposal?.lensPostLink}
                 />
               ))}
             </Stack>

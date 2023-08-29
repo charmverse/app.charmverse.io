@@ -9,7 +9,6 @@ import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
@@ -38,8 +37,9 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { sidebarItemStyles, SidebarLink } from './SidebarButton';
-import SidebarSubmenu from './SidebarSubmenu';
+import { SectionName } from './components/SectionName';
+import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
+import SidebarSubmenu from './components/SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -91,16 +91,6 @@ const SidebarContainer = styled.div`
       }
     }
   }
-`;
-
-export const SectionName = styled(Typography)`
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
-  color: ${({ theme }) => theme.palette.secondary.main};
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 `;
 
 const StyledSidebarBox = styled(Box)`

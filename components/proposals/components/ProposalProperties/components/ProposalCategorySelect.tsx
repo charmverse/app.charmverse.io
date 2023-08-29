@@ -2,13 +2,14 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import type { ProposalCategory } from 'lib/proposal/interface';
 
 type Props = {
-  disabled?: boolean;
+  readOnly?: boolean;
+  readOnlyMessage?: string;
   options: ProposalCategory[];
   value: ProposalCategory | null;
   onChange: (value: ProposalCategory | null) => void;
 };
 
-export function ProposalCategorySelect({ disabled, options, value, onChange }: Props) {
+export function ProposalCategorySelect({ readOnly, readOnlyMessage, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     value: option.title,
@@ -30,7 +31,8 @@ export function ProposalCategorySelect({ disabled, options, value, onChange }: P
     <TagSelect
       data-test='proposal-category-select'
       wrapColumn
-      readOnly={disabled}
+      readOnly={readOnly}
+      readOnlyMessage={readOnlyMessage}
       options={propertyOptions}
       propertyValue={propertyValue}
       onChange={onValueChange}

@@ -9,6 +9,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
 
+import { LoadingIcon } from '../LoadingComponent';
+
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
     type: 'doc',
@@ -25,14 +27,18 @@ export function CommentForm({
   disabled,
   placeholder,
   setPublishToLens,
-  publishToLens
+  publishToLens,
+  lensPostLink,
+  isPublishingComments
 }: {
+  isPublishingComments?: boolean;
+  lensPostLink?: string | null;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
-  handleCreateComment: (comment: CommentContent) => Promise<void>;
+  handleCreateComment: (comment: CommentContent, lensPostLink?: string | null) => Promise<void>;
   disabled?: boolean;
   placeholder?: string;
 }) {
@@ -49,10 +55,13 @@ export function CommentForm({
   }
 
   async function createPostComment() {
-    await handleCreateComment({
-      content: postContent.doc,
-      contentText: postContent.rawText
-    });
+    await handleCreateComment(
+      {
+        content: postContent.doc,
+        contentText: postContent.rawText
+      },
+      publishToLens ? lensPostLink : undefined
+    );
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -89,24 +98,37 @@ export function CommentForm({
   }
 
   return (
-    <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form'>
-        <UserDisplay user={user} hideName={true} />
+    <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form' my={1}>
+      <UserDisplay user={user} hideName={true} />
+      <Stack gap={1} width='100%'>
         {editor}
-      </Box>
-      <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
-        {showPublishToLens && (
-          <Stack flexDirection='row' gap={1} alignItems='center'>
-            <Typography variant='caption' color='text.secondary'>
-              Publish to Lens
-            </Typography>
-            <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
-          </Stack>
-        )}
-        <Button data-test='post-comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
-          Comment
-        </Button>
+        <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
+          {showPublishToLens && (
+            <>
+              <Typography variant='body2' color='text.secondary'>
+                {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
+              </Typography>
+              {isPublishingComments ? (
+                <LoadingIcon size={16} sx={{ mx: 1 }} />
+              ) : (
+                <Switch
+                  sx={{ mr: 1, top: 2 }}
+                  size='small'
+                  checked={publishToLens}
+                  onChange={(e) => setPublishToLens?.(e.target.checked)}
+                />
+              )}
+            </>
+          )}
+          <Button
+            data-test='post-comment-button'
+            disabled={!postContent.rawText || disabled}
+            onClick={createPostComment}
+          >
+            Comment
+          </Button>
+        </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 }

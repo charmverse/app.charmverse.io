@@ -6,7 +6,7 @@ import NextLink from 'next/link';
 
 import { getSpaceUrl } from 'lib/utilities/browser';
 
-import DraggableListItem from '../DraggableListItem';
+import DraggableListItem from '../../DraggableListItem';
 
 import WorkspaceAvatar from './WorkspaceAvatar';
 

@@ -1,22 +1,18 @@
-import { Box, CircularProgress, InputLabel, Stack, Switch, Typography } from '@mui/material';
+import { Box, InputLabel, Stack, Switch, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 import { useLensProfile } from '../hooks/useLensProfile';
 
 export function LensPublication() {
   const { user, updateUser } = useUser();
-  const { setupLensProfile, lensProfile } = useLensProfile();
-  const { showMessage } = useSnackbar();
+  const { lensProfile, isAuthenticated } = useLensProfile();
   const [isSwitchOn, setIsSwitchOn] = useState(user?.publishToLensDefault ?? false);
   const [isSettingUpLensProfile, setIsSettingUpLensProfile] = useState(false);
-  const { connectWallet, account } = useWeb3AuthSig();
 
   useEffect(() => {
     if (user) {
@@ -25,41 +21,13 @@ export function LensPublication() {
   }, [user]);
 
   async function setAutoLensPublish() {
-    if (!user) {
-      return;
-    }
-
-    if (!account) {
-      return connectWallet();
-    }
-
     const newState = !isSwitchOn;
     setIsSettingUpLensProfile(true);
-    let _lensProfile = lensProfile;
-    if (!_lensProfile && !isSwitchOn) {
-      try {
-        _lensProfile = await setupLensProfile();
-        if (_lensProfile) {
-          showMessage('Lens profile setup successfully', 'success');
-        } else {
-          showMessage("You don't have a lens profile. Please setup one first.", 'warning');
-        }
-      } catch (err) {
-        showMessage('Failed to set up Lens profile', 'error');
-        // User rejected to sign the message
-        return;
-      } finally {
-        setIsSettingUpLensProfile(false);
-      }
-    }
-    // Only continue if the user has a lens profile or if the switch is turned on
-    if (isSwitchOn || _lensProfile) {
-      setIsSwitchOn(newState);
-      await charmClient.updateUser({
-        publishToLensDefault: newState
-      });
-      updateUser({ ...user, publishToLensDefault: newState });
-    }
+    setIsSwitchOn(newState);
+    await charmClient.updateUser({
+      publishToLensDefault: newState
+    });
+    updateUser({ ...user, publishToLensDefault: newState });
     setIsSettingUpLensProfile(false);
   }
 
@@ -75,7 +43,6 @@ export function LensPublication() {
           <Stack flexDirection='row' alignItems='center' gap={1}>
             <Switch size='small' disabled={isSettingUpLensProfile} checked={isSwitchOn} onChange={setAutoLensPublish} />
             Publish to Lens
-            {isSettingUpLensProfile && <CircularProgress sx={{ ml: 1 }} color='secondary' size={16} />}
           </Stack>
           <Typography variant='caption'>
             Publish your proposals and proposal comments to Lens. A{' '}
@@ -86,7 +53,7 @@ export function LensPublication() {
           </Typography>
         </InputLabel>
       </Stack>
-      {lensProfile && (
+      {lensProfile && isAuthenticated && (
         <Typography variant='caption' my={0.5}>
           Signed in as {lensProfile.handle}
         </Typography>

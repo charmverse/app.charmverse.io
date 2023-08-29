@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { debounce } from 'lodash';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
@@ -47,6 +47,7 @@ export function ProposalProperties({
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateTasks } = useTasks();
   const { user } = useUser();
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { createLensPost } = useLensPublication({
     proposalId,
     proposalPath: proposalPage.path,
@@ -89,9 +90,11 @@ export function ProposalProperties({
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
       // If proposal is being published for the first time and publish to lens is enabled, create a lens post
       if (newStatus === 'discussion' && proposalPage && proposal.publishToLens && !proposal.lensPostLink) {
+        setIsPublishingToLens(true);
         await createLensPost({
           proposalContent: proposalPage.content as PageContent
         });
+        setIsPublishingToLens(false);
       }
       await Promise.all([
         refreshProposal(),
@@ -103,7 +106,7 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeRubricCriteriaAnswer() {
+  async function onSaveRubricCriteriaAnswers() {
     refreshProposal();
   }
 
@@ -135,14 +138,14 @@ export function ProposalProperties({
 
   const readOnlyReviewers =
     readOnlyProperties ||
-    (isFromTemplateSource &&
-      !!proposalTemplates?.find((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
+    !!proposalTemplates?.some((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0);
 
   return (
     <ProposalPropertiesBase
       proposalLensLink={proposal?.lensPostLink ?? undefined}
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
+      isFromTemplate={!!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
@@ -162,13 +165,14 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
-      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
+      onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}
       canAnswerRubric={canAnswerRubric}
       canViewRubricAnswers={canViewRubricAnswers}
       title={title || ''}
+      isPublishingToLens={isPublishingToLens}
     />
   );
 }

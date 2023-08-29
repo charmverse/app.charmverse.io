@@ -13,8 +13,8 @@ import { Fragment } from 'react';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import type { NotificationDisplayType } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
-import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
-import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
+import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
+import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import Legend from 'components/settings/Legend';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 

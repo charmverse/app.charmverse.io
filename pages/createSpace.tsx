@@ -56,7 +56,7 @@ export default function CreateSpace() {
               justifyContent: 'center'
             }}
           >
-            <Image px={3} maxWidth={{ xs: 300, md: 'none' }} src={splashImage} />
+            <Image px={3} maxWidth={{ xs: 300, md: '100%' }} src={splashImage} />
           </Grid>
         </Grid>
       </Container>

@@ -2,10 +2,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
+
+import { ApiError } from './errors';
 
 declare module 'http' {
   interface IncomingMessage {
