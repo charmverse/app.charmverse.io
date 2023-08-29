@@ -73,7 +73,8 @@ export class SpaceEventHandler {
         docRooms: this.docRooms,
         payload: message.payload,
         sendError: this.sendError,
-        event: 'page_deleted'
+        event: 'page_deleted',
+        relay: this.relay
       });
     } else if (message.type === 'page_restored' && this.userId) {
       const pageId = message.payload.id;
@@ -242,7 +243,8 @@ export class SpaceEventHandler {
               id: pageId
             },
             sendError: this.sendError,
-            event: 'page_reordered'
+            event: 'page_reordered',
+            relay: this.relay
           });
         }
 
@@ -314,22 +316,21 @@ export class SpaceEventHandler {
   }
 }
 
-async function handlePageRemoveMessage(
-  this: any,
-  {
-    event,
-    userId,
-    docRooms,
-    payload,
-    sendError
-  }: {
-    event: 'page_deleted' | 'page_reordered';
-    userId: string;
-    docRooms: Map<string | undefined, DocumentRoom>;
-    payload: WebSocketPayload<'page_deleted'>;
-    sendError: (message: string) => void;
-  }
-) {
+async function handlePageRemoveMessage({
+  event,
+  userId,
+  docRooms,
+  payload,
+  sendError,
+  relay
+}: {
+  event: 'page_deleted' | 'page_reordered';
+  userId: string;
+  docRooms: Map<string | undefined, DocumentRoom>;
+  payload: WebSocketPayload<'page_deleted'>;
+  sendError: (message: string) => void;
+  relay: AbstractWebsocketBroadcaster;
+}) {
   try {
     const pageId = payload.id;
     const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
@@ -381,7 +382,7 @@ async function handlePageRemoveMessage(
           userId,
           spaceId,
           archive: true,
-          relay: this.relay
+          relay
         });
       }
     }
