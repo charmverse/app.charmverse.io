@@ -30,7 +30,7 @@ export async function getPermissionedCategories({
   if (isAdmin) {
     return postCategories.map((c) => ({ ...c, permissions: permissions.full }));
   } else if (spaceRole) {
-    permissions.addPermissions(['create_post']);
+    permissions.addPermissions(['create_post', 'edit_category', 'delete_category', 'view_posts', 'comment_posts']);
   }
 
   return postCategories.map((c) => ({ ...c, permissions: permissions.operationFlags }));
