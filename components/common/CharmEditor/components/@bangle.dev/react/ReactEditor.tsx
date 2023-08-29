@@ -23,6 +23,7 @@ import { useUser } from 'hooks/useUser';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
+import type { ConnectionEvent } from '../../fiduswriter/ws';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
@@ -50,7 +51,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
   initialContent?: any;
   enableComments?: boolean;
-  onConnectionError?: (error: Error) => void;
+  onConnectionEvent?: (event: ConnectionEvent) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -73,7 +74,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     onParticipantUpdate = () => {},
     readOnly = false,
     enableComments = true,
-    onConnectionError
+    onConnectionEvent
   },
   ref
 ) {
@@ -117,20 +118,22 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function _onError(_editor: CoreBangleEditor, error: Error) {
-    if (onConnectionError) {
-      onConnectionError(error);
-    } else {
+  function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
+    if (onConnectionEvent) {
+      onConnectionEvent(event);
+    } else if (event.type === 'error') {
       // for now, just use a standard error message to be over-cautious
-      showMessage(error.message, 'warning');
+      showMessage(event.error.message, 'warning');
     }
-    log.error('[ws/ceditor]: Error message displayed to user', {
-      pageId,
-      error
-    });
-    if (isLoadingRef.current) {
-      isLoadingRef.current = false;
-      setEditorContent(_editor, initialContent);
+    if (event.type === 'error') {
+      log.error('[ws/ceditor]: Error message displayed to user', {
+        pageId,
+        error: event.error
+      });
+      if (isLoadingRef.current) {
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
+      }
     }
   }
 
@@ -191,7 +194,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
+        fEditor.init(_editor.view, authResponse.authToken, (event) => _onConnectionEvent(_editor, event));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
         isLoadingRef.current = false;

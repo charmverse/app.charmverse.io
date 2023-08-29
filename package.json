@@ -17,7 +17,7 @@
     "cron:staging": "npx react-env --path .env.staging -- node ./.next/server/cron.js",
     "cron:prod": "node ./.next/server/cron.js",
     "cron:dev": "dotenv -e .env.local -- ts-node --transpileOnly ./background/cron.ts",
-    "sockets": "concurrently --names \"sockets,next\" -c \"yellow,green\" \"npm run sockets:dev\" \"npm run server:sockets\"",
+    "sockets": "concurrently --names \"next,sockets\" -c \"green,yellow\" \"npm run server:sockets\" \"npm run sockets:dev\"",
     "sockets:build": "tsc --project tsconfig.websockets.json && tsc-alias -p tsconfig.websockets.json",
     "sockets:esbuild": "esbuild background/initWebsockets.ts --bundle --outdir=dist --tsconfig=tsconfig.websockets.json",
     "sockets:dev": "cross-env PORT=3002 npx dotenv -e .env -e .env.local -- node --watch ./.next/server/websockets.js",

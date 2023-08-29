@@ -24,10 +24,13 @@ const socketEvent = 'message';
 type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
 type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 
+export type ConnectionEvent = { type: 'subscribed' } | { type: 'error'; error: Error };
+
 type WebSocketConnectorProps = {
   authToken: string;
   anythingToSend: () => boolean;
   editor: FidusEditor;
+  onConnectionEvent: (event: ConnectionEvent) => void;
   onError: (error: Error) => void;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
@@ -40,7 +43,6 @@ type ServerToClientEvents = { message: (message: WrappedMessage | RequestResendM
 type ClientToServerEvents = {
   [event: string]: any;
 };
-
 export interface WebSocketConnector extends WebSocketConnectorProps {}
 
 /* Sets up communicating with server (retrieving document, saving, collaboration, etc.).
@@ -88,8 +90,8 @@ export class WebSocketConnector {
     resubscribed,
     restartMessage,
     receiveData,
-    onError
-  }: WebSocketConnectorProps) {
+    onConnectionEvent
+  }: Omit<WebSocketConnectorProps, 'onError'>) {
     this.anythingToSend = anythingToSend;
     this.editor = editor;
     this.sendMessage = sendMessage;
@@ -97,7 +99,10 @@ export class WebSocketConnector {
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
-    this.onError = onError;
+    this.onConnectionEvent = onConnectionEvent;
+    this.onError = (error: Error) => {
+      onConnectionEvent({ type: 'error', error });
+    };
 
     // socket.io client options: https://socket.io/docs/v4/client-options/
     this.socket = io(socketHost, {
@@ -314,6 +319,7 @@ export class WebSocketConnector {
         }
       }
     }
+    this.onConnectionEvent({ type: 'subscribed' });
   }
 
   /** Sends data to server or keeps it in a list if currently offline. */
