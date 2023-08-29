@@ -33,8 +33,12 @@ type Props = {
 export const CriteriaRow = styled(Box)`
   position: relative;
 
-  ${({ theme }) => theme.breakpoints.down('sm')} {
+  ${({ theme }) => theme.breakpoints.up('xs')} {
     flex-direction: column;
+  }
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
   }
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
