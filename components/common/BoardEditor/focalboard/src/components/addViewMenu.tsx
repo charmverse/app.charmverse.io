@@ -30,7 +30,7 @@ import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
-import { typeDisplayName } from '../widgets/propertyMenu';
+import { typeDisplayName } from '../widgets/typeDisplayName';
 
 /**
  * @onClick // Default behaviour is to show a dropdown with views. If this provided, then onClick will be handled externally

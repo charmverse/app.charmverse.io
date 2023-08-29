@@ -8,6 +8,7 @@ import { archivePages } from 'lib/pages/archivePages';
 import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -55,7 +56,8 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     pageIds: [pageId],
     userId,
     spaceId: pageSpaceId.spaceId,
-    emitPageStatusEvent: false
+    emitPageStatusEvent: false,
+    relay
   });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds });

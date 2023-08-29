@@ -15,11 +15,11 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
-import { relay } from 'lib/websockets/relay';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
+import type { AbstractWebsocketBroadcaster } from './interfaces';
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -28,7 +28,11 @@ export class SpaceEventHandler {
 
   docRooms: Map<string | undefined, DocumentRoom> = new Map();
 
-  constructor(private socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
+  constructor(
+    private relay: AbstractWebsocketBroadcaster,
+    private socket: Socket,
+    docRooms: Map<string | undefined, DocumentRoom>
+  ) {
     this.socket = socket;
     this.docRooms = docRooms;
   }
@@ -53,7 +57,7 @@ export class SpaceEventHandler {
         });
         if (typeof decryptedUserId === 'string') {
           this.userId = decryptedUserId;
-          relay.registerWorkspaceSubscriber({
+          this.relay.registerWorkspaceSubscriber({
             userId: decryptedUserId,
             socket: this.socket,
             roomId: message.payload.spaceId
@@ -69,7 +73,8 @@ export class SpaceEventHandler {
         docRooms: this.docRooms,
         payload: message.payload,
         sendError: this.sendError,
-        event: 'page_deleted'
+        event: 'page_deleted',
+        relay: this.relay
       });
     } else if (message.type === 'page_restored' && this.userId) {
       const pageId = message.payload.id;
@@ -114,7 +119,8 @@ export class SpaceEventHandler {
             pageIds: [pageId],
             userId: this.userId,
             spaceId,
-            archive: false
+            archive: false,
+            relay: this.relay
           });
         }
       } catch (error) {
@@ -144,7 +150,7 @@ export class SpaceEventHandler {
 
         const { content, contentText, ...newPageToNotify } = createdPage;
 
-        relay.broadcast(
+        this.relay.broadcast(
           {
             type: 'pages_created',
             payload: [newPageToNotify]
@@ -237,7 +243,8 @@ export class SpaceEventHandler {
               id: pageId
             },
             sendError: this.sendError,
-            event: 'page_reordered'
+            event: 'page_reordered',
+            relay: this.relay
           });
         }
 
@@ -314,13 +321,15 @@ async function handlePageRemoveMessage({
   userId,
   docRooms,
   payload,
-  sendError
+  sendError,
+  relay
 }: {
   event: 'page_deleted' | 'page_reordered';
   userId: string;
   docRooms: Map<string | undefined, DocumentRoom>;
   payload: WebSocketPayload<'page_deleted'>;
   sendError: (message: string) => void;
+  relay: AbstractWebsocketBroadcaster;
 }) {
   try {
     const pageId = payload.id;
@@ -372,7 +381,8 @@ async function handlePageRemoveMessage({
           pageIds: [pageId],
           userId,
           spaceId,
-          archive: true
+          archive: true,
+          relay
         });
       }
     }

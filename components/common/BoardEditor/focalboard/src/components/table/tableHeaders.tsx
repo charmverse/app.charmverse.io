@@ -19,8 +19,8 @@ import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
 
