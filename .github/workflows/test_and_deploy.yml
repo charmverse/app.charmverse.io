@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  SELECTED_PERMISSION_API_TAG: filter-page-notifications
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
