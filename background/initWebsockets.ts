@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 
 import { appEnv } from 'config/constants';
 
-import { httpServer } from './websockets/app';
+import { httpServer, socketServer } from './websockets/app';
 import { cleanup as originCacheCleanup } from './websockets/verifyCustomOrigin';
 
 const port = process.env.PORT || 3002;
@@ -16,9 +16,12 @@ log.info(`[server] Websocket server running in ${appEnv} listening to port: ${po
 function cleanup() {
   log.info('[server] Closing Websocket server...');
   originCacheCleanup();
-  httpServer.close(() => {
-    log.info('[server] Exiting process...');
-    process.exit(1);
+  socketServer.close(() => {
+    log.info('[server] Closing HTTP server...');
+    httpServer.close(() => {
+      log.info('[server] Exiting process...');
+      process.exit(1);
+    });
   });
 }
 
