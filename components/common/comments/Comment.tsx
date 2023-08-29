@@ -50,6 +50,7 @@ type Props = {
   handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
   inlineCharmEditor?: boolean;
   lensPostLink?: string | null;
+  isPublishingComments?: boolean;
 };
 
 export function Comment({
@@ -62,7 +63,8 @@ export function Comment({
   handleUpdateComment,
   handleDeleteComment,
   handleVoteComment,
-  lensPostLink
+  lensPostLink,
+  isPublishingComments
 }: Props) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
@@ -283,6 +285,7 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
+                isPublishingComments={isPublishingComments}
                 publishToLens={publishCommentsToLens}
                 setPublishToLens={setPublishCommentsToLens}
                 showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}

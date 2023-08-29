@@ -43,6 +43,7 @@ export function PageComments({ page, permissions }: Props) {
     proposalPath: page.path,
     proposalTitle: page.title
   });
+  const [isPublishingComments, setPublishingComments] = useState(false);
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
 
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
@@ -57,12 +58,14 @@ export function PageComments({ page, permissions }: Props) {
   // For root level comments lensPostId is the post's id and for replies it is the parent comment's id
   async function createComment(comment: CommentContent, lensPostId?: string | null) {
     const createdComment = await addComment(comment);
-    if (isProposal && proposal?.lensPostLink && lensPostId) {
+    if (isProposal && proposal?.lensPostLink && lensPostId && !isPublishingComments) {
+      setPublishingComments(true);
       await createLensComment({
         commentContent: comment.content as PageContent,
         commentId: createdComment.id,
         lensPostId
       });
+      setPublishingComments(false);
     }
   }
 
@@ -82,6 +85,7 @@ export function PageComments({ page, permissions }: Props) {
 
       {permissions.comment && (
         <CommentForm
+          isPublishingComments={isPublishingComments}
           publishToLens={publishCommentsToLens}
           setPublishToLens={setPublishCommentsToLens}
           showPublishToLens={

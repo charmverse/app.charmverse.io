@@ -9,6 +9,8 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
 
+import { LoadingIcon } from '../LoadingComponent';
+
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
     type: 'doc',
@@ -26,8 +28,10 @@ export function CommentForm({
   placeholder,
   setPublishToLens,
   publishToLens,
-  lensPostLink
+  lensPostLink,
+  isPublishingComments
 }: {
+  isPublishingComments?: boolean;
   lensPostLink?: string | null;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
@@ -102,14 +106,18 @@ export function CommentForm({
           {showPublishToLens && (
             <>
               <Typography variant='body2' color='text.secondary'>
-                Publish to Lens
+                {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
               </Typography>
-              <Switch
-                sx={{ mr: 1, top: 2.5 }}
-                size='small'
-                checked={publishToLens}
-                onChange={(e) => setPublishToLens?.(e.target.checked)}
-              />
+              {isPublishingComments ? (
+                <LoadingIcon size={16} sx={{ mx: 1 }} />
+              ) : (
+                <Switch
+                  sx={{ mr: 1, top: 2 }}
+                  size='small'
+                  checked={publishToLens}
+                  onChange={(e) => setPublishToLens?.(e.target.checked)}
+                />
+              )}
             </>
           )}
           <Button

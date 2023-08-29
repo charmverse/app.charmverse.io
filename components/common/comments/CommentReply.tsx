@@ -8,6 +8,8 @@ import type { CreateCommentPayload } from 'components/common/comments/interfaces
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 
+import { LoadingIcon } from '../LoadingComponent';
+
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
     type: 'doc',
@@ -17,6 +19,7 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentReply({
+  isPublishingComments,
   commentId,
   handleCreateComment,
   onCancelComment,
@@ -25,6 +28,7 @@ export function CommentReply({
   showPublishToLens,
   lensCommentLink
 }: {
+  isPublishingComments?: boolean;
   lensCommentLink?: string | null;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
@@ -82,14 +86,18 @@ export function CommentReply({
             {showPublishToLens && (
               <>
                 <Typography variant='body2' color='text.secondary'>
-                  Publish to Lens
+                  {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
                 </Typography>
-                <Switch
-                  sx={{ mr: 1, top: 2.5 }}
-                  size='small'
-                  checked={publishToLens}
-                  onChange={(e) => setPublishToLens?.(e.target.checked)}
-                />
+                {isPublishingComments ? (
+                  <LoadingIcon size={16} sx={{ mx: 1 }} />
+                ) : (
+                  <Switch
+                    sx={{ mr: 1, top: 2 }}
+                    size='small'
+                    checked={publishToLens}
+                    onChange={(e) => setPublishToLens?.(e.target.checked)}
+                  />
+                )}
               </>
             )}
             <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
