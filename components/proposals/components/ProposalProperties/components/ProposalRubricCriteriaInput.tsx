@@ -33,16 +33,22 @@ type Props = {
 export const CriteriaRow = styled(Box)`
   position: relative;
 
-  .show-on-hover {
-    opacity: 0;
-    transform: opacity 0.2s ease-in-out;
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    flex-direction: column;
   }
-  &:hover {
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
-      opacity: 1;
+      opacity: 0;
+      transform: opacity 0.2s ease-in-out;
     }
-    .octo-propertyvalue:not(.readonly) {
-      background-color: var(--mui-action-hover);
+    &:hover {
+      .show-on-hover {
+        opacity: 1;
+      }
+      .octo-propertyvalue:not(.readonly) {
+        background-color: var(--mui-action-hover);
+      }
     }
   }
 
@@ -227,13 +233,17 @@ export function ProposalRubricCriteriaInput({
               </Grid>
             </Box>
             {!readOnly && (
-              <div className='show-on-hover delete-icon'>
+              <Box
+                className='show-on-hover delete-icon'
+                position={{ xs: 'absolute', sm: 'relative' }}
+                right={{ xs: -25, sm: 0 }}
+              >
                 <Tooltip title='Delete'>
                   <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
                     <DeleteIcon color='secondary' fontSize='small' />
                   </IconButton>
                 </Tooltip>
-              </div>
+              </Box>
             )}
           </CriteriaRow>
         </DraggableListItem>
