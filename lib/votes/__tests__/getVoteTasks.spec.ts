@@ -1,6 +1,6 @@
-import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote } from 'testing/setupDatabase';
 
 import { getVoteTasks } from '../getVoteTasks';
 
@@ -83,6 +83,93 @@ describe('getVoteTasks', () => {
         expect.objectContaining({ id: inProgressPastDeadlineVote.id }),
         expect.objectContaining({ id: inProgressVote.id })
       ])
+    );
+  });
+
+  it('should get votes tasks for a user only in the forum posts they can comment in', async () => {
+    const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+
+    const hiddenForumCategory = await testUtilsForum.generatePostCategory({
+      spaceId: space.id,
+      permissions: [],
+      name: 'Hidden category'
+    });
+
+    const hiddenCategoryPost = await testUtilsForum.generateForumPost({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: hiddenForumCategory.id
+    });
+
+    const inProgressHiddenVote = await createVote({
+      postId: hiddenCategoryPost.id,
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      voteOptions: ['a', 'b'],
+      status: 'InProgress',
+      userVotes: ['1'],
+      deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
+
+    const viewOnlyForumCategory = await testUtilsForum.generatePostCategory({
+      spaceId: space.id,
+      name: 'View only category',
+      permissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'view'
+        }
+      ]
+    });
+    const viewOnlyCategoryPost = await testUtilsForum.generateForumPost({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: viewOnlyForumCategory.id
+    });
+
+    const inProgressViewableVote = await createVote({
+      postId: viewOnlyCategoryPost.id,
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      voteOptions: ['a', 'b'],
+      status: 'InProgress',
+      userVotes: ['1'],
+      deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
+
+    const commentableForumCategory = await testUtilsForum.generatePostCategory({
+      spaceId: space.id,
+      name: 'Commentable category',
+      permissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'comment_vote'
+        }
+      ]
+    });
+    const commentableCategoryPost = await testUtilsForum.generateForumPost({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: commentableForumCategory.id
+    });
+
+    const inProgressVotableVote = await createVote({
+      postId: commentableCategoryPost.id,
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      voteOptions: ['a', 'b'],
+      status: 'InProgress',
+      userVotes: ['1'],
+      deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
+    const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+
+    const votes = await getVoteTasks(spaceMember.id);
+
+    expect(votes.unmarked).toHaveLength(1);
+
+    expect(votes.unmarked).toMatchObject(
+      expect.arrayContaining([expect.objectContaining({ id: inProgressVotableVote.id })])
     );
   });
 });

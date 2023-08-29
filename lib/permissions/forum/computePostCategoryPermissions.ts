@@ -35,7 +35,7 @@ export async function computePostCategoryPermissions({
 
   // Space members can create and edit post categories, people outside the space cannot perform any actions
   if (spaceRole) {
-    permissions.addPermissions(['create_post', 'edit_category', 'delete_category']);
+    permissions.addPermissions(['create_post', 'edit_category', 'delete_category', 'view_posts', 'comment_posts']);
   }
 
   return permissions.operationFlags;
