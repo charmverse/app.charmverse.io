@@ -428,21 +428,6 @@ export function ProposalProperties({
               />
             </Box>
           </Box>
-          {/* Select valuation type */}
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Type</PropertyLabel>
-              <ProposalEvaluationTypeSelect
-                disabled={readOnlyProposalEvaluationType}
-                value={proposalFormInputs.evaluationType}
-                onChange={(evaluationType) => {
-                  setProposalFormInputs({
-                    evaluationType
-                  });
-                }}
-              />
-            </Box>
-          </Box>
 
           {lensProposalPropertyState !== 'hide' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
@@ -495,6 +480,22 @@ export function ProposalProperties({
               </Box>
             </Box>
           )}
+
+          {/* Select valuation type */}
+          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <ProposalEvaluationTypeSelect
+                disabled={readOnlyProposalEvaluationType}
+                value={proposalFormInputs.evaluationType}
+                onChange={(evaluationType) => {
+                  setProposalFormInputs({
+                    evaluationType
+                  });
+                }}
+              />
+            </Box>
+          </Box>
 
           {/* Select rubric criteria */}
 

@@ -98,14 +98,19 @@ export function CommentForm({
       <UserDisplay user={user} hideName={true} />
       <Stack gap={1} width='100%'>
         {editor}
-        <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
+        <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
           {showPublishToLens && (
-            <Stack flexDirection='row' gap={1} alignItems='center'>
+            <>
               <Typography variant='body2' color='text.secondary'>
                 Publish to Lens
               </Typography>
-              <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
-            </Stack>
+              <Switch
+                sx={{ mr: 1, top: 2.5 }}
+                size='small'
+                checked={publishToLens}
+                onChange={(e) => setPublishToLens?.(e.target.checked)}
+              />
+            </>
           )}
           <Button
             data-test='post-comment-button'

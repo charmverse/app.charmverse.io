@@ -78,14 +78,19 @@ export function CommentReply({
             placeholderText='What are your thoughts?'
           />
 
-          <Stack flexDirection='row' justifyContent={showPublishToLens ? 'space-between' : 'flex-end'}>
+          <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
             {showPublishToLens && (
-              <Stack flexDirection='row' gap={1} alignItems='center'>
+              <>
                 <Typography variant='body2' color='text.secondary'>
                   Publish to Lens
                 </Typography>
-                <Switch size='small' checked={publishToLens} onChange={(e) => setPublishToLens?.(e.target.checked)} />
-              </Stack>
+                <Switch
+                  sx={{ mr: 1, top: 2.5 }}
+                  size='small'
+                  checked={publishToLens}
+                  onChange={(e) => setPublishToLens?.(e.target.checked)}
+                />
+              </>
             )}
             <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
               <Button variant='outlined' color='secondary' onClick={onCancelComment}>
