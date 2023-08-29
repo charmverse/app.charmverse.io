@@ -21,8 +21,6 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
-    outputs:
-      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -31,12 +29,6 @@ jobs:
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
-      - name: Calculate Build ID
-        id: get_build_id
-        run: |
-          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
-          echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
@@ -46,7 +38,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   test:
     name: Tests
@@ -71,7 +62,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -166,7 +156,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -190,12 +179,6 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
-      - name: Calculate Build ID
-        id: get_build_id
-        run: |
-          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
-          echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
       - name: Build app
         uses: ./.github/actions/build
         with:
@@ -217,7 +200,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          # NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -286,7 +269,7 @@ jobs:
           npm install -g @datadog/datadog-ci
           datadog-ci sourcemaps upload .next/static       \
             --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --release-version="${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}"  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
       - name: Deploy Background to Beanstalk
