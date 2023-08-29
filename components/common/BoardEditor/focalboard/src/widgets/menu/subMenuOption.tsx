@@ -3,7 +3,7 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import Popper from '@mui/material/Popper';
 import React, { useEffect, useRef, useState } from 'react';
 
-import Menu from '.';
+import TextOption from './textOption';
 
 type SubMenuOptionProps = {
   id: string;
@@ -80,7 +80,7 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
             <div className='menu-spacer hideOnWidescreen' />
 
             <div className='menu-options hideOnWidescreen'>
-              <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
+              <TextOption id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
             </div>
           </div>
         </div>

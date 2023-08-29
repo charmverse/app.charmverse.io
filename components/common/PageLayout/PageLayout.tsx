@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Tooltip, Box, Typography } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
 import * as React from 'react';
@@ -23,8 +22,9 @@ import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
 import { AnnouncementBanner } from './components/AnnouncementBanner';
+import { AppBar } from './components/AppBar';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import { Header, headerHeight } from './components/Header/Header';
+import { Header, HeaderSpacer } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
 import { Sidebar } from './components/Sidebar/Sidebar';
 
@@ -53,31 +53,6 @@ const closedMixin = (theme: Theme) =>
     border: 'none'
   } as const);
 
-export const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open'
-})<{ open: boolean; sidebarWidth: number }>`
-  background: transparent;
-  box-shadow: none;
-  color: inherit;
-  z-index: var(--z-index-appBar);
-  transition: ${({ theme }) =>
-    theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })};
-  ${({ open, sidebarWidth, theme }) =>
-    open
-      ? `
-    margin-left: ${sidebarWidth}px;
-    width: calc(100% - ${sidebarWidth}px);
-    transition: ${theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })};
-  `
-      : ''}
-`;
-
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open' && prop !== 'sidebarWidth'
 })<{ open: boolean; sidebarWidth: number }>(
@@ -99,10 +74,6 @@ const Drawer = styled(MuiDrawer, {
     paddingRight: 3
   })
 );
-
-export const HeaderSpacer = styled.div`
-  min-height: ${headerHeight}px;
-`;
 
 const LayoutContainer = styled.div`
   display: flex;

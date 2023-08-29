@@ -4,19 +4,23 @@ import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
 import { Box, Paper, useMediaQuery } from '@mui/material';
+import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
 import { Button } from 'components/common/Button';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { updateInlineComment } from '../inlineComment.utils';
+
+export const InlineCharmEditor = dynamic(() => import('components/common/CharmEditor/InlineCharmEditor'), {
+  ssr: false
+});
 
 const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 

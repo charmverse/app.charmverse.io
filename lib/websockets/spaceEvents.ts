@@ -15,8 +15,8 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
-import { relay } from 'lib/websockets/relay';
 
+import type { WebsocketBroadcaster } from './broadcaster';
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
@@ -28,7 +28,11 @@ export class SpaceEventHandler {
 
   docRooms: Map<string | undefined, DocumentRoom> = new Map();
 
-  constructor(private socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
+  constructor(
+    private relay: WebsocketBroadcaster,
+    private socket: Socket,
+    docRooms: Map<string | undefined, DocumentRoom>
+  ) {
     this.socket = socket;
     this.docRooms = docRooms;
   }
@@ -53,7 +57,7 @@ export class SpaceEventHandler {
         });
         if (typeof decryptedUserId === 'string') {
           this.userId = decryptedUserId;
-          relay.registerWorkspaceSubscriber({
+          this.relay.registerWorkspaceSubscriber({
             userId: decryptedUserId,
             socket: this.socket,
             roomId: message.payload.spaceId
@@ -144,7 +148,7 @@ export class SpaceEventHandler {
 
         const { content, contentText, ...newPageToNotify } = createdPage;
 
-        relay.broadcast(
+        this.relay.broadcast(
           {
             type: 'pages_created',
             payload: [newPageToNotify]

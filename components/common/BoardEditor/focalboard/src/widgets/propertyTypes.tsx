@@ -6,7 +6,7 @@ import { proposalPropertyTypesList, propertyTypesList } from 'lib/focalboard/boa
 
 import { iconForPropertyType } from '../components/viewHeader/viewHeaderPropertiesMenu';
 
-import { typeDisplayName } from './propertyMenu';
+import { typeDisplayName } from './typeDisplayName';
 
 export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyType) => void; isMobile?: boolean }) {
   const intl = useIntl();

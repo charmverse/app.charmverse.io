@@ -6,7 +6,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
 import { InvalidApiKeyError } from 'lib/middleware/errors';
-import './requireApiKey'; // import types on http
 
 declare module 'http' {
   interface IncomingMessage {

@@ -1,9 +1,11 @@
 import { log } from '@charmverse/core/log';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { relay } from 'lib/websockets/relay';
+import { WebsocketBroadcaster } from 'lib/websockets/broadcaster';
 
 import { modifyChildPages } from './modifyChildPages';
+
+const relay = new WebsocketBroadcaster();
 
 export async function archivePages({
   archive,

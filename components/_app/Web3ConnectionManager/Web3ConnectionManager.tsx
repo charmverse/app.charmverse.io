@@ -5,7 +5,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { useContext, createContext, useEffect, useState } from 'react';
 
-import WalletSelectorModal from './components/WalletSelectorModal';
+import { WalletSelectorModal } from './components/WalletSelectorModal/WalletSelectorModal';
 import useEagerConnect from './hooks/useEagerConnect';
 import useInactiveListener from './hooks/useInactiveListener';
 
@@ -71,7 +71,6 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
       }}
     >
       {children}
-      <WalletSelectorModal loginSuccess={() => null} />
     </Web3Connection.Provider>
   );
 }
