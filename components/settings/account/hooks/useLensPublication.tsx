@@ -135,7 +135,7 @@ export function useLensPublication({
         });
       } else {
         publicationResponse = await createCommentPublication({
-          contentText: `I just commented on **${proposalTitle}** from **${space.name}**\n\n${finalMarkdownContent}`,
+          contentText: finalMarkdownContent,
           postId: params.lensPostId,
           lensProfile,
           commentLink: `https://app.charmverse.io/${space.domain}/${proposalPath}?commentId=${params.commentId}`

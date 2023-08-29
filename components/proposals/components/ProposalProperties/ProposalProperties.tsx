@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
-import { useTheme } from '@emotion/react';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -249,8 +248,6 @@ export function ProposalProperties({
   } else {
     lensProposalPropertyState = lensProfile ? 'show_toggle' : 'hide';
   }
-
-  const theme = useTheme();
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
     if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
