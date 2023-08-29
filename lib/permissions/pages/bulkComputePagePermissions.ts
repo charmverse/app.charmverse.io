@@ -1,13 +1,13 @@
 import type {
+  BulkPagePermissionCompute,
   BulkPagePermissionFlags,
-  BulkPermissionCompute,
   PagePermissionFlags,
   PageResource,
   ProposalResource,
   SpacePermissionFlags
 } from '@charmverse/core/permissions';
-import { proposalResourceSelect, pageResourceSelect } from '@charmverse/core/permissions';
-import type { ProposalCategoryPermission, SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma-client';
+import { pageResourceSelect, proposalResourceSelect } from '@charmverse/core/permissions';
+import type { ProposalCategoryPermission, SpaceRole } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { computeSpacePermissions } from 'lib/permissions/spaces/computeSpacePermissions';
@@ -15,14 +15,14 @@ import { computeSpacePermissions } from 'lib/permissions/spaces/computeSpacePerm
 import { computePagePermissions } from './computePagePermissions';
 
 export async function bulkComputePagePermissions({
-  resourceIds,
+  pageIds,
   userId
-}: BulkPermissionCompute): Promise<BulkPagePermissionFlags> {
+}: BulkPagePermissionCompute): Promise<BulkPagePermissionFlags> {
   // Preload all relevant pages
   const resources = await prisma.page.findMany({
     where: {
       id: {
-        in: resourceIds
+        in: pageIds
       }
     },
     select: { ...pageResourceSelect(), permissions: true }

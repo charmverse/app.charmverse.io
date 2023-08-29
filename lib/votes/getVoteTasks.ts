@@ -1,13 +1,10 @@
-import type { PermissionsClient } from '@charmverse/core/dist/cjs/permissions';
-import type { Vote, SubscriptionTier, UserVote, VoteOptions, User, PostCategory } from '@charmverse/core/prisma-client';
+import type { PostCategory, SubscriptionTier, User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
-import { U } from '@fullcalendar/core/internal-common';
 
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { getPermissionsClient } from 'lib/permissions/api';
 import { publicPermissionsClient } from 'lib/permissions/api/client';
-import { SpacePermissionsClient, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
@@ -157,11 +154,11 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
 
   const [commentableFreeSpacePages, commentablePaidSpacePages] = await Promise.all([
     publicPermissionsClient.pages.bulkComputePagePermissions({
-      resourceIds: voteBuckets.freeSpacePageVotes.map((vote) => vote.pageId as string),
+      pageIds: voteBuckets.freeSpacePageVotes.map((vote) => vote.pageId as string),
       userId
     }),
     premiumPermissionsApiClient.pages.bulkComputePagePermissions({
-      resourceIds: voteBuckets.paidSpacePageVotes.map((vote) => vote.pageId as string),
+      pageIds: voteBuckets.paidSpacePageVotes.map((vote) => vote.pageId as string),
       userId
     })
   ]);

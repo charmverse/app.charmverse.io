@@ -135,7 +135,7 @@ describe('bulkComputePagePermissions', () => {
   it('should always return the same results as computePagePermissions for users outside the space', async () => {
     for (const user of secondSpaceUsers) {
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: firstSpacePages.map((page) => page.id),
+        pageIds: firstSpacePages.map((page) => page.id),
         userId: user.id
       });
 
@@ -147,7 +147,7 @@ describe('bulkComputePagePermissions', () => {
 
     for (const user of firstSpaceUsers) {
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: secondSpacePages.map((page) => page.id),
+        pageIds: secondSpacePages.map((page) => page.id),
         userId: user.id
       });
 
@@ -161,7 +161,7 @@ describe('bulkComputePagePermissions', () => {
   it('should always return the same results as computePagePermissions for users inside the space', async () => {
     for (const user of secondSpaceUsers) {
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: secondSpacePages.map((page) => page.id),
+        pageIds: secondSpacePages.map((page) => page.id),
         userId: user.id
       });
 
@@ -173,7 +173,7 @@ describe('bulkComputePagePermissions', () => {
 
     for (const user of firstSpaceUsers) {
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: firstSpacePages.map((page) => page.id),
+        pageIds: firstSpacePages.map((page) => page.id),
         userId: user.id
       });
 
@@ -187,7 +187,7 @@ describe('bulkComputePagePermissions', () => {
   it('should always return the same results as computePagePermissions for users when pages belong to multiple spaces', async () => {
     for (const user of allUsers) {
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: allPages.map((page) => page.id),
+        pageIds: allPages.map((page) => page.id),
         userId: user.id
       });
 
@@ -275,7 +275,7 @@ describe('bulkComputePagePermissions', () => {
     for (let i = 0; i < allUsersForTestingProposals.length; i++) {
       const user = allUsersForTestingProposals[i];
       const bulkPermissions = await bulkComputePagePermissions({
-        resourceIds: allProposals.map((page) => page.id),
+        pageIds: allProposals.map((page) => page.id),
         userId: user.id
       });
       for (const proposal of allProposals) {
