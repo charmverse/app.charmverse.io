@@ -6,8 +6,8 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function ForumPageComponent() {
-  const { features } = useFeaturesAndMembers();
-  const forumTitle = features.find((f) => f.id === 'forum')?.title || 'Forum';
+  const { mappedFeatures } = useFeaturesAndMembers();
+  const forumTitle = mappedFeatures.forum.title;
 
   setTitle(forumTitle);
 

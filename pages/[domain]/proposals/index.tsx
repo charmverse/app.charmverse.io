@@ -4,8 +4,8 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function ProposalsPageComponent() {
-  const { features } = useFeaturesAndMembers();
-  const proposalTitle = features.find((f) => f.id === 'proposals')?.title || 'Proposals';
+  const { mappedFeatures } = useFeaturesAndMembers();
+  const proposalTitle = mappedFeatures.proposals.title;
 
   setTitle(proposalTitle);
 

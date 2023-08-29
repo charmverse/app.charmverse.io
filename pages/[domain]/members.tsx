@@ -4,8 +4,8 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function MemberDirectory() {
-  const { features } = useFeaturesAndMembers();
-  const memberDirectoryTitle = features.find((f) => f.id === 'member_directory')?.title || 'Member Directory';
+  const { mappedFeatures } = useFeaturesAndMembers();
+  const memberDirectoryTitle = mappedFeatures.member_directory.title;
 
   setTitle(memberDirectoryTitle);
 

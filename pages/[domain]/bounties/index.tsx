@@ -10,8 +10,8 @@ import { useSharedPage } from 'hooks/useSharedPage';
 export default function BountyPage() {
   const { bounties, loadingBounties } = useBounties();
   const { accessChecked } = useSharedPage();
-  const { features } = useFeaturesAndMembers();
-  const bountiesTitle = features.find((f) => f.id === 'bounties')?.title || 'Bounties';
+  const { mappedFeatures } = useFeaturesAndMembers();
+  const bountiesTitle = mappedFeatures.bounties.title;
 
   const { hasAccess: isSpaceMember, isLoadingAccess } = useHasMemberLevel('member');
 

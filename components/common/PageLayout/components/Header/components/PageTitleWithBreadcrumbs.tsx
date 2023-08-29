@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 
@@ -118,38 +119,38 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
   );
 }
 
-function ProposalPageTitle({ basePath }: { basePath: string }) {
+function ProposalPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/proposals`}>Proposals</Link>
+        <Link href={`${basePath}/proposals`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
 
-function ForumPostTitle({ basePath, pathName }: { basePath: string; pathName: string }) {
+function ForumPostTitle({ basePath, pathName, baseTitle }: { basePath: string; pathName: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
 
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/forum`}>Forum</Link>
+        <Link href={`${basePath}/forum`}>{baseTitle}</Link>
       </BreadCrumb>
       {title ?? 'Untitled'}
     </PageTitle>
   );
 }
 
-function BountyPageTitle({ basePath }: { basePath: string }) {
+function BountyPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/bounties`}>Bounties</Link>
+        <Link href={`${basePath}/bounties`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
@@ -177,17 +178,21 @@ function DefaultPageTitle() {
 
 export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
+  const { mappedFeatures } = useFeaturesAndMembers();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
   } else if (pageType === 'bounty') {
-    return <BountyPageTitle basePath={`/${router.query.domain}`} />;
+    const baseTitle = mappedFeatures.bounties.title;
+    return <BountyPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;
   } else if (pageType === 'proposal') {
-    return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
+    const baseTitle = mappedFeatures.proposals.title;
+    return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;
   } else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.includes('/[domain]/forum')) {
-    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
+    const baseTitle = mappedFeatures.forum.title;
+    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} baseTitle={baseTitle} />;
   } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
   } else {
