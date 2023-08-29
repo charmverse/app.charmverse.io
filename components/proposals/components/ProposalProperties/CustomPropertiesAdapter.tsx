@@ -25,7 +25,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props)
       readOnly={!!readOnly}
       pageUpdatedAt={proposalPage?.updatedAt.toString() || new Date().toString()}
       pageUpdatedBy={proposalPage?.updatedBy || user?.id || ''}
-      // mutator={mutator}
+      mutator={mutator ?? undefined}
     />
   );
 }

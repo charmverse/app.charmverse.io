@@ -10,14 +10,20 @@ type Props = {
 };
 
 export function usePropertiesMutator({ onChange }: Props) {
-  // TODO: connect all methods to mutator
-  const { proposalPropertiesBlock, updateBlock, updateProperty, createProperty, deleteProperty } = useProposalBlocks();
+  const blocksContext = useProposalBlocks();
   const [mutator, setMutator] = useState<ProposalsMutator | null>(null);
 
   useEffect(() => {
-    const instance = new ProposalsMutator(onChange);
+    const instance = new ProposalsMutator(blocksContext, onChange);
     setMutator(instance);
   }, []);
+
+  useEffect(() => {
+    if (mutator) {
+      // keep the mutator properties updated on each render
+      mutator.blocksContext = blocksContext;
+    }
+  });
 
   return mutator;
 }

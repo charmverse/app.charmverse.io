@@ -31,7 +31,7 @@ export interface BlockChange {
 // The Mutator is used to make all changes to server state
 // It also ensures that the Undo-manager is called for each action
 //
-class Mutator {
+export class Mutator {
   private undoGroupId?: string;
 
   private undoDisplayId?: string;

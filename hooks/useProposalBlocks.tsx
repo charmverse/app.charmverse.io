@@ -11,7 +11,7 @@ import type {
   ProposalPropertiesBlock
 } from 'lib/proposal/blocks/interfaces';
 
-type ProposalBlocksContextType = {
+export type ProposalBlocksContextType = {
   proposalBlocks: ProposalBlockWithTypedFields[] | undefined;
   proposalPropertiesBlock: ProposalPropertiesBlock | undefined;
   isLoading: boolean;

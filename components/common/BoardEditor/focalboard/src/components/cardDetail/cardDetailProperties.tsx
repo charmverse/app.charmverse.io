@@ -15,7 +15,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
-import mutator from '../../mutator';
+import type { Mutator } from '../../mutator';
+import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import { typeDisplayName } from '../../widgets/propertyMenu';
@@ -32,10 +33,21 @@ type Props = {
   readOnly: boolean;
   pageUpdatedBy: string;
   pageUpdatedAt: string;
+  mutator?: Mutator;
 };
 
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy, syncWithPageId } = props;
+  const {
+    board,
+    card,
+    cards,
+    views,
+    activeView,
+    pageUpdatedAt,
+    pageUpdatedBy,
+    syncWithPageId,
+    mutator = defaultMutator
+  } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -71,6 +83,7 @@ function CardDetailProperties(props: Props) {
     const srcIndex = cardPropertyIds.indexOf(sourceProperty.id);
     cardPropertyIds.splice(srcIndex, 1);
     cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
+
     await charmClient.patchBlock(
       board.id,
       {
@@ -261,6 +274,7 @@ function CardDetailProperties(props: Props) {
             pageUpdatedBy={pageUpdatedBy}
             property={propertyTemplate}
             readOnly={props.readOnly}
+            mutator={mutator}
           />
         );
       })}

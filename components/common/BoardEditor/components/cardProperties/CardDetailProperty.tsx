@@ -6,6 +6,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import PropertyValueElement from 'components/common/BoardEditor/focalboard/src/components/propertyValueElement';
 import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
+import type { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import PropertyMenu from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -42,7 +43,8 @@ export function CardDetailProperty({
   pageUpdatedAt,
   deleteDisabledMessage,
   onDrop,
-  syncWithPageId
+  syncWithPageId,
+  mutator
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -54,6 +56,7 @@ export function CardDetailProperty({
   pageUpdatedAt: string;
   pageUpdatedBy: string;
   deleteDisabledMessage?: string;
+  mutator: Mutator;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
@@ -111,6 +114,7 @@ export function CardDetailProperty({
         propertyTemplate={property}
         showEmptyPlaceholder={true}
         displayType='details'
+        mutator={mutator}
       />
     </Stack>
   );
