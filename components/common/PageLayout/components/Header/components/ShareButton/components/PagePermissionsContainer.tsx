@@ -2,10 +2,10 @@ import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 
+import { useGetPermissions } from 'charmClient/hooks/permissions';
 import Loader from 'components/common/Loader';
 import MultiTabs from 'components/common/MultiTabs';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
 
 import FreePagePermissions from './FreePagePermissions/FreePagePermissions';
 import FreeShareToWeb from './FreePagePermissions/FreeShareToWeb';
@@ -20,9 +20,7 @@ export function PagePermissionsContainer({ pageId }: Props) {
   const [activeTab, setActiveTab] = useState(0);
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { pagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId: !isFreeSpace ? pageId : null
-  });
+  const { data: pagePermissions, mutate: refreshPermissions } = useGetPermissions(!isFreeSpace ? pageId : null);
 
   if (!isFreeSpace && !pagePermissions) {
     return (

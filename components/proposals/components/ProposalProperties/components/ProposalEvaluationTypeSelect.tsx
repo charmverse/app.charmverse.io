@@ -4,7 +4,8 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import type { IPropertyOption } from 'lib/focalboard/board';
 
 type Props = {
-  disabled?: boolean;
+  readOnly?: boolean;
+  readOnlyMessage?: string;
   value: ProposalEvaluationType;
   onChange: (value: ProposalEvaluationType) => void;
 };
@@ -22,7 +23,7 @@ const options: IPropertyOption<ProposalEvaluationType>[] = [
   }
 ];
 
-export function ProposalEvaluationTypeSelect({ disabled, value, onChange }: Props) {
+export function ProposalEvaluationTypeSelect({ readOnly, readOnlyMessage, value, onChange }: Props) {
   function onValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (newValue) {
@@ -30,5 +31,14 @@ export function ProposalEvaluationTypeSelect({ disabled, value, onChange }: Prop
     }
   }
 
-  return <TagSelect wrapColumn readOnly={disabled} options={options} propertyValue={value} onChange={onValueChange} />;
+  return (
+    <TagSelect
+      wrapColumn
+      readOnly={readOnly}
+      readOnlyMessage={readOnlyMessage}
+      options={options}
+      propertyValue={value}
+      onChange={onValueChange}
+    />
+  );
 }
