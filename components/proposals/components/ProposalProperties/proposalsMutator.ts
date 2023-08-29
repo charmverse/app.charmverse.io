@@ -3,7 +3,7 @@ import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { ProposalPropertiesBlockFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
@@ -111,5 +111,92 @@ export class ProposalsMutator extends Mutator {
     }
 
     this.onPropertiesChange?.(properties);
+  }
+
+  async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
+    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+
+    const updatedProperties = proposalPropertiesBlock?.fields?.properties
+      ? [...proposalPropertiesBlock.fields.properties]
+      : [];
+
+    if (!proposalPropertiesBlock) {
+      return;
+    }
+
+    const properties = updatedProperties.map((p) => {
+      if (p.id !== template.id) {
+        return p;
+      }
+
+      return {
+        ...p,
+        options: p.options.map((o) =>
+          o.id === updatedOption.id ? { ...o, color: updatedOption.color, value: updatedOption.value } : o
+        )
+      };
+    });
+
+    const oldFields = proposalPropertiesBlock?.fields || {};
+
+    await this.blocksContext.updateBlock({
+      ...proposalPropertiesBlock,
+      fields: { ...oldFields, properties } as ProposalPropertiesBlockFields
+    });
+  }
+
+  async insertPropertyOption(
+    board: Board,
+    template: IPropertyTemplate,
+    option: IPropertyOption,
+    description = 'add option'
+  ) {
+    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+
+    const updatedProperties = proposalPropertiesBlock?.fields?.properties
+      ? [...proposalPropertiesBlock.fields.properties]
+      : [];
+
+    if (!proposalPropertiesBlock) {
+      return;
+    }
+
+    const udpatedTemplate = updatedProperties.find((o) => o.id === template.id);
+
+    if (udpatedTemplate) {
+      udpatedTemplate.options = udpatedTemplate.options ? [...udpatedTemplate.options, option] : [option];
+
+      const oldFields = proposalPropertiesBlock?.fields || {};
+
+      await this.blocksContext.updateBlock({
+        ...proposalPropertiesBlock,
+        fields: { ...oldFields, properties: updatedProperties } as ProposalPropertiesBlockFields
+      });
+    }
+  }
+
+  async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
+    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+
+    const updatedProperties = proposalPropertiesBlock?.fields?.properties
+      ? [...proposalPropertiesBlock.fields.properties]
+      : [];
+
+    if (!proposalPropertiesBlock) {
+      return;
+    }
+
+    const udpatedTemplate = updatedProperties.find((o) => o.id === template.id);
+
+    if (udpatedTemplate) {
+      udpatedTemplate.options = udpatedTemplate.options?.filter((o) => o.id !== option.id) || [];
+
+      const oldFields = proposalPropertiesBlock?.fields || {};
+
+      await this.blocksContext.updateBlock({
+        ...proposalPropertiesBlock,
+        fields: { ...oldFields, properties: updatedProperties } as ProposalPropertiesBlockFields
+      });
+    }
   }
 }
