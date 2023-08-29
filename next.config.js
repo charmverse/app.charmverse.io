@@ -52,9 +52,6 @@ const config = {
   },
   assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
-  async generateBuildId() {
-    return process.env.NEXT_PUBLIC_BUILD_ID || uuid.v4();
-  },
   async redirects() {
     return [
       {
