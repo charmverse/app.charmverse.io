@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { useTheme } from '@emotion/react';
 import type { Web3Provider } from '@ethersproject/providers';
 import type {
   CreateCommentTypedDataFragment,
@@ -10,10 +11,12 @@ import type {
   RelayErrorFragment,
   Result
 } from '@lens-protocol/client';
+import { Stack } from '@mui/material';
 import { RPC } from 'connectors/index';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
+import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -49,10 +52,11 @@ export function useLensPublication({
 }) {
   const { account, library, chainId } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
-  const { showMessage } = useSnackbar();
+  const { showMessage, setAutoHideDuration } = useSnackbar();
   const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
   const { updateComment } = usePageComments(proposalId);
+  const theme = useTheme();
 
   async function createPublication(
     params: { content: PageContent } & (
@@ -66,6 +70,18 @@ export function useLensPublication({
         }
     )
   ) {
+    setAutoHideDuration(null);
+    showMessage(
+      <Stack flexDirection='row' gap={1} alignItems='center'>
+        <LoadingIcon
+          size={16}
+          style={{
+            color: theme.palette.mode === 'dark' ? 'black' : 'white'
+          }}
+        />
+        Publishing {params.publicationType} to lens ...
+      </Stack>
+    );
     const { publicationType, content } = params;
 
     if (!space || !account || !lensProfile) {
@@ -154,6 +170,7 @@ export function useLensPublication({
 
       if (!failedToPublishInLens && publicationResponse.data.isSuccess()) {
         showMessage(`${capitalizedPublicationType} published to Lens`, 'info');
+        setAutoHideDuration(5000);
         log.info(`${capitalizedPublicationType} published to Lens`, {
           spaceId: space.id,
           ...params
@@ -173,6 +190,7 @@ export function useLensPublication({
 
     if (lensError && failedToPublishInLens) {
       showMessage(`Failed to publish ${capitalizedPublicationType} to Lens`, 'error');
+      setAutoHideDuration(5000);
       log.error(`Publishing ${capitalizedPublicationType} to Lens failed`, {
         error: lensError,
         spaceId: space.id,

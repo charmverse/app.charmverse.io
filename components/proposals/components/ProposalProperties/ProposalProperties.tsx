@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
+import { useTheme } from '@emotion/react';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -12,7 +13,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Link from 'components/common/Link';
-import LoadingComponent from 'components/common/LoadingComponent';
+import LoadingComponent, { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import type { TabConfig } from 'components/common/MultiTabs';
@@ -243,12 +244,13 @@ export function ProposalProperties({
   }, [detailsExpanded, proposalStatus]);
 
   let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
-  const isDraftStatus = proposalStatus === 'draft';
   if (proposalLensLink) {
     lensProposalPropertyState = 'show_link';
   } else {
     lensProposalPropertyState = lensProfile ? 'show_toggle' : 'hide';
   }
+
+  const theme = useTheme();
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
     if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
@@ -470,15 +472,19 @@ export function ProposalProperties({
                 ) : (
                   <>
                     <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
-                    <Switch
-                      disabled={proposalStatus !== 'draft'}
-                      checked={proposalFormInputs.publishToLens ?? false}
-                      onChange={(e) => {
-                        setProposalFormInputs({
-                          publishToLens: e.target.checked
-                        });
-                      }}
-                    />
+                    {isPublishingToLens ? (
+                      <LoadingIcon size={16} />
+                    ) : (
+                      <Switch
+                        disabled={proposalStatus !== 'draft'}
+                        checked={proposalFormInputs.publishToLens ?? false}
+                        onChange={(e) => {
+                          setProposalFormInputs({
+                            publishToLens: e.target.checked
+                          });
+                        }}
+                      />
+                    )}
                     {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && !isPublishingToLens && (
                       <Typography variant='body2' color='error'>
                         Failed publishing to Lens
