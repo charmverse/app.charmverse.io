@@ -85,7 +85,7 @@ export function FullPageEditor() {
       enableVoting={true}
       pageType='page'
       pagePermissions={undefined}
-      onConnectionError={() => {}}
+      onConnectionEvent={() => {}}
       snapshotProposalId={null}
       onParticipantUpdate={() => {}}
       style={{
