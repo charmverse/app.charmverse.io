@@ -100,17 +100,25 @@ export async function syncPageComments({
   for (const lensComment of lensComments) {
     if (!commentIdsPublishedToLens.has(lensComment.id)) {
       const lensUserHandle = lensComment.profile.handle.toLowerCase();
-      let charmVerseUser = await prisma.user.findFirst({
+      let charmverseUserId: null | string = null;
+      const charmVerseUser = await prisma.user.findFirst({
         where: {
           username: `${lensUserHandle}-${usernameSuffix}`
         },
         select: {
-          id: true
+          id: true,
+          spaceRoles: {
+            where: {
+              spaceId
+            }
+          }
         }
       });
 
+      charmverseUserId = charmVerseUser?.id ?? null;
+
       if (!charmVerseUser) {
-        charmVerseUser = await prisma.user.create({
+        const createdCharmVerseUser = await prisma.user.create({
           data: {
             username: `${lensUserHandle}-${usernameSuffix}`,
             path: `${lensUserHandle}-${pathSuffix}`,
@@ -131,12 +139,24 @@ export async function syncPageComments({
             id: true
           }
         });
+
+        charmverseUserId = createdCharmVerseUser.id;
+      } else {
+        const hasSpaceRole = charmVerseUser.spaceRoles.length === 0;
+        if (hasSpaceRole) {
+          await prisma.spaceRole.create({
+            data: {
+              spaceId,
+              userId: charmVerseUser.id
+            }
+          });
+        }
       }
 
       const charmverseComment = await prisma.pageComment.create({
         data: {
           pageId,
-          createdBy: charmVerseUser.id,
+          createdBy: charmverseUserId!,
           contentText: lensComment.metadata.content ? lensComment.metadata.content : '',
           content: lensComment.metadata.content ? parseMarkdown(lensComment.metadata.content) : Prisma.JsonNull,
           lensCommentLink: lensComment.id,

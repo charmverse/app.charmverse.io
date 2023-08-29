@@ -1,3 +1,5 @@
+import { prisma } from '@charmverse/core/prisma-client';
+import { generateSpaceRole } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
 import { lensClient } from 'lib/lens/lensClient';
@@ -61,6 +63,14 @@ describe('syncPageComments', () => {
       }
     };
 
+    const lensComment4 = {
+      id: v4(),
+      profile: lensUser1,
+      metadata: {
+        content: 'Lens Comment 4'
+      }
+    };
+
     const lensComment1NestedComment1 = {
       id: v4(),
       profile: lensUser1,
@@ -68,6 +78,7 @@ describe('syncPageComments', () => {
         content: 'Lens Comment 1 Nested Comment 1'
       }
     };
+
     const lensComment1NestedComment2 = {
       id: v4(),
       profile: lensUser2,
@@ -75,6 +86,7 @@ describe('syncPageComments', () => {
         content: 'Lens Comment 1 Nested Comment 2'
       }
     };
+
     const lensComment1NestedComment3 = {
       id: v4(),
       profile: lensUser2,
@@ -82,6 +94,7 @@ describe('syncPageComments', () => {
         content: 'Lens Comment 1 Nested Comment 3'
       }
     };
+
     const lensComment2NestedComment1 = {
       id: v4(),
       profile: lensUser1,
@@ -90,7 +103,8 @@ describe('syncPageComments', () => {
       }
     };
 
-    const lensPostId = v4();
+    const lensPost1Id = v4();
+    const lensPost2Id = v4();
 
     const publicationFetchAll = jest
       .fn()
@@ -134,24 +148,29 @@ describe('syncPageComments', () => {
 
     lensClient.publication.fetchAll = publicationFetchAll;
 
-    const { space, user } = await generateUserAndSpace();
+    const { space: space1, user } = await generateUserAndSpace();
+    const { space: space2 } = await generateUserAndSpace();
+    await generateSpaceRole({
+      spaceId: space2.id,
+      userId: user.id
+    });
 
-    const proposalCategory = await createProposalCategory({
+    const space1ProposalCategory = await createProposalCategory({
       data: {
-        spaceId: space.id,
+        spaceId: space1.id,
         title: 'Test Category'
       }
     });
 
-    const proposalPage = await createProposal({
-      categoryId: proposalCategory.id,
-      spaceId: space.id,
+    const space1ProposalPage = await createProposal({
+      categoryId: space1ProposalCategory.id,
+      spaceId: space1.id,
       userId: user.id
     });
 
     await updateProposalLensProperties({
-      proposalId: proposalPage.proposal.id,
-      lensPostLink: lensPostId
+      proposalId: space1ProposalPage.proposal.id,
+      lensPostLink: lensPost1Id
     });
 
     // This comment already exist in charmverse so we should not create it again
@@ -176,7 +195,7 @@ describe('syncPageComments', () => {
         ]
       },
       contentText: 'Regular Comment 1',
-      pageId: proposalPage.page.id,
+      pageId: space1ProposalPage.page.id,
       userId: user.id
     });
 
@@ -207,20 +226,102 @@ describe('syncPageComments', () => {
         ]
       },
       contentText: 'Regular Comment 2',
-      pageId: proposalPage.page.id,
+      pageId: space1ProposalPage.page.id,
       userId: user.id
     });
 
+    const space2ProposalCategory = await createProposalCategory({
+      data: {
+        spaceId: space2.id,
+        title: 'Test Category'
+      }
+    });
+
+    const space2ProposalPage = await createProposal({
+      categoryId: space2ProposalCategory.id,
+      spaceId: space2.id,
+      userId: user.id
+    });
+
+    await updateProposalLensProperties({
+      proposalId: space2ProposalPage.proposal.id,
+      lensPostLink: lensPost2Id
+    });
+
     const pageComments = await syncPageComments({
-      lensPostLink: lensPostId,
-      pageId: proposalPage.page.id,
-      spaceId: space.id,
+      lensPostLink: lensPost1Id,
+      pageId: space1ProposalPage.page.id,
+      spaceId: space1.id,
+      userId: user.id
+    });
+
+    // Create a separate implementation for fetchAll for space 2 proposal
+
+    lensClient.publication.fetchAll = jest
+      .fn()
+      .mockImplementationOnce(() => ({
+        pageInfo: {
+          next: null
+        },
+        items: [lensComment4]
+      }))
+      .mockImplementation(() => ({
+        items: [],
+        pageInfo: {
+          next: null
+        }
+      }));
+
+    // Sync page comments for space 2 proposal
+    await syncPageComments({
+      lensPostLink: lensPost2Id,
+      pageId: space2ProposalPage.page.id,
+      spaceId: space2.id,
       userId: user.id
     });
 
     const lensCommentCount = pageComments.filter((pageComment) => pageComment.lensCommentLink).length;
     const nonLensCommentCount = pageComments.filter((pageComment) => !pageComment.lensCommentLink).length;
+
+    const charmverseLensUser1 = await prisma.user.findFirstOrThrow({
+      where: {
+        username: `${lensUser1.handle}-lens-imported`
+      }
+    });
+
+    const charmverseLensUser2 = await prisma.user.findFirstOrThrow({
+      where: {
+        username: `${lensUser2.handle}-lens-imported`
+      }
+    });
+
+    const charmverseLensUser1Space1Role = await prisma.spaceRole.findFirst({
+      where: {
+        userId: charmverseLensUser1.id,
+        spaceId: space1.id
+      }
+    });
+
+    const charmverseLensUser1Space2Role = await prisma.spaceRole.findFirst({
+      where: {
+        userId: charmverseLensUser1.id,
+        spaceId: space2.id
+      }
+    });
+
+    const charmverseLensUser2Space1Role = await prisma.spaceRole.findFirst({
+      where: {
+        userId: charmverseLensUser2.id,
+        spaceId: space1.id
+      }
+    });
+
     expect(lensCommentCount).toBe(7);
     expect(nonLensCommentCount).toBe(1);
+    expect(charmverseLensUser1).toBeTruthy();
+    expect(charmverseLensUser2).toBeTruthy();
+    expect(charmverseLensUser1Space1Role).toBeTruthy();
+    expect(charmverseLensUser1Space2Role).toBeTruthy();
+    expect(charmverseLensUser2Space1Role).toBeTruthy();
   });
 });
