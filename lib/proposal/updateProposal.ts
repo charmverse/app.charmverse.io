@@ -11,6 +11,7 @@ export type UpdateProposalRequest = {
   reviewers: ProposalReviewerInput[];
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
+  publishToLens?: boolean;
 };
 
 export async function updateProposal({
@@ -18,13 +19,25 @@ export async function updateProposal({
   authors,
   reviewers,
   categoryId,
-  evaluationType
+  evaluationType,
+  publishToLens
 }: UpdateProposalRequest) {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
 
   await prisma.$transaction(async (tx) => {
+    if (publishToLens !== undefined) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          publishToLens
+        }
+      });
+    }
+
     // Update category only when it is present in request payload
     if (categoryId) {
       await tx.proposal.update({

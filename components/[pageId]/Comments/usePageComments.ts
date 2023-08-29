@@ -4,11 +4,12 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
-import type { CommentContent } from 'lib/comments';
+import { useMembers } from 'hooks/useMembers';
+import type { CommentContent, UpdateCommentInput } from 'lib/comments';
 
 export function usePageComments(pageId: string) {
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
-
+  const { mutateMembers } = useMembers();
   const { data, mutate, isValidating } = useSWR(`${pageId}/comments`, () => charmClient.pages.listComments(pageId));
   const isLoadingComments = !data && isValidating;
 
@@ -33,7 +34,7 @@ export function usePageComments(pageId: string) {
   );
 
   const updateComment = useCallback(
-    async (comment: CommentContent & { id: string }) => {
+    async (comment: UpdateCommentInput & { id: string }) => {
       const updatedComment = await charmClient.pages.updateComment({ pageId, ...comment });
       mutate((existingComments) => {
         if (!existingComments) {
@@ -69,7 +70,17 @@ export function usePageComments(pageId: string) {
     [mutate, pageId]
   );
 
+  const syncPageComments = useCallback(async () => {
+    const newComments = await charmClient.pages.syncPageComments({ pageId });
+    // Refetch newly created members
+    await mutateMembers();
+    mutate(() => newComments, {
+      revalidate: false
+    });
+  }, [mutate, pageId]);
+
   return {
+    syncPageComments,
     commentSort,
     setCommentSort,
     isLoadingComments,
