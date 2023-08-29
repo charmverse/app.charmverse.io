@@ -1,30 +1,42 @@
 import { PageNotFoundError } from '@charmverse/core/errors';
-import type { PagePermissionFlags, PageResource, PermissionCompute } from '@charmverse/core/permissions';
+import type {
+  PagePermissionFlags,
+  PageResource,
+  PermissionCompute,
+  PreComputedSpaceRole,
+  PreFetchedResource,
+  ProposalResource
+} from '@charmverse/core/permissions';
 import {
-  defaultPagePolicies,
-  pageResolver,
   AvailablePagePermissions,
   buildComputePermissionsWithPermissionFilteringPolicies,
-  hasAccessToSpace
+  defaultPagePolicies,
+  hasAccessToSpace,
+  pageResolver,
+  pageResourceSelect
 } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { computePagePermissionsUsingProposalPermissions } from './computePagePermissionsUsingProposalPermissions';
 import { policyOnlyEditableByBountyCreator } from './policies/policyOnlyEditableByBountyCreator';
 
+type ComputeParams = PermissionCompute &
+  PreFetchedResource<PageResource> &
+  PreComputedSpaceRole & { preFetchedProposalResource?: ProposalResource };
+
 export async function baseComputePagePermissions({
   resourceId,
-  userId
-}: PermissionCompute): Promise<PagePermissionFlags> {
-  const pageInDb = await prisma.page.findUnique({
-    where: { id: resourceId },
-    select: {
-      id: true,
-      spaceId: true,
-      proposalId: true,
-      convertedProposalId: true
-    }
-  });
+  userId,
+  preFetchedResource,
+  preComputedSpaceRole,
+  preFetchedProposalResource
+}: ComputeParams): Promise<PagePermissionFlags> {
+  const pageInDb =
+    preFetchedResource ??
+    (await prisma.page.findUnique({
+      where: { id: resourceId },
+      select: pageResourceSelect()
+    }));
 
   const pageId = resourceId;
 
@@ -35,13 +47,16 @@ export async function baseComputePagePermissions({
   if (pageInDb.proposalId) {
     return computePagePermissionsUsingProposalPermissions({
       resourceId: pageId,
-      userId
+      userId,
+      preComputedSpaceRole,
+      preFetchedResource: preFetchedProposalResource
     });
   }
 
   const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId: pageInDb.spaceId,
-    userId
+    userId,
+    preComputedSpaceRole
   });
 
   const permissions = new AvailablePagePermissions();
@@ -65,7 +80,8 @@ export async function baseComputePagePermissions({
 
 export const computePagePermissions = buildComputePermissionsWithPermissionFilteringPolicies<
   PageResource,
-  PagePermissionFlags
+  PagePermissionFlags,
+  ComputeParams
 >({
   resolver: pageResolver,
   computeFn: baseComputePagePermissions,
