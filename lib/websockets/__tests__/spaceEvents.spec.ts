@@ -80,6 +80,7 @@ async function createPageAndSetupDocRooms({
           }
         }
       } as any,
+      {} as any,
       docRooms
     );
 
@@ -119,7 +120,7 @@ async function socketSetup({
     user
   });
 
-  const spaceEventHandler = new SpaceEventHandler({} as any, docRooms);
+  const spaceEventHandler = new SpaceEventHandler({} as any, {} as any, docRooms);
   spaceEventHandler.userId = userId;
 
   return {

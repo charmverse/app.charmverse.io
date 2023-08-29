@@ -2,7 +2,7 @@ import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Decoration, PluginKey } from '@bangle.dev/pm';
 import { DecorationSet } from 'prosemirror-view';
 
-import { getFromToMark } from '../state_plugins/track/helpers';
+import { getFromToMark } from '../state_plugins/track/getFromToMark';
 import {
   selectedInsertionSpec,
   selectedDeletionSpec,
