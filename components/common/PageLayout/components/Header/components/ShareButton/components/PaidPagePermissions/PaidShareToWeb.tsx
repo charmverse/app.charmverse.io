@@ -2,6 +2,7 @@ import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
+import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
@@ -31,12 +32,14 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   const { page: currentPage } = usePage({ pageIdOrPath: pageId });
 
   const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
+  const { trigger: deletePermission, isMutating: isDeletingPermissions } = useDeletePermissions();
+  const { trigger: createPermission, isMutating: isCreatingPermission } = useCreatePermissions();
 
   async function togglePublic() {
     if (publicPermission) {
-      await charmClient.deletePermission({ permissionId: publicPermission.id });
+      await deletePermission({ permissionId: publicPermission.id });
     } else {
-      await charmClient.createPermission({
+      await createPermission({
         pageId,
         permission: {
           permissionLevel: 'view',
@@ -102,11 +105,11 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
         pageId={pageId}
         handlePublish={togglePublic}
         handleDiscovery={handleDiscovery}
-        disabled={!!disabledToolip}
+        disabled={isDeletingPermissions || isCreatingPermission || !!disabledToolip}
         disabledTooltip={disabledToolip}
+        isLoading={isDeletingPermissions || isCreatingPermission}
         shareAlertMessage={shareAlertMessage}
       />
-
       {isShareChecked && publicPermission && currentPage?.type !== 'proposal' && (
         <PermissionInheritedFrom permission={publicPermission} />
       )}
