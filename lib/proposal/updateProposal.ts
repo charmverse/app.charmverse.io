@@ -12,6 +12,7 @@ export type UpdateProposalRequest = {
   reviewers: ProposalReviewerInput[];
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
+  publishToLens?: boolean;
   fields?: ProposalFields;
 };
 
@@ -21,6 +22,7 @@ export async function updateProposal({
   reviewers,
   categoryId,
   evaluationType,
+  publishToLens,
   fields
 }: UpdateProposalRequest) {
   if (authors.length === 0) {
@@ -28,6 +30,17 @@ export async function updateProposal({
   }
 
   await prisma.$transaction(async (tx) => {
+    if (publishToLens !== undefined) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          publishToLens
+        }
+      });
+    }
+
     // Update category only when it is present in request payload
     if (categoryId) {
       await tx.proposal.update({

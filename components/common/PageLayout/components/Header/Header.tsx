@@ -31,6 +31,10 @@ export const StyledToolbar = styled(Toolbar)`
   min-height: ${headerHeight}px;
 `;
 
+export const HeaderSpacer = styled.div`
+  min-height: ${headerHeight}px;
+`;
+
 type HeaderProps = {
   open: boolean;
   openSidebar: () => void;

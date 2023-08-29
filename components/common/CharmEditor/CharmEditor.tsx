@@ -46,7 +46,7 @@ import Mention, { MentionSuggest } from './components/mention';
 import NestedPage, { NestedPagesList } from './components/nestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
-import * as poll from './components/poll';
+import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
@@ -458,7 +458,7 @@ function CharmEditor({
             return <BookmarkNodeView {...allProps} />;
           }
           case 'poll': {
-            return <poll.Component {...allProps} />;
+            return <PollNodeView {...allProps} />;
           }
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;

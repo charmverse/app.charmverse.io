@@ -13,6 +13,7 @@ import type {
 import { RPC } from 'connectors/index';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
+import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -20,7 +21,6 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createCommentPublication } from 'lib/lens/createCommentPublication';
 import { createPostPublication } from 'lib/lens/createPostPublication';
 import { LensChain, lensClient } from 'lib/lens/lensClient';
-import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
@@ -50,8 +50,9 @@ export function useLensPublication({
   const { account, library, chainId } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { lensProfile, setupLensProfile } = useLensProfile();
+  const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
+  const { updateComment } = usePageComments(proposalId);
 
   async function createPublication(
     params: { content: PageContent } & (
@@ -65,25 +66,25 @@ export function useLensPublication({
         }
     )
   ) {
-    let _lensProfile = lensProfile;
     const { publicationType, content } = params;
 
-    if (!space || !account) {
-      return;
-    }
-
-    // If the user is not currently authenticated, try to authenticate them rather than doing nothing
-    if (!lensProfile) {
-      _lensProfile = await setupLensProfile();
-    }
-
-    // User doesn't have a profile or rejected signing the challenge
-    if (!_lensProfile) {
+    if (!space || !account || !lensProfile) {
       return null;
     }
 
     if (chainId !== RPC[LensChain].chainId) {
       await switchNetwork();
+    }
+
+    // If the user is not currently authenticated, try to authenticate them rather than doing nothing
+    if (!isAuthenticated) {
+      try {
+        await setupLensProfile();
+      } catch (_) {
+        // User deliberately cancelled the auth process
+        showMessage('Publishing to Lens cancelled', 'warning');
+        return null;
+      }
     }
 
     const markdownContent = await generateMarkdown({
@@ -114,13 +115,13 @@ export function useLensPublication({
         publicationResponse = await createPostPublication({
           contentText: `Proposal **${proposalTitle}** from **${space.name}** is now open for feedback.\n\n${finalMarkdownContent}`,
           proposalLink: `https://app.charmverse.io/${space.domain}/${proposalPath}`,
-          lensProfile: _lensProfile
+          lensProfile
         });
       } else {
         publicationResponse = await createCommentPublication({
-          contentText: `I just commented on **${proposalTitle}** from **${space.name}**\n\n${finalMarkdownContent}`,
+          contentText: finalMarkdownContent,
           postId: params.lensPostId,
-          lensProfile: _lensProfile,
+          lensProfile,
           commentLink: `https://app.charmverse.io/${space.domain}/${proposalPath}?commentId=${params.commentId}`
         });
       }
@@ -202,16 +203,22 @@ export function useLensPublication({
     commentContent
   }: {
     commentContent: PageContent;
-    proposal: PageWithContent;
     commentId: string;
     lensPostId: string;
   }) {
-    return createPublication({
+    const createdComment = (await createPublication({
       content: commentContent,
       commentId,
       lensPostId,
       publicationType: 'comment'
-    });
+    })) as CreateDataAvailabilityPublicationResultFragment | CreateCommentTypedDataFragment;
+
+    if (createdComment) {
+      await updateComment({
+        id: commentId,
+        lensCommentLink: createdComment.id
+      });
+    }
   }
 
   return {

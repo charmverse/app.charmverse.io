@@ -17,11 +17,15 @@ import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { isDevEnv } from 'config/constants';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+
+import Link from '../Link';
 
 const StyledStack = styled(Stack)`
   &:hover .comment-actions {
@@ -45,6 +49,8 @@ type Props = {
   handleDeleteComment: (commentId: string) => Promise<void>;
   handleVoteComment?: (vote: { commentId: string; upvoted: boolean | null }) => Promise<void>;
   inlineCharmEditor?: boolean;
+  lensPostLink?: string | null;
+  isPublishingComments?: boolean;
 };
 
 export function Comment({
@@ -56,12 +62,16 @@ export function Comment({
   handleCreateComment,
   handleUpdateComment,
   handleDeleteComment,
-  handleVoteComment
+  handleVoteComment,
+  lensPostLink,
+  isPublishingComments
 }: Props) {
+  const { user } = useUser();
+  const { lensProfile } = useLensProfile();
+  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
-  const { user } = useUser();
   const { getMemberById } = useMembers();
   const commentUser = getMemberById(comment.createdBy);
   const [isEditingComment, setIsEditingComment] = useState(false);
@@ -240,7 +250,7 @@ export function Comment({
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (
-            <Stack flexDirection='row' gap={1}>
+            <Stack flexDirection='row' alignItems='center' gap={1}>
               {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
               <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
                 <Typography
@@ -259,12 +269,28 @@ export function Comment({
                   Reply
                 </Typography>
               </Tooltip>
+              {comment.lensCommentLink && (
+                <Link
+                  href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${comment.lensCommentLink}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <Typography variant='body2' color='primary'>
+                    View on lens
+                  </Typography>
+                </Link>
+              )}
             </Stack>
           )}
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
+                isPublishingComments={isPublishingComments}
+                publishToLens={publishCommentsToLens}
+                setPublishToLens={setPublishCommentsToLens}
+                showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
+                lensCommentLink={comment.lensCommentLink}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
               />

@@ -419,22 +419,6 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
-    return http.GET('/api/permissions', { pageId });
-  }
-
-  createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
-    return http.POST('/api/permissions', permission);
-  }
-
-  updatePermission(body: PermissionResource & { pageId: string; allowDiscovery: boolean }): Promise<any> {
-    return http.PUT('/api/permissions', body);
-  }
-
-  deletePermission(query: PermissionResource): Promise<boolean> {
-    return http.DELETE('/api/permissions', query);
-  }
-
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }

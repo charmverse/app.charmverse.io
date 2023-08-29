@@ -28,11 +28,11 @@ import processConnectionError from './utils/processConnectionError';
 type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 
 type Props = {
-  loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
+  loginSuccess?: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
   onError?: (err: DisabledAccountError) => void;
 };
 
-export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
+export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
   const {
     setActivatingConnector,
     closeWalletSelectorModal,
@@ -159,11 +159,11 @@ function resetWalletConnector(connector: AbstractConnector) {
     connector.walletConnectProvider = undefined;
   }
 }
-export function WalletSelectorModal({ loginSuccess, onError }: Props) {
+export function WalletSelectorModal() {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useWeb3ConnectionManager();
   return (
     <Modal open={isWalletSelectorModalOpen} onClose={closeWalletSelectorModal}>
-      <WalletSelector loginSuccess={loginSuccess} onError={onError} />
+      <WalletSelector />
     </Modal>
   );
 }

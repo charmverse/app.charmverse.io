@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { UnknownError } from 'lib/middleware';
 import { SystemError } from 'lib/utilities/errors';
 
+import { UnknownError } from './errors';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];

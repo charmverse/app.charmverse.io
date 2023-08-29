@@ -1,19 +1,31 @@
 import { AvailablePagePermissions } from '@charmverse/core/permissions';
-import type { PagePermissionFlags, PermissionCompute } from '@charmverse/core/permissions';
+import type {
+  PagePermissionFlags,
+  PermissionCompute,
+  PreFetchedResource,
+  ProposalResource,
+  PreComputedSpaceRole
+} from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
+
+type ComputeParams = PermissionCompute & PreFetchedResource<ProposalResource> & PreComputedSpaceRole;
 
 /**
  * @resourceId - The id of the proposal (usually the same as page id)
  */
 export async function computePagePermissionsUsingProposalPermissions({
   resourceId,
-  userId
-}: PermissionCompute): Promise<PagePermissionFlags> {
+  userId,
+  preFetchedResource,
+  preComputedSpaceRole
+}: ComputeParams): Promise<PagePermissionFlags> {
   const proposalPermissions = await computeProposalPermissions({
     resourceId,
-    userId
+    userId,
+    preFetchedResource,
+    preComputedSpaceRole
   });
 
   const permissions = new AvailablePagePermissions();

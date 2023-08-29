@@ -1,14 +1,18 @@
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import type { PreComputedSpaceRole } from '@charmverse/core/permissions';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
+type ComputeParams = PermissionCompute & PreComputedSpaceRole;
+
 export async function computeSpacePermissions({
   resourceId,
-  userId
-}: PermissionCompute): Promise<SpacePermissionFlags> {
+  userId,
+  preComputedSpaceRole
+}: ComputeParams): Promise<SpacePermissionFlags> {
   const allowedOperations = new AvailableSpacePermissions();
 
   if (!userId) {
@@ -17,7 +21,8 @@ export async function computeSpacePermissions({
 
   const { spaceRole } = await hasAccessToSpace({
     userId,
-    spaceId: resourceId
+    spaceId: resourceId,
+    preComputedSpaceRole
   });
 
   if (!spaceRole) {

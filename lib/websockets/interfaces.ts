@@ -2,6 +2,7 @@
 
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Server, Socket } from 'socket.io';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -185,3 +186,19 @@ export type ServerMessage =
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
 export type WebSocketPayload<T extends WebSocketMessage['type']> = Extract<WebSocketMessage, { type: T }>['payload'];
+
+export type AbstractWebsocketBroadcaster = {
+  sockets: Record<string, Socket>;
+
+  bindServer(io: Server): Promise<void>;
+
+  broadcastToAll(message: ServerMessage): void;
+
+  broadcast(message: ServerMessage, roomId: string): void;
+
+  leaveRoom(socket: Socket, roomId: string): void;
+
+  registerWorkspaceSubscriber(args: { userId: string; socket: Socket; roomId: string }): Promise<void>;
+
+  close(): void;
+};

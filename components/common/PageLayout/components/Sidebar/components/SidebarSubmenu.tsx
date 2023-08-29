@@ -27,7 +27,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
-import { headerHeight } from '../Header/Header';
+import { headerHeight } from '../../Header/Header';
 
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';

@@ -17,6 +17,7 @@ import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProvi
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
@@ -234,6 +235,7 @@ function DataProviders({ children }: { children: ReactNode }) {
         <DiscordProvider>
           <Web3ReactProvider getLibrary={getLibrary}>
             <Web3ConnectionManager>
+              <WalletSelectorModal />
               <Web3AccountProvider>
                 <SpacesProvider>
                   <CurrentSpaceProvider>

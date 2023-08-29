@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { PaymentMethod, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -7,8 +8,6 @@ import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } fro
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { isUniqueConstraintError } from 'lib/utilities/errors/prisma';
-
-import { InvalidInputError } from '../../../lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -18,8 +18,8 @@ import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 import Calculations from '../calculations/calculations';
 
 type Props = {
