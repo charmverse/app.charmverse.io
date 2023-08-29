@@ -25,7 +25,6 @@ async function fetchLensComments({
   }
 
   const comments: CommentFragmentWithMeta[] = [];
-
   let publicationFetchAllResponse = await lensClient.publication.fetchAll({
     commentsOf: parentId
   });

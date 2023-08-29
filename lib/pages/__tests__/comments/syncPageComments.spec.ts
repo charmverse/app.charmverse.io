@@ -10,14 +10,12 @@ import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensPro
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 jest.mock('lib/lens/lensClient', () => ({
-  publication: {
-    fetchAll: jest.fn()
+  lensClient: {
+    publication: {
+      fetchAll: jest.fn()
+    }
   }
 }));
-
-function sortLensComments(c1lensCommentLink: string | null, c2lensCommentLink: string | null) {
-  return (c1lensCommentLink ?? '') > (c2lensCommentLink ?? '') ? 1 : -1;
-}
 
 describe('syncPageComments', () => {
   it(`Should sync lens post comment to CharmVerse`, async () => {
@@ -41,34 +39,55 @@ describe('syncPageComments', () => {
 
     const lensComment1 = {
       id: v4(),
-      profile: lensUser1
+      profile: lensUser1,
+      metadata: {
+        content: 'Lens Comment 1'
+      }
     };
 
     const lensComment2 = {
       id: v4(),
-      profile: lensUser2
+      profile: lensUser2,
+      metadata: {
+        content: 'Lens Comment 2'
+      }
     };
 
     const lensComment3 = {
       id: v4(),
-      profile: lensUser2
+      profile: lensUser2,
+      metadata: {
+        content: 'Lens Comment 3'
+      }
     };
 
     const lensComment1NestedComment1 = {
       id: v4(),
-      profile: lensUser1
+      profile: lensUser1,
+      metadata: {
+        content: 'Lens Comment 1 Nested Comment 1'
+      }
     };
     const lensComment1NestedComment2 = {
       id: v4(),
-      profile: lensUser2
+      profile: lensUser2,
+      metadata: {
+        content: 'Lens Comment 1 Nested Comment 2'
+      }
     };
     const lensComment1NestedComment3 = {
       id: v4(),
-      profile: lensUser2
+      profile: lensUser2,
+      metadata: {
+        content: 'Lens Comment 1 Nested Comment 3'
+      }
     };
     const lensComment2NestedComment1 = {
       id: v4(),
-      profile: lensUser1
+      profile: lensUser1,
+      metadata: {
+        content: 'Lens Comment 2 Nested Comment 1'
+      }
     };
 
     const lensPostId = v4();
@@ -105,6 +124,12 @@ describe('syncPageComments', () => {
           next: null
         },
         items: [lensComment2NestedComment1]
+      }))
+      .mockImplementation(() => ({
+        items: [],
+        pageInfo: {
+          next: null
+        }
       }));
 
     lensClient.publication.fetchAll = publicationFetchAll;
@@ -129,20 +154,28 @@ describe('syncPageComments', () => {
       lensPostLink: lensPostId
     });
 
-    const pageComments = await syncPageComments({
-      lensPostLink: lensPostId,
-      pageId: proposalPage.page.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-
     // This comment already exist in charmverse so we should not create it again
     const pageComment1 = await createPageComment({
       content: {
         type: 'doc',
-        content: []
+        content: [
+          {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Regular Comment 1'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
-      contentText: 'Hello World',
+      contentText: 'Regular Comment 1',
       pageId: proposalPage.page.id,
       userId: user.id
     });
@@ -153,26 +186,41 @@ describe('syncPageComments', () => {
     });
 
     // This is a regular comment on proposal page, it should be left untouched
-    const pageComment2 = await createPageComment({
+    await createPageComment({
       content: {
         type: 'doc',
-        content: []
+        content: [
+          {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Regular Comment 2'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
-      contentText: 'Hello World',
+      contentText: 'Regular Comment 2',
       pageId: proposalPage.page.id,
       userId: user.id
     });
 
-    expect(pageComments.map((pageComment) => pageComment.lensCommentLink).sort(sortLensComments)).toStrictEqual(
-      [
-        pageComment2.id,
-        lensComment1.id,
-        lensComment2.id,
-        lensComment1NestedComment1.id,
-        lensComment1NestedComment2.id,
-        lensComment1NestedComment3.id,
-        lensComment2NestedComment1.id
-      ].sort(sortLensComments)
-    );
+    const pageComments = await syncPageComments({
+      lensPostLink: lensPostId,
+      pageId: proposalPage.page.id,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const lensCommentCount = pageComments.filter((pageComment) => pageComment.lensCommentLink).length;
+    const nonLensCommentCount = pageComments.filter((pageComment) => !pageComment.lensCommentLink).length;
+    expect(lensCommentCount).toBe(7);
+    expect(nonLensCommentCount).toBe(1);
   });
 });

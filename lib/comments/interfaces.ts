@@ -27,7 +27,7 @@ export type GenericComment<T = object> = T & {
   deletedAt: Date | null;
   deletedBy: string | null;
   parentId: string | null;
-  lensCommentLink?: string;
+  lensCommentLink?: string | null;
 };
 
 export type GenericCommentWithVote<T = object> = GenericComment<T> & GenericCommentVote;
