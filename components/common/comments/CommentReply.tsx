@@ -25,12 +25,12 @@ export function CommentReply({
   showPublishToLens,
   lensCommentLink
 }: {
-  lensCommentLink?: string;
+  lensCommentLink?: string | null;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   onCancelComment: () => void;
-  handleCreateComment: (comment: CreateCommentPayload, lensCommentLin?: string) => Promise<void>;
+  handleCreateComment: (comment: CreateCommentPayload, lensCommentLink?: string | null) => Promise<void>;
   commentId: string;
 }) {
   const { user } = useUser();
