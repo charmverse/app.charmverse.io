@@ -1,11 +1,12 @@
 import type { ProposalBlock, ProposalBlockType } from '@charmverse/core/prisma-client';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+export type ProposalPropertyOption = { id: string; color: string; value: string };
+
+export type ProposalPropertyField = { id: string; name: string; type: string; options: ProposalPropertyOption[] };
 
 export type ProposalPropertiesBlockFields = {
-  properties: IPropertyTemplate[];
+  properties: ProposalPropertyField[];
 };
-
 // Properties block with typed fields
 export type ProposalPropertiesBlock = ProposalBlock & {
   fields: ProposalPropertiesBlockFields;

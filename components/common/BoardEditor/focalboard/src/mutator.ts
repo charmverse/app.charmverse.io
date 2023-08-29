@@ -1051,6 +1051,18 @@ export class Mutator {
 
   // Other methods
 
+  async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]) {
+    await charmClient.patchBlock(
+      boardId,
+      {
+        updatedFields: {
+          cardProperties
+        }
+      },
+      () => {}
+    );
+  }
+
   // Not a mutator, but convenient to put here since Mutator wraps OctoClient
   async exportArchive(boardID?: string): Promise<Block[]> {
     return octoClient.exportArchive(boardID);

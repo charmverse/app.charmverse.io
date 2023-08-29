@@ -4,7 +4,6 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -84,19 +83,11 @@ function CardDetailProperties(props: Props) {
     cardPropertyIds.splice(srcIndex, 1);
     cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
 
-    await charmClient.patchBlock(
-      board.id,
-      {
-        updatedFields: {
-          cardProperties: cardPropertyIds
-            .map((cardPropertyId) =>
-              board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId)
-            )
-            .filter(isTruthy)
-        }
-      },
-      () => {}
-    );
+    const updatedProperties = cardPropertyIds
+      .map((cardPropertyId) => board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId))
+      .filter(isTruthy);
+
+    await mutator.reorderProperties(board.id, updatedProperties);
   };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(

@@ -1,17 +1,12 @@
 /* eslint-disable default-param-last */
-import type { PageMeta } from '@charmverse/core/pages';
-
 import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
-import octoClient from 'components/common/BoardEditor/focalboard/src/octoClient';
-import undoManager from 'components/common/BoardEditor/focalboard/src/undomanager';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { ProposalPropertiesBlockFields } from 'lib/proposal/blocks/interfaces';
 
 export interface BlockChange {
   block: Block;
@@ -68,5 +63,19 @@ export class ProposalsMutator extends Mutator {
     views: BoardView[]
   ) {
     this.blocksContext.updateProperty({ ...propertyTemplate, type: newType, name: newName });
+  }
+
+  async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {
+    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+    const oldFields = proposalPropertiesBlock?.fields || {};
+
+    if (!proposalPropertiesBlock) {
+      return;
+    }
+
+    await this.blocksContext.updateBlock({
+      ...proposalPropertiesBlock,
+      fields: { ...oldFields, properties: cardProperties } as ProposalPropertiesBlockFields
+    });
   }
 }
