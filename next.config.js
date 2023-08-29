@@ -186,10 +186,10 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/initWebsockets.ts',
-            countSpaceData: './scripts/countSpaceData.ts',
-            importFromDiscourse: './scripts/importFromDiscourse.ts',
-            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
+            websockets: './background/initWebsockets.ts'
+            // countSpaceData: './scripts/countSpaceData.ts',
+            // importFromDiscourse: './scripts/importFromDiscourse.ts',
+            // updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };
