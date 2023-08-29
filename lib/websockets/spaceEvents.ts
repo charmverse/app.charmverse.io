@@ -16,10 +16,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
 import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
 
-import type { WebsocketBroadcaster } from './broadcaster';
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
+import type { AbstractWebsocketBroadcaster } from './interfaces';
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -29,7 +29,7 @@ export class SpaceEventHandler {
   docRooms: Map<string | undefined, DocumentRoom> = new Map();
 
   constructor(
-    private relay: WebsocketBroadcaster,
+    private relay: AbstractWebsocketBroadcaster,
     private socket: Socket,
     docRooms: Map<string | undefined, DocumentRoom>
   ) {
@@ -118,7 +118,8 @@ export class SpaceEventHandler {
             pageIds: [pageId],
             userId: this.userId,
             spaceId,
-            archive: false
+            archive: false,
+            relay: this.relay
           });
         }
       } catch (error) {
@@ -313,19 +314,22 @@ export class SpaceEventHandler {
   }
 }
 
-async function handlePageRemoveMessage({
-  event,
-  userId,
-  docRooms,
-  payload,
-  sendError
-}: {
-  event: 'page_deleted' | 'page_reordered';
-  userId: string;
-  docRooms: Map<string | undefined, DocumentRoom>;
-  payload: WebSocketPayload<'page_deleted'>;
-  sendError: (message: string) => void;
-}) {
+async function handlePageRemoveMessage(
+  this: any,
+  {
+    event,
+    userId,
+    docRooms,
+    payload,
+    sendError
+  }: {
+    event: 'page_deleted' | 'page_reordered';
+    userId: string;
+    docRooms: Map<string | undefined, DocumentRoom>;
+    payload: WebSocketPayload<'page_deleted'>;
+    sendError: (message: string) => void;
+  }
+) {
   try {
     const pageId = payload.id;
     const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
@@ -376,7 +380,8 @@ async function handlePageRemoveMessage({
           pageIds: [pageId],
           userId,
           spaceId,
-          archive: true
+          archive: true,
+          relay: this.relay
         });
       }
     }

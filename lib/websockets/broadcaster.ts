@@ -11,10 +11,10 @@ import { authOnConnect } from './authentication';
 import { config } from './config';
 import { docRooms } from './documentEvents/docRooms';
 import { DocumentEventHandler } from './documentEvents/documentEvents';
-import type { ServerMessage } from './interfaces';
+import type { AbstractWebsocketBroadcaster, ServerMessage } from './interfaces';
 import { SpaceEventHandler } from './spaceEvents';
 
-export class WebsocketBroadcaster {
+export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
   sockets: Record<string, Socket> = {};
 
   // Server will be set after the first request

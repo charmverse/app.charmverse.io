@@ -1,24 +1,24 @@
 import { log } from '@charmverse/core/log';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebsocketBroadcaster } from 'lib/websockets/broadcaster';
+import type { AbstractWebsocketBroadcaster } from 'lib/websockets/interfaces';
 
 import { modifyChildPages } from './modifyChildPages';
-
-const relay = new WebsocketBroadcaster();
 
 export async function archivePages({
   archive,
   pageIds,
   userId,
   spaceId,
-  emitPageStatusEvent = true
+  emitPageStatusEvent = true,
+  relay
 }: {
   archive: boolean;
   pageIds: string[];
   userId: string;
   spaceId: string;
   emitPageStatusEvent?: boolean;
+  relay: AbstractWebsocketBroadcaster;
 }) {
   const modifiedChildPageIds: string[] = [];
 

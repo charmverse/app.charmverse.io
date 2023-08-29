@@ -13,7 +13,7 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { AuthenticatedSocketData } from '../authentication';
-import type { WebsocketBroadcaster } from '../broadcaster';
+import type { AbstractWebsocketBroadcaster } from '../interfaces';
 
 import type { DocumentRoom } from './docRooms';
 import type {
@@ -92,7 +92,11 @@ export class DocumentEventHandler {
     return room;
   }
 
-  constructor(private relay: WebsocketBroadcaster, socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
+  constructor(
+    private relay: AbstractWebsocketBroadcaster,
+    socket: Socket,
+    docRooms: Map<string | undefined, DocumentRoom>
+  ) {
     this.id = socket.id;
     this.socket = socket;
     this.docRooms = docRooms;
@@ -489,7 +493,8 @@ export class DocumentEventHandler {
             pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: true
+            archive: true,
+            relay: this.relay
           });
         }
 
@@ -498,7 +503,8 @@ export class DocumentEventHandler {
             pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: false
+            archive: false,
+            relay: this.relay
           });
         }
 
