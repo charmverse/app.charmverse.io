@@ -66,8 +66,8 @@ function mapProposalToCard({
     type: 'card' as BlockTypes,
     updatedBy: proposalPage?.updatedBy || '',
     createdBy: proposalPage?.createdBy || '',
-    createdAt: proposalPage?.createdAt?.getTime() || 0,
-    updatedAt: proposalPage?.updatedAt?.getTime() || 0,
+    createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : 0,
+    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
     deletedAt: null,
     fields: { ...proposalFields, contentOrder: [] }
   };

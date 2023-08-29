@@ -6,7 +6,7 @@ import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { ProposalPropertiesBlockFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPropertiesBlockFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 
 export interface BlockChange {
   block: Block;
@@ -19,16 +19,19 @@ export interface BlockChange {
 //
 export class ProposalsMutator extends Mutator {
   // callback invoked on property value change
-  private onValueChange?: (val: any) => void;
+  private onPropertiesChange?: (val: any) => void;
 
   public blocksContext: ProposalBlocksContextType;
 
   // other methods related to proposal blocks
-  constructor(blocksContext: ProposalBlocksContextType, onValueChange?: (val: any) => void) {
+  constructor(
+    blocksContext: ProposalBlocksContextType,
+    onPropertiesChange: (properties: ProposalPropertiesField) => void
+  ) {
     super();
 
     this.blocksContext = blocksContext;
-    this.onValueChange = onValueChange;
+    this.onPropertiesChange = onPropertiesChange;
   }
 
   // Property Templates
@@ -77,5 +80,36 @@ export class ProposalsMutator extends Mutator {
       ...proposalPropertiesBlock,
       fields: { ...oldFields, properties: cardProperties } as ProposalPropertiesBlockFields
     });
+  }
+
+  async changePropertyValue(
+    card: Card,
+    propertyId: string,
+    value?: string | string[] | number,
+    description = 'change property',
+    mutate = true
+  ) {
+    const oldValue = card.fields.properties[propertyId];
+
+    // dont save anything if property value was not changed.
+    if (oldValue === value) {
+      return;
+    }
+    // handle undefined vs empty string
+    if (!oldValue && !value) {
+      return;
+    }
+
+    // proposal fields are saved in Proposal entity so we don't need to update the block
+    // that is why we use external onChange callback
+    const properties = { ...card.fields.properties } || {};
+
+    if (value) {
+      properties[propertyId] = value;
+    } else {
+      delete properties[propertyId];
+    }
+
+    this.onPropertiesChange?.(properties);
   }
 }

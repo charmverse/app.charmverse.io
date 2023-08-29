@@ -2,11 +2,11 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import { usePropertiesMutator } from 'components/proposals/components/ProposalProperties/hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 
 type Props = {
   proposal: { spaceId?: string; id?: string } & ProposalFields;
-  onChange?: (values: ProposalFields) => void;
+  onChange: (properties: ProposalPropertiesField) => void;
   readOnly?: boolean;
 };
 

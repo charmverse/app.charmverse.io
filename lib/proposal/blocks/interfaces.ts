@@ -30,8 +30,10 @@ export type ProposalBlockUpdateInput = ProposalBlockInput & {
   id: string;
 };
 
-export type ProposalPropertyValue = string | string[];
+export type ProposalPropertyValue = string | string[] | number;
 
-export type ProposalPropertyValues = { properties: Record<string, ProposalPropertyValue> };
+export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
+
+export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
 export type ProposalFields = { fields: ProposalPropertyValues };

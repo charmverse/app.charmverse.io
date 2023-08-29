@@ -504,7 +504,12 @@ export function ProposalProperties({
             </Box>
           )}
           {/* TODO - add from form */}
-          <CustomPropertiesAdapter proposal={{ fields: { properties: {} } }} />
+          <CustomPropertiesAdapter
+            proposal={{ fields: { properties: {} } }}
+            onChange={(val) => {
+              // console.log('🔥v', val);
+            }}
+          />
         </Collapse>
         <Divider
           sx={{
