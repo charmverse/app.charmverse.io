@@ -103,7 +103,7 @@ export function ProposalProperties({
     }
   }
 
-  async function onChangeRubricCriteriaAnswer() {
+  async function onSaveRubricCriteriaAnswers() {
     refreshProposal();
   }
 
@@ -142,6 +142,7 @@ export function ProposalProperties({
       proposalLensLink={proposal?.lensPostLink ?? undefined}
       archived={!!proposal?.archived}
       disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
+      isFromTemplate={!!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
@@ -161,7 +162,7 @@ export function ProposalProperties({
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}
-      onChangeRubricCriteriaAnswer={onChangeRubricCriteriaAnswer}
+      onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
       onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
       proposalFormInputs={proposalFormInputs}
       setProposalFormInputs={onChangeProperties}

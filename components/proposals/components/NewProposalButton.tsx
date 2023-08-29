@@ -1,11 +1,9 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useRef } from 'react';
-import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -15,6 +13,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
@@ -27,7 +26,7 @@ export function NewProposalButton() {
   const { showProposal } = useProposalDialog();
   const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
-  const { mutatePage } = usePages();
+  const { pages, mutatePage } = usePages();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   // MUI Menu specific content
@@ -37,7 +36,8 @@ export function NewProposalButton() {
   const { proposalTemplates, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
-  const proposalTemplatePages = proposalTemplates?.map((template) => template.page);
+  // grab page data from context so that title is always up-to-date
+  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
 
   async function createProposalFromTemplate(templateId: string) {
     const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
