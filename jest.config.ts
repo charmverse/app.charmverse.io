@@ -28,7 +28,7 @@ export const jestConfig: JestConfigWithTsJest = {
 
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-node',
-  testMatch: ['**/lib/pages/__tests__/comments/syncPageComments.spec.ts'],
+  testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   // This is needed so CI environment does not attempt to run tests in the permissions_api folder
   testPathIgnorePatterns: ['<rootDir>/permissions_api'],
