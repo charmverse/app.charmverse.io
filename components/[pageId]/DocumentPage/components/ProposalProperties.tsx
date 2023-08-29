@@ -19,6 +19,7 @@ import { useLensPublication } from 'components/settings/account/hooks/useLensPub
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface ProposalPropertiesProps {
@@ -82,7 +83,10 @@ export function ProposalProperties({
         group: reviewer.roleId ? 'role' : 'user',
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
-    fields: typeof proposal?.fields === 'object' ? proposal.fields : {}
+    fields:
+      typeof proposal?.fields === 'object' && !!proposal?.fields
+        ? (proposal.fields as ProposalFields)
+        : { properties: {} }
   };
 
   async function updateProposalStatus(newStatus: ProposalStatus) {
