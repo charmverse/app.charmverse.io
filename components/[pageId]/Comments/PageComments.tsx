@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
@@ -33,7 +33,8 @@ export function PageComments({ page, permissions }: Props) {
     addComment,
     updateComment,
     deleteComment,
-    voteComment
+    voteComment,
+    syncPageComments
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
@@ -64,6 +65,12 @@ export function PageComments({ page, permissions }: Props) {
       });
     }
   }
+
+  useEffect(() => {
+    if (page.type === 'proposal' && proposal && proposal.lensPostLink) {
+      syncPageComments();
+    }
+  }, [page.id, proposal?.lensPostLink]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
 
