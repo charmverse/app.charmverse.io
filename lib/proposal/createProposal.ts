@@ -49,7 +49,8 @@ export async function createProposal({
   reviewers,
   evaluationType,
   rubricCriteria,
-  publishToLens
+  publishToLens,
+  fields
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -95,7 +96,8 @@ export async function createProposal({
                 }))
               }
             }
-          : undefined
+          : undefined,
+        fields
       },
       include: {
         authors: true,

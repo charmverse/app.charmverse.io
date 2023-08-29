@@ -2,6 +2,7 @@ import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 
 import type { ProposalReviewerInput } from './interface';
 
@@ -11,6 +12,7 @@ export type UpdateProposalRequest = {
   reviewers: ProposalReviewerInput[];
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
+  fields?: ProposalFields;
 };
 
 export async function updateProposal({
@@ -18,7 +20,8 @@ export async function updateProposal({
   authors,
   reviewers,
   categoryId,
-  evaluationType
+  evaluationType,
+  fields
 }: UpdateProposalRequest) {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
@@ -44,6 +47,18 @@ export async function updateProposal({
         },
         data: {
           evaluationType
+        }
+      });
+    }
+
+    // Update fields only when it is present in request payload
+    if (fields) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          fields
         }
       });
     }
