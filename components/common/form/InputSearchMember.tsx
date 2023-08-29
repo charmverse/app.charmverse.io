@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
-import type { AutocompleteChangeReason, AutocompleteProps, PopperProps } from '@mui/material';
-import { Autocomplete, Popover, TextField } from '@mui/material';
+import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { createRef, useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -202,7 +202,7 @@ export function InputSearchMemberMultiple({
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
-      options={members}
+      options={members.filter((member) => !member.isBot)}
     />
   );
 }

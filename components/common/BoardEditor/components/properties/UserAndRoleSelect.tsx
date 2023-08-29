@@ -147,12 +147,13 @@ export function UserAndRoleSelect({
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
   const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
 
+  const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
     ? (inputValue as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
     : (inputValue as { id: string; group: 'user' | 'role' }[]);
 
-  const mappedMembers: GroupedMemberPopulated[] = members.map((member) => ({ ...member, group: 'user' }));
+  const mappedMembers: GroupedMemberPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
   const mappedRoles: GroupedRolePopulated[] =
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
@@ -185,7 +186,7 @@ export function UserAndRoleSelect({
       _filteredOptions = [...mappedMembers, ...mappedRoles];
     }
     return _filteredOptions;
-  }, [reviewerPool, isFreeSpace, members, roles, proposalCategoryId]);
+  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId]);
 
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
@@ -198,7 +199,7 @@ export function UserAndRoleSelect({
     } else {
       return [...mappedMembers, ...mappedRoles];
     }
-  }, [members, roles]);
+  }, [filteredMembers, roles]);
 
   const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 
@@ -255,7 +256,7 @@ export function UserAndRoleSelect({
         }}
         groupBy={(option) => `${option.group[0].toUpperCase() + option.group.slice(1)}s`}
         isOptionEqualToValue={(option, val) => option.id === val.id}
-        loading={!roles || members.length === 0 || (!!proposalCategoryId && !reviewerPool)}
+        loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
         multiple
         noOptionsText='No more options available'
         onChange={(e, value) => onChange(value)}
