@@ -8,10 +8,10 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
 
 type Props = {
-  proposal: { spaceId?: string; id?: string } & ProposalFields;
+  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
 };
 
 export function useProposalsBoardAdapter({ proposal }: Props) {
@@ -21,6 +21,7 @@ export function useProposalsBoardAdapter({ proposal }: Props) {
   const { proposalPropertiesBlock } = useProposalBlocks();
   const proposalPage = pages[proposal?.id || ''];
 
+  // board with all proposal properties
   const board: Board = {
     fields: { cardProperties: proposalPropertiesBlock?.fields?.properties || [] }
   } as unknown as Board;
@@ -49,11 +50,11 @@ function mapProposalToCard({
   proposalPage,
   spaceId
 }: {
-  proposal: { spaceId?: string; id?: string } & ProposalFields;
+  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
-  const proposalFields = proposal?.fields || {};
+  const proposalFields = proposal?.fields || { properties: {} };
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
 
   return {

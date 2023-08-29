@@ -18,9 +18,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
@@ -40,7 +38,6 @@ type Props = {
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
-  const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { showProposal } = useProposalDialog();
   const [, { width: containerWidth }] = useElementSize();
@@ -103,7 +100,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens
+        publishToLens: formInputs.publishToLens,
+        fields: formInputs.fields
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

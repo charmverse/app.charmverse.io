@@ -22,6 +22,7 @@ import { CustomPropertiesAdapter } from 'components/proposals/components/Proposa
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePages } from 'hooks/usePages';
+import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
@@ -53,7 +54,7 @@ export type ProposalPropertiesInput = {
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
-  fields: Record<string, any> | undefined | null;
+  fields: ProposalFields;
 };
 
 type ProposalPropertiesProps = {
@@ -503,11 +504,13 @@ export function ProposalProperties({
               </Box>
             </Box>
           )}
-          {/* TODO - add from form */}
+
           <CustomPropertiesAdapter
-            proposal={{ fields: { properties: {} } }}
-            onChange={(val) => {
-              // console.log('🔥v', val);
+            proposal={proposalFormInputs}
+            onChange={(properties: ProposalPropertiesField) => {
+              setProposalFormInputs({
+                fields: { properties: properties ? { ...properties } : {} }
+              });
             }}
           />
         </Collapse>

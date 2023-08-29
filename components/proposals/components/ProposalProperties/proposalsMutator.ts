@@ -26,7 +26,7 @@ export class ProposalsMutator extends Mutator {
   // other methods related to proposal blocks
   constructor(
     blocksContext: ProposalBlocksContextType,
-    onPropertiesChange: (properties: ProposalPropertiesField) => void
+    onPropertiesChange?: (properties: ProposalPropertiesField) => void
   ) {
     super();
 

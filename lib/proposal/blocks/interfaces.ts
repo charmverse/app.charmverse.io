@@ -36,4 +36,6 @@ export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 
 export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
-export type ProposalFields = { fields: ProposalPropertyValues };
+export type ProposalFields = ProposalPropertyValues;
+
+export type ProposalFieldsProp = { fields: ProposalFields };
