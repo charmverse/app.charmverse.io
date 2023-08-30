@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues,
@@ -74,7 +75,12 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
       type: true,
       spaceId: true,
       path: true,
-      title: true
+      title: true,
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
 
@@ -89,18 +95,16 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   // Usually a userId, but can be an email
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
 
-  // Store these in top level scope, so we can send an email to the user after the page permission is created
-  const isGuestMember = userIdAsEmail && isValidEmail(userIdAsEmail);
-  let spaceDomain: string = '';
+  let recipientEmail: string | null = null;
 
-  // Handle case where we are sharing a page
+  // Handle case where we are sharing a page to a user by email
   if (userIdAsEmail && isValidEmail(userIdAsEmail)) {
     const addGuestResult = await addGuest({
       spaceId: page.spaceId,
       userIdOrEmail: userIdAsEmail
     });
 
-    spaceDomain = addGuestResult.spaceDomain;
+    recipientEmail = addGuestResult.user.email;
 
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
   }
@@ -110,17 +114,35 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: permissionData
   });
 
-  if (isGuestMember) {
-    const sender = await prisma.user.findUniqueOrThrow({
-      where: {
-        id: req.session.user.id
-      }
-    });
-    await sendGuestInvitationEmail({
-      to: { email: userIdAsEmail as string },
-      pageLink: `/${spaceDomain}/${page.path}`,
-      pageTitle: page.title,
-      invitingUserName: sender.username
+  // notify a user the doc has been shared
+  if (permissionData.assignee.group === 'user') {
+    recipientEmail =
+      recipientEmail ||
+      (await await prisma.user
+        .findUniqueOrThrow({
+          where: {
+            id: req.session.user.id
+          }
+        })
+        .then((user) => user.email));
+    if (recipientEmail) {
+      const sender = await prisma.user.findUniqueOrThrow({
+        where: {
+          id: req.session.user.id
+        }
+      });
+      await sendGuestInvitationEmail({
+        to: { email: recipientEmail },
+        pageLink: `/${page.space.domain}/${page.path}`,
+        pageTitle: page.title,
+        invitingUserName: sender.username
+      });
+    }
+
+    log.info('Shared a page with a new user', {
+      pageId,
+      spaceId: page.spaceId,
+      userId: req.session.user.id
     });
   }
 

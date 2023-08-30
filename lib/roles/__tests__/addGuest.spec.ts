@@ -23,7 +23,6 @@ describe('addGuest', () => {
     });
 
     const spaceRole = output.user.spaceRoles[0];
-    expect(output.spaceDomain).toBe(space.domain);
 
     expect(spaceRole.spaceId).toBe(space.id);
     expect(spaceRole.userId).toBe(user.id);
@@ -45,8 +44,6 @@ describe('addGuest', () => {
 
     const spaceRole = output.user.spaceRoles[0];
 
-    expect(output.spaceDomain).toBe(space.domain);
-
     expect(spaceRole.spaceId).toBe(space.id);
     expect(spaceRole.userId).toBe(user.id);
     expect(spaceRole.isGuest).toBe(true);
@@ -65,9 +62,6 @@ describe('addGuest', () => {
     });
 
     const spaceRole = output.user.spaceRoles[0];
-
-    expect(output.spaceDomain).toBe(space.domain);
-
     expect(spaceRole.spaceId).toBe(space.id);
 
     expect(spaceRole.isGuest).toBe(true);
@@ -86,8 +80,6 @@ describe('addGuest', () => {
     });
 
     const spaceRole = output.user.spaceRoles[0];
-
-    expect(output.spaceDomain).toBe(space2.domain);
 
     expect(spaceRole.spaceId).toBe(space2.id);
 
