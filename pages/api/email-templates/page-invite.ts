@@ -10,10 +10,11 @@ const handler = nc({
 
 const templates = {
   'Guest added': () => {
-    return emails.getGuestInvitationEmail({
+    return emails.getInviteToPageEmail({
+      guestEmail: 'matt.blockchain',
       invitingUserName: 'momakes.blockchain',
       pageTitle: 'Acme Inc proposal',
-      pageLink: 'https://app.charmverse.io/cvt-mospace/page-12344553'
+      pageId: '12344553'
     });
   }
 };

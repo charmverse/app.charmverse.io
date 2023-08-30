@@ -3,6 +3,8 @@ import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandle
 
 import { getIronOptions } from './getIronOptions';
 
+// Code Source: the Readme at https://github.com/vvo/iron-session
+
 export function withSessionRoute(handler: NextApiHandler) {
   return withIronSessionApiRoute(handler, getIronOptions);
 }

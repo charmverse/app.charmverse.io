@@ -16,6 +16,7 @@ export const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
+  email?: string;
   onClose?: () => void;
   handleSubmit: (email: string) => void;
   loading?: boolean;
@@ -28,10 +29,13 @@ type DialogProps = Props & {
   onClose?: () => void;
 };
 
-export function CollectEmail({ handleSubmit, description, title, loading, onClose }: Props) {
+export function CollectEmail({ email, handleSubmit, description, title, loading, onClose }: Props) {
   const { register, getValues, getFieldState, watch } = useForm<FormValues>({
     mode: 'onChange',
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    defaultValues: {
+      email
+    }
   });
   // Return actual email or null
   function validEmail(): string | false {
@@ -49,8 +53,6 @@ export function CollectEmail({ handleSubmit, description, title, loading, onClos
       handleSubmit(validValue);
     }
   }
-
-  const values = watch();
 
   return (
     <Box mb={2} px={1}>
@@ -74,7 +76,7 @@ export function CollectEmail({ handleSubmit, description, title, loading, onClos
   );
 }
 
-export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, description, loading }: DialogProps) {
+export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, description, email, loading }: DialogProps) {
   const { reset } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -90,7 +92,7 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, descr
     <Modal title={title} open={isOpen} onClose={onClose ? closeForm : undefined}>
       {/** Align the title of modal with the dialog */}
       <Box sx={{ mx: -1 }}>
-        <CollectEmail description={description} handleSubmit={handleSubmit} loading={loading} />
+        <CollectEmail description={description} handleSubmit={handleSubmit} email={email} loading={loading} />
       </Box>
     </Modal>
   );

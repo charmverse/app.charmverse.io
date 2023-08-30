@@ -34,10 +34,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function InvitationPage({ invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (invite) {
-    <Head>
-      <meta name='robots' content='noindex' />
-    </Head>;
-    return <InviteLinkPage invite={invite} />;
+    return (
+      <>
+        <Head>
+          <meta name='robots' content='noindex' />
+        </Head>
+        <InviteLinkPage invite={invite} />
+      </>
+    );
   }
   return <InviteLinkPageError />;
 }

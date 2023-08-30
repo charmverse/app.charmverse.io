@@ -9,7 +9,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { sendGuestInvitationEmail } from 'lib/mailer';
+import { sendInviteToPageEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
@@ -140,9 +140,10 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
           id: req.session.user.id
         }
       });
-      await sendGuestInvitationEmail({
+      await sendInviteToPageEmail({
+        guestEmail: recipientEmail,
         to: { email: recipientEmail, userId },
-        pageLink: `/${page.space.domain}/${page.path}`,
+        pageId,
         pageTitle: page.title,
         invitingUserName: sender.username
       });

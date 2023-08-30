@@ -11,7 +11,7 @@ import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
-import { templatesContainer } from './guest-invite';
+import { templatesContainer } from './page-invite';
 
 const handler = nc({
   onError,

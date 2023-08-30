@@ -2,10 +2,11 @@ import { MjmlColumn, MjmlSection, MjmlText } from 'mjml-react';
 
 import { Button, EmailWrapper, Footer, Header } from './components';
 
-export type GuestInvitationProps = {
+export type InviteToPageProps = {
+  guestEmail: string;
   invitingUserName: string;
   pageTitle: string;
-  pageLink: string;
+  pageId: string;
 };
 
 const pageContainerStyle = {
@@ -19,8 +20,8 @@ const pageContainerStyle = {
 
 const charmverseUrl = process.env.DOMAIN;
 
-export function GuestInvitation(props: GuestInvitationProps) {
-  const pageLink = `${charmverseUrl}${props.pageLink}`;
+export function InviteToPage(props: InviteToPageProps) {
+  const pageLink = `${charmverseUrl}/invite/page?id=${props.pageId}&email=${props.guestEmail}`;
 
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
@@ -50,6 +51,6 @@ export function GuestInvitation(props: GuestInvitationProps) {
   );
 }
 
-export function emailSubject({ pageTitle }: GuestInvitationProps) {
+export function emailSubject({ pageTitle }: InviteToPageProps) {
   return `Document shared with you: "${pageTitle}"`;
 }
