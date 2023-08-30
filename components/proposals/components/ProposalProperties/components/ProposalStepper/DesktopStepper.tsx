@@ -16,9 +16,8 @@ import { StepperIcon } from './StepperIcon';
 const lastStatuses = ['vote_closed', 'evaluation_closed'];
 
 export function DesktopStepper({
-  openVoteModal,
   proposalStatus,
-  updateProposalStatus,
+  handleProposalStatusUpdate,
   proposalFlowPermissions,
   archived,
   evaluationType
@@ -28,11 +27,7 @@ export function DesktopStepper({
 
   function updateStatus(newStatus: ProposalStatus) {
     if (proposalFlowPermissions?.[newStatus]) {
-      if (newStatus === 'vote_active') {
-        openVoteModal?.();
-      } else {
-        updateProposalStatus?.(newStatus);
-      }
+      handleProposalStatusUpdate(newStatus);
     }
   }
 
@@ -51,6 +46,7 @@ export function DesktopStepper({
               <Stack alignItems='center' height='100%' gap={1}>
                 <Tooltip title={archived ? 'Archived proposals cannot be updated' : proposalStatusDetails[status]}>
                   <StepperIcon
+                    data-test={`proposal-status-stepper-${status}`}
                     isComplete={currentStatusIndex > statusIndex}
                     isCurrent={currentStatusIndex === statusIndex}
                     isEnabled={!!proposalFlowPermissions?.[status] && !archived}

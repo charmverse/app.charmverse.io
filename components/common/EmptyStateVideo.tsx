@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 
 export function EmptyStateVideo(props: { description: string; videoTitle: string; videoUrl: string }) {
   return (
-    <div>
+    <div data-test='empty-state'>
       <Typography variant='h6' gutterBottom>
         {props.description}
       </Typography>

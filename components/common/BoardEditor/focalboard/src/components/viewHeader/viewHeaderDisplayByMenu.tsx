@@ -9,7 +9,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import { typeDisplayName } from '../../widgets/propertyMenu';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 type Props = {
   properties: readonly IPropertyTemplate[];

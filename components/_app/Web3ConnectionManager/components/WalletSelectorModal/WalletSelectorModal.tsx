@@ -28,15 +28,15 @@ import processConnectionError from './utils/processConnectionError';
 type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 
 type Props = {
-  loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
+  loginSuccess?: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
   onError?: (err: DisabledAccountError) => void;
 };
 
-export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
+export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
   const {
     setActivatingConnector,
     closeWalletSelectorModal,
-    openNetworkModal,
+    isWalletSelectorModalOpen,
     isConnectingIdentity,
     activatingConnector
   } = useWeb3ConnectionManager();
@@ -64,17 +64,16 @@ export function WalletSelector({ loginSuccess, onError = () => null }: Props) {
 
   // close the modal after signing in
   useEffect(() => {
-    if (active) {
+    if (active && isWalletSelectorModalOpen) {
       closeWalletSelectorModal();
     }
-  }, [active]);
+  }, [active, isWalletSelectorModalOpen]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
       closeWalletSelectorModal();
-      openNetworkModal();
     }
-  }, [error, openNetworkModal, closeWalletSelectorModal]);
+  }, [error, closeWalletSelectorModal]);
 
   const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
   log.info('Connect redirectUri', redirectUri);
@@ -160,11 +159,11 @@ function resetWalletConnector(connector: AbstractConnector) {
     connector.walletConnectProvider = undefined;
   }
 }
-export function WalletSelectorModal({ loginSuccess, onError }: Props) {
+export function WalletSelectorModal() {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useWeb3ConnectionManager();
   return (
     <Modal open={isWalletSelectorModalOpen} onClose={closeWalletSelectorModal}>
-      <WalletSelector loginSuccess={loginSuccess} onError={onError} />
+      <WalletSelector />
     </Modal>
   );
 }

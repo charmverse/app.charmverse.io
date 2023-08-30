@@ -54,7 +54,9 @@ export default function MultiTabs(props: MultiTabsProps) {
   };
 
   useEffect(() => {
-    setValue(props.activeTab);
+    if (typeof props.activeTab !== 'undefined') {
+      setValue(props.activeTab);
+    }
   }, [props.activeTab]);
 
   return (
@@ -74,6 +76,7 @@ export default function MultiTabs(props: MultiTabsProps) {
               }}
               key={tabLabel}
               label={tabLabel}
+              data-test={`${tabLabel}-tab`}
             />
           ))}
         </Tabs>

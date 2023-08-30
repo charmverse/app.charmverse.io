@@ -3,23 +3,34 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import LoadingComponent from 'components/common/LoadingComponent';
+import Link from 'components/common/Link';
+import LoadingComponent, { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { isDevEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalCategory } from 'lib/proposal/interface';
+import {
+  getProposalStatuses,
+  nextProposalStatusUpdateMessage,
+  previousProposalStatusUpdateMessage
+} from 'lib/proposal/proposalStatusTransition';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -35,30 +46,32 @@ import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
 import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
-export type ProposalFormInputs = {
-  title?: string; // title is saved to the same state that's used in ProposalPage
+export type ProposalPropertiesInput = {
   content?: PageContent | null;
-  contentText?: string;
-  // id?: string;
+  contentText?: string; // required to know if we can overwrite content when selecting a template
   categoryId?: string | null;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
+  publishToLens?: boolean;
 };
 
 type ProposalPropertiesProps = {
+  isPublishingToLens?: boolean;
+  proposalLensLink?: string;
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   disabledCategoryInput?: boolean;
+  isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  onChangeRubricCriteriaAnswer?: () => void;
+  onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
-  proposalFormInputs: ProposalFormInputs;
+  proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
   readOnlyReviewers?: boolean;
@@ -66,7 +79,7 @@ type ProposalPropertiesProps = {
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
-  setProposalFormInputs: (values: ProposalFormInputs) => Promise<void> | void;
+  setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   showStatus?: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
@@ -75,12 +88,14 @@ type ProposalPropertiesProps = {
 };
 
 export function ProposalProperties({
+  proposalLensLink,
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
   disabledCategoryInput,
+  isFromTemplate,
   onChangeRubricCriteria,
-  onChangeRubricCriteriaAnswer,
+  onSaveRubricCriteriaAnswers,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -97,27 +112,60 @@ export function ProposalProperties({
   snapshotProposalId,
   userId,
   updateProposalStatus,
-  title
+  title,
+  isPublishingToLens
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
-
   const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
+  const { lensProfile } = useLensProfile();
+  const { proposalTemplates = [] } = useProposalTemplates();
+  const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
 
-  const { proposalTemplates } = useProposalTemplates();
+  const previousConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'previous-proposal-status-change-confirmation'
+  });
+  const nextConfirmationPopup = usePopupState({
+    variant: 'popover',
+    popupId: 'next-proposal-status-change-confirmation'
+  });
+
+  const statuses = getProposalStatuses(proposalFormInputs.evaluationType);
+  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
+  const nextStatus = statuses[currentStatusIndex + 1];
+  const previousStatus = statuses[currentStatusIndex - 1];
+  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
+  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
+
+  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
+    switch (newStatus) {
+      case 'draft':
+      case 'discussion':
+      case 'review':
+      case 'vote_active':
+      case 'evaluation_active':
+      case 'evaluation_closed':
+      case 'reviewed':
+        if (newStatus === previousStatus) {
+          previousConfirmationPopup.open();
+        } else if (newStatus === nextStatus) {
+          nextConfirmationPopup.open();
+        }
+        break;
+      default:
+        await updateProposalStatus?.(newStatus);
+        break;
+    }
+  }
 
   const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
     !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
   );
-
-  const proposalTemplatePages = useMemo(() => {
-    return Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[];
-  }, [pages]);
-
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -125,21 +173,14 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
-
-  const proposalsRecord = (proposalTemplates ?? []).reduce((acc, _proposal) => {
-    acc[_proposal.id] = _proposal;
-    return acc;
-  }, {} as Record<string, ProposalTemplate>);
-
-  const templateOptions = proposalTemplatePages.filter((proposalTemplate) => {
-    const _proposal = proposalTemplate.proposalId && proposalsRecord[proposalTemplate.proposalId];
-    if (!_proposal) {
-      return false;
-    } else if (!proposalCategoryId) {
-      return true;
-    }
-    return _proposal.categoryId === proposalCategoryId;
-  });
+  const templateOptions = proposalTemplates
+    .filter((_proposal) => {
+      if (!proposalCategoryId) {
+        return true;
+      }
+      return _proposal.categoryId === proposalCategoryId;
+    })
+    .map((template) => template.page);
 
   const proposalTemplatePage = proposalFormInputs.proposalTemplateId
     ? pages[proposalFormInputs.proposalTemplateId]
@@ -148,13 +189,11 @@ export function ProposalProperties({
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
       setProposalFormInputs({
-        ...proposalFormInputs,
         categoryId: updatedCategory.id,
         proposalTemplateId: null
       });
     } else if (!updatedCategory) {
       setProposalFormInputs({
-        ...proposalFormInputs,
         categoryId: null,
         proposalTemplateId: null
       });
@@ -169,7 +208,6 @@ export function ProposalProperties({
       );
       if (proposalTemplate) {
         setProposalFormInputs({
-          ...proposalFormInputs,
           categoryId: proposalTemplate.categoryId,
           content: proposalTemplate.page.content as PageContent,
           contentText: proposalTemplate.page.contentText,
@@ -187,7 +225,6 @@ export function ProposalProperties({
 
   function clearTemplate() {
     setProposalFormInputs({
-      ...proposalFormInputs,
       proposalTemplateId: null
     });
   }
@@ -197,7 +234,7 @@ export function ProposalProperties({
   }
 
   function onSubmitEvaluation() {
-    onChangeRubricCriteriaAnswer?.();
+    onSaveRubricCriteriaAnswers?.();
     // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
     setRubricView(1);
   }
@@ -209,6 +246,13 @@ export function ProposalProperties({
 
     prevStatusRef.current = proposalStatus || '';
   }, [detailsExpanded, proposalStatus]);
+
+  let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
+  if (proposalLensLink) {
+    lensProposalPropertyState = 'show_link';
+  } else {
+    lensProposalPropertyState = lensProfile ? 'show_toggle' : 'hide';
+  }
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
     if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
@@ -266,8 +310,7 @@ export function ProposalProperties({
                   archived={archived}
                   proposalFlowFlags={proposalFlowFlags}
                   proposalStatus={proposalStatus}
-                  openVoteModal={openVoteModal}
-                  updateProposalStatus={updateProposalStatus}
+                  handleProposalStatusUpdate={handleProposalStatusUpdate}
                   evaluationType={proposalFormInputs.evaluationType}
                 />
               )}
@@ -296,8 +339,7 @@ export function ProposalProperties({
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
                 proposalStatus={proposalStatus}
-                openVoteModal={openVoteModal}
-                updateProposalStatus={updateProposalStatus}
+                handleProposalStatusUpdate={handleProposalStatusUpdate}
                 evaluationType={proposalFormInputs.evaluationType}
               />
             </Box>
@@ -309,7 +351,8 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
-                  disabled={disabledCategoryInput}
+                  readOnly={disabledCategoryInput}
+                  readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
@@ -361,7 +404,6 @@ export function ProposalProperties({
                   readOnly={readOnlyAuthors}
                   onChange={(authors) => {
                     setProposalFormInputs({
-                      ...proposalFormInputs,
                       authors
                     });
                   }}
@@ -376,11 +418,13 @@ export function ProposalProperties({
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
+                data-test='proposal-reviewer-select'
+                readOnlyMessage={isFromTemplate ? 'Cannot change reviewers when using template' : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
+                proposalCategoryId={proposalFormInputs.categoryId}
                 onChange={async (options) => {
                   await setProposalFormInputs({
-                    ...proposalFormInputs,
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
                   refreshReviewerIds();
@@ -388,31 +432,99 @@ export function ProposalProperties({
               />
             </Box>
           </Box>
+
+          {lensProposalPropertyState !== 'hide' && (
+            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                // override align-items flex-start with inline style
+                style={{
+                  alignItems: 'center'
+                }}
+              >
+                {lensProposalPropertyState === 'show_link' ? (
+                  <>
+                    <PropertyLabel readOnly>Lens Post</PropertyLabel>
+                    <Link
+                      href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${proposalLensLink}`}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      <Typography variant='body2' color='primary'>
+                        View on lens
+                      </Typography>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+                    {isPublishingToLens ? (
+                      <LoadingIcon size={16} />
+                    ) : (
+                      <Switch
+                        disabled={proposalStatus !== 'draft'}
+                        checked={proposalFormInputs.publishToLens ?? false}
+                        onChange={(e) => {
+                          setProposalFormInputs({
+                            publishToLens: e.target.checked
+                          });
+                        }}
+                      />
+                    )}
+                    {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && !isPublishingToLens && (
+                      <Typography variant='body2' color='error'>
+                        Failed publishing to Lens
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </Box>
+            </Box>
+          )}
+
           {/* Select valuation type */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
-                disabled={readOnlyProposalEvaluationType}
+                readOnly={readOnlyProposalEvaluationType}
+                readOnlyMessage={isFromTemplate ? 'Cannot change evaluation type when using template' : undefined}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
-                    ...proposalFormInputs,
                     evaluationType
                   });
                 }}
               />
             </Box>
           </Box>
+
           {/* Select rubric criteria */}
 
           {proposalFormInputs.evaluationType === 'rubric' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                alignItems={{ xs: 'stretch!important', sm: 'flex-start' }}
+              >
+                {isMobile ? (
+                  <Typography variant='caption' component='div' color='secondary' fontWeight='600' p='4px 8px' mb={1}>
+                    Rubric criteria
+                  </Typography>
+                ) : (
+                  <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+                )}
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
+                    readOnlyMessage={isFromTemplate ? 'Cannot change rubric criteria when using template' : undefined}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
                     proposalStatus={proposalStatus}
@@ -445,7 +557,7 @@ export function ProposalProperties({
           secondaryButtonText='Go back'
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
-            const templatePage = proposalTemplatePages.find((template) => template.id === selectedProposalTemplateId);
+            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
             if (templatePage) {
               applyTemplate(templatePage);
             }
@@ -471,6 +583,28 @@ export function ProposalProperties({
           }}
         />
       </div>
+      <ModalWithButtons
+        open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
+        buttonText='Continue'
+        onClose={previousConfirmationPopup.close}
+        onConfirm={() => updateProposalStatus?.(previousStatus)}
+      >
+        <Typography>{previousConfirmationMessage}</Typography>
+      </ModalWithButtons>
+      <ModalWithButtons
+        open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
+        onClose={nextConfirmationPopup.close}
+        buttonText='Continue'
+        onConfirm={() => {
+          if (nextStatus === 'vote_active') {
+            openVoteModal?.();
+          } else {
+            updateProposalStatus?.(nextStatus);
+          }
+        }}
+      >
+        <Typography>{nextConfirmationMessage}</Typography>
+      </ModalWithButtons>
     </Box>
   );
 }

@@ -59,8 +59,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    let toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    let toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeChecked();
@@ -86,11 +86,11 @@ describe('PaidShareToWeb', () => {
       />
     );
 
-    toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveTextContent('Unpublish');
     expect(toggle).not.toBeDisabled();
   });
 
@@ -105,8 +105,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeDisabled();
@@ -123,8 +123,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).toBeDisabled();
@@ -158,11 +158,11 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveTextContent('Publish to web');
     expect(toggle).toBeDisabled();
   });
 
@@ -194,11 +194,11 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveTextContent('Unpublish');
     expect(toggle).toBeDisabled();
   });
 
@@ -225,8 +225,8 @@ describe('PaidShareToWeb', () => {
       <PaidShareToWeb pageId={pageId} pagePermissions={[]} refreshPermissions={jest.fn()} />
     );
 
-    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {}).children.item(0);
-    expect(toggle?.getAttribute('type')).toBe('checkbox');
+    const toggle = resultWithPermissions.getByTestId('toggle-public-page', {});
+    expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
     expect(toggle).not.toBeDisabled();

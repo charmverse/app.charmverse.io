@@ -9,8 +9,8 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { SnapshotProposal } from 'lib/snapshot';
-import { getSnapshotProposal } from 'lib/snapshot';
+import { getSnapshotProposal } from 'lib/snapshot/getProposal';
+import type { SnapshotProposal } from 'lib/snapshot/interfaces';
 
 import { PublishingForm } from './PublishingForm';
 

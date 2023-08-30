@@ -52,9 +52,10 @@ export class PagesApi {
     pageId,
     id,
     content,
-    contentText
+    contentText,
+    lensCommentLink
   }: UpdateCommentInput & { pageId: string; id: string }): Promise<PageComment> {
-    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText });
+    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText, lensCommentLink });
   }
 
   deleteComment({ commentId, pageId }: { pageId: string; commentId: string }): Promise<void> {
@@ -63,5 +64,9 @@ export class PagesApi {
 
   voteComment({ pageId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; pageId: string }) {
     return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
+  }
+
+  syncPageComments({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
+    return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 }

@@ -1,12 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Block } from '@charmverse/core/prisma-client';
 import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
-import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import { InvalidStateError } from 'lib/middleware';
 
 const properties: { [key in DatabaseProposalPropertyType]: () => IPropertyTemplate<key> } = {
   proposalCategory: () => ({
@@ -207,14 +207,18 @@ export async function generateUpdatedProposalEvaluationAverageProperty({
   return proposalStatusProp;
 }
 
-export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Block> {
-  const database = await prisma.block.findUniqueOrThrow({
+export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Board> {
+  const database = (await prisma.block.findUniqueOrThrow({
     where: {
       id: databaseId
     }
-  });
+  })) as any as Board;
 
-  const boardProperties = ((database.fields as any).cardProperties as IPropertyTemplate[]) ?? [];
+  const boardProperties = database.fields.cardProperties ?? [];
+
+  if (database.fields.sourceType !== 'proposals') {
+    throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
+  }
 
   const [categoryProp, statusProp, proposalUrlProp] = await Promise.all([
     generateUpdatedProposalCategoryProperty({ boardProperties, spaceId: database.spaceId }),
@@ -299,5 +303,5 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
         cardProperties: boardProperties
       }
     }
-  });
+  }) as any as Board;
 }

@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { getChainById } from 'connectors';
 import { utils } from 'ethers';
 import { DateTime } from 'luxon';
@@ -24,20 +25,15 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
-import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
+import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
+import { getSnapshotSpace } from 'lib/snapshot/getSpace';
+import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
+import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
 import { InputVotingStrategies } from './InputVotingStrategies';
-
-async function getSnapshotClient() {
-  const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
-
-  const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-  return new snapshot.Client712(hub);
-}
 
 interface Props {
   onSubmit: () => void;
@@ -74,8 +70,8 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
   );
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
-  const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
-  const [votingOptions, setVotingOptions] = useState<string[]>(['For', 'Against']);
+  const [snapshotVoteMode, setSnapshotVoteMode] = useState<ProposalType>('single-choice');
+  const [votingOptions, setVotingOptions] = useState<string[]>(['For', 'Against', 'Abstain']);
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
@@ -335,7 +331,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
                       ? SnapshotVotingMode
                       : { [snapshotVotingType]: SnapshotVotingMode[snapshotVotingType] }
                   }
-                  onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
+                  onChange={(voteMode) => setSnapshotVoteMode(voteMode as ProposalType)}
                 />
               </Tooltip>
             </Grid>

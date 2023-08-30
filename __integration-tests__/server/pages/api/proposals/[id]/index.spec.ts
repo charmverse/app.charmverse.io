@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
+import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole } from 'testing/setupDatabase';
@@ -95,10 +96,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
+    const category = await testUtilsProposals.generateProposalCategory({
+      spaceId: adminSpace.id
+    });
+
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
       spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      categoryId: category.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -111,15 +116,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${page.proposalId}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: page.proposalId! });
 
     expect(updated.proposal?.reviewers).toHaveLength(1);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
@@ -131,10 +135,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const role = await testUtilsMembers.generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
 
+    const category = await testUtilsProposals.generateProposalCategory({
+      spaceId: adminSpace.id
+    });
+
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      categoryId: category.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -151,15 +159,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       ]
     };
 
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${proposalTemplate.id}`)
-        .set('Cookie', adminCookie)
-        .send(updateContent)
-        .expect(200)
-    ).body as PageWithProposal;
+    await request(baseUrl)
+      .put(`/api/proposals/${proposalTemplate.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
 
     // Make sure update went through
+    const updated = await getProposal({ proposalId: proposalTemplate.id });
     expect(updated.proposal?.reviewers).toHaveLength(2);
     expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
     expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
@@ -171,10 +178,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
+    const category = await testUtilsProposals.generateProposalCategory({
+      spaceId: adminSpace.id
+    });
+
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: proposalCategory.id,
+      categoryId: category.id,
       proposalStatus: 'discussion'
     });
 
@@ -220,10 +231,14 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       operations: ['createPage']
     });
 
+    const category = await testUtilsProposals.generateProposalCategory({
+      spaceId: adminSpace.id
+    });
+
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: proposalCategory.id,
+      categoryId: category.id,
       proposalStatus: 'discussion',
       reviewers: [{ group: 'user', id: userWithRole.id }]
     });

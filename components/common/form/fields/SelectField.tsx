@@ -107,6 +107,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     return (
       <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
         <Autocomplete
+          data-test='autocomplete'
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}

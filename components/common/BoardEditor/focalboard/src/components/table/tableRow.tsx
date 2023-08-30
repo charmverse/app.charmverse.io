@@ -139,6 +139,7 @@ function TableRow(props: Props) {
 
   return (
     <div
+      data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}

@@ -67,8 +67,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test_name: 'Type check and lint'
-            test_command: 'npm run typecheck && npm run lint'
+          - test_name: 'Type check, lint, and verify dependencies'
+            test_command: 'npm run typecheck && npm run lint && npm run verifydeps'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -261,8 +261,14 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Package Webapp
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+      - name: Package Webapp and upload web assets to s3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Update and Package background worker
         run: |
@@ -301,7 +307,7 @@ jobs:
           datadog-ci sourcemaps upload .next/static       \
             --service=webapp                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://app.charmverse.io/_next/static
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21

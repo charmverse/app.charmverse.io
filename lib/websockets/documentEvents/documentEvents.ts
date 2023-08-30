@@ -13,7 +13,7 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { AuthenticatedSocketData } from '../authentication';
-import { relay } from '../relay';
+import type { AbstractWebsocketBroadcaster } from '../interfaces';
 
 import type { DocumentRoom } from './docRooms';
 import type {
@@ -92,7 +92,11 @@ export class DocumentEventHandler {
     return room;
   }
 
-  constructor(socket: Socket, docRooms: Map<string | undefined, DocumentRoom>) {
+  constructor(
+    private relay: AbstractWebsocketBroadcaster,
+    socket: Socket,
+    docRooms: Map<string | undefined, DocumentRoom>
+  ) {
     this.id = socket.id;
     this.socket = socket;
     this.docRooms = docRooms;
@@ -381,11 +385,11 @@ export class DocumentEventHandler {
     return diff;
   }
 
-  // skipSendingToActor is used when we want to send the diff to all other participants, but not the actor
+  // sendMessageToActor is used when we want to send the diff to all other participants, but not the actor
   async handleDiff(
     message: WrappedSocketMessage<ClientDiffMessage>,
-    { skipSendingToActor, restorePage = false }: { skipSendingToActor?: boolean; restorePage?: boolean } = {
-      skipSendingToActor: true
+    { socketEvent }: { socketEvent?: 'page_created' | 'page_restored' | 'page_deleted' | 'page_reordered' | null } = {
+      socketEvent: null
     }
   ) {
     const room = this.getDocumentRoomOrThrow();
@@ -407,49 +411,58 @@ export class DocumentEventHandler {
     log.debug('Handling change event', logMeta);
     const deletedPageIds: string[] = [];
     const restoredPageIds: string[] = [];
-    const staticPageTypeRegex = /(member|bounty|forum|proposal)/;
+
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
         // Go through the diffs and see if any of them are for deleting a page.
-        for (const ds of message.ds) {
-          if (ds.stepType === 'replace') {
-            // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
-            // Otherwise the page was created by the user manually
-            // Skip over linked and static linked pages
-            if (ds.slice?.content && (ds.from === ds.to || restorePage)) {
-              ds.slice.content.forEach((node) => {
-                if (node && node.type === 'page' && node.attrs) {
-                  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                  // pagePath is null when the page is not a linked page
-                  if (pageId && pageType === null && pagePath === null) {
-                    restoredPageIds.push(node.attrs?.id);
+        try {
+          for (const ds of message.ds) {
+            if (ds.stepType === 'replace') {
+              // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
+              // We don't need to restore the page if it was created by the user manually
+              if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
+                ds.slice.content.forEach((node) => {
+                  if (node && node.type === 'page' && node.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
+                    // pagePath is null when the page is not a linked page
+                    if (pageId && pageType === null && pagePath === null) {
+                      restoredPageIds.push(node.attrs?.id);
+                    }
                   }
-                }
-              });
-            } else if (ds.from + 1 === ds.to) {
-              // deleted using row action menu
-              const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
-              if (node && node.attrs && node.type === 'page') {
-                const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                if (pageId && pageType === null && pagePath === null) {
-                  deletedPageIds.push(pageId);
-                }
-              }
-            } else {
-              // deleted using multi line selection
-              room.node.nodesBetween(ds.from, ds.to, (_node) => {
-                const jsonNode = _node.toJSON() as PageContent;
-                if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
-                  const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
+                });
+              } else if (ds.from + 1 === ds.to) {
+                // deleted using row action menu
+                const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
+                if (node && node.attrs && node.type === 'page') {
+                  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
                   if (pageId && pageType === null && pagePath === null) {
                     deletedPageIds.push(pageId);
                   }
                 }
-              });
+              } else {
+                // deleted using multi line selection
+                // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
+                room.node.nodesBetween(ds.from, ds.to, (_node) => {
+                  const jsonNode = _node.toJSON() as PageContent;
+                  if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
+                    const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
+                    if (pageId && pageType === null && pagePath === null) {
+                      deletedPageIds.push(pageId);
+                    }
+                  }
+                });
+              }
             }
           }
+        } catch (error) {
+          log.warn('Error looping through nodes for page meta', {
+            error,
+            docSize: room.node.nodeSize,
+            ds: message.ds,
+            ...logMeta
+          });
         }
 
         try {
@@ -475,26 +488,28 @@ export class DocumentEventHandler {
           await this.saveDocument();
         }
 
-        if (deletedPageIds.length) {
+        if (deletedPageIds.length && socketEvent !== 'page_reordered') {
           await archivePages({
             pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: true
+            archive: true,
+            relay: this.relay
           });
         }
 
-        if (restoredPageIds.length) {
+        if (restoredPageIds.length && socketEvent !== 'page_reordered') {
           await archivePages({
             pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: false
+            archive: false,
+            relay: this.relay
           });
         }
 
         this.confirmDiff(message.rid);
-        this.sendUpdatesToOthers(message, skipSendingToActor);
+        this.sendUpdatesToOthers(message, !!socketEvent);
       } catch (error) {
         log.error('Error when saving changes to the db', { error, ...logMeta });
         this.sendError('There was an error saving your changes! Please refresh and try again.');
@@ -640,27 +655,23 @@ export class DocumentEventHandler {
     }
   }
 
-  sendUpdatesToOthers(message: ClientMessage | ServerMessage, skipSendingToActor = true) {
-    this.sendUpdates({ message, senderId: this.id, skipSendingToActor });
+  sendUpdatesToOthers(message: ClientMessage | ServerMessage, sendMessageToActor?: boolean) {
+    this.sendUpdates({ message, senderId: this.id, sendMessageToActor });
   }
 
   sendUpdates({
     message,
     senderId,
-    skipSendingToActor = true
+    sendMessageToActor
   }: {
     message: ClientMessage | ServerMessage;
     senderId?: string;
-    skipSendingToActor?: boolean;
+    sendMessageToActor?: boolean;
   }) {
     // log.debug(`Broadcasting message "${message.type}" to room`, { pageId: this.getSession().documentId });
     const room = this.getDocumentRoomOrThrow();
     for (const [, participant] of room.participants) {
-      if (skipSendingToActor) {
-        if (participant.id !== senderId) {
-          participant.sendMessage(message);
-        }
-      } else {
+      if (participant.id !== senderId || sendMessageToActor) {
         participant.sendMessage(message);
       }
     }
@@ -733,7 +744,7 @@ export class DocumentEventHandler {
     if (galleryImage !== room.doc.galleryImage || hasContent !== room.doc.hasContent) {
       room.doc.galleryImage = galleryImage;
       room.doc.hasContent = hasContent;
-      relay.broadcast(
+      this.relay.broadcast(
         {
           type: 'pages_meta_updated',
           payload: [{ galleryImage, hasContent, spaceId: res.spaceId, id: room.doc.id }]

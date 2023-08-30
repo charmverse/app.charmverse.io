@@ -17,8 +17,12 @@ export type IdentityUpdate = {
 /**
  * Switch to specific identity, or auto-fallback to an existing identity if current was just deleted
  */
-export async function updateUsedIdentity(userId: string, identityUpdate?: IdentityUpdate): Promise<LoggedInUser> {
-  const user = await getUserProfile('id', userId);
+export async function updateUsedIdentity(
+  userId: string,
+  identityUpdate?: IdentityUpdate,
+  tx: Prisma.TransactionClient = prisma
+): Promise<LoggedInUser> {
+  const user = await getUserProfile('id', userId, tx);
 
   if (identityUpdate) {
     const { displayName, identityType } = identityUpdate;
@@ -53,7 +57,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
       throw new InsecureOperationError(`User ${userId} does not have a verified email with address ${displayName}`);
     }
 
-    return prisma.user.update({
+    return tx.user.update({
       where: {
         id: userId
       },
@@ -85,7 +89,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
     updateContent.identityType = 'VerifiedEmail';
   }
 
-  return prisma.user.update({
+  return tx.user.update({
     where: {
       id: userId
     },

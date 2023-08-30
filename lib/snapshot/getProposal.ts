@@ -32,8 +32,9 @@ export async function getSnapshotProposal(proposalId: string): Promise<SnapshotP
         votes
         scores
         scores_total
+        type
       }
-    }    
+    }
   `
   });
 

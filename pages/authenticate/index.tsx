@@ -3,46 +3,72 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
-import ErrorPage from 'components/common/errors/ErrorPage';
-import Link from 'components/common/Link';
+import { Button } from 'components/common/Button';
 import { LoginPageContent } from 'components/login';
 import { CollectEmailDialog } from 'components/login/CollectEmail';
+import { LoginButton } from 'components/login/LoginButton';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { SystemError } from 'lib/utilities/errors';
 import { isValidEmail } from 'lib/utilities/strings';
 
 export default function Authenticate() {
-  const [error, setError] = useState<SystemError | null>(null);
+  const [loginError, setLoginError] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const { isLoaded: isUserLoaded } = useUser();
+  const { isLoaded: isUserLoaded, user } = useUser();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const { validateMagicLink, emailForSignIn, setEmailForSignIn } = useFirebaseAuth();
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
 
+  async function redirectLoggedInUser() {
+    const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
+
+    // Use spaces might not be loaded yet, this ensures we have up to date data
+    const userSpaces = await charmClient.spaces.getSpaces();
+
+    const domainFromRedirect = redirectPath.split('/')[1];
+    if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
+      router.push(redirectPath);
+    } else if (userSpaces?.length) {
+      router.push(`/${userSpaces[0].domain}`);
+    } else {
+      router.push('/createSpace');
+    }
+  }
+
   // Case where existing user is adding an email to their account
-  const isConnectingAccount = router.query.connectToExistingAccount === 'true';
+  function loginViaEmail() {
+    setIsAuthenticating(true);
+    validateMagicLink()
+      .then(() => {
+        showMessage('Logged in with email. Redirecting you now', 'success');
+        redirectLoggedInUser();
+      })
+      .catch((err) => {
+        if (user) {
+          redirectLoggedInUser();
+        } else {
+          setIsAuthenticating(false);
+          setLoginError(true);
+          showMessage('Invalid invite link', 'error');
+        }
+      });
+  }
 
   useEffect(() => {
-    if (isUserLoaded && emailForSignIn && isValidEmail(emailForSignIn)) {
-      setIsAuthenticating(true);
-      validateMagicLink()
-        .then(() => {
-          showMessage('Logged in with email. Redirecting you now', 'success');
-          const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
-          router.push(redirectPath);
-        })
-        .catch((err) => {
-          setIsAuthenticating(false);
-          setError(err as any);
-        });
-    } else if (isUserLoaded && !isAuthenticating) {
-      emailPopup.open();
+    if (isUserLoaded && isSpacesLoaded) {
+      if (emailForSignIn && isValidEmail(emailForSignIn)) {
+        loginViaEmail();
+      } else if (!loginError && !isAuthenticating) {
+        emailPopup.open();
+      }
     }
-  }, [isUserLoaded, emailForSignIn]);
+  }, [isUserLoaded, emailForSignIn, isSpacesLoaded]);
 
   function submitEmail(email: string) {
     setIsAuthenticating(true);
@@ -50,27 +76,35 @@ export default function Authenticate() {
     setEmailForSignIn(email);
   }
 
+  const showLoginButton = !isAuthenticating && !emailPopup.isOpen && !emailPopup.isOpen && !user;
+
+  const showAdditionalOptions = !!user && !showLoginButton && !isAuthenticating && !emailPopup.isOpen;
+
   if (!isUserLoaded) {
     return null;
   }
-
-  if (error) {
-    return (
-      <ErrorPage message={isConnectingAccount ? 'Failed to connect email to your account' : 'Login failed'}>
-        <Box sx={{ mt: 3 }}>
-          <Link href='/'>
-            {isConnectingAccount
-              ? 'Request new magic link from your profile settings'
-              : 'Request magic link from login page'}
-          </Link>
-        </Box>
-      </ErrorPage>
-    );
-  }
-
   return getLayout(
     <Box height='100%' display='flex' flexDirection='column'>
-      <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating} />
+      <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating}>
+        <Box gap={3} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'column', pt: 2 }}>
+          {showLoginButton && <LoginButton emailOnly showSignup={false} />}
+
+          {showAdditionalOptions && (
+            <>
+              {user && !!spaces?.length && (
+                <Button sx={{ width: '100%' }} href={`/${spaces[0].domain}`} color='primary'>
+                  Go to my space
+                </Button>
+              )}
+              {user && !spaces?.length && (
+                <Button sx={{ width: '100%' }} href='/createSpace' color='primary'>
+                  Create a space
+                </Button>
+              )}
+            </>
+          )}
+        </Box>
+      </LoginPageContent>
 
       <CollectEmailDialog
         title='Login with your email'

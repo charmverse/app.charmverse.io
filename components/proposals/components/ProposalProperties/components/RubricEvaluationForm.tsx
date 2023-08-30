@@ -71,13 +71,16 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
     }
     // resolver: yupResolver(schema(hasCustomReward))
   });
+
   const { fields } = useFieldArray({ control, name: 'answers' });
 
   async function saveForm(values: FormInput) {
     if (proposalId) {
+      // answers are optional - filter out ones with no score
+      const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
       await upsertRubricCriteriaAnswer({
         // @ts-ignore -  TODO: make answer types match
-        answers: values.answers
+        answers: filteredAnswers
       });
       onSubmit(values);
     }
@@ -181,12 +184,12 @@ function CriteriaInput({
                     </Typography>
                   </FormLabel>
                   <IntegerInput
-                    inputProps={{
-                      'data-criteria': criteria.id,
-                      placeholder: parameters.min
-                    }}
                     onChange={(score) => {
                       _field.onChange(score);
+                    }}
+                    inputProps={{
+                      min: parameters.min,
+                      max: parameters.max
                     }}
                     maxWidth={50}
                     value={_field.value}

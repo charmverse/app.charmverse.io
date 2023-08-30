@@ -1,11 +1,8 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, Chip, IconButton, Box, Stack, Autocomplete, TextField } from '@mui/material';
-import type { SyntheticEvent } from 'react';
-import { useCallback, useState, useMemo } from 'react';
-import useSWR from 'swr';
+import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { useCallback, useMemo, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useGetReviewerPool } from 'charmClient/hooks/proposals';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
@@ -62,131 +59,161 @@ const StyledUserPropertyContainer = styled(Box, {
 function SelectedReviewers({
   value,
   readOnly,
+  readOnlyMessage,
   onRemove,
   wrapColumn
 }: {
   wrapColumn: boolean;
   readOnly: boolean;
+  readOnlyMessage?: string;
   value: GroupedOptionPopulated[];
   onRemove: (reviewerId: string) => void;
 }) {
   return (
-    <Stack flexDirection='row' gap={1} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
-      {value.map((reviewer) => {
-        return (
-          <Stack
-            alignItems='center'
-            flexDirection='row'
-            key={reviewer.id}
-            gap={0.5}
-            sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
-          >
-            {reviewer.group === 'user' && (
-              <>
-                <UserDisplay fontSize={14} avatarSize='xSmall' user={reviewer} wrapName={wrapColumn} />
-                {!readOnly && (
-                  <IconButton size='small' onClick={() => onRemove(reviewer.id)}>
+    <Tooltip title={readOnlyMessage ?? null}>
+      <Stack
+        display='inline-flex'
+        width='min-content'
+        flexDirection='row'
+        gap={1}
+        flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
+      >
+        {value.map((reviewer) => {
+          return (
+            <Stack
+              alignItems='center'
+              flexDirection='row'
+              key={reviewer.id}
+              gap={0.5}
+              sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
+            >
+              {reviewer.group === 'user' && (
+                <>
+                  <UserDisplay fontSize={14} avatarSize='xSmall' user={reviewer} wrapName={wrapColumn} />
+                  {!readOnly && (
+                    <IconButton size='small' onClick={() => onRemove(reviewer.id)}>
+                      <CloseIcon
+                        sx={{
+                          fontSize: 14
+                        }}
+                        cursor='pointer'
+                        color='secondary'
+                      />
+                    </IconButton>
+                  )}
+                </>
+              )}
+              {reviewer.group === 'role' && (
+                <Chip
+                  sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                  label={reviewer.name}
+                  // color={reviewer.color}
+                  key={reviewer.id}
+                  size='small'
+                  onDelete={readOnly ? undefined : () => onRemove(reviewer.id)}
+                  deleteIcon={
                     <CloseIcon
                       sx={{
                         fontSize: 14
                       }}
                       cursor='pointer'
-                      color='secondary'
                     />
-                  </IconButton>
-                )}
-              </>
-            )}
-            {reviewer.group === 'role' && (
-              <Chip
-                sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
-                label={reviewer.name}
-                // color={reviewer.color}
-                key={reviewer.id}
-                size='small'
-                onDelete={readOnly ? undefined : () => onRemove(reviewer.id)}
-                deleteIcon={
-                  <CloseIcon
-                    sx={{
-                      fontSize: 14
-                    }}
-                    cursor='pointer'
-                  />
-                }
-              />
-            )}
-          </Stack>
-        );
-      })}
-    </Stack>
+                  }
+                />
+              )}
+            </Stack>
+          );
+        })}
+      </Stack>
+    </Tooltip>
   );
 }
 
 type Props = {
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
-  proposalId?: string;
+  proposalCategoryId?: string | null;
   readOnly?: boolean;
+  readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
   value: GroupedOption[];
   variant?: 'outlined' | 'standard';
+  'data-test'?: string;
 };
 
 export function UserAndRoleSelect({
   displayType = 'details',
   onChange,
-  proposalId,
+  proposalCategoryId,
   readOnly,
+  readOnlyMessage,
   showEmptyPlaceholder = true,
   variant = 'standard',
-  value: inputValue
+  value: inputValue,
+  'data-test': dataTest
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useGetReviewerPool(proposalId);
+  const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
 
+  const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
     ? (inputValue as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
     : (inputValue as { id: string; group: 'user' | 'role' }[]);
 
-  const mappedMembers: GroupedMemberPopulated[] = members.map((member) => ({ ...member, group: 'user' }));
+  const mappedMembers: GroupedMemberPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
   const mappedRoles: GroupedRolePopulated[] =
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
   // Avoid mapping through userIds all the time
-  const mappedProposalUsers = useMemo(() => {
+  const mappedEligibleProposalReviewers = useMemo(() => {
     return (reviewerPool?.userIds ?? []).reduce((acc, userId) => {
       acc[userId] = userId;
       return acc;
     }, {} as Record<string, string>);
   }, [reviewerPool]);
 
-  let options: GroupedOptionPopulated[] = [];
-  if (proposalId && isFreeSpace) {
-    options = reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : [];
-  } else if (proposalId && !isFreeSpace) {
-    options = [
-      // For proposals we only want current space members and roles that are allowed to review proposals
-      ...(reviewerPool ? mappedMembers.filter((member) => !!mappedProposalUsers[member.id]) : []),
-      ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
-    ];
-  } else if (isFreeSpace) {
-    // In public space, don't include custom roles
-    options = [...mappedMembers];
-  } else {
-    // For bounties, allow any space member or role to be selected
-    options = [...mappedMembers, ...mappedRoles];
-  }
+  const filteredOptions = useMemo(() => {
+    let _filteredOptions: GroupedOptionPopulated[] = [];
+    if (proposalCategoryId && isFreeSpace) {
+      _filteredOptions = reviewerPool
+        ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
+        : [];
+    } else if (proposalCategoryId && !isFreeSpace) {
+      _filteredOptions = [
+        // For proposals we only want current space members and roles that are allowed to review proposals
+        ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
+        ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
+      ];
+    } else if (isFreeSpace) {
+      // In public space, don't include custom roles
+      _filteredOptions = [...mappedMembers];
+    } else {
+      // For bounties, allow any space member or role to be selected
+      _filteredOptions = [...mappedMembers, ...mappedRoles];
+    }
+    return _filteredOptions;
+  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId]);
+
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
-    proposalId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
+    proposalCategoryId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
   );
-  const populatedValue = inputValue.map(({ id }) => options.find((opt) => opt.id === id)).filter(isTruthy);
+
+  const allOptions = useMemo(() => {
+    if (isFreeSpace) {
+      return [...mappedMembers];
+    } else {
+      return [...mappedMembers, ...mappedRoles];
+    }
+  }, [filteredMembers, roles]);
+
+  const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 
   const onClickToEdit = useCallback(() => {
     if (!readOnly) {
@@ -201,12 +228,24 @@ export function UserAndRoleSelect({
   // TODO: maybe we don't need a separate component for un-open state?
   if (variant === 'standard' && !isOpen) {
     return (
-      <SelectPreviewContainer isHidden={isOpen} displayType={displayType} readOnly={readOnly} onClick={onClickToEdit}>
+      <SelectPreviewContainer
+        data-test={dataTest}
+        isHidden={isOpen}
+        displayType={displayType}
+        readOnly={readOnly}
+        onClick={onClickToEdit}
+      >
         <Stack gap={0.5}>
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
-            <SelectedReviewers wrapColumn readOnly value={populatedValue} onRemove={removeReviewer} />
+            <SelectedReviewers
+              readOnlyMessage={readOnlyMessage}
+              wrapColumn
+              readOnly
+              value={populatedValue}
+              onRemove={removeReviewer}
+            />
           )}
         </Stack>
       </SelectPreviewContainer>
@@ -216,6 +255,7 @@ export function UserAndRoleSelect({
   return (
     <StyledUserPropertyContainer displayType='details'>
       <StyledAutocomplete
+        data-test={dataTest}
         autoHighlight
         // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
         disableClearable
@@ -234,13 +274,13 @@ export function UserAndRoleSelect({
         }}
         groupBy={(option) => `${option.group[0].toUpperCase() + option.group.slice(1)}s`}
         isOptionEqualToValue={(option, val) => option.id === val.id}
-        loading={!roles || members.length === 0 || (!!proposalId && !reviewerPool)}
+        loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
         multiple
         noOptionsText='No more options available'
         onChange={(e, value) => onChange(value)}
         onClose={() => setIsOpen(false)}
         openOnFocus
-        options={options}
+        options={filteredOptions}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -264,12 +304,19 @@ export function UserAndRoleSelect({
         renderOption={(_props, option) => {
           if (option.group === 'role') {
             return (
-              <li {..._props}>
+              <li data-test={`select-option-${option.id}`} {..._props}>
                 <Chip sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }} label={option.name} size='small' />
               </li>
             );
           }
-          return <UserDisplay {...(_props as any)} user={option} avatarSize='small' />;
+          return (
+            <UserDisplay
+              data-test={`select-option-${option.id}`}
+              {...(_props as any)}
+              user={option}
+              avatarSize='small'
+            />
+          );
         }}
         renderTags={() => (
           <SelectedReviewers wrapColumn readOnly={!!readOnly} value={populatedValue} onRemove={removeReviewer} />

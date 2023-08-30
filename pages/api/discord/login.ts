@@ -34,6 +34,8 @@ async function loginDiscordCodeHandler(req: NextApiRequest, res: NextApiResponse
       user.spaceRoles
     );
 
+    log.info(`User ${user.id} logged in with Discord`, { userId: user.id, method: 'discord' });
+
     await req.session.save();
 
     return res.status(200).json(user);

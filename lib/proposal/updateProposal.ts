@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 
-import type { ProposalReviewerInput, ProposalWithUsersAndRubric } from './interface';
+import type { ProposalReviewerInput } from './interface';
 
 export type UpdateProposalRequest = {
   proposalId: string;
@@ -11,6 +11,7 @@ export type UpdateProposalRequest = {
   reviewers: ProposalReviewerInput[];
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
+  publishToLens?: boolean;
 };
 
 export async function updateProposal({
@@ -18,13 +19,25 @@ export async function updateProposal({
   authors,
   reviewers,
   categoryId,
-  evaluationType
-}: UpdateProposalRequest): Promise<ProposalWithUsersAndRubric> {
+  evaluationType,
+  publishToLens
+}: UpdateProposalRequest) {
   if (authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
 
   await prisma.$transaction(async (tx) => {
+    if (publishToLens !== undefined) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          publishToLens
+        }
+      });
+    }
+
     // Update category only when it is present in request payload
     if (categoryId) {
       await tx.proposal.update({
@@ -69,17 +82,4 @@ export async function updateProposal({
       }))
     });
   });
-
-  return prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    include: {
-      authors: true,
-      reviewers: true,
-      category: true,
-      rubricAnswers: true,
-      rubricCriteria: true
-    }
-  }) as any as Promise<ProposalWithUsersAndRubric>;
 }

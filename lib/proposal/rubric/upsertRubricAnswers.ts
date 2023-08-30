@@ -1,4 +1,4 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalRubricCriteriaType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
@@ -18,11 +18,7 @@ export type RubricAnswerUpsert = {
   answers: RubricAnswerData[];
 };
 
-export async function upsertRubricAnswers({
-  answers,
-  userId,
-  proposalId
-}: RubricAnswerUpsert): Promise<ProposalRubricCriteriaAnswerWithTypedResponse[]> {
+export async function upsertRubricAnswers({ answers, userId, proposalId }: RubricAnswerUpsert) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!stringUtils.isUUID(userId)) {
@@ -57,29 +53,21 @@ export async function upsertRubricAnswers({
     }
   }
 
-  const updatedAnswers = await prisma.$transaction(
-    answers.map((a) =>
-      prisma.proposalRubricCriteriaAnswer.upsert({
-        where: {
-          userId_rubricCriteriaId: {
-            rubricCriteriaId: a.rubricCriteriaId,
-            userId
-          }
-        },
-        create: {
-          response: a.response,
-          userId,
-          comment: a.comment,
-          proposal: { connect: { id: proposalId } },
-          rubricCriteria: { connect: { id: a.rubricCriteriaId } }
-        },
-        update: {
-          response: a.response,
-          comment: a.comment
-        }
-      })
-    )
-  );
-
-  return updatedAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[];
+  return prisma.$transaction([
+    prisma.proposalRubricCriteriaAnswer.deleteMany({
+      where: {
+        proposalId,
+        userId
+      }
+    }),
+    prisma.proposalRubricCriteriaAnswer.createMany({
+      data: answers.map((a) => ({
+        proposalId,
+        response: a.response,
+        userId,
+        comment: a.comment,
+        rubricCriteriaId: a.rubricCriteriaId
+      }))
+    })
+  ]);
 }

@@ -260,9 +260,12 @@ function VoteTaskMjml({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.pageTitle} | ${task.spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
+      >
         {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
-      </div>
+      </a>
       <div
         style={{
           fontSize: 16,
@@ -350,13 +353,16 @@ function BountyTaskMjml({ task }: { task: BountyTask }) {
   );
 }
 
-function DiscussionTask({ task: { text, spaceName, pageTitle } }: { task: DiscussionTask }) {
+function DiscussionTask({ task: { text, spaceName, pageTitle, pagePath, spaceDomain } }: { task: DiscussionTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
+      <a
+        href={`${charmverseUrl}/${spaceDomain}/${pagePath}`}
+        style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
+      >
         {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
-      </div>
+      </a>
       <div
         style={{
           fontSize: 16,
@@ -371,13 +377,16 @@ function DiscussionTask({ task: { text, spaceName, pageTitle } }: { task: Discus
   );
 }
 
-function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: ForumTask }) {
+function ForumTask({ task: { commentText, spaceName, spaceDomain, postPath, postTitle } }: { task: ForumTask }) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
+      <a
+        href={`${charmverseUrl}/${spaceDomain}/forum/post/${postPath}`}
+        style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
+      >
         {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText || 'New Post'}
-      </div>
+      </a>
       <div
         style={{
           fontSize: 16,

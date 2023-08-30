@@ -1,6 +1,6 @@
 import type { Node } from '@bangle.dev/pm';
 
-import { type DocumentEventHandler } from './documentEvents';
+import type { DocumentEventHandler } from './documentEvents';
 import type { ClientDiffMessage } from './interfaces';
 
 export type DocumentRoom = {

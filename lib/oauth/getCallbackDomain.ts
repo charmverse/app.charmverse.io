@@ -1,4 +1,4 @@
-import { appSubdomain, isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { appSubdomain, baseUrl, isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
@@ -12,6 +12,9 @@ export function getCallbackDomain(host?: string | undefined) {
   }
 
   if (!host) {
+    if (isStagingEnv) {
+      return baseUrl || '';
+    }
     return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
 
@@ -20,6 +23,11 @@ export function getCallbackDomain(host?: string | undefined) {
   }
 
   const subdomain = getValidSubdomain(host);
+
+  if (!subdomain && isStagingEnv) {
+    return baseUrl || `${protocol}${host}`;
+  }
+
   const callbackDomain = subdomain ? `${protocol}${host?.replace(subdomain, 'app')}` : `${protocol}${host}`;
 
   return callbackDomain;

@@ -4,10 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import type { PageWithProposal } from 'lib/pages';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
@@ -73,11 +71,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   return res.status(200).json(proposal as ProposalWithUsersAndRubric);
 }
 
-async function updateProposalController(req: NextApiRequest, res: NextApiResponse<PageWithProposal>) {
+async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, reviewers, categoryId, evaluationType } = req.body as UpdateProposalRequest;
+  const { publishToLens, authors, reviewers, categoryId, evaluationType } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -134,10 +132,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
             : proposalReviewer.userId === updatedReviewer.id;
         })
     );
-
     if (newReviewers.length > 0) {
       const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
-        resourceId: proposal.id
+        resourceId: proposal.categoryId as string
       });
       for (const reviewer of newReviewers) {
         if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
@@ -165,14 +162,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType });
+  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId, evaluationType, publishToLens });
 
-  const updatedProposal = await getProposal({ proposalId: proposal.id });
-
-  // Don't allow fetching answers here
-  updatedProposal.proposal.rubricAnswers = [];
-
-  return res.status(200).send(updatedProposal);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

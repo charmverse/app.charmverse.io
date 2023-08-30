@@ -2,6 +2,7 @@ import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 
 import charmClient from 'charmClient';
+import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
@@ -31,12 +32,14 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   const { page: currentPage } = usePage({ pageIdOrPath: pageId });
 
   const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
+  const { trigger: deletePermission, isMutating: isDeletingPermissions } = useDeletePermissions();
+  const { trigger: createPermission, isMutating: isCreatingPermission } = useCreatePermissions();
 
   async function togglePublic() {
     if (publicPermission) {
-      await charmClient.deletePermission({ permissionId: publicPermission.id });
+      await deletePermission({ permissionId: publicPermission.id });
     } else {
-      await charmClient.createPermission({
+      await createPermission({
         pageId,
         permission: {
           permissionLevel: 'view',
@@ -49,6 +52,18 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
     refreshPermissions();
   }
 
+  const isDiscoveryChecked = !!publicPermission?.allowDiscovery;
+
+  async function handleDiscovery() {
+    if (publicPermission) {
+      await charmClient.permissions.pages.updatePagePermissionDiscoverability({
+        permissionId: publicPermission.id,
+        allowDiscovery: !isDiscoveryChecked
+      });
+      refreshPermissions();
+    }
+  }
+
   // In the case of a space with public proposals, we want to override the manual setting
   const disabledToolip =
     !!space?.publicProposals && currentPage?.type === 'proposal'
@@ -57,7 +72,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       ? 'You cannot update permissions for this page'
       : null;
 
-  const isChecked =
+  const isShareChecked =
     // If not using space wide proposals, go by the page permissions
     (!space?.publicProposals && !!publicPermission) ||
     (!!space?.publicProposals &&
@@ -65,6 +80,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       ((currentPage?.type !== 'proposal' && !!publicPermission) ||
         // All proposals beyond draft are public
         (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
+
   const baseShareAlertMessage = currentPage ? alerts[currentPage.type] : '';
 
   const publicProposalToggleInfo =
@@ -84,15 +100,17 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   return (
     <>
       <ShareToWeb
-        toggleChecked={isChecked}
+        shareChecked={isShareChecked}
+        discoveryChecked={isDiscoveryChecked}
         pageId={pageId}
-        onChange={togglePublic}
-        disabled={!!disabledToolip}
+        handlePublish={togglePublic}
+        handleDiscovery={handleDiscovery}
+        disabled={isDeletingPermissions || isCreatingPermission || !!disabledToolip}
         disabledTooltip={disabledToolip}
+        isLoading={isDeletingPermissions || isCreatingPermission}
         shareAlertMessage={shareAlertMessage}
       />
-
-      {isChecked && publicPermission && currentPage?.type !== 'proposal' && (
+      {isShareChecked && publicPermission && currentPage?.type !== 'proposal' && (
         <PermissionInheritedFrom permission={publicPermission} />
       )}
     </>

@@ -16,7 +16,8 @@ import {
   ListItemIcon
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import PopupState from 'material-ui-popup-state';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,25 +30,21 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import {
-  type Feature,
-  type FeatureJson,
-  STATIC_PAGES_RECORD
-} from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
+import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
-import { memberProfileLabels } from 'lib/profile/memberProfiles';
+import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
-import { capitalize } from 'lib/utilities/strings';
 
 import Avatar from './components/LargeAvatar';
 import SettingsItem from './components/SettingsItem';
@@ -67,23 +64,17 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-const featureLabels: Record<Feature, string> = {
-  bounties: 'Bounties',
-  forum: 'Forum',
-  member_directory: 'Member Directory',
-  proposals: 'Proposals'
-};
-
 export function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
+  const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
-  const [features, setFeatures] = useState(space.features as FeatureJson[]);
-  const [memberProfiles, setMemberProfiles] = useState(space.memberProfiles as MemberProfileJson[]);
+  const [features, setFeatures] = useState(allFeatures);
+  const [memberProfiles, setMemberProfiles] = useState(allMemberProfiles);
   const {
     register,
     handleSubmit,
@@ -96,6 +87,17 @@ export function SpaceSettings({ space }: { space: Space }) {
     defaultValues: _getFormValues(space),
     resolver: yupResolver(schema)
   });
+
+  const {
+    register: registerNewTitle,
+    watch: watchNewTitle,
+    reset: resetNewTitle,
+    setValue: setValueNewTitle
+  } = useForm<{ newTitle: string }>({
+    defaultValues: { newTitle: '' },
+    resolver: yupResolver(yup.object({ newTitle: yup.string().trim() }))
+  });
+  const newTitle = watchNewTitle('newTitle');
 
   const {
     trigger: updateSpace,
@@ -168,7 +170,7 @@ export function SpaceSettings({ space }: { space: Space }) {
 
   async function changeOptionsOrder(draggedProperty: Feature, droppedOnProperty: Feature) {
     const newOrder = [...features];
-    const propIndex = newOrder.findIndex((_feat) => draggedProperty === _feat.id); // find the property that was dragged
+    const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
     newOrder.splice(droppedOnIndex, 0, deletedElements[0]); // add the property to the new index
@@ -177,7 +179,7 @@ export function SpaceSettings({ space }: { space: Space }) {
 
   async function changeMembersOrder(draggedProperty: MemberProfileName, droppedOnProperty: MemberProfileName) {
     const newOrder = [...memberProfiles];
-    const propIndex = newOrder.findIndex((_feat) => draggedProperty === _feat.id); // find the property that was dragged
+    const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
     newOrder.splice(droppedOnIndex, 0, deletedElements[0]); // add the property to the new index
@@ -190,7 +192,7 @@ export function SpaceSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend marginTop={0}>Space Settings</Legend>
+      <Legend marginTop={0}>Overview</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3}>
           <Grid item>
@@ -272,8 +274,7 @@ export function SpaceSettings({ space }: { space: Space }) {
               exist, but it won't be visible in the sidebar.
             </Typography>
             <Stack>
-              {features.map(({ id, isHidden }) => {
-                const page = STATIC_PAGES_RECORD[id];
+              {features.map(({ id, isHidden, title, path }) => {
                 return (
                   <DraggableListItem
                     key={id}
@@ -284,34 +285,67 @@ export function SpaceSettings({ space }: { space: Space }) {
                       changeOptionsOrder(draggedProperty as Feature, droppedOnProperty as Feature)
                     }
                   >
-                    <SettingsItem
-                      sx={{ gap: 0 }}
-                      data-test={`settings-feature-item-${id}`}
-                      actions={[
-                        <MenuItem
-                          key='1'
-                          data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
-                          onClick={() => {
-                            setFeatures((prevState) => {
-                              const newState = [...prevState];
-                              const index = newState.findIndex((_feat) => _feat.id === id);
-                              newState[index] = { id, isHidden: !newState[index].isHidden };
-                              return [...newState];
-                            });
-                          }}
-                        >
-                          {isHidden ? 'Show' : 'Hide'}
-                        </MenuItem>
-                      ]}
-                      disabled={!isAdmin}
-                      hidden={isHidden}
-                      text={
-                        <Box display='flex' gap={1}>
-                          {!!page && <PageIcon icon={null} pageType={page.path} />}
-                          {featureLabels[id]}
-                        </Box>
-                      }
-                    />
+                    <PopupState variant='popover' popupId='features-rename'>
+                      {(popupState) => (
+                        <>
+                          <SettingsItem
+                            sx={{ gap: 0 }}
+                            data-test={`settings-feature-item-${id}`}
+                            actions={[
+                              <MenuItem
+                                key='1'
+                                data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
+                                onClick={() => {
+                                  setFeatures((prevState) => {
+                                    const newState = [...prevState];
+                                    const index = newState.findIndex((_feat) => _feat.id === id);
+                                    newState[index] = { ...newState[index], isHidden: !newState[index].isHidden };
+                                    return [...newState];
+                                  });
+                                }}
+                              >
+                                {isHidden ? 'Show' : 'Hide'}
+                              </MenuItem>,
+                              <MenuItem
+                                key='2'
+                                data-test='settings-feature-option-rename'
+                                onClick={(e) => {
+                                  setValueNewTitle('newTitle', title);
+                                  popupState.open(e);
+                                }}
+                              >
+                                Rename
+                              </MenuItem>
+                            ]}
+                            disabled={!isAdmin}
+                            hidden={isHidden}
+                            text={
+                              <Box display='flex' gap={1}>
+                                <PageIcon icon={null} pageType={path} />
+                                {title}
+                              </Box>
+                            }
+                          />
+                          <ModalWithButtons
+                            {...bindPopover(popupState)}
+                            title={`Rename ${title}`}
+                            buttonText='Continue'
+                            disabled={newTitle === '' || newTitle === title}
+                            onConfirm={() => {
+                              setFeatures((prevState) => {
+                                const newState = [...prevState];
+                                const index = newState.findIndex((_feat) => _feat.id === id);
+                                newState[index] = { ...newState[index], title: newTitle };
+                                return [...newState];
+                              });
+                              resetNewTitle();
+                            }}
+                          >
+                            <TextField {...registerNewTitle('newTitle')} fullWidth />
+                          </ModalWithButtons>
+                        </>
+                      )}
+                    </PopupState>
                   </DraggableListItem>
                 );
               })}
@@ -325,11 +359,11 @@ export function SpaceSettings({ space }: { space: Space }) {
             <Stack gap={1}>
               {memberProfiles
                 .filter((mp) => !mp.isHidden)
-                .map((mp) => (
+                .map(({ id, title }) => (
                   <DraggableListItem
-                    key={mp.id}
+                    key={id}
                     name='memberProfileItem'
-                    itemId={mp.id}
+                    itemId={id}
                     disabled={!isAdmin}
                     changeOrderHandler={async (draggedProperty: string, droppedOnProperty: string) =>
                       changeMembersOrder(draggedProperty as MemberProfileName, droppedOnProperty as MemberProfileName)
@@ -337,16 +371,16 @@ export function SpaceSettings({ space }: { space: Space }) {
                   >
                     <SettingsItem
                       sx={{ gap: 0 }}
-                      data-test={`settings-profiles-item-${mp.id}`}
+                      data-test={`settings-profiles-item-${id}`}
                       actions={[
                         <MenuItem
-                          key={mp.id}
+                          key='1'
                           data-test='settings-profiles-option-hide'
                           onClick={() => {
                             setMemberProfiles((prevState) => {
                               const newState = [...prevState];
-                              const index = newState.findIndex((prevMp) => mp.id === prevMp.id);
-                              newState[index] = { id: mp.id, isHidden: true };
+                              const index = newState.findIndex((prevMp) => prevMp.id === id);
+                              newState[index] = { id, title, isHidden: true };
                               return [...newState];
                             });
                           }}
@@ -357,8 +391,8 @@ export function SpaceSettings({ space }: { space: Space }) {
                       disabled={!isAdmin}
                       text={
                         <Box display='flex' alignItems='center' gap={1}>
-                          <Image width={25} height={25} alt={mp.id} src={getProfileWidgetLogo(mp.id)} />
-                          <Typography>{memberProfileLabels[mp.id]}</Typography>
+                          <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
+                          <Typography>{title}</Typography>
                         </Box>
                       }
                     />
@@ -392,8 +426,9 @@ export function SpaceSettings({ space }: { space: Space }) {
         </Grid>
       </form>
       <SetupCustomDomain space={space} />
-      <Legend mt={3}>Snapshot.org Integration</Legend>
-      <ConnectSnapshot />
+
+      <SpaceIntegrations />
+
       <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
         Warning
       </Legend>
@@ -456,17 +491,21 @@ export function SpaceSettings({ space }: { space: Space }) {
         <List>
           {memberProfiles
             .filter((mp) => mp.isHidden)
-            .map((mp) => (
+            .map(({ id, title }) => (
               <ListItem
-                key={mp.id}
+                key={id}
                 secondaryAction={
                   <Button
-                    data-test={`add-profile-button-${mp.id}`}
+                    data-test={`add-profile-button-${id}`}
                     onClick={() => {
                       setMemberProfiles((prevState) => {
                         const prevMemberProfiles = [...prevState];
-                        const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === mp.id);
-                        prevMemberProfiles[targetedMemberProfileIndex] = { id: mp.id, isHidden: false };
+                        const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
+                        prevMemberProfiles[targetedMemberProfileIndex] = {
+                          id,
+                          title,
+                          isHidden: false
+                        };
                         if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
                           memberProfilesPopupState.close();
                         }
@@ -479,9 +518,9 @@ export function SpaceSettings({ space }: { space: Space }) {
                 }
               >
                 <ListItemIcon>
-                  <Image width={25} height={25} alt={mp.id} src={getProfileWidgetLogo(mp.id)} />
+                  <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
                 </ListItemIcon>
-                <ListItemText primary={memberProfileLabels[mp.id]} />
+                <ListItemText primary={title} />
               </ListItem>
             ))}
         </List>
@@ -510,7 +549,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'lens':
       return '/images/logos/lens_logo.svg';
     case 'summon':
-      return '/images/logos/game7_logo.svg';
+      return '/images/logos/summon_dark_mark.svg';
     default:
       return '';
   }

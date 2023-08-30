@@ -82,9 +82,6 @@ test.describe.serial('Update category permissions', () => {
 
     // Edit text in modal and save
     const newDescription = `Random text ${randomIntFromInterval(0, 100000000)}`;
-
-    await page.pause();
-
     await forumHomePage.categoryDescriptionInput.fill(newDescription);
     await forumHomePage.saveCategoryDescription.click();
 

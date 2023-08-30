@@ -22,7 +22,7 @@ describe('getVote', () => {
     expect(vote).toMatchObject(
       expect.objectContaining({
         id: createdVote.id,
-        userChoice: '1',
+        userChoice: ['1'],
         totalVotes: 1,
         aggregatedResult: {
           1: 1,

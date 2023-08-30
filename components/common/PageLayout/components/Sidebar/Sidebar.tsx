@@ -9,7 +9,6 @@ import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
@@ -20,6 +19,7 @@ import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -37,10 +37,9 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { sidebarItemStyles, SidebarLink } from './SidebarButton';
-import SidebarSubmenu from './SidebarSubmenu';
-import type { FeatureJson } from './utils/staticPages';
-import { STATIC_PAGES_RECORD } from './utils/staticPages';
+import { SectionName } from './components/SectionName';
+import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
+import SidebarSubmenu from './components/SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -92,16 +91,6 @@ const SidebarContainer = styled.div`
       }
     }
   }
-`;
-
-export const SectionName = styled(Typography)`
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
-  color: ${({ theme }) => theme.palette.secondary.main};
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 `;
 
 const StyledSidebarBox = styled(Box)`
@@ -186,12 +175,12 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             <PageNavigation isFavorites rootPageIds={favoritePageIds} />
           </Box>
         )}
-        <WorkspaceLabel>
+        <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
-              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+              <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
             </div>
           )}
         </WorkspaceLabel>
@@ -235,6 +224,8 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
       </>
     );
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
+
+  const { features } = useFeaturesAndMembers();
 
   return (
     <SidebarContainer>
@@ -282,25 +273,23 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                     />
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
-                  {(space.features as FeatureJson[])
-                    .filter((mp) => !mp.isHidden)
-                    .map(({ id }) => {
-                      const page = STATIC_PAGES_RECORD[id];
+                  {features
+                    .filter((feat) => !feat.isHidden)
+                    .map((feat) => {
                       if (
-                        page &&
-                        (showMemberFeatures ||
-                          // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                          (page.path === 'forum' && categories.length > 0))
+                        showMemberFeatures ||
+                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                        (feat.path === 'forum' && categories.length > 0)
                       ) {
                         return (
                           <SidebarLink
-                            key={page.path}
-                            href={`/${space.domain}/${page.path}`}
-                            active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                            icon={<PageIcon icon={null} pageType={page.path} />}
-                            label={page.title}
+                            key={feat.path}
+                            href={`/${space.domain}/${feat.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
+                            icon={<PageIcon icon={null} pageType={feat.path} />}
+                            label={feat.title}
                             onClick={navAction}
-                            data-test={`sidebar-link-${page.path}`}
+                            data-test={`sidebar-link-${feat.path}`}
                           />
                         );
                       }

@@ -218,7 +218,7 @@ export function PageLink({
   onClick
 }: PageLinkProps) {
   const popupState = usePopupState({
-    popupId: 'page-emoji',
+    popupId: `page-emoji-${pageId}`,
     variant: 'popover'
   });
 
@@ -259,7 +259,10 @@ export function PageLink({
         {isempty ? 'Untitled' : label}
       </PageTitle>
       {children}
-      {showPicker && pageId && permissions?.edit_content && <EmojiMenu popupState={popupState} pageId={pageId} />}
+      {/* check for strict false so that we optimistically show the popup in the normal case */}
+      {showPicker && pageId && permissions?.edit_content !== false && (
+        <EmojiMenu popupState={popupState} pageId={pageId} />
+      )}
     </PageAnchor>
   );
 }

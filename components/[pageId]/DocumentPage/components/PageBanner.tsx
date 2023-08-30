@@ -63,7 +63,7 @@ export function randomBannerImage() {
 interface PageBannerProps {
   focalBoard?: boolean;
   headerImage: string;
-  readOnly: boolean;
+  readOnly?: boolean;
   setPage: (page: { headerImage: string | null }) => void;
 }
 

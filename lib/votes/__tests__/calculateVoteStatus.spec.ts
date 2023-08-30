@@ -17,13 +17,16 @@ describe('calculateVoteStatus', () => {
       deadline: new Date(),
       userVotes: [
         {
-          choice: '1'
+          choice: '1',
+          choices: []
         },
         {
-          choice: '1'
+          choice: '1',
+          choices: []
         },
         {
-          choice: '2'
+          choice: '2',
+          choices: []
         }
       ]
     });
@@ -38,13 +41,16 @@ describe('calculateVoteStatus', () => {
       deadline: nonExpiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choice: null,
+          choices: ['1']
         },
         {
-          choice: '1'
+          choice: null,
+          choices: ['1']
         },
         {
-          choice: '2'
+          choice: null,
+          choices: ['2']
         }
       ]
     });
@@ -59,13 +65,16 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: 'Yes'
+          choice: null,
+          choices: ['Yes']
         },
         {
-          choice: 'Yes'
+          choice: null,
+          choices: ['Yes']
         },
         {
-          choice: 'No'
+          choice: null,
+          choices: ['No']
         }
       ]
     });
@@ -80,13 +89,16 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: 'Yes'
+          choice: null,
+          choices: ['Yes']
         },
         {
-          choice: 'No'
+          choice: 'No',
+          choices: []
         },
         {
-          choice: 'No'
+          choice: null,
+          choices: ['No']
         }
       ]
     });
@@ -101,13 +113,16 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choice: '1',
+          choices: []
         },
         {
-          choice: '1'
+          choice: '1',
+          choices: []
         },
         {
-          choice: '2'
+          choice: '2',
+          choices: []
         }
       ]
     });
@@ -122,13 +137,16 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choice: null,
+          choices: ['1']
         },
         {
-          choice: '1'
+          choice: null,
+          choices: ['1']
         },
         {
-          choice: '2'
+          choice: null,
+          choices: ['2']
         }
       ]
     });

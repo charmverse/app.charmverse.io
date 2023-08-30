@@ -19,8 +19,8 @@ import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
 
@@ -184,6 +184,7 @@ function TableHeaders(props: Props): JSX.Element {
         }
         return (
           <TableHeader
+            data-test={`table-property-${template.type}`}
             type={template.type}
             name={template.name}
             sorted={sorted}
@@ -206,7 +207,7 @@ function TableHeaders(props: Props): JSX.Element {
         {!props.readOnly && !props.readOnlySourceData && (
           <>
             <Button {...bindTrigger(addPropertyPopupState)}>
-              <AddIcon fontSize='small' />
+              <AddIcon data-test='add-table-prop' fontSize='small' />
             </Button>
             {isSmallScreen ? (
               <MobileDialog

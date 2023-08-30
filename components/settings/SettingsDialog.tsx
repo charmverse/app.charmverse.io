@@ -13,8 +13,8 @@ import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
-import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
-import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
+import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
+import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -144,7 +144,7 @@ export function SpaceSettingsDialog() {
           }}
         >
           <Box mt={2} py={0.5}>
-            <SectionName>User settings</SectionName>
+            <SectionName>Account</SectionName>
           </Box>
           {ACCOUNT_TABS.map((tab) => (
             <SidebarLink
@@ -157,7 +157,7 @@ export function SpaceSettingsDialog() {
           ))}
           {currentSpace && isSpaceSettingsVisible && (
             <Box mt={2} py={0.5}>
-              <SectionName>Space settings</SectionName>
+              <SectionName>Space</SectionName>
             </Box>
           )}
           {currentSpace &&

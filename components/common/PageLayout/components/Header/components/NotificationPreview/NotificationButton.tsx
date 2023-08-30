@@ -3,12 +3,11 @@ import { IconButton } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 
-import { NotificationModal } from 'components/common/PageLayout/components/Header/components/NotificationPreview/NotificationModal';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
-import NotificationsBadge from '../../../Sidebar/NotificationsBadge';
-
+import { NotificationModal } from './NotificationModal';
 import { NotificationPreviewPopover } from './NotificationPreviewPopover';
+import NotificationsBadge from './NotificationsBadge';
 
 export function NotificationButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });

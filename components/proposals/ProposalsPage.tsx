@@ -6,7 +6,7 @@ import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { NewProposalButton } from 'components/votes/components/NewProposalButton';
+import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -18,7 +18,7 @@ import { ProposalsViewOptions } from './components/ProposalViewOptions/Proposals
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
-export function ProposalsPage() {
+export function ProposalsPage({ title }: { title: string }) {
   const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
@@ -60,7 +60,7 @@ export function ProposalsPage() {
           <Grid item xs={12}>
             <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
               <Typography variant='h1' gutterBottom>
-                Proposals
+                {title}
               </Typography>
 
               <Box display='flex'>
@@ -73,7 +73,7 @@ export function ProposalsPage() {
                     flexDirection: 'row-reverse'
                   }}
                 >
-                  <NewProposalButton mutateProposals={mutateProposals} />
+                  <NewProposalButton />
 
                   <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
                     <ProposalsViewOptions
