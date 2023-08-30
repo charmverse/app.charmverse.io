@@ -125,13 +125,11 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
     };
 
     // Submit answers first
-    const updated = (
-      await request(baseUrl)
-        .put(`/api/proposals/${proposal.id}/rubric-answers`)
-        .set('Cookie', reviewerCookie)
-        .send(answerContent)
-        .expect(200)
-    ).body as ProposalRubricCriteriaWithTypedParams[];
+    await request(baseUrl)
+      .put(`/api/proposals/${proposal.id}/rubric-answers`)
+      .set('Cookie', reviewerCookie)
+      .send(answerContent)
+      .expect(200);
 
     await request(baseUrl)
       .delete(`/api/proposals/${proposal.id}/rubric-answers`)

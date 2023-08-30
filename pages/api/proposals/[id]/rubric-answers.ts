@@ -36,13 +36,13 @@ async function upsertProposalAnswersController(
 
   const { answers } = req.body as RubricAnswerUpsert;
 
-  const updatedCriteria = await upsertRubricAnswers({
+  await upsertRubricAnswers({
     proposalId,
     answers,
     userId
   });
 
-  res.status(200).send(updatedCriteria);
+  res.status(200).end();
 }
 
 async function deleteRubricAnswer(req: NextApiRequest, res: NextApiResponse) {
