@@ -8,7 +8,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { sendMagicLink } from 'lib/google/sendMagicLink';
+import { sendGuestInvitationEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
@@ -73,7 +73,8 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     select: {
       type: true,
       spaceId: true,
-      path: true
+      path: true,
+      title: true
     }
   });
 
@@ -89,7 +90,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
 
   // Store these in top level scope, so we can send an email to the user after the page permission is created
-  let isNewSpaceMember = false;
+  const isGuestMember = userIdAsEmail && isValidEmail(userIdAsEmail);
   let spaceDomain: string = '';
 
   // Handle case where we are sharing a page
@@ -99,7 +100,6 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
       userIdOrEmail: userIdAsEmail
     });
 
-    isNewSpaceMember = addGuestResult.isNewSpaceRole;
     spaceDomain = addGuestResult.spaceDomain;
 
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
@@ -110,11 +110,21 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: permissionData
   });
 
-  updateTrackPageProfile(pageId);
-
-  if (isNewSpaceMember) {
-    await sendMagicLink({ email: userIdAsEmail as string, redirectUrl: `/${spaceDomain}/${page.path}` });
+  if (isGuestMember) {
+    const sender = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: req.session.user.id
+      }
+    });
+    await sendGuestInvitationEmail({
+      to: { email: userIdAsEmail as string },
+      pageLink: `/${spaceDomain}/${page.path}`,
+      pageTitle: page.title,
+      invitingUserName: sender.username
+    });
   }
+
+  updateTrackPageProfile(pageId);
 
   return res.status(201).json(createdPermission);
 }

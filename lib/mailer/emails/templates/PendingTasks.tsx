@@ -19,7 +19,7 @@ const charmverseUrl = process.env.DOMAIN;
 const MAX_ITEMS_PER_TASK = 3;
 const MAX_CHAR = 60;
 type TemplateUser = Pick<User, 'id' | 'username'> & { email: string };
-const buttonStyle = {
+export const buttonStyle = {
   color: '#ffffff',
   lineHeight: '120%',
   textDecoration: 'none',

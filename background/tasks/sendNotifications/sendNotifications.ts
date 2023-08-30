@@ -4,10 +4,10 @@ import { RateLimit } from 'async-sema';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
-import * as emails from 'lib/emails';
-import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
+import * as emails from 'lib/mailer/emails';
+import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasks';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
@@ -125,9 +125,6 @@ async function sendNotification(
     unmarkedWorkspaceEvents: string[];
   }
 ) {
-  const template = emails.getPendingTasksEmail(notification);
-  const { html, subject } = template;
-
   try {
     // remember that we sent these tasks
     await prisma.$transaction([
@@ -208,13 +205,14 @@ async function sendNotification(
     return undefined;
   }
 
+  const template = emails.getPendingTasksEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: notification.user.username,
       email: notification.user.email
     },
-    subject,
-    html
+    subject: template.subject,
+    html: template.html
   });
 
   return result;

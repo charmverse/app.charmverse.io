@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 
+import { getGuestInvitationEmail } from './emails';
+import type { GuestInvitationProps } from './emails/templates/GuestInvitation';
 import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 
 export interface EmailRecipient {
@@ -31,4 +33,9 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
     html,
     attachment: attachment ? { data: attachment.data, filename: attachment.name } : undefined
   });
+}
+
+export function sendGuestInvitationEmail({ to, ...variables }: { to: EmailRecipient } & GuestInvitationProps) {
+  const template = getGuestInvitationEmail(variables);
+  return sendEmail({ ...template, to });
 }

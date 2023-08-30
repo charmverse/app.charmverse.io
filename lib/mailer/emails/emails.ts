@@ -1,5 +1,5 @@
-import type { AddedAsGuestProps } from './templates/AddedAsGuest';
-import { addedAsGuestTitle, AddedAsGuest } from './templates/AddedAsGuest';
+import type { GuestInvitationProps } from './templates/GuestInvitation';
+import { emailSubject, GuestInvitation } from './templates/GuestInvitation';
 import type { PendingTasksProps } from './templates/PendingTasks';
 import PendingTasks, { tasksRequiresYourAttention } from './templates/PendingTasks';
 import { renderMJML } from './templates/utils';
@@ -11,9 +11,9 @@ export function getPendingTasksEmail(props: PendingTasksProps) {
   return { html, subject };
 }
 
-export function getAddedAsGuestEmail(props: AddedAsGuestProps) {
-  const html = renderMJML(AddedAsGuest(props));
-  const subject = addedAsGuestTitle(props);
+export function getGuestInvitationEmail(props: GuestInvitationProps) {
+  const html = renderMJML(GuestInvitation(props));
+  const subject = emailSubject(props);
 
   return { html, subject };
 }
