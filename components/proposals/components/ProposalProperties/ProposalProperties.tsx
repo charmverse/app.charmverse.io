@@ -233,8 +233,8 @@ export function ProposalProperties({
     setIsVoteModalOpen(true);
   }
 
-  function onSubmitEvaluation() {
-    onSaveRubricCriteriaAnswers?.();
+  async function onSubmitEvaluation() {
+    await onSaveRubricCriteriaAnswers?.();
     // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
     setRubricView(1);
   }
