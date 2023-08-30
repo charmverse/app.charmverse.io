@@ -20,7 +20,7 @@ const pageContainerStyle = {
 const charmverseUrl = process.env.DOMAIN;
 
 export function GuestInvitation(props: GuestInvitationProps) {
-  const pageLink = `${charmverseUrl}/${props.pageLink}`;
+  const pageLink = `${charmverseUrl}${props.pageLink}`;
 
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
