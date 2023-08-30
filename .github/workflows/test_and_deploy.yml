@@ -54,8 +54,6 @@ jobs:
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:
-          # temp disable pr blocking
-          exitZeroOnChanges: true
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
