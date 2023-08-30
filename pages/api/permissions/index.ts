@@ -107,6 +107,13 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     recipientEmail = addGuestResult.user.email;
 
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
+
+    log.info('Member shared a page with a guest by email', {
+      pageId,
+      spaceId: page.spaceId,
+      guestUserId: addGuestResult.user.id,
+      userId: req.session.user.id
+    });
   }
 
   const createdPermission = await req.premiumPermissionsClient.pages.upsertPagePermission({
@@ -115,16 +122,18 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   });
 
   // notify a user the doc has been shared
-  if (permissionData.assignee.group === 'user') {
+  if (createdPermission.assignee.group === 'user') {
+    const userId = (createdPermission.assignee as TargetPermissionGroup<'user'>).id;
     recipientEmail =
       recipientEmail ||
       (await await prisma.user
         .findUniqueOrThrow({
           where: {
-            id: req.session.user.id
+            id: userId
           }
         })
         .then((user) => user.email));
+
     if (recipientEmail) {
       const sender = await prisma.user.findUniqueOrThrow({
         where: {
@@ -132,18 +141,12 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
         }
       });
       await sendGuestInvitationEmail({
-        to: { email: recipientEmail },
+        to: { email: recipientEmail, userId },
         pageLink: `/${page.space.domain}/${page.path}`,
         pageTitle: page.title,
         invitingUserName: sender.username
       });
     }
-
-    log.info('Shared a page with a new user', {
-      pageId,
-      spaceId: page.spaceId,
-      userId: req.session.user.id
-    });
   }
 
   updateTrackPageProfile(pageId);

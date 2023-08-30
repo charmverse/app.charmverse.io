@@ -8,6 +8,7 @@ import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 export interface EmailRecipient {
   email: string;
   displayName?: string | null;
+  userId?: string;
 }
 
 interface EmailProps {
@@ -22,6 +23,8 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
 
   if (!client) {
     log.debug('No mailgun client, not sending email');
+  } else {
+    log.debug('Sending email to Mailgun', { subject, userId: to.userId });
   }
 
   return client?.messages.create(DOMAIN, {

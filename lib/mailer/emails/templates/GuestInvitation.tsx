@@ -17,7 +17,11 @@ const pageContainerStyle = {
   padding: '10px 30px'
 };
 
+const charmverseUrl = process.env.DOMAIN;
+
 export function GuestInvitation(props: GuestInvitationProps) {
+  const pageLink = `${charmverseUrl}/${props.pageLink}`;
+
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
       <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
@@ -32,11 +36,11 @@ export function GuestInvitation(props: GuestInvitationProps) {
               {props.invitingUserName} has invited you to <b>view</b> the following document:
             </p>
             <br />
-            <a href={props.pageLink} style={pageContainerStyle}>
+            <a href={pageLink} style={pageContainerStyle}>
               {props.pageTitle}
             </a>
           </MjmlText>
-          <Button paddingBottom={40} align='left' href={props.pageLink}>
+          <Button paddingBottom={40} align='left' href={pageLink}>
             Open
           </Button>
         </MjmlColumn>
@@ -46,6 +50,6 @@ export function GuestInvitation(props: GuestInvitationProps) {
   );
 }
 
-export function emailSubject({ invitingUserName, pageTitle }: GuestInvitationProps) {
-  return `${invitingUserName} shared ${pageTitle} with you`;
+export function emailSubject({ pageTitle }: GuestInvitationProps) {
+  return `Document shared with you: "${pageTitle}"`;
 }
