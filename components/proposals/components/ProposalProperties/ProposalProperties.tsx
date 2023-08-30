@@ -523,6 +523,7 @@ export function ProposalProperties({
           )}
 
           <CustomPropertiesAdapter
+            readOnly={readOnlyAuthors}
             proposal={proposalFormInputs}
             onChange={(properties: ProposalPropertiesField) => {
               setProposalFormInputs({
