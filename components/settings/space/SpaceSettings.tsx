@@ -20,7 +20,7 @@ import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -41,6 +41,7 @@ import { SpaceIntegrations } from 'components/settings/space/components/SpaceInt
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
@@ -68,6 +69,7 @@ export function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
+  const { handleUnsavedChanges } = useSettingsDialog();
   const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
@@ -186,9 +188,19 @@ export function SpaceSettings({ space }: { space: Space }) {
     setMemberProfiles(newOrder);
   }
 
-  usePreventReload(isDirty);
+  const dataChanged = useMemo(() => {
+    return !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
+  }, [space.features, space.memberProfiles, features, memberProfiles, isDirty]);
 
-  const enableButton = !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
+  useEffect(() => {
+    handleUnsavedChanges(dataChanged);
+
+    return () => {
+      handleUnsavedChanges(false);
+    };
+  }, [dataChanged]);
+
+  usePreventReload(dataChanged);
 
   return (
     <>
@@ -416,7 +428,7 @@ export function SpaceSettings({ space }: { space: Space }) {
                 disableElevation
                 size='large'
                 data-test='submit-space-update'
-                disabled={isMutating || !enableButton}
+                disabled={isMutating || !dataChanged}
                 type='submit'
               >
                 Save
