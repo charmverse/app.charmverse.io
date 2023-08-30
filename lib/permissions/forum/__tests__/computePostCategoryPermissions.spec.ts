@@ -48,14 +48,18 @@ describe('computePostCategoryPermissions - public version', () => {
       create_post: true,
       delete_category: true,
       edit_category: true,
-      manage_permissions: false
+      manage_permissions: false,
+      comment_posts: true,
+      view_posts: true
     });
 
     expect(memberPermissions).toMatchObject<PostCategoryPermissionFlags>({
       create_post: true,
       delete_category: true,
       edit_category: true,
-      manage_permissions: false
+      manage_permissions: false,
+      comment_posts: true,
+      view_posts: true
     });
   });
   it('should return empty permissions for people outside the space', async () => {
