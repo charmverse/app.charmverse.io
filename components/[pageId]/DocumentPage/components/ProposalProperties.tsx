@@ -111,8 +111,8 @@ export function ProposalProperties({
     }
   }
 
-  async function onSaveRubricCriteriaAnswers() {
-    refreshProposal();
+  function onSaveRubricCriteriaAnswers() {
+    return refreshProposal();
   }
 
   async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {

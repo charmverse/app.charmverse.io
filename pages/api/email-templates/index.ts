@@ -70,7 +70,7 @@ const createForumTask = ({
     spaceName,
     postId: v4(),
     postTitle,
-    postPath: `/forum/post/${getPagePath()}`,
+    postPath: getPagePath(),
     commentText,
     commentId: v4(),
     createdAt: new Date().toISOString(),
@@ -109,7 +109,11 @@ const createVoteTasks = ({
     } as any,
     pageId: v4(),
     spaceId: v4(),
-    title: voteTitle
+    title: voteTitle,
+    pageTitle,
+    spaceName,
+    pagePath: getPagePath(),
+    spaceDomain: randomName()
   } as any;
 };
 
