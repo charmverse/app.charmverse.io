@@ -7,6 +7,7 @@ import { createMockSpace } from '../../testing/mocks/space';
 import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { Member } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
+import { brandColorNames } from 'theme/colors';
 
 // write a list of uuids here
 const seeds = [
@@ -35,7 +36,7 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
 ];
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
   'space-id'
-).map((cat) => ({
+).map((cat, i) => ({
   id: 'some-id',
   permissions: {
     manage_permissions: true,
@@ -46,7 +47,8 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
     comment_proposals: true,
     vote_proposals: true
   },
-  ...cat
+  ...cat,
+  color: brandColorNames[i % brandColorNames.length]
 }));
 
 export const proposalTemplates: ProposalWithUsers[] = [];
