@@ -35,6 +35,7 @@ import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
+import type { ConnectionEvent } from './components/fiduswriter/ws';
 import { File } from './components/file/File';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as iframe from './components/iframe';
@@ -186,7 +187,7 @@ interface CharmEditorProps {
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
   disableNestedPages?: boolean;
-  onConnectionError?: (error: Error) => void;
+  onConnectionEvent?: (event: ConnectionEvent) => void;
   isPollOrVote?: boolean;
   disableMention?: boolean;
 }
@@ -216,7 +217,7 @@ function CharmEditor({
   onParticipantUpdate,
   disableRowHandles = false,
   disableNestedPages = false,
-  onConnectionError,
+  onConnectionEvent,
   isPollOrVote = false,
   disableMention = false
 }: CharmEditorProps) {
@@ -366,7 +367,7 @@ function CharmEditor({
       trackChanges
       readOnly={readOnly}
       enableComments={enableComments}
-      onConnectionError={onConnectionError}
+      onConnectionEvent={onConnectionEvent}
       style={{
         ...(style ?? {}),
         width: '100%',
