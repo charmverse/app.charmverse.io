@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type {
   ProposalBlockInput,
@@ -38,6 +39,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
     isLoading,
     mutate
   } = useSWR(space ? ['proposalBlocks', space.id] : null, () => charmClient.proposals.getProposalBlocks(space!.id));
+  const { showMessage } = useSnackbar();
 
   const updateBlockCache = useCallback(
     (updatedBlock: ProposalBlockWithTypedFields) => {
@@ -63,30 +65,34 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (proposalPropertiesBlock) {
-        const updatedProperties = [...proposalPropertiesBlock.fields.properties, propertyTemplate];
-        const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
-        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+      try {
+        if (proposalPropertiesBlock) {
+          const updatedProperties = [...proposalPropertiesBlock.fields.properties, propertyTemplate];
+          const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
+          const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
 
-        updateBlockCache(res[0]);
+          updateBlockCache(res[0]);
 
-        return res[0].id;
-      } else {
-        const propertiesBlock = { fields: { properties: [propertyTemplate] }, type: 'properties', spaceId: space.id };
-        const res = await charmClient.proposals.createProposalBlocks({
-          spaceId: space.id,
-          data: [propertiesBlock as ProposalBlockInput]
-        });
+          return res[0].id;
+        } else {
+          const propertiesBlock = { fields: { properties: [propertyTemplate] }, type: 'properties', spaceId: space.id };
+          const res = await charmClient.proposals.createProposalBlocks({
+            spaceId: space.id,
+            data: [propertiesBlock as ProposalBlockInput]
+          });
 
-        mutate(
-          (blocks) => {
-            if (!blocks) return blocks;
-            return [...blocks, res[0]];
-          },
-          { revalidate: false }
-        );
+          mutate(
+            (blocks) => {
+              if (!blocks) return blocks;
+              return [...blocks, res[0]];
+            },
+            { revalidate: false }
+          );
 
-        return res[0].id;
+          return res[0].id;
+        }
+      } catch (e: any) {
+        showMessage(`Failed to create property: ${e.message}`, 'error');
       }
     },
     [mutate, proposalPropertiesBlock, space, updateBlockCache]
@@ -102,11 +108,14 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
       const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
-      const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
 
-      updateBlockCache(res[0]);
-
-      return res[0].id;
+      try {
+        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        updateBlockCache(res[0]);
+        return res[0].id;
+      } catch (e: any) {
+        showMessage(`Failed to update property: ${e.message}`, 'error');
+      }
     },
     [proposalPropertiesBlock, space, updateBlockCache]
   );
@@ -119,9 +128,12 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
       const updatedProperties = proposalPropertiesBlock.fields.properties.filter((p) => p.id !== propertyTemplateId);
       const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
-      const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
-
-      updateBlockCache(res[0]);
+      try {
+        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        updateBlockCache(res[0]);
+      } catch (e: any) {
+        showMessage(`Failed to delete property: ${e.message}`, 'error');
+      }
     },
     [proposalPropertiesBlock, space, updateBlockCache]
   );
@@ -132,11 +144,13 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
-
-      updateBlockCache(res[0]);
-
-      return res[0];
+      try {
+        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        updateBlockCache(res[0]);
+        return res[0];
+      } catch (e: any) {
+        showMessage(`Failed to update block: ${e.message}`, 'error');
+      }
     },
     [proposalBlocks, space, updateBlockCache]
   );
