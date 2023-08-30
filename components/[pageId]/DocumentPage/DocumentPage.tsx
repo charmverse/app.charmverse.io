@@ -15,6 +15,7 @@ import { getCardComments } from 'components/common/BoardEditor/focalboard/src/st
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -164,8 +165,13 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     setPageProps({ participants });
   }
 
-  function onConnectionError(error: Error) {
-    setConnectionError(error);
+  function onConnectionEvent(event: ConnectionEvent) {
+    if (event.type === 'error') {
+      setConnectionError(event.error);
+    } else if (event.type === 'subscribed') {
+      // clear out error in case we re-subscribed
+      setConnectionError(null);
+    }
   }
 
   // reset error whenever page id changes
@@ -230,7 +236,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   containerWidth={containerWidth}
                   pageType={page.type}
                   pagePermissions={pagePermissions ?? undefined}
-                  onConnectionError={onConnectionError}
+                  onConnectionEvent={onConnectionEvent}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   style={{

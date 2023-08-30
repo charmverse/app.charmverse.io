@@ -16,6 +16,7 @@ import {
   acceptAllNoInsertions,
   amendTransaction
 } from './track';
+import type { ConnectionEvent } from './ws';
 import { WebSocketConnector } from './ws';
 
 type EditorModules = {
@@ -116,7 +117,7 @@ export class FidusEditor {
     ];
   }
 
-  init(view: EditorView, authToken: string, onError: (error: Error) => void) {
+  init(view: EditorView, authToken: string, onConnectionEvent: (event: ConnectionEvent) => void) {
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
@@ -134,7 +135,7 @@ export class FidusEditor {
         }
         return message;
       },
-      onError,
+      onConnectionEvent,
       resubscribed: () => {
         resubscribed = true;
         if (this.mod.collab) {
@@ -165,7 +166,7 @@ export class FidusEditor {
               this.mod.collab.doc.receiveDocument(data);
             } catch (error) {
               log.error('Error loading document from sockets', { data, error, pageId: this.docInfo.id });
-              onError(error as Error);
+              onConnectionEvent({ type: 'error', error: error as Error });
             }
             // console.log('received doc');
             break;
@@ -213,11 +214,11 @@ export class FidusEditor {
             this.mod.collab.doc.rejectDiff(data.rid);
             break;
           case 'patch_error':
-            onError(new Error('Your document was out of sync and has been reset.'));
+            onConnectionEvent({ type: 'error', error: new Error('Your document was out of sync and has been reset.') });
             break;
           case 'error':
             log.error('Error talking to socket server', data.message);
-            onError(new Error(data.message));
+            onConnectionEvent({ type: 'error', error: new Error(data.message) });
             break;
           default:
             break;
