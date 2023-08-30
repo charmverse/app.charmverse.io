@@ -28,6 +28,7 @@ const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid'
 interface Props {
   publicMode?: boolean;
   bounties: BountyWithDetails[];
+  title: string;
 }
 
 const StyledButton = styled(Button)`
@@ -44,7 +45,7 @@ const views: { label: string; view: 'gallery' | 'board' }[] = [
   { label: 'All', view: 'board' }
 ];
 
-export default function BountiesPage({ publicMode = false, bounties }: Props) {
+export default function BountiesPage({ publicMode = false, bounties, title }: Props) {
   const { space } = useCurrentSpace();
   const router = useRouter();
 
@@ -101,7 +102,7 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
             <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
               <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
                 <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
-                  Bounties
+                  {title}
                 </Typography>
 
                 {!publicMode && (

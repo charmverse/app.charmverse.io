@@ -34,7 +34,7 @@ function memberNamePropertyValue(member: Member) {
   return member.username.startsWith('0x') ? `zzzzzzzz${member.username}` : member.username;
 }
 
-export default function MemberDirectoryPage() {
+export default function MemberDirectoryPage({ title }: { title: string }) {
   const router = useRouter();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
@@ -57,7 +57,7 @@ export default function MemberDirectoryPage() {
   return (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>
-        Member Directory
+        {title}
       </Typography>
       <MemberDirectorySearchBar onChange={setSearchQuery} />
       <Stack flexDirection='row' justifyContent='space-between' mb={1}>
