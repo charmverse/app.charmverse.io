@@ -3,7 +3,9 @@ import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
+import type { Theme } from '@mui/material';
 import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -122,6 +124,7 @@ export function ProposalProperties({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const { lensProfile } = useLensProfile();
   const { proposalTemplates = [] } = useProposalTemplates();
+  const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
 
   const previousConfirmationPopup = usePopupState({
     variant: 'popover',
@@ -503,8 +506,21 @@ export function ProposalProperties({
 
           {proposalFormInputs.evaluationType === 'rubric' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+              <Box
+                display='flex'
+                height='fit-content'
+                flex={1}
+                className='octo-propertyrow'
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                alignItems={{ xs: 'stretch!important', sm: 'flex-start' }}
+              >
+                {isMobile ? (
+                  <Typography variant='caption' component='div' color='secondary' fontWeight='600' p='4px 8px' mb={1}>
+                    Rubric criteria
+                  </Typography>
+                ) : (
+                  <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+                )}
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
