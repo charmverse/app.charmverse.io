@@ -67,7 +67,7 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
@@ -105,7 +105,7 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
