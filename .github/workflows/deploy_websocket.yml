@@ -56,6 +56,8 @@ jobs:
 #    needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
