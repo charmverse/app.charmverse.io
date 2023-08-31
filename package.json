@@ -61,8 +61,9 @@
     "test:browser:ci": "npm run test:browser",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "storybook": "storybook dev -p 6006",
-    "build:storybook": "storybook build",
-    "update-core": "npm install @charmverse/core@0.3.1"
+    "update-core": "npm install github:charmverse/core#main",
+    "build-storybook": "storybook build",
+    "chromatic:ci": "chromatic --exit-zero-on-changes"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -323,6 +324,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "aws-cdk-lib": "^2.78.0",
+    "chromatic": "^6.21.0",
     "cross-env": "^7.0.3",
     "dependency-cruiser": "^13.1.5",
     "esbuild": "^0.16.17",

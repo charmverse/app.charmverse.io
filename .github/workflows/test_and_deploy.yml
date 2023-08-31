@@ -31,6 +31,9 @@ jobs:
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Calculate Build ID
         id: get_build_id
         run: |
@@ -48,6 +51,11 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -61,6 +69,8 @@ jobs:
             test_command: 'npm run typecheck && npm run lint && npm run verifydeps'
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -75,6 +85,7 @@ jobs:
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
+
 
   integration-test:
     name: Tests
@@ -97,7 +108,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 7
+      max-parallel: 8
       fail-fast: false
       matrix:
         include:
@@ -115,6 +126,7 @@ jobs:
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test'
             test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci'
+
     steps:
       - uses: actions/checkout@v3
 
@@ -265,6 +277,12 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+      # - name: Publish to Chromatic
+      #   uses: chromaui/action@v1
+      #   with:
+      #     skip: true
+      #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Deploy webapp to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
