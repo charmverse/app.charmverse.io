@@ -58,20 +58,4 @@ export class ProposalsApi {
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
-
-  getProposalBlocks(spaceId: string) {
-    return http.GET<ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`);
-  }
-
-  createProposalBlocks({ data, spaceId }: { data: ProposalBlockInput[]; spaceId: string }) {
-    return http.POST<ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`, data);
-  }
-
-  updateProposalBlocks({ data, spaceId }: { data: ProposalBlockUpdateInput[]; spaceId: string }) {
-    return http.PUT<ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`, data);
-  }
-
-  deleteProposalBlocks({ data, spaceId }: { data: string[]; spaceId: string }) {
-    return http.DELETE(`/api/spaces/${spaceId}/proposals/blocks`, data);
-  }
 }

@@ -6,6 +6,11 @@ import type {
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { PageWithProposal } from 'lib/pages';
+import type {
+  ProposalBlockInput,
+  ProposalBlockUpdateInput,
+  ProposalBlockWithTypedFields
+} from 'lib/proposal/blocks/interfaces';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
@@ -15,7 +20,7 @@ import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
-import { useGET, usePOST, usePUT } from './helpers';
+import { useGET, usePOST, usePUT, useDELETE } from './helpers';
 
 type MaybeString = string | null | undefined;
 
@@ -52,6 +57,10 @@ export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
   return useGET<RubricProposalsUserInfo>(spaceId ? `/api/spaces/${spaceId}/proposals-evaluated-by-user` : null);
 }
 
+export function useGetProposalBlocks(spaceId?: string) {
+  return useGET<ProposalBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/proposals/blocks` : null);
+}
+
 // Mutative requests
 
 export function useCreateProposal() {
@@ -70,4 +79,16 @@ export function useUpdateProposalLensProperties({ proposalId }: { proposalId: st
   return usePUT<Omit<UpdateProposalLensPropertiesRequest, 'proposalId'>>(
     `/api/proposals/${proposalId}/update-lens-properties`
   );
+}
+
+export function useCreateProposalBlocks(spaceId: string) {
+  return usePOST<ProposalBlockInput[], ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`);
+}
+
+export function useUpdateProposalBlocks(spaceId: string) {
+  return usePUT<ProposalBlockUpdateInput[], ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`);
+}
+
+export function useDeleteProposalBlocks(spaceId: string) {
+  return useDELETE<string[]>(`/api/spaces/${spaceId}/proposals/blocks`);
 }

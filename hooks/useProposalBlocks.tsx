@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
+import { useCreateProposalBlocks, useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -34,11 +33,10 @@ export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContex
 
 export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
-  const {
-    data: proposalBlocks,
-    isLoading,
-    mutate
-  } = useSWR(space ? ['proposalBlocks', space.id] : null, () => charmClient.proposals.getProposalBlocks(space!.id));
+  const { data: proposalBlocks, isLoading, mutate } = useGetProposalBlocks(space?.id);
+  const { trigger: createProposalBlocks } = useCreateProposalBlocks(space?.id || '');
+  const { trigger: updateProposalBlocks } = useUpdateProposalBlocks(space?.id || '');
+
   const { showMessage } = useSnackbar();
 
   const updateBlockCache = useCallback(
@@ -69,17 +67,22 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         if (proposalPropertiesBlock) {
           const updatedProperties = [...proposalPropertiesBlock.fields.properties, propertyTemplate];
           const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
-          const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+          const res = await updateProposalBlocks([updatedBlock]);
+
+          if (!res) {
+            return;
+          }
 
           updateBlockCache(res[0]);
 
           return res[0].id;
         } else {
           const propertiesBlock = { fields: { properties: [propertyTemplate] }, type: 'properties', spaceId: space.id };
-          const res = await charmClient.proposals.createProposalBlocks({
-            spaceId: space.id,
-            data: [propertiesBlock as ProposalBlockInput]
-          });
+          const res = await createProposalBlocks([propertiesBlock as ProposalBlockInput]);
+
+          if (!res) {
+            return;
+          }
 
           mutate(
             (blocks) => {
@@ -110,7 +113,12 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
 
       try {
-        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        const res = await updateProposalBlocks([updatedBlock]);
+
+        if (!res) {
+          return;
+        }
+
         updateBlockCache(res[0]);
         return res[0].id;
       } catch (e: any) {
@@ -129,7 +137,12 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       const updatedProperties = proposalPropertiesBlock.fields.properties.filter((p) => p.id !== propertyTemplateId);
       const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
       try {
-        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        const res = await updateProposalBlocks([updatedBlock]);
+
+        if (!res) {
+          return;
+        }
+
         updateBlockCache(res[0]);
       } catch (e: any) {
         showMessage(`Failed to delete property: ${e.message}`, 'error');
@@ -145,7 +158,12 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const res = await charmClient.proposals.updateProposalBlocks({ spaceId: space.id, data: [updatedBlock] });
+        const res = await updateProposalBlocks([updatedBlock]);
+
+        if (!res) {
+          return;
+        }
+
         updateBlockCache(res[0]);
         return res[0];
       } catch (e: any) {
