@@ -148,6 +148,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        mask-password: true
       - name: Run permissions api docker image
         id: run_permissions_api
         run: |
@@ -166,11 +167,13 @@ jobs:
                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
                      node --experimental-specifier-resolution=node ./dist/main.js
 
-          until curl localhost:3001/api/health; do
+          sleep_loop_ct=0
+          until curl localhost:3001/api/health || [ sleep_loop_ct -gt 30 ]; do
             docker ps
             docker logs permissions-api
             docker inspect permissions-api
             echo "permission api not up...sleeping"
+            ((sleep_loop_ct++))
             sleep 10
           done
 
@@ -193,6 +196,8 @@ jobs:
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -274,9 +279,21 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       - name: Update and Package websockets
+        id: pkg_websocket
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+          changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
+          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig)+'
+          for file in $changed_files; do
+            echo "evaluating $file:"
+            if [[ $file =~ $websocket_src_file_pattern ]]; then
+              echo "Requires deployment to websocket"
+              echo "deploy_websocket=true" >> $GITHUB_OUTPUT
+              break
+            fi 
+          done
 
       # - name: Publish to Chromatic
       #   uses: chromaui/action@v1
@@ -321,6 +338,7 @@ jobs:
           wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk
+        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
