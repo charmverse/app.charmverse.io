@@ -191,7 +191,6 @@ jobs:
         if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         run: |
           echo "deployed websocket!"
-        # uses: einaregilsson/beanstalk-deploy@v21
         # with:
         #   aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         #   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
