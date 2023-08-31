@@ -1,9 +1,10 @@
+import { log } from '@charmverse/core/log';
 import Card from '@mui/material/Card';
 import { useRef, useState } from 'react';
 
 import { CollectEmail } from 'components/login/CollectEmail';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
-import { useUser } from 'hooks/useUser';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 import { CenteredBox } from '../components/CenteredBox';
 
@@ -11,24 +12,33 @@ type InviteToPageProps = {
   email?: string;
 };
 
+type MagicLinkResponseStatus = 'loading' | 'sent' | 'error' | 'error-invalid-email';
+
 function useMagicLink() {
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
-  const [status, setStatus] = useState<'loading' | 'sent' | 'error' | undefined>();
+  const { showMessage } = useSnackbar();
+  const [status, setStatus] = useState<MagicLinkResponseStatus | undefined>();
+
   async function handleMagicLinkRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
-        await requestMagicLinkViaFirebase({ email, redirectUrl: '' });
+        await requestMagicLinkViaFirebase({ email, redirectUrl: window.location.pathname });
         setStatus('sent');
-      } catch (err) {
-        setStatus('error');
+      } catch (error) {
+        if ((error as any)?.code === 'auth/invalid-email') {
+          showMessage('Try another email address', 'error');
+        } else {
+          log.error('Error requesting firebase magic link', { error });
+          showMessage('There was a problem. Please try again later', 'error');
+        }
       } finally {
         sendingMagicLink.current = false;
       }
     }
   }
+
   const isLoading = sendingMagicLink.current === true;
   return {
     handleMagicLinkRequest,

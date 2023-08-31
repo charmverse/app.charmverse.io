@@ -21,7 +21,7 @@ const pageContainerStyle = {
 const charmverseUrl = process.env.DOMAIN;
 
 export function InviteToPage(props: InviteToPageProps) {
-  const pageLink = `${charmverseUrl}/invite/page?id=${props.pageId}&email=${props.guestEmail}`;
+  const pageLink = `${charmverseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
