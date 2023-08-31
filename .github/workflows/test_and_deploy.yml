@@ -166,7 +166,8 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        mask-password: true
+        with:
+          mask-password: true
       - name: Run permissions api docker image
         id: run_permissions_api
         run: |
