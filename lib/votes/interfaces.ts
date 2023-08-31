@@ -16,7 +16,7 @@ export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'pos
 export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;
 
 export interface UserVoteDTO {
-  choice: string | string[];
+  choices: string[];
 }
 export interface ExtendedVote extends Vote {
   aggregatedResult: Record<string, number>;

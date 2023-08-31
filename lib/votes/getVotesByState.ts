@@ -14,10 +14,6 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       rejectedVotes.push(vote);
     } else if (vote.type === VoteType.Approval) {
       const yesVoteCount = vote.userVotes.filter((uv) => {
-        if (uv.choice) {
-          return uv.choice === YES_OPTION;
-        }
-
         if (uv.choices) {
           return uv.choices.includes(YES_OPTION);
         }
@@ -33,10 +29,6 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       }
     } else if (vote.type === VoteType.SingleChoice) {
       const choices: string[] = vote.userVotes.reduce((currentChoices, userVote) => {
-        if (userVote.choice) {
-          currentChoices.push(userVote.choice);
-        }
-
         if (userVote.choices) {
           currentChoices.push(...userVote.choices);
         }
