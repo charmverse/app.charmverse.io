@@ -261,10 +261,19 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      - name: Update and Package websockets
+      - name: Update and Package websockets and decide whether to deploy websocket
+        id: pkg_websocket
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+          websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
+          for file in $(git diff --name-only HEAD..HEAD^1); do
+            if [[ $file =~ $websocket_src_file_pattern ]]; then
+              echo "deploy_websocket=true" >> $GITHUB_OUTPUT
+              break
+            fi 
+          done
 
       - name: Deploy webapp to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
@@ -302,7 +311,8 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Websockets to Beanstalk
+      - name: Deploy Websockets to Beanstalk if required
+        if: steps.pkg_websocket.outputs.deploy_websocket == "true"
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
