@@ -144,7 +144,7 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-          git diff --name-only HEAD^ HEAD --
+          git diff --name-only ${{github.event.before}} ${{github.event.after}}
           websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
           for file in $(git diff --name-only HEAD..HEAD^1); do
             if [[ $file =~ $websocket_src_file_pattern ]]; then
