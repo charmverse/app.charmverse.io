@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, splitting-websocket-deployment]
   pull_request:
     branches: ['**']
   workflow_dispatch:
@@ -177,7 +177,7 @@ jobs:
     permissions:
       contents: write
     # Re-enable condition before merge
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' or github.ref == 'splitting-websocket-deployment'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
@@ -267,6 +267,7 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
+          git diff --name-only HEAD..HEAD^1
           websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
           for file in $(git diff --name-only HEAD..HEAD^1); do
             if [[ $file =~ $websocket_src_file_pattern ]]; then
@@ -275,52 +276,54 @@ jobs:
             fi 
           done
 
-      - name: Deploy webapp to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: web3-workspace
-          environment_name: prd-charmverse-webapp
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+      # - name: Deploy webapp to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: web3-workspace
+      #     environment_name: prd-charmverse-webapp
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
-            --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+      # - name: Use datadog ci package to upload js maps
+      #   env:
+      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      #   run: |
+      #     npm install -g @datadog/datadog-ci
+      #     datadog-ci sourcemaps upload .next/static       \
+      #       --service=webapp                              \
+      #       --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+      #       --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
-      - name: Deploy Background to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: charmverse-worker
-          environment_name: prd-charmverse-worker
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_cron.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+      # - name: Deploy Background to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: charmverse-worker
+      #     environment_name: prd-charmverse-worker
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy_cron.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk if required
         if: steps.pkg_websocket.outputs.deploy_websocket == "true"
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: prd-charmverse-websockets
-          environment_name: prd-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+        run: |
+          echo "deployed websocket!"
+        # uses: einaregilsson/beanstalk-deploy@v21
+        # with:
+        #   aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #   application_name: prd-charmverse-websockets
+        #   environment_name: prd-charmverse-websockets
+        #   version_label: ${{ github.sha }}
+        #   region: us-east-1
+        #   deployment_package: deploy_websockets.zip
+        #   use_existing_version_if_available: true # allows triggering re-deploys with same version
+        #   wait_for_deployment: false # set to false to save sweet Github minutes
