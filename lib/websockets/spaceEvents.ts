@@ -219,7 +219,7 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId: pagePathOrId, newParentId, newIndex } = message.payload;
+      const { pageId: pagePathOrId, newParentId, newIndex, trigger } = message.payload;
 
       const page = await prisma.page.findFirst({
         where: isUUID(pagePathOrId)
@@ -231,6 +231,7 @@ export class SpaceEventHandler {
             },
         select: {
           id: true,
+          spaceId: true,
           parentId: true
         }
       });
@@ -316,6 +317,26 @@ export class SpaceEventHandler {
                 parentId: newParentId,
                 diffs: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
               });
+            }
+
+            // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
+            if (trigger === 'sidebar-to-editor') {
+              await prisma.page.update({
+                where: {
+                  id: pageId
+                },
+                data: {
+                  parentId: newParentId
+                }
+              });
+
+              this.relay.broadcast(
+                {
+                  type: 'pages_meta_updated',
+                  payload: [{ id: pageId, parentId: newParentId, spaceId: page.spaceId }]
+                },
+                page.spaceId
+              );
             }
           }
         }

@@ -3,15 +3,14 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
-import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
+  ClientDiffMessage,
   ClientMessage,
   ClientRestartMessage,
   ClientSubscribeMessage,
-  ServerMessage,
   RequestResendMessage,
-  WrappedSocketMessage,
-  ClientDiffMessage
+  ServerMessage,
+  WrappedSocketMessage
 } from 'lib/websockets/documentEvents/interfaces';
 
 import type { FidusEditor } from './fiduseditor';
@@ -346,22 +345,9 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        // Handle drag and drop from sidebar to editor
-        const pagePath = data.type === 'diff' ? this.extractPagePath(data) : null;
-        if (pagePath) {
-          emitSocketMessage({
-            type: 'page_reordered',
-            payload: {
-              pageId: pagePath,
-              newParentId: this.editor.docInfo.id,
-              newIndex: -1
-            }
-          });
-        } else {
-          log.debug(`[ws${namespace}] Send message`, { data: wrappedMessage });
-          this.socket.emit(socketEvent, wrappedMessage);
-          this.setRecentlySentTimer(timer);
-        }
+        log.debug(`[ws${namespace}] Send message`, { data: wrappedMessage });
+        this.socket.emit(socketEvent, wrappedMessage);
+        this.setRecentlySentTimer(timer);
       });
     } else {
       this.messagesToSend.push(getData);

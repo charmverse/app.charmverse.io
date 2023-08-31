@@ -1,8 +1,9 @@
-import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
   ClientSubscribeMessage,
   SocketMessage,
@@ -277,7 +278,20 @@ export class FidusEditor {
       dispatchTransaction: (tr) => {
         // console.log('dispatchTransaction', tr.meta);
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
-        if (!view.isDestroyed) {
+        const step = trackedTr.steps[0]?.toJSON();
+        const pagePath = step ? this.extractPagePath(step) : null;
+        // Handle drag and drop from sidebar to editor
+        if (pagePath) {
+          emitSocketMessage({
+            type: 'page_reordered',
+            payload: {
+              pageId: pagePath,
+              newParentId: this.docInfo.id,
+              newIndex: -1,
+              trigger: 'sidebar-to-editor'
+            }
+          });
+        } else if (!view.isDestroyed) {
           const { state: newState } = view.state.applyTransaction(trackedTr);
           view.updateState(newState);
           if (tr.steps.length) {
@@ -295,6 +309,42 @@ export class FidusEditor {
     new ModCollab(this);
     // new ModTrack(this);
     // this.ws.init();
+  }
+
+  extractPagePath(step: any) {
+    const content0 = step.slice?.content?.[0];
+    const content1 = step.slice?.content?.[1];
+
+    if (!content0 || !content1) {
+      return null;
+    }
+
+    // Check if the step type is replace
+    const isReplace = step.stepType === 'replace' && step.from === step.to;
+
+    if (!isReplace) {
+      return null;
+    }
+
+    const isImage = content0.type === 'image';
+    const isParagraph = content1.type === 'paragraph';
+
+    if (!isImage || !isParagraph) {
+      return null;
+    }
+
+    // Check if the paragraph's first content is a text with the first mark of that text being a link and get the href attribute of that link
+    let href = null;
+    const content10 = content1.content?.[0];
+    if (content10.type === 'text' && content10.marks.length > 0 && content10.marks[0].type === 'link') {
+      href = content10.marks[0].attrs.href;
+    }
+
+    if (href.startsWith(window.location.origin)) {
+      href = href.split('/').at(-1);
+    }
+
+    return href;
   }
 
   // Collect all components of the current doc. Needed for saving and export

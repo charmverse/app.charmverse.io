@@ -164,7 +164,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             payload: {
               pageId: droppedItem.id,
               newParentId: containerItem.parentId,
-              newIndex: droppedItem.index
+              newIndex: droppedItem.index,
+              trigger: 'sidebar-to-sidebar'
             }
           });
         }
@@ -211,7 +212,8 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           payload: {
             pageId: droppedItem.id,
             newParentId: containerItem.id,
-            newIndex: droppedItem.index
+            newIndex: droppedItem.index,
+            trigger: 'sidebar-to-sidebar'
           }
         });
       }
