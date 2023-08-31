@@ -177,7 +177,7 @@ jobs:
     permissions:
       contents: write
     # Re-enable condition before merge
-    if: github.ref == 'refs/heads/main' or github.ref == 'splitting-websocket-deployment'
+    if: github.ref == 'refs/heads/main' or github.ref == 'refs/heads/splitting-websocket-deployment'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
