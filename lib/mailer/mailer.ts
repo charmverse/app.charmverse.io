@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 
-import { getInviteToPageEmail } from './emails';
-import type { InviteToPageProps } from './emails/templates/InviteToPageTemplate';
+import { getPageInviteEmail } from './emails';
+import type { PageInviteEmailProps } from './emails/templates/PageInviteEmail';
 import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 
 export interface EmailRecipient {
@@ -38,7 +38,7 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
   });
 }
 
-export function sendInviteToPageEmail({ to, ...variables }: { to: EmailRecipient } & InviteToPageProps) {
-  const template = getInviteToPageEmail(variables);
+export function sendPageInviteEmail({ to, ...variables }: { to: EmailRecipient } & PageInviteEmailProps) {
+  const template = getPageInviteEmail(variables);
   return sendEmail({ ...template, to });
 }

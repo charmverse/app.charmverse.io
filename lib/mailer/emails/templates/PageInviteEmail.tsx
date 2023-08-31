@@ -4,7 +4,7 @@ import { baseUrl } from 'config/constants';
 
 import { Button, EmailWrapper, Footer, Header } from './components';
 
-export type InviteToPageProps = {
+export type PageInviteEmailProps = {
   guestEmail: string;
   invitingUserName: string;
   pageTitle: string;
@@ -20,7 +20,7 @@ const pageContainerStyle = {
   padding: '10px 30px'
 };
 
-export function InviteToPage(props: InviteToPageProps) {
+export function PageInviteEmail(props: PageInviteEmailProps) {
   const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
@@ -51,6 +51,6 @@ export function InviteToPage(props: InviteToPageProps) {
   );
 }
 
-export function emailSubject({ pageTitle }: InviteToPageProps) {
+export function emailSubject({ pageTitle }: PageInviteEmailProps) {
   return `Document shared with you: "${pageTitle}"`;
 }

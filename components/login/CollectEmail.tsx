@@ -55,7 +55,7 @@ export function CollectEmail({ email, handleSubmit, description, title, loading,
   }
 
   return (
-    <Box mb={2} px={1}>
+    <Box mb={2} px={1} width='100%'>
       {title && <DialogTitle onClose={onClose}>{title}</DialogTitle>}
 
       {description && (

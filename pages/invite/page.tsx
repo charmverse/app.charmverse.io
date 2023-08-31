@@ -2,10 +2,14 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useRef, useState, useEffect } from 'react';
 import { validate } from 'uuid';
 
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
-import { InviteToPage } from 'components/invite/page/InviteToPage';
+import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteLink';
+import { PageInviteLink } from 'components/invite/page/PageInviteLink';
+import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionSsr } from 'lib/session/withSession';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
@@ -78,15 +82,73 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
   return { props: { email: requestedEmail } };
 });
 
-export default function InviteToPageComponent(props: Props) {
+export default function PageInviteLinkComponent({ email, error }: Props) {
+  const { requestMagicLink, status } = useMagicLink();
   return (
     <>
       <Head>
         <meta name='robots' content='noindex' />
       </Head>
-      <InviteToPage {...props} />
+      <PageInviteLink status={status} email={email} submitEmail={requestMagicLink} />
     </>
   );
 }
 
-InviteToPageComponent.getLayout = getBaseLayout;
+function useMagicLink() {
+  const router = useRouter();
+  const { requestMagicLinkViaFirebase, validateMagicLink, emailForSignIn } = useFirebaseAuth({
+    authenticatePath: router.asPath
+  });
+  const sendingMagicLink = useRef(false);
+  const [status, setStatus] = useState<MagicLinkResponseStatus | undefined>();
+
+  async function requestMagicLink(email: string) {
+    if (status !== 'requesting-link') {
+      sendingMagicLink.current = true;
+      try {
+        setStatus('requesting-link');
+        await requestMagicLinkViaFirebase({ email, redirectUrl: window.location.pathname });
+        setStatus('sent-link');
+      } catch (error) {
+        if ((error as any)?.code === 'auth/invalid-email') {
+          setStatus('error-invalid-email');
+        } else {
+          log.error('Error requesting firebase magic link', { error });
+          setStatus('error');
+        }
+      }
+    }
+  }
+
+  // attempt to validate email on first load
+  useEffect(() => {
+    async function init() {
+      if (emailForSignIn && status === undefined) {
+        try {
+          setStatus('verifying-email');
+          await validateMagicLink(emailForSignIn);
+          log.info('Magic link validated, redirect user to page');
+          setStatus('verified-email');
+          // refresh page to redirect user
+          router.replace(router.asPath);
+        } catch (error: any) {
+          log.error('Error validating firebase magic link', { error });
+          if ((error as any)?.code === 'auth/invalid-action-code') {
+            setStatus('error-invalid-code');
+          } else {
+            setStatus('error');
+          }
+        }
+      }
+    }
+    init();
+  }, [emailForSignIn, status]);
+
+  return {
+    requestMagicLink,
+    validateMagicLink,
+    status
+  };
+}
+
+PageInviteLinkComponent.getLayout = getBaseLayout;

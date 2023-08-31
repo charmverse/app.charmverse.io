@@ -9,7 +9,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { sendInviteToPageEmail } from 'lib/mailer';
+import { sendPageInviteEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
@@ -133,14 +133,14 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
           }
         })
         // TODO: maybe support checking user.email, but we would need to look for it when logging in thru magic link
-        .then((user) => user.googleAccounts[0].email || user.verifiedEmails[0]?.email));
+        .then((user) => user.googleAccounts[0]?.email || user.verifiedEmails[0]?.email));
     if (notificationEmail) {
       const sender = await prisma.user.findUniqueOrThrow({
         where: {
           id: req.session.user.id
         }
       });
-      await sendInviteToPageEmail({
+      await sendPageInviteEmail({
         guestEmail: notificationEmail,
         to: { email: notificationEmail, userId },
         pageId,

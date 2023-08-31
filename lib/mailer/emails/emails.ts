@@ -1,5 +1,5 @@
-import type { InviteToPageProps } from './templates/InviteToPageTemplate';
-import { emailSubject, InviteToPage } from './templates/InviteToPageTemplate';
+import type { PageInviteEmailProps } from './templates/PageInviteEmail';
+import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 import type { PendingTasksProps } from './templates/PendingTasksTemplate';
 import PendingTasks, { tasksRequiresYourAttention } from './templates/PendingTasksTemplate';
 import { renderMJML } from './templates/utils';
@@ -11,8 +11,8 @@ export function getPendingTasksEmail(props: PendingTasksProps) {
   return { html, subject };
 }
 
-export function getInviteToPageEmail(props: InviteToPageProps) {
-  const html = renderMJML(InviteToPage(props));
+export function getPageInviteEmail(props: PageInviteEmailProps) {
+  const html = renderMJML(PageInviteEmail(props));
   const subject = emailSubject(props);
 
   return { html, subject };
