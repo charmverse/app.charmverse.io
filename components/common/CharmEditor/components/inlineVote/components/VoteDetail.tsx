@@ -94,8 +94,8 @@ export function VoteDetail({
     if (!user) {
       return;
     }
-
-    const userVote = await castVote(id, v);
+    const choiceArray = typeof v === 'string' ? [v] : v;
+    const userVote = await castVote(id, choiceArray);
     refetchTasks();
     mutate(
       (_userVotes) => {
