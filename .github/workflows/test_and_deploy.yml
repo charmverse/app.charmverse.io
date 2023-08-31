@@ -187,17 +187,13 @@ jobs:
                      node --experimental-specifier-resolution=node ./dist/main.js
 
           sleep_loop_ct=0
-          while [[ $sleep_loop_ct < 30 ]]; do
-            if ! curl localhost:3001/api/health; then 
-              docker ps
-              docker logs permissions-api
-              docker inspect permissions-api
-              echo "permission api not up...sleeping"
-              ((sleep_loop_ct++))
-              sleep 10
-            else
-              break
-            fi
+          until curl localhost:3001/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            docker ps
+            docker logs permissions-api
+            docker inspect permissions-api
+            echo "permission api not up in loop $sleep_loop_ct ...sleeping"
+            ((sleep_loop_ct++))
+            sleep 10
           done
 
       - name: Restore app from cache
