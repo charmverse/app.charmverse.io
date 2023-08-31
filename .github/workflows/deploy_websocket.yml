@@ -144,10 +144,12 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-          git diff --name-only ${{github.event.before}} ${{github.event.after}}
+          changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
           websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
-          for file in $(git diff --name-only ${{github.event.before}} ${{github.event.after}}); do
+          for file in $changed_files; do
+            echo "evaluating $file:"
             if [[ $file =~ $websocket_src_file_pattern ]]; then
+              echo "Requires deployment to websocket"
               echo "deploy_websocket=true" >> $GITHUB_OUTPUT
               break
             fi 
