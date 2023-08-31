@@ -7,9 +7,11 @@ import { createMockSpace } from '../../testing/mocks/space';
 import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { Member } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
+import { LoggedInUser } from 'models';
+import { brandColorNames } from 'theme/colors';
 
 export const spaces = [createMockSpace()];
-export const userProfile = createMockUser();
+export const userProfile = {...createMockUser(), spaceRoles: [{ spaceId: spaces[0].id, isAdmin: true }]} as LoggedInUser;
 export const userMemberProfile: Member = createMockSpaceMember(userProfile);
 export const members: Member[] = [
   createMockSpaceMember(),
@@ -24,7 +26,7 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
 ];
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
   'space-id'
-).map((cat) => ({
+).map((cat, i) => ({
   id: 'some-id',
   permissions: {
     manage_permissions: true,
@@ -35,7 +37,8 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
     comment_proposals: true,
     vote_proposals: true
   },
-  ...cat
+  ...cat,
+  color: brandColorNames[i % brandColorNames.length]
 }));
 
 export const proposalTemplates: ProposalWithUsers[] = [];

@@ -1,4 +1,5 @@
-import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
+import type { PageMeta } from '@charmverse/core/pages';
+import { useState } from 'react';
 
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -7,19 +8,44 @@ import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import type { ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
 
-type Props = {
-  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
+export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsProp;
+
+const defaultView: BoardView = {
+  fields: {
+    viewType: 'table',
+    sortOptions: [],
+    visiblePropertyIds: [],
+    visibleOptionIds: [],
+    hiddenOptionIds: [],
+    collapsedOptionIds: [],
+    filter: { operation: 'and', filters: [] },
+    cardOrder: [],
+    columnWidths: {},
+    columnCalculations: {},
+    kanbanCalculations: {},
+    defaultTemplateId: ''
+  }
 };
 
-export function useProposalsBoardAdapter({ proposal }: Props) {
+export function useProposalsBoardAdapter() {
+  const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { proposals } = useProposals();
   const { pages } = usePages();
   const { proposalPropertiesBlock } = useProposalBlocks();
-  const proposalPage = pages[proposal?.id || ''];
+  const proposalPage = pages[boardProposal?.id || ''];
+
+  const cardPages: CardPage[] =
+    proposals
+      ?.map((p: any) => {
+        const page = pages[p?.id];
+
+        return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
+      })
+      .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
   // board with all proposal properties
   const board: Board = {
@@ -27,37 +53,32 @@ export function useProposalsBoardAdapter({ proposal }: Props) {
   } as unknown as Board;
 
   // card from current proposal
-  const card: Card = mapProposalToCard({ proposal, proposalPage, spaceId: space?.id });
+  const card: Card = mapProposalToCardPage({ proposal: boardProposal, proposalPage, spaceId: space?.id }).card;
 
   // each proposal with fields reflects a card
-  const cards: Card[] =
-    proposals?.map((p: any) => {
-      const page = pages[p?.id];
-
-      return mapProposalToCard({ proposal: p, proposalPage: page, spaceId: space?.id });
-    }) || [];
+  const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
   // mock needed properties unused for now
-  const activeView = { fields: {} } as BoardView;
+  const activeView = defaultView;
   const views: BoardView[] = [];
 
-  return { board, card, cards, activeView, views, proposalPage };
+  return { board, card, cards, cardPages, activeView, views, proposalPage, boardProposal, setBoardProposal };
 }
 
 // build mock card from proposal and page data
-function mapProposalToCard({
+function mapProposalToCardPage({
   proposal,
   proposalPage,
   spaceId
 }: {
-  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
+  proposal: BoardProposal | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
   const proposalFields = proposal?.fields || { properties: {} };
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
 
-  return {
+  const card: Card = {
     id: proposal?.id || '',
     spaceId: proposalSpaceId,
     parentId: '',
@@ -72,4 +93,6 @@ function mapProposalToCard({
     deletedAt: null,
     fields: { ...proposalFields, contentOrder: [] }
   };
+
+  return { card, page: proposalPage };
 }

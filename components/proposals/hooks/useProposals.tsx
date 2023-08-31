@@ -1,4 +1,7 @@
-import { useCallback, useState } from 'react';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
@@ -7,17 +10,49 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 
-export function useProposals() {
+type ProposalsContextType = {
+  proposals: ProposalWithUsers[] | undefined;
+  filteredProposals: ProposalWithUsers[] | undefined;
+  statusFilter: ProposalStatusFilter;
+  categoryIdFilter: string;
+  setStatusFilter: (status: ProposalStatusFilter) => void;
+  setCategoryIdFilter: (categoryId: string) => void;
+  mutateProposals: KeyedMutator<ProposalWithUsers[]>;
+  isLoading: boolean;
+  archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
+};
+
+export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
+  proposals: undefined,
+  filteredProposals: undefined,
+  statusFilter: 'all',
+  categoryIdFilter: 'all',
+  setStatusFilter: () => {},
+  setCategoryIdFilter: () => {},
+  mutateProposals: async () => {
+    return undefined;
+  },
+  isLoading: false,
+  archiveProposal: () => Promise.resolve()
+});
+
+export function ProposalsProvider({ children }: { children: ReactNode }) {
   const [statusFilter, setStatusFilter] = useState<ProposalStatusFilter>('all');
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
+
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
   // filter out deleted and templates
-  let filteredProposals = proposals
-    ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')
-    : [];
+  let filteredProposals = useMemo(
+    () =>
+      proposals
+        ? proposals.filter((proposal) => !pages[proposal.id]?.deletedAt && pages[proposal.id]?.type === 'proposal')
+        : [],
+    [pages, proposals]
+  );
+
   if (statusFilter === 'archived') {
     filteredProposals = filteredProposals?.filter((p) => !!p.archived);
     // Never show archived proposals within the other statuses list
@@ -56,15 +91,31 @@ export function useProposals() {
     [mutateProposals, space]
   );
 
-  return {
-    proposals,
-    filteredProposals,
-    statusFilter,
-    categoryIdFilter,
-    setStatusFilter,
-    setCategoryIdFilter,
-    mutateProposals,
-    isLoading: isLoading || loadingPages,
-    archiveProposal
-  };
+  const value = useMemo(
+    () => ({
+      proposals,
+      filteredProposals,
+      statusFilter,
+      categoryIdFilter,
+      setStatusFilter,
+      setCategoryIdFilter,
+      mutateProposals,
+      isLoading: isLoading || loadingPages,
+      archiveProposal
+    }),
+    [
+      archiveProposal,
+      categoryIdFilter,
+      filteredProposals,
+      isLoading,
+      loadingPages,
+      mutateProposals,
+      proposals,
+      statusFilter
+    ]
+  );
+
+  return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;
 }
+
+export const useProposals = () => useContext(ProposalsContext);
