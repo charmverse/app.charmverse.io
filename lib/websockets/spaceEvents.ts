@@ -14,6 +14,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
+import { isUUID } from 'lib/utilities/strings';
 import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
@@ -218,7 +219,34 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId, currentParentId, newParentId, newIndex } = message.payload;
+      const { pageId: pagePathOrId, newParentId, newIndex } = message.payload;
+
+      const page = await prisma.page.findFirst({
+        where: isUUID(pagePathOrId)
+          ? {
+              id: pagePathOrId
+            }
+          : {
+              path: pagePathOrId
+            },
+        select: {
+          id: true,
+          parentId: true
+        }
+      });
+
+      if (!page) {
+        return null;
+      }
+
+      const pageId = page.id;
+
+      const currentParentId = page.parentId ?? null;
+
+      // If the page is dropped on the same parent page or on itself, do nothing
+      if (currentParentId === newParentId || pageId === newParentId) {
+        return null;
+      }
 
       try {
         const { flatChildren } = await resolvePageTree({

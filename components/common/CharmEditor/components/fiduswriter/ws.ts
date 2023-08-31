@@ -3,13 +3,15 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
   ClientMessage,
   ClientRestartMessage,
   ClientSubscribeMessage,
   ServerMessage,
   RequestResendMessage,
-  WrappedSocketMessage
+  WrappedSocketMessage,
+  ClientDiffMessage
 } from 'lib/websockets/documentEvents/interfaces';
 
 import type { FidusEditor } from './fiduseditor';
@@ -50,7 +52,7 @@ export interface WebSocketConnector extends WebSocketConnectorProps {}
 export class WebSocketConnector {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-  // Messages object used to ensure that data is received in right order.
+  // Messages dataect used to ensure that data is received in right order.
   messages: { server: number; client: number; lastTen: WrappedMessage[] } = {
     server: 0,
     client: 0,
@@ -344,13 +346,63 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        log.debug(`[ws${namespace}] Send message`, { data: wrappedMessage });
-        this.socket.emit(socketEvent, wrappedMessage);
-        this.setRecentlySentTimer(timer);
+        // Handle drag and drop from sidebar to editor
+        const pagePath = data.type === 'diff' ? this.extractPagePath(data) : null;
+        if (pagePath) {
+          emitSocketMessage({
+            type: 'page_reordered',
+            payload: {
+              pageId: pagePath,
+              newParentId: this.editor.docInfo.id,
+              newIndex: -1
+            }
+          });
+        } else {
+          log.debug(`[ws${namespace}] Send message`, { data: wrappedMessage });
+          this.socket.emit(socketEvent, wrappedMessage);
+          this.setRecentlySentTimer(timer);
+        }
       });
     } else {
       this.messagesToSend.push(getData);
     }
+  }
+
+  extractPagePath(data: ClientDiffMessage) {
+    const ds = data.ds[0];
+    const content0 = ds.slice?.content?.[0];
+    const content1 = ds.slice?.content?.[1];
+
+    if (!ds || !content0 || !content1) {
+      return null;
+    }
+
+    // Check if the step type is replace
+    const isReplace = ds.stepType === 'replace' && ds.from === ds.to;
+
+    if (!isReplace) {
+      return null;
+    }
+
+    const isImage = content0.type === 'image';
+    const isParagraph = content1.type === 'paragraph';
+
+    if (!isImage || !isParagraph) {
+      return null;
+    }
+
+    // Check if the paragraph's first content is a text with the first mark of that text being a link and get the href attribute of that link
+    let href = null;
+    const content10 = content1.content?.[0];
+    if (content10.type === 'text' && content10.marks.length > 0 && content10.marks[0].type === 'link') {
+      href = content10.marks[0].attrs.href;
+    }
+
+    if (href.startsWith(window.location.origin)) {
+      href = href.split('/').at(-1);
+    }
+
+    return href;
   }
 
   setRecentlySentTimer(timer: number) {

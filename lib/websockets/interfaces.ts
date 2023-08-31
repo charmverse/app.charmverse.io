@@ -126,7 +126,6 @@ type PageReordered = {
   type: 'page_reordered';
   payload: {
     pageId: string;
-    currentParentId: string | null;
     newParentId: string | null;
     newIndex: number;
   };
