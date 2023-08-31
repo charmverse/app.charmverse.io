@@ -1,0 +1,204 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: CI
+
+on:
+  push:
+    branches: [main, selective-websocket-deployment]
+  workflow_dispatch:
+    inputs:
+      core_pkg_version:
+        description: 'Core pkg version to update to'
+        required: true
+
+env:
+  SELECTED_PERMISSION_API_TAG: latest
+
+jobs:
+  build-test-env:
+    name: Build test env
+    runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.get_build_id.outputs.build_id }}
+    steps:
+      - name: Print Triggering event context payload
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
+        run: |
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
+      - uses: actions/checkout@v3
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Re-enable condition before merge
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/selective-websocket-deployment'
+#    needs: [test, integration-test]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+          commit_core_pkg_upgrade: true
+
+      - name: Calculate Build ID
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
+
+      - name: Build app
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'production'
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
+          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
+          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
+          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
+          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
+          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
+          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
+          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+
+      - name: Build and Push Docker image
+        id: docker_build_push
+        uses: ./.github/actions/build_docker_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .NODE_ENV = "production" |
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_cron/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_websockets/00_env_vars.config
+
+      - name: Package Webapp and upload web assets to s3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
+      - name: Update and Package background worker
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+
+      - name: Update and Package websockets and decide whether to deploy websocket
+        id: pkg_websocket
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+          git diff --name-only HEAD..HEAD^1
+          websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
+          for file in $(git diff --name-only HEAD..HEAD^1); do
+            if [[ $file =~ $websocket_src_file_pattern ]]; then
+              echo "deploy_websocket=true" >> $GITHUB_OUTPUT
+              break
+            fi 
+          done
+
+      # - name: Deploy webapp to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: web3-workspace
+      #     environment_name: prd-charmverse-webapp
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
+
+      # - name: Use datadog ci package to upload js maps
+      #   env:
+      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      #   run: |
+      #     npm install -g @datadog/datadog-ci
+      #     datadog-ci sourcemaps upload .next/static       \
+      #       --service=webapp                              \
+      #       --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+      #       --minified-path-prefix=https://cdn.charmverse.io/_next/static
+
+      # - name: Deploy Background to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: charmverse-worker
+      #     environment_name: prd-charmverse-worker
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy_cron.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Deploy Websockets to Beanstalk if required
+        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
+        run: |
+          echo "deployed websocket!"
+        # uses: einaregilsson/beanstalk-deploy@v21
+        # with:
+        #   aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #   application_name: prd-charmverse-websockets
+        #   environment_name: prd-charmverse-websockets
+        #   version_label: ${{ github.sha }}
+        #   region: us-east-1
+        #   deployment_package: deploy_websockets.zip
+        #   use_existing_version_if_available: true # allows triggering re-deploys with same version
+        #   wait_for_deployment: false # set to false to save sweet Github minutes
