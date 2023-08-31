@@ -31,7 +31,7 @@ export interface BlockChange {
 // The Mutator is used to make all changes to server state
 // It also ensures that the Undo-manager is called for each action
 //
-class Mutator {
+export class Mutator {
   private undoGroupId?: string;
 
   private undoDisplayId?: string;
@@ -1050,6 +1050,18 @@ class Mutator {
   }
 
   // Other methods
+
+  async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]) {
+    await charmClient.patchBlock(
+      boardId,
+      {
+        updatedFields: {
+          cardProperties
+        }
+      },
+      () => {}
+    );
+  }
 
   // Not a mutator, but convenient to put here since Mutator wraps OctoClient
   async exportArchive(boardID?: string): Promise<Block[]> {

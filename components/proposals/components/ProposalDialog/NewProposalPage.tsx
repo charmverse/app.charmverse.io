@@ -19,7 +19,6 @@ import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { fontClassName } from 'theme/fonts';
@@ -101,7 +100,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens
+        publishToLens: formInputs.publishToLens,
+        fields: formInputs.fields
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

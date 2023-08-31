@@ -3,6 +3,7 @@ import React from 'react';
 import '../theme/styles.scss';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import { IntlProvider } from 'react-intl';
 
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
 import '@skiff-org/prosemirror-tables/style/table-headers.css';
@@ -139,4 +140,15 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-export const decorators = [withMuiTheme];
+export const withIntl = (Story, context) => {
+  // needed for focalboard
+  return (
+    <IntlProvider locale='en'>
+      <Story />
+    </IntlProvider>
+  );
+};
+
+
+
+export const decorators = [withMuiTheme, withIntl];

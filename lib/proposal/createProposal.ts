@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 
 import { getPagePath } from '../pages';
 
@@ -30,6 +31,7 @@ export type CreateProposalInput = {
   evaluationType?: ProposalEvaluationType;
   rubricCriteria?: RubricDataInput[];
   publishToLens?: boolean;
+  fields?: ProposalFields;
 };
 
 export type CreatedProposal = {
@@ -47,7 +49,8 @@ export async function createProposal({
   reviewers,
   evaluationType,
   rubricCriteria,
-  publishToLens
+  publishToLens,
+  fields
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -93,7 +96,8 @@ export async function createProposal({
                 }))
               }
             }
-          : undefined
+          : undefined,
+        fields
       },
       include: {
         authors: true,
