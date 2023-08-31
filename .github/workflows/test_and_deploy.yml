@@ -191,8 +191,8 @@ jobs:
             docker ps
             docker logs permissions-api
             docker inspect permissions-api
-            echo "permission api not up in loop $sleep_loop_ct ...sleeping"
-            ((sleep_loop_ct++))
+            echo "permission api not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
             sleep 10
           done
 
