@@ -177,7 +177,7 @@ jobs:
     permissions:
       contents: write
     # Re-enable condition before merge
-    if: github.ref == 'refs/heads/main' or github.ref == 'refs/heads/splitting-websocket-deployment'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/splitting-websocket-deployment'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
@@ -313,7 +313,7 @@ jobs:
       #     wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk if required
-        if: steps.pkg_websocket.outputs.deploy_websocket == "true"
+        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         run: |
           echo "deployed websocket!"
         # uses: einaregilsson/beanstalk-deploy@v21
