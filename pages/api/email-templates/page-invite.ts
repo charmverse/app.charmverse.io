@@ -10,7 +10,7 @@ const handler = nc({
 
 const templates = {
   'Guest added': () => {
-    return emails.getInviteToPageEmail({
+    return emails.getPageInviteEmail({
       guestEmail: 'matt.blockchain',
       invitingUserName: 'momakes.blockchain',
       pageTitle: 'Acme Inc proposal',
