@@ -51,8 +51,27 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
+  chromatic:
+    name: Publish to Chromatic
+    runs-on: ubuntu-latest
+    needs: build-test-env
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_APP_ENV: 'test'
+          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
+
+      - uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
@@ -85,7 +104,6 @@ jobs:
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
-
 
   integration-test:
     name: Tests
