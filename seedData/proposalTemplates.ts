@@ -510,7 +510,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
@@ -1648,7 +1649,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
@@ -2071,7 +2073,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
@@ -2420,7 +2423,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Protocol',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   },
   {
@@ -3113,7 +3117,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Metagoverance',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   },
   {
@@ -3806,7 +3811,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Metagoverance',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   }
 ];
