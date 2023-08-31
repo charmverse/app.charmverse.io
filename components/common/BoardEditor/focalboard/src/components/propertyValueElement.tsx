@@ -17,7 +17,8 @@ import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilitie
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../components/properties/TextInput';
-import mutator from '../mutator';
+import type { Mutator } from '../mutator';
+import defaultMutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
 
@@ -41,6 +42,7 @@ type Props = {
   showTooltip?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
+  mutator?: Mutator;
 };
 
 /**
@@ -65,7 +67,8 @@ function PropertyValueElement(props: Props) {
     board,
     updatedBy,
     updatedAt,
-    displayType
+    displayType,
+    mutator = defaultMutator
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =

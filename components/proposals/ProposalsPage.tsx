@@ -18,7 +18,7 @@ import { ProposalsViewOptions } from './components/ProposalViewOptions/Proposals
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
-export function ProposalsPage() {
+export function ProposalsPage({ title }: { title: string }) {
   const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
@@ -60,7 +60,7 @@ export function ProposalsPage() {
           <Grid item xs={12}>
             <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
               <Typography variant='h1' gutterBottom>
-                Proposals
+                {title}
               </Typography>
 
               <Box display='flex'>

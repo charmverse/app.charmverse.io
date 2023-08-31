@@ -20,11 +20,13 @@ import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
+import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isDevEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
+import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
@@ -56,6 +58,7 @@ export type ProposalPropertiesInput = {
   evaluationType: ProposalEvaluationType;
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
+  fields: ProposalFields;
 };
 
 type ProposalPropertiesProps = {
@@ -233,8 +236,8 @@ export function ProposalProperties({
     setIsVoteModalOpen(true);
   }
 
-  function onSubmitEvaluation() {
-    onSaveRubricCriteriaAnswers?.();
+  async function onSubmitEvaluation() {
+    await onSaveRubricCriteriaAnswers?.();
     // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
     setRubricView(1);
   }
@@ -534,6 +537,16 @@ export function ProposalProperties({
               </Box>
             </Box>
           )}
+
+          <CustomPropertiesAdapter
+            readOnly={readOnlyAuthors}
+            proposal={proposalFormInputs}
+            onChange={(properties: ProposalPropertiesField) => {
+              setProposalFormInputs({
+                fields: { properties: properties ? { ...properties } : {} }
+              });
+            }}
+          />
         </Collapse>
         <Divider
           sx={{
