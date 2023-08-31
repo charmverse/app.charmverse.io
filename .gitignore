@@ -59,3 +59,4 @@ todo.md
 /playwright-report/
 /playwright/.cache/
 storybook-static
+build-storybook.log
