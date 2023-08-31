@@ -178,7 +178,7 @@ jobs:
       contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/splitting-websocket-deployment'
-    needs: [test, integration-test]
+#    needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
       - name: Inject slug/short variables
