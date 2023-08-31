@@ -26,7 +26,7 @@ export async function getVote(id: string, userId?: string): Promise<ExtendedVote
   });
 
   // filter empty votes
-  const userVotes = vote?.userVotes.filter((uv) => !!uv.choice || uv.choices.length) ?? [];
+  const userVotes = vote?.userVotes.filter((uv) => uv.choices.length) ?? [];
   const { aggregatedResult, userChoice } = aggregateVoteResult({
     userId,
     userVotes,

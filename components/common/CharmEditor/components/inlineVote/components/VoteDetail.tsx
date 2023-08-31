@@ -32,7 +32,7 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choice: string | string[]) => Promise<UserVote>;
+  castVote: (voteId: string, choices: string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -94,8 +94,8 @@ export function VoteDetail({
     if (!user) {
       return;
     }
-
-    const userVote = await castVote(id, v);
+    const choiceArray = typeof v === 'string' ? [v] : v;
+    const userVote = await castVote(id, choiceArray);
     refetchTasks();
     mutate(
       (_userVotes) => {
@@ -213,7 +213,7 @@ export function VoteDetail({
         <List>
           {userVotes.map((userVote) => {
             const member = getMemberById(userVote.user.id);
-            const choices = userVote.choice ? [userVote.choice] : userVote.choices;
+            const choices = userVote.choices;
 
             if (!choices.length) {
               return null;
