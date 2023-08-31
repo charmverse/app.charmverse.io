@@ -23,7 +23,7 @@ type IContext = {
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
-  castVote: (voteId: string, option: string | string[]) => Promise<UserVote>;
+  castVote: (voteId: string, choices: string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -167,9 +167,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  async function castVote(voteId: string, choice: string | string[]) {
-    const updatedChoice = Array.isArray(choice) ? choice : [choice];
-    const userVote = await charmClient.votes.castVote(voteId, updatedChoice);
+  async function castVote(voteId: string, choices: string[]) {
+    const userVote = await charmClient.votes.castVote(voteId, choices);
 
     setVotes((_votes) => {
       const vote = { ..._votes[voteId] };
@@ -184,11 +183,11 @@ export function VotesProvider({ children }: { children: ReactNode }) {
           vote.totalVotes += 1;
         }
 
-        vote.userChoice = updatedChoice;
+        vote.userChoice = choices;
 
-        if (updatedChoice.length > 0) {
+        if (choices.length > 0) {
           // Add new choices
-          updatedChoice.forEach((c) => {
+          choices.forEach((c) => {
             vote.aggregatedResult[c] += 1;
           });
         } else if (currentChoice && currentChoice.length) {

@@ -26,7 +26,7 @@ handler
   .post(castVote);
 
 async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
-  const { choice } = req.body as UserVoteDTO;
+  const { choices } = req.body as UserVoteDTO;
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -79,7 +79,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       throw new ActionNotPermittedError('You do not have permissions to cast a vote on this post.');
     }
   }
-  const newUserVote: UserVote = await castVoteService(choice, vote, userId);
+  const newUserVote: UserVote = await castVoteService(choices, vote, userId);
 
   if (vote.pageId && vote.context === 'proposal') {
     trackUserAction('user_cast_a_vote', {
