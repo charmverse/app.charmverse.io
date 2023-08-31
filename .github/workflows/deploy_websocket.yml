@@ -187,7 +187,4 @@ jobs:
       #     use_existing_version_if_available: true # allows triggering re-deploys with same version
       #     wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Websockets to Beanstalk if required
-        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
-        run: |
-          echo "deployed websocket!"
+
