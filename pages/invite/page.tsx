@@ -5,9 +5,10 @@ import { validate } from 'uuid';
 
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { InviteToPage } from 'components/invite/page/InviteToPage';
-import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionSsr } from 'lib/session/withSession';
+import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
   const pageId = context.query.id as string;
@@ -41,10 +42,11 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     if (permissions.read) {
       // redirect to page
       const hostName = context.req.headers?.host;
-      const pathHost = getCallbackDomain(hostName);
+      const isDomainInPath = !getValidCustomDomain(hostName) && !getValidSubdomain(hostName);
       return {
         redirect: {
-          destination: `${pathHost}/${page.space.domain}/${page.path}`,
+          // TODO: support subdomain and custom domain
+          destination: `/${isDomainInPath ? `${page.space.domain}/` : ''}${page.path}`,
           permanent: false
         }
       };
