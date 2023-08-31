@@ -101,13 +101,15 @@ export function ProposalsPage({ title }: { title: string }) {
               <LoadingComponent height={500} isLoading size={50} />
             </Grid>
           ) : (
-            <Grid item xs={12} sx={{ mt: 5 }}>
+            <Grid item xs={12}>
               {proposals?.length === 0 && (
-                <EmptyStateVideo
-                  description='Getting started with proposals'
-                  videoTitle='Proposals | Getting started with CharmVerse'
-                  videoUrl='https://tiny.charmverse.io/proposal-builder'
-                />
+                <Box sx={{ mt: 5 }}>
+                  <EmptyStateVideo
+                    description='Getting started with proposals'
+                    videoTitle='Proposals | Getting started with CharmVerse'
+                    videoUrl='https://tiny.charmverse.io/proposal-builder'
+                  />
+                </Box>
               )}
               {proposals?.length > 0 && (
                 <Box className='container-container'>
