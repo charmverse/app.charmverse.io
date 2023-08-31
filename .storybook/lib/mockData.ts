@@ -9,6 +9,8 @@ import type { Member } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
 import { brandColorNames } from 'theme/colors';
 
+const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
+
 // write a list of uuids here
 const seeds = [
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
@@ -21,7 +23,7 @@ const seeds = [
 ];
 
 export const spaces = [createMockSpace()];
-export const userProfile = createMockUser();
+export const userProfile = createMockUser({ id: userProfileSeed });
 export const userMemberProfile: Member = createMockSpaceMember(userProfile);
 export const members: Member[] = [
   createMockSpaceMember(createMockUser({ id: seeds[0] })),
