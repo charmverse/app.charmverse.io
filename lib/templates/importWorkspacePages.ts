@@ -393,7 +393,8 @@ export async function generateImportWorkspacePages({
         spaceId: space.id,
         createdBy: space.createdBy,
         status: 'draft',
-        id: oldNewPageIdHashMap[node.id]
+        id: oldNewPageIdHashMap[node.id],
+        fields: proposal.fields || {}
       });
       pageArgs.push(newPageContent);
     }

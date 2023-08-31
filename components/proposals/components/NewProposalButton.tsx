@@ -11,6 +11,7 @@ import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
@@ -54,7 +55,8 @@ export function NewProposalButton() {
           group: reviewer.roleId ? 'role' : 'user',
           id: (reviewer.roleId ?? reviewer.userId) as string
         })),
-        rubricCriteria: proposalTemplate.rubricCriteria
+        rubricCriteria: proposalTemplate.rubricCriteria,
+        fields: (proposalTemplate.fields as ProposalFields) || {}
       });
     }
   }

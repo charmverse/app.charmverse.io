@@ -47,5 +47,5 @@ export async function castProposalVote({
     throw error;
   }
 
-  return castVoteService(choice, vote, userId);
+  return castVoteService([choice], vote, userId);
 }

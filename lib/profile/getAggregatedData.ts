@@ -107,7 +107,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
           userId
         },
         select: {
-          choice: true
+          choices: true
         }
       },
       deadline: true,

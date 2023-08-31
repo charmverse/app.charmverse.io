@@ -8,12 +8,11 @@ import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { isVotingClosed } from './utils';
 
 export async function castVote(
-  userChoices: string | string[],
+  choices: string[],
   vote: Vote & { voteOptions: VoteOptions[] },
   userId: string
 ): Promise<UserVote> {
   const voteId = vote.id;
-  const choices = Array.isArray(userChoices) ? userChoices : [userChoices];
 
   if (isVotingClosed(vote)) {
     throw new UndesirableOperationError(`Vote with id: ${voteId} is past deadline.`);
@@ -52,13 +51,9 @@ export async function castVote(
     create: {
       userId,
       voteId,
-      // deprecated way of storing choice
-      choice: '',
       choices
     },
     update: {
-      // deprecated way of storing choice
-      choice: '',
       choices,
       updatedAt: new Date()
     },

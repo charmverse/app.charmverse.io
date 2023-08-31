@@ -200,7 +200,7 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
 
   sortedVotes.forEach((vote) => {
     const voteStatus = calculateVoteStatus(vote);
-    const userVotes = vote.userVotes.filter((uv) => !!uv.choice || uv.choices.length) ?? [];
+    const userVotes = vote.userVotes.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
       userVotes,
