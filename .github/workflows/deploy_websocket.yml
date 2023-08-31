@@ -127,9 +127,9 @@ jobs:
       #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #     AWS_REGION: us-east-1
-        run: |
-          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        # run: |
+        #   cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        #   aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Update and Package background worker
         run: |
@@ -187,4 +187,7 @@ jobs:
       #     use_existing_version_if_available: true # allows triggering re-deploys with same version
       #     wait_for_deployment: false # set to false to save sweet Github minutes
 
-
+      - name: Deploy Websockets to Beanstalk if required
+        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
+        run: |
+          echo "deployed websocket!"
