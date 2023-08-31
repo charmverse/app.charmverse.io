@@ -15,7 +15,8 @@ type Props = {
 export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props) {
   const { user } = useUser();
   // TODO - use value from context instead of raw hook
-  const { board, card, cards, activeView, views, proposalPage, setBoardProposal } = useProposalsBoardAdapter();
+  const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } =
+    useProposalsBoardAdapter();
   const mutator = usePropertiesMutator({ proposal, onChange });
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props)
 
   return (
     <CardDetailProperties
-      board={board}
+      board={boardCustomProperties}
       card={card}
       cards={cards}
       activeView={activeView}

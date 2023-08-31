@@ -3,67 +3,10 @@ import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware';
-
-const properties: { [key in DatabaseProposalPropertyType]: () => IPropertyTemplate<key> } = {
-  proposalCategory: () => ({
-    id: uuid(),
-    name: 'Proposal Category',
-    options: [],
-    type: 'proposalCategory'
-  }),
-  proposalStatus: () => ({
-    id: uuid(),
-    name: 'Proposal Status',
-    options: [],
-    type: 'proposalStatus'
-  }),
-  proposalUrl: () => ({
-    id: uuid(),
-    name: 'Proposal Url',
-    options: [],
-    type: 'proposalUrl'
-  }),
-  proposalEvaluatedBy: () => ({
-    id: uuid(),
-    name: 'Proposal Evaluated By',
-    options: [],
-    type: 'proposalEvaluatedBy'
-  }),
-  proposalEvaluationAverage: () => ({
-    id: uuid(),
-    name: 'Proposal Evaluation Average',
-    options: [],
-    type: 'proposalEvaluationAverage'
-  }),
-  proposalEvaluationTotal: () => ({
-    id: uuid(),
-    name: 'Proposal Evaluation Total',
-    options: [],
-    type: 'proposalEvaluationTotal'
-  })
-};
-
-/**
- * See components/proposals/components/ProposalStatusBadge.tsx // ProposalStatusColors for the corresponding statuses
- */
-
-const proposalStatusBoardColors: Record<
-  Exclude<ProposalStatus, 'draft'> | 'archived',
-  keyof (typeof Constants)['menuColors']
-> = {
-  archived: 'propColorGray',
-  discussion: 'propColorTeal',
-  review: 'propColorYellow',
-  reviewed: 'propColorPurple',
-  vote_active: 'propColorPink',
-  vote_closed: 'propColorRed',
-  evaluation_active: 'propColorRed',
-  evaluation_closed: 'propColorPink'
-};
 
 export async function generateUpdatedProposalCategoryProperty({
   boardProperties,
@@ -90,7 +33,7 @@ export async function generateUpdatedProposalCategoryProperty({
   // We will mutate and return this property
   const proposalCategoryProp = {
     ...(boardProperties.find((p) => p.type === 'proposalCategory') ?? {
-      ...properties.proposalCategory(),
+      ...proposalDbProperties.proposalCategory(),
       id: uuid()
     })
   };
@@ -120,7 +63,7 @@ export async function generateUpdatedProposalStatusProperty({
   // We will mutate and return this property
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalStatus') ?? {
-      ...properties.proposalStatus(),
+      ...proposalDbProperties.proposalStatus(),
       id: uuid()
     })
   };
@@ -151,7 +94,7 @@ export async function generateUpdatedProposalUrlProperty({
   // We will mutate and return this property
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalUrl') ?? {
-      ...properties.proposalUrl(),
+      ...proposalDbProperties.proposalUrl(),
       id: uuid()
     })
   };
@@ -167,7 +110,7 @@ export async function generateUpdatedProposalEvaluatedByProperty({
   // We will mutate and return this property
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalEvaluatedBy') ?? {
-      ...properties.proposalEvaluatedBy(),
+      ...proposalDbProperties.proposalEvaluatedBy(),
       id: uuid()
     })
   };
@@ -183,7 +126,7 @@ export async function generateUpdatedProposalEvaluationTotalProperty({
   // We will mutate and return this property
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalEvaluationTotal') ?? {
-      ...properties.proposalEvaluationTotal(),
+      ...proposalDbProperties.proposalEvaluationTotal(),
       id: uuid()
     })
   };
@@ -199,7 +142,7 @@ export async function generateUpdatedProposalEvaluationAverageProperty({
   // We will mutate and return this property
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalEvaluationAverage') ?? {
-      ...properties.proposalEvaluationAverage(),
+      ...proposalDbProperties.proposalEvaluationAverage(),
       id: uuid()
     })
   };

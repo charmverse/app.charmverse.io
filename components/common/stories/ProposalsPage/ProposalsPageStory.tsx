@@ -16,17 +16,27 @@ export function ProposalsPageStory() {
 export const proposals = [
   createMockProposal({
     authors: [{ proposalId: '', userId: members[0].id }],
-    reviewers: [{ id: '1', proposalId: '', roleId: null, userId: userProfile.id }],
+    reviewers: [
+      { id: '1', proposalId: '', roleId: null, userId: userProfile.id },
+      { id: '2', proposalId: '', roleId: null, userId: members[0].id }
+    ],
     categoryId: proposalCategories[0].id,
     evaluationType: 'vote',
     status: 'draft'
   }),
   createMockProposal({
-    authors: [{ proposalId: '', userId: members[0].id }],
+    authors: [{ proposalId: '', userId: members[1].id }],
     reviewers: [{ id: '1', proposalId: '', roleId: null, userId: userProfile.id }],
     categoryId: proposalCategories[1].id,
     evaluationType: 'vote',
     status: 'discussion'
+  }),
+  createMockProposal({
+    authors: [{ proposalId: '', userId: members[2].id }],
+    reviewers: [{ id: '1', proposalId: '', roleId: null, userId: userProfile.id }],
+    categoryId: proposalCategories[2].id,
+    evaluationType: 'rubric',
+    status: 'review'
   })
 ];
 

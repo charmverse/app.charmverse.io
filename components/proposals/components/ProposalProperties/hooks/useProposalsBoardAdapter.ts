@@ -1,42 +1,31 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useState } from 'react';
 
+import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
+import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import type { ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields, ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsProp;
-
-const defaultView: BoardView = {
-  fields: {
-    viewType: 'table',
-    sortOptions: [],
-    visiblePropertyIds: [],
-    visibleOptionIds: [],
-    hiddenOptionIds: [],
-    collapsedOptionIds: [],
-    filter: { operation: 'and', filters: [] },
-    cardOrder: [],
-    columnWidths: {},
-    columnCalculations: {},
-    kanbanCalculations: {},
-    defaultTemplateId: ''
-  }
-};
 
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { proposals } = useProposals();
+  const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalPropertiesBlock } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
+  const customProperties = (proposalPropertiesBlock?.fields?.properties || []) as IPropertyTemplate[];
 
   const cardPages: CardPage[] =
     proposals
@@ -47,10 +36,17 @@ export function useProposalsBoardAdapter() {
       })
       .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-  // board with all proposal properties
-  const board: Board = {
-    fields: { cardProperties: proposalPropertiesBlock?.fields?.properties || [] }
-  } as unknown as Board;
+  // board with all proposal properties and default properties
+  const board: Board = getDefaultBoard({
+    properties: customProperties,
+    categories
+  });
+
+  const boardCustomProperties: Board = getDefaultBoard({
+    properties: customProperties,
+    customOnly: true,
+    categories: []
+  });
 
   // card from current proposal
   const card: Card = mapProposalToCardPage({ proposal: boardProposal, proposalPage, spaceId: space?.id }).card;
@@ -58,11 +54,23 @@ export function useProposalsBoardAdapter() {
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
-  // mock needed properties unused for now
-  const activeView = defaultView;
+  // mock properties needed to display focalboard view
+  const activeView = getDefaultTableView({ properties: customProperties, categories });
+
   const views: BoardView[] = [];
 
-  return { board, card, cards, cardPages, activeView, views, proposalPage, boardProposal, setBoardProposal };
+  return {
+    board,
+    boardCustomProperties,
+    card,
+    cards,
+    cardPages,
+    activeView,
+    views,
+    proposalPage,
+    boardProposal,
+    setBoardProposal
+  };
 }
 
 // build mock card from proposal and page data
@@ -71,12 +79,23 @@ function mapProposalToCardPage({
   proposalPage,
   spaceId
 }: {
-  proposal: BoardProposal | null;
+  proposal: BoardProposal | ProposalWithUsers | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
-  const proposalFields = proposal?.fields || { properties: {} };
+  const proposalFields = (proposal?.fields || { properties: {} }) as ProposalFields;
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
+
+  proposalFields.properties = {
+    ...proposalFields.properties,
+    // add default field values on the fly
+    __category: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
+    __status: (proposal && 'status' in proposal && proposal.status) || '',
+    __evaluationType: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
+    __authors: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
+    __reviewers:
+      (proposal && 'reviewers' in proposal && proposal.reviewers?.map((r) => r.userId).filter(isTruthy)) || ''
+  };
 
   const card: Card = {
     id: proposal?.id || '',

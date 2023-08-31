@@ -5,7 +5,6 @@ import charmClient from 'charmClient';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { ProposalsBoard } from 'components/proposals/components/ProposalsBoard/ProposalsBoard';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -46,52 +45,56 @@ export function ProposalsPage({ title }: { title: string }) {
   }
 
   return (
-    <CenteredPageContent>
-      <ProposalDialogProvider>
-        <Grid container mb={6}>
-          <Grid item xs={12}>
-            <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
-              <Typography variant='h1' gutterBottom>
-                {title}
-              </Typography>
+    <div className='focalboard-body full-page'>
+      <Box className='BoardComponent' py={(theme) => theme.spacing(8)}>
+        <ProposalDialogProvider>
+          <div className='top-head'>
+            <Grid container mb={6}>
+              <Grid item xs={12}>
+                <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
+                  <Typography variant='h1' gutterBottom>
+                    {title}
+                  </Typography>
 
-              <Box display='flex'>
-                <Box
-                  gap={3}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    flexDirection: 'row-reverse'
-                  }}
-                >
-                  <NewProposalButton />
+                  <Box display='flex'>
+                    <Box
+                      gap={3}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        flexDirection: 'row-reverse'
+                      }}
+                    >
+                      <NewProposalButton />
 
-                  <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
-                    <ProposalsViewOptions
-                      statusFilter={statusFilter}
-                      setStatusFilter={setStatusFilter}
-                      categoryIdFilter={categoryIdFilter}
-                      setCategoryIdFilter={setCategoryIdFilter}
-                      categories={categories}
-                      // Playwright-specific
-                      testKey='desktop'
-                    />
+                      <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
+                        <ProposalsViewOptions
+                          statusFilter={statusFilter}
+                          setStatusFilter={setStatusFilter}
+                          categoryIdFilter={categoryIdFilter}
+                          setCategoryIdFilter={setCategoryIdFilter}
+                          categories={categories}
+                          // Playwright-specific
+                          testKey='desktop'
+                        />
+                      </Box>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
-            </Box>
 
-            <Box sx={{ display: { xs: 'flex', lg: 'none' }, justifyContent: 'flex-end' }}>
-              <ProposalsViewOptions
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                categoryIdFilter={categoryIdFilter}
-                setCategoryIdFilter={setCategoryIdFilter}
-                categories={categories}
-              />
-            </Box>
-          </Grid>
+                <Box sx={{ display: { xs: 'flex', lg: 'none' }, justifyContent: 'flex-end' }}>
+                  <ProposalsViewOptions
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    categoryIdFilter={categoryIdFilter}
+                    setCategoryIdFilter={setCategoryIdFilter}
+                    categories={categories}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          </div>
 
           {loadingData ? (
             <Grid item xs={12} sx={{ mt: 12 }}>
@@ -106,12 +109,16 @@ export function ProposalsPage({ title }: { title: string }) {
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               )}
-              {proposals?.length > 0 && <ProposalsBoard />}
+              {proposals?.length > 0 && (
+                <Box className='container-container'>
+                  <ProposalsBoard />
+                </Box>
+              )}
             </Grid>
           )}
-        </Grid>
-        <ProposalDialogGlobal />
-      </ProposalDialogProvider>
-    </CenteredPageContent>
+          <ProposalDialogGlobal />
+        </ProposalDialogProvider>
+      </Box>
+    </div>
   );
 }

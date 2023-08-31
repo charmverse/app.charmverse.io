@@ -10,6 +10,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 
 type ProposalsBoardContextType = {
   board: Board;
+  boardCustomProperties: Board;
   card: Card;
   cards: Card[];
   cardPages: CardPage[];
@@ -22,6 +23,7 @@ type ProposalsBoardContextType = {
 
 export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContextType>>({
   board: {} as Board,
+  boardCustomProperties: {} as Board,
   card: {} as Card,
   cards: [],
   cardPages: [],
@@ -33,12 +35,23 @@ export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContex
 });
 
 export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
-  const { board, card, cards, activeView, views, proposalPage, setBoardProposal, boardProposal, cardPages } =
-    useProposalsBoardAdapter();
+  const {
+    board,
+    boardCustomProperties,
+    card,
+    cards,
+    activeView,
+    views,
+    proposalPage,
+    setBoardProposal,
+    boardProposal,
+    cardPages
+  } = useProposalsBoardAdapter();
 
   const value = useMemo(
     () => ({
       board,
+      boardCustomProperties,
       card,
       cards,
       activeView,
@@ -48,7 +61,18 @@ export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
       boardProposal,
       cardPages
     }),
-    [activeView, board, boardProposal, card, cards, proposalPage, setBoardProposal, views, cardPages]
+    [
+      board,
+      boardCustomProperties,
+      card,
+      cards,
+      activeView,
+      views,
+      proposalPage,
+      setBoardProposal,
+      boardProposal,
+      cardPages
+    ]
   );
 
   return <ProposalsBoardContext.Provider value={value}>{children}</ProposalsBoardContext.Provider>;
