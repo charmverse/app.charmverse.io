@@ -58,7 +58,7 @@ describe('POST /api/v1/proposals/vote', () => {
         .send({
           proposalId: proposal.id,
           userId: user.id,
-          choices: ['1']
+          choice: '1'
         })
         .expect(200)
     ).body as PublicApiProposal[];
@@ -67,7 +67,7 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choices: ['1']
+        choice: '1'
       })
     );
 
@@ -96,7 +96,7 @@ describe('POST /api/v1/proposals/vote', () => {
         .send({
           proposalId: proposal.id,
           userId: user.id,
-          choices: ['1']
+          choice: '1'
         })
         .expect(200)
     ).body as PublicApiProposal[];
@@ -105,7 +105,7 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choices: ['1']
+        choice: '1'
       })
     );
 
@@ -129,7 +129,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: proposal.id,
         userId: user.id,
-        choices: ['1']
+        choice: '1'
       })
       .expect(401);
   });
@@ -149,7 +149,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: v4(),
         userId: user.id,
-        choices: ['1']
+        choice: '1'
       })
       .expect(404);
 
@@ -159,7 +159,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: proposal.id,
         userId: v4(),
-        choices: ['1']
+        choice: '1'
       })
       .expect(401);
 
@@ -169,7 +169,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .send({
         proposalId: proposal.id,
         userId: user.id,
-        choices: ['12']
+        choice: '12'
       })
       .expect(400);
 

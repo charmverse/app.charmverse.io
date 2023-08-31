@@ -22,7 +22,7 @@ handler
       resourceIdType: 'vote'
     })
   )
-  .use(requireKeys(['choice'], 'body'))
+  .use(requireKeys(['choices'], 'body'))
   .post(castVote);
 
 async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
