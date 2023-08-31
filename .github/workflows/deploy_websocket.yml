@@ -146,7 +146,7 @@ jobs:
 
           git diff --name-only ${{github.event.before}} ${{github.event.after}}
           websocket_src_file_pattern='^(background/|config/|lib/[dD]ocker|package.json)+'
-          for file in $(git diff --name-only HEAD..HEAD^1); do
+          for file in $(git diff --name-only ${{github.event.before}} ${{github.event.after}}); do
             if [[ $file =~ $websocket_src_file_pattern ]]; then
               echo "deploy_websocket=true" >> $GITHUB_OUTPUT
               break
