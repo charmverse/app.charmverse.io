@@ -129,6 +129,7 @@ type PageReordered = {
     newParentId: string | null;
     newIndex: number;
     trigger: 'sidebar-to-sidebar' | 'sidebar-to-editor';
+    pos?: number;
   };
 };
 

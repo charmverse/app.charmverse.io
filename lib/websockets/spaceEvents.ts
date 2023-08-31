@@ -219,7 +219,7 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId: pagePathOrId, newParentId, newIndex, trigger } = message.payload;
+      const { pageId: pagePathOrId, newParentId, newIndex, trigger, pos } = message.payload;
 
       const page = await prisma.page.findFirst({
         where: isUUID(pagePathOrId)
@@ -290,7 +290,7 @@ export class SpaceEventHandler {
             docRooms: this.docRooms,
             parentId: newParentId
           });
-          const lastValidPos = pageNode.content.size;
+          const lastValidPos = pos ?? pageNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {

@@ -288,7 +288,8 @@ export class FidusEditor {
               pageId: pagePath,
               newParentId: this.docInfo.id,
               newIndex: -1,
-              trigger: 'sidebar-to-editor'
+              trigger: 'sidebar-to-editor',
+              pos: step.from
             }
           });
         } else if (!view.isDestroyed) {
@@ -312,10 +313,12 @@ export class FidusEditor {
   }
 
   extractPagePath(step: any) {
-    const content0 = step.slice?.content?.[0];
-    const content1 = step.slice?.content?.[1];
+    const sliceLength = step.slice?.content.length ?? 0;
+    let marks: any[] = [];
 
-    if (!content0 || !content1) {
+    const content0 = step.slice?.content?.[0];
+
+    if (!content0) {
       return null;
     }
 
@@ -326,21 +329,40 @@ export class FidusEditor {
       return null;
     }
 
-    const isImage = content0.type === 'image';
-    const isParagraph = content1.type === 'paragraph';
+    if (sliceLength === 1) {
+      marks =
+        (content0.type === 'text'
+          ? content0.marks
+          : content0.type === 'paragraph'
+          ? content0.content?.[0]?.marks
+          : []) ?? [];
+    } else if (sliceLength === 2) {
+      const content1 = step.slice?.content?.[1];
 
-    if (!isImage || !isParagraph) {
+      if (!content1) {
+        return null;
+      }
+
+      const isImage = content0.type === 'image';
+      const isParagraph = content1.type === 'paragraph';
+
+      if (!isImage || !isParagraph) {
+        return null;
+      }
+
+      marks = content1.content[0]?.marks ?? [];
+    }
+
+    if (marks.length === 0) {
       return null;
     }
 
-    // Check if the paragraph's first content is a text with the first mark of that text being a link and get the href attribute of that link
     let href = null;
-    const content10 = content1.content?.[0];
-    if (content10.type === 'text' && content10.marks.length > 0 && content10.marks[0].type === 'link') {
-      href = content10.marks[0].attrs.href;
+    if (marks[0].type === 'link') {
+      href = marks[0].attrs.href;
     }
 
-    if (href.startsWith(window.location.origin)) {
+    if (href?.startsWith(window.location.origin)) {
       href = href.split('/').at(-1);
     }
 
