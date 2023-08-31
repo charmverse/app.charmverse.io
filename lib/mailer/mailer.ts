@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 
 import { getInviteToPageEmail } from './emails';
-import type { InviteToPageProps } from './emails/templates/InviteToPage';
+import type { InviteToPageProps } from './emails/templates/InviteToPageTemplate';
 import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 
 export interface EmailRecipient {

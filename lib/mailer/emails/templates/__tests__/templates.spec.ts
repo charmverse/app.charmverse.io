@@ -1,4 +1,4 @@
-import { tasksRequiresYourAttention } from '../PendingTasks';
+import { tasksRequiresYourAttention } from '../PendingTasksTemplate';
 
 describe('Email template unit tests', () => {
   it('Subject line should be formatted properly for one task', async () => {

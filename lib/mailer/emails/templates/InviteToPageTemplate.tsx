@@ -1,5 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from 'mjml-react';
 
+import { baseUrl } from 'config/constants';
+
 import { Button, EmailWrapper, Footer, Header } from './components';
 
 export type InviteToPageProps = {
@@ -18,10 +20,8 @@ const pageContainerStyle = {
   padding: '10px 30px'
 };
 
-const charmverseUrl = process.env.DOMAIN;
-
 export function InviteToPage(props: InviteToPageProps) {
-  const pageLink = `${charmverseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
+  const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>

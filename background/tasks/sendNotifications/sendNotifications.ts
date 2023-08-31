@@ -7,7 +7,7 @@ import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasks';
+import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasksTemplate';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 

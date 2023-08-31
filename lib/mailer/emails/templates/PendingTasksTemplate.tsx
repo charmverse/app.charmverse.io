@@ -4,6 +4,7 @@ import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 
 import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import { baseUrl } from 'config/constants';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
 import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
@@ -13,8 +14,6 @@ import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
 
 import { EmailWrapper, Feedback, Footer, Header } from './components';
-
-const charmverseUrl = process.env.DOMAIN;
 
 const MAX_ITEMS_PER_TASK = 3;
 const MAX_CHAR = 60;
@@ -59,11 +58,11 @@ export default function PendingTasks(props: PendingTasksProps) {
   const totalBountyTasks = props.bountyTasks.length;
   const totalForumTasks = props.forumTasks.length;
 
-  const nexusDiscussionLink = `${charmverseUrl}/?notifications=discussion`;
-  const nexusVoteLink = `${charmverseUrl}/?notifications=vote`;
-  const nexusProposalLink = `${charmverseUrl}/?notifications=proposal`;
-  const nexusBountyLink = `${charmverseUrl}/?notifications=bounty`;
-  const nexusForumLink = `${charmverseUrl}/?notifications=forum`;
+  const nexusDiscussionLink = `${baseUrl}/?notifications=discussion`;
+  const nexusVoteLink = `${baseUrl}/?notifications=vote`;
+  const nexusProposalLink = `${baseUrl}/?notifications=proposal`;
+  const nexusBountyLink = `${baseUrl}/?notifications=bounty`;
+  const nexusForumLink = `${baseUrl}/?notifications=forum`;
 
   const discussionSection =
     totalDiscussionTasks > 0 ? (
@@ -261,7 +260,7 @@ function VoteTaskMjml({ task }: { task: VoteTask }) {
   return (
     <MjmlText>
       <a
-        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        href={`${baseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
       >
         {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
@@ -294,7 +293,7 @@ function ProposalTaskMjml({ task }: { task: ProposalTask }) {
   return (
     <MjmlText>
       <a
-        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        href={`${baseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{
           display: 'block',
           color: 'inherit'
@@ -326,7 +325,7 @@ function BountyTaskMjml({ task }: { task: BountyTask }) {
   return (
     <MjmlText>
       <a
-        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        href={`${baseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{
           color: 'inherit',
           display: 'block'
@@ -358,7 +357,7 @@ function DiscussionTask({ task: { text, spaceName, pageTitle, pagePath, spaceDom
   return (
     <MjmlText>
       <a
-        href={`${charmverseUrl}/${spaceDomain}/${pagePath}`}
+        href={`${baseUrl}/${spaceDomain}/${pagePath}`}
         style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
       >
         {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
@@ -382,7 +381,7 @@ function ForumTask({ task: { commentText, spaceName, spaceDomain, postPath, post
   return (
     <MjmlText>
       <a
-        href={`${charmverseUrl}/${spaceDomain}/forum/post/${postPath}`}
+        href={`${baseUrl}/${spaceDomain}/forum/post/${postPath}`}
         style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
       >
         {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText || 'New Post'}

@@ -94,18 +94,13 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   // Usually a userId, but can be an email
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
-
-  let recipientEmail: string | null = null;
-
+  const userEmail = userIdAsEmail && isValidEmail(userIdAsEmail) ? userIdAsEmail : null;
   // Handle case where we are sharing a page to a user by email
-  if (userIdAsEmail && isValidEmail(userIdAsEmail)) {
+  if (userEmail) {
     const addGuestResult = await addGuest({
       spaceId: page.spaceId,
-      userIdOrEmail: userIdAsEmail
+      userIdOrEmail: userEmail
     });
-
-    recipientEmail = addGuestResult.user.email;
-
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
 
     log.info('Member shared a page with a guest by email', {
@@ -124,25 +119,30 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   // notify a user the doc has been shared
   if (createdPermission.assignee.group === 'user') {
     const userId = (createdPermission.assignee as TargetPermissionGroup<'user'>).id;
-    recipientEmail =
-      recipientEmail ||
-      (await await prisma.user
+    // get the email of the user, if available
+    const notificationEmail =
+      userEmail ||
+      (await prisma.user
         .findUniqueOrThrow({
           where: {
             id: userId
+          },
+          select: {
+            googleAccounts: true,
+            verifiedEmails: true
           }
         })
-        .then((user) => user.email));
-
-    if (recipientEmail) {
+        // TODO: maybe support checking user.email, but we would need to look for it when logging in thru magic link
+        .then((user) => user.googleAccounts[0].email || user.verifiedEmails[0]?.email));
+    if (notificationEmail) {
       const sender = await prisma.user.findUniqueOrThrow({
         where: {
           id: req.session.user.id
         }
       });
       await sendInviteToPageEmail({
-        guestEmail: recipientEmail,
-        to: { email: recipientEmail, userId },
+        guestEmail: notificationEmail,
+        to: { email: notificationEmail, userId },
         pageId,
         pageTitle: page.title,
         invitingUserName: sender.username
