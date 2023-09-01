@@ -174,7 +174,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
   const updateBlock = useCallback(
     async (updatedBlock: ProposalBlockWithTypedFields) => {
-      if (!space || !proposalBlocks?.find((b) => b.id === updatedBlock.id)) {
+      if (!space) {
         return;
       }
 
@@ -191,7 +191,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update block: ${e.message}`, 'error');
       }
     },
-    [proposalBlocks, showMessage, space, updateBlockCache, updateProposalBlocks]
+    [showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const createBlock = useCallback(

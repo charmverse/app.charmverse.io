@@ -31,6 +31,7 @@ export function useProposalsBoardMutator() {
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
     const blockInput = fbBlockToBlock(fbBlockInput);
+
     const updatedBlock = await updateBlock(blockInput as ProposalBlockWithTypedFields);
     if (!updatedBlock) return;
 

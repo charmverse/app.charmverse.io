@@ -40,7 +40,7 @@ export function ProposalsBoard() {
       visibleGroups={[]}
       selectedCardIds={[]}
       readOnly={!isAdmin}
-      readOnlySourceData={true}
+      readOnlySourceData={false}
       cardIdToFocusOnRender=''
       showCard={openPage}
       addCard={async () => {}}
