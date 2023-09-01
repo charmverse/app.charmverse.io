@@ -1,9 +1,11 @@
 import { Box } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/u/components/UserDetails/UserDetailsForm';
 import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
@@ -35,6 +37,7 @@ export function CurrentUserProfile({
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
   const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+  const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
@@ -88,6 +91,14 @@ export function CurrentUserProfile({
     [memberPropertyValues, currentSpace?.id]
   );
 
+  const handleClose = () => {
+    if (!isFormClean) {
+      confirmExitPopupState.open();
+    } else {
+      onClose();
+    }
+  };
+
   // dont show a modal until the space is loaded at least
   if (!currentSpace) {
     return null;
@@ -105,7 +116,7 @@ export function CurrentUserProfile({
   }
 
   return (
-    <UserProfileDialog fluidSize={currentStep === 'email_step'} onClose={onClose} title={title}>
+    <UserProfileDialog fluidSize={currentStep === 'email_step'} onClose={handleClose} title={title}>
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
@@ -128,10 +139,22 @@ export function CurrentUserProfile({
           <Legend mt={4}>Profiles</Legend>
           <ProfileWidgets userId={currentUser.id} />
           <Box display='flex' justifyContent='flex-end' mt={2}>
-            <Button disableElevation size='large' onClick={saveForm}>
+            <Button disableElevation size='large' onClick={saveForm} disabled={isFormClean}>
               Save
             </Button>
           </Box>
+          <ConfirmDeleteModal
+            onClose={confirmExitPopupState.close}
+            title='Unsaved changes'
+            open={confirmExitPopupState.isOpen}
+            buttonText='Discard'
+            secondaryButtonText='Cancel'
+            question='Are you sure you want to close this window? You have unsaved changes.'
+            onConfirm={() => {
+              confirmExitPopupState.close();
+              onClose();
+            }}
+          />
         </>
       ) : null}
     </UserProfileDialog>

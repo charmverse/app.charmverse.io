@@ -83,7 +83,7 @@ export interface CastProposalVoteRequestBody {
 export interface CastProposalVoteResponseBody {
   voteId: string;
   userId: string;
-  choice: string;
+  choices: string[];
   createdAt: string;
   updatedAt: string;
 }

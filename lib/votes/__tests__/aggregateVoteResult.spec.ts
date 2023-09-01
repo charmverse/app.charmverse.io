@@ -9,17 +9,14 @@ describe('aggregateVoteResult', () => {
       userId,
       userVotes: [
         {
-          choice: null,
           choices: ['1', '2'],
           userId
         },
         {
-          choice: '1',
-          choices: [],
+          choices: ['1'],
           userId: v4()
         },
         {
-          choice: '',
           choices: ['2', '1'],
           userId: v4()
         }

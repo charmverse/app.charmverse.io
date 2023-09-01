@@ -88,7 +88,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
       .post(`/api/votes/${inProgressVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: '1'
+        choices: ['1']
       })
       .expect(200);
   });
@@ -102,7 +102,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
       .post(`/api/votes/${v4()}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: '3'
+        choices: ['3']
       })
       .expect(404);
   });
@@ -112,7 +112,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
       .post(`/api/votes/${cancelledVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: '3'
+        choices: ['3']
       })
       .expect(400);
   });
@@ -122,7 +122,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
       .post(`/api/votes/${inProgressVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: v4()
+        choices: [v4()]
       })
       .expect(400);
   });
@@ -132,7 +132,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
       .post(`/api/votes/${space2Vote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: '1'
+        choices: ['1']
       })
       .expect(401);
   });
@@ -173,7 +173,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
       .post(`/api/votes/${proposalVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: 'Yes'
+        choices: ['Yes']
       })
       .expect(200);
 
@@ -215,7 +215,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
       .post(`/api/votes/${proposalVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: 'Yes'
+        choices: ['Yes']
       })
       .expect(401);
   });
@@ -246,7 +246,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
       .post(`/api/votes/${proposalVote.id}/cast`)
       .set('Cookie', userCookie)
       .send({
-        choice: 'Yes'
+        choices: ['Yes']
       })
       .expect(401);
   });
