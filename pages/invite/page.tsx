@@ -2,20 +2,18 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useRef, useState, useEffect } from 'react';
 import { validate } from 'uuid';
 
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
+import { useMagicLink } from 'components/invite/page/hooks/useMagicLink';
 import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteLink';
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
-import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionSsr } from 'lib/session/withSession';
 import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
 import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
-type Props = { email?: string; error?: 'invalid_page_id' };
+type Props = { email?: string; error?: Extract<MagicLinkResponseStatus, 'error_invalid_page_id'> };
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(async (context) => {
   const pageId = context.query.id as string;
@@ -25,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
   if (!pageId || !validate(pageId)) {
     return {
       props: {
-        error: 'invalid_page_id'
+        error: 'error_invalid_page_id'
       }
     };
   }
@@ -83,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
 });
 
 export default function PageInviteLinkComponent({ email, error }: Props) {
-  const { requestMagicLink, status } = useMagicLink();
+  const { requestMagicLink, status } = useMagicLink({ error });
   return (
     <>
       <Head>
@@ -92,63 +90,6 @@ export default function PageInviteLinkComponent({ email, error }: Props) {
       <PageInviteLink status={status} email={email} submitEmail={requestMagicLink} />
     </>
   );
-}
-
-function useMagicLink() {
-  const router = useRouter();
-  const { requestMagicLinkViaFirebase, validateMagicLink, emailForSignIn } = useFirebaseAuth({
-    authenticatePath: router.asPath
-  });
-  const sendingMagicLink = useRef(false);
-  const [status, setStatus] = useState<MagicLinkResponseStatus | undefined>();
-
-  async function requestMagicLink(email: string) {
-    if (status !== 'requesting-link') {
-      sendingMagicLink.current = true;
-      try {
-        setStatus('requesting-link');
-        await requestMagicLinkViaFirebase({ email, redirectUrl: window.location.pathname });
-        setStatus('sent-link');
-      } catch (error) {
-        if ((error as any)?.code === 'auth/invalid-email') {
-          setStatus('error-invalid-email');
-        } else {
-          log.error('Error requesting firebase magic link', { error });
-          setStatus('error');
-        }
-      }
-    }
-  }
-
-  // attempt to validate email on first load
-  useEffect(() => {
-    async function init() {
-      if (emailForSignIn && status === undefined) {
-        try {
-          setStatus('verifying-email');
-          await validateMagicLink(emailForSignIn);
-          log.info('Magic link validated, redirect user to page');
-          setStatus('verified-email');
-          // refresh page to redirect user
-          router.replace(router.asPath);
-        } catch (error: any) {
-          log.error('Error validating firebase magic link', { error });
-          if ((error as any)?.code === 'auth/invalid-action-code') {
-            setStatus('error-invalid-code');
-          } else {
-            setStatus('error');
-          }
-        }
-      }
-    }
-    init();
-  }, [emailForSignIn, status]);
-
-  return {
-    requestMagicLink,
-    validateMagicLink,
-    status
-  };
 }
 
 PageInviteLinkComponent.getLayout = getBaseLayout;
