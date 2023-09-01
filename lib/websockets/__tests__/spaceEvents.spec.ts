@@ -713,7 +713,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPageId
@@ -841,7 +841,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPageId
@@ -955,7 +955,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: null,
         pageId: childPageId
@@ -1008,7 +1008,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: null,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage.id,
         pageId: childPageId
