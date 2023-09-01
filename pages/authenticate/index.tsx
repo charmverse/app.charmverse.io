@@ -43,8 +43,11 @@ export default function Authenticate() {
 
   // Case where existing user is adding an email to their account
   function loginViaEmail() {
+    if (!emailForSignIn) {
+      return;
+    }
     setIsAuthenticating(true);
-    validateMagicLink()
+    validateMagicLink(emailForSignIn)
       .then(() => {
         showMessage('Logged in with email. Redirecting you now', 'success');
         redirectLoggedInUser();

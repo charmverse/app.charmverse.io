@@ -90,6 +90,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
+        showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         onClose();
         setIdentityToAdd(null);
       } catch (err) {
