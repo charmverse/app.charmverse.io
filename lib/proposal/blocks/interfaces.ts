@@ -17,8 +17,9 @@ export type ProposalPropertiesBlock = ProposalBlock & {
 export type ProposalBlockWithTypedFields = ProposalPropertiesBlock;
 
 export type ProposalBlockInput = {
+  id?: string;
   type: ProposalBlockType;
-  spaceId: string;
+  spaceId?: string;
   title?: string;
   schema?: number;
   fields?: ProposalPropertiesBlockFields;

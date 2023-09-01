@@ -7,20 +7,24 @@ import type { ProposalBlockUpdateInput } from 'lib/proposal/blocks/interfaces';
 export function updateBlock({
   data,
   userId,
+  spaceId,
   tx = prisma
 }: {
   data: ProposalBlockUpdateInput;
   userId: string;
+  spaceId: string;
   tx?: PrismaTransactionClient;
 }) {
-  if (!data.id || !data.type || !data.spaceId || !data.fields) {
+  if (!data.id || !data.type || !data.fields) {
     throw new InvalidInputError('Missing required fields');
   }
 
   return tx.proposalBlock.update({
     where: {
-      id: data.id,
-      spaceId: data.spaceId,
+      id_spaceId: {
+        id: data.id,
+        spaceId
+      },
       type: data.type
     },
     data: {

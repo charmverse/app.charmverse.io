@@ -9,13 +9,15 @@ import { updateBlock } from 'lib/proposal/blocks/updateBlock';
 export async function createBlock({
   data,
   userId,
+  spaceId,
   tx = prisma
 }: {
   data: ProposalBlockInput;
   userId: string;
+  spaceId: string;
   tx?: PrismaTransactionClient;
 }) {
-  const { type, spaceId } = data;
+  const { type } = data;
 
   if (!data.type || !data.spaceId || !data.fields) {
     throw new InvalidInputError('Missing required fields');
@@ -26,14 +28,15 @@ export async function createBlock({
     const currentPropertiesBlock = await tx.proposalBlock.findFirst({ where: { spaceId, type } });
 
     if (currentPropertiesBlock) {
-      return updateBlock({ data: { ...data, id: currentPropertiesBlock.id }, userId, tx });
+      return updateBlock({ data: { ...data, id: currentPropertiesBlock.id }, userId, spaceId, tx });
     }
   }
 
   return tx.proposalBlock.create({
     data: {
       ...data,
-      id: v4(),
+      spaceId,
+      id: data.id || v4(),
       createdBy: userId,
       updatedBy: userId,
       parentId: data.parentId || '',

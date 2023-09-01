@@ -1,7 +1,8 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
@@ -23,9 +24,12 @@ export function useProposalsBoardAdapter() {
   const { proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
-  const { proposalPropertiesBlock } = useProposalBlocks();
+  const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  const customProperties = (proposalPropertiesBlock?.fields?.properties || []) as IPropertyTemplate[];
+  const customProperties = useMemo(
+    () => (proposalPropertiesBlock?.fields?.properties || []) as IPropertyTemplate[],
+    [proposalPropertiesBlock?.fields?.properties]
+  );
 
   const cardPages: CardPage[] =
     proposals
@@ -54,8 +58,14 @@ export function useProposalsBoardAdapter() {
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
-  // mock properties needed to display focalboard view
-  const activeView = getDefaultTableView({ properties: customProperties, categories });
+  const activeView = useMemo(() => {
+    // use saved default block or build on the fly
+    const viewBlock = proposalBlocks?.find((b) => b.id === '__defaultView');
+
+    return viewBlock
+      ? (blockToFBBlock(viewBlock) as BoardView)
+      : getDefaultTableView({ properties: customProperties, categories });
+  }, [categories, customProperties, proposalBlocks]);
 
   const views: BoardView[] = [];
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
+import { v4 } from 'uuid';
 
 import * as http from 'adapters/http';
 import { useCreateProposalBlocks, useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
@@ -20,6 +21,7 @@ export type ProposalBlocksContextType = {
   updateProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
   deleteProperty: (id: string) => Promise<void>;
   updateBlock: (block: ProposalBlockWithTypedFields) => Promise<ProposalBlockWithTypedFields | void>;
+  createBlock: (block: ProposalBlockInput) => Promise<ProposalBlockWithTypedFields | void>;
   getBlock: (blockId: string) => Promise<ProposalBlockWithTypedFields | void>;
 };
 
@@ -31,6 +33,7 @@ export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContex
   updateProperty: async () => {},
   deleteProperty: async () => {},
   updateBlock: async () => {},
+  createBlock: async () => {},
   getBlock: async () => {}
 });
 
@@ -44,7 +47,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   const getBlock = useCallback(
     async (blockId: string): Promise<ProposalBlockWithTypedFields> => {
       const blocks = await http.GET<ProposalBlockWithTypedFields[]>(`/api/spaces/${space?.id}/proposals/blocks`, {
-        id: blockId
+        blockId
       });
       return blocks[0];
     },
@@ -56,7 +59,13 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       mutate(
         (blocks) => {
           if (!blocks) return blocks;
-          return blocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
+          const hasBlock = blocks.find((b) => b.id === updatedBlock.id);
+
+          if (hasBlock) {
+            return blocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
+          } else {
+            return [...blocks, updatedBlock];
+          }
         },
         { revalidate: false }
       );
@@ -185,6 +194,29 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
     [proposalBlocks, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
+  const createBlock = useCallback(
+    async (blockInput: ProposalBlockInput & { id?: string }) => {
+      if (!space) {
+        return;
+      }
+
+      try {
+        const newBlock = { ...blockInput, spaceId: space.id, id: blockInput.id || v4() };
+        const res = await createProposalBlocks([newBlock]);
+
+        if (!res) {
+          return;
+        }
+
+        updateBlockCache(res[0]);
+        return res[0];
+      } catch (e: any) {
+        showMessage(`Failed to update block: ${e.message}`, 'error');
+      }
+    },
+    [createProposalBlocks, showMessage, space, updateBlockCache]
+  );
+
   const value = useMemo(
     () => ({
       proposalBlocks,
@@ -194,6 +226,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       updateProperty,
       deleteProperty,
       updateBlock,
+      createBlock,
       getBlock
     }),
     [
@@ -204,6 +237,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       updateProperty,
       deleteProperty,
       updateBlock,
+      createBlock,
       getBlock
     ]
   );

@@ -38,7 +38,8 @@ describe('proposal blocks - createBlock', () => {
 
     const block = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     expect(block).toMatchObject(propertiesData);
@@ -105,12 +106,14 @@ describe('proposal blocks - createBlock', () => {
 
     const properties = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     const properties2 = await createBlock({
       userId: user.id,
-      data: propertiesData2
+      data: propertiesData2,
+      spaceId: space.id
     });
 
     expect(properties2.id).toEqual(properties.id);
@@ -149,16 +152,16 @@ describe('proposal blocks - createBlock', () => {
       }
     };
 
-    await expect(createBlock({ data: { ...propertiesData, spaceId: '' }, userId: '123' })).rejects.toBeInstanceOf(
-      InvalidInputError
-    );
-
-    await expect(createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123' })).rejects.toBeInstanceOf(
-      InvalidInputError
-    );
+    await expect(
+      createBlock({ data: { ...propertiesData, spaceId: '' }, userId: '123', spaceId: '123' })
+    ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
-      createBlock({ data: { ...propertiesData, fields: null } as any, userId: '123' })
+      createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123', spaceId: '123' })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+
+    await expect(
+      createBlock({ data: { ...propertiesData, fields: null } as any, userId: '123', spaceId: '123' })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

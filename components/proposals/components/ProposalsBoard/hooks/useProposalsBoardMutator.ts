@@ -1,14 +1,27 @@
+import { useEffect } from 'react';
+
 import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { blockToFBBlock, fbBlockToBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockPatch } from 'lib/focalboard/block';
 import type { ProposalBlockWithTypedFields } from 'lib/proposal/blocks/interfaces';
 
 export function useProposalsBoardMutator() {
-  const { updateBlock, getBlock } = useProposalBlocks();
+  const { updateBlock, createBlock, getBlock } = useProposalBlocks();
+  const { activeView } = useProposalsBoard();
 
   const patchBlock = async (blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> => {
-    const currentBlock = await getBlock(blockId);
+    let currentBlock = await getBlock(blockId);
+
+    if (!currentBlock) {
+      // if updating default view for the first time - create it in db
+      if (blockId === '__defaultView') {
+        currentBlock = await createBlock(fbBlockToBlock(activeView) as unknown as ProposalBlockWithTypedFields);
+      }
+    }
+
     if (!currentBlock) return;
 
     const currentFBBlock = blockToFBBlock(currentBlock);
@@ -25,5 +38,11 @@ export function useProposalsBoardMutator() {
     updater([fbBlock]);
   };
 
-  return null;
+  useEffect(() => {
+    // override default mutator updaters
+    mutator.setCustomMutatorUpdaters({ patchBlock });
+
+    // restore default mutator updaters on unmount
+    return () => mutator.setCustomMutatorUpdaters(null);
+  });
 }

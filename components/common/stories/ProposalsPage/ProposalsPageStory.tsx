@@ -56,6 +56,12 @@ ProposalsPageStory.parameters = {
       proposals: rest.get('/api/spaces/:spaceId/proposals', (req, res, ctx) => {
         return res(ctx.json(proposals));
       }),
+      getProposalBlocks: rest.get('/api/spaces/:spaceId/proposals/blocks', (req, res, ctx) => {
+        return res(ctx.json([]));
+      }),
+      createProposalBlocks: rest.post('/api/spaces/:spaceId/proposals/blocks', (req, res, ctx) => {
+        return res(ctx.json(req.body));
+      }),
       pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
         return res(ctx.json(pages));
       })

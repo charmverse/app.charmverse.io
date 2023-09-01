@@ -38,7 +38,8 @@ describe('proposal blocks - updateBlock', () => {
 
     const block = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     const propertiesUpdateData = {
@@ -61,7 +62,7 @@ describe('proposal blocks - updateBlock', () => {
       }
     };
 
-    const updatedBlock = await updateBlock({ data: propertiesUpdateData, userId: user.id });
+    const updatedBlock = await updateBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
 
     expect(updatedBlock).toMatchObject(propertiesUpdateData);
 
@@ -127,12 +128,14 @@ describe('proposal blocks - updateBlock', () => {
 
     const properties = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     const properties2 = await createBlock({
       userId: user.id,
-      data: propertiesData2
+      data: propertiesData2,
+      spaceId: space.id
     });
 
     expect(properties2.id).toEqual(properties.id);
