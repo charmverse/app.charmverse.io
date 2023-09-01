@@ -29,7 +29,7 @@ export function useProposalsBoardAdapter() {
 
   const cardPages: CardPage[] =
     proposals
-      ?.map((p: any) => {
+      ?.map((p) => {
         const page = pages[p?.id];
 
         return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });

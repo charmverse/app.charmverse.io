@@ -36,7 +36,7 @@ export function ProposalsBoard() {
       views={views}
       visibleGroups={[]}
       selectedCardIds={[]}
-      readOnly={true}
+      readOnly={!isAdmin}
       readOnlySourceData={true}
       cardIdToFocusOnRender=''
       showCard={openPage}

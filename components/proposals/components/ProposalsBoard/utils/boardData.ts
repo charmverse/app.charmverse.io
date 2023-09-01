@@ -27,6 +27,7 @@ export function getDefaultBoard({
 }) {
   const board = createBoard({
     block: {
+      id: '__defaultBoard',
       fields: {
         cardProperties: [
           // additional mocked properties that are not being saved with ids starting with __
@@ -82,8 +83,11 @@ export function getDefaultTableView({
   properties: IPropertyTemplate[] | undefined;
   categories: ProposalCategory[] | undefined;
 }) {
-  const view = createTableView({ board: getDefaultBoard({ properties, categories }) });
+  const view = createTableView({
+    board: getDefaultBoard({ properties, categories })
+  });
 
+  view.id = '__defaultView';
   view.fields.columnWidths = {
     __title: 310,
     __category: 200,

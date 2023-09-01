@@ -25,9 +25,11 @@ handler
 
 async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
   const spaceId = req.query.id as string;
+  const blockId = req.query.blockId as string;
 
   const proposalBlocks = await getBlocks({
-    spaceId
+    spaceId,
+    ids: blockId ? [blockId] : undefined
   });
 
   return res.status(200).json(proposalBlocks);
