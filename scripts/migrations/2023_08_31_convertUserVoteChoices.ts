@@ -1,4 +1,6 @@
-import { prisma } from "@charmverse/core/prisma-client";
+// @ts-nocheck
+
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function convertUserVoteChoices() {
   const userVotes = await prisma.userVote.findMany({});
@@ -15,7 +17,7 @@ async function convertUserVoteChoices() {
         choices: userVote.choice && userVote.choices.length === 0 ? [userVote.choice] : userVote.choices,
         choice: null
       }
-    })
+    });
   }
 }
 
