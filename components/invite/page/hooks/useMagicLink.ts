@@ -6,7 +6,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 
 import type { MagicLinkResponseStatus } from '../PageInviteLink';
 
-export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_id' }) {
+export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_id' } = {}) {
   const router = useRouter();
   const { requestMagicLinkViaFirebase, validateMagicLink, emailForSignIn } = useFirebaseAuth({
     authenticatePath: router.asPath
