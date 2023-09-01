@@ -15,7 +15,7 @@ jest.mock('next/router', () => ({
   })
 }));
 
-describe('useMagicLink', () => {
+describe('useMagicLink()', () => {
   afterAll(() => {
     jest.restoreAllMocks();
   });
