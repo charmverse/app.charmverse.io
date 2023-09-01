@@ -20,12 +20,11 @@ describe('castVote', () => {
       voteOptions: ['1', '2', '3']
     });
     const choice = '1';
-    const userVote = await castVote(choice, vote, user.id);
+    const userVote = await castVote([choice], vote, user.id);
     expect(userVote).toMatchObject(
       expect.objectContaining({
         userId: user.id,
         voteId: vote.id,
-        choice: '',
         choices: [choice]
       })
     );
@@ -45,14 +44,13 @@ describe('castVote', () => {
       voteOptions: ['1', '2', '3'],
       maxChoices: 2
     });
-    const choice = ['1', '3'];
-    const userVote = await castVote(choice, vote, user.id);
+    const choices = ['1', '3'];
+    const userVote = await castVote(choices, vote, user.id);
     expect(userVote).toMatchObject(
       expect.objectContaining({
         userId: user.id,
         voteId: vote.id,
-        choice: '',
-        choices: choice
+        choices
       })
     );
   });
@@ -72,12 +70,11 @@ describe('castVote', () => {
       userVotes: ['1']
     });
     const choice = '3';
-    const userVote = await castVote(choice, vote, user.id);
+    const userVote = await castVote([choice], vote, user.id);
     expect(userVote).toMatchObject(
       expect.objectContaining({
         userId: user.id,
         voteId: vote.id,
-        choice: '',
         choices: [choice]
       })
     );
@@ -98,14 +95,13 @@ describe('castVote', () => {
       userVotes: ['1'],
       maxChoices: 2
     });
-    const choice = ['3', '1'];
-    const userVote = await castVote(choice, vote, user.id);
+    const choices = ['3', '1'];
+    const userVote = await castVote(choices, vote, user.id);
     expect(userVote).toMatchObject(
       expect.objectContaining({
         userId: user.id,
         voteId: vote.id,
-        choice: '',
-        choices: choice
+        choices
       })
     );
   });
@@ -124,7 +120,7 @@ describe('castVote', () => {
       spaceId: space.id
     });
 
-    await expect(castVote('1', vote, v4())).rejects.toBeInstanceOf(UndesirableOperationError);
+    await expect(castVote(['1'], vote, v4())).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it("should throw error if vote choice isn't one of vote option", async () => {
@@ -141,7 +137,7 @@ describe('castVote', () => {
       voteOptions: ['1', '2', '3']
     });
 
-    await expect(castVote('4', vote, v4())).rejects.toBeInstanceOf(InvalidInputError);
+    await expect(castVote(['4'], vote, v4())).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it('should throw error if user selects more choices than allowed', async () => {

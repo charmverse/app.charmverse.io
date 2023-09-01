@@ -17,16 +17,13 @@ describe('calculateVoteStatus', () => {
       deadline: new Date(),
       userVotes: [
         {
-          choice: '1',
-          choices: []
+          choices: ['1']
         },
         {
-          choice: '1',
-          choices: []
+          choices: ['1']
         },
         {
-          choice: '2',
-          choices: []
+          choices: ['2']
         }
       ]
     });
@@ -41,15 +38,12 @@ describe('calculateVoteStatus', () => {
       deadline: nonExpiredDeadline,
       userVotes: [
         {
-          choice: null,
           choices: ['1']
         },
         {
-          choice: null,
           choices: ['1']
         },
         {
-          choice: null,
           choices: ['2']
         }
       ]
@@ -65,15 +59,12 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: null,
           choices: ['Yes']
         },
         {
-          choice: null,
           choices: ['Yes']
         },
         {
-          choice: null,
           choices: ['No']
         }
       ]
@@ -89,15 +80,12 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: null,
           choices: ['Yes']
         },
         {
-          choice: 'No',
-          choices: []
+          choices: ['No']
         },
         {
-          choice: null,
           choices: ['No']
         }
       ]
@@ -113,16 +101,13 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: '1',
-          choices: []
+          choices: ['1']
         },
         {
-          choice: '1',
-          choices: []
+          choices: ['1']
         },
         {
-          choice: '2',
-          choices: []
+          choices: ['2']
         }
       ]
     });
@@ -137,15 +122,12 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: null,
           choices: ['1']
         },
         {
-          choice: null,
           choices: ['1']
         },
         {
-          choice: null,
           choices: ['2']
         }
       ]

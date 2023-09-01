@@ -133,7 +133,6 @@ function AddCommentCharmEditor({
           border: '1px solid var(--input-border)'
         }}
         placeholderText='Reply...'
-        key={thread.comments[thread.comments.length - 1]?.id}
         content={commentContent}
         onContentChange={({ doc }) => {
           setCommentContent(doc);
@@ -290,6 +289,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+    const [counter, setCounter] = useState(0);
 
     function resetState() {
       setEditedCommentId(null);
@@ -477,8 +477,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
         </div>
         {permissions?.comment && (
           <AddCommentCharmEditor
-            key={thread.comments[thread.comments.length - 1]?.id}
             readOnly={Boolean(editedCommentId)}
+            key={counter}
             sx={{
               display: 'flex',
               px: 1,
@@ -496,6 +496,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
               setIsMutating(true);
               cb();
               resetState();
+              setCounter(counter + 1);
             }}
           />
         )}

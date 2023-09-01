@@ -1,5 +1,5 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, Chip, Divider, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 
 import { Button } from 'components/common/Button';
