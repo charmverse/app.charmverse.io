@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
+import * as http from 'adapters/http';
 import { useCreateProposalBlocks, useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -19,6 +20,7 @@ export type ProposalBlocksContextType = {
   updateProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
   deleteProperty: (id: string) => Promise<void>;
   updateBlock: (block: ProposalBlockWithTypedFields) => Promise<ProposalBlockWithTypedFields | void>;
+  getBlock: (blockId: string) => Promise<ProposalBlockWithTypedFields | void>;
 };
 
 export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContextType>>({
@@ -28,7 +30,8 @@ export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContex
   createProperty: async () => {},
   updateProperty: async () => {},
   deleteProperty: async () => {},
-  updateBlock: async () => {}
+  updateBlock: async () => {},
+  getBlock: async () => {}
 });
 
 export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
@@ -36,8 +39,17 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   const { data: proposalBlocks, isLoading, mutate } = useGetProposalBlocks(space?.id);
   const { trigger: createProposalBlocks } = useCreateProposalBlocks(space?.id || '');
   const { trigger: updateProposalBlocks } = useUpdateProposalBlocks(space?.id || '');
-
   const { showMessage } = useSnackbar();
+
+  const getBlock = useCallback(
+    async (blockId: string): Promise<ProposalBlockWithTypedFields> => {
+      const blocks = await http.GET<ProposalBlockWithTypedFields[]>(`/api/spaces/${space?.id}/proposals/blocks`, {
+        id: blockId
+      });
+      return blocks[0];
+    },
+    [space?.id]
+  );
 
   const updateBlockCache = useCallback(
     (updatedBlock: ProposalBlockWithTypedFields) => {
@@ -98,7 +110,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to create property: ${e.message}`, 'error');
       }
     },
-    [mutate, proposalPropertiesBlock, space, updateBlockCache]
+    [createProposalBlocks, mutate, proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const updateProperty = useCallback(
@@ -125,7 +137,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update property: ${e.message}`, 'error');
       }
     },
-    [proposalPropertiesBlock, space, updateBlockCache]
+    [proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const deleteProperty = useCallback(
@@ -148,7 +160,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to delete property: ${e.message}`, 'error');
       }
     },
-    [proposalPropertiesBlock, space, updateBlockCache]
+    [proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const updateBlock = useCallback(
@@ -170,7 +182,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update block: ${e.message}`, 'error');
       }
     },
-    [proposalBlocks, space, updateBlockCache]
+    [proposalBlocks, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const value = useMemo(
@@ -181,9 +193,19 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       createProperty,
       updateProperty,
       deleteProperty,
-      updateBlock
+      updateBlock,
+      getBlock
     }),
-    [proposalBlocks, proposalPropertiesBlock, isLoading, createProperty, updateProperty, deleteProperty, updateBlock]
+    [
+      proposalBlocks,
+      proposalPropertiesBlock,
+      isLoading,
+      createProperty,
+      updateProperty,
+      deleteProperty,
+      updateBlock,
+      getBlock
+    ]
   );
 
   return <ProposalBlocksContext.Provider value={value}>{children}</ProposalBlocksContext.Provider>;
