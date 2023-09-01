@@ -34,7 +34,7 @@ export const disconnectWallet = async ({ userId, address }: DisconnectWalletRequ
     }
   });
 
-  const usersWithTokenGates = await prisma.spaceRole.findMany({
+  const userSpaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId,
       isAdmin: false
@@ -60,7 +60,7 @@ export const disconnectWallet = async ({ userId, address }: DisconnectWalletRequ
     }
   });
 
-  for (const spaceRole of usersWithTokenGates) {
+  for (const spaceRole of userSpaceRoles) {
     const { removedRoles } = await verifyTokenGateMembership({
       userTokenGates: spaceRole.user.userTokenGates,
       userId,
