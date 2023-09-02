@@ -29,54 +29,59 @@ type DialogProps = Props & {
   onClose?: () => void;
 };
 
-export function CollectEmail({ email, handleSubmit, description, title, loading, onClose }: Props) {
-  const { register, getValues, getFieldState } = useForm<FormValues>({
+export function EmailAddressForm({ email = '', handleSubmit: onSubmit, description, title, loading, onClose }: Props) {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitted, submitCount }
+  } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema),
     defaultValues: {
       email
     }
   });
-  // Return actual email or null
-  function validEmail(): string | false {
-    const values = getValues();
-    const hasError = getFieldState('email').invalid;
-    if (!!values.email && !hasError) {
-      return values.email;
-    }
-    return false;
-  }
 
-  function submitEmail() {
-    const validValue = validEmail();
-    if (validValue) {
-      handleSubmit(validValue);
-    }
+  function submitEmail(fields: { email: string }) {
+    onSubmit(fields.email);
   }
 
   return (
     <Box mb={2} px={1} width='100%'>
-      {title && <DialogTitle onClose={onClose}>{title}</DialogTitle>}
+      <form onSubmit={handleSubmit(submitEmail)}>
+        {title && <DialogTitle onClose={onClose}>{title}</DialogTitle>}
 
-      {description && (
-        <Typography pl={0.2} mb={2}>
-          {description}
-        </Typography>
-      )}
-      <TextField {...register('email')} placeholder='email@charmverse.io' type='text' fullWidth sx={{ mb: 2 }} />
-      <Button disabled={!validEmail() || loading} onClick={submitEmail}>
-        Submit
-        {loading && (
-          <span style={{ marginLeft: '6px' }}>
-            <LoadingComponent size={14} />
-          </span>
+        {description && (
+          <Typography pl={0.2} mb={2}>
+            {description}
+          </Typography>
         )}
-      </Button>
+        <TextField
+          {...register('email')}
+          placeholder='email@charmverse.io'
+          error={isSubmitted && !!errors.email}
+          helperText={isSubmitted && !!errors.email && 'Email is invalid'}
+          type='text'
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <Button type='submit' disabled={loading} loading={loading}>
+          Submit
+        </Button>
+      </form>
     </Box>
   );
 }
 
-export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, description, email, loading }: DialogProps) {
+export function EmailAddressFormDialog({
+  handleSubmit,
+  isOpen,
+  onClose,
+  title,
+  description,
+  email,
+  loading
+}: DialogProps) {
   const { reset } = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema)
@@ -92,7 +97,7 @@ export function CollectEmailDialog({ handleSubmit, isOpen, onClose, title, descr
     <Modal title={title} open={isOpen} onClose={onClose ? closeForm : undefined}>
       {/** Align the title of modal with the dialog */}
       <Box sx={{ mx: -1 }}>
-        <CollectEmail description={description} handleSubmit={handleSubmit} email={email} loading={loading} />
+        <EmailAddressForm description={description} handleSubmit={handleSubmit} email={email} loading={loading} />
       </Box>
     </Modal>
   );

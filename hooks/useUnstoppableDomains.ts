@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
-import type { AnyIdLogin } from 'components/login/LoginButton';
+import type { AnyIdLogin } from 'components/login/components/LoginButton';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { extractDomainFromProof, type UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
