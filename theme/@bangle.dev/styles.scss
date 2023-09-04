@@ -625,4 +625,22 @@ ol li {
   }
 }
 
+.bangle-editor-core.readonly {
+  p, h1, h2, h3, ul, ol, code, .charm-column-row, .bangle-nv-container {
+    &:has(div.charm-row-decoration-suggestions) {
+      // important for column row, as it uses inline-styles
+      display: none !important;
+    }
+  }
+
+  // For NodeView blocks the decoration is adjacent to it
+  .bangle-nv-container:has(+ div.charm-row-decoration-suggestions) {
+    display: none;
+  }
+
+  div.charm-row-decoration-suggestions {
+    display: none;
+  }
+}
+
 /** End columns **/
