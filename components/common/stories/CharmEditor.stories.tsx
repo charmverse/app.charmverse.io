@@ -12,6 +12,7 @@ import {
   contentWithColumnsAndTables,
   contentWithMedia
 } from 'testing/mocks/charmEditorContent';
+import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 function renderEditorWithContent(content: PageContent | undefined) {
   return (
@@ -116,8 +117,18 @@ export function EditorWithContent() {
   return renderEditorWithContent(contentWithBlocksAndMarks);
 }
 
-export function ColumnLayout() {
+export function LayoutColumnComponent() {
   return renderEditorWithContent(contentWithColumnsAndTables);
+}
+
+export function LayoutTableComponent() {
+  const content = jsonDoc(
+    _.table(
+      _.table_row(_.table_header(_.p('Header 1')), _.table_header(_.p('Header 2'))),
+      _.table_row(_.table_cell(_.p('Cell 1')), _.table_cell(_.p('Cell 2')))
+    )
+  );
+  return renderEditorWithContent(content);
 }
 
 export function EditorWithMedia() {

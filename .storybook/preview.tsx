@@ -5,10 +5,10 @@ import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { IntlProvider } from 'react-intl';
 
-import '@skiff-org/prosemirror-tables/style/table-filters.css';
-import '@skiff-org/prosemirror-tables/style/table-headers.css';
-import '@skiff-org/prosemirror-tables/style/table-popup.css';
-import '@skiff-org/prosemirror-tables/style/tables.css';
+// import '@skiff-org/prosemirror-tables/style/table-filters.css';
+// import '@skiff-org/prosemirror-tables/style/table-headers.css';
+// import '@skiff-org/prosemirror-tables/style/table-popup.css';
+// import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
@@ -148,7 +148,5 @@ export const withIntl = (Story, context) => {
     </IntlProvider>
   );
 };
-
-
 
 export const decorators = [withMuiTheme, withIntl];
