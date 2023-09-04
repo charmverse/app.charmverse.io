@@ -6,8 +6,6 @@ import { useContext, useEffect, useState } from 'react';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import Loader from 'components/common/LoadingComponent';
-import { LoginPageContent } from 'components/login';
-import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -16,6 +14,9 @@ import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie, getSpaceUrl } from 'lib/utilities/browser';
+
+import Footer from './components/Footer';
+import { LoginPageContent } from './LoginPageContent';
 
 export function LoginPageView() {
   const { triedEager } = useContext(Web3Connection);

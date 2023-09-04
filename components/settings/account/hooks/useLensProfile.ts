@@ -3,6 +3,7 @@ import { RPC } from 'connectors/index';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
@@ -15,6 +16,7 @@ async function switchNetwork() {
 export function useLensProfile() {
   const { account, library, chainId } = useWeb3AuthSig();
   const { user } = useUser();
+  const { space } = useCurrentSpace();
 
   const {
     data: lensProfileState = {
@@ -49,7 +51,12 @@ export function useLensProfile() {
   }
 
   return {
-    ...lensProfileState,
+    isAuthenticated: lensProfileState.isAuthenticated,
+    lensProfile: !isCyberConnect(space?.domain) && lensProfileState.lensProfile,
     setupLensProfile
   };
+}
+
+function isCyberConnect(domain?: string) {
+  return domain === 'cyberconnect';
 }

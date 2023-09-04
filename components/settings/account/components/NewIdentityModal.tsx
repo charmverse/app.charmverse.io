@@ -5,8 +5,8 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login';
-import { CollectEmail } from 'components/login/CollectEmail';
+import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
+import { WalletSign } from 'components/login/components/WalletSign';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -90,6 +90,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
+        showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         onClose();
         setIdentityToAdd(null);
       } catch (err) {
@@ -212,7 +213,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       )}
 
       {identityToAdd === 'email' && (
-        <CollectEmail
+        <EmailAddressForm
           description='Enter the email address that you want to connect to this account'
           handleSubmit={handleConnectEmailRequest}
         />
