@@ -34,8 +34,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -101,10 +99,8 @@ function CenterPanel(props: Props) {
 
   const router = useRouter();
   const { space } = useCurrentSpace();
-  const { pages, refreshPage, updatePage } = usePages();
+  const { pages, refreshPage } = usePages();
   const { members } = useMembers();
-  const { showMessage } = useSnackbar();
-  const { user } = useUser();
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
