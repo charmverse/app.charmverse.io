@@ -85,7 +85,7 @@ function ViewHeader(props: Props) {
     if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
       updateProposalSource({ pageId: currentRootPageId });
     }
-  }, [currentRootPageId, activeBoard?.fields.sourceType, activeBoard?.id]);
+  }, [currentRootPageId, activeBoard?.id]);
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
