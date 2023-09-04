@@ -278,21 +278,7 @@ export class FidusEditor {
       dispatchTransaction: (tr) => {
         // console.log('dispatchTransaction', tr.meta);
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
-        const step = trackedTr.steps[0]?.toJSON();
-        const pagePath = step ? this.extractPagePath(step) : null;
-        // Handle drag and drop from sidebar to editor
-        if (pagePath) {
-          emitSocketMessage({
-            type: 'page_reordered',
-            payload: {
-              pageId: pagePath,
-              newParentId: this.docInfo.id,
-              newIndex: -1,
-              trigger: 'sidebar-to-editor',
-              pos: step.from
-            }
-          });
-        } else if (!view.isDestroyed) {
+        if (!view.isDestroyed) {
           const { state: newState } = view.state.applyTransaction(trackedTr);
           view.updateState(newState);
           if (tr.steps.length) {

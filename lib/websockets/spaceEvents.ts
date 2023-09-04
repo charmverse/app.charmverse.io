@@ -230,7 +230,6 @@ export class SpaceEventHandler {
               path: pagePathOrId
             },
         select: {
-          icon: true,
           id: true,
           spaceId: true,
           parentId: true
@@ -291,7 +290,7 @@ export class SpaceEventHandler {
             docRooms: this.docRooms,
             parentId: newParentId
           });
-          const lastValidPos = pos ? pos + (page.icon ? 0 : 1) : pageNode.content.size;
+          const lastValidPos = pos ?? pageNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {

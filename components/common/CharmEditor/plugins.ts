@@ -4,6 +4,11 @@ import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
+
+import type { StaticPagesType } from '../PageLayout/components/Sidebar/utils/staticPages';
+import { STATIC_PAGES } from '../PageLayout/components/Sidebar/utils/staticPages';
+
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
@@ -85,6 +90,52 @@ export function charmEditorPlugins({
   placeholderText?: string;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
+    new Plugin({
+      props: {
+        handleDOMEvents: {
+          drop(view, ev) {
+            ev.preventDefault();
+            if (!ev.dataTransfer || !pageId) {
+              return true;
+            }
+
+            const coordinates = view.posAtCoords({
+              left: ev.clientX,
+              top: ev.clientY
+            });
+
+            if (!coordinates) {
+              return true;
+            }
+
+            const staticPagePaths = STATIC_PAGES.map((page) => page.path);
+
+            const data = ev.dataTransfer.getData('text/plain');
+            if (!data) {
+              return true;
+            }
+
+            const pagePath = data.split('/').pop();
+
+            if (pagePath && !staticPagePaths.includes(pagePath as StaticPagesType)) {
+              emitSocketMessage({
+                type: 'page_reordered',
+                payload: {
+                  pageId: pagePath,
+                  newParentId: pageId,
+                  newIndex: -1,
+                  trigger: 'sidebar-to-editor',
+                  pos: coordinates.pos
+                }
+              });
+              return false;
+            }
+
+            return true;
+          }
+        }
+      }
+    }),
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
