@@ -207,7 +207,8 @@ export function charmEditorPlugins({
   );
 
   if (!readOnly && !disableRowHandles) {
-    basePlugins.push(
+    // add rowActions before the table plugin, or else mousedown is not triggered
+    basePlugins.unshift(
       rowActions.plugins({
         key: actionsPluginKey
       })
