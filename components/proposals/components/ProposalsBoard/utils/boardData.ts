@@ -1,7 +1,9 @@
 import type { ProposalCategory } from '@charmverse/core/prisma';
 
+import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { evaluationTypeOptions } from 'components/proposals/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
-import { createBoard, type IPropertyTemplate } from 'lib/focalboard/board';
+import type { Block } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
@@ -14,6 +16,7 @@ import {
   STATUS_BLOCK_ID,
   TITLE_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
+import type { ProposalPropertiesBlock } from 'lib/proposal/blocks/interfaces';
 
 const proposalStatuses = [
   'draft',
@@ -27,25 +30,31 @@ const proposalStatuses = [
 ] as const;
 
 export function getDefaultBoard({
-  properties = [],
+  storedBoard,
   categories = [],
   customOnly = false
 }: {
-  properties: IPropertyTemplate[] | undefined;
+  storedBoard: ProposalPropertiesBlock | undefined;
   categories: ProposalCategory[] | undefined;
   customOnly?: boolean;
 }) {
+  const block: Partial<Block> = storedBoard
+    ? blockToFBBlock(storedBoard)
+    : {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        fields: {
+          cardProperties: getDefaultProperties({ categories })
+        }
+      };
+
+  if (customOnly) {
+    block.fields = {
+      cardProperties: block.fields?.cardProperties?.filter((p: { id: string }) => !p.id.startsWith('__'))
+    };
+  }
+
   const board = createBoard({
-    block: {
-      id: DEFAULT_BOARD_BLOCK_ID,
-      fields: {
-        cardProperties: [
-          // additional mocked properties that are not being saved with ids starting with __
-          ...(customOnly ? [] : getDefaultProperties({ categories })),
-          ...properties
-        ]
-      }
-    }
+    block
   });
 
   return board;
@@ -87,14 +96,14 @@ function getDefaultEvaluationTypeProperty() {
 }
 
 export function getDefaultTableView({
-  properties = [],
+  storedBoard,
   categories = []
 }: {
-  properties: IPropertyTemplate[] | undefined;
+  storedBoard: ProposalPropertiesBlock | undefined;
   categories: ProposalCategory[] | undefined;
 }) {
   const view = createTableView({
-    board: getDefaultBoard({ properties, categories })
+    board: getDefaultBoard({ storedBoard, categories })
   });
 
   view.id = DEFAULT_VIEW_BLOCK_ID;

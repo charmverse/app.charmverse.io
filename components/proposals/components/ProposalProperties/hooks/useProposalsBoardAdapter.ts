@@ -12,7 +12,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
-import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -37,14 +37,10 @@ export function useProposalsBoardAdapter() {
   const { pages } = usePages();
   const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  const customProperties = useMemo(
-    () => (proposalPropertiesBlock?.fields?.cardProperties || []) as IPropertyTemplate[],
-    [proposalPropertiesBlock?.fields?.cardProperties]
-  );
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
-    properties: customProperties,
+    storedBoard: proposalPropertiesBlock,
     categories
   });
 
@@ -54,8 +50,8 @@ export function useProposalsBoardAdapter() {
 
     return viewBlock
       ? (blockToFBBlock(viewBlock) as BoardView)
-      : getDefaultTableView({ properties: customProperties, categories });
-  }, [categories, customProperties, proposalBlocks]);
+      : getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+  }, [categories, proposalPropertiesBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     const cards =
@@ -73,7 +69,7 @@ export function useProposalsBoardAdapter() {
   }, [activeView, board, members, pages, proposals, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
-    properties: customProperties,
+    storedBoard: proposalPropertiesBlock,
     customOnly: true,
     categories: []
   });
