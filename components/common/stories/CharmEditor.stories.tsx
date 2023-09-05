@@ -77,6 +77,7 @@ export default {
 export function FullPageEditor() {
   return (
     <CharmEditorComponent
+      allowClickingFooter={true}
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}
