@@ -62,10 +62,5 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     [props]
   );
 
-  return (
-    <ContextElement.Provider value={value}>
-      {/** Ensure that proposals viewed in a popup receive the correct comment threads */}
-      <ThreadsProvider externalPageId={props.pageId}>{children}</ThreadsProvider>
-    </ContextElement.Provider>
-  );
+  return <ContextElement.Provider value={value}>{children}</ContextElement.Provider>;
 }
