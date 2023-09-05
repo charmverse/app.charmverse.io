@@ -45,7 +45,7 @@ export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...
 }>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : '860px')};
   max-width: 100%;
-  margin: 0 auto ${({ top }) => top + 100}px;
+  margin: 0 auto ${({ top }) => top}px;
   position: relative;
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
