@@ -125,7 +125,7 @@ export function charmEditorPlugins({
                   newParentId: pageId,
                   newIndex: -1,
                   trigger: 'sidebar-to-editor',
-                  pos: coordinates.pos
+                  pos: coordinates.pos + 1
                 }
               });
               return false;
