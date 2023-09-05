@@ -141,8 +141,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }
 
   function onClickEditorBottom(event: MouseEvent) {
-    const isWrapper = (event.target as HTMLDivElement)?.className.includes('bangle-editor-core');
-    if (editor && !readOnly && isWrapper) {
+    if (editor && !readOnly) {
       event.preventDefault();
       // insert new line
       insertAndFocusLineAtEndofDoc(editor.view);
@@ -247,7 +246,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
-        {allowClickingFooter && <div className='charm-empty-footer' onMouseDown={onClickEditorBottom} />}
+        {allowClickingFooter && (
+          <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
+        )}
       </div>
       {nodeViews.map((nodeView) => {
         return nodeView.containerDOM
