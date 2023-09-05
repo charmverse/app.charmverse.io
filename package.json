@@ -115,7 +115,6 @@
     "@lens-protocol/client": "^1.2.0",
     "@lit-protocol/constants": "^2.2.47",
     "@lit-protocol/lit-node-client": "^2.2.49",
-    "@material-ui/pickers": "^3.3.10",
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.118",
