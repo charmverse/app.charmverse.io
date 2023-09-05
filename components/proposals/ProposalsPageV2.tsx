@@ -181,12 +181,12 @@ export function ProposalsPage({ title }: { title: string }) {
                       selectedCardIds={[]}
                       readOnly={!isAdmin}
                       readOnlySourceData={false}
-                      cardIdToFocusOnRender=''
+                      disableAddingCards={true}
                       showCard={openPage}
+                      readOnlyTitle={true}
+                      cardIdToFocusOnRender=''
                       addCard={async () => {}}
                       onCardClicked={() => {}}
-                      disableAddingCards={true}
-                      readOnlyTitle={true}
                     />
                   </Box>
 

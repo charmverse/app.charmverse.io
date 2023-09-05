@@ -43,15 +43,15 @@ export function getDefaultBoard({
     : {
         id: DEFAULT_BOARD_BLOCK_ID,
         fields: {
-          cardProperties: getDefaultProperties({ categories })
+          cardProperties: []
         }
       };
 
-  if (customOnly) {
-    block.fields = {
-      cardProperties: block.fields?.cardProperties?.filter((p: { id: string }) => !p.id.startsWith('__'))
-    };
-  }
+  const cardProperties = [...(block.fields?.cardProperties || []), ...getDefaultProperties({ categories })];
+
+  block.fields = {
+    cardProperties: customOnly ? cardProperties.filter((p) => !p.id.startsWith('__')) : cardProperties
+  };
 
   const board = createBoard({
     block
