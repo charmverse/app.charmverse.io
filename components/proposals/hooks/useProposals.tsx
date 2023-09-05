@@ -9,6 +9,7 @@ import type { ProposalStatusFilter } from 'components/proposals/components/Propo
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 type ProposalsContextType = {
   proposals: ProposalWithUsers[] | undefined;
@@ -20,6 +21,7 @@ type ProposalsContextType = {
   mutateProposals: KeyedMutator<ProposalWithUsers[]>;
   isLoading: boolean;
   archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
+  updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
 };
 
 export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
@@ -33,7 +35,8 @@ export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
     return undefined;
   },
   isLoading: false,
-  archiveProposal: () => Promise.resolve()
+  archiveProposal: () => Promise.resolve(),
+  updateProposal: () => Promise.resolve()
 });
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
@@ -91,6 +94,17 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     [mutateProposals, space]
   );
 
+  const updateProposal = useCallback(
+    async (proposal: UpdateProposalRequest) => {
+      if (proposal) {
+        await charmClient.proposals.updateProposal(proposal);
+
+        mutateProposals();
+      }
+    },
+    [mutateProposals]
+  );
+
   const value = useMemo(
     () => ({
       proposals,
@@ -101,7 +115,8 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       setCategoryIdFilter,
       mutateProposals,
       isLoading: isLoading || loadingPages,
-      archiveProposal
+      archiveProposal,
+      updateProposal
     }),
     [
       archiveProposal,
@@ -111,7 +126,8 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       loadingPages,
       mutateProposals,
       proposals,
-      statusFilter
+      statusFilter,
+      updateProposal
     ]
   );
 
