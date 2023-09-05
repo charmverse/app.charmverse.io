@@ -61,6 +61,8 @@ type Props = {
   view?: BoardView;
   board?: Board;
   groupByProperty?: IPropertyTemplate;
+  hideLayoutOptions?: boolean;
+  hideSourceOptions?: boolean;
 };
 
 type SourceIconType = DataSourceType | 'linked';
@@ -83,7 +85,15 @@ function SourceIcon({ sourceType }: SourceIconProps) {
   }
 }
 
-export function ViewSidebarSelect({ setSidebarView, closeSidebar, view, board, groupByProperty }: Props) {
+export function ViewSidebarSelect({
+  setSidebarView,
+  closeSidebar,
+  view,
+  board,
+  groupByProperty,
+  hideLayoutOptions,
+  hideSourceOptions
+}: Props) {
   const { pages } = usePages();
 
   const withGroupBy = view?.fields.viewType.match(/board/) || view?.fields.viewType === 'table';
@@ -113,12 +123,14 @@ export function ViewSidebarSelect({ setSidebarView, closeSidebar, view, board, g
   return (
     <>
       <DatabaseSidebarHeader title='View options' onClose={closeSidebar} />
-      <MenuRow
-        onClick={() => setSidebarView('layout')}
-        icon={<PreviewIcon color='secondary' />}
-        title='Layout'
-        value={capitalize(currentLayout)}
-      />
+      {!hideLayoutOptions && (
+        <MenuRow
+          onClick={() => setSidebarView('layout')}
+          icon={<PreviewIcon color='secondary' />}
+          title='Layout'
+          value={capitalize(currentLayout)}
+        />
+      )}
       <MenuRow
         onClick={() => setSidebarView('card-properties')}
         icon={<FormatListBulletedIcon color='secondary' />}
@@ -134,12 +146,14 @@ export function ViewSidebarSelect({ setSidebarView, closeSidebar, view, board, g
         />
       )}
 
-      <MenuRow
-        onClick={sourceIconType === 'proposals' ? undefined : () => setSidebarView('source')}
-        icon={<SourceIcon sourceType={sourceIconType} />}
-        title='Source'
-        value={sourceTitle}
-      />
+      {!hideSourceOptions && (
+        <MenuRow
+          onClick={sourceIconType === 'proposals' ? undefined : () => setSidebarView('source')}
+          icon={<SourceIcon sourceType={sourceIconType} />}
+          title='Source'
+          value={sourceTitle}
+        />
+      )}
     </>
   );
 }

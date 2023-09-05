@@ -5,7 +5,7 @@ import React from 'react';
 import IconButton from '../../widgets/buttons/iconButton';
 
 type Props = {
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
 };
 
 const ViewHeaderActionsMenu = React.memo((props: Props) => {

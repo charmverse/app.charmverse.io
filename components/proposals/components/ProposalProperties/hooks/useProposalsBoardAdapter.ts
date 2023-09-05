@@ -21,7 +21,7 @@ export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsPr
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
-  const { proposals } = useProposals();
+  const { filteredProposals: proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
