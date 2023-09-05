@@ -43,19 +43,16 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
 
 type CommentThreadsMap = Record<string, ThreadWithCommentsAndAuthors | undefined>;
 
-export function ThreadsProvider({ children, externalPageId }: { children: ReactNode; externalPageId?: string }) {
+export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
-
-  const actualPageId = externalPageId ?? currentPageId;
-
   const [threads, setThreads] = useState<CommentThreadsMap>({});
   const { members } = useMembers();
   const { subscribe } = useWebSocketClient();
   const { spaceRole } = useCurrentSpace();
 
   const { data, isValidating, mutate } = useSWR(
-    () => (actualPageId ? getThreadsKey(actualPageId) : null),
-    () => charmClient.comments.getThreads(actualPageId),
+    () => (currentPageId ? getThreadsKey(currentPageId) : null),
+    () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
   );
 
@@ -76,11 +73,11 @@ export function ThreadsProvider({ children, externalPageId }: { children: ReactN
 
   const threadsUpdatedHandler = useCallback(
     (payload: WebSocketPayload<'threads_updated'>) => {
-      if (payload.pageId === actualPageId) {
+      if (payload.pageId === currentPageId) {
         mutate();
       }
     },
-    [actualPageId]
+    [currentPageId]
   );
 
   useEffect(() => {
@@ -91,7 +88,7 @@ export function ThreadsProvider({ children, externalPageId }: { children: ReactN
         unsubscribeFromThreadsUpdatedEvent();
       };
     }
-  }, [spaceRole, actualPageId]);
+  }, [spaceRole, currentPageId]);
 
   useEffect(() => {
     if (data) {
@@ -190,7 +187,7 @@ export function ThreadsProvider({ children, externalPageId }: { children: ReactN
       isValidating,
       refetchThreads: mutate
     }),
-    [actualPageId, threads, isValidating]
+    [currentPageId, threads, isValidating]
   );
 
   return <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>;
