@@ -7,6 +7,7 @@ import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposal/blocks/interfaces';
 
 export function useProposalsBoardMutator() {
@@ -44,6 +45,12 @@ export function useProposalsBoardMutator() {
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
+
+    if (fbBlockInput.fields.cardProperties) {
+      fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
+        (p: IPropertyTemplate) => !p.id.startsWith('__')
+      );
+    }
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
     const blockInput = fbBlockToBlock(fbBlockInput);
 
@@ -60,6 +67,12 @@ export function useProposalsBoardMutator() {
       const fbBlockInput = Object.assign(currentFBBlock, updates, {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
+
+      if (fbBlockInput.fields.cardProperties) {
+        fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
+          (p: IPropertyTemplate) => !p.id.startsWith('__')
+        );
+      }
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
