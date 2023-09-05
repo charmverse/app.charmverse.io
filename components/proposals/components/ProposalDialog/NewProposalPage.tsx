@@ -150,6 +150,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
         <Container data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
+              allowClickingFooter={true}
               placeholderText={
                 readOnlyEditor
                   ? `You must select a proposal template to begin writing`

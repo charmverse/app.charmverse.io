@@ -1,3 +1,4 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
@@ -246,6 +247,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     minHeight: proposalId ? '100px' : 'unset'
                   }}
                   disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                  allowClickingFooter={true}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
                   <PageHeader
