@@ -226,7 +226,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       {editor ? children : null}
       <div
         ref={editorRef}
-        className='bangle-editor-core'
+        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
         data-page-id={pageId}
         style={{
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,

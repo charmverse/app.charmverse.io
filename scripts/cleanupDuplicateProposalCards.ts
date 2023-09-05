@@ -4,22 +4,26 @@ import { Page, prisma } from "@charmverse/core/prisma-client";
 
 
 async function cleanupDuplicateProposalCards() {
-  const targetSpace = 'blank-alpha-butterfly';
+  const targetSpace = 'charmverse';
 
-  const space = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: targetSpace
-    },
-    select: {
-      id: true
-    }
-  })
+  // const space = await prisma.space.findUniqueOrThrow({
+  //   where: {
+  //     domain: targetSpace
+  //   },
+  //   select: {
+  //     id: true
+  //   }
+  // })
 
   const proposalCards = await prisma.page.findMany({
     where: {
       syncWithPageId: {
         not: null
+      },
+      parentId: {
+        not: null
       }
+      //spaceId: space.id
     },
     select: {
       id: true,
@@ -48,10 +52,11 @@ async function cleanupDuplicateProposalCards() {
 
 
   if (cardsToDelete.cardIdsToDelete.length > 0) {
+    console.log(cardsToDelete.cardIdsToDelete.length)
     await prisma.$transaction(async tx => {
       await tx.page.deleteMany({
         where: {
-          spaceId: space.id,
+//          spaceId: space.id,
           type: 'card',
           id: {
             in: cardsToDelete.cardIdsToDelete
@@ -60,14 +65,14 @@ async function cleanupDuplicateProposalCards() {
       });
       await tx.block.deleteMany({
         where: {
-          spaceId: space.id,
+          // spaceId: space.id,
           type: 'card',
           id: {
             in: cardsToDelete.cardIdsToDelete
           }
         }
       });
-    })
+    }, {timeout: 60000})
     console.log('Deleted', cardsToDelete.cardIdsToDelete.length, 'duplicate cards');
   }
 
