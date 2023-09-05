@@ -4,6 +4,16 @@ import { evaluationTypeOptions } from 'components/proposals/components/ProposalP
 import { createBoard, type IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_BOARD_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID,
+  TITLE_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
 
 const proposalStatuses = [
   'draft',
@@ -27,7 +37,7 @@ export function getDefaultBoard({
 }) {
   const board = createBoard({
     block: {
-      id: '__defaultBoard',
+      id: DEFAULT_BOARD_ID,
       fields: {
         cardProperties: [
           // additional mocked properties that are not being saved with ids starting with __
@@ -46,21 +56,21 @@ function getDefaultProperties({ categories }: { categories: ProposalCategory[] |
     getDefaultCategoryProperty(categories),
     getDefaultStatusProperty(),
     getDefaultEvaluationTypeProperty(),
-    proposalDbProperties.proposalAuthor('__authors', 'Author'),
-    proposalDbProperties.proposalReviewer('__reviewers', 'Reviewer')
+    proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
+    proposalDbProperties.proposalReviewer(REVIEWERS_BLOCK_ID, 'Reviewer')
   ];
 }
 
 function getDefaultCategoryProperty(categories: ProposalCategory[] = []) {
   return {
-    ...proposalDbProperties.proposalCategory('__category', 'Category'),
+    ...proposalDbProperties.proposalCategory(CATEGORY_BLOCK_ID, 'Category'),
     options: categories.map((c) => ({ id: c.id, value: c.title, color: c.color }))
   };
 }
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalCategory('__status', 'Status'),
+    ...proposalDbProperties.proposalCategory(STATUS_BLOCK_ID, 'Status'),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
@@ -71,7 +81,7 @@ export function getDefaultStatusProperty() {
 
 function getDefaultEvaluationTypeProperty() {
   return {
-    ...proposalDbProperties.proposalCategory('__evaluationType', 'Type'),
+    ...proposalDbProperties.proposalCategory(EVALUATION_TYPE_BLOCK_ID, 'Type'),
     options: evaluationTypeOptions
   };
 }
@@ -87,13 +97,13 @@ export function getDefaultTableView({
     board: getDefaultBoard({ properties, categories })
   });
 
-  view.id = '__defaultView';
+  view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
-    __title: 310,
-    __category: 200,
-    __status: 150,
-    __authors: 150,
-    __reviewers: 150
+    [TITLE_BLOCK_ID]: 310,
+    [CATEGORY_BLOCK_ID]: 200,
+    [STATUS_BLOCK_ID]: 150,
+    [AUTHORS_BLOCK_ID]: 150,
+    [REVIEWERS_BLOCK_ID]: 150
   };
 
   return view;

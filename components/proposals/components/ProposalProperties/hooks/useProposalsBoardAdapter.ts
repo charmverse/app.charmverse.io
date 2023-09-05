@@ -15,6 +15,14 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
 import type { ProposalFields, ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -42,7 +50,7 @@ export function useProposalsBoardAdapter() {
 
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
-    const viewBlock = proposalBlocks?.find((b) => b.id === '__defaultView');
+    const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     return viewBlock
       ? (blockToFBBlock(viewBlock) as BoardView)
@@ -108,11 +116,11 @@ function mapProposalToCardPage({
   proposalFields.properties = {
     ...proposalFields.properties,
     // add default field values on the fly
-    __category: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
-    __status: (proposal && 'status' in proposal && proposal.status) || '',
-    __evaluationType: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
-    __authors: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    __reviewers:
+    [CATEGORY_BLOCK_ID]: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
+    [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
+    [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
+    [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
+    [REVIEWERS_BLOCK_ID]:
       (proposal && 'reviewers' in proposal && proposal.reviewers?.map((r) => r.userId).filter(isTruthy)) || ''
   };
 

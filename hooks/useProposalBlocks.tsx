@@ -21,6 +21,7 @@ export type ProposalBlocksContextType = {
   updateProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
   deleteProperty: (id: string) => Promise<void>;
   updateBlock: (block: ProposalBlockWithTypedFields) => Promise<ProposalBlockWithTypedFields | void>;
+  updateBlocks: (blocks: ProposalBlockWithTypedFields[]) => Promise<ProposalBlockWithTypedFields[] | void>;
   createBlock: (block: ProposalBlockInput) => Promise<ProposalBlockWithTypedFields | void>;
   getBlock: (blockId: string) => Promise<ProposalBlockWithTypedFields | void>;
 };
@@ -33,6 +34,7 @@ export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContex
   updateProperty: async () => {},
   deleteProperty: async () => {},
   updateBlock: async () => {},
+  updateBlocks: async () => {},
   createBlock: async () => {},
   getBlock: async () => {}
 });
@@ -55,17 +57,24 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   );
 
   const updateBlockCache = useCallback(
-    (updatedBlock: ProposalBlockWithTypedFields) => {
+    (updatedBlocks: ProposalBlockWithTypedFields | ProposalBlockWithTypedFields[]) => {
       mutate(
         (blocks) => {
           if (!blocks) return blocks;
-          const hasBlock = blocks.find((b) => b.id === updatedBlock.id);
 
-          if (hasBlock) {
-            return blocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
-          } else {
-            return [...blocks, updatedBlock];
-          }
+          const udpatedCache = [...blocks];
+          const updated = Array.isArray(updatedBlocks) ? updatedBlocks : [updatedBlocks];
+
+          updated.forEach((updatedBlock) => {
+            const index = udpatedCache.findIndex((b) => b.id === updatedBlock.id);
+            if (index !== -1) {
+              udpatedCache[index] = updatedBlock;
+            } else {
+              udpatedCache.push(updatedBlock);
+            }
+          });
+
+          return udpatedCache;
         },
         { revalidate: false }
       );
@@ -74,7 +83,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   );
 
   const proposalPropertiesBlock = useMemo(
-    () => proposalBlocks?.find((b): b is ProposalPropertiesBlock => b.type === 'properties'),
+    () => proposalBlocks?.find((b): b is ProposalPropertiesBlock => b.type === 'board'),
     [proposalBlocks]
   );
 
@@ -172,26 +181,35 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
     [proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
-  const updateBlock = useCallback(
-    async (updatedBlock: ProposalBlockWithTypedFields) => {
+  const updateBlocks = useCallback(
+    async (updatedBlocks: ProposalBlockWithTypedFields[]) => {
       if (!space) {
         return;
       }
 
       try {
-        const res = await updateProposalBlocks([updatedBlock]);
+        const res = await updateProposalBlocks(updatedBlocks);
 
         if (!res) {
           return;
         }
 
-        updateBlockCache(res[0]);
-        return res[0];
+        updateBlockCache(res);
+        return res;
       } catch (e: any) {
-        showMessage(`Failed to update block: ${e.message}`, 'error');
+        showMessage(`Failed to update blocks: ${e.message}`, 'error');
       }
     },
     [showMessage, space, updateBlockCache, updateProposalBlocks]
+  );
+
+  const updateBlock = useCallback(
+    async (updatedBlock: ProposalBlockWithTypedFields) => {
+      const res = await updateBlocks([updatedBlock]);
+
+      return res?.[0];
+    },
+    [updateBlocks]
   );
 
   const createBlock = useCallback(
@@ -226,6 +244,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       updateProperty,
       deleteProperty,
       updateBlock,
+      updateBlocks,
       createBlock,
       getBlock
     }),
@@ -237,6 +256,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       updateProperty,
       deleteProperty,
       updateBlock,
+      updateBlocks,
       createBlock,
       getBlock
     ]

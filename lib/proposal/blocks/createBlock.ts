@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
-import { ProposalBlockType, prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { ProposalBlockInput } from 'lib/proposal/blocks/interfaces';
@@ -19,11 +19,12 @@ export async function createBlock({
 }) {
   const { type } = data;
 
-  if (!data.type || !data.spaceId || !data.fields) {
+  if (!data.type || !data.fields) {
     throw new InvalidInputError('Missing required fields');
   }
 
-  if (type === ProposalBlockType.properties) {
+  // there should be only 1 block with properties for space
+  if (type === 'board') {
     // there should be only 1 block with properties for space
     const currentPropertiesBlock = await tx.proposalBlock.findFirst({ where: { spaceId, type } });
 
@@ -40,7 +41,7 @@ export async function createBlock({
       createdBy: userId,
       updatedBy: userId,
       parentId: data.parentId || '',
-      rootId: data.rootId || data.spaceId,
+      rootId: data.rootId || data.spaceId || spaceId,
       schema: data.schema || 1,
       title: data.title || '',
       fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue

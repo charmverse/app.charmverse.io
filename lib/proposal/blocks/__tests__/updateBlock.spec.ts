@@ -1,4 +1,3 @@
-import { ProposalBlockType } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
@@ -14,7 +13,7 @@ describe('proposal blocks - updateBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -46,7 +45,7 @@ describe('proposal blocks - updateBlock', () => {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -79,7 +78,7 @@ describe('proposal blocks - updateBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -104,7 +103,7 @@ describe('proposal blocks - updateBlock', () => {
     const propertiesData2 = {
       spaceId: space.id,
       title: 'Properties 2',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {

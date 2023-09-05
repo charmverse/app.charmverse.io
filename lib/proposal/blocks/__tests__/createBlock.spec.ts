@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { ProposalBlockType } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
@@ -14,7 +13,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -57,7 +56,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -82,7 +81,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData2 = {
       spaceId: space.id,
       title: 'Properties 2',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -130,7 +129,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: '123',
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -151,10 +150,6 @@ describe('proposal blocks - createBlock', () => {
         ]
       }
     };
-
-    await expect(
-      createBlock({ data: { ...propertiesData, spaceId: '' }, userId: '123', spaceId: '123' })
-    ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
       createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123', spaceId: '123' })

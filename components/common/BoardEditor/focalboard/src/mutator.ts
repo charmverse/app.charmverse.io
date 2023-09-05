@@ -31,6 +31,7 @@ type BlockUpdater = (blocks: Block[]) => void;
 
 export type MutatorUpdaters = {
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
+  patchBlocks(blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
 };
 
 //
@@ -46,6 +47,10 @@ export class Mutator {
 
   get patchBlock() {
     return this.customMutatorUpdaters?.patchBlock || charmClient.patchBlock;
+  }
+
+  get patchBlocks() {
+    return this.customMutatorUpdaters?.patchBlocks || charmClient.patchBlocks;
   }
 
   setCustomMutatorUpdaters(updaters: MutatorUpdaters | null) {
@@ -111,10 +116,10 @@ export class Mutator {
 
     return undoManager.perform(
       async () => {
-        await charmClient.patchBlocks(newBlocks, updatePatches, publishIncrementalUpdate);
+        await this.patchBlocks(newBlocks, updatePatches, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlocks(newBlocks, undoPatches, publishIncrementalUpdate);
+        await this.patchBlocks(newBlocks, undoPatches, publishIncrementalUpdate);
       },
       description,
       this.undoGroupId
