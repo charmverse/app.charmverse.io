@@ -245,6 +245,7 @@
     margin-bottom: 2px;
     margin-right: -14px;
     margin-left: -1px;
+    margin-bottom: 16px;
     padding: 0;
     padding-right: 3px;
     padding-left: 1px;
@@ -391,7 +392,7 @@
 }
 
 
-// copied from style/tables.css
+// @source: https://github.com/skiff-org/prosemirror-tables/blob/master/style/tables.css
 
 // .tableScrollWrapper {
 //   margin-top: -25px;
@@ -406,8 +407,6 @@
 
 //   overflow: auto;
 // }
-
-/* TODO: all the table css should be in the table package */
 .tableScrollWrapper {
   .tableButton,
   .tableColHandle,
@@ -416,7 +415,8 @@
   .addColAfterContainer,
   .tableRowHandle,
   .tableHandle {
-    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
   }
 
   &:hover {
@@ -428,6 +428,7 @@
     .tableRowHandle,
     .tableHandle {
       display: block;
+      opacity: 1;
     }
   }
 }
@@ -464,15 +465,10 @@
   text-decoration: none;
 }
 
-.ProseMirror .tableAddRightColumn {
-}
-
 .ProseMirror .tableAddBottomRow {
   background-color: #f7f9fa;
   height: 15px;
-  font-size: 20px;
   padding: 0;
-  line-height: 14px;
   pointer-events: auto;
   margin-top: -1px;
   margin-bottom: 1px;
@@ -482,7 +478,6 @@
   border-bottom-right-radius: 8px;
   border-top: 1px solid #c1c7cd;
   z-index: 1;
-  font-size: 20px;
   position: absolute;
   bottom: 1px;
 }
