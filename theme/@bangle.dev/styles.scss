@@ -519,8 +519,12 @@ ol li {
   content: attr(data-placeholder);
   pointer-events: none;
   position: relative;
+}
+.ProseMirror[data-placeholder]::before  {
   top: 3px;
 }
+
+
 
 /** Begin Resizable columns **/
 
