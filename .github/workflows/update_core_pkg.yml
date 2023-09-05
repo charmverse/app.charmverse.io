@@ -64,7 +64,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
-      - name: Save dependency and build to another cache
+      - name: Save dependency and build using diff cache key to do one step restore in subsequent jobs
         id: update_cache_build
         uses: actions/cache/save@v3
         with:
@@ -233,6 +233,7 @@ jobs:
           key: webapp-corebump-${{ needs.build-test-env.outputs.new_commit_hash }}
 
       - name: ${{matrix.step_name}}
+        if: github.ref == 'refs/heads/main'              # <<< remove before merge
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
