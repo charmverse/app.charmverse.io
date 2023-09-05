@@ -511,7 +511,8 @@ ol li {
 }
 
 /** placeholder **/
-.ProseMirror[data-placeholder]::before {
+.ProseMirror[data-placeholder]::before,
+.charm-placeholder::before  {
   display: block;
   height: 0;
   color: var(--bg-gray);

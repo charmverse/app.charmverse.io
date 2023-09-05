@@ -1,5 +1,7 @@
+import { createElement } from '@bangle.dev/core';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
@@ -23,6 +25,30 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
   };
 
   return new Plugin({
+    props: {
+      // use decorations to add a placeholder when the current line is empty
+      decorations: (state) => {
+        const hasContent = !checkIsContentEmpty(state.doc.toJSON() as any);
+        // ignore placeholder if there is no doc content
+        if (!hasContent) {
+          return null;
+        }
+        const selectionPos = state.selection.from;
+        const selectedNode = state.doc.resolve(selectionPos).parent;
+        const selectedNodeIsEmpty = checkIsContentEmpty(selectedNode.toJSON() as any);
+        if (selectedNodeIsEmpty) {
+          return DecorationSet.create(state.doc, [
+            Decoration.widget(selectionPos, () => {
+              return createElement([
+                'div',
+                { contentEditable: false, class: 'charm-placeholder', 'data-placeholder': text }
+              ]);
+            })
+          ]);
+        }
+        return null;
+      }
+    },
     view(_view) {
       update(_view);
       return { update };
