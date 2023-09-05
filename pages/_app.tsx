@@ -49,10 +49,6 @@ import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 import '@bangle.dev/tooltip/style.css';
-// import '@skiff-org/prosemirror-tables/style/table-filters.css';
-// import '@skiff-org/prosemirror-tables/style/table-headers.css';
-// import '@skiff-org/prosemirror-tables/style/table-popup.css';
-// import '@skiff-org/prosemirror-tables/style/tables.css';
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
