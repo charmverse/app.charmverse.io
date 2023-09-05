@@ -50,6 +50,7 @@ export function getDefaultBoard({
   const cardProperties = [...(block.fields?.cardProperties || []), ...getDefaultProperties({ categories })];
 
   block.fields = {
+    ...(block.fields || {}),
     cardProperties: customOnly ? cardProperties.filter((p) => !p.id.startsWith('__')) : cardProperties
   };
 
