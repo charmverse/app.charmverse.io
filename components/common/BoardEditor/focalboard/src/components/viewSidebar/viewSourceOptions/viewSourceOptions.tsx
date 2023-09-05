@@ -141,6 +141,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
             {allowedSourceOptions.includes('proposals') && (
               <SourceType
+                data-test='source-proposals'
                 active={activeSourceType === 'proposals'}
                 onClick={
                   isLoadingProposalSource
