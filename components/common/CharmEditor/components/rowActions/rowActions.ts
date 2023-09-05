@@ -101,6 +101,9 @@ export function plugins({ key }: { key: PluginKey }) {
 
   const brokenClipboardAPI = false;
 
+  // keepy track of mouse being dragged
+  let dragging = false;
+
   // Listen to drag start events on the .charm-drag-handle elements and set the dragged content based on prosemiror content.
   function dragStart(view: EditorView, e: DragEvent) {
     if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
@@ -148,8 +151,17 @@ export function plugins({ key }: { key: PluginKey }) {
           drop: (view) => {
             view.dispatch(view.state.tr.setMeta('row-handle-is-dragging', true));
           },
+          mousedown: () => {
+            dragging = true;
+          },
+          mouseup: () => {
+            dragging = false;
+          },
           mousemove: (view: EditorView, event: MouseEvent) => {
-            throttledMouseOver(view, event);
+            // dont update view when user is dragging cursor - this causes the table columns to snap back and forth
+            if (!dragging) {
+              throttledMouseOver(view, event);
+            }
             return false;
           }
         }
