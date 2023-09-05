@@ -41,4 +41,11 @@ export class DatabasePage extends GlobalPage {
     selectors.setTestIdAttribute('data-test');
     return this.page.getByTestId(/^database-row/).nth(index);
   }
+
+  getTablePropertySelectLocator({ cardId }: { cardId: string }) {
+    return {
+      closedSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=select-preview').first(),
+      openSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=autocomplete').first()
+    };
+  }
 }
