@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 
 import { greyColor2 } from 'theme/colors';
 
-export default function Footer() {
+export default function Footer({ showSnooze }: { showSnooze?: boolean }) {
   const unsubscribeLink = `${process.env.DOMAIN}/?account=true`;
 
   return (
@@ -27,16 +27,18 @@ export default function Footer() {
         </MjmlColumn>
       </MjmlSection>
 
-      <MjmlSection paddingTop={0}>
-        <MjmlColumn>
-          <MjmlText align='center' color={greyColor2} fontSize={12}>
-            <a href={unsubscribeLink} style={{ textDecoration: 'underline', color: 'inherit' }}>
-              Disable or Snooze
-            </a>{' '}
-            notifications from CharmVerse
-          </MjmlText>
-        </MjmlColumn>
-      </MjmlSection>
+      {showSnooze && (
+        <MjmlSection paddingTop={0}>
+          <MjmlColumn>
+            <MjmlText align='center' color={greyColor2} fontSize={12}>
+              <a href={unsubscribeLink} style={{ textDecoration: 'underline', color: 'inherit' }}>
+                Disable or Snooze
+              </a>{' '}
+              notifications from CharmVerse
+            </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
+      )}
     </>
   );
 }

@@ -70,6 +70,9 @@ const StyledBannerContainer = styled.div<{ showPageActionSidebar: boolean }>(
   transition: width ease-in 0.25s;
   ${theme.breakpoints.up('lg')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 `
 );

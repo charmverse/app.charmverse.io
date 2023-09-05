@@ -13,7 +13,6 @@ import { useRef, useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import { Button } from 'components/common/Button';
-import { DiscordLoginHandler } from 'components/login/components/DiscordLoginHandler';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
@@ -23,7 +22,8 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
 
-import { CollectEmail } from './CollectEmail';
+import { DiscordLoginHandler } from './DiscordLoginHandler';
+import { EmailAddressForm } from './EmailAddressForm';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
 
@@ -138,6 +138,7 @@ function LoginHandler(props: DialogProps) {
       // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, redirectUrl });
+        showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         onClose();
         setLoginMethod(null);
       } catch (err) {
@@ -246,7 +247,7 @@ function LoginHandler(props: DialogProps) {
 
         {loginMethod === 'email' && (
           <Box m={2}>
-            <CollectEmail
+            <EmailAddressForm
               loading={sendingMagicLink.current === true}
               title='Connect with email'
               description="Enter your email address and we'll email you a login link"

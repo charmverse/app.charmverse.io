@@ -113,22 +113,6 @@ export function scrollToThread(threadId: string) {
   // Find the inline-comment with the threadId and scroll into view
   const threadDocument = document.getElementById(`inline-comment.${threadId}`);
   if (threadDocument) {
-    let parentElement: HTMLElement | null = null;
-    let element: HTMLElement | null = threadDocument;
-    // Check for highest 5 levels of depth
-    for (let i = 0; i < 10; i++) {
-      element = element?.parentElement ?? null;
-      // Get the first paragraph parent element
-      const tagName = element?.tagName.toLowerCase() || '';
-      if (tagName === 'p' || tagName.startsWith('h')) {
-        parentElement = element;
-        break;
-      }
-    }
-
-    if (parentElement) {
-      createHighlightDomElement(parentElement);
-      parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    threadDocument.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }

@@ -8,14 +8,14 @@ export function calculateVoteStatus({
   threshold,
   userVotes
 }: {
-  userVotes: Pick<UserVote, 'choice' | 'choices'>[];
+  userVotes: Pick<UserVote, 'choices'>[];
   threshold: Vote['threshold'];
   status: Vote['status'];
   type: Vote['type'];
   deadline: Vote['deadline'];
 }) {
   const userVoteFrequencyRecord = userVotes.reduce<Record<string, number>>((currentFrequencyRecord, userVote) => {
-    const choices = userVote.choice ? [userVote.choice] : userVote.choices;
+    const choices = userVote.choices;
 
     choices.forEach((choice) => {
       if (!currentFrequencyRecord[choice]) {
