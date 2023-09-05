@@ -11,6 +11,7 @@ import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -29,6 +30,13 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   const mounted = useRef(false);
   const router = useRouter();
   const { updatePage } = usePages();
+  // This is needed so that the surrounding currentPage context provides the correct pageId
+  const { setCurrentPageId } = useCurrentPage();
+  useEffect(() => {
+    if (pageId) {
+      setCurrentPageId(pageId);
+    }
+  }, [pageId]);
   const { user } = useUser();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
   const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
