@@ -8,8 +8,8 @@ export function insertAndFocusLineAtEndofDoc(view: EditorView) {
   const isLastLineEmptyParapgrah =
     view.state.doc.lastChild &&
     view.state.doc.lastChild.type.name === 'paragraph' &&
-    checkIsContentEmpty(view.state.doc.lastChild as any);
-
+    checkIsContentEmpty(view.state.doc.lastChild.toJSON() as any);
+  // console.log(checkIsContentEmpty(view.state.doc.lastChild as any), view.state.doc.lastChild.content);
   if (!isLastLineEmptyParapgrah) {
     const paragraph = schema.nodes.paragraph?.createAndFill();
     if (paragraph) {
