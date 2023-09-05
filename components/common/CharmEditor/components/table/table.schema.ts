@@ -1,12 +1,11 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import * as tables from '@skiff-org/prosemirror-tables';
+import * as tables from 'prosemirror-tables';
 
 export function spec(): RawSpecs {
   const schemas = tables.tableNodes({
-    cellAttributes: {},
     cellContent: 'block+',
-    cellContentGroup: 'block',
-    tableGroup: 'block'
+    tableGroup: 'block',
+    cellAttributes: {}
   });
 
   const specs = Object.entries(schemas).map(

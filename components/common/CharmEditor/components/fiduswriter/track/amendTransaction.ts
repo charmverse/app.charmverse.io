@@ -1,7 +1,7 @@
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { AddMarkStep, Mapping, RemoveMarkStep, ReplaceAroundStep, ReplaceStep, Slice } from '@bangle.dev/pm';
-import { CellSelection } from '@skiff-org/prosemirror-tables';
 import { Selection, TextSelection } from 'prosemirror-state';
+import { CellSelection } from 'prosemirror-tables';
 
 import type { FidusEditor } from '../fiduseditor';
 
