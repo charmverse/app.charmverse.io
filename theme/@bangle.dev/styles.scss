@@ -23,24 +23,6 @@
   outline: none;
 }
 
-.ProseMirror .tableWrapper {
-  overflow-x: auto;
-}
-
-.ProseMirror table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  overflow: hidden;
-}
-
-.ProseMirror td,
-.ProseMirror th {
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
-}
-
 /* Prevent iframes from stealing drag events - https://github.com/react-grid-layout/react-draggable/issues/613 */
 .react-draggable-transparent-selection iframe {
   pointer-events: none;
@@ -82,30 +64,6 @@
 
 .ProseMirror {
   padding: 5px 0;
-}
-
-.ProseMirror table {
-  margin: 0 !important;
-}
-
-.ProseMirror th,
-.ProseMirror td {
-  min-width: 1em;
-  border: 1px solid #ddd;
-  padding: 3px 5px;
-}
-
-// .ProseMirror th {
-//   background-color: var(--bg-gray);
-// }
-
-.ProseMirror .tableWrapper {
-  margin: 1em 0;
-}
-
-.ProseMirror th {
-  font-weight: bold;
-  text-align: left;
 }
 
 // @bangle.dev/core/style.css
