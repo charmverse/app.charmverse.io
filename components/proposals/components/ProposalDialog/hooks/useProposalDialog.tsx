@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import { ThreadsProvider } from 'hooks/useThreads';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalPropertiesInput } from '../../ProposalProperties/ProposalProperties';
@@ -61,5 +62,10 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     [props]
   );
 
-  return <ContextElement.Provider value={value}>{children}</ContextElement.Provider>;
+  return (
+    <ContextElement.Provider value={value}>
+      {/** Ensure that proposals viewed in a popup receive the correct comment threads */}
+      <ThreadsProvider externalPageId={props.pageId}>{children}</ThreadsProvider>
+    </ContextElement.Provider>
+  );
 }
