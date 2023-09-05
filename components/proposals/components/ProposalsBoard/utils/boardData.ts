@@ -7,7 +7,7 @@ import { createTableView } from 'lib/focalboard/tableView';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
-  DEFAULT_BOARD_ID,
+  DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
   REVIEWERS_BLOCK_ID,
@@ -37,7 +37,7 @@ export function getDefaultBoard({
 }) {
   const board = createBoard({
     block: {
-      id: DEFAULT_BOARD_ID,
+      id: DEFAULT_BOARD_BLOCK_ID,
       fields: {
         cardProperties: [
           // additional mocked properties that are not being saved with ids starting with __

@@ -15,7 +15,7 @@ describe('proposal blocks - updateBlock', () => {
       title: 'Properties',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -47,7 +47,7 @@ describe('proposal blocks - updateBlock', () => {
       title: 'Update',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'tagz',
@@ -80,7 +80,7 @@ describe('proposal blocks - updateBlock', () => {
       title: 'Properties',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -105,7 +105,7 @@ describe('proposal blocks - updateBlock', () => {
       title: 'Properties 2',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title2',

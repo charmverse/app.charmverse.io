@@ -78,7 +78,7 @@ export class ProposalsMutator extends Mutator {
 
     await this.blocksContext.updateBlock({
       ...proposalPropertiesBlock,
-      fields: { ...oldFields, properties: cardProperties } as ProposalPropertiesBlockFields
+      fields: { ...oldFields, cardProperties } as ProposalPropertiesBlockFields
     });
   }
 
@@ -116,8 +116,8 @@ export class ProposalsMutator extends Mutator {
   async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
     const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.properties
-      ? [...proposalPropertiesBlock.fields.properties]
+    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
+      ? [...proposalPropertiesBlock.fields.cardProperties]
       : [];
 
     if (!proposalPropertiesBlock) {
@@ -141,7 +141,7 @@ export class ProposalsMutator extends Mutator {
 
     await this.blocksContext.updateBlock({
       ...proposalPropertiesBlock,
-      fields: { ...oldFields, properties } as ProposalPropertiesBlockFields
+      fields: { ...oldFields, cardProperties: properties } as ProposalPropertiesBlockFields
     });
   }
 
@@ -153,8 +153,8 @@ export class ProposalsMutator extends Mutator {
   ) {
     const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.properties
-      ? [...proposalPropertiesBlock.fields.properties]
+    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
+      ? [...proposalPropertiesBlock.fields.cardProperties]
       : [];
 
     if (!proposalPropertiesBlock) {
@@ -170,7 +170,7 @@ export class ProposalsMutator extends Mutator {
 
       await this.blocksContext.updateBlock({
         ...proposalPropertiesBlock,
-        fields: { ...oldFields, properties: updatedProperties } as ProposalPropertiesBlockFields
+        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalPropertiesBlockFields
       });
     }
   }
@@ -178,8 +178,8 @@ export class ProposalsMutator extends Mutator {
   async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
     const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.properties
-      ? [...proposalPropertiesBlock.fields.properties]
+    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
+      ? [...proposalPropertiesBlock.fields.cardProperties]
       : [];
 
     if (!proposalPropertiesBlock) {
@@ -195,7 +195,7 @@ export class ProposalsMutator extends Mutator {
 
       await this.blocksContext.updateBlock({
         ...proposalPropertiesBlock,
-        fields: { ...oldFields, properties: updatedProperties } as ProposalPropertiesBlockFields
+        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalPropertiesBlockFields
       });
     }
   }

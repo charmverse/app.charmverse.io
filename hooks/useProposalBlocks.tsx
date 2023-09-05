@@ -95,8 +95,8 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
       try {
         if (proposalPropertiesBlock) {
-          const updatedProperties = [...proposalPropertiesBlock.fields.properties, propertyTemplate];
-          const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
+          const updatedProperties = [...proposalPropertiesBlock.fields.cardProperties, propertyTemplate];
+          const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
           const res = await updateProposalBlocks([updatedBlock]);
 
           if (!res) {
@@ -107,7 +107,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
           return res[0].id;
         } else {
-          const propertiesBlock = { fields: { properties: [propertyTemplate] }, type: 'properties', spaceId: space.id };
+          const propertiesBlock = { fields: { cardProperties: [propertyTemplate] }, type: 'board', spaceId: space.id };
           const res = await createProposalBlocks([propertiesBlock as ProposalBlockInput]);
 
           if (!res) {
@@ -137,10 +137,10 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const updatedProperties = proposalPropertiesBlock.fields.properties.map((p) =>
+      const updatedProperties = proposalPropertiesBlock.fields.cardProperties.map((p) =>
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
-      const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
+      const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
 
       try {
         const res = await updateProposalBlocks([updatedBlock]);
@@ -164,8 +164,10 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const updatedProperties = proposalPropertiesBlock.fields.properties.filter((p) => p.id !== propertyTemplateId);
-      const updatedBlock = { ...proposalPropertiesBlock, fields: { properties: updatedProperties } };
+      const updatedProperties = proposalPropertiesBlock.fields.cardProperties.filter(
+        (p) => p.id !== propertyTemplateId
+      );
+      const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
       try {
         const res = await updateProposalBlocks([updatedBlock]);
 

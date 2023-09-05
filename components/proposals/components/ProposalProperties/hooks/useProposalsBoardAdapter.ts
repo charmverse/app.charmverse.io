@@ -38,8 +38,8 @@ export function useProposalsBoardAdapter() {
   const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   const customProperties = useMemo(
-    () => (proposalPropertiesBlock?.fields?.properties || []) as IPropertyTemplate[],
-    [proposalPropertiesBlock?.fields?.properties]
+    () => (proposalPropertiesBlock?.fields?.cardProperties || []) as IPropertyTemplate[],
+    [proposalPropertiesBlock?.fields?.cardProperties]
   );
 
   // board with all proposal properties and default properties

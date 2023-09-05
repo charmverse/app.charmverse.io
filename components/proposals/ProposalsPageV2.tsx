@@ -20,8 +20,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import { ProposalDialogProvider, useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
-import ProposalDialogGlobal from './components/ProposalDialog/ProposalDialogGlobal';
+import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
@@ -118,33 +117,37 @@ export function ProposalsPage({ title }: { title: string }) {
               </Box>
             </Grid>
           </Grid>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ProposalsViewOptions
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              categoryIdFilter={categoryIdFilter}
-              setCategoryIdFilter={setCategoryIdFilter}
-              categories={categories}
-              // Playwright-specific
-              testKey='desktop'
-            />
+          {!!proposals?.length && (
+            <>
+              <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+                <ProposalsViewOptions
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                  categoryIdFilter={categoryIdFilter}
+                  setCategoryIdFilter={setCategoryIdFilter}
+                  categories={categories}
+                  // Playwright-specific
+                  testKey='desktop'
+                />
 
-            <ViewSortControl
-              activeBoard={activeBoard}
-              activeView={activeView}
-              cards={cards}
-              viewSortPopup={viewSortPopup}
-            />
+                <ViewSortControl
+                  activeBoard={activeBoard}
+                  activeView={activeView}
+                  cards={cards}
+                  viewSortPopup={viewSortPopup}
+                />
 
-            <ViewHeaderActionsMenu
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowSidebar(!showSidebar);
-              }}
-            />
-          </Stack>
-          <Divider />
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              </Stack>
+              <Divider />
+            </>
+          )}
         </div>
 
         {loadingData ? (

@@ -1,4 +1,4 @@
-export const DEFAULT_BOARD_ID = '__defaultBoard';
+export const DEFAULT_BOARD_BLOCK_ID = '__defaultBoard';
 export const CATEGORY_BLOCK_ID = '__category';
 export const TITLE_BLOCK_ID = '__title';
 export const DEFAULT_VIEW_BLOCK_ID = '__defaultView';

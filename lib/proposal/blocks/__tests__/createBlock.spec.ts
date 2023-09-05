@@ -15,7 +15,7 @@ describe('proposal blocks - createBlock', () => {
       title: 'Properties',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -58,7 +58,7 @@ describe('proposal blocks - createBlock', () => {
       title: 'Properties',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -83,7 +83,7 @@ describe('proposal blocks - createBlock', () => {
       title: 'Properties 2',
       type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title2',
