@@ -14,7 +14,7 @@ import {
 } from 'testing/mocks/charmEditorContent';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-function renderEditorWithContent(content: PageContent | undefined) {
+function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
     <CharmEditorComponent
       placeholderText='Custom placeholder... start typing / to see commands'
@@ -40,7 +40,7 @@ function renderEditorWithContent(content: PageContent | undefined) {
       <PageHeader
         headerImage=''
         icon=''
-        title='Custom page title component'
+        title={title || 'Custom page title component'}
         updatedAt={new Date('2021-10-10T10:10:10.000Z').toISOString()}
         readOnly={false}
         setPage={() => {}}
@@ -114,11 +114,11 @@ export function InlineEditor() {
 }
 
 export function EditorWithContent() {
-  return renderEditorWithContent(contentWithBlocksAndMarks);
+  return renderEditorWithContent({ content: contentWithBlocksAndMarks });
 }
 
 export function LayoutColumnComponent() {
-  return renderEditorWithContent(contentWithColumnsAndTables);
+  return renderEditorWithContent({ content: contentWithColumnsAndTables });
 }
 
 export function LayoutTableComponent() {
@@ -128,9 +128,9 @@ export function LayoutTableComponent() {
       _.table_row(_.table_cell(_.p('Cell 1')), _.table_cell(_.p('Cell 2')))
     )
   );
-  return renderEditorWithContent(content);
+  return renderEditorWithContent({ content, title: 'Table component' });
 }
 
 export function EditorWithMedia() {
-  return renderEditorWithContent(contentWithMedia);
+  return renderEditorWithContent({ content: contentWithMedia });
 }

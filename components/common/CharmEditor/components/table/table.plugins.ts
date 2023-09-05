@@ -1,9 +1,13 @@
 import { keymap } from 'prosemirror-keymap';
 import * as table from 'prosemirror-tables';
 
+import { TableView } from './tableView';
+
 export function plugins() {
   const p = [
-    table.columnResizing(),
+    table.columnResizing({
+      View: TableView
+    }),
     table.tableEditing({ allowTableNodeSelection: true }),
     // table.columnHandles()
     keymap({

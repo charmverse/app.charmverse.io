@@ -192,7 +192,6 @@ export function charmEditorPlugins({
       containerDOM: ['div', { draggable: 'false' }]
     }),
     bookmarkPlugins(),
-    tabIndent.plugins(),
     tablePlugins,
     disclosure.plugins(),
     nft.plugins(),
@@ -203,7 +202,8 @@ export function charmEditorPlugins({
     markdownPlugins(),
     tableOfContentPlugins(),
     filePlugins(),
-    placeholderPlugin(placeholderText)
+    placeholderPlugin(placeholderText),
+    tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
 
   if (!readOnly && !disableRowHandles) {
