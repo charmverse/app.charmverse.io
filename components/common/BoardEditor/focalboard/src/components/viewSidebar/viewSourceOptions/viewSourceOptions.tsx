@@ -3,7 +3,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
 import { RiGoogleFill } from 'react-icons/ri';
 import { SiTypeform } from 'react-icons/si';
@@ -65,6 +65,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const [formStep, setStep] = useState<FormStep>(
     (rootIsLinkedBoard && views.length > 0) || activeSourceType === 'google_form' ? 'configure_source' : 'select_source'
   );
+
+  const isCreatingProposals = useRef(false);
 
   const allowedSourceOptions: SourceOptions[] = [];
 
@@ -147,8 +149,11 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                   isLoadingProposalSource
                     ? undefined
                     : () => {
-                        selectSourceType('proposals');
-                        handleProposalSource();
+                        if (!isCreatingProposals.current) {
+                          isCreatingProposals.current = true;
+                          selectSourceType('proposals');
+                          handleProposalSource();
+                        }
                       }
                 }
               >

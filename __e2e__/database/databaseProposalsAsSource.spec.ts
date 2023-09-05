@@ -74,7 +74,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.serial('Edit database select properties', async () => {
+test.describe.serial('Database with proposals as datasource', async () => {
   test('create a board', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
@@ -100,7 +100,12 @@ test.describe.serial('Edit database select properties', async () => {
     // Initialise the new database
     await expect(databasePage.selectProposalsAsSource).toBeVisible();
 
-    await databasePage.selectProposalsAsSource.click();
+    // This is important as we want to simulate multiple clicks to ensure the card creation only happens once
+    await Promise.all([
+      databasePage.selectProposalsAsSource.click(),
+      databasePage.selectProposalsAsSource.click(),
+      databasePage.selectProposalsAsSource.click()
+    ]);
 
     await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
 
