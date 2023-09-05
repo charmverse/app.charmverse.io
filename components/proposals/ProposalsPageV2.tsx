@@ -1,8 +1,10 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
@@ -43,9 +45,26 @@ export function ProposalsPage({ title }: { title: string }) {
   const isAdmin = useIsAdmin();
 
   const { showProposal, hideProposal } = useProposalDialog();
-  const { board: activeBoard, views, cardPages, activeView } = useProposalsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
+  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+
+  const groupByProperty = useMemo(() => {
+    let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
+
+    if (
+      (!_groupByProperty ||
+        (_groupByProperty?.type !== 'select' &&
+          _groupByProperty?.type !== 'proposalCategory' &&
+          _groupByProperty?.type !== 'proposalStatus')) &&
+      activeView?.fields.viewType === 'board'
+    ) {
+      _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
+    }
+
+    return _groupByProperty;
+  }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
   useProposalsBoardMutator();
 
@@ -74,115 +93,120 @@ export function ProposalsPage({ title }: { title: string }) {
 
   return (
     <div className='focalboard-body full-page'>
-      <ProposalDialogProvider>
-        <Box className='BoardComponent' py={(theme) => theme.spacing(8)}>
-          <div className='top-head'>
-            <Grid container mb={6}>
-              <Grid item xs={12}>
-                <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
-                  <Typography variant='h1' gutterBottom>
-                    {title}
-                  </Typography>
+      <Box className='BoardComponent' py={(theme) => theme.spacing(8)}>
+        <div className='top-head'>
+          <Grid container mb={6}>
+            <Grid item xs={12}>
+              <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
+                <Typography variant='h1' gutterBottom>
+                  {title}
+                </Typography>
 
-                  <Box display='flex'>
-                    <Box
-                      gap={3}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        flexDirection: 'row-reverse'
-                      }}
-                    >
-                      <NewProposalButton />
-                    </Box>
+                <Box display='flex'>
+                  <Box
+                    gap={3}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      flexDirection: 'row-reverse'
+                    }}
+                  >
+                    <NewProposalButton />
                   </Box>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+            <ProposalsViewOptions
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              categoryIdFilter={categoryIdFilter}
+              setCategoryIdFilter={setCategoryIdFilter}
+              categories={categories}
+              // Playwright-specific
+              testKey='desktop'
+            />
+
+            <ViewSortControl
+              activeBoard={activeBoard}
+              activeView={activeView}
+              cards={cards}
+              viewSortPopup={viewSortPopup}
+            />
+
+            <ViewHeaderActionsMenu
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowSidebar(!showSidebar);
+              }}
+            />
+          </Stack>
+          <Divider />
+        </div>
+
+        {loadingData ? (
+          <Grid item xs={12} sx={{ mt: 12 }}>
+            <LoadingComponent height={500} isLoading size={50} />
+          </Grid>
+        ) : (
+          <>
+            {proposals?.length === 0 && (
+              <Grid item xs={12} position='relative'>
+                <Box sx={{ mt: 5 }}>
+                  <EmptyStateVideo
+                    description='Getting started with proposals'
+                    videoTitle='Proposals | Getting started with CharmVerse'
+                    videoUrl='https://tiny.charmverse.io/proposal-builder'
+                  />
                 </Box>
               </Grid>
-            </Grid>
-            <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <ProposalsViewOptions
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                categoryIdFilter={categoryIdFilter}
-                setCategoryIdFilter={setCategoryIdFilter}
-                categories={categories}
-                // Playwright-specific
-                testKey='desktop'
-              />
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
-              />
-            </Stack>
-            <Divider />
-          </div>
-
-          {loadingData ? (
-            <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent height={500} isLoading size={50} />
-            </Grid>
-          ) : (
-            <>
-              {proposals?.length === 0 && (
-                <Grid item xs={12} position='relative'>
-                  <Box sx={{ mt: 5 }}>
-                    <EmptyStateVideo
-                      description='Getting started with proposals'
-                      videoTitle='Proposals | Getting started with CharmVerse'
-                      videoUrl='https://tiny.charmverse.io/proposal-builder'
+            )}
+            {proposals?.length > 0 && (
+              <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
+                <Stack>
+                  <Box width='100%'>
+                    <Table
+                      board={activeBoard}
+                      activeView={activeView}
+                      cardPages={cardPages}
+                      groupByProperty={groupByProperty}
+                      views={views}
+                      visibleGroups={[]}
+                      selectedCardIds={[]}
+                      readOnly={!isAdmin}
+                      readOnlySourceData={false}
+                      cardIdToFocusOnRender=''
+                      showCard={openPage}
+                      addCard={async () => {}}
+                      onCardClicked={() => {}}
+                      disableAddingCards={true}
+                      readOnlyTitle={true}
                     />
                   </Box>
-                </Grid>
-              )}
-              {proposals?.length > 0 && (
-                <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
-                  <Stack>
-                    <Box width='100%'>
-                      <Table
-                        board={activeBoard}
-                        activeView={activeView}
-                        cardPages={cardPages}
-                        groupByProperty={undefined}
-                        views={views}
-                        visibleGroups={[]}
-                        selectedCardIds={[]}
-                        readOnly={!isAdmin}
-                        readOnlySourceData={false}
-                        cardIdToFocusOnRender=''
-                        showCard={openPage}
-                        addCard={async () => {}}
-                        onCardClicked={() => {}}
-                        disableAddingCards={true}
-                        readOnlyTitle={true}
-                      />
-                    </Box>
 
-                    <ViewSidebar
-                      views={views}
-                      board={activeBoard}
-                      rootBoard={activeBoard}
-                      view={activeView}
-                      isOpen={!!showSidebar}
-                      closeSidebar={() => setShowSidebar(false)}
-                      hideLayoutOptions={true}
-                      hideSourceOptions={true}
-                      groupByProperty={undefined} // TODO - get this from somewhere
-                      page={undefined}
-                      pageId={undefined}
-                      showView={() => {}}
-                    />
-                  </Stack>
-                </Box>
-              )}
-            </>
-          )}
-          <ProposalDialogGlobal />
-        </Box>
-      </ProposalDialogProvider>
+                  <ViewSidebar
+                    views={views}
+                    board={activeBoard}
+                    rootBoard={activeBoard}
+                    view={activeView}
+                    isOpen={!!showSidebar}
+                    closeSidebar={() => setShowSidebar(false)}
+                    hideLayoutOptions={true}
+                    hideSourceOptions={true}
+                    groupByProperty={groupByProperty}
+                    page={undefined}
+                    pageId={undefined}
+                    showView={() => {}}
+                  />
+                </Stack>
+              </Box>
+            )}
+          </>
+        )}
+      </Box>
     </div>
   );
 }

@@ -2,11 +2,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useMemo, useState } from 'react';
 
+import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
@@ -21,6 +23,7 @@ export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsPr
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
+  const { members } = useMembers();
   const { filteredProposals: proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
@@ -31,20 +34,35 @@ export function useProposalsBoardAdapter() {
     [proposalPropertiesBlock?.fields?.properties]
   );
 
-  const cardPages: CardPage[] =
-    proposals
-      ?.map((p) => {
-        const page = pages[p?.id];
-
-        return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
-      })
-      .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
-
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
     properties: customProperties,
     categories
   });
+
+  const activeView = useMemo(() => {
+    // use saved default block or build on the fly
+    const viewBlock = proposalBlocks?.find((b) => b.id === '__defaultView');
+
+    return viewBlock
+      ? (blockToFBBlock(viewBlock) as BoardView)
+      : getDefaultTableView({ properties: customProperties, categories });
+  }, [categories, customProperties, proposalBlocks]);
+
+  const cardPages: CardPage[] = useMemo(() => {
+    const cards =
+      proposals
+        ?.map((p) => {
+          const page = pages[p?.id];
+
+          return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
+        })
+        .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+
+    const sortedCardPages = activeView ? sortCards(cards, board, activeView, members) : [];
+
+    return sortedCardPages;
+  }, [activeView, board, members, pages, proposals, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     properties: customProperties,
@@ -57,15 +75,6 @@ export function useProposalsBoardAdapter() {
 
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
-
-  const activeView = useMemo(() => {
-    // use saved default block or build on the fly
-    const viewBlock = proposalBlocks?.find((b) => b.id === '__defaultView');
-
-    return viewBlock
-      ? (blockToFBBlock(viewBlock) as BoardView)
-      : getDefaultTableView({ properties: customProperties, categories });
-  }, [categories, customProperties, proposalBlocks]);
 
   const views: BoardView[] = [];
 

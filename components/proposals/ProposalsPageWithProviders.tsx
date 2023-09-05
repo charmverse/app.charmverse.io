@@ -1,3 +1,5 @@
+import { ProposalDialogProvider } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
+import ProposalDialogGlobal from 'components/proposals/components/ProposalDialog/ProposalDialogGlobal';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPageV2';
@@ -15,7 +17,11 @@ export function ProposalsPageWithProviders() {
     <ProposalsProvider>
       <ProposalBlocksProvider>
         <ProposalsBoardProvider>
-          <ProposalsPage title={proposalTitle} />
+          <ProposalDialogProvider>
+            <ProposalsPage title={proposalTitle} />
+
+            <ProposalDialogGlobal />
+          </ProposalDialogProvider>
         </ProposalsBoardProvider>
       </ProposalBlocksProvider>
     </ProposalsProvider>
