@@ -334,7 +334,12 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   </div>
                 </CharmEditor>
 
-                {page.type === 'proposal' && <PageComments page={page} permissions={pagePermissions} />}
+                {page.type === 'proposal' && (
+                  <Box mt='-100px'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} permissions={pagePermissions} />
+                  </Box>
+                )}
               </Container>
             </div>
           </ScrollContainer>

@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -34,6 +35,10 @@ type Props = {
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };
+
+const StyledContainer = styled(Container)`
+  margin-bottom: 180px;
+`;
 
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, setContentUpdated }: Props) {
@@ -147,10 +152,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
     <ScrollableWindow>
       <div className={`document-print-container ${fontClassName}`}>
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-        <Container data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+        <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
-              allowClickingFooter={true}
               placeholderText={
                 readOnlyEditor
                   ? `You must select a proposal template to begin writing`
@@ -218,7 +222,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
               Create
             </Button>
           </Stack>
-        </Container>
+        </StyledContainer>
       </div>
     </ScrollableWindow>
   );
