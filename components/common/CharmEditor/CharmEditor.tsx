@@ -89,11 +89,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);
-          .ProseMirror[data-placeholder]::before {
-            color: var(--primary-text);
-            opacity: 0.5;
-          }`
+          background-color: var(--background-light);`
       : ''};
 
   ${({ disableRowHandles }) =>
