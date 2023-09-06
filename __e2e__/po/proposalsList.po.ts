@@ -23,11 +23,11 @@ export class ProposalsListPage extends GlobalPage {
   }
 
   getProposalRowLocator(proposalId: string): Locator {
-    return this.page.locator(`data-test=proposal-row-${proposalId}`);
+    return this.page.locator(`data-test=database-row-${proposalId}`);
   }
 
   getProposalRowOpenLocator(proposalId: string): Locator {
-    return this.page.locator(`data-test=open-proposal-${proposalId}`);
+    return this.page.locator(`data-test=open-database-row-${proposalId} .open-button > Button`);
   }
 
   getProposalCategoryLocator(categoryId: string) {
