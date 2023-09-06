@@ -5,7 +5,7 @@ npx lint-staged
 
 # List of files to check. These should already be in gitignore, but this provides an additional layer of protection.
 # List of banned files to check against. Any staging (ex. .env.staging, .env.stg) or prod file will be rejected.
-banned_files=(".env.p" ".env.s")
+banned_files=(".env.p" ".env.s" ".env.b")
 
 # Get list of staged files from git
 staged_files=$(git diff --cached --name-only)
@@ -16,8 +16,9 @@ for staged_file in $staged_files; do
   for banned_file in "${banned_files[@]}"; do
     # Check if the staged file contains the banned file pattern
     if grep -q "$banned_file" <<< "$staged_file"; then
-      echo "Error: Banned file '$staged_file' found in staged files"
-      echo "Please remove it and try again."
+      printf "\n"
+      printf "\e[31mError: Banned file \e[1m'$staged_file'\e[0m\e[31m found in staged files\e[0m \n"
+      printf "Please remove it and try again.\n"
       exit 1
     fi
   done
