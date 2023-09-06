@@ -1,4 +1,3 @@
-import { findParentNodeOfType } from '@bangle.dev/utils';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
