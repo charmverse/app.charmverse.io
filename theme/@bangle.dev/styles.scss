@@ -515,8 +515,9 @@ ol li {
 .charm-placeholder::before  {
   display: block;
   height: 0;
-  color: var(--bg-gray);
+  color: var(--secondary-text);
   content: attr(data-placeholder);
+  opacity: 0.75;
   pointer-events: none;
   position: relative;
 }
