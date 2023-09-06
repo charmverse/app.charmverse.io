@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { getAccessibleProposals } from '../getAccessibleProposals';
+import { getAccessibleProposalIds } from '../getAccessibleProposalIds';
 
-describe('getAccessibleProposals', () => {
+describe('getAccessibleProposalIds', () => {
   it('Should return all proposals at discussion stage and beyond, except templates and drafts', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
@@ -38,15 +38,15 @@ describe('getAccessibleProposals', () => {
       proposalStatus: 'discussion'
     });
 
-    const proposals = await getAccessibleProposals({
+    const proposals = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: user.id
     });
 
-    const expectedProposals = [proposal1];
+    const expectedProposals = [proposal1.id];
     expect(proposals.length).toBe(expectedProposals.length);
 
-    expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));
+    expect(proposals).toEqual(expectedProposals);
   });
 
   it('should not return drafts if user is not an author', async () => {
@@ -84,7 +84,7 @@ describe('getAccessibleProposals', () => {
       }
     );
 
-    const proposals = await getAccessibleProposals({
+    const proposals = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: user.id
     });
@@ -92,7 +92,7 @@ describe('getAccessibleProposals', () => {
     const expectedProposals = [proposalCategory1ProposalAuthoredByUser];
     expect(proposals.length).toBe(expectedProposals.length);
 
-    expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));
+    expect(proposals).toEqual([proposalCategory1ProposalAuthoredByUser.id]);
   });
 
   it('should return all proposals to the admin', async () => {
@@ -121,7 +121,7 @@ describe('getAccessibleProposals', () => {
       userId: user.id,
       proposalStatus: 'draft'
     });
-    const proposals = await getAccessibleProposals({
+    const proposals = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: adminUser.id
     });
@@ -129,7 +129,10 @@ describe('getAccessibleProposals', () => {
     const expectedProposals = [invisibleCategoryProposalAuthoredByUser, invisibleCategoryDraftProposalAuthoredByUser];
     expect(proposals.length).toBe(expectedProposals.length);
 
-    expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));
+    expect(proposals).toEqual([
+      invisibleCategoryProposalAuthoredByUser.id,
+      invisibleCategoryDraftProposalAuthoredByUser.id
+    ]);
   });
 
   it('should return only proposals from specified categories if categoryIds are provided', async () => {
@@ -166,7 +169,7 @@ describe('getAccessibleProposals', () => {
       proposalStatus: 'discussion'
     });
     // Admin user test
-    const proposalsRequestedByAdmin = await getAccessibleProposals({
+    const proposalsRequestedByAdmin = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: adminUser.id,
       categoryIds: [category1.id]
@@ -174,17 +177,17 @@ describe('getAccessibleProposals', () => {
 
     expect(proposalsRequestedByAdmin.length).toBe(1);
 
-    expect(proposalsRequestedByAdmin[0]).toMatchObject(proposal);
+    expect(proposalsRequestedByAdmin).toEqual([proposal.id]);
 
     // Normal user test
-    const proposalsRequestedByUser = await getAccessibleProposals({
+    const proposalsRequestedByUser = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: user.id,
       categoryIds: [category1.id]
     });
     expect(proposalsRequestedByUser.length).toBe(1);
 
-    expect(proposalsRequestedByUser[0]).toMatchObject(proposal);
+    expect(proposalsRequestedByUser).toEqual([proposal.id]);
   });
 
   it('should return only the proposals where a user is an author if onlyAssigned is true', async () => {
@@ -230,7 +233,7 @@ describe('getAccessibleProposals', () => {
     });
 
     // Admin user test
-    const proposalsRequestedByAdmin = await getAccessibleProposals({
+    const proposalsRequestedByAdmin = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: adminUser.id,
       onlyAssigned: true
@@ -241,14 +244,11 @@ describe('getAccessibleProposals', () => {
     expect(proposalsRequestedByAdmin.length).toBe(expectedAdminProposals.length);
 
     expect(proposalsRequestedByAdmin).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining(proposalByAdmin),
-        expect.objectContaining(proposalByAdminReviewedByUser)
-      ])
+      expect.arrayContaining([proposalByAdmin.id, proposalByAdminReviewedByUser.id])
     );
 
     // Normal user test
-    const proposalsRequestedByUser = await getAccessibleProposals({
+    const proposalsRequestedByUser = await getAccessibleProposalIds({
       spaceId: space.id,
       userId: user.id,
       onlyAssigned: true
@@ -258,6 +258,6 @@ describe('getAccessibleProposals', () => {
 
     expect(proposalsRequestedByUser.length).toBe(expectedUserProposals.length);
 
-    expect(proposalsRequestedByUser).toEqual([expect.objectContaining(proposalByUser)]);
+    expect(proposalsRequestedByUser).toEqual([proposalByUser.id]);
   });
 });

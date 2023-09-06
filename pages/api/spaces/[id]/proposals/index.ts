@@ -1,10 +1,9 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ListProposalsRequest, ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
