@@ -1,11 +1,11 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Box, FormGroup, FormLabel, TextField, Rating, Typography } from '@mui/material';
+import { Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
-import { useUpsertRubricCriteriaAnswer } from 'charmClient/hooks/proposals';
+import { useUpsertRubricCriteriaAnswer, useUpsertDraftRubricCriteriaAnswer } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 
 import { IntegerInput, CriteriaRow } from './ProposalRubricCriteriaInput';
@@ -59,6 +59,14 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
   } = useUpsertRubricCriteriaAnswer({ proposalId });
 
   const {
+    error: draftAnswerError,
+    isMutating: draftIsSaving,
+    trigger: upsertDraftRubricCriteriaAnswer
+  } = useUpsertDraftRubricCriteriaAnswer({ proposalId });
+
+  const formError = draftAnswerError || answerError;
+
+  const {
     control,
     register,
     handleSubmit,
@@ -83,14 +91,15 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
     });
     onSubmit(values);
   }
+
   async function saveAnswersDraft(values: FormInput) {
     // answers are optional - filter out ones with no score
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
-    await upsertRubricCriteriaAnswer({
+    await upsertDraftRubricCriteriaAnswer({
       // @ts-ignore -  TODO: make answer types match
-      answers: filteredAnswers
+      answers: filteredAnswers,
+      isDraft: true
     });
-    onSubmit(values);
   }
 
   useEffect(() => {
@@ -112,23 +121,24 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
           />
         ))}
         <Box display='flex' gap={2}>
-          <div>
-            <Button loading={isSaving} onClick={handleSubmit(submitAnswers)}>
+          <Stack direction='row' gap={2}>
+            <Button sx={{ alignSelf: 'start' }} loading={isSaving} onClick={handleSubmit(submitAnswers)}>
               Submit
             </Button>
             <Button
+              sx={{ alignSelf: 'start' }}
               color='secondary'
               variant='outlined'
-              loading={isSaving}
+              loading={draftIsSaving}
               type='submit'
               onClick={handleSubmit(saveAnswersDraft)}
             >
               Save Draft
             </Button>
-          </div>
-          {answerError && (
+          </Stack>
+          {formError && (
             <Typography variant='body2' color='error'>
-              {answerError.message}
+              {formError.message}
             </Typography>
           )}
         </Box>

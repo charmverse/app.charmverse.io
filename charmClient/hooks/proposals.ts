@@ -75,6 +75,10 @@ export function useUpsertRubricCriteriaAnswer({ proposalId }: { proposalId: Mayb
   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
+export function useUpsertDraftRubricCriteriaAnswer({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
   return usePUT<Omit<UpdateProposalLensPropertiesRequest, 'proposalId'>>(
     `/api/proposals/${proposalId}/update-lens-properties`
