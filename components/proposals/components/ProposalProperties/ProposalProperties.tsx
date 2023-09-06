@@ -81,6 +81,7 @@ type ProposalPropertiesProps = {
   readOnlyProposalEvaluationType?: boolean;
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  draftRubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   showStatus?: boolean;
@@ -109,6 +110,7 @@ export function ProposalProperties({
   readOnlyReviewers,
   readOnlyRubricCriteria,
   rubricAnswers = [],
+  draftRubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
   showStatus,
@@ -176,6 +178,7 @@ export function ProposalProperties({
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
+  const myDraftRubricAnswers = draftRubricAnswers.filter((answer) => answer.userId === userId);
   const templateOptions = proposalTemplates
     .filter((_proposal) => {
       if (!proposalCategoryId) {
@@ -269,6 +272,7 @@ export function ProposalProperties({
             <RubricEvaluationForm
               proposalId={proposalId!}
               answers={myRubricAnswers}
+              draftAnswers={myDraftRubricAnswers}
               criteriaList={rubricCriteria!}
               onSubmit={onSubmitEvaluation}
             />

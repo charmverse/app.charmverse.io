@@ -1,7 +1,7 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
-import { useEffect, useMemo } from 'react';
+import { Alert, Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
@@ -15,6 +15,7 @@ export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 type Props = {
   proposalId: string;
   answers?: ProposalRubricCriteriaAnswer[];
+  draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (answers: FormInput) => void;
 };
@@ -47,10 +48,18 @@ const StyledRating = styled(Rating)`
   }
 `;
 
-export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = [], onSubmit }: Props) {
+export function RubricEvaluationForm({
+  proposalId,
+  criteriaList = [],
+  answers = [],
+  draftAnswers = [],
+  onSubmit
+}: Props) {
   const mappedAnswers = criteriaList.map(
     (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
   );
+
+  const [showDraftAnswers, setShowDraftAnswers] = useState(false);
 
   const {
     error: answerError,
@@ -65,6 +74,8 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
   } = useUpsertDraftRubricCriteriaAnswer({ proposalId });
 
   const formError = draftAnswerError || answerError;
+
+  const showDraftBanner = draftAnswers.length > 0 && !showDraftAnswers;
 
   const {
     control,
@@ -107,8 +118,26 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
     reset({ answers: mappedAnswers });
   }, [mappedAnswers.length]);
 
+  useEffect(() => {
+    const mappedDraftAnswers = criteriaList.map(
+      (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
+    );
+    // update the form values when the criteria list loads
+    reset({ answers: mappedDraftAnswers });
+  }, [showDraftAnswers]);
+
   return (
     <form>
+      {showDraftBanner && (
+        <Alert action='View draft' severity='info' onClose={() => setShowDraftAnswers(true)}>
+          You have saved draft answers
+        </Alert>
+      )}
+      {showDraftAnswers && (
+        <Alert severity='info' onClose={() => setShowDraftAnswers(true)}>
+          These are draft answers
+        </Alert>
+      )}
       <Box>
         {fields.map((field, index) => (
           <CriteriaInput

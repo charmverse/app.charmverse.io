@@ -50,6 +50,7 @@ describe('getProposal', () => {
           status: proposal.status,
           archived: expect.any(Boolean),
           evaluationType: 'vote',
+          draftRubricAnswers: [],
           rubricAnswers: [],
           rubricCriteria: [],
           page: {
