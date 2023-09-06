@@ -63,6 +63,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   hideLayoutOptions?: boolean;
   hideSourceOptions?: boolean;
+  hideGroupOptions?: boolean;
 };
 
 type SourceIconType = DataSourceType | 'linked';
@@ -92,7 +93,8 @@ export function ViewSidebarSelect({
   board,
   groupByProperty,
   hideLayoutOptions,
-  hideSourceOptions
+  hideSourceOptions,
+  hideGroupOptions
 }: Props) {
   const { pages } = usePages();
 
@@ -137,7 +139,7 @@ export function ViewSidebarSelect({
         title='Properties'
         value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
       />
-      {withGroupBy && (
+      {withGroupBy && !hideGroupOptions && (
         <MenuRow
           onClick={() => setSidebarView('group-by')}
           icon={<GroupIcon color='secondary' />}

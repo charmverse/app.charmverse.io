@@ -199,6 +199,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     closeSidebar={() => setShowSidebar(false)}
                     hideLayoutOptions={true}
                     hideSourceOptions={true}
+                    hideGroupOptions={true}
                     groupByProperty={groupByProperty}
                     page={undefined}
                     pageId={undefined}
