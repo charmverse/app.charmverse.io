@@ -9,6 +9,7 @@ import type { Member } from 'lib/members/interfaces';
 
 const ContentContainer = styled(Container)`
   width: 100%;
+  margin-bottom: 100px;
 `;
 
 export function MemberProfile({

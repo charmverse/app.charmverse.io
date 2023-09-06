@@ -186,6 +186,7 @@ interface CharmEditorProps {
   onConnectionEvent?: (event: ConnectionEvent) => void;
   isPollOrVote?: boolean;
   disableMention?: boolean;
+  allowClickingFooter?: boolean;
 }
 
 function CharmEditor({
@@ -215,7 +216,8 @@ function CharmEditor({
   disableNestedPages = false,
   onConnectionEvent,
   isPollOrVote = false,
-  disableMention = false
+  disableMention = false,
+  allowClickingFooter
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -351,6 +353,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
       focusOnInit={focusOnInit}

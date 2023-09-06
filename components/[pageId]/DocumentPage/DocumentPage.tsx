@@ -1,3 +1,4 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
@@ -44,7 +45,7 @@ export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...
 }>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : '860px')};
   max-width: 100%;
-  margin: 0 auto ${({ top }) => top + 100}px;
+  margin: 0 auto ${({ top }) => top}px;
   position: relative;
   top: ${({ top }) => top}px;
   padding: 0 40px 0 30px;
@@ -246,6 +247,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     minHeight: proposalId ? '100px' : 'unset'
                   }}
                   disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                  allowClickingFooter={true}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
                   <PageHeader
@@ -332,7 +334,12 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   </div>
                 </CharmEditor>
 
-                {page.type === 'proposal' && <PageComments page={page} permissions={pagePermissions} />}
+                {page.type === 'proposal' && (
+                  <Box mt='-100px'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} permissions={pagePermissions} />
+                  </Box>
+                )}
               </Container>
             </div>
           </ScrollContainer>

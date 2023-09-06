@@ -437,6 +437,12 @@ ol li {
   position: relative;
 }
 
+// add some space at bottom of editor so user can click to adding new rows
+.charm-empty-footer {
+  width: 100%;
+  height: 100px;
+}
+
 .empty-editor .row-handle {
   display: none;
 }
