@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest, ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -24,11 +25,26 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
   const categoryIds = req.query.categoryIds;
   const userId = req.session.user?.id;
   const spaceId = req.query.id as string;
+  const onlyAssigned = req.query.onlyAssigned === 'true';
 
-  const proposals = await req.basePermissionsClient.proposals.getAccessibleProposals({
-    categoryIds,
+  const proposalIds = await req.basePermissionsClient.proposals.getAccessibleProposalIds({
     spaceId,
+    categoryIds,
+    onlyAssigned,
     userId
+  });
+
+  const proposals = await prisma.proposal.findMany({
+    where: {
+      id: {
+        in: proposalIds
+      }
+    },
+    include: {
+      authors: true,
+      reviewers: true,
+      category: true
+    }
   });
 
   return res.status(200).json(proposals);
