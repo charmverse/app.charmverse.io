@@ -74,16 +74,23 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
 
   const { fields } = useFieldArray({ control, name: 'answers' });
 
-  async function saveForm(values: FormInput) {
-    if (proposalId) {
-      // answers are optional - filter out ones with no score
-      const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
-      await upsertRubricCriteriaAnswer({
-        // @ts-ignore -  TODO: make answer types match
-        answers: filteredAnswers
-      });
-      onSubmit(values);
-    }
+  async function submitAnswers(values: FormInput) {
+    // answers are optional - filter out ones with no score
+    const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
+    await upsertRubricCriteriaAnswer({
+      // @ts-ignore -  TODO: make answer types match
+      answers: filteredAnswers
+    });
+    onSubmit(values);
+  }
+  async function saveAnswersDraft(values: FormInput) {
+    // answers are optional - filter out ones with no score
+    const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
+    await upsertRubricCriteriaAnswer({
+      // @ts-ignore -  TODO: make answer types match
+      answers: filteredAnswers
+    });
+    onSubmit(values);
   }
 
   useEffect(() => {
@@ -92,7 +99,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
   }, [mappedAnswers.length]);
 
   return (
-    <form onSubmit={handleSubmit(saveForm)}>
+    <form>
       <Box>
         {fields.map((field, index) => (
           <CriteriaInput
@@ -106,8 +113,17 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers = 
         ))}
         <Box display='flex' gap={2}>
           <div>
-            <Button loading={isSaving} type='submit'>
+            <Button loading={isSaving} onClick={handleSubmit(submitAnswers)}>
               Submit
+            </Button>
+            <Button
+              color='secondary'
+              variant='outlined'
+              loading={isSaving}
+              type='submit'
+              onClick={handleSubmit(saveAnswersDraft)}
+            >
+              Save Draft
             </Button>
           </div>
           {answerError && (
