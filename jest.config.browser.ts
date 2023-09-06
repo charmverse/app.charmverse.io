@@ -26,7 +26,6 @@ const jestConfig = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: ['**/components/**/?(*.)+(spec).[tj]s?(x)', '**/hooks/**/*.spec.ts'],
-  modulePathIgnorePatterns: ['focalboard/src'],
   moduleNameMapper: {
     // map SVG to something that Jest can read - could be used for other extensions as well?
     // source: https://github.com/vercel/next.js/discussions/42535#discussioncomment-4828013

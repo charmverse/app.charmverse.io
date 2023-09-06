@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

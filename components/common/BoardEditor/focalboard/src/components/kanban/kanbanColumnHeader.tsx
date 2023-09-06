@@ -179,7 +179,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             <IconButton icon={<MoreHorizIcon fontSize='small' />} />
             <Menu disablePortal={false}>
               <Menu.Text
-                id='hide'
+                id='hide-column-action'
                 icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}

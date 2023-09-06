@@ -10,7 +10,7 @@ import { wrapIntl, mockStateStore } from '../../testUtils';
 import Comment from './comment';
 
 jest.mock('../../mutator');
-const mockedMutator = jest.mocked(mutator, true);
+const mockedMutator = jest.mocked(mutator, { shallow: true });
 
 const board = TestBlockFactory.createBoard();
 const card = TestBlockFactory.createCard(board);
@@ -19,7 +19,7 @@ const dateFixed = Date.parse('01 Oct 2020');
 comment.createdAt = dateFixed;
 comment.updatedAt = dateFixed;
 comment.title = 'Test comment';
-const member = { username: 'Test user', avatar: null };
+const member = { username: 'Test user', hasNftAvatar: false, avatar: undefined };
 
 describe('components/cardDetail/comment', () => {
   const state = {

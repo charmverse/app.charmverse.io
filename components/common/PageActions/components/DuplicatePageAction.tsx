@@ -61,7 +61,12 @@ export function DuplicatePageAction({
       }
     >
       <div>
-        <MenuItem dense disabled={excludedPageTypes.includes(pageType) || disabled} onClick={duplicatePage}>
+        <MenuItem
+          data-testid='duplicate-page-action'
+          dense
+          disabled={excludedPageTypes.includes(pageType) || disabled}
+          onClick={duplicatePage}
+        >
           <ListItemIcon>
             <FileCopyOutlinedIcon fontSize='small' />
           </ListItemIcon>
