@@ -23,25 +23,6 @@
   outline: none;
 }
 
-.ProseMirror .tableWrapper {
-  overflow-x: auto;
-}
-
-.ProseMirror table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  overflow: hidden;
-}
-
-.ProseMirror td,
-.ProseMirror th {
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
-  background-color: var(--background-default);
-}
-
 /* Prevent iframes from stealing drag events - https://github.com/react-grid-layout/react-draggable/issues/613 */
 .react-draggable-transparent-selection iframe {
   pointer-events: none;
@@ -83,30 +64,6 @@
 
 .ProseMirror {
   padding: 5px 0;
-}
-
-.ProseMirror table {
-  margin: 0 !important;
-}
-
-.ProseMirror th,
-.ProseMirror td {
-  min-width: 1em;
-  border: 1px solid #ddd;
-  padding: 3px 5px;
-}
-
-.ProseMirror th {
-  background-color: var(--bg-gray);
-}
-
-.ProseMirror .tableWrapper {
-  margin: 1em 0;
-}
-
-.ProseMirror th {
-  font-weight: bold;
-  text-align: left;
 }
 
 // @bangle.dev/core/style.css
@@ -622,6 +579,24 @@ ol li {
   .charm-column-resizer {
     visibility: hidden;
     pointer-events: none;
+  }
+}
+
+.bangle-editor-core.readonly {
+  p, h1, h2, h3, ul, ol, code, .charm-column-row, .bangle-nv-container {
+    &:has(div.charm-row-decoration-suggestions) {
+      // important for column row, as it uses inline-styles
+      display: none !important;
+    }
+  }
+
+  // For NodeView blocks the decoration is adjacent to it
+  .bangle-nv-container:has(+ div.charm-row-decoration-suggestions) {
+    display: none;
+  }
+
+  div.charm-row-decoration-suggestions {
+    display: none;
   }
 }
 

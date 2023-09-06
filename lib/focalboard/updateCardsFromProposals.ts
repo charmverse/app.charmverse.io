@@ -41,7 +41,7 @@ export async function updateCardsFromProposals({
   });
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
   if ((database.fields as any as BoardFields).sourceType !== 'proposals') {
-    throw new InvalidStateError('Board does not have a proposals view');
+    throw new InvalidStateError('Database not configured to use proposals as a source');
   }
 
   const pageProposals = await prisma.page.findMany({

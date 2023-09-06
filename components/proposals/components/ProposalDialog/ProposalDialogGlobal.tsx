@@ -1,3 +1,5 @@
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
+
 import { useProposalDialog } from './hooks/useProposalDialog';
 import { ProposalDialog } from './ProposalDialog';
 
@@ -6,7 +8,11 @@ export default function ProposalDialogGlobal() {
   const { props, hideProposal } = useProposalDialog();
   const { newProposal, pageId } = props;
   if (newProposal || pageId) {
-    return <ProposalDialog newProposal={newProposal} pageId={pageId} onClose={hideProposal} />;
+    return (
+      <DocumentPageProviders>
+        <ProposalDialog newProposal={newProposal} pageId={pageId} onClose={hideProposal} />
+      </DocumentPageProviders>
+    );
   }
   return null;
 }

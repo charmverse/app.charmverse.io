@@ -14,7 +14,6 @@ import * as columnLayout from './components/columnLayout/columnLayout.plugins';
 import * as disclosure from './components/disclosure';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import * as emoji from './components/emojiSuggest/emojiSuggest.plugins';
-import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
 import * as heading from './components/heading';
@@ -91,10 +90,7 @@ export function charmEditorPlugins({
     linkPlugins({ key: linksPluginKey }),
     pasteChecker.plugins({ onError }),
     new Plugin({
-      view: (_view) => {
-        if (readOnly) {
-          rejectAll(_view);
-        }
+      view: () => {
         return {
           update: (view, prevState) => {
             if (
@@ -192,7 +188,6 @@ export function charmEditorPlugins({
       containerDOM: ['div', { draggable: 'false' }]
     }),
     bookmarkPlugins(),
-    tabIndent.plugins(),
     tablePlugins,
     disclosure.plugins(),
     nft.plugins(),
@@ -203,11 +198,13 @@ export function charmEditorPlugins({
     markdownPlugins(),
     tableOfContentPlugins(),
     filePlugins(),
-    placeholderPlugin(placeholderText)
+    placeholderPlugin(placeholderText),
+    tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
 
   if (!readOnly && !disableRowHandles) {
-    basePlugins.push(
+    // add rowActions before the table plugin, or else mousedown is not triggered
+    basePlugins.unshift(
       rowActions.plugins({
         key: actionsPluginKey
       })
