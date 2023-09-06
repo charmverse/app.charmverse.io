@@ -4,7 +4,7 @@
 npx lint-staged
 
 # List of files to check. These should already be in gitignore, but this provides an additional layer of protection.
-files_to_check=(".env.production" ".env.staging")
+files_to_check=(".env.production" ".env.staging", ".env.blocked")
 
 # Loop over each file in the list and check for the forbidden string
 for file_to_check in "${files_to_check[@]}"; do
