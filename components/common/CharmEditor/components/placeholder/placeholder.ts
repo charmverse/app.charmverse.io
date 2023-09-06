@@ -60,7 +60,7 @@ const parentNodesToShow = ['columnBlock', 'listItem'];
 function shouldShowPlaceholder(state: EditorState) {
   const selectionStart = state.selection.$from;
   const depth = selectionStart.depth;
-  if (depth === 1) {
+  if (depth <= 1) {
     return true;
   }
 

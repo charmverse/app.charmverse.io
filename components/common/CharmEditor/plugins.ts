@@ -32,7 +32,7 @@ import * as nft from './components/nft/nft.plugins';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
-import { placeholderPlugin } from './components/placeholder/index';
+import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
