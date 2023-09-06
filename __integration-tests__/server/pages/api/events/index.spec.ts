@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 
 import { baseUrl } from 'config/constants';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-import type { EventInput } from 'pages/api/events/index';
+import type { EventInput } from 'lib/metrics/recordDatabaseEvent';
 import { loginAnonymousUser } from 'testing/mockApiCall';
 
 describe('POST /api/events - Analytics endpoint', () => {

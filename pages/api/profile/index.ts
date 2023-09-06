@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { trackAppLoaded } from 'lib/metrics/mixpanel/trackAppLoaded';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
@@ -62,6 +63,9 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse) {
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = v4();
+
+    trackAppLoaded(req.session.anonymousUserId);
+
     await req.session.save();
   }
 
@@ -84,6 +88,8 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 
     await req.session.save();
   }
+
+  trackAppLoaded(req.session.user.id, profile.spaceRoles[0]?.spaceId);
 
   res.setHeader('Cache-Control', 'no-store');
   await removeOldCookieFromResponse(req, res, true);

@@ -7,6 +7,7 @@ import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
+import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -21,6 +22,8 @@ export function GlobalComponents() {
   const { setPages } = usePages();
   // Register logs to Datadog
   useDatadogLogger();
+
+  useAppLoadedEvent();
 
   // Trigger discord role import on redirect since modal won't be open
   useImportDiscordRoles();
