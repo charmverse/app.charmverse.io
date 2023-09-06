@@ -1,4 +1,5 @@
-import { createElement } from '@bangle.dev/core';
+import { findParentNodeOfType } from '@bangle.dev/utils';
+import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import { Decoration, DecorationSet } from 'prosemirror-view';
@@ -6,6 +7,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 const defaultPlaceholderText = "Type '/' for commands";
+
 // source: https://gist.github.com/amk221/1f9657e92e003a3725aaa4cf86a07cc0
 // see also: https://discuss.prosemirror.net/t/how-to-input-like-placeholder-behavior/705/24
 export function placeholderPlugin(text: string = defaultPlaceholderText) {
@@ -31,11 +33,12 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
         if (!hasContent) {
           return null;
         }
-        const selectionPos = state.selection.from;
-        const selectedNode = state.doc.resolve(selectionPos).parent;
-        const selectedNodeIsEmpty = checkIsContentEmpty(selectedNode.toJSON() as any);
-        if (selectedNodeIsEmpty) {
-          const resolved = state.doc.resolve(selectionPos);
+        // add to empty paragraph nodes, we can skip checkIsContentEmpty() since it's a little slower
+        const selectedNode = state.selection.$from.parent;
+        const isEmptyParagraph = selectedNode.childCount === 0 && selectedNode.type.name === 'paragraph';
+        const shouldShow = shouldShowPlaceholder(state);
+        if (isEmptyParagraph && shouldShow) {
+          const resolved = state.doc.resolve(state.selection.from);
           return DecorationSet.create(state.doc, [
             Decoration.node(resolved.before(), resolved.after(), {
               class: 'charm-placeholder',
@@ -51,4 +54,17 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
       return { update };
     }
   });
+}
+
+const parentNodesToShow = ['columnBlock', 'listItem'];
+
+function shouldShowPlaceholder(state: EditorState) {
+  const selectionStart = state.selection.$from;
+  const depth = selectionStart.depth;
+  if (depth === 1) {
+    return true;
+  }
+
+  const parentNode = selectionStart.node(depth - 1);
+  return parentNodesToShow.includes(parentNode.type.name);
 }
