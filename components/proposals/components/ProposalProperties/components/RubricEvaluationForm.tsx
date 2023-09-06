@@ -140,7 +140,7 @@ export function RubricEvaluationForm({
           }
           severity='info'
         >
-          You have saved draft answers
+          You have a saved draft
         </Alert>
       )}
       {showDraftAnswers && (
@@ -152,7 +152,7 @@ export function RubricEvaluationForm({
             </Button>
           }
         >
-          These are draft answers
+          Viewing a draft
         </Alert>
       )}
       <Box>
