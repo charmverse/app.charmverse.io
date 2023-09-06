@@ -119,22 +119,39 @@ export function RubricEvaluationForm({
   }, [mappedAnswers.length]);
 
   useEffect(() => {
-    const mappedDraftAnswers = criteriaList.map(
-      (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
-    );
-    // update the form values when the criteria list loads
-    reset({ answers: mappedDraftAnswers });
+    if (showDraftAnswers) {
+      const mappedDraftAnswers = criteriaList.map(
+        (criteria) => draftAnswers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
+      );
+      reset({ answers: mappedDraftAnswers });
+    } else {
+      reset({ answers: mappedAnswers });
+    }
   }, [showDraftAnswers]);
 
   return (
     <form>
       {showDraftBanner && (
-        <Alert action='View draft' severity='info' onClose={() => setShowDraftAnswers(true)}>
+        <Alert
+          action={
+            <Button variant='outlined' size='small' onClick={() => setShowDraftAnswers(true)}>
+              View Draft
+            </Button>
+          }
+          severity='info'
+        >
           You have saved draft answers
         </Alert>
       )}
       {showDraftAnswers && (
-        <Alert severity='info' onClose={() => setShowDraftAnswers(true)}>
+        <Alert
+          severity='info'
+          action={
+            <Button variant='outlined' size='small' onClick={() => setShowDraftAnswers(false)}>
+              Cancel
+            </Button>
+          }
+        >
           These are draft answers
         </Alert>
       )}
