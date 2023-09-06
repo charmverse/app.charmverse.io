@@ -90,7 +90,7 @@ describe('components/viewHeader/newCardButton', () => {
   });
 
   test('return NewCardButton and addCardTemplate', async () => {
-    render(
+    const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
           <NewCardButton
@@ -106,7 +106,8 @@ describe('components/viewHeader/newCardButton', () => {
       )
     );
 
-    const buttonAdd = ((await screen.findByTestId('KeyboardArrowDownIcon')) as Element).parentElement as Element;
+    const buttonAdd = (container.querySelector('[data-testid="KeyboardArrowDownIcon"]') as Element)
+      .parentElement as Element;
     userEvent.click(buttonAdd);
     const buttonAddTemplate = screen.getByText('New template');
     userEvent.click(buttonAddTemplate);

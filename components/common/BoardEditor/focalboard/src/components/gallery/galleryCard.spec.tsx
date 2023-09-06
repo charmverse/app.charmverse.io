@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as ReduxProvider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
@@ -144,7 +144,7 @@ describe('src/components/gallery/GalleryCard', () => {
       userEvent.click(buttonElement);
       expect(container).toMatchSnapshot();
 
-      const deleteButton = await screen.findByTestId('delete-page-action');
+      const deleteButton = container.querySelector('[data-testid="delete-page-action"]') as Element;
       userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
       expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
       expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');

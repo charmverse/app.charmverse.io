@@ -126,7 +126,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
   });
 
   test('return kanbanColumnHeader, click on menuwrapper and click on hide menu', async () => {
-    render(
+    const { container } = render(
       wrapDNDIntl(
         wrapPagesProvider(
           card.id,
@@ -147,14 +147,14 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
         )
       )
     );
-    const buttonMenuWrapper = await screen.findByTestId('menu-wrapper');
+    const buttonMenuWrapper = container.querySelector('[data-testid="menu-wrapper"]') as Element;
     userEvent.click(buttonMenuWrapper);
     const buttonHide = screen.queryByText('Hide') as HTMLElement;
     userEvent.click(buttonHide);
     expect(mockedMutator.hideViewColumn).toBeCalledTimes(1);
   });
   test('return kanbanColumnHeader, click on menuwrapper and click on delete menu', async () => {
-    render(
+    const { container } = render(
       wrapDNDIntl(
         wrapPagesProvider(
           card.id,
@@ -176,7 +176,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
       )
     );
 
-    const buttonMenuWrapper = await screen.findByTestId('menu-wrapper');
+    const buttonMenuWrapper = container.querySelector('[data-testid="menu-wrapper"]') as Element;
     userEvent.click(buttonMenuWrapper);
     const buttonDelete = screen.queryByText('Delete') as HTMLElement;
     userEvent.click(buttonDelete);
@@ -184,7 +184,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
   });
 
   test('return kanbanColumnHeader, click on menuwrapper and click on blue color menu', async () => {
-    render(
+    const { container } = render(
       wrapDNDIntl(
         <KanbanColumnHeader
           anchorEl={null}
@@ -202,7 +202,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
         />
       )
     );
-    const buttonMenuWrapper = await screen.findByTestId('menu-wrapper');
+    const buttonMenuWrapper = container.querySelector('[data-testid="menu-wrapper"]') as Element;
     userEvent.click(buttonMenuWrapper);
     const buttonBlueColor = screen.queryByText('Blue') as HTMLElement;
     userEvent.click(buttonBlueColor);
@@ -211,7 +211,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
 
   test('return kanbanColumnHeader and click to add card', async () => {
     const mockedAddCard = jest.fn();
-    render(
+    const { container } = render(
       wrapDNDIntl(
         <KanbanColumnHeader
           anchorEl={null}
@@ -229,7 +229,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
         />
       )
     );
-    const buttonAddCard = (await screen.findByTestId('AddIcon'))!.parentElement;
+    const buttonAddCard = (container.querySelector('[data-testid="AddIcon"]') as Element).parentElement;
     userEvent.click(buttonAddCard!);
     expect(mockedAddCard).toBeCalledTimes(1);
   });

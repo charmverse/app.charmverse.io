@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { act } from 'react-dom/test-utils';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
@@ -112,7 +111,7 @@ test('should match snapshot, hide group', async () => {
   );
 
   const { container } = render(component);
-  const triangle = await screen.findByTestId('ArrowDropDownOutlinedIcon');
+  const triangle = container.querySelector('[data-testid="ArrowDropDownOutlinedIcon"]');
   expect(triangle).not.toBeNull();
 
   act(() => {
@@ -140,12 +139,10 @@ test('should match snapshot, add new', async () => {
 
   const { container } = render(component);
 
-  const triangle = await screen.findByTestId('AddIcon');
+  const triangle = container.querySelector('[data-testid="AddIcon"]');
   expect(triangle).not.toBeNull();
+  userEvent.click(triangle as Element);
 
-  act(() => {
-    fireEvent.click(triangle as Element);
-  });
   expect(addNew).toBeCalled();
   expect(container).toMatchSnapshot();
 });
