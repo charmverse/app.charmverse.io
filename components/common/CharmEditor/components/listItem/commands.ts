@@ -603,7 +603,8 @@ export const backspaceKeyCommand =
           isEmptySelectionAtStart,
 
           // list items might have multiple paragraphs; only do this at the first one
-          isFirstChildOfParent
+          isFirstChildOfParent,
+          canOutdent(type)
         ],
         chainCommands(deletePreviousEmptyListItem(type), outdentList(type))
       ),

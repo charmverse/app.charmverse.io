@@ -1,9 +1,11 @@
-import { Paper } from '@mui/material';
+import { Divider, Paper } from '@mui/material';
+import { useState } from 'react';
 import { Provider } from 'react-redux';
 
 import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -75,27 +77,37 @@ export default {
 };
 
 export function FullPageEditor() {
+  const [content, setContent] = useState<PageContent | undefined>(undefined);
+  function onChange(event: ICharmEditorOutput) {
+    setContent(event.doc);
+  }
   return (
-    <CharmEditorComponent
-      allowClickingFooter={true}
-      placeholderText='Custom placeholder... start typing / to see commands'
-      readOnly={false}
-      autoFocus={true}
-      pageActionDisplay={null}
-      pageId='123'
-      disablePageSpecificFeatures={false}
-      enableSuggestingMode={false}
-      enableVoting={true}
-      pageType='page'
-      pagePermissions={undefined}
-      onConnectionEvent={() => {}}
-      snapshotProposalId={null}
-      onParticipantUpdate={() => {}}
-      style={{
-        minHeight: '100px'
-      }}
-      disableNestedPages={true}
-    />
+    <>
+      <CharmEditorComponent
+        allowClickingFooter={true}
+        placeholderText='Custom placeholder... start typing / to see commands'
+        readOnly={false}
+        autoFocus={true}
+        pageActionDisplay={null}
+        pageId='123'
+        disablePageSpecificFeatures={false}
+        enableSuggestingMode={false}
+        enableVoting={true}
+        pageType='page'
+        pagePermissions={undefined}
+        onContentChange={onChange}
+        onConnectionEvent={() => {}}
+        snapshotProposalId={null}
+        onParticipantUpdate={() => {}}
+        style={{
+          minHeight: '100px'
+        }}
+        disableNestedPages={true}
+      />
+      <Divider />
+      <h3>Document JSON:</h3>
+      <pre style={{ fontSize: 10 }}>{JSON.stringify(content, null, 2)}</pre>
+    </>
   );
 }
 
