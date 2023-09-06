@@ -4,8 +4,8 @@
 npx lint-staged
 
 # List of files to check. These should already be in gitignore, but this provides an additional layer of protection.
-# List of banned files to check against
-banned_files=(".env.b")
+# List of banned files to check against. Any staging (ex. .env.staging, .env.stg) or prod file will be rejected.
+banned_files=(".env.p" ".env.s")
 
 # Get list of staged files from git
 staged_files=$(git diff --cached --name-only)
