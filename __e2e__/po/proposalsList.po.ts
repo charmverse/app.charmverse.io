@@ -41,4 +41,9 @@ export class ProposalsListPage extends GlobalPage {
   getTemplateOptionLocator(pageId: string) {
     return this.page.locator(`data-test=select-option-${pageId}`);
   }
+
+  async openProposalCard(proposalId: string) {
+    await this.getProposalRowLocator(proposalId).hover();
+    await this.getProposalRowOpenLocator(proposalId).click();
+  }
 }
