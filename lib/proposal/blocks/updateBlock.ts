@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalBlockUpdateInput } from 'lib/proposal/blocks/interfaces';
 
 export function updateBlock({
@@ -20,7 +19,7 @@ export function updateBlock({
     throw new InvalidInputError('Missing required fields');
   }
 
-  if (data.type === 'board') {
+  if (data.type === 'board' || data.type === 'view') {
     return tx.proposalBlock.upsert({
       where: {
         id_spaceId: {
@@ -38,7 +37,6 @@ export function updateBlock({
       },
       create: {
         ...data,
-        id: DEFAULT_BOARD_BLOCK_ID,
         spaceId,
         rootId: spaceId,
         createdBy: userId,
