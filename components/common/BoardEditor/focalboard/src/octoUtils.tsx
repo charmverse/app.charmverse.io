@@ -24,7 +24,7 @@ export type Formatters = {
 };
 
 export type PropertyContext = {
-  users: { [key: string]: string };
+  users: { [key: string]: { username: string } };
   proposalCategories: { [key: string]: string };
 };
 
@@ -75,7 +75,7 @@ class OctoUtils {
       case 'proposalReviewer': {
         const valueArray = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         displayValue = valueArray
-          .map((value) => (typeof value === 'string' ? context?.users[value] : null))
+          .map((value) => (typeof value === 'string' ? context?.users[value]?.username : null))
           .filter(isTruthy);
         break;
       }

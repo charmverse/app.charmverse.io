@@ -205,7 +205,7 @@ describe('getCSVColumns()', () => {
     Object.assign(card.fields, fields);
 
     const context: PropertyContext = {
-      users: { user_1: 'Mo' },
+      users: { user_1: { username: 'Mo' } },
       proposalCategories: { category_id: 'General' }
     };
     const rowColumns = getCSVColumns({
