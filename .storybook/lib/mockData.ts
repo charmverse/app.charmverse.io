@@ -5,10 +5,13 @@ import { generateDefaultProposalCategoriesInput } from '../../lib/proposal/gener
 import { createMockUser } from '../../testing/mocks/user';
 import { createMockSpace } from '../../testing/mocks/space';
 import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
-import type { Member } from '../../lib/members/interfaces';
+import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
 import { brandColorNames } from 'theme/colors';
 import { LoggedInUser } from 'models/User';
+import { createMemberProperty } from 'testing/mocks/memberProperty';
+import { MemberProperty } from '@charmverse/core/prisma-client';
+import { Social } from 'components/u/interfaces';
 
 const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
 
@@ -23,21 +26,104 @@ const seeds = [
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17'
 ];
 
+export const memberPropertyTypes = [
+  'profile_pic',
+  'name',
+  'role',
+  'bio',
+  'discord',
+  'twitter',
+  'linked_in',
+  'github',
+  'timezone',
+  'join_date'
+] as const;
+
 export const spaces = [createMockSpace()];
+
+export const memberProperties: MemberPropertyWithPermissions[] = memberPropertyTypes.map((type, index) => {
+  const memberProperty = createMemberProperty({
+    index,
+    name: type
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '),
+    type,
+    spaceId: spaces[0].id,
+    updatedBy: seeds[0],
+    createdBy: seeds[0]
+  });
+
+  return {
+    ...memberProperty,
+    permissions: [],
+  };
+});
+
 // user profile with space role
 export const userProfile = {...createMockUser({ id: userProfileSeed}), spaceRoles: [{ spaceId: spaces[0].id, isAdmin: true }]} as LoggedInUser;
-export const userMemberProfile: Member = createMockSpaceMember(userProfile);
-export const members: Member[] = [
-  createMockSpaceMember(createMockUser({ id: seeds[0] })),
-  createMockSpaceMember(createMockUser({ id: seeds[1] })),
-  createMockSpaceMember(createMockUser({ id: seeds[2] })),
-  createMockSpaceMember(createMockUser({ id: seeds[3] })),
-  createMockSpaceMember(createMockUser({ id: seeds[4] }))
-];
+const userSpaceMember = createMockSpaceMember(userProfile);
+export const userMemberProfile: Member = {
+  ...userSpaceMember,
+  properties: memberProperties.map((property) => ({
+    enabledViews: property.enabledViews,
+    memberPropertyId: property.id,
+    name: property.name,
+    spaceId: property.spaceId,
+    type: property.type,
+    value: createMemberPropertyValue(userSpaceMember, property.type),
+  })) as PropertyValueWithDetails[],
+};
+
+function createMemberPropertyValue(member: Member, memberPropertyType: MemberProperty["type"]) {
+  switch (memberPropertyType) {
+    case 'profile_pic':
+      return member.avatar;
+    case 'name':
+      return member.username;
+    case 'role':
+      return member.roles;
+    case 'bio':
+      return member.profile?.description;
+    case 'discord':
+      return (member.profile?.social as Social)?.discordUsername;
+    case 'twitter':
+      return (member.profile?.social as Social)?.twitterURL;
+    case 'linked_in':
+      return (member.profile?.social as Social)?.linkedinURL;
+    case 'github':
+      return (member.profile?.social as Social)?.githubURL;
+    case 'timezone':
+      return member.profile?.timezone;
+    case 'join_date':
+      return member.joinDate;
+    default:
+      return '';
+  }
+}
+
+export const members: Member[] = seeds.map(seed => {
+  const member = createMockSpaceMember(createMockUser({ id: seed }))
+
+  const memberWithProperties = {
+    ...member,
+    properties: memberProperties.map((property) => ({
+      enabledViews: property.enabledViews,
+      memberPropertyId: property.id,
+      name: property.name,
+      spaceId: property.spaceId,
+      type: property.type,
+      value: createMemberPropertyValue(member, property.type),
+    })) as PropertyValueWithDetails[],
+  }
+  return memberWithProperties
+});
+
 export const spaceRoles: ListSpaceRolesResponse[] = [
   { id: '1', name: 'Moderator', spacePermissions: [], source: null },
   { id: '1', name: 'Grant Reviewer', spacePermissions: [], source: null }
 ];
+
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
   'space-id'
 ).map((cat, i) => ({
