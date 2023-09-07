@@ -23,6 +23,7 @@ const formatters: Formatters = {
 };
 
 const emptyContext: PropertyContext = {
+  spaceDomain: 'test-space',
   users: {},
   proposalCategories: {}
 };

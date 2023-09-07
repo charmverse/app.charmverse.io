@@ -62,6 +62,7 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse) {
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = v4();
+
     await req.session.save();
   }
 
