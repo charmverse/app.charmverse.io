@@ -89,7 +89,7 @@ export function NewProposalButton() {
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
             <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
-              {isXsScreen ? 'Create' : 'Create Proposal'}
+              Create
             </Button>
             <Button
               data-test='proposal-template-select'

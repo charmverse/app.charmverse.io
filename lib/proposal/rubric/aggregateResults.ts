@@ -1,4 +1,3 @@
-import type { ProposalRubricCriteria } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { mean, sum } from 'lodash';
 
@@ -24,12 +23,17 @@ export type AggregateResults = {
   allScores: NumericResults;
 };
 
+export type AnswerData = Pick<
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  'comment' | 'userId' | 'response' | 'rubricCriteriaId'
+>;
+
 export function aggregateResults({
   criteria,
   answers
 }: {
-  answers: ProposalRubricCriteriaAnswerWithTypedResponse[];
-  criteria: ProposalRubricCriteria[];
+  answers: AnswerData[];
+  criteria: { id: string }[];
 }): AggregateResults {
   const criteriaScores: Record<string, number[]> = criteria.reduce((criteriaRecord, _criteria) => {
     criteriaRecord[_criteria.id] = [];

@@ -61,7 +61,7 @@
     "test:browser:ci": "npm run test:browser",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "storybook": "storybook dev -p 6006",
-    "update-core": "npm install github:charmverse/core#main",
+    "update-core": "npm install @charmverse/core",
     "build-storybook": "storybook build",
     "chromatic:ci": "chromatic --exit-zero-on-changes"
   },
@@ -89,7 +89,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.3.19",
+    "@charmverse/core": "^0.3.24",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",

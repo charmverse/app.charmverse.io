@@ -2,7 +2,7 @@ import type { Block } from '@charmverse/core/prisma';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 
-export type ExtractedDatabaseProposalProperties = Record<DatabaseProposalPropertyType, IPropertyTemplate>;
+export type ExtractedDatabaseProposalProperties = Partial<Record<DatabaseProposalPropertyType, IPropertyTemplate>>;
 
 /**
  * Returns all proposal properties

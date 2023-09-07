@@ -81,6 +81,7 @@ type ProposalPropertiesProps = {
   readOnlyProposalEvaluationType?: boolean;
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  draftRubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   showStatus?: boolean;
@@ -109,6 +110,7 @@ export function ProposalProperties({
   readOnlyReviewers,
   readOnlyRubricCriteria,
   rubricAnswers = [],
+  draftRubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
   showStatus,
@@ -175,7 +177,14 @@ export function ProposalProperties({
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
-  const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
+  const myRubricAnswers = useMemo(
+    () => rubricAnswers.filter((answer) => answer.userId === userId),
+    [userId, rubricAnswers]
+  );
+  const myDraftRubricAnswers = useMemo(
+    () => draftRubricAnswers.filter((answer) => answer.userId === userId),
+    [userId, draftRubricAnswers]
+  );
   const templateOptions = proposalTemplates
     .filter((_proposal) => {
       if (!proposalCategoryId) {
@@ -236,10 +245,12 @@ export function ProposalProperties({
     setIsVoteModalOpen(true);
   }
 
-  async function onSubmitEvaluation() {
+  async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     await onSaveRubricCriteriaAnswers?.();
-    // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
-    setRubricView(1);
+    if (!isDraft) {
+      // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
+      setRubricView(1);
+    }
   }
 
   useEffect(() => {
@@ -269,10 +280,12 @@ export function ProposalProperties({
             <RubricEvaluationForm
               proposalId={proposalId!}
               answers={myRubricAnswers}
+              draftAnswers={myDraftRubricAnswers}
               criteriaList={rubricCriteria!}
               onSubmit={onSubmitEvaluation}
             />
-          </LoadingComponent>
+          </LoadingComponent>,
+          { sx: { p: 0 } } // disable default padding of tab panel
         ] as TabConfig),
       canViewRubricAnswers &&
         ([

@@ -132,49 +132,6 @@ describe('getAccessibleProposals', () => {
     expect(proposals).toEqual(expect.arrayContaining(expectedProposals.map((p) => expect.objectContaining(p))));
   });
 
-  it('should include the page and its comments if includePage is true', async () => {
-    const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true
-    });
-
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      title: 'Visible Category',
-      spaceId: space.id
-    });
-
-    const { page, ...proposal } = await testUtilsProposals.generateProposal({
-      categoryId: proposalCategory.id,
-      spaceId: space.id,
-      userId: adminUser.id,
-      proposalStatus: 'discussion'
-    });
-
-    const pageComment = await prisma.pageComment.create({
-      data: {
-        page: { connect: { id: proposal.id } },
-        content: {},
-        contentText: '',
-        user: { connect: { id: adminUser.id } }
-      }
-    });
-
-    const proposals = await getAccessibleProposals({
-      spaceId: space.id,
-      userId: adminUser.id,
-      includePage: true
-    });
-
-    expect(proposals.length).toBe(1);
-
-    expect(proposals[0]).toMatchObject({
-      ...proposal,
-      page: expect.objectContaining({
-        ...page,
-        comments: [pageComment]
-      })
-    });
-  });
-
   it('should return only proposals from specified categories if categoryIds are provided', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true

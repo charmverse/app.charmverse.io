@@ -11,7 +11,9 @@ import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 
+import type { DiscussionPropertiesFromPage } from './getPropertiesFromPage';
 import { getPropertiesFromPage } from './getPropertiesFromPage';
+import { getProposalDiscussionTasks } from './getProposalDiscussionTasks';
 import type { DiscussionTask } from './interfaces';
 
 export type DiscussionTasksGroup = {
@@ -22,12 +24,12 @@ export type DiscussionTasksGroup = {
 export type Discussion = Omit<DiscussionTask, 'createdBy'> & { userId: string };
 export type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
-interface GetDiscussionsInput {
+export type GetDiscussionsInput = {
   userId: string;
   username: string;
   spaceIds: string[];
   spaceRecord: SpaceRecord;
-}
+};
 
 export interface GetDiscussionsResponse {
   mentions: Discussion[];
@@ -462,99 +464,100 @@ async function getPageCommentMentions({
   };
 }
 
-async function getBoardPersonPropertyMentions({
-  userId,
-  spaceIds,
-  spaceRecord
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-  const boards = (
-    await prisma.block.findMany({
-      where: {
-        spaceId: {
-          in: spaceIds
-        },
-        type: 'board',
-        deletedAt: null
-      }
-    })
-  ).map(prismaToBlock) as Board[];
+/** Currently this code is unused - leaving to see if we should fix */
+// async function getBoardPersonPropertyMentions({
+//   userId,
+//   spaceIds,
+//   spaceRecord
+// }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+//   const boards = (
+//     await prisma.block.findMany({
+//       where: {
+//         spaceId: {
+//           in: spaceIds
+//         },
+//         type: 'board',
+//         deletedAt: null
+//       }
+//     })
+//   ).map(prismaToBlock) as Board[];
 
-  const boardBlocksPersonPropertyRecord: Record<string, string> = {};
+//   const boardBlocksPersonPropertyRecord: Record<string, string> = {};
 
-  boards.forEach((board) => {
-    const personProperty = board.fields.cardProperties.find((cardProperty) => cardProperty.type === 'person');
-    if (personProperty) {
-      boardBlocksPersonPropertyRecord[board.id] = personProperty.id;
-    }
-  });
+//   boards.forEach((board) => {
+//     const personProperty = board.fields.cardProperties.find((cardProperty) => cardProperty.type === 'person');
+//     if (personProperty) {
+//       boardBlocksPersonPropertyRecord[board.id] = personProperty.id;
+//     }
+//   });
 
-  const cards = await prisma.block.findMany({
-    where: {
-      parentId: {
-        in: Object.keys(boardBlocksPersonPropertyRecord)
-      },
-      type: 'card',
-      deletedAt: null,
-      createdAt: {
-        gt: new Date(Date.now() - 1000 * 60 * 60 * 24)
-      }
-    },
-    include: {
-      page: {
-        select: {
-          title: true,
-          id: true,
-          path: true,
-          bountyId: true
-        }
-      },
-      user: {
-        select: {
-          username: true,
-          id: true
-        }
-      }
-    }
-  });
+//   const cards = await prisma.block.findMany({
+//     where: {
+//       parentId: {
+//         in: Object.keys(boardBlocksPersonPropertyRecord)
+//       },
+//       type: 'card',
+//       deletedAt: null,
+//       createdAt: {
+//         gt: new Date(Date.now() - 1000 * 60 * 60 * 24)
+//       }
+//     },
+//     include: {
+//       page: {
+//         select: {
+//           title: true,
+//           id: true,
+//           path: true,
+//           bountyId: true
+//         }
+//       },
+//       user: {
+//         select: {
+//           username: true,
+//           id: true
+//         }
+//       }
+//     }
+//   });
 
-  const mentions: GetDiscussionsResponse['mentions'] = [];
-  const discussionUserIds: string[] = [];
-  for (const card of cards) {
-    const blockCard = prismaToBlock(card) as Card;
-    const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
-    const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
-    const space = spaceRecord[card.spaceId];
-    if (space && card.page && (personPropertyValue as string[]).includes(userId) && userId !== card.user.id) {
-      discussionUserIds.push(personPropertyId);
-      // Need to push author of card to fetch information
-      discussionUserIds.push(card.user.id);
-      mentions.push({
-        pageId: card.page.id,
-        spaceId: card.spaceId,
-        spaceDomain: space.domain,
-        pagePath: card.page.path,
-        spaceName: space.name,
-        pageTitle: card.page.title || 'Untitled',
-        bountyId: card.page.bountyId,
-        bountyTitle: card.page.title,
-        type: card.page.bountyId ? 'bounty' : 'page',
-        mentionId: null,
-        taskId: `${card.id}.${personPropertyId}`,
-        // Fake value
-        createdAt: new Date().toString(),
-        userId: card.createdBy,
-        text: `${card.user.username} assigned you in the card ${card.page.title || 'Untitled'}`,
-        commentId: null
-      });
-    }
-  }
+//   const mentions: GetDiscussionsResponse['mentions'] = [];
+//   const discussionUserIds: string[] = [];
+//   for (const card of cards) {
+//     const blockCard = prismaToBlock(card) as Card;
+//     const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
+//     const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
+//     const space = spaceRecord[card.spaceId];
+//     if (space && card.page && (personPropertyValue as string[]).includes(userId) && userId !== card.user.id) {
+//       discussionUserIds.push(personPropertyId);
+//       // Need to push author of card to fetch information
+//       discussionUserIds.push(card.user.id);
+//       mentions.push({
+//         pageId: card.page.id,
+//         spaceId: card.spaceId,
+//         spaceDomain: space.domain,
+//         pagePath: card.page.path,
+//         spaceName: space.name,
+//         pageTitle: card.page.title || 'Untitled',
+//         bountyId: card.page.bountyId,
+//         bountyTitle: card.page.title,
+//         type: card.page.bountyId ? 'bounty' : 'page',
+//         mentionId: null,
+//         taskId: `${card.id}.${personPropertyId}`,
+//         // Fake value
+//         createdAt: new Date().toString(),
+//         userId: card.createdBy,
+//         text: `${card.user.username} assigned you in the card ${card.page.title || 'Untitled'}`,
+//         commentId: null
+//       });
+//     }
+//   }
 
-  return {
-    mentions,
-    discussionUserIds,
-    comments: []
-  };
-}
+//   return {
+//     mentions,
+//     discussionUserIds,
+//     comments: []
+//   };
+// }
 
 type PageToExtractMentionsFrom = Pick<Page, 'bountyId' | 'content' | 'id' | 'path' | 'title' | 'createdBy' | 'spaceId'>;
 
@@ -627,56 +630,4 @@ async function getPageMentions({
 // utils
 function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
-}
-
-export type ProposalDiscussionNotificationsContext = {
-  userId: string;
-  spaceRecord: SpaceRecord;
-  username: string;
-  proposals: ProposalWithCommentsAndUsers[];
-};
-
-async function getProposalDiscussionTasks({
-  spaceIds,
-  userId,
-  spaceRecord,
-  username
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-  const proposals: ProposalDiscussionNotificationsContext['proposals'] = [];
-  for (const spaceId of spaceIds) {
-    const userProposals = (await getPermissionsClient({ resourceId: spaceId, resourceIdType: 'space' }).then(
-      ({ client }) =>
-        client.proposals.getAccessibleProposals({
-          userId,
-          spaceId,
-          includePage: true,
-          onlyAssigned: true
-        })
-    )) as ProposalWithCommentsAndUsers[];
-
-    proposals.push(...userProposals);
-  }
-
-  const context: ProposalDiscussionNotificationsContext = { userId, username, spaceRecord, proposals };
-
-  // aggregate the results
-  const { mentions, discussionUserIds, comments } = [
-    getProposalComments(context),
-    getProposalCommentMentions(context)
-  ].reduce(
-    (acc, result) => {
-      return {
-        mentions: acc.mentions.concat(result.mentions),
-        discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
-        comments: acc.comments.concat(result.comments)
-      };
-    },
-    { mentions: [], discussionUserIds: [], comments: [] }
-  );
-
-  return {
-    mentions,
-    discussionUserIds,
-    comments
-  };
 }

@@ -4,6 +4,7 @@ import '../theme/styles.scss';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { IntlProvider } from 'react-intl';
+import ReactDndProvider from '../components/common/ReactDndProvider';
 
 import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
@@ -128,6 +129,7 @@ export const globalTypes = {
   }
 };
 
+
 export const withMuiTheme = (Story, context) => {
   return (
     <AppThemeProvider forceTheme={context.globals.theme}>
@@ -136,13 +138,14 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-export const withIntl = (Story, context) => {
-  // needed for focalboard
+export const globalProviders = (Story, context) => {
   return (
     <IntlProvider locale='en'>
-      <Story />
+      <ReactDndProvider>
+        <Story />
+      </ReactDndProvider>
     </IntlProvider>
   );
 };
 
-export const decorators = [withMuiTheme, withIntl];
+export const decorators = [withMuiTheme, globalProviders];
