@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import { ThreadsProvider } from 'hooks/useThreads';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalPropertiesInput } from '../../ProposalProperties/ProposalProperties';

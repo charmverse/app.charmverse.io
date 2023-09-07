@@ -29,6 +29,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
+      draftRubricAnswers: true,
       rubricAnswers: true,
       rubricCriteria: true,
       authors: true,
@@ -65,6 +66,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
 
   if (!canSeeAnswers) {
+    proposal.draftRubricAnswers = [];
     proposal.rubricAnswers = [];
   }
 

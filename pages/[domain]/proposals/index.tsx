@@ -12,7 +12,7 @@ export default function ProposalsPageComponent() {
 
   return (
     <ProposalBlocksProvider>
-      <ProposalsPage title={proposalTitle} />;
+      <ProposalsPage title={proposalTitle} />
     </ProposalBlocksProvider>
   );
 }
