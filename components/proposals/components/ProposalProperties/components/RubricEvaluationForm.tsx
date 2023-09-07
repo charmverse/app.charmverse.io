@@ -53,17 +53,9 @@ const StyledRating = styled(Rating)`
 `;
 
 export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, draftAnswers, onSubmit }: Props) {
-  const mappedAnswers = criteriaList.map(
-    (criteria) =>
-      answers?.find((a) => a.rubricCriteriaId === criteria.id) || {
-        rubricCriteriaId: criteria.id,
-        // add default empty values so that isDirty is updated only when values actually change
-        comment: '',
-        response: { score: undefined }
-      }
-  );
+  const hasDraft = !!draftAnswers?.length;
 
-  const [showDraftAnswers, setShowDraftAnswers] = useState(false);
+  const [showDraftAnswers, setShowDraftAnswers] = useState(hasDraft);
 
   const {
     error: answerError,
@@ -80,8 +72,6 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
   const { trigger: deleteRubricCriteriaAnswers } = useDeleteRubricCriteriaAnswers({ proposalId });
 
   const formError = draftAnswerError || answerError;
-
-  const hasDraft = !!draftAnswers?.length;
   const showDraftBanner = hasDraft && !showDraftAnswers;
 
   const {
@@ -93,7 +83,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
-      answers: mappedAnswers
+      answers: showDraftAnswers ? mapAnswersToFormValues(draftAnswers) : mapAnswersToFormValues(answers)
     }
     // resolver: yupResolver(schema(hasCustomReward))
   });
@@ -138,27 +128,51 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
     setShowDraftAnswers(false);
   }
 
+  function mapAnswersToFormValues(_answers?: ProposalRubricCriteriaAnswer[]) {
+    return criteriaList.map(
+      (criteria) =>
+        _answers?.find((a) => a.rubricCriteriaId === criteria.id) || {
+          rubricCriteriaId: criteria.id,
+          // add default empty values so that isDirty is updated only when values actually change
+          comment: '',
+          response: { score: undefined }
+        }
+    );
+  }
+
+  function applyDraftValues() {
+    reset({ answers: mapAnswersToFormValues(draftAnswers) }, { keepDirty: false });
+  }
+
+  function applyActualValues() {
+    reset({ answers: mapAnswersToFormValues(answers) }, { keepDirty: false });
+  }
+
   function toggleDraftView(showDraft: boolean) {
     setShowDraftAnswers(showDraft);
     if (showDraft) {
-      const mappedDraftAnswers = criteriaList.map(
-        (criteria) => draftAnswers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
-      );
-      reset({ answers: mappedDraftAnswers }, { keepDirty: false });
+      applyDraftValues();
     } else {
-      reset({ answers: mappedAnswers }, { keepDirty: false });
+      applyActualValues();
     }
   }
 
   useEffect(() => {
-    if (!showDraftAnswers && answers) {
-      // update the form values when the criteria list loads
-      reset({ answers: mappedAnswers }, { keepDirty: false });
-    } else if (draftAnswers) {
-      const mappedDraftAnswers = criteriaList.map(
-        (criteria) => draftAnswers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
-      );
-      reset({ answers: mappedDraftAnswers }, { keepDirty: false });
+    if (answers && draftAnswers) {
+      // set form values for the first time
+      if (draftAnswers?.length && fields.length === 0) {
+        setShowDraftAnswers(true);
+        applyDraftValues();
+      }
+      // display actual values
+      else if (!showDraftAnswers) {
+        // update the form values when the criteria list loads
+        applyActualValues();
+      }
+      // display draft values
+      else {
+        applyDraftValues();
+      }
     }
   }, [answers, draftAnswers]);
 
@@ -181,7 +195,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
           severity='info'
           action={
             <Button variant='outlined' size='small' onClick={() => toggleDraftView(false)}>
-              Cancel
+              View submitted
             </Button>
           }
         >
