@@ -115,10 +115,19 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
       };
     });
     try {
-      CsvExporter.exportTableCsv(_board, _view, _cards, {
-        date: formatDate,
-        dateTime: formatDateTime
-      });
+      CsvExporter.exportTableCsv(
+        _board,
+        _view,
+        _cards,
+        {
+          date: formatDate,
+          dateTime: formatDateTime
+        },
+        {
+          users: {},
+          proposalCategories: {}
+        }
+      );
       showMessage('Export complete!');
     } catch (error) {
       log.error('CSV export failed', error);

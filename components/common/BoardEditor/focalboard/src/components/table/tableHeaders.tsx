@@ -88,9 +88,14 @@ function TableHeaders(props: Props): JSX.Element {
           thisLen = Utils.getTextWidth(card.title, columnFontPadding.fontDescriptor) + columnFontPadding.padding;
         } else if (template) {
           const displayValue =
-            OctoUtils.propertyDisplayValue(card, card.fields.properties[columnID], template as IPropertyTemplate, {
-              date: formatDate,
-              dateTime: formatDateTime
+            OctoUtils.propertyDisplayValue({
+              block: card,
+              propertyValue: card.fields.properties[columnID],
+              propertyTemplate: template as IPropertyTemplate,
+              formatters: {
+                date: formatDate,
+                dateTime: formatDateTime
+              }
             }) || '';
           switch (template.type) {
             case 'select': {
