@@ -202,18 +202,16 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
             >
               Submit
             </Button>
-            {(showDraftAnswers || isDirty) && (
-              <Button
-                sx={{ alignSelf: 'start' }}
-                color='secondary'
-                variant='outlined'
-                disabled={!isDirty}
-                loading={draftIsSaving}
-                onClick={handleSubmit(saveDraftAnswers)}
-              >
-                {hasDraft ? 'Update' : 'Save'} draft
-              </Button>
-            )}
+            <Button
+              sx={{ alignSelf: 'start' }}
+              color='secondary'
+              variant='outlined'
+              disabled={!isDirty}
+              loading={draftIsSaving}
+              onClick={handleSubmit(saveDraftAnswers)}
+            >
+              {showDraftAnswers ? 'Update' : 'Save'} draft
+            </Button>
             {showDraftAnswers && (
               <Button sx={{ alignSelf: 'start' }} color='secondary' variant='text' onClick={deleteDraftAnswers}>
                 Delete draft
