@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  SELECTED_PERMISSION_API_TAG: devops-optimise-proposals-list
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   build-test-env:
