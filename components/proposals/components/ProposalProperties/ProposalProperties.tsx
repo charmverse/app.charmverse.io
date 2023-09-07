@@ -68,6 +68,7 @@ type ProposalPropertiesProps = {
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
   readOnlyCategory?: boolean;
+  isAdmin?: boolean;
   isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onSaveRubricCriteriaAnswers?: () => void;
@@ -96,6 +97,7 @@ export function ProposalProperties({
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
+  isAdmin = false,
   isFromTemplate,
   onChangeRubricCriteria,
   onSaveRubricCriteriaAnswers,
@@ -368,7 +370,7 @@ export function ProposalProperties({
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
                   readOnly={readOnlyCategory}
-                  readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
+                  readOnlyMessage={isFromTemplate ? templateTooltip('category', isAdmin) : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
@@ -435,7 +437,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
-                readOnlyMessage={isFromTemplate ? 'Cannot change reviewers when using template' : undefined}
+                readOnlyMessage={isFromTemplate ? templateTooltip('reviewers', isAdmin) : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
@@ -507,7 +509,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
                 readOnly={readOnlyProposalEvaluationType}
-                readOnlyMessage={isFromTemplate ? 'Cannot change evaluation type when using template' : undefined}
+                readOnlyMessage={isFromTemplate ? templateTooltip('evaluation type', isAdmin) : undefined}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
@@ -540,7 +542,7 @@ export function ProposalProperties({
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
-                    readOnlyMessage={isFromTemplate ? 'Cannot change rubric criteria when using template' : undefined}
+                    readOnlyMessage={isFromTemplate ? templateTooltip('rubric criteria', isAdmin) : undefined}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
                     proposalStatus={proposalStatus}
@@ -633,4 +635,10 @@ export function ProposalProperties({
       </ModalWithButtons>
     </Box>
   );
+}
+
+function templateTooltip(fieldName: string, isAdmin: boolean) {
+  return isAdmin
+    ? `Only admins can override ${fieldName} when using a template`
+    : `Cannot change ${fieldName} when using template`;
 }

@@ -144,7 +144,7 @@ export function ProposalProperties({
   }
 
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
-
+  const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers =
     readOnlyProperties ||
     (!isAdmin && !!proposalTemplates?.some((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
@@ -159,7 +159,8 @@ export function ProposalProperties({
       proposalId={proposal?.id}
       pageId={pageId}
       readOnlyAuthors={readOnlyProperties}
-      readOnlyCategory={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
+      readOnlyCategory={readOnlyCategory}
+      isAdmin={isAdmin}
       readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
       readOnlyProposalEvaluationType={
         readOnlyProperties ||
