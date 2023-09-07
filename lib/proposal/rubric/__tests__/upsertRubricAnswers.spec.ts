@@ -4,6 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
+import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
+
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -134,16 +136,44 @@ describe('upsertRubricAnswers', () => {
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
+
+  it('should save draft rubric criteria', async () => {
+    const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+
+    await upsertRubricAnswers({
+      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
+      userId: evaluator.id,
+      proposalId: proposal.id,
+      isDraft: true
+    });
+
+    const firstSet = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id
+    });
+
+    expect(firstSet).toHaveLength(0);
+
+    const draftAnswers = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id,
+      isDraft: true
+    });
+
+    expect(draftAnswers).toHaveLength(1);
+  });
 });
 
 async function getResponses({
   proposalId,
-  userId
+  userId,
+  isDraft
 }: {
   proposalId: string;
   userId: string;
+  isDraft?: boolean;
 }): Promise<ProposalRubricCriteriaAnswerWithTypedResponse[]> {
-  const answers = await prisma.proposalRubricCriteriaAnswer.findMany({
+  const answers = await getAnswersTable({ isDraft }).findMany({
     where: {
       proposalId,
       userId
