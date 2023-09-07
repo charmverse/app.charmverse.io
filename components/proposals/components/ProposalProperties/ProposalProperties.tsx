@@ -67,7 +67,7 @@ type ProposalPropertiesProps = {
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
-  disabledCategoryInput?: boolean;
+  readOnlyCategory?: boolean;
   isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onSaveRubricCriteriaAnswers?: () => void;
@@ -95,7 +95,6 @@ export function ProposalProperties({
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
-  disabledCategoryInput,
   isFromTemplate,
   onChangeRubricCriteria,
   onSaveRubricCriteriaAnswers,
@@ -105,6 +104,7 @@ export function ProposalProperties({
   proposalFlowFlags,
   proposalStatus,
   readOnlyAuthors,
+  readOnlyCategory,
   readOnlyProposalEvaluationType,
   readOnlyReviewers,
   readOnlyRubricCriteria,
@@ -354,7 +354,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
-                  readOnly={disabledCategoryInput}
+                  readOnly={readOnlyCategory}
                   readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}

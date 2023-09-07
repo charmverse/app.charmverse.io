@@ -143,19 +143,19 @@ export function ProposalProperties({
 
   const readOnlyReviewers =
     readOnlyProperties ||
-    !!proposalTemplates?.some((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0);
+    (!isAdmin && !!proposalTemplates?.some((t) => t.id === proposal?.page?.sourceTemplateId && t.reviewers.length > 0));
 
   return (
     <ProposalPropertiesBase
       proposalLensLink={proposal?.lensPostLink ?? undefined}
       archived={!!proposal?.archived}
-      disabledCategoryInput={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       isFromTemplate={!!proposal?.page?.sourceTemplateId}
       proposalFlowFlags={proposalFlowFlags}
       proposalStatus={proposal?.status}
       proposalId={proposal?.id}
       pageId={pageId}
       readOnlyAuthors={readOnlyProperties}
+      readOnlyCategory={!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId}
       readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
       readOnlyProposalEvaluationType={
         readOnlyProperties ||
