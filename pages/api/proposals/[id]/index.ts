@@ -125,7 +125,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   }
 
   // We want to filter out only new reviewers so that we don't affect existing proposals
-  if (proposal.page?.type === 'proposal' && reviewers?.length > 0) {
+  if (proposal.page?.type === 'proposal' && (reviewers?.length || 0) > 0) {
     const newReviewers = (reviewers ?? []).filter(
       (updatedReviewer) =>
         !proposal.reviewers.some((proposalReviewer) => {

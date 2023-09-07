@@ -25,6 +25,9 @@ interface Props {
   groupByProperty?: IPropertyTemplate;
   pageId?: string;
   showView: (viewId: string) => void;
+  hideLayoutOptions?: boolean;
+  hideSourceOptions?: boolean;
+  hideGroupOptions?: boolean;
 }
 
 function ViewSidebar(props: Props) {
