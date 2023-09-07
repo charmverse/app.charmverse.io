@@ -1,7 +1,7 @@
 import { Alert } from '@mui/material';
 import Card from '@mui/material/Card';
 
-import { CollectEmail } from 'components/login/CollectEmail';
+import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 
 import { CenteredBox } from '../components/CenteredBox';
 
@@ -25,7 +25,7 @@ export function PageInviteLink({ email, status, submitEmail }: InviteToPageProps
   return (
     <CenteredBox style={{ width: 500 }}>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <CollectEmail
+        <EmailAddressForm
           email={email || ''}
           loading={status === 'requesting_link'}
           title='Log in to view this document'

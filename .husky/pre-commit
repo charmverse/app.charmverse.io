@@ -2,3 +2,25 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npx lint-staged
+
+# List of files to check. These should already be in gitignore, but this provides an additional layer of protection.
+# List of banned files to check against. Any staging (ex. .env.staging, .env.stg) or prod file will be rejected.
+# To test this, try adding a file with the name .env.blocked to your project and add '.env.b' to the banned_files array
+banned_files=(".env.p" ".env.s")
+
+# Get list of staged files from git
+staged_files=$(git diff --cached --name-only)
+
+# Loop through each staged file
+for staged_file in $staged_files; do
+  # Loop through each banned file
+  for banned_file in "${banned_files[@]}"; do
+    # Check if the staged file contains the banned file pattern
+    if grep -q "$banned_file" <<< "$staged_file"; then
+      printf "\n"
+      printf "\e[31mError: Banned file \e[1m'$staged_file'\e[0m\e[31m found in staged files\e[0m \n"
+      printf "Please remove it and try again.\n"
+      exit 1
+    fi
+  done
+done

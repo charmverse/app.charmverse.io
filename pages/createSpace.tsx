@@ -3,8 +3,8 @@ import { Box, Card, Grid, Typography } from '@mui/material';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm/CreateSpaceForm';
 import Image from 'components/common/Image';
+import Footer from 'components/login/components/Footer';
 import { Container } from 'components/login/components/LoginLayout';
-import Footer from 'components/login/Footer';
 import { useSpaces } from 'hooks/useSpaces';
 import splashImage from 'public/images/artwork/world.png';
 

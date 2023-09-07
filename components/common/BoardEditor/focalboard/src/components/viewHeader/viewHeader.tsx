@@ -10,6 +10,7 @@ import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
@@ -85,7 +86,7 @@ function ViewHeader(props: Props) {
     if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
       updateProposalSource({ pageId: currentRootPageId });
     }
-  }, [currentRootPageId, activeBoard?.fields.sourceType, activeBoard?.id]);
+  }, [currentRootPageId, activeBoard?.id]);
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
@@ -185,40 +186,12 @@ function ViewHeader(props: Props) {
             {/* Sort */}
 
             {withSortBy && (
-              <>
-                <Button
-                  color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
-                  variant='text'
-                  size='small'
-                  sx={{ minWidth: 0 }}
-                  {...bindTrigger(viewSortPopup)}
-                >
-                  <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
-                </Button>
-                <Menu
-                  {...bindMenu(viewSortPopup)}
-                  PaperProps={{
-                    sx: {
-                      overflow: 'visible'
-                    }
-                  }}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
-                  onClick={() => viewSortPopup.close()}
-                >
-                  <ViewHeaderSortMenu
-                    properties={activeBoard?.fields.cardProperties ?? []}
-                    activeView={activeView}
-                    orderedCards={cards}
-                  />
-                </Menu>
-              </>
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
             )}
           </>
         )}

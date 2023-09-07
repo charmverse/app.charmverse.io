@@ -80,7 +80,7 @@ test.describe.serial('Proposal Flow', () => {
   });
 
   test('A user can move draft proposal to feedback', async () => {
-    await proposalListPage.getProposalRowLocator(proposalId).click();
+    await proposalListPage.openProposalCard(proposalId);
 
     await expect(proposalPage.dialog).toBeVisible();
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.discussion);

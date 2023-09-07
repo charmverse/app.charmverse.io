@@ -1,3 +1,4 @@
+import type { ProposalStatus } from '@charmverse/core/prisma';
 import { DateUtils } from 'react-day-picker';
 
 import type { Block } from 'lib/focalboard/block';
@@ -8,6 +9,9 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { getAbsolutePath } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createCommentBlock } from './blocks/commentBlock';
@@ -15,17 +19,32 @@ import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';
 
+export type Formatters = {
+  date(date: Date | string): string;
+  dateTime(date: Date | string): string;
+};
+
+export type PropertyContext = {
+  users: { [key: string]: { username: string } };
+  proposalCategories: { [key: string]: string };
+  spaceDomain: string;
+};
+
 class OctoUtils {
-  static propertyDisplayValue(
-    block: Block,
-    propertyValue: string | string[] | undefined | number,
-    propertyTemplate: IPropertyTemplate,
-    formatter: {
-      date: (date: Date | string) => string;
-      dateTime: (date: Date | string) => string;
-    }
-  ) {
-    const { date: formatDate, dateTime: formatDateTime } = formatter;
+  static propertyDisplayValue({
+    block,
+    propertyValue,
+    propertyTemplate,
+    formatters,
+    context
+  }: {
+    block: Block;
+    propertyValue: string | string[] | undefined | number;
+    propertyTemplate: IPropertyTemplate;
+    formatters: Formatters;
+    context?: PropertyContext;
+  }) {
+    const { date: formatDate, dateTime: formatDateTime } = formatters;
     let displayValue: string | string[] | undefined | number;
     switch (propertyTemplate.type) {
       case 'select': {
@@ -41,6 +60,30 @@ class OctoUtils {
           const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
           displayValue = options.map((o) => o.value);
         }
+        break;
+      }
+      case 'proposalCategory': {
+        displayValue = typeof propertyValue === 'string' ? context?.proposalCategories[propertyValue] : propertyValue;
+        break;
+      }
+      case 'proposalStatus': {
+        const proposalStatus = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
+        displayValue = proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus as ProposalStatus] : propertyValue;
+        break;
+      }
+      case 'person':
+      case 'proposalEvaluatedBy':
+      case 'proposalAuthor':
+      case 'proposalReviewer': {
+        const valueArray = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
+        displayValue = valueArray
+          .map((value) => (typeof value === 'string' ? context?.users[value]?.username : null))
+          .filter(isTruthy);
+        break;
+      }
+      case 'proposalUrl': {
+        displayValue =
+          typeof propertyValue === 'string' ? getAbsolutePath(`/${propertyValue}`, context?.spaceDomain) : '';
         break;
       }
       case 'createdTime': {

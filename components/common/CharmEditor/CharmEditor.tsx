@@ -89,11 +89,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);
-          .ProseMirror[data-placeholder]::before {
-            color: var(--primary-text);
-            opacity: 0.5;
-          }`
+          background-color: var(--background-light);`
       : ''};
 
   ${({ disableRowHandles }) =>
@@ -190,6 +186,7 @@ interface CharmEditorProps {
   onConnectionEvent?: (event: ConnectionEvent) => void;
   isPollOrVote?: boolean;
   disableMention?: boolean;
+  allowClickingFooter?: boolean;
 }
 
 function CharmEditor({
@@ -219,7 +216,8 @@ function CharmEditor({
   disableNestedPages = false,
   onConnectionEvent,
   isPollOrVote = false,
-  disableMention = false
+  disableMention = false,
+  allowClickingFooter
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -355,6 +353,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
       focusOnInit={focusOnInit}

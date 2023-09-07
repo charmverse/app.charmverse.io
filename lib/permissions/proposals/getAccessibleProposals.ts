@@ -24,22 +24,14 @@ export async function getAccessibleProposals({
   spaceId,
   userId,
   categoryIds: requestedCategoryIds,
-  includePage,
   onlyAssigned
-}: ListProposalsRequest): Promise<(ProposalWithUsers | ProposalWithCommentsAndUsers)[]> {
+}: ListProposalsRequest): Promise<ProposalWithUsers[]> {
   const { spaceRole } = await hasAccessToSpace({ spaceId, userId });
 
   const include: Prisma.ProposalInclude = {
     authors: true,
     reviewers: true,
-    category: true,
-    page: includePage
-      ? {
-          include: {
-            comments: true
-          }
-        }
-      : false
+    category: true
   };
 
   if (spaceRole?.isAdmin) {

@@ -14,6 +14,7 @@ import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -57,6 +58,7 @@ export function ProposalProperties({
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
+  const { mutateProposals } = useProposals();
 
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
@@ -108,6 +110,7 @@ export function ProposalProperties({
         refreshProposalPermissions()
       ]);
       mutateTasks();
+      mutateProposals();
     }
   }
 
@@ -137,6 +140,7 @@ export function ProposalProperties({
     }
     refreshProposal();
     refreshProposalFlowFlags(); // needs to run when reviewers change?
+    mutateProposals();
   }
 
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
@@ -165,6 +169,7 @@ export function ProposalProperties({
       }
       readOnlyReviewers={readOnlyReviewers}
       rubricAnswers={proposal?.rubricAnswers}
+      draftRubricAnswers={proposal?.draftRubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       showStatus={!isTemplate}
       userId={user?.id}

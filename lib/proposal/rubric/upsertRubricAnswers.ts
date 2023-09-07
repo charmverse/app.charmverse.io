@@ -3,6 +3,8 @@ import type { ProposalRubricCriteriaType } from '@charmverse/core/prisma-client'
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
+
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -13,12 +15,13 @@ type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCrite
   'rubricCriteriaId' | 'response'
 > & { comment?: string };
 export type RubricAnswerUpsert = {
+  isDraft?: boolean;
   userId: string;
   proposalId: string;
   answers: RubricAnswerData[];
 };
 
-export async function upsertRubricAnswers({ answers, userId, proposalId }: RubricAnswerUpsert) {
+export async function upsertRubricAnswers({ answers, userId, proposalId, isDraft }: RubricAnswerUpsert) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!stringUtils.isUUID(userId)) {
@@ -53,14 +56,16 @@ export async function upsertRubricAnswers({ answers, userId, proposalId }: Rubri
     }
   }
 
+  const table = getAnswersTable({ isDraft });
+
   return prisma.$transaction([
-    prisma.proposalRubricCriteriaAnswer.deleteMany({
+    table.deleteMany({
       where: {
         proposalId,
         userId
       }
     }),
-    prisma.proposalRubricCriteriaAnswer.createMany({
+    table.createMany({
       data: answers.map((a) => ({
         proposalId,
         response: a.response,
