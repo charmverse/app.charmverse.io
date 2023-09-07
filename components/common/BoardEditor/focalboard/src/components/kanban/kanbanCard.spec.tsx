@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as ReduxProvider } from 'react-redux';
 
@@ -125,13 +125,13 @@ describe('src/components/kanban/kanbanCard', () => {
       )
     );
 
-    const buttonElement = container.querySelector('[data-test="page-actions-context-menu"] button') as Element;
+    const buttonElement = container.querySelector('[data-testid="page-actions-context-menu"] button') as Element;
     userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();
 
-    const deleteButton = container.querySelector('[data-testid="delete-page-action"]') as Element;
+    const deleteButton = screen.getByText('Delete') as Element;
     userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
-    const deleteButtonModal = container.querySelector('[data-testid="confirm-delete-button"]') as Element;
+    const deleteButtonModal = screen.getByRole('button', { name: 'Delete' }) as Element;
     userEvent.click(deleteButtonModal, undefined, { skipPointerEventsCheck: true });
     expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
     expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');

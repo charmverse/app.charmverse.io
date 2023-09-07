@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -42,12 +42,12 @@ describe('components/viewHeader/newCardButton', () => {
     }
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   const store = mockStateStore([], state);
   const mockFunction = jest.fn();
-
-  charmClient.permissions.pages.computePagePermissions = jest.fn().mockReturnValue({
-    edit_content: true
-  });
 
   test('return NewCardButton', () => {
     const { container } = render(
@@ -90,6 +90,10 @@ describe('components/viewHeader/newCardButton', () => {
   });
 
   test('return NewCardButton and addCardTemplate', async () => {
+    charmClient.permissions.pages.computePagePermissions = jest.fn().mockResolvedValueOnce({
+      edit_content: true
+    });
+
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
@@ -109,7 +113,7 @@ describe('components/viewHeader/newCardButton', () => {
     const buttonAdd = (container.querySelector('[data-testid="KeyboardArrowDownIcon"]') as Element)
       .parentElement as Element;
     userEvent.click(buttonAdd);
-    const buttonAddTemplate = screen.getByText('New template');
+    const buttonAddTemplate = await waitFor(() => screen.getByText('New template'));
     userEvent.click(buttonAddTemplate);
     expect(mockFunction).toBeCalledTimes(1);
   });

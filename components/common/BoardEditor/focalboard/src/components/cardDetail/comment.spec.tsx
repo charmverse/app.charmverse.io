@@ -31,15 +31,6 @@ describe('components/cardDetail/comment', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // moment.now = () => {
-    //     return dateFixed + (24 * 60 * 60 * 1000)
-    // }
-  });
-
-  afterEach(() => {
-    // moment.now = () => {
-    //     return Number(new Date())
-    // }
   });
 
   test('return comment', () => {

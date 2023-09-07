@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as ReduxProvider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
@@ -67,26 +67,29 @@ describe('src/components/gallery/GalleryCard', () => {
     test('should match snapshot', () => {
       const { container } = render(
         wrapDNDIntl(
-          <ReduxProvider store={store}>
-            <GalleryCard
-              board={board}
-              card={card}
-              onClick={jest.fn()}
-              visiblePropertyTemplates={[
-                {
-                  id: card.id,
-                  name: 'testTemplateProperty',
-                  type: 'text',
-                  options: [{ id: '1', value: 'testValue', color: 'blue' }]
-                }
-              ]}
-              visibleTitle={true}
-              isSelected={true}
-              readOnly={false}
-              isManualSort={true}
-              onDrop={jest.fn()}
-            />
-          </ReduxProvider>
+          wrapPagesProvider(
+            [card.id],
+            <ReduxProvider store={store}>
+              <GalleryCard
+                board={board}
+                card={card}
+                onClick={jest.fn()}
+                visiblePropertyTemplates={[
+                  {
+                    id: card.id,
+                    name: 'testTemplateProperty',
+                    type: 'text',
+                    options: [{ id: '1', value: 'testValue', color: 'blue' }]
+                  }
+                ]}
+                visibleTitle={true}
+                isSelected={true}
+                readOnly={false}
+                isManualSort={true}
+                onDrop={jest.fn()}
+              />
+            </ReduxProvider>
+          )
         )
       );
       expect(container).toMatchSnapshot();
@@ -140,11 +143,9 @@ describe('src/components/gallery/GalleryCard', () => {
         )
       );
 
-      const buttonElement = container.querySelector('[data-test="page-actions-context-menu"] button') as Element;
+      const buttonElement = container.querySelector('[data-testid="page-actions-context-menu"] button') as Element;
       userEvent.click(buttonElement);
-      expect(container).toMatchSnapshot();
-
-      const deleteButton = container.querySelector('[data-testid="delete-page-action"]') as Element;
+      const deleteButton = screen.getByText('Delete') as Element;
       userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
       expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
       expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');
@@ -170,19 +171,22 @@ describe('src/components/gallery/GalleryCard', () => {
     test('return GalleryCard with content readonly', () => {
       const { container } = render(
         wrapDNDIntl(
-          <ReduxProvider store={store}>
-            <GalleryCard
-              board={board}
-              card={card}
-              onClick={jest.fn()}
-              visiblePropertyTemplates={[]}
-              visibleTitle={true}
-              isSelected={true}
-              readOnly={true}
-              isManualSort={true}
-              onDrop={jest.fn()}
-            />
-          </ReduxProvider>
+          wrapPagesProvider(
+            [card.id],
+            <ReduxProvider store={store}>
+              <GalleryCard
+                board={board}
+                card={card}
+                onClick={jest.fn()}
+                visiblePropertyTemplates={[]}
+                visibleTitle={true}
+                isSelected={true}
+                readOnly={true}
+                isManualSort={true}
+                onDrop={jest.fn()}
+              />
+            </ReduxProvider>
+          )
         )
       );
       expect(container).toMatchSnapshot();
