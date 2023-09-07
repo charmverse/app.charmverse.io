@@ -81,9 +81,14 @@ function PropertyValueElement(props: Props) {
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
-  const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
-    date: formatDate,
-    dateTime: formatDateTime
+  const displayValue = OctoUtils.propertyDisplayValue({
+    block: card,
+    propertyValue,
+    propertyTemplate,
+    formatters: {
+      date: formatDate,
+      dateTime: formatDateTime
+    }
   });
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
