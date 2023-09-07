@@ -107,6 +107,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
       // @ts-ignore -  TODO: make answer types match
       answers: filteredAnswers
     });
+    // if draft is showing, delete it now that we updated the answers
     if (showDraftAnswers) {
       await deleteRubricCriteriaAnswers({
         isDraft: true
@@ -115,9 +116,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
     onSubmit({ isDraft: false });
   }
 
-  // case 1: no draft, no answers
-  // case 2: no draft, answers
-  async function saveDraftAnswers(values: FormInput) {
+  async function submitDraftAnswers(values: FormInput) {
     // answers are optional - filter out ones with no score
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertDraftRubricCriteriaAnswer({
@@ -125,6 +124,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
       answers: filteredAnswers,
       isDraft: true
     });
+    // switch to draft before updating the parent context, or else the two Alerts will flicker one after the other
     setShowDraftAnswers(true);
     await onSubmit({ isDraft: true });
   }
@@ -133,6 +133,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
     await deleteRubricCriteriaAnswers({
       isDraft: true
     });
+    // update the answers from parent context before switching from 'draft' view
     await onSubmit({ isDraft: true });
     setShowDraftAnswers(false);
   }
@@ -214,7 +215,7 @@ export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, d
               variant='outlined'
               disabled={!isDirty}
               loading={draftIsSaving}
-              onClick={handleSubmit(saveDraftAnswers)}
+              onClick={handleSubmit(submitDraftAnswers)}
             >
               {showDraftAnswers ? 'Update' : 'Save'} draft
             </Button>
