@@ -96,7 +96,7 @@ class CsvExporter {
       }
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
-        const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, formatter) || '') as string;
+        const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, template, formatter) || '';
         if (template.id === Constants.titleColumnId) {
           _row.push(`"${this.encodeText(card.title)}"`);
         } else if (template.type === 'number') {
@@ -107,7 +107,7 @@ class CsvExporter {
           _row.push(multiSelectValue);
         } else {
           // Export as string
-          _row.push(`"${this.encodeText(displayValue)}"`);
+          _row.push(`"${typeof displayValue === 'string' ? this.encodeText(displayValue) : displayValue}"`);
         }
       });
       rows.push(_row);
