@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { BoardView } from 'lib/focalboard/boardView';
 import { InvalidStateError } from 'lib/middleware';
 import { generateBoard } from 'testing/setupDatabase';
 

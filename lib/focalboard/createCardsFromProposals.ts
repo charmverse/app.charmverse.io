@@ -12,13 +12,19 @@ import type {
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
-
 import type { BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { upsertProposalCardPage } from './upsertProposalCardPage';
+
+const baseFields = {
+  contentOrder: [],
+  headerImage: null,
+  icon: '',
+  isTemplate: false
+};
 
 export async function createCardsFromProposals({
   boardId,
@@ -181,7 +187,7 @@ export async function createCardsFromProposals({
 
       const updatedCardShape = generateResyncedProposalEvaluationForCard({
         proposalEvaluationType: pageProposal.proposal.evaluationType,
-        cardProps: { fields: properties },
+        cardProps: { fields: { properties } },
         databaseProperties: databaseProposalProps,
         rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
         rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
@@ -190,13 +196,16 @@ export async function createCardsFromProposals({
       properties = updatedCardShape.fields;
     }
 
-    const _card = await createCardPage({
+    const _card = await upsertProposalCardPage({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
       createdAt,
-      createdBy: userId,
-      properties: properties as any,
+      userId,
+      fields: {
+        ...baseFields,
+        properties
+      },
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,

@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import type { Page, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
@@ -8,12 +8,16 @@ import { v4 } from 'uuid';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { generateBoard, generateProposal } from 'testing/setupDatabase';
 
+import type { CardFields } from '../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
+import type { ExtractedDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
+import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 
 describe('createCardsFromProposals', () => {
   let user: User;
   let space: Space;
   let board: Page;
+  let proposalCategory: ProposalCategory;
 
   beforeAll(async () => {
     const generated = await testUtilsUser.generateUserAndSpace();
@@ -25,16 +29,20 @@ describe('createCardsFromProposals', () => {
       viewDataSource: 'proposals'
     });
     board = generatedBoard;
+    proposalCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id
+    });
   });
 
   beforeEach(async () => {
     await prisma.$transaction([prisma.page.deleteMany(), prisma.proposal.deleteMany()]);
   });
 
-  it('should create cards from proposals', async () => {
+  it('should create cards from proposals with the proposal properties set', async () => {
     const newProposal = await generateProposal({
       authors: [user.id],
       proposalStatus: 'discussion',
+      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',
@@ -59,6 +67,29 @@ describe('createCardsFromProposals', () => {
           isEqual(newProposal.content, card.content)
       )
     ).toBeTruthy();
+
+    const database = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: board.id
+      }
+    });
+
+    const databaseSchema = (await extractDatabaseProposalProperties({
+      database
+    })) as Required<ExtractedDatabaseProposalProperties>;
+
+    const card = await prisma.block.findFirstOrThrow({
+      where: {
+        id: cards[0].id
+      }
+    });
+
+    expect((card.fields as CardFields).properties).toMatchObject({
+      [databaseSchema.proposalCategory.id]: proposalCategory.id,
+      [databaseSchema.proposalStatus.id]:
+        databaseSchema.proposalStatus.options.find((opt) => opt.value === 'discussion')?.id ?? 'error',
+      [databaseSchema.proposalUrl.id]: newProposal.path
+    });
   });
 
   it('should not create cards from draft proposals', async () => {

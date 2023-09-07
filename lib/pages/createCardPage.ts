@@ -1,5 +1,5 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
-import type { Page, Block } from '@charmverse/core/prisma';
+import type { Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -7,11 +7,10 @@ import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BoardPropertyValue } from 'lib/public-api';
 
-export async function createCardPage(
-  pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, BoardPropertyValue>;
-  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>>
-): Promise<{ page: Page; block: Block }> {
+export type CardPageCreateInput = Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
+  properties: Record<string, BoardPropertyValue>;
+} & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>>;
+export async function createCardPage(pageInfo: CardPageCreateInput): Promise<{ page: Page; block: Block }> {
   const board = await prisma.block.findFirst({
     where: {
       type: 'board',

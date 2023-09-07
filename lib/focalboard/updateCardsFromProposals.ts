@@ -12,11 +12,10 @@ import type {
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
-
 import type { BoardFields } from './board';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { upsertProposalCardPage } from './upsertProposalCardPage';
 
 export async function updateCardsFromProposals({
   boardId,
@@ -213,33 +212,20 @@ export async function updateCardsFromProposals({
           newCardBlockFields = updatedCardShape.fields;
         }
 
-        const { updatedCardPage, updatedCardBlock } = await prisma.$transaction(async (tx) => {
-          const updatedPage = await tx.page.update({
-            where: {
-              id: card.id
-            },
-            data: {
-              updatedAt: new Date(),
-              updatedBy: userId,
-              deletedAt: pageWithProposal.deletedAt,
-              title: pageWithProposal.title,
-              hasContent: pageWithProposal.hasContent,
-              content: pageWithProposal.content || undefined,
-              contentText: pageWithProposal.contentText
-            }
-          });
-
-          const updatedBlock = await tx.block.update({
-            where: {
-              id: updatedPage.id
-            },
-            data: {
-              fields: newCardBlockFields
-            }
-          });
-
-          return { updatedCardPage: updatedPage, updatedCardBlock: updatedBlock };
+        const { block: updatedCardBlock, page: updatedCardPage } = await upsertProposalCardPage({
+          boardId: database.id,
+          spaceId: database.spaceId,
+          syncWithPageId: pageWithProposal.proposalId as string,
+          content: pageWithProposal.content,
+          contentText: pageWithProposal.contentText,
+          updatedAt: new Date(),
+          userId,
+          deletedAt: pageWithProposal.deletedAt,
+          title: pageWithProposal.title,
+          hasContent: pageWithProposal.hasContent,
+          fields: newCardBlockFields
         });
+
         updatedCards.push(updatedCardPage);
         updatedBlocks.push(updatedCardBlock);
       }
@@ -279,13 +265,14 @@ export async function updateCardsFromProposals({
         properties = updatedCardShape.fields;
       }
 
-      const _card = await createCardPage({
+      const _card = await upsertProposalCardPage({
         title: pageWithProposal.title,
+        deletedAt: pageWithProposal.deletedAt,
         boardId,
         spaceId: pageWithProposal.spaceId,
         createdAt,
-        createdBy: userId,
-        properties,
+        userId,
+        fields: properties,
         hasContent: pageWithProposal.hasContent,
         content: pageWithProposal.content,
         contentText: pageWithProposal.contentText,

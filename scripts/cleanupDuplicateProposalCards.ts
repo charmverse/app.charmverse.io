@@ -23,7 +23,7 @@ async function cleanupDuplicateProposalCards() {
       parentId: {
         not: null
       }
-      //spaceId: space.id
+      // spaceId: space.id
     },
     select: {
       id: true,
@@ -56,7 +56,7 @@ async function cleanupDuplicateProposalCards() {
     await prisma.$transaction(async tx => {
       await tx.page.deleteMany({
         where: {
-//          spaceId: space.id,
+        // spaceId: space.id,
           type: 'card',
           id: {
             in: cardsToDelete.cardIdsToDelete
@@ -65,7 +65,7 @@ async function cleanupDuplicateProposalCards() {
       });
       await tx.block.deleteMany({
         where: {
-          // spaceId: space.id,
+          //spaceId: space.id,
           type: 'card',
           id: {
             in: cardsToDelete.cardIdsToDelete
