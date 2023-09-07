@@ -139,7 +139,6 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
     await request(baseUrl)
       .delete(`/api/proposals/${proposal.id}/rubric-answers`)
       .set('Cookie', reviewerCookie)
-      .send({ rubricCriteriaId: rubricCriteria.id })
       .expect(200);
 
     const response = await prisma.proposalRubricCriteriaAnswer.findFirst({
@@ -160,7 +159,6 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
     await request(baseUrl)
       .delete(`/api/proposals/${proposal.id}/rubric-answers`)
       .set('Cookie', memberCookie)
-      .send({ rubricCriteriaId: rubricCriteria.id })
       .expect(401);
   });
 });

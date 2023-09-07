@@ -17,6 +17,7 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
     <CharmEditorComponent
+      allowClickingFooter={true}
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}
@@ -76,6 +77,7 @@ export default {
 export function FullPageEditor() {
   return (
     <CharmEditorComponent
+      allowClickingFooter={true}
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}

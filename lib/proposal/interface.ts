@@ -30,6 +30,7 @@ export interface ProposalWithCategory extends Proposal {
 export type ProposalRubricData = {
   rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &

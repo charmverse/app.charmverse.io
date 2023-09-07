@@ -26,6 +26,7 @@ export async function getProposal({
           authors: true,
           reviewers: true,
           category: true,
+          draftRubricAnswers: true,
           rubricAnswers: true,
           rubricCriteria: true
         }

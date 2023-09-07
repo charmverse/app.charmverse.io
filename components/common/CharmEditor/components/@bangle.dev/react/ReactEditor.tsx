@@ -7,7 +7,7 @@ import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
-import type { RefObject } from 'react';
+import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 import { mutate } from 'swr';
@@ -20,6 +20,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
@@ -52,6 +53,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   initialContent?: any;
   enableComments?: boolean;
   onConnectionEvent?: (event: ConnectionEvent) => void;
+  allowClickingFooter?: boolean;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -74,7 +76,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     onParticipantUpdate = () => {},
     readOnly = false,
     enableComments = true,
-    onConnectionEvent
+    onConnectionEvent,
+    allowClickingFooter
   },
   ref
 ) {
@@ -134,6 +137,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         isLoadingRef.current = false;
         setEditorContent(_editor, initialContent);
       }
+    }
+  }
+
+  function onClickEditorBottom(event: MouseEvent) {
+    if (editor && !readOnly) {
+      event.preventDefault();
+      // insert new line
+      insertAndFocusLineAtEndofDoc(editor.view);
     }
   }
 
@@ -232,10 +243,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
           cursor: readOnly ? 'default' : 'text'
         }}
-        // onClick={() => !readOnly && editor?.view.focus()}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
+        {allowClickingFooter && (
+          <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
+        )}
       </div>
       {nodeViews.map((nodeView) => {
         return nodeView.containerDOM

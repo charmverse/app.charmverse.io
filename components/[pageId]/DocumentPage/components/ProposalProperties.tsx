@@ -169,6 +169,7 @@ export function ProposalProperties({
       }
       readOnlyReviewers={readOnlyReviewers}
       rubricAnswers={proposal?.rubricAnswers}
+      draftRubricAnswers={proposal?.draftRubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
       showStatus={!isTemplate}
       userId={user?.id}

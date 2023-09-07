@@ -1,8 +1,11 @@
 import { v4 as uuid } from 'uuid';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { OptionalNullable } from 'lib/utilities/types';
 
-export function createMockProposal(input: Partial<ProposalWithUsersAndRubric> = {}): ProposalWithUsersAndRubric {
+export function createMockProposal(
+  input: Partial<ProposalWithUsersAndRubric> = {}
+): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
     lensPostLink: null,
@@ -18,6 +21,7 @@ export function createMockProposal(input: Partial<ProposalWithUsersAndRubric> = 
     rubricCriteria: [],
     reviewedAt: null,
     reviewedBy: null,
+    draftRubricAnswers: [],
     rubricAnswers: [],
     snapshotProposalExpiry: null,
     spaceId: '',

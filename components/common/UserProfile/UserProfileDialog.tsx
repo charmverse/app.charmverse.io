@@ -9,6 +9,11 @@ import ScrollableWindow from 'components/common/PageLayout/components/Scrollable
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
 
+const ContentContainer = styled(Container)`
+  width: 100%;
+  margin-bottom: 100px;
+`;
+
 const StyledDialog = styled(Dialog)<{ fluidSize?: boolean }>`
   ${(props) =>
     props.fluidSize
@@ -43,10 +48,10 @@ export function UserProfileDialog({
   return (
     <StyledDialog toolbar={<div />} fluidSize={fluidSize} onClose={onClickClose}>
       <ScrollableWindow>
-        <Container fullWidth={fullWidth} top={20}>
+        <ContentContainer fullWidth={fullWidth} top={20}>
           {title && <Legend wrap>{title}</Legend>}
           {children}
-        </Container>
+        </ContentContainer>
       </ScrollableWindow>
     </StyledDialog>
   );
