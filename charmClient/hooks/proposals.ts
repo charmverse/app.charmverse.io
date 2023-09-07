@@ -70,8 +70,16 @@ export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) 
   return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
 }
 
-export function useUpsertRubricCriteriaAnswer({ proposalId }: { proposalId: MaybeString }) {
+export function useUpsertRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
+export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
+export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return useDELETE<{ isDraft: boolean }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {

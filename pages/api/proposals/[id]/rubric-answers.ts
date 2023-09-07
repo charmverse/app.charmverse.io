@@ -1,10 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import { upsertRubricAnswers } from 'lib/proposal/rubric/upsertRubricAnswers';
@@ -16,7 +16,7 @@ handler
   .use(requireUser)
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .put(upsertProposalAnswersController)
-  .delete(deleteRubricAnswer);
+  .delete(deleteRubricAnswers);
 
 async function upsertProposalAnswersController(
   req: NextApiRequest,
@@ -34,9 +34,10 @@ async function upsertProposalAnswersController(
     throw new ActionNotPermittedError(`You cannot update your answer for this proposal`);
   }
 
-  const { answers } = req.body as RubricAnswerUpsert;
+  const { answers, isDraft } = req.body as RubricAnswerUpsert;
 
   await upsertRubricAnswers({
+    isDraft,
     proposalId,
     answers,
     userId
@@ -45,14 +46,9 @@ async function upsertProposalAnswersController(
   res.status(200).end();
 }
 
-async function deleteRubricAnswer(req: NextApiRequest, res: NextApiResponse) {
+async function deleteRubricAnswers(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
-
-  const rubricCriteriaId = req.body.rubricCriteriaId;
-
-  if (!rubricCriteriaId) {
-    throw new InvalidInputError(`Valid rubric criteria id is required`);
-  }
+  const isDraft = req.query.isDraft === 'true';
 
   const userId = req.session.user.id;
 
@@ -64,17 +60,14 @@ async function deleteRubricAnswer(req: NextApiRequest, res: NextApiResponse) {
   if (!permissions.evaluate) {
     throw new ActionNotPermittedError(`You cannot update your answer for this proposal`);
   }
-
-  await prisma.proposalRubricCriteriaAnswer.delete({
+  await getAnswersTable({ isDraft }).deleteMany({
     where: {
-      userId_rubricCriteriaId: {
-        userId,
-        rubricCriteriaId
-      }
+      userId,
+      proposalId
     }
   });
 
-  res.status(200).send({ message: 'ok' });
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);
