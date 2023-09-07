@@ -1,6 +1,7 @@
-import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import type { Page, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';
@@ -535,5 +536,88 @@ describe('updateCardsFromProposals()', () => {
     await expect(
       updateCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
     ).rejects.toThrowError();
+  });
+});
+describe('updateCardsFromProposals and createCardsFromProposals', () => {
+  let user: User;
+  let space: Space;
+  let board: Page;
+  let proposalCategory: ProposalCategory;
+
+  const expectedCardPageCount = 50;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace();
+    user = generated.user;
+    space = generated.space;
+    board = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals'
+    });
+    proposalCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id
+    });
+
+    // Generate a large amount of proposals
+    for (let i = 0; i < expectedCardPageCount; i++) {
+      await testUtilsProposals.generateProposal({
+        categoryId: proposalCategory.id,
+        authors: [user.id],
+        proposalStatus: 'discussion',
+        reviewers: [
+          {
+            group: 'user',
+            id: user.id
+          }
+        ],
+        spaceId: space.id,
+        userId: user.id
+      });
+    }
+  });
+
+  it('the functions should not create duplicate cards when called at the same time', async () => {
+    createCardsFromProposals({
+      boardId: board.id,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        Promise.all([
+          createCardsFromProposals({
+            boardId: board.id,
+            spaceId: space.id,
+            userId: user.id
+          }),
+          updateCardsFromProposals({
+            boardId: board.id,
+            spaceId: space.id,
+            userId: user.id
+          })
+          // updateCardsFromProposals({
+          //   boardId: board.id,
+          //   spaceId: space.id,
+          //   userId: user.id
+          // })
+        ]).then(resolve);
+        // Simulate a user delay in triggering these actions
+      }, 500);
+    });
+
+    const childPages = await prisma.page.findMany({
+      where: {
+        parentId: board.id
+      },
+      select: {
+        id: true,
+        syncWithPageId: true
+      }
+    });
+
+    expect(childPages.length).toEqual(expectedCardPageCount);
+    expect(arrayUtils.uniqueValues(childPages.map((p) => p.syncWithPageId))).toEqual(expectedCardPageCount);
   });
 });
