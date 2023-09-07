@@ -92,8 +92,8 @@ export function ProposalsPage({ title }: { title: string }) {
 
   return (
     <div className='focalboard-body full-page'>
-      <Box className='BoardComponent' py={(theme) => theme.spacing(8)}>
-        <div className='top-head'>
+      <Box className='BoardComponent'>
+        <Box className='top-head' pt={8}>
           <Grid container mb={6}>
             <Grid item xs={12}>
               <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
@@ -148,7 +148,7 @@ export function ProposalsPage({ title }: { title: string }) {
               <Divider />
             </>
           )}
-        </div>
+        </Box>
 
         {loadingData ? (
           <Grid item xs={12} sx={{ mt: 12 }}>
