@@ -11,7 +11,7 @@ import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabas
 import { generateResyncedProposalEvaluationForCard } from 'lib/focalboard/generateResyncedProposalEvaluationForCard';
 import { getBoardProperties } from 'lib/focalboard/setDatabaseProposalProperties';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
-import { createMockBoard, createMockCard } from 'testing/mocks/blocks';
+import { createMockBoard, createMockCard } from 'testing/mocks/block';
 
 import { CsvExporter, getCSVColumns } from '../csvExporter';
 

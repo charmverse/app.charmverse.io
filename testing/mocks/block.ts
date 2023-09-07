@@ -1,5 +1,5 @@
 import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
-import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
 export function createMockBoard(): Board {
