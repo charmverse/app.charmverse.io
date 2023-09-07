@@ -5,7 +5,11 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
-import { useUpsertRubricCriteriaAnswer, useUpsertDraftRubricCriteriaAnswer } from 'charmClient/hooks/proposals';
+import {
+  useUpsertRubricCriteriaAnswers,
+  useUpsertDraftRubricCriteriaAnswers,
+  useDeleteRubricCriteriaAnswers
+} from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 
 import { IntegerInput, CriteriaRow } from './ProposalRubricCriteriaInput';
@@ -17,7 +21,7 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
-  onSubmit: (answers: FormInput) => void;
+  onSubmit: (props: { isDraft: boolean }) => void;
 };
 
 const StyledIcon = styled.div`
@@ -48,13 +52,7 @@ const StyledRating = styled(Rating)`
   }
 `;
 
-export function RubricEvaluationForm({
-  proposalId,
-  criteriaList = [],
-  answers = [],
-  draftAnswers = [],
-  onSubmit
-}: Props) {
+export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, draftAnswers, onSubmit }: Props) {
   const mappedAnswers = criteriaList.map(
     (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
   );
@@ -65,24 +63,27 @@ export function RubricEvaluationForm({
     error: answerError,
     isMutating: isSaving,
     trigger: upsertRubricCriteriaAnswer
-  } = useUpsertRubricCriteriaAnswer({ proposalId });
+  } = useUpsertRubricCriteriaAnswers({ proposalId });
 
   const {
     error: draftAnswerError,
     isMutating: draftIsSaving,
     trigger: upsertDraftRubricCriteriaAnswer
-  } = useUpsertDraftRubricCriteriaAnswer({ proposalId });
+  } = useUpsertDraftRubricCriteriaAnswers({ proposalId });
+
+  const { trigger: deleteRubricCriteriaAnswers } = useDeleteRubricCriteriaAnswers({ proposalId });
 
   const formError = draftAnswerError || answerError;
 
-  const showDraftBanner = draftAnswers.length > 0 && !showDraftAnswers;
+  const hasDraft = !!draftAnswers?.length;
+  const showDraftBanner = hasDraft && !showDraftAnswers;
 
   const {
     control,
     register,
     handleSubmit,
     reset,
-    formState: { errors, isValid }
+    formState: { errors, isDirty, isValid }
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
@@ -100,10 +101,17 @@ export function RubricEvaluationForm({
       // @ts-ignore -  TODO: make answer types match
       answers: filteredAnswers
     });
-    onSubmit(values);
+    if (showDraftAnswers) {
+      await deleteRubricCriteriaAnswers({
+        isDraft: true
+      });
+    }
+    onSubmit({ isDraft: false });
   }
 
-  async function saveAnswersDraft(values: FormInput) {
+  // case 1: no draft, no answers
+  // case 2: no draft, answers
+  async function saveDraftAnswers(values: FormInput) {
     // answers are optional - filter out ones with no score
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertDraftRubricCriteriaAnswer({
@@ -111,31 +119,49 @@ export function RubricEvaluationForm({
       answers: filteredAnswers,
       isDraft: true
     });
+    setShowDraftAnswers(true);
+    await onSubmit({ isDraft: true });
   }
 
-  useEffect(() => {
-    // update the form values when the criteria list loads
-    reset({ answers: mappedAnswers });
-  }, [mappedAnswers.length]);
+  async function deleteDraftAnswers() {
+    await deleteRubricCriteriaAnswers({
+      isDraft: true
+    });
+    await onSubmit({ isDraft: true });
+    setShowDraftAnswers(false);
+  }
 
-  useEffect(() => {
-    if (showDraftAnswers) {
+  function toggleDraftView(showDraft: boolean) {
+    setShowDraftAnswers(showDraft);
+    if (showDraft) {
       const mappedDraftAnswers = criteriaList.map(
         (criteria) => draftAnswers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
       );
-      reset({ answers: mappedDraftAnswers });
+      reset({ answers: mappedDraftAnswers }, { keepDirty: false });
     } else {
-      reset({ answers: mappedAnswers });
+      reset({ answers: mappedAnswers }, { keepDirty: false });
     }
-  }, [showDraftAnswers]);
+  }
+
+  useEffect(() => {
+    if (!showDraftAnswers && answers) {
+      // update the form values when the criteria list loads
+      reset({ answers: mappedAnswers }, { keepDirty: false });
+    } else if (draftAnswers) {
+      const mappedDraftAnswers = criteriaList.map(
+        (criteria) => draftAnswers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
+      );
+      reset({ answers: mappedDraftAnswers }, { keepDirty: false });
+    }
+  }, [answers, draftAnswers]);
 
   return (
     <form>
       {showDraftBanner && (
         <Alert
           action={
-            <Button variant='outlined' size='small' onClick={() => setShowDraftAnswers(true)}>
-              View Draft
+            <Button variant='outlined' size='small' onClick={() => toggleDraftView(true)}>
+              View draft
             </Button>
           }
           severity='info'
@@ -147,7 +173,7 @@ export function RubricEvaluationForm({
         <Alert
           severity='info'
           action={
-            <Button variant='outlined' size='small' onClick={() => setShowDraftAnswers(false)}>
+            <Button variant='outlined' size='small' onClick={() => toggleDraftView(false)}>
               Cancel
             </Button>
           }
@@ -155,7 +181,7 @@ export function RubricEvaluationForm({
           Viewing a draft
         </Alert>
       )}
-      <Box>
+      <Box p={3}>
         {fields.map((field, index) => (
           <CriteriaInput
             key={field.id}
@@ -168,19 +194,31 @@ export function RubricEvaluationForm({
         ))}
         <Box display='flex' gap={2}>
           <Stack direction='row' gap={2}>
-            <Button sx={{ alignSelf: 'start' }} loading={isSaving} onClick={handleSubmit(submitAnswers)}>
-              Submit
-            </Button>
             <Button
               sx={{ alignSelf: 'start' }}
-              color='secondary'
-              variant='outlined'
-              loading={draftIsSaving}
-              type='submit'
-              onClick={handleSubmit(saveAnswersDraft)}
+              disabled={!isDirty && !showDraftAnswers}
+              loading={isSaving}
+              onClick={handleSubmit(submitAnswers)}
             >
-              Save Draft
+              Submit
             </Button>
+            {(showDraftAnswers || isDirty) && (
+              <Button
+                sx={{ alignSelf: 'start' }}
+                color='secondary'
+                variant='outlined'
+                disabled={!isDirty}
+                loading={draftIsSaving}
+                onClick={handleSubmit(saveDraftAnswers)}
+              >
+                {hasDraft ? 'Update' : 'Save'} draft
+              </Button>
+            )}
+            {showDraftAnswers && (
+              <Button sx={{ alignSelf: 'start' }} color='secondary' variant='text' onClick={deleteDraftAnswers}>
+                Delete draft
+              </Button>
+            )}
           </Stack>
           {formError && (
             <Typography variant='body2' color='error'>
@@ -222,6 +260,7 @@ function CriteriaInput({
   );
   const muiMax = convertActualToMUIRating(parameters.max, parameters.min);
   const useRatingsInput = rangeLength < 8;
+
   return (
     <CriteriaRow key={field.id} mb={2}>
       <FormGroup sx={{ display: 'flex', gap: 1 }}>

@@ -16,7 +16,7 @@ handler
   .use(requireUser)
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .put(upsertProposalAnswersController)
-  .delete(deleteRubricAnswer);
+  .delete(deleteRubricAnswers);
 
 async function upsertProposalAnswersController(
   req: NextApiRequest,
@@ -46,15 +46,9 @@ async function upsertProposalAnswersController(
   res.status(200).end();
 }
 
-async function deleteRubricAnswer(req: NextApiRequest, res: NextApiResponse) {
+async function deleteRubricAnswers(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
-
-  const isDraft = Boolean(req.body.isDraft);
-  const rubricCriteriaId = req.body.rubricCriteriaId;
-
-  if (!rubricCriteriaId) {
-    throw new InvalidInputError(`Valid rubric criteria id is required`);
-  }
+  const isDraft = req.query.isDraft === 'true';
 
   const userId = req.session.user.id;
 
@@ -66,16 +60,14 @@ async function deleteRubricAnswer(req: NextApiRequest, res: NextApiResponse) {
   if (!permissions.evaluate) {
     throw new ActionNotPermittedError(`You cannot update your answer for this proposal`);
   }
-  await getAnswersTable({ isDraft }).delete({
+  await getAnswersTable({ isDraft }).deleteMany({
     where: {
-      userId_rubricCriteriaId: {
-        userId,
-        rubricCriteriaId
-      }
+      userId,
+      proposalId
     }
   });
 
-  res.status(200).send({ message: 'ok' });
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);
