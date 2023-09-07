@@ -9,7 +9,21 @@ export type EventInput<T = MixpanelEvent> = T & {
   event: MixpanelEventName;
 } & Partial<MixpanelTrackBase>;
 
-export async function recordDatabaseEvent(event: EventInput, userId?: string) {
+/*
+ * This function is used to record events in the database.
+ * userId? - existing user id, optional. Must be a valid user id in the database
+ * distinctUserId? - a unique id for the user, can be either an anonymous user id or a user id
+ */
+
+export async function recordDatabaseEvent({
+  event,
+  userId,
+  distinctUserId
+}: {
+  event: EventInput;
+  userId?: string;
+  distinctUserId?: string;
+}) {
   if (event.event === 'app_loaded') {
     const typedEvent = event as UserEventMap['app_loaded'];
 
@@ -17,6 +31,7 @@ export async function recordDatabaseEvent(event: EventInput, userId?: string) {
       data: {
         action: 'app_loaded',
         createdBy: userId,
+        distinctUserId,
         spaceId: typedEvent.spaceId
       }
     });
@@ -30,6 +45,7 @@ export async function recordDatabaseEvent(event: EventInput, userId?: string) {
         data: {
           action: 'view_page',
           createdBy: userId,
+          distinctUserId,
           pageId: typedEvent.pageId,
           spaceId: typedEvent.spaceId,
           pageType: typedEvent.type
@@ -43,6 +59,7 @@ export async function recordDatabaseEvent(event: EventInput, userId?: string) {
       data: {
         action: 'view_page',
         createdBy: userId,
+        distinctUserId,
         postId: typedEvent.resourceId,
         spaceId: typedEvent.spaceId,
         pageType: 'post'

@@ -34,7 +34,11 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   trackUserAction(_eventName, { ...eventPayload, userId });
 
   try {
-    await recordDatabaseEvent(req.body, req.session.user?.id || req.session.anonymousUserId);
+    await recordDatabaseEvent({
+      event: req.body,
+      distinctUserId: req.session.user?.id || req.session.anonymousUserId,
+      userId: req.session.user?.id
+    });
   } catch (error) {
     log.error('Error recording database event', { ...request, error, referer: req.headers.referer });
   }
