@@ -134,7 +134,8 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
     propertyTemplate.type === 'proposalCategory' ||
-    propertyTemplate.type === 'proposalStatus'
+    propertyTemplate.type === 'proposalStatus' ||
+    propertyTemplate.type === 'proposalEvaluationType'
   ) {
     propertyValueElement = (
       <TagSelect
@@ -164,7 +165,12 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.type === 'person' || propertyTemplate.type === 'proposalEvaluatedBy') {
+  } else if (
+    propertyTemplate.type === 'person' ||
+    propertyTemplate.type === 'proposalEvaluatedBy' ||
+    propertyTemplate.type === 'proposalAuthor' ||
+    propertyTemplate.type === 'proposalReviewer'
+  ) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
@@ -172,7 +178,7 @@ function PropertyValueElement(props: Props) {
         readOnly={
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
-          propertyTemplate.type === 'proposalEvaluatedBy'
+          proposalPropertyTypesList.includes(propertyTemplate.type as any)
         }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);

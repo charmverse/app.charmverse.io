@@ -8,6 +8,7 @@ import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { Member } from '../../lib/members/interfaces';
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
 import { brandColorNames } from 'theme/colors';
+import { LoggedInUser } from 'models/User';
 
 const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
 
@@ -23,7 +24,8 @@ const seeds = [
 ];
 
 export const spaces = [createMockSpace()];
-export const userProfile = createMockUser({ id: userProfileSeed });
+// user profile with space role
+export const userProfile = {...createMockUser({ id: userProfileSeed}), spaceRoles: [{ spaceId: spaces[0].id, isAdmin: true }]} as LoggedInUser;
 export const userMemberProfile: Member = createMockSpaceMember(userProfile);
 export const members: Member[] = [
   createMockSpaceMember(createMockUser({ id: seeds[0] })),

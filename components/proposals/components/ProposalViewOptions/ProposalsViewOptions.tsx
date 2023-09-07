@@ -61,6 +61,7 @@ export function ProposalsViewOptions({
     <ViewOptions label='Filter'>
       <Box data-test={`proposal-view-options-${testKey}`} display='flex' gap={1}>
         <Select
+          sx={{ height: '32px' }}
           variant='outlined'
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as ProposalStatusFilter)}
@@ -74,8 +75,8 @@ export function ProposalsViewOptions({
           <Divider />
           <MenuItem value='archived'>Archived</MenuItem>
         </Select>
-
         <Select
+          sx={{ height: '32px' }}
           data-test='proposal-category-list'
           variant='outlined'
           value={categoryIdFilter || ''}
@@ -88,7 +89,7 @@ export function ProposalsViewOptions({
 
             const category = categories.find((c) => c.id === value);
             if (category) {
-              return <ProposalCategoryChip color={category.color} title={category.title} />;
+              return <ProposalCategoryChip size='small' color={category.color} title={category.title} />;
             }
           }}
           onChange={(e) => {
@@ -105,7 +106,7 @@ export function ProposalsViewOptions({
               value={category.id}
               sx={{ justifyContent: 'space-between' }}
             >
-              <ProposalCategoryChip color={category.color} title={category.title} />
+              <ProposalCategoryChip size='small' color={category.color} title={category.title} />
               <ProposalCategoryContextMenu category={category} key={category.id} />
             </MenuItem>
           ))}

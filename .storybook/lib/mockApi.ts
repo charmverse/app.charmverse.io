@@ -16,6 +16,10 @@ import {
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
 
 const spaceHandlers = {
+  // mock tracking requests
+  track: rest.post(`/api/events`, (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
   spaceMembers: rest.get(`/api/spaces/:spaceId/members`, (req, res, ctx) => {
     return res(ctx.json([userMemberProfile, ...members]));
   }),

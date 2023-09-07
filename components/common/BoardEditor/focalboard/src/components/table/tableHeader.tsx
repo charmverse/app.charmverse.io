@@ -29,6 +29,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { DEFAULT_BLOCK_IDS } from 'lib/proposal/blocks/constants';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -62,6 +63,7 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
+  const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -138,6 +140,7 @@ function TableHeader(props: Props): JSX.Element {
       <MenuList>
         <Stack p={1}>
           <TextField
+            disabled={disableRename}
             value={tempName}
             onClick={(e) => {
               e.stopPropagation();
