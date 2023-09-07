@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { ProposalBlockType } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
@@ -14,9 +13,9 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -38,7 +37,8 @@ describe('proposal blocks - createBlock', () => {
 
     const block = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     expect(block).toMatchObject(propertiesData);
@@ -56,9 +56,9 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: space.id,
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title',
@@ -81,9 +81,9 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData2 = {
       spaceId: space.id,
       title: 'Properties 2',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
-        properties: [
+        cardProperties: [
           {
             id: v4(),
             name: 'title2',
@@ -105,12 +105,14 @@ describe('proposal blocks - createBlock', () => {
 
     const properties = await createBlock({
       userId: user.id,
-      data: propertiesData
+      data: propertiesData,
+      spaceId: space.id
     });
 
     const properties2 = await createBlock({
       userId: user.id,
-      data: propertiesData2
+      data: propertiesData2,
+      spaceId: space.id
     });
 
     expect(properties2.id).toEqual(properties.id);
@@ -127,7 +129,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData = {
       spaceId: '123',
       title: 'Properties',
-      type: ProposalBlockType.properties,
+      type: 'board',
       fields: {
         properties: [
           {
@@ -149,16 +151,12 @@ describe('proposal blocks - createBlock', () => {
       }
     };
 
-    await expect(createBlock({ data: { ...propertiesData, spaceId: '' }, userId: '123' })).rejects.toBeInstanceOf(
-      InvalidInputError
-    );
-
-    await expect(createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123' })).rejects.toBeInstanceOf(
-      InvalidInputError
-    );
+    await expect(
+      createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123', spaceId: '123' })
+    ).rejects.toBeInstanceOf(InvalidInputError);
 
     await expect(
-      createBlock({ data: { ...propertiesData, fields: null } as any, userId: '123' })
+      createBlock({ data: { ...propertiesData, fields: null } as any, userId: '123', spaceId: '123' })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });
