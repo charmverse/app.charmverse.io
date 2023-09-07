@@ -130,6 +130,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           dateTime: formatDateTime
         },
         {
+          spaceDomain: currentSpace?.domain ?? '',
           users: membersRecord,
           proposalCategories
         }
