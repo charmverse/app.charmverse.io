@@ -145,7 +145,7 @@ export async function createProposal({
 
   return {
     page: page as PageWithPermissions,
-    proposal: { ...proposal, rubricCriteria: upsertedCriteria, rubricAnswers: [] },
+    proposal: { ...proposal, rubricCriteria: upsertedCriteria, draftRubricAnswers: [], rubricAnswers: [] },
     workspaceEvent
   };
 }
