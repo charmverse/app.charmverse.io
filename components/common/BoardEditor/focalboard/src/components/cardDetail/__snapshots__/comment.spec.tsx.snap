@@ -128,7 +128,7 @@ exports[`components/cardDetail/comment return comment 1`] = `
         class="MuiBox-root css-ir5tdx"
       >
         <div
-          class="bangle-editor-core"
+          class="bangle-editor-core readonly"
           style="cursor: default;"
         >
           <span />
@@ -315,7 +315,7 @@ exports[`components/cardDetail/comment return comment and delete comment 1`] = `
         class="MuiBox-root css-ir5tdx"
       >
         <div
-          class="bangle-editor-core"
+          class="bangle-editor-core readonly"
           style="cursor: default;"
         >
           <span />
@@ -407,7 +407,7 @@ exports[`components/cardDetail/comment return comment readonly 1`] = `
         class="MuiBox-root css-ir5tdx"
       >
         <div
-          class="bangle-editor-core"
+          class="bangle-editor-core readonly"
           style="cursor: default;"
         >
           <span />

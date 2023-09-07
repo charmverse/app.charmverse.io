@@ -45,7 +45,7 @@ exports[`src/components/gallery/GalleryCard without block content should match s
       style="opacity: 1;"
     >
       <div
-        data-test="page-actions-context-menu"
+        data-testid="page-actions-context-menu"
       >
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
