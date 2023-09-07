@@ -338,6 +338,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -473,6 +474,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -1010,6 +1012,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -1139,6 +1142,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -1673,6 +1677,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -1740,7 +1745,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               <div
                 class="LastModifiedAt octo-propertyvalue readonly"
               >
-                9/14/22, 2:13 PM
+                9/14/22, 8:13 PM
               </div>
             </div>
             <div
@@ -1808,6 +1813,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -1875,7 +1881,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               <div
                 class="LastModifiedAt octo-propertyvalue readonly"
               >
-                9/14/22, 2:13 PM
+                9/14/22, 8:13 PM
               </div>
             </div>
             <div
@@ -2345,6 +2351,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -2474,6 +2481,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
+                  data-test="database-row-open-card-id-2"
                 >
                   <button
                     class="Button size--small"

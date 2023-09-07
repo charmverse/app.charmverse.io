@@ -73,6 +73,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
@@ -167,6 +168,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
@@ -261,6 +263,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
@@ -403,6 +406,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
@@ -481,6 +485,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
@@ -575,6 +580,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
           </div>
           <div
             class="open-button"
+            data-test="database-row-open-card-1"
           >
             <button
               class="Button size--small"
