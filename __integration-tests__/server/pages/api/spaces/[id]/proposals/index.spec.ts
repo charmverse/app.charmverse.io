@@ -70,9 +70,18 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
     });
 
     visibleCategoryFeedbackProposalReviewedByAdmin = proposal3;
+
+    const templateProposal = await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      categoryId: visibleProposalCategory.id,
+      userId: adminUser.id,
+      authors: [adminUser.id],
+      proposalStatus: 'discussion',
+      reviewers: [{ group: 'user', id: adminUser.id }]
+    });
   });
 
-  it('Should return all proposals a user can access, responding 200', async () => {
+  it('Should return all proposals a user can access excluding templates, responding 200', async () => {
     const proposals = (await (
       await request(baseUrl).get(`/api/spaces/${space.id}/proposals`).set('Cookie', memberCookie).expect(200)
     ).body) as ProposalWithUsers[];
