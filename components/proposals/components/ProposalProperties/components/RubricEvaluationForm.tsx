@@ -54,7 +54,13 @@ const StyledRating = styled(Rating)`
 
 export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, draftAnswers, onSubmit }: Props) {
   const mappedAnswers = criteriaList.map(
-    (criteria) => answers?.find((a) => a.rubricCriteriaId === criteria.id) || { rubricCriteriaId: criteria.id }
+    (criteria) =>
+      answers?.find((a) => a.rubricCriteriaId === criteria.id) || {
+        rubricCriteriaId: criteria.id,
+        // add default empty values so that isDirty is updated only when values actually change
+        comment: '',
+        response: { score: undefined }
+      }
   );
 
   const [showDraftAnswers, setShowDraftAnswers] = useState(false);
