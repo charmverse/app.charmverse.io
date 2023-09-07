@@ -93,7 +93,7 @@ export function ProposalsPage({ title }: { title: string }) {
   return (
     <div className='focalboard-body full-page'>
       <Box className='BoardComponent'>
-        <Box className='top-head' pt={(theme) => theme.spacing(8)}>
+        <Box className='top-head' pt={8}>
           <Grid container mb={6}>
             <Grid item xs={12}>
               <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
