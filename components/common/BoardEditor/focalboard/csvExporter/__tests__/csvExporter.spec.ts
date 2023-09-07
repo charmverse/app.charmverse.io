@@ -186,7 +186,7 @@ describe('getCSVColumns()', () => {
     });
     const properties = {
       [databaseProperties.proposalCategory!.id]: 'category_id',
-      [databaseProperties.proposalUrl!.id]: 'https://www.google.com',
+      [databaseProperties.proposalUrl!.id]: 'path-123',
       [databaseProperties.proposalStatus!.id]: reviewStatusOptionId,
       [databaseProperties.proposalEvaluatedBy!.id]: 'user_1'
     };
@@ -206,7 +206,8 @@ describe('getCSVColumns()', () => {
 
     const context: PropertyContext = {
       users: { user_1: { username: 'Mo' } },
-      proposalCategories: { category_id: 'General' }
+      proposalCategories: { category_id: 'General' },
+      spaceDomain: 'test-space'
     };
     const rowColumns = getCSVColumns({
       card,
@@ -215,6 +216,14 @@ describe('getCSVColumns()', () => {
       hasTitleProperty: false,
       visibleProperties: board.fields.cardProperties
     });
-    expect(rowColumns).toEqual(['"title"', '"General"', '"In Review"', '"https://www.google.com"', 'Mo', '10', '10']);
+    expect(rowColumns).toEqual([
+      '"title"',
+      '"General"',
+      '"In Review"',
+      '"http://localhost/test-space/path-123"',
+      'Mo',
+      '10',
+      '10'
+    ]);
   });
 });

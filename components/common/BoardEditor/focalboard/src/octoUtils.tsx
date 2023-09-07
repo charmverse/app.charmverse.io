@@ -10,6 +10,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
@@ -26,6 +27,7 @@ export type Formatters = {
 export type PropertyContext = {
   users: { [key: string]: { username: string } };
   proposalCategories: { [key: string]: string };
+  spaceDomain: string;
 };
 
 class OctoUtils {
@@ -77,6 +79,11 @@ class OctoUtils {
         displayValue = valueArray
           .map((value) => (typeof value === 'string' ? context?.users[value]?.username : null))
           .filter(isTruthy);
+        break;
+      }
+      case 'proposalUrl': {
+        displayValue =
+          typeof propertyValue === 'string' ? getAbsolutePath(`/${propertyValue}`, context?.spaceDomain) : '';
         break;
       }
       case 'createdTime': {
