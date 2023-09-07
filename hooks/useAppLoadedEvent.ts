@@ -1,4 +1,5 @@
-import { useCallback, useEffect } from 'react';
+import { debounce } from 'lodash';
+import { useCallback, useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -8,9 +9,11 @@ export function useAppLoadedEvent() {
   const { isLoaded } = useUser();
   const { space } = useCurrentSpace();
 
+  const debouncedTrackAction = useRef(debounce(charmClient.track.trackAction, 2000)).current;
+
   const trackAppLoaded = useCallback(() => {
     if (isLoaded) {
-      charmClient.track.trackAction('app_loaded', { spaceId: space?.id });
+      debouncedTrackAction('app_loaded', { spaceId: space?.id });
     }
   }, [isLoaded, space?.id]);
 
