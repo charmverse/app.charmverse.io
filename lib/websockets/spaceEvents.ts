@@ -14,7 +14,6 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { authSecret } from 'lib/session/config';
-import { isUUID } from 'lib/utilities/strings';
 import type { ClientMessage, SealedUserId, WebSocketPayload } from 'lib/websockets/interfaces';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
@@ -29,11 +28,14 @@ export class SpaceEventHandler {
 
   docRooms: Map<string | undefined, DocumentRoom> = new Map();
 
+  private relay: AbstractWebsocketBroadcaster;
+
   constructor(
-    private relay: AbstractWebsocketBroadcaster,
+    relay: AbstractWebsocketBroadcaster,
     private socket: Socket,
     docRooms: Map<string | undefined, DocumentRoom>
   ) {
+    this.relay = relay;
     this.socket = socket;
     this.docRooms = docRooms;
   }
@@ -219,16 +221,11 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId: pagePathOrId, newParentId, newIndex, trigger, pos } = message.payload;
-
+      const { pageId, newParentId, newIndex, trigger, pos } = message.payload;
       const page = await prisma.page.findFirst({
-        where: isUUID(pagePathOrId)
-          ? {
-              id: pagePathOrId
-            }
-          : {
-              path: pagePathOrId
-            },
+        where: {
+          id: pageId
+        },
         select: {
           id: true,
           spaceId: true,
@@ -239,8 +236,6 @@ export class SpaceEventHandler {
       if (!page) {
         return null;
       }
-
-      const pageId = page.id;
 
       const currentParentId = page.parentId ?? null;
 
@@ -448,23 +443,6 @@ async function handlePageRemoveMessage({
 
 function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: number }): ProsemirrorJSONStep[] {
   return [
-    {
-      stepType: 'replace',
-      from: pos,
-      to: pos,
-      slice: {
-        content: [
-          {
-            type: 'paragraph',
-            content: [],
-            attrs: {
-              path: null,
-              track: []
-            }
-          }
-        ]
-      }
-    },
     {
       stepType: 'replace',
       from: pos,

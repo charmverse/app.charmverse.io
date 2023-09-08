@@ -3,11 +3,9 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
+import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-
-import type { StaticPagesType } from '../PageLayout/components/Sidebar/utils/staticPages';
-import { STATIC_PAGES } from '../PageLayout/components/Sidebar/utils/staticPages';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -107,20 +105,20 @@ export function charmEditorPlugins({
               return true;
             }
 
-            const staticPagePaths = STATIC_PAGES.map((page) => page.path);
-
-            const data = ev.dataTransfer.getData('text/plain');
+            const data = ev.dataTransfer.getData('sidebar-page');
             if (!data) {
               return true;
             }
 
-            const pagePath = data.split('/').pop();
-
-            if (pagePath && !staticPagePaths.includes(pagePath as StaticPagesType)) {
+            try {
+              const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
+              if (!parsedData.pageId) {
+                return true;
+              }
               emitSocketMessage({
                 type: 'page_reordered',
                 payload: {
-                  pageId: pagePath,
+                  pageId: parsedData.pageId,
                   newParentId: pageId,
                   newIndex: -1,
                   trigger: 'sidebar-to-editor',
@@ -128,9 +126,9 @@ export function charmEditorPlugins({
                 }
               });
               return false;
+            } catch (_) {
+              return true;
             }
-
-            return true;
           }
         }
       }
