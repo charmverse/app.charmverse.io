@@ -84,6 +84,7 @@ export function PageActionsMenu({
       )}
       <MenuItem
         dense
+        data-testid='delete-page-action'
         onClick={onClickDelete}
         disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
       >

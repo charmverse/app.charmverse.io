@@ -39,20 +39,4 @@
     color: #ccc;
     font-size: 12px;
   }
-
-  .comment-text {
-    color: rgb(var(--center-channel-color-rgb));
-    width: 100%;
-    padding-left: 32px;
-
-    p {
-      &:first-child {
-        margin-top: 0;
-      }
-    }
-  }
-
-  .comment-text * {
-    user-select: text;
-  }
 }

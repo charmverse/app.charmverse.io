@@ -17,7 +17,7 @@ export function CopyPageLinkAction({ path, onComplete }: { path: string; onCompl
 
   return (
     <CopyToClipboard text={getAbsolutePath(path, router.query.domain as string | undefined)} onCopy={onClick}>
-      <MenuItem dense>
+      <MenuItem data-testid='copy-link-page-action' dense>
         <ListItemIcon>
           <LinkIcon fontSize='small' />
         </ListItemIcon>

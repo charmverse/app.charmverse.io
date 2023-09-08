@@ -155,7 +155,7 @@ describe('components/calculations/calculation logic', () => {
     properties.updatedTime
   ]);
 
-  const intl = createIntl({ locale: 'en-us' });
+  const intl = createIntl({ locale: 'en' });
 
   // testing count
   Object.values(properties).forEach((property) => {
