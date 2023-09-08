@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Bump Core Pkg to latest and deploy
+name: Deploy with latest Core pkg
 
 on:
   workflow_dispatch:
@@ -210,20 +210,25 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - step_name: 'Deploying prd Webapp to beanstalk'
-            env_name: prd-charmverse-webapp
-            app_name: web3-workspace
+          - step_name: 'Deploying prd Webapp to beanstalk'        #<<< remove before merge
+            env_name: stg-charmverse-pr-2731-synchronize-downs
+            app_name: stg-charmverse-pr-2731-synchronize-downs
             deployment_package: deploy.zip
+          # - step_name: 'Deploying prd Worker to beanstalk'
+          #   env_name: prd-charmverse-worker
+          #   app_name: charmverse-worker
+          #   deployment_package: deploy_cron.zip
 
-          - step_name: 'Deploying prd Worker to beanstalk'
-            env_name: prd-charmverse-worker
-            app_name: charmverse-worker
-            deployment_package: deploy_cron.zip
+          # - step_name: 'Deploying prd Websocket to beanstalk'
+          #   env_name: prd-charmverse-websockets
+          #   app_name: prd-charmverse-websockets
+          #   deployment_package: deploy_websockets.zip
 
-          - step_name: 'Deploying prd Websocket to beanstalk'
-            env_name: prd-charmverse-websockets
-            app_name: prd-charmverse-websockets
-            deployment_package: deploy_websockets.zip
+          # - step_name: 'Deploying prd Webapp to beanstalk'
+          #   env_name: prd-charmverse-webapp
+          #   app_name: web3-workspace
+          #   deployment_package: deploy.zip
+
     steps:
       - name: Restore beanstalk payload from cache
         id: restore_from_beanstalk_payload_cache
@@ -234,7 +239,6 @@ jobs:
           key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
 
       - name: ${{matrix.step_name}}
-        if: github.ref == 'refs/heads/main'              # <<< remove before merge
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
