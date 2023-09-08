@@ -19,7 +19,7 @@ jest.mock('../../mutator');
 const mockedMutator = jest.mocked(Mutator, { shallow: true });
 
 describe('src/components/kanban/kanbanHiddenColumnItem', () => {
-  const intl = createIntl({ locale: 'en-us' });
+  const intl = createIntl({ locale: 'en' });
   const board = TestBlockFactory.createBoard();
   const activeView = TestBlockFactory.createBoardView(board);
   const card = TestBlockFactory.createCard(board);
