@@ -1,5 +1,4 @@
 import type { MemberProperty } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,19 +23,6 @@ import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 import { mergeRefs } from 'lib/utilities/react';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
-
-const StyledSidebar = styled.div`
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
-  display: flex;
-  flex-direction: column;
-  height: fit-content;
-  min-height: 100%;
-  width: 100%;
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    width: 250px;
-  }
-`;
 
 function MemberPropertyItemForm({ property, close }: { property: MemberProperty; close: VoidFunction }) {
   const { updateProperty } = useMemberProperties();

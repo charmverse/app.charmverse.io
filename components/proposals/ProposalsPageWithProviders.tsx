@@ -19,7 +19,6 @@ export function ProposalsPageWithProviders() {
         <ProposalsBoardProvider>
           <ProposalDialogProvider>
             <ProposalsPage title={proposalTitle} />
-
             <ProposalDialogGlobal />
           </ProposalDialogProvider>
         </ProposalsBoardProvider>
