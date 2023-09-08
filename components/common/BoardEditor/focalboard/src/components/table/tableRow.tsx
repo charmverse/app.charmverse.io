@@ -40,6 +40,7 @@ type Props = {
   resizingColumn: string;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
@@ -70,7 +71,8 @@ function TableRow(props: Props) {
     pageTitle,
     pageUpdatedAt,
     pageUpdatedBy,
-    saveTitle
+    saveTitle,
+    onDeleteCard
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -88,7 +90,11 @@ function TableRow(props: Props) {
       Utils.assertFailure();
       return;
     }
-    await mutator.deleteBlock(card, 'delete card');
+    if (onDeleteCard) {
+      await onDeleteCard(card.id);
+    } else {
+      await mutator.deleteBlock(card, 'delete card');
+    }
     mutate(`pages/${space?.id}`);
   };
 
@@ -136,7 +142,6 @@ function TableRow(props: Props) {
     readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
-
   return (
     <div
       data-test={`database-row-${card.id}`}

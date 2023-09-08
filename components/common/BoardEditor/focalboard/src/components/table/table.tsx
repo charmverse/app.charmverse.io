@@ -34,6 +34,7 @@ type Props = {
   showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
   disableAddingCards?: boolean;
 };
@@ -275,6 +276,7 @@ function Table(props: Props): JSX.Element {
               addCard={props.addCard}
               onCardClicked={props.onCardClicked}
               onDrop={onDropToCard}
+              onDeleteCard={props.onDeleteCard}
               readOnlyTitle={props.readOnlyTitle}
             />
           )}

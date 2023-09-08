@@ -25,11 +25,12 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
-  const { board, cardPages: allCardPages, activeView } = props;
+  const { board, cardPages: allCardPages, activeView, onDeleteCard } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
@@ -70,6 +71,7 @@ function TableRows(props: Props): JSX.Element {
           showCard={props.showCard}
           readOnly={props.readOnly}
           onDrop={props.onDrop}
+          onDeleteCard={onDeleteCard}
           offset={props.offset}
           resizingColumn={props.resizingColumn}
           columnRefs={props.columnRefs}
