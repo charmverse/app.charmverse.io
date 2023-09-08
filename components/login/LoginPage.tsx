@@ -7,7 +7,6 @@ import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import { deleteCookie, getCookie, getSpaceUrl } from 'lib/utilities/browser';
