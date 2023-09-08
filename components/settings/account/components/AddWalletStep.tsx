@@ -2,7 +2,7 @@ import type { AuthSig } from '@lit-protocol/types';
 import { Typography, Stack } from '@mui/material';
 
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login';
+import { WalletSign } from 'components/login/components/WalletSign';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 

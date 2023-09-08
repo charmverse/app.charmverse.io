@@ -1,9 +1,12 @@
 import type { IronSessionOptions } from 'iron-session';
 
-import { baseUrl, cookieName } from 'config/constants';
-import { authSecret } from 'lib/session/config';
+// import the "optional" auth secret here so it doesnt throw an error at build time
+import { authSecret, baseUrl, cookieName } from 'config/constants';
 
 export function getIronOptions(): IronSessionOptions {
+  if (!authSecret) {
+    throw new Error('AUTH_SECRET is not defined');
+  }
   const ironOptions: IronSessionOptions = {
     cookieName,
     password: authSecret,

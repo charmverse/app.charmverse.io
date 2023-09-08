@@ -29,6 +29,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
+      draftRubricAnswers: true,
       rubricAnswers: true,
       rubricCriteria: true,
       authors: true,
@@ -65,6 +66,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
 
   if (!canSeeAnswers) {
+    proposal.draftRubricAnswers = [];
     proposal.rubricAnswers = [];
   }
 
@@ -123,7 +125,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   }
 
   // We want to filter out only new reviewers so that we don't affect existing proposals
-  if (proposal.page?.type === 'proposal' && reviewers?.length > 0) {
+  if (proposal.page?.type === 'proposal' && (reviewers?.length || 0) > 0) {
     const newReviewers = (reviewers ?? []).filter(
       (updatedReviewer) =>
         !proposal.reviewers.some((proposalReviewer) => {

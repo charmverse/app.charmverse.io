@@ -3,7 +3,7 @@ import type {
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type { PageWithProposal } from 'lib/pages';
 import type {
@@ -12,7 +12,6 @@ import type {
   ProposalBlockWithTypedFields
 } from 'lib/proposal/blocks/interfaces';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
-import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -71,8 +70,16 @@ export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) 
   return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
 }
 
-export function useUpsertRubricCriteriaAnswer({ proposalId }: { proposalId: MaybeString }) {
+export function useUpsertRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
+export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+}
+
+export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return useDELETE<{ isDraft: boolean }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {

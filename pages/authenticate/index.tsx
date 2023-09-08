@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
-import { LoginPageContent } from 'components/login';
-import { CollectEmailDialog } from 'components/login/CollectEmail';
-import { LoginButton } from 'components/login/LoginButton';
+import { EmailAddressFormDialog } from 'components/login/components/EmailAddressForm';
+import { LoginButton } from 'components/login/components/LoginButton';
+import { LoginPageContent } from 'components/login/LoginPageContent';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
@@ -43,8 +43,11 @@ export default function Authenticate() {
 
   // Case where existing user is adding an email to their account
   function loginViaEmail() {
+    if (!emailForSignIn) {
+      return;
+    }
     setIsAuthenticating(true);
-    validateMagicLink()
+    validateMagicLink(emailForSignIn)
       .then(() => {
         showMessage('Logged in with email. Redirecting you now', 'success');
         redirectLoggedInUser();
@@ -106,7 +109,7 @@ export default function Authenticate() {
         </Box>
       </LoginPageContent>
 
-      <CollectEmailDialog
+      <EmailAddressFormDialog
         title='Login with your email'
         description='Please enter the email address on which you received the login link.'
         isOpen={emailPopup.isOpen}

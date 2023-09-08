@@ -17,16 +17,14 @@ import { getAppUrl } from 'lib/utilities/browser';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { useLocalStorage } from './useLocalStorage';
-import { useSnackbar } from './useSnackbar';
 
-export function useFirebaseAuth() {
+export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
   const { setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
   const router = useRouter();
-  const { showMessage } = useSnackbar();
 
   useEffect(() => {
     provider.addScope('email');
@@ -50,8 +48,8 @@ export function useFirebaseAuth() {
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
 
-    const url = new URL(`${getAppUrl()}authenticate`);
-
+    authenticatePath = authenticatePath.replace(/\/$/, ''); // remove beginning slash
+    const url = new URL(`${getAppUrl()}${authenticatePath}`);
     if (connectToExistingAccount) {
       url.searchParams.set('connectToExistingAccount', 'true');
     }
@@ -69,29 +67,22 @@ export function useFirebaseAuth() {
     setEmailForSignIn(email);
 
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-
-    showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
   }
 
   /**
    * Validate the data from a magic link, and login the user
    */
-  async function validateMagicLink() {
-    const email = emailForSignIn;
-
+  async function validateMagicLink(email: string) {
     if (!email) {
-      throw new InvalidInputError(`Could not login`);
+      throw new InvalidInputError(`Email not provided`);
     }
 
     const auth = getAuth(firebaseApp);
     auth.languageCode = 'en';
-
     if (isSignInWithEmailLink(auth, window.location.href)) {
       try {
         const result = await signInWithEmailLink(auth, email, window.location.href);
-
         const token = await result.user.getIdToken();
-
         const loggedInUser = await (router.query.connectToExistingAccount === 'true'
           ? charmClient.google.connectEmailAccount({
               accessToken: token
@@ -109,7 +100,7 @@ export function useFirebaseAuth() {
       }
     } else {
       setEmailForSignIn('');
-      throw new InvalidInputError(`Could not login`);
+      throw new InvalidInputError(`Sign-in link is invalid`);
     }
   }
 

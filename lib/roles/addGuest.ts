@@ -21,7 +21,6 @@ type GuestAddedResult = {
   user: UserFromGuest;
   isNewUser: boolean;
   isNewSpaceRole: boolean;
-  spaceDomain: string;
 };
 
 export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
@@ -117,8 +116,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
       spaceRoles: [existingSpaceRole ?? (newSpaceRole as SpaceRole)]
     },
     isNewUser: !userExists,
-    isNewSpaceRole: !existingSpaceRole,
-    spaceDomain: spaceWithDomain.domain
+    isNewSpaceRole: !existingSpaceRole
   };
 
   return result;

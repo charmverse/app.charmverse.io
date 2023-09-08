@@ -23,9 +23,9 @@ export class VotesApi {
     return http.DELETE(`/api/votes/${voteId}`);
   }
 
-  castVote(voteId: string, choice: string | string[]) {
+  castVote(voteId: string, choices: string[]) {
     return http.POST<UserVote>(`/api/votes/${voteId}/cast`, {
-      choice
+      choices
     });
   }
 

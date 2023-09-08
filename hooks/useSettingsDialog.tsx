@@ -13,21 +13,26 @@ export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCO
 type IContext = {
   open: boolean;
   activePath: string;
+  unsavedChanges: boolean;
   onClose: () => void;
   onClick: (path?: SettingsPath, section?: string) => void;
   openUpgradeSubscription: () => void;
+  handleUnsavedChanges: (dataChanged: boolean) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
   open: false,
   activePath: '',
+  unsavedChanges: false,
   onClose: () => {},
   onClick: () => undefined,
-  openUpgradeSubscription: () => null
+  openUpgradeSubscription: () => null,
+  handleUnsavedChanges: () => undefined
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
   const { subscriptionEnded } = useSpaceSubscription();
@@ -46,6 +51,10 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const onClose = () => {
     settingsModalState.close();
     setActivePath('');
+  };
+
+  const handleUnsavedChanges = (dataChanged: boolean) => {
+    setUnsavedChanges(dataChanged);
   };
 
   useEffect(() => {
@@ -81,11 +90,13 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     () => ({
       open: settingsModalState.isOpen,
       activePath,
+      unsavedChanges,
       onClick,
       onClose,
-      openUpgradeSubscription
+      openUpgradeSubscription,
+      handleUnsavedChanges
     }),
-    [activePath, settingsModalState.isOpen]
+    [activePath, settingsModalState.isOpen, unsavedChanges]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;

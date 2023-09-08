@@ -8,7 +8,7 @@ export function aggregateVoteResult({
   voteOptions
 }: {
   voteOptions: Pick<VoteOptions, 'name'>[];
-  userVotes: Pick<UserVote, 'choice' | 'choices' | 'userId'>[];
+  userVotes: Pick<UserVote, 'choices' | 'userId'>[];
   userId?: string;
 }) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
@@ -19,7 +19,7 @@ export function aggregateVoteResult({
   let userChoice: string[] | null = [];
 
   userVotes.forEach((userVote) => {
-    const currentUserChoice = userVote.choice ? [userVote.choice] : userVote.choices;
+    const currentUserChoice = userVote.choices;
     if (userId && userId === userVote.userId) {
       userChoice = currentUserChoice;
     }

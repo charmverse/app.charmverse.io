@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type {
-  Discussion,
-  GetDiscussionsResponse,
-  ProposalDiscussionNotificationsContext
-} from 'lib/discussion/getDiscussionTasks';
+import type { Discussion, GetDiscussionsResponse } from 'lib/discussion/getDiscussionTasks';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
+import type {
+  NotificationProposalData,
+  ProposalDiscussionNotificationsContext
+} from 'lib/discussion/getProposalDiscussionTasks';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -76,7 +76,7 @@ export function getProposalComments({
   userId,
   spaceRecord
 }: ProposalDiscussionNotificationsContext): GetDiscussionsResponse {
-  const proposalRecord = proposals.reduce<Record<string, ProposalWithCommentsAndUsers>>((acc, proposal) => {
+  const proposalRecord = proposals.reduce<Record<string, NotificationProposalData>>((acc, proposal) => {
     acc[proposal.id] = proposal;
     return acc;
   }, {});

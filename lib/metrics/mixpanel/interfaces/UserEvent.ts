@@ -46,6 +46,8 @@ export type CreateNewSpace = BaseEvent & {
   source?: string;
 };
 
+export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
+
 export interface UserEventMap {
   sign_up: UserSignupEvent;
   sign_in: UserLoginEvent;
@@ -53,4 +55,5 @@ export interface UserEventMap {
   create_new_workspace: CreateNewSpace;
   join_a_workspace: SpaceJoined;
   token_gate_verification: TokenGateVerificationEvent;
+  app_loaded: AppLoaded;
 }

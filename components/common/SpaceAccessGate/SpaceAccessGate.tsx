@@ -2,7 +2,7 @@ import { Alert, Card, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login';
+import { WalletSign } from 'components/login/components/WalletSign';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';

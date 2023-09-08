@@ -10,7 +10,7 @@ type Props = {
   onChange: (value: ProposalEvaluationType) => void;
 };
 
-const options: IPropertyOption<ProposalEvaluationType>[] = [
+export const evaluationTypeOptions: IPropertyOption<ProposalEvaluationType>[] = [
   {
     id: 'rubric',
     value: 'Rubric',
@@ -36,7 +36,7 @@ export function ProposalEvaluationTypeSelect({ readOnly, readOnlyMessage, value,
       wrapColumn
       readOnly={readOnly}
       readOnlyMessage={readOnlyMessage}
-      options={options}
+      options={evaluationTypeOptions}
       propertyValue={value}
       onChange={onValueChange}
     />

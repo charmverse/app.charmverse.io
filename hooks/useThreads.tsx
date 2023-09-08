@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useMembers } from 'hooks/useMembers';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadWithCommentsAndAuthors, ThreadWithComments } from 'lib/threads/interfaces';
+import type { ThreadWithComments, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -56,7 +56,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     { revalidateOnFocus: false }
   );
 
-  function populateThreads(_threads: ThreadWithComments[]): CommentThreadsMap {
+  const populateThreads = useCallback((_threads: ThreadWithComments[]) => {
     const threadsAndAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
       const newThread: ThreadWithCommentsAndAuthors = {
         ...thread,
@@ -69,7 +69,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       return acc;
     }, {});
     return threadsAndAuthors;
-  }
+  }, []);
 
   const threadsUpdatedHandler = useCallback(
     (payload: WebSocketPayload<'threads_updated'>) => {

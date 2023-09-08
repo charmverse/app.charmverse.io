@@ -728,7 +728,7 @@ export async function createVote({
       userVotes: {
         createMany: {
           data: userVotes.map((userVote) => ({
-            choice: userVote,
+            choices: [userVote],
             userId: createdBy
           }))
         }

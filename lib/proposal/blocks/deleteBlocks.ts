@@ -2,6 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { deleteBlock } from 'lib/proposal/blocks/deleteBlock';
 
-export async function deleteBlocks({ blocksData }: { blocksData: string[]; userId: string }) {
-  return prisma.$transaction(blocksData.map((blockId) => deleteBlock({ blockId })));
+export async function deleteBlocks({ blocksData, spaceId }: { blocksData: string[]; userId: string; spaceId: string }) {
+  return prisma.$transaction(blocksData.map((blockId) => deleteBlock({ blockId, spaceId })));
 }

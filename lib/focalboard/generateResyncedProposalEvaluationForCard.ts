@@ -1,10 +1,7 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 
+import type { AnswerData } from 'lib/proposal/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
 
 import type { Block } from './block';
 import type { Card } from './card';
@@ -20,8 +17,8 @@ export function generateResyncedProposalEvaluationForCard({
   cardProps: Pick<Block, 'fields'>;
   proposalEvaluationType: ProposalEvaluationType;
   databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
-  rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
-  rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  rubricCriteria: { id: string }[];
+  rubricAnswers: AnswerData[];
 }): Pick<Block, 'fields'> {
   if (proposalEvaluationType !== 'rubric') {
     return cardProps;

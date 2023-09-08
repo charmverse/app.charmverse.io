@@ -5,11 +5,6 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type {
-  ProposalBlockInput,
-  ProposalBlockUpdateInput,
-  ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';

@@ -25,9 +25,11 @@ handler
 
 async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
   const spaceId = req.query.id as string;
+  const blockId = req.query.blockId as string;
 
   const proposalBlocks = await getBlocks({
-    spaceId
+    spaceId,
+    ids: blockId ? [blockId] : undefined
   });
 
   return res.status(200).json(proposalBlocks);
@@ -39,7 +41,8 @@ async function createProposalBlocksHandler(req: NextApiRequest, res: NextApiResp
 
   const proposalBlocks = await createBlocks({
     blocksData: data,
-    userId
+    userId,
+    spaceId: req.query.id as string
   });
 
   return res.status(200).json(proposalBlocks);
@@ -48,10 +51,12 @@ async function createProposalBlocksHandler(req: NextApiRequest, res: NextApiResp
 async function updateProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
   const userId = req.session.user.id;
   const data = req.body as ProposalBlockUpdateInput[];
+  const spaceId = req.query.id as string;
 
   const proposalBlocks = await updateBlocks({
     blocksData: data,
-    userId
+    userId,
+    spaceId
   });
 
   return res.status(200).json(proposalBlocks);
@@ -63,7 +68,8 @@ async function deleteProposalBlocksHandler(req: NextApiRequest, res: NextApiResp
 
   await deleteBlocks({
     blocksData: data,
-    userId
+    userId,
+    spaceId: req.query.id as string
   });
 
   return res.status(200).json(data);

@@ -67,7 +67,8 @@ type ProposalPropertiesProps = {
   archived?: boolean;
   canAnswerRubric?: boolean;
   canViewRubricAnswers?: boolean;
-  disabledCategoryInput?: boolean;
+  readOnlyCategory?: boolean;
+  isAdmin?: boolean;
   isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onSaveRubricCriteriaAnswers?: () => void;
@@ -81,6 +82,7 @@ type ProposalPropertiesProps = {
   readOnlyProposalEvaluationType?: boolean;
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  draftRubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   showStatus?: boolean;
@@ -95,7 +97,7 @@ export function ProposalProperties({
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
-  disabledCategoryInput,
+  isAdmin = false,
   isFromTemplate,
   onChangeRubricCriteria,
   onSaveRubricCriteriaAnswers,
@@ -105,10 +107,12 @@ export function ProposalProperties({
   proposalFlowFlags,
   proposalStatus,
   readOnlyAuthors,
+  readOnlyCategory,
   readOnlyProposalEvaluationType,
   readOnlyReviewers,
   readOnlyRubricCriteria,
   rubricAnswers = [],
+  draftRubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
   showStatus,
@@ -175,7 +179,14 @@ export function ProposalProperties({
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
-  const myRubricAnswers = rubricAnswers.filter((answer) => answer.userId === userId);
+  const myRubricAnswers = useMemo(
+    () => rubricAnswers.filter((answer) => answer.userId === userId),
+    [userId, rubricAnswers]
+  );
+  const myDraftRubricAnswers = useMemo(
+    () => draftRubricAnswers.filter((answer) => answer.userId === userId),
+    [userId, draftRubricAnswers]
+  );
   const templateOptions = proposalTemplates
     .filter((_proposal) => {
       if (!proposalCategoryId) {
@@ -236,10 +247,12 @@ export function ProposalProperties({
     setIsVoteModalOpen(true);
   }
 
-  async function onSubmitEvaluation() {
+  async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     await onSaveRubricCriteriaAnswers?.();
-    // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
-    setRubricView(1);
+    if (!isDraft) {
+      // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
+      setRubricView(1);
+    }
   }
 
   useEffect(() => {
@@ -269,10 +282,12 @@ export function ProposalProperties({
             <RubricEvaluationForm
               proposalId={proposalId!}
               answers={myRubricAnswers}
+              draftAnswers={myDraftRubricAnswers}
               criteriaList={rubricCriteria!}
               onSubmit={onSubmitEvaluation}
             />
-          </LoadingComponent>
+          </LoadingComponent>,
+          { sx: { p: 0 } } // disable default padding of tab panel
         ] as TabConfig),
       canViewRubricAnswers &&
         ([
@@ -354,8 +369,8 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Category</PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
-                  readOnly={disabledCategoryInput}
-                  readOnlyMessage={isFromTemplate ? 'Cannot change category when using template' : undefined}
+                  readOnly={readOnlyCategory}
+                  readOnlyMessage={isFromTemplate ? templateTooltip('category', isAdmin) : undefined}
                   options={proposalCategoriesWithCreatePermission || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
@@ -422,7 +437,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Reviewer</PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
-                readOnlyMessage={isFromTemplate ? 'Cannot change reviewers when using template' : undefined}
+                readOnlyMessage={isFromTemplate ? templateTooltip('reviewers', isAdmin) : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
@@ -494,7 +509,7 @@ export function ProposalProperties({
               <PropertyLabel readOnly>Type</PropertyLabel>
               <ProposalEvaluationTypeSelect
                 readOnly={readOnlyProposalEvaluationType}
-                readOnlyMessage={isFromTemplate ? 'Cannot change evaluation type when using template' : undefined}
+                readOnlyMessage={isFromTemplate ? templateTooltip('evaluation type', isAdmin) : undefined}
                 value={proposalFormInputs.evaluationType}
                 onChange={(evaluationType) => {
                   setProposalFormInputs({
@@ -527,7 +542,7 @@ export function ProposalProperties({
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput
                     readOnly={readOnlyRubricCriteria}
-                    readOnlyMessage={isFromTemplate ? 'Cannot change rubric criteria when using template' : undefined}
+                    readOnlyMessage={isFromTemplate ? templateTooltip('rubric criteria', isAdmin) : undefined}
                     value={proposalFormInputs.rubricCriteria}
                     onChange={onChangeRubricCriteria}
                     proposalStatus={proposalStatus}
@@ -620,4 +635,10 @@ export function ProposalProperties({
       </ModalWithButtons>
     </Box>
   );
+}
+
+function templateTooltip(fieldName: string, isAdmin: boolean) {
+  return isAdmin
+    ? `Only admins can override ${fieldName} when using a template`
+    : `Cannot change ${fieldName} when using template`;
 }

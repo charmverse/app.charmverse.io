@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues,
@@ -8,7 +9,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { sendMagicLink } from 'lib/google/sendMagicLink';
+import { sendPageInviteEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
@@ -73,7 +74,13 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     select: {
       type: true,
       spaceId: true,
-      path: true
+      path: true,
+      title: true,
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
 
@@ -87,22 +94,21 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   // Usually a userId, but can be an email
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
-
-  // Store these in top level scope, so we can send an email to the user after the page permission is created
-  let isNewSpaceMember = false;
-  let spaceDomain: string = '';
-
-  // Handle case where we are sharing a page
-  if (userIdAsEmail && isValidEmail(userIdAsEmail)) {
+  const userEmail = userIdAsEmail && isValidEmail(userIdAsEmail) ? userIdAsEmail : null;
+  // Handle case where we are sharing a page to a user by email
+  if (userEmail) {
     const addGuestResult = await addGuest({
       spaceId: page.spaceId,
-      userIdOrEmail: userIdAsEmail
+      userIdOrEmail: userEmail
     });
-
-    isNewSpaceMember = addGuestResult.isNewSpaceRole;
-    spaceDomain = addGuestResult.spaceDomain;
-
     (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
+
+    log.info('Member shared a page with a guest by email', {
+      pageId,
+      spaceId: page.spaceId,
+      guestUserId: addGuestResult.user.id,
+      userId: req.session.user.id
+    });
   }
 
   const createdPermission = await req.premiumPermissionsClient.pages.upsertPagePermission({
@@ -110,11 +116,41 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: permissionData
   });
 
-  updateTrackPageProfile(pageId);
-
-  if (isNewSpaceMember) {
-    await sendMagicLink({ email: userIdAsEmail as string, redirectUrl: `/${spaceDomain}/${page.path}` });
+  // notify a user the doc has been shared
+  if (createdPermission.assignee.group === 'user') {
+    const userId = (createdPermission.assignee as TargetPermissionGroup<'user'>).id;
+    // get the email of the user, if available
+    const notificationEmail =
+      userEmail ||
+      (await prisma.user
+        .findUniqueOrThrow({
+          where: {
+            id: userId
+          },
+          select: {
+            googleAccounts: true,
+            verifiedEmails: true
+          }
+        })
+        // TODO: maybe support checking user.email, but we would need to look for it when logging in thru magic link
+        .then((user) => user.googleAccounts[0]?.email || user.verifiedEmails[0]?.email));
+    if (notificationEmail) {
+      const sender = await prisma.user.findUniqueOrThrow({
+        where: {
+          id: req.session.user.id
+        }
+      });
+      await sendPageInviteEmail({
+        guestEmail: notificationEmail,
+        to: { email: notificationEmail, userId },
+        pageId,
+        pageTitle: page.title,
+        invitingUserName: sender.username
+      });
+    }
   }
+
+  updateTrackPageProfile(pageId);
 
   return res.status(201).json(createdPermission);
 }
