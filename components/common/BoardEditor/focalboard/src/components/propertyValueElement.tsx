@@ -257,8 +257,12 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = <TextInput {...commonProps} />;
     }
   } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
-    const proposalUrl = getAbsolutePath(`/${displayValue}`, domain);
-    propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
+    const proposalUrl = getAbsolutePath(`/${propertyValue as string}`, domain);
+    propertyValueElement = (
+      <div data-test='property-proposal-url'>
+        <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />
+      </div>
+    );
   } else if (propertyValueElement === null) {
     propertyValueElement = (
       <div className='octo-propertyvalue'>
