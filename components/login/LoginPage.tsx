@@ -18,11 +18,11 @@ export function LoginPageView() {
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
   const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
   const isLogInWithDiscord = Boolean(discordCookie);
-  const isDataLoaded = triedEager && isLoaded;
+  const isDataLoaded = triedEager && isUserLoaded;
   const isLoggedIn = !!user;
 
   useEffect(() => {
