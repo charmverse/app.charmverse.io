@@ -38,7 +38,7 @@ export function KanbanPageActionsMenuButton({
   };
 
   return (
-    <div data-test='page-actions-context-menu'>
+    <div data-testid='page-actions-context-menu'>
       <IconButton size='small' className='icons' onClick={handleClick}>
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
