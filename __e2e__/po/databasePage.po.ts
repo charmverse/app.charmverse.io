@@ -48,4 +48,11 @@ export class DatabasePage extends GlobalPage {
       openSelect: this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=autocomplete').first()
     };
   }
+
+  getTablePropertyProposalUrlLocator({ cardId }: { cardId: string }) {
+    return this.page
+      .locator(`data-test=database-row-${cardId}`)
+      .locator('data-test=property-proposal-url')
+      .locator('a');
+  }
 }
