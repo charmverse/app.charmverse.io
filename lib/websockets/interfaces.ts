@@ -126,9 +126,10 @@ type PageReordered = {
   type: 'page_reordered';
   payload: {
     pageId: string;
-    currentParentId: string | null;
     newParentId: string | null;
     newIndex: number;
+    trigger: 'sidebar-to-sidebar' | 'sidebar-to-editor';
+    pos?: number;
   };
 };
 

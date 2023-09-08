@@ -11,16 +11,7 @@ import { WebsocketBroadcaster } from '../broadcaster';
 import type { DocumentRoom } from '../documentEvents/docRooms';
 import { DocumentEventHandler } from '../documentEvents/documentEvents';
 import type { ClientMessage } from '../interfaces';
-import * as serverSocket from '../relay';
 import { SpaceEventHandler } from '../spaceEvents';
-
-jest.mock('../relay', () => {
-  return {
-    relay: {
-      broadcast: jest.fn()
-    }
-  };
-});
 
 async function createPageAndSetupDocRooms({
   participants = false,
@@ -43,6 +34,12 @@ async function createPageAndSetupDocRooms({
   const parentPage = await testUtilsPages.generatePage({ spaceId, createdBy: userId, content: parentContent });
   const socketEmitMockFn = jest.fn();
   let childPage: Page | null = null;
+
+  const relayBroadcastMockFn = jest.fn();
+
+  const websocketBroadcaster = new WebsocketBroadcaster();
+
+  websocketBroadcaster.broadcast = relayBroadcastMockFn;
 
   if (createChildPage) {
     childPage = await testUtilsPages.generatePage({
@@ -71,7 +68,7 @@ async function createPageAndSetupDocRooms({
     });
 
     const documentEvent = new DocumentEventHandler(
-      new WebsocketBroadcaster(),
+      websocketBroadcaster,
       {
         emit: socketEmitMockFn,
         data: {
@@ -94,7 +91,9 @@ async function createPageAndSetupDocRooms({
     socketEmitMockFn,
     childPageId,
     parentPage,
-    childPage
+    childPage,
+    websocketBroadcaster,
+    relayBroadcastMockFn
   };
 }
 
@@ -112,16 +111,17 @@ async function socketSetup({
   const spaceId = space.id;
   const userId = user.id;
 
-  const { docRooms, childPage, childPageId, parentPage, socketEmitMockFn } = await createPageAndSetupDocRooms({
-    createChildPage,
-    participants,
-    content,
-    docRooms: new Map(),
-    spaceId,
-    user
-  });
+  const { docRooms, childPage, childPageId, parentPage, socketEmitMockFn, websocketBroadcaster, relayBroadcastMockFn } =
+    await createPageAndSetupDocRooms({
+      createChildPage,
+      participants,
+      content,
+      docRooms: new Map(),
+      spaceId,
+      user
+    });
 
-  const spaceEventHandler = new SpaceEventHandler(new WebsocketBroadcaster(), {} as any, docRooms);
+  const spaceEventHandler = new SpaceEventHandler(websocketBroadcaster, {} as any, docRooms);
   spaceEventHandler.userId = userId;
 
   return {
@@ -134,13 +134,14 @@ async function socketSetup({
     childPageId,
     parentPage,
     spaceEventHandler,
-    childPage
+    childPage,
+    relayBroadcastMockFn
   };
 }
 
 describe('page delete event handler', () => {
   it(`Archive nested pages and remove it from parent document content when it have the nested page in its content and it is being viewed`, async () => {
-    const { socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
+    const { relayBroadcastMockFn, socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
       participants: true,
       content: (_childPageId) => ({
         type: 'doc',
@@ -157,8 +158,6 @@ describe('page delete event handler', () => {
         id: childPageId
       }
     };
-    const relayBroadCastMock = jest.fn();
-    serverSocket.relay.broadcast = relayBroadCastMock;
 
     await spaceEventHandler.onMessage(message);
 
@@ -202,7 +201,7 @@ describe('page delete event handler', () => {
 
     expect(childPage.deletedAt).toBeTruthy();
     expect(socketEmitMockFn).toHaveBeenCalled();
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
@@ -212,7 +211,7 @@ describe('page delete event handler', () => {
       },
       parentPage.spaceId
     );
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       2,
       {
         type: 'pages_deleted',
@@ -223,7 +222,7 @@ describe('page delete event handler', () => {
   });
 
   it(`Archive nested pages and remove it from parent documents content when it have the nested page in its content and it is not being viewed`, async () => {
-    const { socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
+    const { socketEmitMockFn, relayBroadcastMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
       content: (_childPageId) => ({
         type: 'doc',
         content: [
@@ -240,8 +239,6 @@ describe('page delete event handler', () => {
         id: childPageId
       }
     };
-    const relayBroadCastMock = jest.fn();
-    serverSocket.relay.broadcast = relayBroadCastMock;
 
     await spaceEventHandler.onMessage(message);
 
@@ -285,7 +282,7 @@ describe('page delete event handler', () => {
 
     expect(childPage.deletedAt).toBeTruthy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
@@ -295,7 +292,7 @@ describe('page delete event handler', () => {
       },
       parentPage.spaceId
     );
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       2,
       {
         type: 'pages_deleted',
@@ -308,97 +305,7 @@ describe('page delete event handler', () => {
 
 describe('page_restored event handler', () => {
   it('Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed', async () => {
-    expect(true).toBe(true);
-    //   const { socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
-    //     content: () => ({
-    //       type: 'doc',
-    //       content: [
-    //         { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-    //         { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-    //       ]
-    //     })
-    //   });
-    //   const message: ClientMessage = {
-    //     type: 'page_restored',
-    //     payload: {
-    //       id: childPageId
-    //     }
-    //   };
-    //   const relayBroadCastMock = jest.fn();
-    //   serverSocket.relay.broadcast = relayBroadCastMock;
-    //   await spaceEventHandler.onMessage(message);
-    //   const parentPageWithContent = await prisma.page.findUniqueOrThrow({
-    //     where: {
-    //       id: parentPage.id
-    //     },
-    //     select: {
-    //       content: true
-    //     }
-    //   });
-    //   const childPage = await prisma.page.findUniqueOrThrow({
-    //     where: {
-    //       id: childPageId
-    //     },
-    //     select: {
-    //       deletedAt: true
-    //     }
-    //   });
-    //   expect(parentPageWithContent.content).toStrictEqual({
-    //     type: 'doc',
-    //     content: [
-    //       {
-    //         type: 'paragraph',
-    //         content: [{ type: 'text', text: 'Text content 1' }],
-    //         attrs: {
-    //           track: []
-    //         }
-    //       },
-    //       {
-    //         type: 'paragraph',
-    //         content: [{ type: 'text', text: 'Text content 2' }],
-    //         attrs: {
-    //           track: []
-    //         }
-    //       },
-    //       {
-    //         type: 'page',
-    //         attrs: {
-    //           track: [],
-    //           id: childPageId,
-    //           path: null,
-    //           type: null
-    //         }
-    //       },
-    //       {
-    //         type: 'paragraph',
-    //         attrs: {
-    //           track: []
-    //         }
-    //       }
-    //     ]
-    //   });
-    //   expect(childPage.deletedAt).toBeFalsy();
-    //   expect(socketEmitMockFn).not.toHaveBeenCalled();
-    //   expect(relayBroadCastMock).toHaveBeenNthCalledWith(
-    //     1,
-    //     {
-    //       type: 'pages_meta_updated',
-    //       payload: [{ id: childPageId, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
-    //     },
-    //     parentPage.spaceId
-    //   );
-    //   expect(relayBroadCastMock).toHaveBeenNthCalledWith(
-    //     2,
-    //     {
-    //       type: 'pages_restored',
-    //       payload: [{ id: childPageId }]
-    //     },
-    //     parentPage.spaceId
-    //   );
-  });
-
-  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed`, async () => {
-    const { socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
+    const { socketEmitMockFn, relayBroadcastMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
       content: () => ({
         type: 'doc',
         content: [
@@ -407,9 +314,88 @@ describe('page_restored event handler', () => {
         ]
       })
     });
+    const message: ClientMessage = {
+      type: 'page_restored',
+      payload: {
+        id: childPageId
+      }
+    };
 
-    const relayBroadCastMock = jest.fn();
-    serverSocket.relay.broadcast = relayBroadCastMock;
+    await spaceEventHandler.onMessage(message);
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+    const childPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPageId
+      },
+      select: {
+        deletedAt: true
+      }
+    });
+    expect(parentPageWithContent.content).toStrictEqual({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Text content 1' }],
+          attrs: {
+            track: []
+          }
+        },
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Text content 2' }],
+          attrs: {
+            track: []
+          }
+        },
+        {
+          type: 'page',
+          attrs: {
+            track: [],
+            id: childPageId,
+            path: null,
+            type: null
+          }
+        }
+      ]
+    });
+    expect(childPage.deletedAt).toBeFalsy();
+    expect(socketEmitMockFn).not.toHaveBeenCalled();
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
+      1,
+      {
+        type: 'pages_meta_updated',
+        payload: [{ id: childPageId, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
+      },
+      parentPage.spaceId
+    );
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
+      2,
+      {
+        type: 'pages_restored',
+        payload: [{ id: childPageId }]
+      },
+      parentPage.spaceId
+    );
+  });
+
+  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed`, async () => {
+    const { relayBroadcastMockFn, socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
+      content: () => ({
+        type: 'doc',
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+        ]
+      })
+    });
 
     const message: ClientMessage = {
       type: 'page_restored',
@@ -463,19 +449,13 @@ describe('page_restored event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
 
     expect(childPage.deletedAt).toBeFalsy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
@@ -483,7 +463,7 @@ describe('page_restored event handler', () => {
       },
       parentPage.spaceId
     );
-    expect(relayBroadCastMock).toHaveBeenNthCalledWith(
+    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       2,
       {
         type: 'pages_restored',
@@ -496,7 +476,7 @@ describe('page_restored event handler', () => {
 
 describe('page_created event handler', () => {
   it(`Create nested page and add it to parent page content when parent document is not being viewed`, async () => {
-    const { spaceEventHandler, parentPage, socketEmitMockFn } = await socketSetup({
+    const { relayBroadcastMockFn, spaceEventHandler, parentPage, socketEmitMockFn } = await socketSetup({
       content: () => ({
         type: 'doc',
         content: [
@@ -507,8 +487,7 @@ describe('page_created event handler', () => {
     });
 
     const childPageId = v4();
-    const relayBroadCastMock = jest.fn();
-    serverSocket.relay.broadcast = relayBroadCastMock;
+
     const message: ClientMessage = {
       type: 'page_created',
       payload: {
@@ -569,23 +548,17 @@ describe('page_created event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
 
     expect(childPage).toBeTruthy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
-    expect(relayBroadCastMock).toHaveBeenCalled();
+    expect(relayBroadcastMockFn).toHaveBeenCalled();
   });
 
   it(`Create nested page and add it to parent page content when parent document is being viewed`, async () => {
-    const { socketEmitMockFn, spaceEventHandler, parentPage } = await socketSetup({
+    const { relayBroadcastMockFn, socketEmitMockFn, spaceEventHandler, parentPage } = await socketSetup({
       participants: true,
       content: () => ({
         type: 'doc',
@@ -595,8 +568,6 @@ describe('page_created event handler', () => {
         ]
       })
     });
-    const relayBroadCastMock = jest.fn();
-    serverSocket.relay.broadcast = relayBroadCastMock;
 
     const childPageId = v4();
 
@@ -660,23 +631,17 @@ describe('page_created event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
 
     expect(childPage).toBeTruthy();
     expect(socketEmitMockFn).toHaveBeenCalled();
-    expect(relayBroadCastMock).toHaveBeenCalled();
+    expect(relayBroadcastMockFn).toHaveBeenCalled();
   });
 });
 
-describe.only('page_reordered event handler', () => {
+describe('page_reordered event handler', () => {
   it(`Move page from one parent page to another parent page when both documents are being viewed`, async () => {
     const { spaceEventHandler, socketEmitMockFn, parentPage, childPageId, docRooms, space, user } = await socketSetup({
       participants: true,
@@ -713,7 +678,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPageId
@@ -783,12 +748,6 @@ describe.only('page_reordered event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
@@ -841,7 +800,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPageId
@@ -920,12 +879,6 @@ describe.only('page_reordered event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
@@ -955,7 +908,7 @@ describe.only('page_reordered event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: parentPage.id,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: null,
         pageId: childPageId
@@ -995,20 +948,35 @@ describe.only('page_reordered event handler', () => {
   });
 
   it(`Move page from root level another parent when the parent document is not being viewed`, async () => {
-    const { spaceEventHandler, parentPage, childPageId, socketEmitMockFn } = await socketSetup({
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const userId = user.id;
+    const spaceId = space.id;
+
+    const parentContent = {
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
+      ]
+    };
+    const parentPage = await testUtilsPages.generatePage({
+      spaceId: space.id,
+      createdBy: userId,
+      content: parentContent
     });
+    const childPage = await testUtilsPages.generatePage({
+      spaceId,
+      createdBy: userId
+    });
+    const childPageId = childPage.id;
+
+    const spaceEventHandler = new SpaceEventHandler(new WebsocketBroadcaster(), {} as any, new Map());
+    spaceEventHandler.userId = userId;
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered',
       payload: {
-        currentParentId: null,
+        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage.id,
         pageId: childPageId
@@ -1049,16 +1017,8 @@ describe.only('page_reordered event handler', () => {
             path: null,
             type: null
           }
-        },
-        {
-          type: 'paragraph',
-          attrs: {
-            track: []
-          }
         }
       ]
     });
-
-    expect(socketEmitMockFn).not.toHaveBeenCalled();
   });
 });

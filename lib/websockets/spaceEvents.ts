@@ -28,11 +28,14 @@ export class SpaceEventHandler {
 
   docRooms: Map<string | undefined, DocumentRoom> = new Map();
 
+  private relay: AbstractWebsocketBroadcaster;
+
   constructor(
-    private relay: AbstractWebsocketBroadcaster,
+    relay: AbstractWebsocketBroadcaster,
     private socket: Socket,
     docRooms: Map<string | undefined, DocumentRoom>
   ) {
+    this.relay = relay;
     this.socket = socket;
     this.docRooms = docRooms;
   }
@@ -218,7 +221,28 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId, currentParentId, newParentId, newIndex } = message.payload;
+      const { pageId, newParentId, newIndex, trigger, pos } = message.payload;
+      const page = await prisma.page.findFirst({
+        where: {
+          id: pageId
+        },
+        select: {
+          id: true,
+          spaceId: true,
+          parentId: true
+        }
+      });
+
+      if (!page) {
+        return null;
+      }
+
+      const currentParentId = page.parentId ?? null;
+
+      // If the page is dropped on the same parent page or on itself, do nothing
+      if (currentParentId === newParentId || pageId === newParentId) {
+        return null;
+      }
 
       try {
         const { flatChildren } = await resolvePageTree({
@@ -261,7 +285,7 @@ export class SpaceEventHandler {
             docRooms: this.docRooms,
             parentId: newParentId
           });
-          const lastValidPos = pageNode.content.size;
+          const lastValidPos = pos ?? pageNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {
@@ -288,6 +312,26 @@ export class SpaceEventHandler {
                 parentId: newParentId,
                 diffs: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
               });
+            }
+
+            // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
+            if (trigger === 'sidebar-to-editor') {
+              await prisma.page.update({
+                where: {
+                  id: pageId
+                },
+                data: {
+                  parentId: newParentId
+                }
+              });
+
+              this.relay.broadcast(
+                {
+                  type: 'pages_meta_updated',
+                  payload: [{ id: pageId, parentId: newParentId, spaceId: page.spaceId }]
+                },
+                page.spaceId
+              );
             }
           }
         }
@@ -399,23 +443,6 @@ async function handlePageRemoveMessage({
 
 function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: number }): ProsemirrorJSONStep[] {
   return [
-    {
-      stepType: 'replace',
-      from: pos,
-      to: pos,
-      slice: {
-        content: [
-          {
-            type: 'paragraph',
-            content: [],
-            attrs: {
-              path: null,
-              track: []
-            }
-          }
-        ]
-      }
-    },
     {
       stepType: 'replace',
       from: pos,

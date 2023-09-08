@@ -3,6 +3,9 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
+import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -84,6 +87,52 @@ export function charmEditorPlugins({
   placeholderText?: string;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
+    new Plugin({
+      props: {
+        handleDOMEvents: {
+          drop(view, ev) {
+            ev.preventDefault();
+            if (!ev.dataTransfer || !pageId) {
+              return true;
+            }
+
+            const coordinates = view.posAtCoords({
+              left: ev.clientX,
+              top: ev.clientY
+            });
+
+            if (!coordinates) {
+              return true;
+            }
+
+            const data = ev.dataTransfer.getData('sidebar-page');
+            if (!data) {
+              return true;
+            }
+
+            try {
+              const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
+              if (!parsedData.pageId) {
+                return true;
+              }
+              emitSocketMessage({
+                type: 'page_reordered',
+                payload: {
+                  pageId: parsedData.pageId,
+                  newParentId: pageId,
+                  newIndex: -1,
+                  trigger: 'sidebar-to-editor',
+                  pos: coordinates.pos + 1
+                }
+              });
+              return false;
+            } catch (_) {
+              return true;
+            }
+          }
+        }
+      }
+    }),
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
