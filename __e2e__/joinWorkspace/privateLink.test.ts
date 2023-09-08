@@ -31,7 +31,6 @@ test('private invite link - accepting invite sends user your space', async ({ pa
   await page.goto(`${baseUrl}${invitePath}`);
   await acceptInvitePage.acceptInviteButton.click();
 
-  await acceptInvitePage.goto();
   await acceptInvitePage.waitForWorkspaceLoaded({
     domain: space.domain
   });
