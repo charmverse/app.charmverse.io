@@ -245,6 +245,7 @@ export function PostPage({
                   <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
                 </Box>
                 <CharmEditor
+                  allowClickingFooter={true}
                   pageType='post'
                   autoFocus={false}
                   readOnly={!canEdit}

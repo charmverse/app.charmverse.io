@@ -16,10 +16,11 @@ import {
   ListItemIcon
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import PopupState from 'material-ui-popup-state';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -29,6 +30,7 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
@@ -39,6 +41,7 @@ import { SpaceIntegrations } from 'components/settings/space/components/SpaceInt
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
@@ -66,6 +69,7 @@ export function SpaceSettings({ space }: { space: Space }) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
+  const { handleUnsavedChanges } = useSettingsDialog();
   const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
@@ -85,6 +89,17 @@ export function SpaceSettings({ space }: { space: Space }) {
     defaultValues: _getFormValues(space),
     resolver: yupResolver(schema)
   });
+
+  const {
+    register: registerNewTitle,
+    watch: watchNewTitle,
+    reset: resetNewTitle,
+    setValue: setValueNewTitle
+  } = useForm<{ newTitle: string }>({
+    defaultValues: { newTitle: '' },
+    resolver: yupResolver(yup.object({ newTitle: yup.string().trim() }))
+  });
+  const newTitle = watchNewTitle('newTitle');
 
   const {
     trigger: updateSpace,
@@ -173,9 +188,19 @@ export function SpaceSettings({ space }: { space: Space }) {
     setMemberProfiles(newOrder);
   }
 
-  usePreventReload(isDirty);
+  const dataChanged = useMemo(() => {
+    return !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
+  }, [space.features, space.memberProfiles, features, memberProfiles, isDirty]);
 
-  const enableButton = !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
+  useEffect(() => {
+    handleUnsavedChanges(dataChanged);
+
+    return () => {
+      handleUnsavedChanges(false);
+    };
+  }, [dataChanged]);
+
+  usePreventReload(dataChanged);
 
   return (
     <>
@@ -272,34 +297,67 @@ export function SpaceSettings({ space }: { space: Space }) {
                       changeOptionsOrder(draggedProperty as Feature, droppedOnProperty as Feature)
                     }
                   >
-                    <SettingsItem
-                      sx={{ gap: 0 }}
-                      data-test={`settings-feature-item-${id}`}
-                      actions={[
-                        <MenuItem
-                          key='1'
-                          data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
-                          onClick={() => {
-                            setFeatures((prevState) => {
-                              const newState = [...prevState];
-                              const index = newState.findIndex((_feat) => _feat.id === id);
-                              newState[index] = { ...newState[index], isHidden: !newState[index].isHidden };
-                              return [...newState];
-                            });
-                          }}
-                        >
-                          {isHidden ? 'Show' : 'Hide'}
-                        </MenuItem>
-                      ]}
-                      disabled={!isAdmin}
-                      hidden={isHidden}
-                      text={
-                        <Box display='flex' gap={1}>
-                          <PageIcon icon={null} pageType={path} />
-                          {title}
-                        </Box>
-                      }
-                    />
+                    <PopupState variant='popover' popupId='features-rename'>
+                      {(popupState) => (
+                        <>
+                          <SettingsItem
+                            sx={{ gap: 0 }}
+                            data-test={`settings-feature-item-${id}`}
+                            actions={[
+                              <MenuItem
+                                key='1'
+                                data-test={`settings-feature-option-${isHidden ? 'show' : 'hide'}`}
+                                onClick={() => {
+                                  setFeatures((prevState) => {
+                                    const newState = [...prevState];
+                                    const index = newState.findIndex((_feat) => _feat.id === id);
+                                    newState[index] = { ...newState[index], isHidden: !newState[index].isHidden };
+                                    return [...newState];
+                                  });
+                                }}
+                              >
+                                {isHidden ? 'Show' : 'Hide'}
+                              </MenuItem>,
+                              <MenuItem
+                                key='2'
+                                data-test='settings-feature-option-rename'
+                                onClick={(e) => {
+                                  setValueNewTitle('newTitle', title);
+                                  popupState.open(e);
+                                }}
+                              >
+                                Rename
+                              </MenuItem>
+                            ]}
+                            disabled={!isAdmin}
+                            hidden={isHidden}
+                            text={
+                              <Box display='flex' gap={1}>
+                                <PageIcon icon={null} pageType={path} />
+                                {title}
+                              </Box>
+                            }
+                          />
+                          <ModalWithButtons
+                            {...bindPopover(popupState)}
+                            title={`Rename ${title}`}
+                            buttonText='Continue'
+                            disabled={newTitle === '' || newTitle === title}
+                            onConfirm={() => {
+                              setFeatures((prevState) => {
+                                const newState = [...prevState];
+                                const index = newState.findIndex((_feat) => _feat.id === id);
+                                newState[index] = { ...newState[index], title: newTitle };
+                                return [...newState];
+                              });
+                              resetNewTitle();
+                            }}
+                          >
+                            <TextField {...registerNewTitle('newTitle')} fullWidth />
+                          </ModalWithButtons>
+                        </>
+                      )}
+                    </PopupState>
                   </DraggableListItem>
                 );
               })}
@@ -370,7 +428,7 @@ export function SpaceSettings({ space }: { space: Space }) {
                 disableElevation
                 size='large'
                 data-test='submit-space-update'
-                disabled={isMutating || !enableButton}
+                disabled={isMutating || !dataChanged}
                 type='submit'
               >
                 Save
@@ -503,7 +561,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'lens':
       return '/images/logos/lens_logo.svg';
     case 'summon':
-      return '/images/logos/game7_logo.svg';
+      return '/images/logos/summon_dark_mark.svg';
     default:
       return '';
   }

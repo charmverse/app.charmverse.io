@@ -30,7 +30,6 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-
     position: fixed;
     top: 0;
     left: 0;
@@ -72,40 +71,42 @@
       overflow-x: hidden;
     }
 
-    > .banner {
-      background-color: rgba(230, 220, 192, 0.9);
-      text-align: center;
-      padding: 10px;
-      color: #222;
-    }
+    > .dialogSubWrapper {
+      > .banner {
+        background-color: rgba(230, 220, 192, 0.9);
+        text-align: center;
+        padding: 10px;
+        color: #222;
+      }
 
-    > .banner.error {
-      background-color: rgba(230, 192, 192, 0.9);
-    }
+      > .banner.error {
+        background-color: rgba(230, 192, 192, 0.9);
+      }
 
-    > .toolbar {
-      display: flex;
-      flex-direction: row;
-      padding: 16px;
-      justify-content: space-between;
-    }
+      > .toolbar {
+        display: flex;
+        flex-direction: row;
+        padding: 16px;
+        justify-content: space-between;
+      }
 
-    > .content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      > .content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
 
-      @media not screen and (max-width: 975px) {
+        @media not screen and (max-width: 975px) {
+          padding: 10px 126px;
+        }
+
+        @media screen and (max-width: 975px) {
+          padding: 10px;
+        }
+      }
+
+      > .content.fullwidth {
         padding: 10px 126px;
       }
-
-      @media screen and (max-width: 975px) {
-        padding: 10px;
-      }
-    }
-
-    > .content.fullwidth {
-      padding: 10px 126px;
     }
   }
 

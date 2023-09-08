@@ -8,18 +8,23 @@ export function calculateVoteStatus({
   threshold,
   userVotes
 }: {
-  userVotes: Pick<UserVote, 'choice'>[];
+  userVotes: Pick<UserVote, 'choices'>[];
   threshold: Vote['threshold'];
   status: Vote['status'];
   type: Vote['type'];
   deadline: Vote['deadline'];
 }) {
   const userVoteFrequencyRecord = userVotes.reduce<Record<string, number>>((currentFrequencyRecord, userVote) => {
-    if (!currentFrequencyRecord[userVote.choice]) {
-      currentFrequencyRecord[userVote.choice] = 1;
-    } else {
-      currentFrequencyRecord[userVote.choice] += 1;
-    }
+    const choices = userVote.choices;
+
+    choices.forEach((choice) => {
+      if (!currentFrequencyRecord[choice]) {
+        currentFrequencyRecord[choice] = 1;
+      } else {
+        currentFrequencyRecord[choice] += 1;
+      }
+    });
+
     return currentFrequencyRecord;
   }, {});
 

@@ -325,6 +325,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiTooltip: {
         defaultProps: {
           arrow: true,
+          enterDelay: 1000,
           placement: 'top'
         }
       },

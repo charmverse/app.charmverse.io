@@ -1,6 +1,6 @@
 import { Add, Remove } from '@mui/icons-material';
 import { Box, Chip, FormControlLabel, FormGroup, Stack, TextField, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
 import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
@@ -33,7 +33,6 @@ export function WeightedVoting({
   }, [userVotes]);
 
   const voteOptions = snapshotProposal?.choices ?? [];
-  const voteScores = snapshotProposal?.scores ?? [];
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newVoteChoice = { ...voteChoiceRecord };
@@ -56,6 +55,14 @@ export function WeightedVoting({
 
     setVoteChoice(newVoteChoice);
   };
+
+  const totalScore = useMemo(() => {
+    if (voteChoiceRecord) {
+      return Object.values(voteChoiceRecord).reduce((acc, curr) => acc + curr, 0);
+    }
+
+    return 0;
+  }, [voteChoiceRecord]);
 
   return (
     <FormGroup sx={{ gap: 0.5 }}>
@@ -89,7 +96,13 @@ export function WeightedVoting({
               </Button>
 
               <Stack justifyContent='center' alignContent='center' minWidth='45px'>
-                <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOption} />
+                <Typography variant='caption' color='secondary'>
+                  {percent({
+                    value: voteChoiceRecord?.[index + 1] || 0,
+                    total: totalScore,
+                    significantDigits: 1
+                  })}
+                </Typography>
               </Stack>
             </Stack>
           }
@@ -100,15 +113,7 @@ export function WeightedVoting({
                 <Typography>{voteOption}</Typography>
                 {userVotes?.find((v) => v.choice === index + 1) && <Chip color='teal' size='small' label='Voted' />}
               </Stack>
-              <Typography variant='subtitle1' color='secondary'>
-                {!voteScores[index]
-                  ? 'No votes yet'
-                  : percent({
-                      value: voteScores[index],
-                      total: snapshotProposal.scores_total,
-                      significantDigits: 2
-                    })}
-              </Typography>
+              <DisplayChoiceScore snapshotProposal={snapshotProposal} choice={voteOption} />
             </Box>
           }
           disableTypography

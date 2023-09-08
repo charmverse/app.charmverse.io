@@ -4,10 +4,13 @@ import { Box, Menu, Popover, Tooltip } from '@mui/material';
 import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
+import charmClient from 'charmClient';
+import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
@@ -29,6 +32,7 @@ import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
+  currentRootPageId: string; // The current page ID from which this header is being viewed (Could be the database ID, or a page ID if this is an inline database )
   activeBoard?: Board;
   activeView?: BoardView;
   views: BoardView[];
@@ -49,7 +53,7 @@ type Props = {
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
-  toggleViewOptions: (enable?: boolean) => void;
+  toggleViewOptions: (open?: boolean) => void;
 };
 
 function ViewHeader(props: Props) {
@@ -67,11 +71,22 @@ function ViewHeader(props: Props) {
     toggleViewOptions,
     viewsBoard,
     activeBoard,
+    currentRootPageId,
     onClickNewView,
     activeView,
     cards,
     dateDisplayProperty
   } = props;
+
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${activeBoard?.id}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+  useEffect(() => {
+    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+      updateProposalSource({ pageId: currentRootPageId });
+    }
+  }, [currentRootPageId, activeBoard?.id]);
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
@@ -122,7 +137,7 @@ function ViewHeader(props: Props) {
             activeView={activeView}
             views={views}
             showView={showView}
-            onClickIcon={onClickNewView}
+            onClick={onClickNewView}
           />
         </Box>
       )}
@@ -171,40 +186,12 @@ function ViewHeader(props: Props) {
             {/* Sort */}
 
             {withSortBy && (
-              <>
-                <Button
-                  color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
-                  variant='text'
-                  size='small'
-                  sx={{ minWidth: 0 }}
-                  {...bindTrigger(viewSortPopup)}
-                >
-                  <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
-                </Button>
-                <Menu
-                  {...bindMenu(viewSortPopup)}
-                  PaperProps={{
-                    sx: {
-                      overflow: 'visible'
-                    }
-                  }}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
-                  onClick={() => viewSortPopup.close()}
-                >
-                  <ViewHeaderSortMenu
-                    properties={activeBoard?.fields.cardProperties ?? []}
-                    activeView={activeView}
-                    orderedCards={cards}
-                  />
-                </Menu>
-              </>
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
             )}
           </>
         )}
@@ -235,7 +222,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && activeView.fields.sourceType !== 'proposals' && (
+            {!props.readOnlySourceData && activeBoard?.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

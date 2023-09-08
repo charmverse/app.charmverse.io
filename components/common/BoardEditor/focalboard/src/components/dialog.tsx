@@ -4,7 +4,6 @@ import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useIntl } from 'react-intl';
 
 type Props = {
   children: React.ReactNode;
@@ -33,16 +32,18 @@ function FBDialog(props: Props) {
           }}
         >
           <div role='dialog' className={clsx('dialog', { fullWidth })}>
-            <div className='toolbar'>
-              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-              {toolsMenu}
-              {!props.hideCloseButton && (
-                <IconButton size='small' onClick={props.onClose}>
-                  <CloseIcon data-test='close-modal' color='secondary' fontSize='small' />
-                </IconButton>
-              )}
+            <div className='dialogSubWrapper' style={{ height: '100%' }}>
+              <div className='toolbar'>
+                {toolbar && <div className='cardToolbar'>{toolbar}</div>}
+                {toolsMenu}
+                {!props.hideCloseButton && (
+                  <IconButton data-test='close-modal' size='small' onClick={props.onClose}>
+                    <CloseIcon color='secondary' fontSize='small' />
+                  </IconButton>
+                )}
+              </div>
+              {props.children}
             </div>
-            {props.children}
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 
 import { getPagePath } from '../pages';
 
@@ -29,6 +30,8 @@ export type CreateProposalInput = {
   spaceId: string;
   evaluationType?: ProposalEvaluationType;
   rubricCriteria?: RubricDataInput[];
+  publishToLens?: boolean;
+  fields?: ProposalFields;
 };
 
 export type CreatedProposal = {
@@ -45,7 +48,9 @@ export async function createProposal({
   authors,
   reviewers,
   evaluationType,
-  rubricCriteria
+  rubricCriteria,
+  publishToLens,
+  fields
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -76,6 +81,7 @@ export async function createProposal({
         status: proposalStatus,
         category: { connect: { id: categoryId } },
         evaluationType,
+        publishToLens,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))
@@ -90,7 +96,8 @@ export async function createProposal({
                 }))
               }
             }
-          : undefined
+          : undefined,
+        fields
       },
       include: {
         authors: true,
@@ -138,7 +145,7 @@ export async function createProposal({
 
   return {
     page: page as PageWithPermissions,
-    proposal: { ...proposal, rubricCriteria: upsertedCriteria, rubricAnswers: [] },
+    proposal: { ...proposal, rubricCriteria: upsertedCriteria, draftRubricAnswers: [], rubricAnswers: [] },
     workspaceEvent
   };
 }

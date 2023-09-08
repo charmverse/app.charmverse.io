@@ -1,19 +1,31 @@
-import type { ProposalCategory } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-interface ProposalDialogContext {
-  newProposal?: { category: ProposalCategory | null };
+import { ThreadsProvider } from 'hooks/useThreads';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import type { ProposalPropertiesInput } from '../../ProposalProperties/ProposalProperties';
+
+export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  headerImage: string | null;
+  icon: string | null;
+};
+
+type ProposalDialogContext = {
+  newProposal?: Partial<ProposalPageAndPropertiesInput>;
   onClose?: () => void;
   pageId?: string;
-}
+};
 
-interface Context {
+type Context = {
   props: ProposalDialogContext;
-  createProposal: (newProposal: ProposalDialogContext['newProposal']) => void;
+  createProposal: (newProposal?: ProposalDialogContext['newProposal']) => void;
   hideProposal: () => void;
   showProposal: (context: ProposalDialogContext) => void;
-}
+};
 
 const ContextElement = createContext<Readonly<Context>>({
   props: {},
@@ -32,7 +44,7 @@ export function ProposalDialogProvider({ children }: { children: ReactNode }) {
     setProps({});
   }
 
-  function createProposal(newProposal: ProposalDialogContext['newProposal']) {
+  function createProposal(newProposal: ProposalDialogContext['newProposal'] = {}) {
     setProps({ newProposal });
   }
 

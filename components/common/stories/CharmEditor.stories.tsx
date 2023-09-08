@@ -1,9 +1,11 @@
-import { Paper } from '@mui/material';
+import { Divider, Paper } from '@mui/material';
+import { useState } from 'react';
 import { Provider } from 'react-redux';
 
 import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -12,10 +14,12 @@ import {
   contentWithColumnsAndTables,
   contentWithMedia
 } from 'testing/mocks/charmEditorContent';
+import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-function renderEditorWithContent(content: PageContent | undefined) {
+function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
     <CharmEditorComponent
+      allowClickingFooter={true}
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}
@@ -26,7 +30,7 @@ function renderEditorWithContent(content: PageContent | undefined) {
       enableVoting={true}
       pageType='page'
       pagePermissions={undefined}
-      onConnectionError={() => {}}
+      onConnectionEvent={() => {}}
       snapshotProposalId={null}
       onParticipantUpdate={() => {}}
       style={{
@@ -39,7 +43,7 @@ function renderEditorWithContent(content: PageContent | undefined) {
       <PageHeader
         headerImage=''
         icon=''
-        title='Custom page title component'
+        title={title || 'Custom page title component'}
         updatedAt={new Date('2021-10-10T10:10:10.000Z').toISOString()}
         readOnly={false}
         setPage={() => {}}
@@ -73,26 +77,37 @@ export default {
 };
 
 export function FullPageEditor() {
+  const [content, setContent] = useState<PageContent | undefined>(undefined);
+  function onChange(event: ICharmEditorOutput) {
+    setContent(event.doc);
+  }
   return (
-    <CharmEditorComponent
-      placeholderText='Custom placeholder... start typing / to see commands'
-      readOnly={false}
-      autoFocus={true}
-      pageActionDisplay={null}
-      pageId='123'
-      disablePageSpecificFeatures={false}
-      enableSuggestingMode={false}
-      enableVoting={true}
-      pageType='page'
-      pagePermissions={undefined}
-      onConnectionError={() => {}}
-      snapshotProposalId={null}
-      onParticipantUpdate={() => {}}
-      style={{
-        minHeight: '100px'
-      }}
-      disableNestedPages={true}
-    />
+    <>
+      <CharmEditorComponent
+        allowClickingFooter={true}
+        placeholderText='Custom placeholder... start typing / to see commands'
+        readOnly={false}
+        autoFocus={true}
+        pageActionDisplay={null}
+        pageId='123'
+        disablePageSpecificFeatures={false}
+        enableSuggestingMode={false}
+        enableVoting={true}
+        pageType='page'
+        pagePermissions={undefined}
+        onContentChange={onChange}
+        onConnectionEvent={() => {}}
+        snapshotProposalId={null}
+        onParticipantUpdate={() => {}}
+        style={{
+          minHeight: '100px'
+        }}
+        disableNestedPages={true}
+      />
+      <Divider />
+      <h3>Document JSON:</h3>
+      <pre style={{ fontSize: 10 }}>{JSON.stringify(content, null, 2)}</pre>
+    </>
   );
 }
 
@@ -113,13 +128,23 @@ export function InlineEditor() {
 }
 
 export function EditorWithContent() {
-  return renderEditorWithContent(contentWithBlocksAndMarks);
+  return renderEditorWithContent({ content: contentWithBlocksAndMarks });
 }
 
-export function ColumnLayout() {
-  return renderEditorWithContent(contentWithColumnsAndTables);
+export function LayoutColumnComponent() {
+  return renderEditorWithContent({ content: contentWithColumnsAndTables });
+}
+
+export function LayoutTableComponent() {
+  const content = jsonDoc(
+    _.table(
+      _.table_row(_.table_header(_.p('Header 1')), _.table_header(_.p('Header 2'))),
+      _.table_row(_.table_cell(_.p('Cell 1')), _.table_cell(_.p('Cell 2')))
+    )
+  );
+  return renderEditorWithContent({ content, title: 'Table component' });
 }
 
 export function EditorWithMedia() {
-  return renderEditorWithContent(contentWithMedia);
+  return renderEditorWithContent({ content: contentWithMedia });
 }

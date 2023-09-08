@@ -11,10 +11,10 @@ import { authOnConnect } from './authentication';
 import { config } from './config';
 import { docRooms } from './documentEvents/docRooms';
 import { DocumentEventHandler } from './documentEvents/documentEvents';
-import type { ServerMessage } from './interfaces';
+import type { AbstractWebsocketBroadcaster, ServerMessage } from './interfaces';
 import { SpaceEventHandler } from './spaceEvents';
 
-export class WebsocketBroadcaster {
+export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
   sockets: Record<string, Socket> = {};
 
   // Server will be set after the first request
@@ -45,7 +45,7 @@ export class WebsocketBroadcaster {
 
     // Define listeners
     io.on('connect', (socket) => {
-      new SpaceEventHandler(socket, docRooms).init();
+      new SpaceEventHandler(this, socket, docRooms).init();
 
       // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
       // so we only need to keep track of the number of clients connected to the root namespace
@@ -67,7 +67,7 @@ export class WebsocketBroadcaster {
       .use(authOnConnect)
       .on('connect', (socket) => {
         log.debug('[ws] Web socket namespace /editor connected', { socketId: socket.id, userId: socket.data.user.id });
-        new DocumentEventHandler(socket, docRooms).init();
+        new DocumentEventHandler(this, socket, docRooms).init();
       });
   }
 

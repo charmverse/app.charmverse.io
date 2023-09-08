@@ -1,6 +1,6 @@
 import type { ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { CloseOutlined as DeleteIcon } from '@mui/icons-material';
+import { CloseOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
+import ReactDndProvider from 'components/common/ReactDndProvider';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { getNumberFromString } from 'lib/utilities/numbers';
 
@@ -21,6 +23,7 @@ export type RangeProposalCriteria = {
 
 type Props = {
   readOnly?: boolean;
+  readOnlyMessage?: string;
   proposalStatus?: ProposalStatus;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
@@ -28,18 +31,38 @@ type Props = {
 };
 
 export const CriteriaRow = styled(Box)`
-  .show-on-hover {
-    opacity: 0;
-    transform: opacity 0.2s ease-in-out;
+  position: relative;
+
+  ${({ theme }) => theme.breakpoints.up('xs')} {
+    flex-direction: column;
   }
-  &:hover {
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
+  }
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
-      opacity: 1;
+      opacity: 0;
+      transform: opacity 0.2s ease-in-out;
     }
-    .octo-propertyvalue:not(.readonly) {
-      background-color: var(--mui-action-hover);
+    &:hover {
+      .show-on-hover {
+        opacity: 1;
+      }
+      .octo-propertyvalue:not(.readonly) {
+        background-color: var(--mui-action-hover);
+      }
     }
   }
+
+  .drag-indicator {
+    cursor: grab;
+    margin-top: 7px;
+    margin-left: -20px;
+    position: absolute;
+  }
+
   .to-pseudo-element {
     position: relative;
   }
@@ -53,7 +76,14 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposalStatus, answers }: Props) {
+export function ProposalRubricCriteriaInput({
+  readOnly,
+  readOnlyMessage,
+  value,
+  onChange,
+  proposalStatus,
+  answers
+}: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
@@ -101,37 +131,8 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
   }
 
   useEffect(() => {
-    // console.log('set criteria since value changed', value);
     setCriteriaList(value);
   }, [value]);
-
-  useEffect(() => {
-    function upHandler(event: KeyboardEvent) {
-      const criteriaId = (event.target as HTMLElement)?.dataset.criteria;
-      const criteria = criteriaList.find((c) => c.id === criteriaId);
-      const parameterType = (event.target as HTMLElement)?.dataset.parameterType as 'min' | 'max';
-      if (criteria && event.key === 'ArrowUp') {
-        const newValue = (criteria.parameters[parameterType] || 0) + 1;
-        const parameters = {
-          ...criteria.parameters,
-          [parameterType]: newValue
-        };
-        setCriteriaProperty(criteria.id, { parameters });
-      } else if (criteria && event.key === 'ArrowDown') {
-        const newValue = (criteria.parameters[parameterType] || 0) - 1;
-        const parameters = {
-          ...criteria.parameters,
-          [parameterType]: newValue
-        };
-        setCriteriaProperty(criteria.id, { parameters });
-      }
-    }
-    window.addEventListener('keyup', upHandler);
-
-    return () => {
-      window.removeEventListener('keyup', upHandler);
-    };
-  }, [criteriaList]);
 
   function handleClickDelete(criteriaId: string) {
     if (proposalStatus === 'evaluation_active') {
@@ -140,12 +141,29 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
       deleteCriteria(criteriaId);
     }
   }
+  async function changeOptionsOrder(draggedProperty: string, droppedOnProperty: string) {
+    const newOrder = [...criteriaList];
+    const propIndex = newOrder.findIndex((val) => val.id === draggedProperty); // find the property that was dragged
+    const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
+    const droppedOnIndex = newOrder.findIndex((val) => val.id === droppedOnProperty); // find the index of the space that was dropped on
+    const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
+    newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
+    setCriteriaList(newOrder);
+  }
 
   return (
-    <>
+    <ReactDndProvider>
       {criteriaList.map((criteria) => (
-        <Box key={criteria.id} display='flex' flexDirection='column'>
+        <DraggableListItem
+          key={criteria.id}
+          name='rubric-option'
+          itemId={criteria.id}
+          changeOrderHandler={changeOptionsOrder}
+        >
           <CriteriaRow display='flex' alignItems='flex-start' gap={1} mb={1}>
+            <div className='drag-indicator show-on-hover'>
+              <DragIndicator color='secondary' fontSize='small' />
+            </div>
             <TextInput
               inputProps={{ autoFocus: true }}
               displayType='details'
@@ -153,36 +171,30 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
               onChange={(title) => setCriteriaProperty(criteria.id, { title })}
               placeholderText='Add a label...'
               readOnly={readOnly}
+              readOnlyMessage={readOnlyMessage}
               value={criteria.title}
             />
-            <Box maxHeight='3em'>
-              <TextInput
-                multiline={false}
-                onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-                placeholderText='Add a description...'
-                readOnly={readOnly}
-                sx={{ flexGrow: 1, width: '100%' }}
-                value={criteria.description ?? ''}
-              />
-            </Box>
+            <TextInput
+              displayType='details'
+              multiline={true}
+              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
+              placeholderText='Add a description...'
+              readOnly={readOnly}
+              sx={{ flexGrow: 1, width: '100%' }}
+              value={criteria.description ?? ''}
+            />
             <Box display='flex' gap={1} alignItems='flex-start'>
               <Grid container width={90} spacing={1}>
                 <Grid xs item>
                   <div>
                     <IntegerInput
-                      // store props on DOM for keyboard events
-                      inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'min'
-                      }}
                       onChange={(min) => {
-                        if (min !== null) {
-                          setCriteriaProperty(criteria.id, {
-                            parameters: { ...criteria.parameters, min }
-                          });
-                        }
+                        setCriteriaProperty(criteria.id, {
+                          parameters: { ...criteria.parameters, min }
+                        });
                       }}
                       readOnly={readOnly}
+                      readOnlyMessage={readOnlyMessage}
                       value={criteria.parameters.min}
                     />
                     <Typography
@@ -199,20 +211,16 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
                 <Grid xs item>
                   <div className='to-pseudo-element'>
                     <IntegerInput
-                      // store props on DOM for keyboard events
                       inputProps={{
-                        'data-criteria': criteria.id,
-                        'data-parameter-type': 'max',
                         min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
                       }}
                       onChange={(max) => {
-                        if (max !== null) {
-                          setCriteriaProperty(criteria.id, {
-                            parameters: { ...criteria.parameters, max }
-                          });
-                        }
+                        setCriteriaProperty(criteria.id, {
+                          parameters: { ...criteria.parameters, max }
+                        });
                       }}
                       readOnly={readOnly}
+                      readOnlyMessage={readOnlyMessage}
                       value={criteria.parameters.max}
                     />
                     <Typography
@@ -229,16 +237,20 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
               </Grid>
             </Box>
             {!readOnly && (
-              <div className='show-on-hover delete-icon'>
+              <Box
+                className='show-on-hover delete-icon'
+                position={{ xs: 'absolute', sm: 'relative' }}
+                right={{ xs: -25, sm: 0 }}
+              >
                 <Tooltip title='Delete'>
                   <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
                     <DeleteIcon color='secondary' fontSize='small' />
                   </IconButton>
                 </Tooltip>
-              </div>
+              </Box>
             )}
           </CriteriaRow>
-        </Box>
+        </DraggableListItem>
       ))}
       {!readOnly && (
         <ConfirmDeleteModal
@@ -257,13 +269,14 @@ export function ProposalRubricCriteriaInput({ readOnly, value, onChange, proposa
           + Add a criteria
         </AddAPropertyButton>
       )}
-    </>
+    </ReactDndProvider>
   );
 }
 export function IntegerInput({
   value,
   onChange,
   readOnly,
+  readOnlyMessage,
   inputProps,
   maxWidth,
   sx
@@ -271,6 +284,7 @@ export function IntegerInput({
   value?: number | string | null;
   onChange: (num: number | null) => void;
   readOnly?: boolean;
+  readOnlyMessage?: string;
   inputProps?: any;
   maxWidth?: number;
   sx?: any;
@@ -279,10 +293,10 @@ export function IntegerInput({
     <TextInput
       displayType='details'
       fullWidth={!maxWidth}
-      // store props on DOM for keyboard events
-      inputProps={inputProps}
+      inputProps={{ type: 'number', ...inputProps }}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
+      readOnlyMessage={readOnlyMessage}
       sx={{
         input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
         ...sx

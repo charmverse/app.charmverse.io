@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import charmClient from 'charmClient';
+import { useCreatePermissions } from 'charmClient/hooks/permissions';
 import { Button } from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
@@ -48,6 +48,7 @@ export default function AddPagePermissionsForm({
 
   const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
   const { showMessage } = useSnackbar();
+  const { trigger: createPermission } = useCreatePermissions();
 
   const [permissionLevelToAssign, setPermissionLevelToAssign] = useState<ApplicablePagePermissionLevel>('full_access');
 
@@ -125,7 +126,7 @@ export default function AddPagePermissionsForm({
         total
       });
 
-      await charmClient.createPermission(permissions[0]);
+      await createPermission(permissions[0]);
 
       permissions.shift();
 

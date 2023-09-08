@@ -18,7 +18,8 @@ const vote: Vote = {
   type: 'Approval',
   context: 'proposal',
   content: null,
-  contentText: ''
+  contentText: '',
+  maxChoices: 1
 };
 
 describe('voting status', () => {

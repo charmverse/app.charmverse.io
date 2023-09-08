@@ -12,7 +12,7 @@ import type { Board } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import { createTableView } from 'lib/focalboard/table';
+import { createTableView } from 'lib/focalboard/tableView';
 import type { PageCreated } from 'lib/websockets/interfaces';
 
 import { getPagePath } from './utils';
@@ -120,7 +120,7 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   board.id = boardId;
   board.rootId = board.id;
 
-  const view = createTableView({ board, views: [] });
+  const view = createTableView({ board });
 
   return {
     board,

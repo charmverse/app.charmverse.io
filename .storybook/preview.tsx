@@ -3,11 +3,9 @@ import React from 'react';
 import '../theme/styles.scss';
 import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import { IntlProvider } from 'react-intl';
+import ReactDndProvider from '../components/common/ReactDndProvider';
 
-import '@skiff-org/prosemirror-tables/style/table-filters.css';
-import '@skiff-org/prosemirror-tables/style/table-headers.css';
-import '@skiff-org/prosemirror-tables/style/table-popup.css';
-import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
@@ -131,6 +129,7 @@ export const globalTypes = {
   }
 };
 
+
 export const withMuiTheme = (Story, context) => {
   return (
     <AppThemeProvider forceTheme={context.globals.theme}>
@@ -139,4 +138,14 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-export const decorators = [withMuiTheme];
+export const globalProviders = (Story, context) => {
+  return (
+    <IntlProvider locale='en'>
+      <ReactDndProvider>
+        <Story />
+      </ReactDndProvider>
+    </IntlProvider>
+  );
+};
+
+export const decorators = [withMuiTheme, globalProviders];

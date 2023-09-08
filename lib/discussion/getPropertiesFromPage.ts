@@ -1,9 +1,8 @@
 import type { Page } from '@charmverse/core/prisma';
 
-export function getPropertiesFromPage(
-  page: Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>,
-  space: { domain: string; name: string }
-) {
+export type DiscussionPropertiesFromPage = Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>;
+
+export function getPropertiesFromPage(page: DiscussionPropertiesFromPage, space: { domain: string; name: string }) {
   return {
     pageId: page.id,
     spaceId: page.spaceId,

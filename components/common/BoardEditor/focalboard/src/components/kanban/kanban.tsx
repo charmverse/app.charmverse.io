@@ -15,7 +15,7 @@ import type { Card } from 'lib/focalboard/card';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
-import { typeDisplayName } from '../../widgets/propertyMenu';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
 import KanbanColumnHeader from './kanbanColumnHeader';

@@ -23,7 +23,7 @@ type IContext = {
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
   createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
-  castVote: (voteId: string, option: string) => Promise<UserVote>;
+  castVote: (voteId: string, choices: string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
@@ -167,23 +167,37 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  async function castVote(voteId: string, choice: string) {
-    const userVote = await charmClient.votes.castVote(voteId, choice);
+  async function castVote(voteId: string, choices: string[]) {
+    const userVote = await charmClient.votes.castVote(voteId, choices);
+
     setVotes((_votes) => {
-      const vote = _votes[voteId];
+      const vote = { ..._votes[voteId] };
       if (vote && user) {
         const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
-        if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+        if (currentChoice?.length) {
+          // Remove previous choices
+          currentChoice.forEach((c) => {
+            vote.aggregatedResult[c] -= 1;
+          });
         } else {
           vote.totalVotes += 1;
         }
-        vote.aggregatedResult[choice] += 1;
-        _votes[voteId] = {
-          ...vote
-        };
+
+        vote.userChoice = choices;
+
+        if (choices.length > 0) {
+          // Add new choices
+          choices.forEach((c) => {
+            vote.aggregatedResult[c] += 1;
+          });
+        } else if (currentChoice && currentChoice.length) {
+          // User deselected all previous choices
+          vote.totalVotes = vote.totalVotes > 0 ? vote.totalVotes - 1 : 0;
+        }
+
+        _votes[voteId] = vote;
       }
+
       return { ..._votes };
     });
     removeVoteFromTask(voteId);

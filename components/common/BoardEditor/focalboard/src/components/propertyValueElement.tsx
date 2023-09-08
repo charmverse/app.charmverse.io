@@ -17,7 +17,8 @@ import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilitie
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../components/properties/TextInput';
-import mutator from '../mutator';
+import type { Mutator } from '../mutator';
+import defaultMutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Switch from '../widgets/switch';
 
@@ -41,6 +42,7 @@ type Props = {
   showTooltip?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
+  mutator?: Mutator;
 };
 
 /**
@@ -65,7 +67,8 @@ function PropertyValueElement(props: Props) {
     board,
     updatedBy,
     updatedAt,
-    displayType
+    displayType,
+    mutator = defaultMutator
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
@@ -78,9 +81,14 @@ function PropertyValueElement(props: Props) {
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
-  const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
-    date: formatDate,
-    dateTime: formatDateTime
+  const displayValue = OctoUtils.propertyDisplayValue({
+    block: card,
+    propertyValue,
+    propertyTemplate,
+    formatters: {
+      date: formatDate,
+      dateTime: formatDateTime
+    }
   });
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
@@ -131,10 +139,12 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
     propertyTemplate.type === 'proposalCategory' ||
-    propertyTemplate.type === 'proposalStatus'
+    propertyTemplate.type === 'proposalStatus' ||
+    propertyTemplate.type === 'proposalEvaluationType'
   ) {
     propertyValueElement = (
       <TagSelect
+        data-test='closed-select-input'
         canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
         multiselect={propertyTemplate.type === 'multiSelect'}
@@ -160,7 +170,12 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.type === 'person' || propertyTemplate.type === 'proposalEvaluatedBy') {
+  } else if (
+    propertyTemplate.type === 'person' ||
+    propertyTemplate.type === 'proposalEvaluatedBy' ||
+    propertyTemplate.type === 'proposalAuthor' ||
+    propertyTemplate.type === 'proposalReviewer'
+  ) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
@@ -168,7 +183,7 @@ function PropertyValueElement(props: Props) {
         readOnly={
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
-          propertyTemplate.type === 'proposalEvaluatedBy'
+          proposalPropertyTypesList.includes(propertyTemplate.type as any)
         }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);

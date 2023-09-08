@@ -1,7 +1,8 @@
+import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import type { IAppWindow } from 'components/common/BoardEditor/focalboard/src/types';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
@@ -9,17 +10,15 @@ import { Constants } from '../src/constants';
 
 declare let window: IAppWindow;
 
-class CsvExporter {
-  static exportTableCsv(
+export const CsvExporter = {
+  exportTableCsv(
     board: Board,
     view: BoardView,
     cards: Card[],
-    formatter: {
-      date: (date: Date | string) => string;
-      dateTime: (date: Date | string) => string;
-    }
+    formatters: Formatters,
+    context: PropertyContext
   ): string {
-    const rows = CsvExporter.generateTableArray(board, cards, view, formatter);
+    const rows = generateTableArray(board, cards, view, formatters, context);
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     rows.forEach((row) => {
@@ -48,73 +47,103 @@ class CsvExporter {
 
     return csvContent;
   }
+};
 
-  private static encodeText(text: string): string {
-    return text.replace(/"/g, '""');
-  }
-
-  private static generateTableArray(
-    board: Board,
-    cards: Card[],
-    viewToExport: BoardView,
-    formatter: {
-      date: (date: Date | string) => string;
-      dateTime: (date: Date | string) => string;
-    }
-  ): string[][] {
-    const rows: string[][] = [];
-    const visibleProperties = board.fields.cardProperties.filter(
-      (template: IPropertyTemplate) =>
-        template.id === Constants.titleColumnId || viewToExport.fields.visiblePropertyIds.includes(template.id)
-    );
-
-    if (
-      viewToExport.fields.viewType === 'calendar' &&
-      viewToExport.fields.dateDisplayPropertyId &&
-      !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)
-    ) {
-      const dateDisplay = board.fields.cardProperties.find(
-        (template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id
-      );
-      if (dateDisplay) {
-        visibleProperties.push(dateDisplay);
-      }
-    }
-
-    const titleProperty = visibleProperties.find((visibleProperty) => visibleProperty.id === Constants.titleColumnId);
-    // Header row
-    const row: string[] = titleProperty ? [] : ['Title'];
-    visibleProperties.forEach((template: IPropertyTemplate) => {
-      row.push(template.name);
-    });
-    rows.push(row);
-
-    cards.forEach((card) => {
-      const _row: string[] = [];
-      if (!titleProperty) {
-        _row.push(`"${this.encodeText(card.title)}"`);
-      }
-      visibleProperties.forEach((template: IPropertyTemplate) => {
-        const propertyValue = card.fields.properties[template.id];
-        const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, formatter) || '') as string;
-        if (template.id === Constants.titleColumnId) {
-          _row.push(`"${this.encodeText(card.title)}"`);
-        } else if (template.type === 'number') {
-          const numericValue = propertyValue ? Number(propertyValue).toString() : '';
-          _row.push(numericValue);
-        } else if (template.type === 'multiSelect' || template.type === 'person') {
-          const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
-          _row.push(multiSelectValue);
-        } else {
-          // Export as string
-          _row.push(`"${this.encodeText(displayValue)}"`);
-        }
-      });
-      rows.push(_row);
-    });
-
-    return rows;
-  }
+function encodeText(text: string): string {
+  return text.replace(/"/g, '""');
 }
 
-export { CsvExporter };
+function generateTableArray(
+  board: Board,
+  cards: Card[],
+  viewToExport: BoardView,
+  formatters: Formatters,
+  context: PropertyContext
+): string[][] {
+  const rows: string[][] = [];
+  const visibleProperties = board.fields.cardProperties.filter(
+    (template: IPropertyTemplate) =>
+      template.id === Constants.titleColumnId || viewToExport.fields.visiblePropertyIds.includes(template.id)
+  );
+
+  if (
+    viewToExport.fields.viewType === 'calendar' &&
+    viewToExport.fields.dateDisplayPropertyId &&
+    !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)
+  ) {
+    const dateDisplay = board.fields.cardProperties.find(
+      (template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id
+    );
+    if (dateDisplay) {
+      visibleProperties.push(dateDisplay);
+    }
+  }
+
+  const titleProperty = visibleProperties.find((visibleProperty) => visibleProperty.id === Constants.titleColumnId);
+  // Header row
+  const row: string[] = titleProperty ? [] : ['Title'];
+  visibleProperties.forEach((template: IPropertyTemplate) => {
+    row.push(template.name);
+  });
+  rows.push(row);
+
+  cards.forEach((card) => {
+    const rowColumns = getCSVColumns({
+      card,
+      context,
+      formatters,
+      hasTitleProperty: !!titleProperty,
+      visibleProperties
+    });
+    rows.push(rowColumns);
+  });
+
+  return rows;
+}
+
+export function getCSVColumns({
+  card,
+  context,
+  formatters,
+  hasTitleProperty,
+  visibleProperties
+}: {
+  card: Card;
+  context: PropertyContext;
+  formatters: Formatters;
+  hasTitleProperty: boolean;
+  visibleProperties: IPropertyTemplate<PropertyType>[];
+}) {
+  const columns: string[] = [];
+  if (!hasTitleProperty) {
+    columns.push(`"${encodeText(card.title)}"`);
+  }
+  visibleProperties.forEach((propertyTemplate: IPropertyTemplate) => {
+    const propertyValue = card.fields.properties[propertyTemplate.id];
+    const displayValue =
+      OctoUtils.propertyDisplayValue({ block: card, context, propertyValue, propertyTemplate, formatters }) || '';
+    if (propertyTemplate.id === Constants.titleColumnId) {
+      columns.push(`"${encodeText(card.title)}"`);
+    } else if (
+      propertyTemplate.type === 'number' ||
+      propertyTemplate.type === 'proposalEvaluationAverage' ||
+      propertyTemplate.type === 'proposalEvaluationTotal'
+    ) {
+      const numericValue = propertyValue ? Number(propertyValue).toString() : '';
+      columns.push(numericValue);
+    } else if (
+      propertyTemplate.type === 'multiSelect' ||
+      propertyTemplate.type === 'person' ||
+      propertyTemplate.type === 'proposalEvaluatedBy' ||
+      propertyTemplate.type === 'proposalAuthor' ||
+      propertyTemplate.type === 'proposalReviewer'
+    ) {
+      const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
+      columns.push(multiSelectValue);
+    } else {
+      // Export as string
+      columns.push(`"${encodeText(displayValue as string)}"`);
+    }
+  });
+  return columns;
+}

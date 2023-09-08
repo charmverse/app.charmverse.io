@@ -2,7 +2,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Head from 'next/head';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
@@ -11,11 +11,11 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import { Button } from 'components/common/Button';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
+import { AppBar } from 'components/common/PageLayout/components/AppBar';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
 import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
-import { StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
+import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
-import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -97,7 +97,7 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
               )}
 
               <Button
-                startIcon={<LogoImage width={32} height={32} src={logo} />}
+                startIcon={<LogoImage width={32} height={32} src={logo} alt='' />}
                 variant='text'
                 color='inherit'
                 href='/'

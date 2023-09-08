@@ -1,14 +1,25 @@
+import type { Feature } from '@charmverse/core/dist/cjs/prisma-client';
 import { useMemo } from 'react';
 
-import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { FeatureJson, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { MemberProfileJson } from 'lib/profile/memberProfiles';
 import { memberProfileLabels, memberProfileNames } from 'lib/profile/memberProfiles';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 
+type MappedFeatures = Record<
+  Feature,
+  {
+    id: Feature;
+    isHidden: boolean;
+    title: string;
+    path: StaticPagesType;
+  }
+>;
+
 export const useFeaturesAndMembers = () => {
-  const { space } = useCurrentSpace();
+  const { space, isLoading } = useCurrentSpace();
 
   const features = useMemo(() => {
     const dbFeatures = Object.fromEntries(((space?.features || []) as FeatureJson[]).map((_feat) => [_feat.id, _feat]));
@@ -22,7 +33,8 @@ export const useFeaturesAndMembers = () => {
     const extendedFeatures = sortedFeatures.map(({ feature, ...restFeat }) => ({
       ...restFeat,
       id: feature,
-      isHidden: !!dbFeatures[feature]?.isHidden
+      isHidden: !!dbFeatures[feature]?.isHidden,
+      title: dbFeatures[feature]?.title || restFeat.title
     }));
 
     return extendedFeatures;
@@ -43,8 +55,16 @@ export const useFeaturesAndMembers = () => {
       ...feat,
       isHidden: !!dbMemberProfiles[feat.id]?.isHidden
     }));
+
     return extendedMemberProfiles;
   }, [space?.memberProfiles]);
 
-  return { features, memberProfiles };
+  const mappedFeatures = useMemo(() => {
+    return features.reduce((acc, val) => {
+      acc[val.id] = val;
+      return acc;
+    }, {} as MappedFeatures);
+  }, [features]);
+
+  return { features, memberProfiles, mappedFeatures, isLoading };
 };

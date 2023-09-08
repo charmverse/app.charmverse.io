@@ -1,5 +1,5 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
-import { Fragment, setBlockType } from '@bangle.dev/pm';
+import { Fragment, setBlockType, findWrapping } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PageType } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
@@ -420,32 +420,26 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-            const { $from, $to } = _state.selection;
-            const isMultiNode = !$from.sameParent($to);
-            const from = $from.start();
-            const to = $to.end();
-            const isEmptySelection = from === to;
-            // if the selection spans across multi nodes then use the exact from and to position
-            // Otherwise use the start and end position of the whole node
-            const textContent = !isEmptySelection
-              ? _state.doc.textBetween(isMultiNode ? $from.pos : from, isMultiNode ? $to.pos : to)
-              : null;
-            const node = _state.schema.nodes.blockquote.create(
+            const { $from } = _state.selection;
+            const nodeType = _state.schema.nodes.blockquote;
+            const isEmptySelection = _state.selection.empty;
+            const node = nodeType.create(
               undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.paragraph.create(
-                  undefined,
-                  Fragment.fromArray(textContent ? [state.schema.text(textContent)] : [])
-                )
-              ])
+              Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
             );
 
             if (_dispatch) {
               const tr = _state.tr;
-              if (isMultiNode || isEmptySelection) {
-                tr.replaceSelectionWith(node);
+              let wrapping: ReturnType<typeof findWrapping> = null;
+              const range = $from.blockRange();
+              // if selection is not empty, try to wrap the node(s) with a callout instead of creating a new node
+              if (!isEmptySelection) {
+                wrapping = range && findWrapping(range, nodeType);
+              }
+              if (wrapping) {
+                tr.wrap(range!, wrapping);
               } else {
-                tr.replaceWith(from - 1, to, node);
+                tr.replaceSelectionWith(node);
               }
               // move cursor to block
               const offset = tr.selection.$head.end(1); // param 1 is node deep

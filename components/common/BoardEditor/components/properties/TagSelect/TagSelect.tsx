@@ -90,6 +90,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 
 type Props = {
   readOnly?: boolean;
+  readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
   noOptionsText?: string;
@@ -101,10 +102,12 @@ type Props = {
   onUpdateOption?: (option: IPropertyOption) => void;
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
+  'data-test'?: string;
 };
 
 export function TagSelect({
   readOnly,
+  readOnlyMessage,
   canEditOptions = false,
   options,
   propertyValue,
@@ -115,7 +118,8 @@ export function TagSelect({
   onCreateOption,
   displayType = 'details',
   noOptionsText,
-  wrapColumn
+  wrapColumn,
+  'data-test': dataTest
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -166,9 +170,10 @@ export function TagSelect({
   }
   if (!isOpened) {
     return (
-      <SelectPreviewContainer onClick={onEdit} displayType={displayType} readOnly={readOnly}>
+      <SelectPreviewContainer data-test={dataTest} onClick={onEdit} displayType={displayType} readOnly={readOnly}>
         <SelectPreview
           readOnly={readOnly}
+          readOnlyMessage={readOnlyMessage}
           sx={{ height: '100%' }}
           wrapColumn={wrapColumn}
           value={selectValue}
@@ -182,6 +187,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
+      data-test={dataTest}
       canEditOptions={canEditOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}

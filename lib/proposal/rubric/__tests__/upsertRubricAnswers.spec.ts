@@ -4,6 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
+import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
+
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -39,33 +41,18 @@ describe('upsertRubricAnswers', () => {
     scoreCriteria = criteria.find((c) => c.title === 'score') as ProposalRubricCriteriaWithTypedParams;
   });
 
-  it('should insert new answers and return them', async () => {
+  it('should update existing answers and return them, removing non-referenced answers', async () => {
     const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
-    const answers = await upsertRubricAnswers({
-      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'my opinion' }],
-      userId: evaluator.id,
-      proposalId: proposal.id
-    });
-
-    expect(answers[0]).toMatchObject<ProposalRubricCriteriaAnswerWithTypedResponse>({
-      proposalId: proposal.id,
-      rubricCriteriaId: scoreCriteria.id,
-      userId: evaluator.id,
-      comment: 'my opinion',
-      response: {
-        score: 7
-      }
-    });
-  });
-
-  it('should update existing answers and return them, leaving non-referenced answers unchanged and returning the modified answers', async () => {
-    const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
-
-    const firstSet = await upsertRubricAnswers({
+    await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
       userId: evaluator.id,
       proposalId: proposal.id
+    });
+
+    const firstSet = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id
     });
 
     expect(firstSet).toHaveLength(1);
@@ -73,10 +60,15 @@ describe('upsertRubricAnswers', () => {
     expect(firstSet[0].rubricCriteriaId).toEqual(scoreCriteria.id);
     expect(firstSet[0].comment).toEqual('first');
 
-    const firstSetUpdated = await upsertRubricAnswers({
+    await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 6 }, comment: 'second' }],
       userId: evaluator.id,
       proposalId: proposal.id
+    });
+
+    const firstSetUpdated = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id
     });
 
     expect(firstSetUpdated).toHaveLength(1);
@@ -84,24 +76,19 @@ describe('upsertRubricAnswers', () => {
     expect(firstSetUpdated[0].rubricCriteriaId).toEqual(scoreCriteria.id);
     expect(firstSetUpdated[0].comment).toEqual('second');
 
-    const secondSet = await upsertRubricAnswers({
+    await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: vibeCriteria.id, response: { score: 7 } }],
       userId: evaluator.id,
       proposalId: proposal.id
     });
 
-    expect(secondSet).toHaveLength(1);
-    expect(secondSet[0].rubricCriteriaId).toEqual(vibeCriteria.id);
-
-    const updatedAnswers = await prisma.proposalRubricCriteriaAnswer.findMany({
-      where: {
-        proposalId: proposal.id,
-        userId: evaluator.id
-      }
+    const secondSet = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id
     });
 
-    // Make sure we didn't delete any answers
-    expect(updatedAnswers).toHaveLength(2);
+    expect(secondSet).toHaveLength(1);
+    expect(secondSet[0].rubricCriteriaId).toEqual(vibeCriteria.id);
   });
 
   it('should throw an error if some answers are for rubric criteria in a different proposal', async () => {
@@ -149,4 +136,48 @@ describe('upsertRubricAnswers', () => {
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
+
+  it('should save draft rubric criteria', async () => {
+    const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+
+    await upsertRubricAnswers({
+      answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
+      userId: evaluator.id,
+      proposalId: proposal.id,
+      isDraft: true
+    });
+
+    const firstSet = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id
+    });
+
+    expect(firstSet).toHaveLength(0);
+
+    const draftAnswers = await getResponses({
+      proposalId: proposal.id,
+      userId: evaluator.id,
+      isDraft: true
+    });
+
+    expect(draftAnswers).toHaveLength(1);
+  });
 });
+
+async function getResponses({
+  proposalId,
+  userId,
+  isDraft
+}: {
+  proposalId: string;
+  userId: string;
+  isDraft?: boolean;
+}): Promise<ProposalRubricCriteriaAnswerWithTypedResponse[]> {
+  const answers = await getAnswersTable({ isDraft }).findMany({
+    where: {
+      proposalId,
+      userId
+    }
+  });
+  return answers as ProposalRubricCriteriaAnswerWithTypedResponse[];
+}

@@ -7,7 +7,7 @@ import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
-import type { RefObject } from 'react';
+import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 import { mutate } from 'swr';
@@ -20,9 +20,11 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
+import type { ConnectionEvent } from '../../fiduswriter/ws';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
@@ -50,7 +52,8 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
   initialContent?: any;
   enableComments?: boolean;
-  onConnectionError?: (error: Error) => void;
+  onConnectionEvent?: (event: ConnectionEvent) => void;
+  allowClickingFooter?: boolean;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -73,7 +76,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     onParticipantUpdate = () => {},
     readOnly = false,
     enableComments = true,
-    onConnectionError
+    onConnectionEvent,
+    allowClickingFooter
   },
   ref
 ) {
@@ -117,20 +121,30 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function _onError(_editor: CoreBangleEditor, error: Error) {
-    if (onConnectionError) {
-      onConnectionError(error);
-    } else {
+  function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
+    if (onConnectionEvent) {
+      onConnectionEvent(event);
+    } else if (event.type === 'error') {
       // for now, just use a standard error message to be over-cautious
-      showMessage(error.message, 'warning');
+      showMessage(event.error.message, 'warning');
     }
-    log.error('[ws/ceditor]: Error message displayed to user', {
-      pageId,
-      error
-    });
-    if (isLoadingRef.current) {
-      isLoadingRef.current = false;
-      setEditorContent(_editor, initialContent);
+    if (event.type === 'error') {
+      log.error('[ws/ceditor]: Error message displayed to user', {
+        pageId,
+        error: event.error
+      });
+      if (isLoadingRef.current) {
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
+      }
+    }
+  }
+
+  function onClickEditorBottom(event: MouseEvent) {
+    if (editor && !readOnly) {
+      event.preventDefault();
+      // insert new line
+      insertAndFocusLineAtEndofDoc(editor.view);
     }
   }
 
@@ -191,7 +205,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, (error) => _onError(_editor, error));
+        fEditor.init(_editor.view, authResponse.authToken, (event) => _onConnectionEvent(_editor, event));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
         isLoadingRef.current = false;
@@ -223,16 +237,18 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       {editor ? children : null}
       <div
         ref={editorRef}
-        className='bangle-editor-core'
+        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
         data-page-id={pageId}
         style={{
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
           cursor: readOnly ? 'default' : 'text'
         }}
-        // onClick={() => !readOnly && editor?.view.focus()}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
+        {allowClickingFooter && (
+          <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
+        )}
       </div>
       {nodeViews.map((nodeView) => {
         return nodeView.containerDOM

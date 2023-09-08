@@ -12,9 +12,9 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
+import { LoginButton } from './components/LoginButton';
+import { LoginErrorModal } from './components/LoginErrorModal';
 import { Container } from './components/LoginLayout';
-import { LoginButton } from './LoginButton';
-import { LoginErrorModal } from './LoginErrorModal';
 
 type Props = {
   hideLoginOptions?: boolean;

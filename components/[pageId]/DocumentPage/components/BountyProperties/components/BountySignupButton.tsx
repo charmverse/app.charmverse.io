@@ -8,7 +8,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
-import { WalletSign } from 'components/login/WalletSign';
+import { WalletSign } from 'components/login/components/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useUser } from 'hooks/useUser';

@@ -2,14 +2,16 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
+import { ApiError } from './errors';
+
 declare module 'http' {
   interface IncomingMessage {
     isAdmin: boolean;
+    isGuest: boolean;
   }
 }
 
@@ -65,6 +67,7 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
       throw new AdministratorOnlyError();
     } else {
       req.isAdmin = spaceRole.isAdmin;
+      req.isGuest = !spaceRole.isAdmin && spaceRole.isGuest;
       next();
     }
   };

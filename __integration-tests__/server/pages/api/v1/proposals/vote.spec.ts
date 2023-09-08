@@ -67,13 +67,13 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 
@@ -105,13 +105,13 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 

@@ -5,6 +5,7 @@ import { AccountPreferences } from 'components/settings/account/components/Accou
 import Legend from 'components/settings/Legend';
 
 import { IdentityProviders } from './components/IdentityProviders';
+import { LensPublication } from './components/LensPublication';
 import { MultiSigList } from './components/MultiSigList';
 
 export function AccountSettings() {
@@ -17,6 +18,7 @@ export function AccountSettings() {
       <Legend>My Account</Legend>
       <IdentityProviders />
       <AccountPreferences />
+      <LensPublication />
       <MultiSigList />
     </>
   );

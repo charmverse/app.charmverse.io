@@ -79,7 +79,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: user.id
+      createdBy: user.id,
+      maxChoices: 1
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(201);
@@ -104,7 +105,8 @@ describe('POST /api/votes - Create a new poll', () => {
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send(newVote).expect(201);
@@ -126,7 +128,8 @@ describe('POST /api/votes - Create a new poll', () => {
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1
     };
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(404);
   });
@@ -149,7 +152,8 @@ describe('POST /api/votes - Create a new poll', () => {
       title: 'new vote',
       type: 'Approval',
       threshold: 50,
-      voteOptions: ['1', '2', '3']
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(401);
@@ -180,7 +184,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: user.id
+      createdBy: user.id,
+      maxChoices: 1
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', authorCookie).send(newVote).expect(201);
@@ -208,7 +213,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: user.id
+      createdBy: user.id,
+      maxChoices: 1
     };
     await request(baseUrl).post('/api/votes').set('Cookie', adminCookie).send(newVote).expect(201);
   });
@@ -240,7 +246,8 @@ describe('POST /api/votes - Create a proposal vote', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      createdBy: user.id
+      createdBy: user.id,
+      maxChoices: 1
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', otherUserCookie).send(newVote).expect(401);

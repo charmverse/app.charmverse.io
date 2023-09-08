@@ -139,6 +139,7 @@ function TableRow(props: Props) {
 
   return (
     <div
+      data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}
@@ -173,7 +174,7 @@ function TableRow(props: Props) {
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
 
-                <div className='open-button'>
+                <div className='open-button' data-test={`database-row-open-${card.id}`}>
                   <Button onClick={() => props.showCard(props.card.id || '')}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>

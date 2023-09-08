@@ -37,7 +37,7 @@ export async function getVotesByPage({
   });
 
   return pageVotes.map((pageVote) => {
-    const userVotes = pageVote.userVotes;
+    const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
       userVotes,

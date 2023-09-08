@@ -1,14 +1,14 @@
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
-import { LoginPageContent } from 'components/login';
-import { CollectEmailDialog } from 'components/login/CollectEmail';
-import { LoginButton } from 'components/login/LoginButton';
+import { EmailAddressFormDialog } from 'components/login/components/EmailAddressForm';
+import { LoginButton } from 'components/login/components/LoginButton';
+import { LoginPageContent } from 'components/login/LoginPageContent';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
@@ -16,38 +16,62 @@ import { useUser } from 'hooks/useUser';
 import { isValidEmail } from 'lib/utilities/strings';
 
 export default function Authenticate() {
-  const [error, setError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded: isUserLoaded, user } = useUser();
-  const { spaces } = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const { validateMagicLink, emailForSignIn, setEmailForSignIn } = useFirebaseAuth();
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
 
-  // Case where existing user is adding an email to their account
-  const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
+  async function redirectLoggedInUser() {
+    const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
 
+    // Use spaces might not be loaded yet, this ensures we have up to date data
+    const userSpaces = await charmClient.spaces.getSpaces();
+
+    const domainFromRedirect = redirectPath.split('/')[1];
+    if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
+      router.push(redirectPath);
+    } else if (userSpaces?.length) {
+      router.push(`/${userSpaces[0].domain}`);
+    } else {
+      router.push('/createSpace');
+    }
+  }
+
+  // Case where existing user is adding an email to their account
   function loginViaEmail() {
+    if (!emailForSignIn) {
+      return;
+    }
     setIsAuthenticating(true);
-    validateMagicLink()
+    validateMagicLink(emailForSignIn)
       .then(() => {
         showMessage('Logged in with email. Redirecting you now', 'success');
-        router.push(redirectPath);
+        redirectLoggedInUser();
       })
       .catch((err) => {
-        setIsAuthenticating(false);
-        setError('Invalid invite link');
+        if (user) {
+          redirectLoggedInUser();
+        } else {
+          setIsAuthenticating(false);
+          setLoginError(true);
+          showMessage('Invalid invite link', 'error');
+        }
       });
   }
 
   useEffect(() => {
-    if (isUserLoaded && emailForSignIn && isValidEmail(emailForSignIn)) {
-      loginViaEmail();
-    } else if (isUserLoaded && !error && !isAuthenticating) {
-      emailPopup.open();
+    if (isUserLoaded && isSpacesLoaded) {
+      if (emailForSignIn && isValidEmail(emailForSignIn)) {
+        loginViaEmail();
+      } else if (!loginError && !isAuthenticating) {
+        emailPopup.open();
+      }
     }
-  }, [isUserLoaded, emailForSignIn]);
+  }, [isUserLoaded, emailForSignIn, isSpacesLoaded]);
 
   function submitEmail(email: string) {
     setIsAuthenticating(true);
@@ -66,7 +90,7 @@ export default function Authenticate() {
     <Box height='100%' display='flex' flexDirection='column'>
       <LoginPageContent hideLoginOptions isLoggingIn={isAuthenticating}>
         <Box gap={3} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'column', pt: 2 }}>
-          {showLoginButton && <LoginButton showSignup={false} />}
+          {showLoginButton && <LoginButton emailOnly showSignup={false} />}
 
           {showAdditionalOptions && (
             <>
@@ -82,16 +106,10 @@ export default function Authenticate() {
               )}
             </>
           )}
-
-          {error && (
-            <Alert sx={{ width: 'fit-content' }} severity='error'>
-              {error}
-            </Alert>
-          )}
         </Box>
       </LoginPageContent>
 
-      <CollectEmailDialog
+      <EmailAddressFormDialog
         title='Login with your email'
         description='Please enter the email address on which you received the login link.'
         isOpen={emailPopup.isOpen}

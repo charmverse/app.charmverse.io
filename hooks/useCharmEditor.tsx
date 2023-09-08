@@ -5,23 +5,28 @@ import type { Dispatch, ReactNode, SetStateAction, MutableRefObject } from 'reac
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 
-const EDIT_MODES = ['editing', 'suggesting', 'viewing'] as const;
-export type EditMode = (typeof EDIT_MODES)[number];
-
 export const EDIT_MODE_CONFIG = {
   editing: {
     permission: 'edit_content',
-    icon: <EditOutlined fontSize='small' />
+    icon: <EditOutlined fontSize='small' />,
+    color: 'primary',
+    label: 'Editing'
   },
   suggesting: {
     permission: 'comment',
-    icon: <RateReviewOutlined fontSize='small' />
+    icon: <RateReviewOutlined fontSize='small' />,
+    color: 'success',
+    label: 'Suggesting'
   },
   viewing: {
     permission: 'read',
-    icon: <VisibilityOutlined fontSize='small' />
+    icon: <VisibilityOutlined fontSize='small' />,
+    color: 'secondary',
+    label: 'Viewing'
   }
 } as const;
+
+export type EditMode = keyof typeof EDIT_MODE_CONFIG;
 
 interface CharmEditorContext {
   isSaving: boolean;
@@ -55,11 +60,7 @@ const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter>>
 export function CharmEditorProvider({ children }: { children: ReactNode }) {
   const [props, _setPageProps] = useState<CharmEditorContext>(defaultProps);
 
-  const availableEditModes = Object.entries(EDIT_MODE_CONFIG)
-    .filter(([, config]) => {
-      return !!props.permissions?.[config.permission];
-    })
-    .map(([mode]) => mode as EditMode);
+  const availableEditModes = Object.keys(EDIT_MODE_CONFIG) as EditMode[];
 
   const setPageProps: CharmEditorContextWithSetter['setPageProps'] = (_props) => {
     _setPageProps((prev) => ({ ...prev, ..._props }));

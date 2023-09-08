@@ -1,10 +1,5 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
-  AssignedPagePermission,
-  PagePermissionAssignment,
-  PagePermissionWithSource
-} from '@charmverse/core/permissions';
-import type {
   ApiPageKey,
   Block,
   FavoritePage,
@@ -21,6 +16,7 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
@@ -30,7 +26,6 @@ import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { PermissionResource } from 'lib/permissions/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
@@ -264,48 +259,15 @@ class CharmClient {
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
     return http
       .GET<Block[]>('/api/blocks', { spaceId })
-      .then((blocks) => blocks.map(this.blockToFBBlock))
-      .then((blocks) => this.fixBlocks(blocks));
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
   }
 
   getSubtree(rootId?: string, levels = 2): Promise<FBBlock[]> {
     return http
       .GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
-      .then((blocks) => blocks.map(this.blockToFBBlock))
-      .then((blocks) => this.fixBlocks(blocks));
-  }
-
-  async fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {
-    const OctoUtils = (await import('components/common/BoardEditor/focalboard/src/octoUtils')).OctoUtils;
-    // Hydrate is important, as it ensures that each block is complete to the current model
-    const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
-    return fixedBlocks;
-  }
-
-  private blockToFBBlock(block: Block): FBBlock {
-    return {
-      ...block,
-      deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
-      createdAt: new Date(block.createdAt).getTime(),
-      updatedAt: new Date(block.updatedAt).getTime(),
-      type: block.type as FBBlock['type'],
-      fields: block.fields as FBBlock['fields']
-    };
-  }
-
-  private fbBlockToBlock(fbBlock: FBBlock): Omit<Block, ServerBlockFields> {
-    return {
-      id: fbBlock.id,
-      parentId: fbBlock.parentId,
-      rootId: fbBlock.rootId,
-      schema: fbBlock.schema,
-      type: fbBlock.type,
-      title: fbBlock.title,
-      fields: fbBlock.fields,
-      deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
-      createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-      updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
-    };
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
   }
 
   async insertBlock(block: FBBlock, updater: BlockUpdater): Promise<FBBlock[]> {
@@ -314,7 +276,7 @@ class CharmClient {
 
   async deleteBlock(blockId: string, updater: BlockUpdater): Promise<void> {
     const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: Block }>(`/api/blocks/${blockId}`);
-    const fbBlock = this.blockToFBBlock(rootBlock);
+    const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
@@ -322,36 +284,36 @@ class CharmClient {
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
     const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
     const fbBlocks = rootBlocks.map((rootBlock) => ({
-      ...this.blockToFBBlock(rootBlock),
+      ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
     }));
     updater(fbBlocks);
   }
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
-    const blocksInput = fbBlocks.map(this.fbBlockToBlock);
+    const blocksInput = fbBlocks.map(fbBlockToBlock);
     const newBlocks = await http.POST<Block[]>('/api/blocks', blocksInput);
-    const newFBBlocks = newBlocks.map(this.blockToFBBlock);
+    const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
     return newFBBlocks;
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
     const currentBlocks = await http.GET<Block[]>('/api/blocks', { id: blockId });
-    const currentFBBlock = this.blockToFBBlock(currentBlocks[0]);
+    const currentFBBlock = blockToFBBlock(currentBlocks[0]);
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-    const blockInput = this.fbBlockToBlock(fbBlockInput);
+    const blockInput = fbBlockToBlock(fbBlockInput);
     const updatedBlocks = await http.PUT<Block[]>('/api/blocks', [blockInput]);
-    const fbBlock = this.blockToFBBlock(updatedBlocks[0]);
+    const fbBlock = blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);
   }
 
   async updateBlock(blockInput: FBBlock) {
-    const newBlock = this.fbBlockToBlock(blockInput);
+    const newBlock = fbBlockToBlock(blockInput);
     return http.PUT<Block[]>('/api/blocks', [newBlock]);
   }
 
@@ -362,10 +324,10 @@ class CharmClient {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-      return this.fbBlockToBlock(fbBlockInput);
+      return fbBlockToBlock(fbBlockInput);
     });
     const updatedBlocks = await http.PUT<Block[]>('/api/blocks', updatedBlockInput);
-    const fbBlocks = updatedBlocks.map(this.blockToFBBlock);
+    const fbBlocks = updatedBlocks.map(blockToFBBlock);
     updater(fbBlocks);
   }
 
@@ -417,22 +379,6 @@ class CharmClient {
 
   deletePaymentMethod(paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
-  }
-
-  listPagePermissions(pageId: string): Promise<AssignedPagePermission[]> {
-    return http.GET('/api/permissions', { pageId });
-  }
-
-  createPermission(permission: PagePermissionAssignment): Promise<PagePermissionWithSource> {
-    return http.POST('/api/permissions', permission);
-  }
-
-  updatePermission(body: PermissionResource & { pageId: string; allowDiscovery: boolean }): Promise<any> {
-    return http.PUT('/api/permissions', body);
-  }
-
-  deletePermission(query: PermissionResource): Promise<boolean> {
-    return http.DELETE('/api/permissions', query);
   }
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {

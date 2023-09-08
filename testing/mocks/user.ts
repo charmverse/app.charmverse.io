@@ -4,8 +4,9 @@ import { deterministicRandomName } from 'lib/utilities/randomName';
 import type { LoggedInUser } from 'models';
 
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
-  const id = uuid();
+  const id = user?.id ?? uuid();
   return {
+    publishToLensDefault: false,
     id: uuid(),
     avatar: null,
     avatarChain: null,

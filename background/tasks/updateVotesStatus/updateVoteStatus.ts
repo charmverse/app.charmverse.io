@@ -20,7 +20,7 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
+  const { passedVotes, rejectedVotes } = getVotesByState(votesPassedDeadline);
 
   const proposalPageIds = votesPassedDeadline
     .filter((v) => v.context === 'proposal')

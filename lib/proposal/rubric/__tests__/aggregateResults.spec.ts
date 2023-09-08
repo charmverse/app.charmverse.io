@@ -17,18 +17,12 @@ describe('aggregateResults', () => {
           rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: 'my opinion',
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         }
       ],
       criteria: [
         {
-          id: firstRubricId,
-          title: 't1',
-          type: 'range',
-          parameters: { min: 1, max: 10 },
-          description: 'd1',
-          proposalId: '111'
+          id: firstRubricId
         }
       ]
     });
@@ -52,47 +46,33 @@ describe('aggregateResults', () => {
           rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: null,
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         },
         {
           rubricCriteriaId: firstRubricId,
           response: { score: 3 },
           comment: null,
-          userId: '2',
-          proposalId: '111'
+          userId: '2'
         },
         {
           rubricCriteriaId: secondRubricId,
           response: { score: 1 },
           comment: null,
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         },
         {
           rubricCriteriaId: secondRubricId,
           response: { score: 3 },
           comment: null,
-          userId: secondUserId,
-          proposalId: '111'
+          userId: secondUserId
         }
       ],
       criteria: [
         {
-          id: firstRubricId,
-          title: 't1',
-          type: 'range',
-          parameters: { min: 1, max: 10 },
-          description: 'd1',
-          proposalId: '111'
+          id: firstRubricId
         },
         {
-          id: secondRubricId,
-          title: 't2',
-          type: 'range',
-          parameters: { min: 1, max: 10 },
-          description: 'd2',
-          proposalId: '111'
+          id: secondRubricId
         }
       ]
     });
@@ -135,47 +115,33 @@ describe('aggregateResults', () => {
           rubricCriteriaId: firstRubricId,
           response: { score: 7 },
           comment: 'my opinion',
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         },
         {
           rubricCriteriaId: firstRubricId,
           response: { score: null as any },
           comment: null,
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         },
         {
           rubricCriteriaId: firstRubricId,
           response: { score: '2' as any },
           comment: null,
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         },
         {
           rubricCriteriaId: secondRubricId,
           response: { score: '3' as any },
           comment: null,
-          userId: firstUserId,
-          proposalId: '111'
+          userId: firstUserId
         }
       ],
       criteria: [
         {
-          id: firstRubricId,
-          title: 't1',
-          type: 'range',
-          parameters: { min: 1, max: 10 },
-          description: 'd1',
-          proposalId: '111'
+          id: firstRubricId
         },
         {
-          id: secondRubricId,
-          title: 't2',
-          type: 'range',
-          parameters: { min: 1, max: 10 },
-          description: 'd2',
-          proposalId: '111'
+          id: secondRubricId
         }
       ]
     });
@@ -211,12 +177,7 @@ describe('aggregateResults', () => {
         answers: [],
         criteria: [
           {
-            description: '',
-            id: '1',
-            parameters: { min: 1, max: 10 },
-            proposalId: '1',
-            title: 'Example',
-            type: 'range'
+            id: '1'
           }
         ]
       })

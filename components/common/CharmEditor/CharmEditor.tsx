@@ -35,10 +35,11 @@ import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
+import type { ConnectionEvent } from './components/fiduswriter/ws';
 import { File } from './components/file/File';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as iframe from './components/iframe';
-import InlineCommentThread from './components/inlineComment/inlineComment.components';
+import { InlineCommentThread } from './components/inlineComment/components/InlineCommentThread';
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
@@ -46,7 +47,7 @@ import Mention, { MentionSuggest } from './components/mention';
 import NestedPage, { NestedPagesList } from './components/nestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
-import * as poll from './components/poll';
+import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
@@ -88,11 +89,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);
-          .ProseMirror[data-placeholder]::before {
-            color: var(--primary-text);
-            opacity: 0.5;
-          }`
+          background-color: var(--background-light);`
       : ''};
 
   ${({ disableRowHandles }) =>
@@ -186,9 +183,10 @@ interface CharmEditorProps {
   focusOnInit?: boolean;
   disableRowHandles?: boolean;
   disableNestedPages?: boolean;
-  onConnectionError?: (error: Error) => void;
+  onConnectionEvent?: (event: ConnectionEvent) => void;
   isPollOrVote?: boolean;
   disableMention?: boolean;
+  allowClickingFooter?: boolean;
 }
 
 function CharmEditor({
@@ -216,9 +214,10 @@ function CharmEditor({
   onParticipantUpdate,
   disableRowHandles = false,
   disableNestedPages = false,
-  onConnectionError,
+  onConnectionEvent,
   isPollOrVote = false,
-  disableMention = false
+  disableMention = false,
+  allowClickingFooter
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -354,6 +353,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
       focusOnInit={focusOnInit}
@@ -366,7 +366,7 @@ function CharmEditor({
       trackChanges
       readOnly={readOnly}
       enableComments={enableComments}
-      onConnectionError={onConnectionError}
+      onConnectionEvent={onConnectionEvent}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -458,7 +458,7 @@ function CharmEditor({
             return <BookmarkNodeView {...allProps} />;
           }
           case 'poll': {
-            return <poll.Component {...allProps} />;
+            return <PollNodeView {...allProps} />;
           }
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;

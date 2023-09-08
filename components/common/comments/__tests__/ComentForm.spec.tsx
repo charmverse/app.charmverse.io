@@ -2,35 +2,8 @@ import { customRenderWithContext } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
 
-jest.mock('hooks/useFirebaseAuth', () => ({
-  useFirebaseAuth: {}
-}));
-
-jest.mock('components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting', () => ({}));
-
-jest.mock('@lit-protocol/lit-node-client', () => ({
-  humanizeAccessControlConditions: () => {}
-}));
-
-jest.mock('@uauth/js', () => ({
-  UAuth: () => {}
-}));
-
-jest.mock('lib/snapshot/getProposal', () => ({
-  getSnapshotProposal: () => ({ proposals: [] })
-}));
-
-jest.mock('lib/snapshot/getSpace', () => ({
-  getSnapshotSpace: () => ({ space: {} })
-}));
-
-jest.mock('lib/snapshot/getVotes', () => ({
-  getSnapshotVotes: () => ({ votes: {} })
-}));
-
-jest.mock('lib/snapshot/getVotingPower', () => ({
-  getSnapshotVotes: () => ({})
-}));
+jest.mock('components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase', () => ({}));
+jest.mock('components/common/CharmEditor/components/poll/PollComponent', () => ({}));
 
 jest.mock('next/router', () => ({
   useRouter: () => ({

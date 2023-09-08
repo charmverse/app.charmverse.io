@@ -1,0 +1,140 @@
+import type { PageMeta } from '@charmverse/core/pages';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { useMemo, useState } from 'react';
+
+import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
+import { useProposalBlocks } from 'hooks/useProposalBlocks';
+import type { BlockTypes } from 'lib/focalboard/block';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card, CardPage } from 'lib/focalboard/card';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
+import type { ProposalFields, ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
+import { isTruthy } from 'lib/utilities/types';
+
+export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsProp;
+
+export function useProposalsBoardAdapter() {
+  const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
+  const { space } = useCurrentSpace();
+  const { members } = useMembers();
+  const { filteredProposals: proposals } = useProposals();
+  const { categories } = useProposalCategories();
+  const { pages } = usePages();
+  const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
+  const proposalPage = pages[boardProposal?.id || ''];
+
+  // board with all proposal properties and default properties
+  const board: Board = getDefaultBoard({
+    storedBoard: proposalPropertiesBlock,
+    categories
+  });
+
+  const activeView = useMemo(() => {
+    // use saved default block or build on the fly
+    const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
+
+    return viewBlock
+      ? (blockToFBBlock(viewBlock) as BoardView)
+      : getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+  }, [categories, proposalPropertiesBlock, proposalBlocks]);
+
+  const cardPages: CardPage[] = useMemo(() => {
+    const cards =
+      proposals
+        ?.map((p) => {
+          const page = pages[p?.id];
+
+          return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
+        })
+        .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+
+    const sortedCardPages = activeView ? sortCards(cards, board, activeView, members) : [];
+
+    return sortedCardPages;
+  }, [activeView, board, members, pages, proposals, space?.id]);
+
+  const boardCustomProperties: Board = getDefaultBoard({
+    storedBoard: proposalPropertiesBlock,
+    customOnly: true,
+    categories: []
+  });
+
+  // card from current proposal
+  const card: Card = mapProposalToCardPage({ proposal: boardProposal, proposalPage, spaceId: space?.id }).card;
+
+  // each proposal with fields reflects a card
+  const cards: Card[] = cardPages.map((cp) => cp.card) || [];
+
+  const views: BoardView[] = [];
+
+  return {
+    board,
+    boardCustomProperties,
+    card,
+    cards,
+    cardPages,
+    activeView,
+    views,
+    proposalPage,
+    boardProposal,
+    setBoardProposal
+  };
+}
+
+// build mock card from proposal and page data
+function mapProposalToCardPage({
+  proposal,
+  proposalPage,
+  spaceId
+}: {
+  proposal: BoardProposal | ProposalWithUsers | null;
+  proposalPage?: PageMeta;
+  spaceId?: string;
+}) {
+  const proposalFields = (proposal?.fields || { properties: {} }) as ProposalFields;
+  const proposalSpaceId = proposal?.spaceId || spaceId || '';
+
+  proposalFields.properties = {
+    ...proposalFields.properties,
+    // add default field values on the fly
+    [CATEGORY_BLOCK_ID]: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
+    [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
+    [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
+    [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
+    [REVIEWERS_BLOCK_ID]:
+      (proposal && 'reviewers' in proposal && proposal.reviewers?.map((r) => r.userId).filter(isTruthy)) || ''
+  };
+
+  const card: Card = {
+    id: proposal?.id || '',
+    spaceId: proposalSpaceId,
+    parentId: '',
+    schema: 1,
+    title: proposalPage?.title || '',
+    rootId: proposalSpaceId,
+    type: 'card' as BlockTypes,
+    updatedBy: proposalPage?.updatedBy || '',
+    createdBy: proposalPage?.createdBy || '',
+    createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : 0,
+    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
+    deletedAt: null,
+    fields: { ...proposalFields, contentOrder: [] }
+  };
+
+  return { card, page: proposalPage };
+}

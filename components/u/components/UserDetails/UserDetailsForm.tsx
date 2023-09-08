@@ -7,7 +7,7 @@ import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
@@ -19,6 +19,7 @@ import { useIdentityTypes } from 'components/settings/account/components/useIden
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/strings';
@@ -132,6 +133,7 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
   const [form, setForm] = useState<EditableFields>({});
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
+  const { handleUnsavedChanges } = useSettingsDialog();
   const { trigger: updateUserDetails } = useSWRMutation(
     '/api/profile/details',
     (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
@@ -151,6 +153,14 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
     showMessage('Profile updated', 'success');
     mutate('/current-user-details');
   }
+
+  useEffect(() => {
+    handleUnsavedChanges(!isFormClean);
+
+    return () => {
+      handleUnsavedChanges(false);
+    };
+  }, [isFormClean]);
 
   return (
     <>

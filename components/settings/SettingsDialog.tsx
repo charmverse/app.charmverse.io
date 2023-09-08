@@ -13,8 +13,9 @@ import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
-import { SectionName } from 'components/common/PageLayout/components/Sidebar/Sidebar';
-import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/SidebarButton';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
+import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
 import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -105,15 +106,24 @@ function TabPanel(props: TabPanelProps) {
 export function SpaceSettingsDialog() {
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
-  const { activePath, onClose, onClick, open } = useSettingsDialog();
+  const { activePath, onClose, onClick, open, unsavedChanges } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
   const { spaceSubscription, subscriptionEnded } = useSpaceSubscription();
   const { blockCount } = useBlockCount();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
+  const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
   const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
+
+  const handleClose = (e: any) => {
+    if (unsavedChanges) {
+      confirmExitPopupState.open(e);
+    } else {
+      onClose();
+    }
+  };
 
   return (
     <Dialog
@@ -129,7 +139,7 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={subscriptionEnded ? undefined : onClose}
+      onClose={subscriptionEnded ? undefined : handleClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -242,7 +252,7 @@ export function SpaceSettingsDialog() {
               <Button
                 variant='text'
                 color='inherit'
-                onClick={onClose}
+                onClick={handleClose}
                 sx={{
                   position: 'absolute',
                   right: 10,
@@ -256,7 +266,7 @@ export function SpaceSettingsDialog() {
               <IconButton
                 data-test='close-settings-modal'
                 aria-label='close the settings modal'
-                onClick={onClose}
+                onClick={handleClose}
                 sx={{
                   position: 'absolute',
                   right: 15,
@@ -270,6 +280,18 @@ export function SpaceSettingsDialog() {
           </Box>
         )}
       </Box>
+      <ConfirmDeleteModal
+        onClose={confirmExitPopupState.close}
+        title='Unsaved changes'
+        open={confirmExitPopupState.isOpen}
+        buttonText='Discard'
+        secondaryButtonText='Cancel'
+        question='Are you sure you want to close this window? You have unsaved changes.'
+        onConfirm={() => {
+          confirmExitPopupState.close();
+          onClose();
+        }}
+      />
     </Dialog>
   );
 }

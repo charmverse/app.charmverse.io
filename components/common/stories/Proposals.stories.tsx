@@ -6,26 +6,27 @@ import { Provider } from 'react-redux';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/NewProposalPage';
+import { ProposalsPageStory } from 'components/common/stories/ProposalsPage/ProposalsPageStory';
+import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
+import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { createMockSpace } from 'testing/mocks/space';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, userProfile } from '../../../.storybook/lib/mockData';
+import { members, proposalCategories, spaces, userProfile } from '../../../.storybook/lib/mockData';
 
 export default {
   title: 'common/Proposals',
   component: ProposalPageComponent
 };
 
-const space = createMockSpace();
+const space = spaces[0];
 
 const reduxStore = mockStateStore([], {
   boards: {
@@ -53,6 +54,20 @@ function Context({ children }: { children: ReactNode }) {
     </UserProvider>
   );
 }
+
+export function ProposalsPage() {
+  return (
+    <Context>
+      <PagesProvider>
+        <Paper>
+          <ProposalsPageStory />
+        </Paper>
+      </PagesProvider>
+    </Context>
+  );
+}
+
+ProposalsPage.parameters = ProposalsPageStory.parameters;
 
 export function NewProposal() {
   const [contentUpdated, setContentUpdated] = useState(false);
@@ -87,7 +102,8 @@ export function NewProposal() {
         }
       }
     ],
-    title: 'A simple proposition'
+    title: 'A simple proposition',
+    fields: { properties: {} }
   });
 
   return (

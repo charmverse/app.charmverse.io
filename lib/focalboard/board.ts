@@ -12,7 +12,10 @@ export const proposalPropertyTypesList = [
   'proposalCategory',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
-  'proposalEvaluationAverage'
+  'proposalEvaluationAverage',
+  'proposalAuthor',
+  'proposalReviewer',
+  'proposalEvaluationType'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
@@ -67,6 +70,16 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
 };
 
+export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
+
+export type GoogleFormSourceData = {
+  credentialId: string;
+  boardId?: string; // the board which contains the blocks that are synced from this form
+  formId: string;
+  formName: string;
+  formUrl: string;
+};
+
 export type BoardFields = {
   icon: string;
   description: PageContent;
@@ -75,6 +88,10 @@ export type BoardFields = {
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
   viewIds: string[];
+  // Currently only for boards of type proposal
+  sourceType?: DataSourceType;
+  // Currently unused. We will migrate Google Data here in a subsequent PR
+  sourceData?: GoogleFormSourceData;
 };
 
 type Board = Block & {

@@ -2,11 +2,9 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardView } from 'lib/focalboard/boardView';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -16,7 +14,7 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { Card } from './card';
+import type { BoardFields } from './board';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 
@@ -29,21 +27,21 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
+  if (boardId && spaceId) {
+    await prisma.block.findFirstOrThrow({
+      where: {
+        id: boardId,
+        spaceId
+      }
+    });
+  }
+
   const database = await setDatabaseProposalProperties({
     databaseId: boardId
   });
-  const views = (
-    await prisma.block.findMany({
-      where: {
-        type: 'view',
-        parentId: boardId
-      }
-    })
-  ).map(prismaToBlock) as BoardView[];
-
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
-  if (!views.find((view) => view.fields.sourceType === 'proposals')) {
-    throw new InvalidStateError('Board does not have a proposals view');
+  if ((database.fields as any as BoardFields).sourceType !== 'proposals') {
+    throw new InvalidStateError('Database not configured to use proposals as a source');
   }
 
   const pageProposals = await prisma.page.findMany({
@@ -322,7 +320,7 @@ export async function updateCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: [prismaToBlock(database)]
+      payload: [prismaToBlock(database as any)]
     },
     spaceId
   );

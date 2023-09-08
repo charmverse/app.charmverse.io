@@ -29,7 +29,7 @@ import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import type { ViewSourceType } from 'lib/focalboard/boardView';
+import type { DataSourceType } from 'lib/focalboard/board';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -678,7 +678,8 @@ export async function createVote({
   title = 'Vote Title',
   context = 'inline',
   content,
-  contentText = null
+  contentText = null,
+  maxChoices = 1
 }: Partial<Vote> &
   Pick<Vote, 'spaceId' | 'createdBy'> & {
     pageId?: string | null;
@@ -727,14 +728,15 @@ export async function createVote({
       userVotes: {
         createMany: {
           data: userVotes.map((userVote) => ({
-            choice: userVote,
+            choices: [userVote],
             userId: createdBy
           }))
         }
       },
       type: 'Approval',
       content: content ?? Prisma.DbNull,
-      contentText
+      contentText,
+      maxChoices
     },
     include: {
       voteOptions: true
@@ -940,6 +942,7 @@ export async function generateProposal({
   categoryId,
   userId,
   spaceId,
+  pageType = 'proposal',
   proposalStatus,
   evaluationType,
   authors,
@@ -953,6 +956,7 @@ export async function generateProposal({
   spaceId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
+  pageType?: PageType;
   proposalStatus: ProposalStatus;
   evaluationType?: ProposalEvaluationType;
   title?: string;
@@ -985,7 +989,7 @@ export async function generateProposal({
       },
       path: `path-${v4()}`,
       title,
-      type: 'proposal',
+      type: pageType,
       author: {
         connect: {
           id: userId
@@ -1072,7 +1076,7 @@ export async function generateBoard({
   parentId?: string;
   cardCount?: number;
   views?: number;
-  viewDataSource?: ViewSourceType;
+  viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
 }): Promise<Page> {
