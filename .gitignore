@@ -26,10 +26,8 @@ playwright-report
 
 # misc
 .DS_Store
-.env
-.env.test.local
-.env.production
-**.local
+*.env*
+!.env.*.example
 *.tsbuildinfo
 
 ./pages/api/script/*
