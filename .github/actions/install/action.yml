@@ -58,6 +58,12 @@ runs:
         file_pattern: 'package*.json'
         commit_message: 'Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}'
 
+    - name: Print the last commit
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      shell: bash
+      run: |
+        echo "Newest commit hash - ${{ steps.commit_core_bump.outputs.commit_hash }}"
+
     # If installing core via github branch
     - name: Install custom core branch
       shell: bash
