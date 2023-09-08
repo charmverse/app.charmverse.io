@@ -21,7 +21,14 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     getLastPageView(sessionUserId)
   ]);
 
-  const destination = getDefaultPage({ lastPageView, returnUrl, spaces: sortedSpaces, userId: sessionUserId });
+  let destination = getDefaultPage({ lastPageView, returnUrl, spaces: sortedSpaces, userId: sessionUserId });
+
+  // append existing query params, lie 'account' or 'subscription'
+  Object.keys(context.query).forEach((key) => {
+    if (key !== 'returnUrl') {
+      destination += `${destination.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
+    }
+  });
 
   return {
     redirect: {
