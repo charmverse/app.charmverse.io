@@ -49,9 +49,9 @@ runs:
       run: |
         npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
-    # Commits pkg upgrade back to main. Only done on push event with main branch.
+    # Commits pkg upgrade back to the code if commit_core_pkg_upgrade is true
     - name: Commit package and lock file back into repo
-      if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
       id: commit_core_bump
       uses: stefanzweifel/git-auto-commit-action@v4
       with:

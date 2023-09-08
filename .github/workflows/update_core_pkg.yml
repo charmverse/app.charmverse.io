@@ -64,7 +64,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
           NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
-      - name: Save dependency and build using diff cache key to do one step restore in subsequent jobs
+      - name: Save dependency and build using another cache key to do one step restore in subsequent jobs
         id: update_cache_build
         uses: actions/cache/save@v3
         with:
@@ -73,7 +73,7 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ steps.install_dependencies.outputs.commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ steps.install_dependencies.outputs.commit_hash }}
 
 
   build-docker-image:
@@ -95,7 +95,7 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
           fail-on-cache-miss: true
 
       - name: Build and Push Docker image
@@ -126,7 +126,7 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
           fail-on-cache-miss: true
 
       - name: Upload assets to s3 
@@ -198,7 +198,8 @@ jobs:
         with:
           path: |
             *.zip
-          key: webapp-corebump-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
+
 
   deploy_to_beanstalk:
     name: Deploy to beanstalk
@@ -230,7 +231,7 @@ jobs:
         with:
           path: |
             *.zip
-          key: webapp-corebump-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
 
       - name: ${{matrix.step_name}}
         if: github.ref == 'refs/heads/main'              # <<< remove before merge
