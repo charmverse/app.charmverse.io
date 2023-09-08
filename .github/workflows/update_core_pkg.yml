@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       build_id: ${{ steps.get_build_id.outputs.build_id }}
-      new_commit_hash: ${{ steps.install_dependencies.outputs.commit_hash }}
+      core_bump_commit_hash: ${{ steps.install_dependencies.outputs.core_bump_commit_hash }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -73,7 +73,7 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ steps.install_dependencies.outputs.commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ steps.install_dependencies.outputs.core_bump_commit_hash }}
 
 
   build-docker-image:
@@ -85,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ needs.build-test-env.outputs.new_commit_hash }}
+          ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
         uses: actions/cache/restore@v3
@@ -95,14 +95,14 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
           fail-on-cache-miss: true
 
       - name: Build and Push Docker image
         id: docker_build_push
         uses: ./.github/actions/build_docker_image
         with:
-          codebase_sha: ${{ needs.build-test-env.outputs.new_commit_hash }}
+          codebase_sha: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -116,7 +116,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ needs.build-test-env.outputs.new_commit_hash }}
+          ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
         uses: actions/cache/restore@v3
@@ -126,7 +126,7 @@ jobs:
             .env.test.local
             dist
             ./node_modules
-          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
           fail-on-cache-miss: true
 
       - name: Upload assets to s3 
@@ -148,7 +148,7 @@ jobs:
 
 
   package-beanstalk-payload:
-    name: Upload asset to s3
+    name: Bundle Beanstalk Payload
     runs-on: ubuntu-latest
     needs: [build-test-env, build-docker-image]
     outputs:
@@ -156,7 +156,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ needs.build-test-env.outputs.new_commit_hash }}
+          ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -198,7 +198,7 @@ jobs:
         with:
           path: |
             *.zip
-          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
 
 
   deploy_to_beanstalk:
@@ -231,7 +231,7 @@ jobs:
         with:
           path: |
             *.zip
-          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.new_commit_hash }}
+          key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
 
       - name: ${{matrix.step_name}}
         if: github.ref == 'refs/heads/main'              # <<< remove before merge
@@ -241,7 +241,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{matrix.app_name}}
           environment_name: ${{matrix.env_name}}
-          version_label: ${{ needs.build-test-env.outputs.new_commit_hash }}
+          version_label: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
           region: us-east-1
           deployment_package: ${{matrix.deployment_package}}
           use_existing_version_if_available: true # allows triggering re-deploys with same version
