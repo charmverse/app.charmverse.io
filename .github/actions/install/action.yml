@@ -55,6 +55,7 @@ runs:
       id: commit_core_bump
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
+        commit_options: '--no-verify'
         file_pattern: 'package*.json'
         commit_message: 'Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}'
 
