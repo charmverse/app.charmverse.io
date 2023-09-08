@@ -9,9 +9,7 @@ import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } 
 import type { GetTasksResponse } from '../../pages/api/tasks/list';
 import { brandColorNames } from 'theme/colors';
 import { LoggedInUser } from 'models/User';
-import { createMemberProperty } from 'testing/mocks/memberProperty';
-import { MemberProperty } from '@charmverse/core/prisma-client';
-import { Social } from 'components/u/interfaces';
+import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 
 const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
 
@@ -75,32 +73,7 @@ export const userMemberProfile: Member = {
   })) as PropertyValueWithDetails[],
 };
 
-function createMemberPropertyValue(member: Member, memberPropertyType: MemberProperty["type"]) {
-  switch (memberPropertyType) {
-    case 'profile_pic':
-      return member.avatar;
-    case 'name':
-      return member.username;
-    case 'role':
-      return member.roles;
-    case 'bio':
-      return member.profile?.description;
-    case 'discord':
-      return (member.profile?.social as Social)?.discordUsername;
-    case 'twitter':
-      return (member.profile?.social as Social)?.twitterURL;
-    case 'linked_in':
-      return (member.profile?.social as Social)?.linkedinURL;
-    case 'github':
-      return (member.profile?.social as Social)?.githubURL;
-    case 'timezone':
-      return member.profile?.timezone;
-    case 'join_date':
-      return member.joinDate;
-    default:
-      return '';
-  }
-}
+
 
 export const members: Member[] = seeds.map(seed => {
   const member = createMockSpaceMember(createMockUser({ id: seed }))
