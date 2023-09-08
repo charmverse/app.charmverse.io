@@ -31,8 +31,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   async function logoutUser() {
     await charmClient.logout();
-    setUser(null);
-    clearSWRCache();
+    window.location.href = window.location.origin;
   }
 
   /**
