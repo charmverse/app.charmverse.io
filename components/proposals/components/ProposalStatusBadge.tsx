@@ -58,6 +58,7 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
 export function ProposalStatusChip({ status, size = 'small' }: { size?: ChipProps['size']; status: ProposalStatus }) {
   return (
     <StyledProposalStatusChip
+      data-test='proposal-status-badge'
       size={size}
       status={status}
       label={PROPOSAL_STATUS_LABELS[status]}
@@ -96,6 +97,7 @@ export function ProposalStatusChipTextOnly({
 }) {
   return (
     <StyledProposalStatusChipNormalText
+      data-test='proposal-status-badge'
       size={size}
       status={status}
       label={PROPOSAL_STATUS_LABELS[status]}

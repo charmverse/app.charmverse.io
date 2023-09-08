@@ -146,7 +146,7 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
 
-      const statusSelect = selectProps[1];
+      const statusSelect = row.locator('data-test=proposal-status-badge');
 
       expect((await statusSelect.allInnerTexts())[0]).toEqual('Feedback');
 
