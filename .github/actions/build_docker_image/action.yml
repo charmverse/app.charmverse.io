@@ -41,6 +41,7 @@ runs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: 'false'
 
     - name: Login to Amazon ECR
       id: login-ecr
