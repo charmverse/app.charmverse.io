@@ -7,15 +7,18 @@ inputs:
     required: false
 
 outputs:
-  full_image_name:
-    description: "Full image repo and tag"
-    value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace:${{ steps.prune_and_get_img_tag.outputs.img_tag }}"
+  ecr-registry:
+    description: "ECR registry url"
+    value: ${{ steps.login-ecr.outputs.registry }}
   img_tag:
     description: "Image tag of the image"
-    value: "${{ steps.prune_and_get_img_tag.outputs.img_tag }}"
+    value: "${{ steps.get_img_tag.outputs.version }}"
   img_repo:
     description: "Image tag of the image"
     value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace"
+  full_image_name:
+    description: "Full image repo and tag"
+    value: "${{ steps.get_img_tag.outputs.tags }}"
 
 runs:
   using: 'composite'
@@ -26,13 +29,6 @@ runs:
       run: |
         npm prune --production
         rm -rf .next/cache
-
-        if [ -n "${{ inputs.codebase_sha }}" ]; then
-          full_sha="${{ inputs.codebase_sha }}"
-          echo "img_tag=${{ github.run_id }}-${full_sha:0:7}" >> $GITHUB_OUTPUT
-        else
-          echo "img_tag=${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
-        fi
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -47,14 +43,21 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Docker get image tags
+      id: get_img_tag
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{steps.login-ecr.outputs.registry}}/charmverse-web3-workspace
+        tags: |
+          type=sha,prefix=${{github.run_id}}-,format=short
+        flavor: |
+          latest=${{ github.ref == 'refs/heads/main' }}
+
     - name: Build and push
       uses: docker/build-push-action@v3
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPO: charmverse-web3-workspace
       with:
         context: .
         push: true
-        tags: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ steps.prune_and_get_img_tag.outputs.img_tag }}'
+        tags: ${{ steps.get_img_tag.outputs.tags }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
