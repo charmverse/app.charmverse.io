@@ -9,6 +9,7 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
+  getBoards,
   getCurrentBoard,
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -39,6 +40,7 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
+  const allBoards = useAppSelector(getBoards);
   const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
@@ -89,7 +91,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (page.boardId && page.type !== 'inline_linked_board' && page.type !== 'linked_board') {
+    if (page.boardId && !allBoards[page.boardId]) {
       dispatch(initialDatabaseLoad({ pageIdOrPath: page.boardId }));
     }
   }, [page.boardId]);
