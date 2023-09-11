@@ -48,7 +48,7 @@ export function MemberPropertiesProvider({ children }: { children: ReactNode }) 
 
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: properties, mutate: mutateProperties } = useSWR(
+  const { data: properties = [], mutate: mutateProperties } = useSWR(
     () => (space ? `members/properties/${space?.id}` : null),
     () => {
       return charmClient.members.getMemberProperties(space!.id);

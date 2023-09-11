@@ -70,12 +70,6 @@
         cursor: pointer;
       }
     }
-
-    &.expanded {
-      .DisclosureTriangleIcon {
-        transform: rotate(90deg);
-      }
-    }
   }
 
   .octo-table-cell {

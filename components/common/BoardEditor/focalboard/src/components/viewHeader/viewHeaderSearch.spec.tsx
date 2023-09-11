@@ -8,16 +8,15 @@ import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import ViewHeaderSearch from './viewHeaderSearch';
 
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom');
-
-  return {
-    ...originalModule,
-    useRouteMatch: jest.fn(() => {
-      return { url: '/board/view' };
-    })
-  };
-});
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    isReady: true
+  })
+}));
 
 describe('components/viewHeader/ViewHeaderSearch', () => {
   const state = {

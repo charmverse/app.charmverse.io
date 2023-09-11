@@ -5,13 +5,17 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
   updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
     return http.PUT(`/api/proposals/${proposalId}`, rest);
+  }
+
+  getProposal(proposalId: string) {
+    return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
   }
 
   updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {

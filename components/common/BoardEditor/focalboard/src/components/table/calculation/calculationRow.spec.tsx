@@ -1,20 +1,13 @@
 import { render } from '@testing-library/react';
-import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import { FetchMock } from '../../../test/fetchMock';
 import { TestBlockFactory } from '../../../test/testBlockFactory';
-import 'isomorphic-fetch';
 import { wrapDNDIntl } from '../../../testUtils';
 
 import CalculationRow from './calculationRow';
 
-global.fetch = FetchMock.fn;
-
-beforeEach(() => {
-  FetchMock.fn.mockReset();
-});
+window.fetch = jest.fn();
 
 describe('components/table/calculation/CalculationRow', () => {
   const board = TestBlockFactory.createBoard();
@@ -51,8 +44,6 @@ describe('components/table/calculation/CalculationRow', () => {
   card2.fields.properties.property_4 = 'Baz';
 
   test('should render three calculation elements', async () => {
-    FetchMock.fn.mockReturnValueOnce(FetchMock.jsonResponse(JSON.stringify([board, view, card])));
-
     const component = wrapDNDIntl(
       <CalculationRow
         board={board}

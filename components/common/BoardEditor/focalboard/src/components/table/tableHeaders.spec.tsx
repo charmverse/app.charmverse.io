@@ -2,7 +2,6 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
 
-import 'isomorphic-fetch';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
@@ -16,6 +15,7 @@ describe('components/table/TableHeaders', () => {
   test('should match snapshot', async () => {
     const component = wrapDNDIntl(
       <TableHeaders
+        readOnlySourceData={false}
         board={board}
         cards={[card]}
         activeView={view}

@@ -1,14 +1,28 @@
 import '@testing-library/jest-dom';
-import 'isomorphic-fetch';
+
+import type { PageMeta } from '@charmverse/core/pages';
 import { render } from '@testing-library/react';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+
+import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
 import TableRow from './tableRow';
+
+const date = 'Wed Sep 06 2023 22:03:26';
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    isReady: true
+  })
+}));
 
 describe('components/table/TableRow', () => {
   const board = TestBlockFactory.createBoard();
@@ -20,6 +34,14 @@ describe('components/table/TableRow', () => {
   const card = TestBlockFactory.createCard(board);
   const cardTemplate = TestBlockFactory.createCard(board);
   cardTemplate.fields.isTemplate = true;
+  card.id = 'card-1';
+
+  const page = pageStubToCreate({
+    createdBy: 'user-1',
+    spaceId: 'space-1',
+    id: card.id,
+    path: card.id
+  }) as PageMeta;
 
   const state = {
     users: {},
@@ -48,7 +70,11 @@ describe('components/table/TableRow', () => {
           card={card}
           isSelected={false}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
@@ -72,7 +98,11 @@ describe('components/table/TableRow', () => {
           activeView={view}
           isSelected={false}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={true}
           offset={0}
@@ -96,7 +126,11 @@ describe('components/table/TableRow', () => {
           activeView={view}
           isSelected={true}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
@@ -123,7 +157,11 @@ describe('components/table/TableRow', () => {
           activeView={view}
           isSelected={false}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
@@ -149,7 +187,11 @@ describe('components/table/TableRow', () => {
           activeView={view}
           isSelected={false}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
@@ -175,7 +217,11 @@ describe('components/table/TableRow', () => {
           activeView={view}
           isSelected={false}
           focusOnMount={false}
-          onSaveWithEnter={jest.fn()}
+          cardPage={page}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
           showCard={jest.fn()}
           readOnly={false}
           offset={0}

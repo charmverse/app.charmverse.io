@@ -1,8 +1,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
-import '@testing-library/jest-dom';
 
-import 'isomorphic-fetch';
+import '@testing-library/jest-dom';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
@@ -19,6 +18,7 @@ describe('components/table/TableHeaderMenu', () => {
     const onAutoSizeColumn = jest.fn();
     const component = wrapDNDIntl(
       <TableHeader
+        readOnlySourceData={false}
         readOnly={false}
         sorted='none'
         name='my Name'

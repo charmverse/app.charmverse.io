@@ -7,6 +7,8 @@ import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
+import { baseUrl } from 'config/constants';
+
 import { loginBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
@@ -144,9 +146,21 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
 
-      const statusSelect = selectProps[1];
+      const statusSelect = row.locator('data-test=proposal-status-badge');
 
       expect((await statusSelect.allInnerTexts())[0]).toEqual('Feedback');
+
+      const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
+      const proposalPage = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: card.syncWithPageId as string
+        },
+        select: {
+          path: true
+        }
+      });
+
+      expect(await syncedProposalUrl.getAttribute('href')).toEqual(`${baseUrl}/${space.domain}/${proposalPage.path}`);
     }
 
     // Make sure the UI only displays 3 cards

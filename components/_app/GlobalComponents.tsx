@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { mutate } from 'swr';
 
@@ -10,16 +11,19 @@ import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImport
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
+  const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
   // Register logs to Datadog
   useDatadogLogger();
 
@@ -57,6 +61,20 @@ export function GlobalComponents() {
       unsubscribeRestoreListener();
     };
   }, [currentSpace?.id]);
+
+  useEffect(() => {
+    const account = router.query.account;
+    const subscription = router.query.subscription;
+
+    if (!isSettingsDialogOpen && router.isReady) {
+      if (account) {
+        openSettingsModal('account');
+      }
+      if (subscription) {
+        openSettingsModal('subscription');
+      }
+    }
+  }, [isSettingsDialogOpen, router.isReady, openSettingsModal]);
 
   return (
     <>

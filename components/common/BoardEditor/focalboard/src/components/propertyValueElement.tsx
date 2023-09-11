@@ -1,4 +1,7 @@
-import { Tooltip } from '@mui/material';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
@@ -8,12 +11,13 @@ import { EmptyPlaceholder } from 'components/common/BoardEditor/components/prope
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
+import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -135,11 +139,23 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-  if (
+
+  if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
+    // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
+    // We should migrate over the proposals as datasource blocks to the same format as proposals table
+    return (
+      <ProposalStatusChipTextOnly
+        status={
+          (stringUtils.isUUID(propertyValue as string)
+            ? propertyTemplate.options.find((opt) => opt.id === propertyValue)?.value
+            : propertyValue) as ProposalStatus
+        }
+      />
+    );
+  } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
     propertyTemplate.type === 'proposalCategory' ||
-    propertyTemplate.type === 'proposalStatus' ||
     propertyTemplate.type === 'proposalEvaluationType'
   ) {
     propertyValueElement = (
@@ -150,11 +166,7 @@ function PropertyValueElement(props: Props) {
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
-        options={
-          propertyTemplate.type === 'proposalStatus'
-            ? mapProposalStatusPropertyToDisplayValue({ property: propertyTemplate }).options
-            : propertyTemplate.options
-        }
+        options={propertyTemplate.options}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
@@ -257,8 +269,12 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = <TextInput {...commonProps} />;
     }
   } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
-    const proposalUrl = getAbsolutePath(`/${displayValue}`, domain);
-    propertyValueElement = <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />;
+    const proposalUrl = getAbsolutePath(`/${propertyValue as string}`, domain);
+    propertyValueElement = (
+      <div data-test='property-proposal-url'>
+        <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />
+      </div>
+    );
   } else if (propertyValueElement === null) {
     propertyValueElement = (
       <div className='octo-propertyvalue'>

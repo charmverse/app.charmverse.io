@@ -52,7 +52,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const { sendMessage, subscribe } = useWebSocketClient();
-
   const { data, mutate: mutatePagesList } = useSWR(
     () => getPagesListCacheKey(currentSpace?.id),
     async () => {

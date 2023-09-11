@@ -99,7 +99,7 @@ export async function getOrgs({ userId, apiToken }: { userId: string; apiToken?:
     id: userWorkspace.id,
     isHidden: hiddenItems.includes(userWorkspace.id),
     isPinned: pinnedItems.includes(userWorkspace.id),
-    joinDate: userWorkspace.spaceRoles.find((spaceRole) => spaceRole.userId === userId)?.createdAt.toISOString(),
+    joinDate: userWorkspace.joinDate.toISOString(),
     name: userWorkspace.name,
     logo: userWorkspace.spaceImage,
     walletId: null

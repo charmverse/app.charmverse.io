@@ -118,9 +118,7 @@
   },
   "exclude": [
     "node_modules",
-    "**/focalboard/src/**/*.spec.ts",
     "**/lib/lit-protocol-modal/**/*.js",
-    "**/focalboard/src/**/*.spec.tsx"
   ],
   "include": [
     "**/*.ts",

@@ -47,7 +47,7 @@ export class SpaceProfileSettings extends SettingsModal {
     this.spaceDomainInput = page.locator('data-test=space-domain-input >> input');
     this.submitSpaceUpdateButton = page.locator('data-test=submit-space-update');
     this.deleteSpaceButton = page.locator('data-test=submit-space-delete');
-    this.confirmDeleteSpaceButton = page.locator('data-test=confirm-delete-button');
+    this.confirmDeleteSpaceButton = page.locator('data-testid=confirm-delete-button');
 
     // Space features
     this.bountyVisibility = page.locator(`data-test=settings-feature-item-bounties`);

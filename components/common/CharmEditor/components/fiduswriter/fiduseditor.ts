@@ -1,8 +1,9 @@
-import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
   ClientSubscribeMessage,
   SocketMessage,
@@ -295,6 +296,63 @@ export class FidusEditor {
     new ModCollab(this);
     // new ModTrack(this);
     // this.ws.init();
+  }
+
+  extractPagePath(step: any) {
+    const sliceLength = step.slice?.content.length ?? 0;
+    let marks: any[] = [];
+
+    const content0 = step.slice?.content?.[0];
+
+    if (!content0) {
+      return null;
+    }
+
+    // Check if the step type is replace
+    const isReplace = step.stepType === 'replace' && step.from === step.to;
+
+    if (!isReplace) {
+      return null;
+    }
+
+    if (sliceLength === 1) {
+      marks =
+        (content0.type === 'text'
+          ? content0.marks
+          : content0.type === 'paragraph'
+          ? content0.content?.[0]?.marks
+          : []) ?? [];
+    } else if (sliceLength === 2) {
+      const content1 = step.slice?.content?.[1];
+
+      if (!content1) {
+        return null;
+      }
+
+      const isImage = content0.type === 'image';
+      const isParagraph = content1.type === 'paragraph';
+
+      if (!isImage || !isParagraph) {
+        return null;
+      }
+
+      marks = content1.content[0]?.marks ?? [];
+    }
+
+    if (marks.length === 0) {
+      return null;
+    }
+
+    let href = null;
+    if (marks[0].type === 'link') {
+      href = marks[0].attrs.href;
+    }
+
+    if (href?.startsWith(window.location.origin)) {
+      href = href.split('/').at(-1);
+    }
+
+    return href;
   }
 
   // Collect all components of the current doc. Needed for saving and export

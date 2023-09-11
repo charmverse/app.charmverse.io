@@ -22,6 +22,7 @@ type ProposalsContextType = {
   isLoading: boolean;
   archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
+  refreshProposal: (proposalId: string) => Promise<void>;
 };
 
 export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
@@ -36,7 +37,8 @@ export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
   },
   isLoading: false,
   archiveProposal: () => Promise.resolve(),
-  updateProposal: () => Promise.resolve()
+  updateProposal: () => Promise.resolve(),
+  refreshProposal: () => Promise.resolve()
 });
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
@@ -105,6 +107,28 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     [mutateProposals]
   );
 
+  const refreshProposal = useCallback(
+    async (proposalId: string) => {
+      const proposal = await charmClient.proposals.getProposal(proposalId);
+      mutateProposals((data) => {
+        const proposalList = data ?? [];
+        const proposalIndex = proposalList.findIndex((p) => p.id === proposalId);
+
+        if (proposalIndex >= 0) {
+          const existingProposal = proposalList[proposalIndex];
+          proposalList[proposalIndex] = {
+            ...existingProposal,
+            ...proposal
+          };
+        } else {
+          proposalList.push(proposal);
+        }
+        return proposalList;
+      });
+    },
+    [mutateProposals]
+  );
+
   const value = useMemo(
     () => ({
       proposals,
@@ -116,7 +140,8 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       mutateProposals,
       isLoading: isLoading || loadingPages,
       archiveProposal,
-      updateProposal
+      updateProposal,
+      refreshProposal
     }),
     [
       archiveProposal,
@@ -127,7 +152,8 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       mutateProposals,
       proposals,
       statusFilter,
-      updateProposal
+      updateProposal,
+      refreshProposal
     ]
   );
 
