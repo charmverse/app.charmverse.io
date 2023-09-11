@@ -278,32 +278,28 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
-        style="align-items: flex-start; width: 100px;"
+        style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiBox-root css-kj9zde"
+          class="css-1s6sld2-MuiStack-root"
+          data-test="closed-select-input"
         >
           <div
-            class="css-1s6sld2-MuiStack-root"
-            data-test="closed-select-input"
+            class="css-1a59yxd-MuiStack-root"
+            data-test="select-preview"
           >
             <div
-              class="css-1a59yxd-MuiStack-root"
-              data-test="select-preview"
+              class=" css-rm7u2m-MuiStack-root"
+              data-mui-internal-clone-element="true"
             >
               <div
-                class=" css-rm7u2m-MuiStack-root"
-                data-mui-internal-clone-element="true"
+                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
               >
-                <div
-                  class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                <span
+                  class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
                 >
-                  <span
-                    class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
-                  >
-                    value 1
-                  </span>
-                </div>
+                  value 1
+                </span>
               </div>
             </div>
           </div>
@@ -311,24 +307,20 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
-        style="align-items: flex-start; width: 100px;"
+        style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiBox-root css-kj9zde"
+          class="css-1s6sld2-MuiStack-root"
+          data-test="closed-select-input"
         >
           <div
-            class="css-1s6sld2-MuiStack-root"
-            data-test="closed-select-input"
+            class="css-1a59yxd-MuiStack-root"
+            data-test="select-preview"
           >
             <div
-              class="css-1a59yxd-MuiStack-root"
-              data-test="select-preview"
-            >
-              <div
-                class=" css-rm7u2m-MuiStack-root"
-                data-mui-internal-clone-element="true"
-              />
-            </div>
+              class=" css-rm7u2m-MuiStack-root"
+              data-mui-internal-clone-element="true"
+            />
           </div>
         </div>
       </div>
@@ -603,32 +595,28 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
-        style="align-items: flex-start; width: 100px;"
+        style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiBox-root css-kj9zde"
+          class="css-1s6sld2-MuiStack-root"
+          data-test="closed-select-input"
         >
           <div
-            class="css-1s6sld2-MuiStack-root"
-            data-test="closed-select-input"
+            class="css-1a59yxd-MuiStack-root"
+            data-test="select-preview"
           >
             <div
-              class="css-1a59yxd-MuiStack-root"
-              data-test="select-preview"
+              class=" css-rm7u2m-MuiStack-root"
+              data-mui-internal-clone-element="true"
             >
               <div
-                class=" css-rm7u2m-MuiStack-root"
-                data-mui-internal-clone-element="true"
+                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
               >
-                <div
-                  class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                <span
+                  class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
                 >
-                  <span
-                    class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
-                  >
-                    value 1
-                  </span>
-                </div>
+                  value 1
+                </span>
               </div>
             </div>
           </div>
@@ -636,24 +624,20 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
-        style="align-items: flex-start; width: 100px;"
+        style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiBox-root css-kj9zde"
+          class="css-1s6sld2-MuiStack-root"
+          data-test="closed-select-input"
         >
           <div
-            class="css-1s6sld2-MuiStack-root"
-            data-test="closed-select-input"
+            class="css-1a59yxd-MuiStack-root"
+            data-test="select-preview"
           >
             <div
-              class="css-1a59yxd-MuiStack-root"
-              data-test="select-preview"
-            >
-              <div
-                class=" css-rm7u2m-MuiStack-root"
-                data-mui-internal-clone-element="true"
-              />
-            </div>
+              class=" css-rm7u2m-MuiStack-root"
+              data-mui-internal-clone-element="true"
+            />
           </div>
         </div>
       </div>
