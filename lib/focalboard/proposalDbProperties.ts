@@ -1,8 +1,8 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate<key>;
@@ -67,7 +67,7 @@ export const proposalDbProperties: {
  * See components/proposals/components/ProposalStatusBadge.tsx // ProposalStatusColors for the corresponding statuses
  */
 
-export const proposalStatusBoardColors: Record<ProposalStatus | 'archived', keyof (typeof Constants)['menuColors']> = {
+export const proposalStatusBoardColors: Record<ProposalStatusWithArchived, keyof (typeof Constants)['menuColors']> = {
   archived: 'propColorGray',
   draft: 'propColorGray',
   discussion: 'propColorTeal',
