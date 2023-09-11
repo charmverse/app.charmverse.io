@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -38,6 +39,9 @@ export function ApiSettings({ space }: { space: Space }) {
   const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(space.id);
   const { showMessage } = useSnackbar();
   const [isTestingWebhook, setIsTestingWebhook] = useState(false);
+
+  useTrackPageView({ type: 'settings/api' });
+
   const {
     register,
     handleSubmit,

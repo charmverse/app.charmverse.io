@@ -26,6 +26,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -116,10 +117,7 @@ export function SpaceSettings({ space }: { space: Space }) {
     }
   );
 
-  // set default values when space is set
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
-  }, [space.id]);
+  useTrackPageView({ type: 'settings/space' });
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');

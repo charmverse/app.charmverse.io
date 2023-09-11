@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   const [sortedSpaces, lastPageView] = await Promise.all([
     getSpacesOfUser(sessionUserId),
-    getLastPageView(sessionUserId)
+    getLastPageView({ userId: sessionUserId })
   ]);
 
   let destination = getDefaultPage({ lastPageView, returnUrl, spaces: sortedSpaces, userId: sessionUserId });
