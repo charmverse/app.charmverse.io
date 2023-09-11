@@ -1,10 +1,11 @@
 import type { Page } from '@charmverse/core/prisma';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
@@ -58,8 +59,11 @@ function DraggableTreeNode({
       handlerId: monitor.getHandlerId()
     })
   }));
+  const databasesDispatch = useAppDispatch();
 
   const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
+
+  const [viewsLoaded, setViewsLoaded] = useState(false);
 
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
@@ -134,6 +138,12 @@ function DraggableTreeNode({
         // Disable Treeview focus system which make draggable on TreeIten unusable
         // see https://github.com/mui-org/material-ui/issues/29518
         e.stopImmediatePropagation();
+
+        // Only load blocks once
+        if (item.type?.match('board') && !viewsLoaded) {
+          databasesDispatch(initialDatabaseLoad({ pageIdOrPath: item.id }));
+          setViewsLoaded(true);
+        }
       });
       drag(elt);
     },
@@ -156,6 +166,10 @@ function DraggableTreeNode({
 
   const allViews = useAppSelector(getSortedViews);
   const views = allViews.filter((view) => view.parentId === item.id);
+
+  // if (views.length === 0 && !viewsLoaded && ) {
+  //   dispatch(initialDat);
+  // }
 
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);

@@ -278,7 +278,7 @@ class CharmClient {
   }: {
     pageIdOrPath?: string;
     spaceId?: string;
-    levels: number;
+    levels?: number;
   }): Promise<FBBlock[]> {
     return http
       .GET<Block[]>(`/api/blocks/${pageIdOrPath}/subtree`, { levels, spaceId })

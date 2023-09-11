@@ -47,7 +47,8 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       return;
     }
 
-    const sourceBoard = boards[sourceDatabaseId];
+    const sourceBoard =
+      boards[sourceDatabaseId] ?? (await charmClient.getSubtree({ pageIdOrPath: sourceDatabaseId, levels: 0 }));
     const sourcePage = pages[sourceDatabaseId];
 
     if (
