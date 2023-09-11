@@ -197,7 +197,8 @@ function TableRow(props: Props) {
             key={template.id}
             style={{
               alignItems: 'flex-start',
-              width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
+              width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
+              overflowX: 'hidden'
             }}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}

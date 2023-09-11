@@ -159,30 +159,28 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalEvaluationType'
   ) {
     propertyValueElement = (
-      <Box sx={{ overflowX: 'hidden', width: '100%', height: '100%' }}>
-        <TagSelect
-          data-test='closed-select-input'
-          canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-          wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
-          multiselect={propertyTemplate.type === 'multiSelect'}
-          readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-          propertyValue={propertyValue as string}
-          options={propertyTemplate.options}
-          onChange={(newValue) => {
-            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-          }}
-          onUpdateOption={(option) => {
-            mutator.changePropertyOption(board, propertyTemplate, option);
-          }}
-          onDeleteOption={(option) => {
-            mutator.deletePropertyOption(board, propertyTemplate, option);
-          }}
-          onCreateOption={(newValue) => {
-            mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
-          }}
-          displayType={displayType}
-        />
-      </Box>
+      <TagSelect
+        data-test='closed-select-input'
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        multiselect={propertyTemplate.type === 'multiSelect'}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
+        propertyValue={propertyValue as string}
+        options={propertyTemplate.options}
+        onChange={(newValue) => {
+          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+        }}
+        onUpdateOption={(option) => {
+          mutator.changePropertyOption(board, propertyTemplate, option);
+        }}
+        onDeleteOption={(option) => {
+          mutator.deletePropertyOption(board, propertyTemplate, option);
+        }}
+        onCreateOption={(newValue) => {
+          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+        }}
+        displayType={displayType}
+      />
     );
   } else if (
     propertyTemplate.type === 'person' ||
