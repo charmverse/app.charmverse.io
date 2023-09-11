@@ -18,7 +18,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type { NewPageInput, PagesMap } from 'lib/pages';
+import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import { isTruthy } from 'lib/utilities/types';
@@ -41,10 +41,8 @@ function mapPageToMenuNode(page: PageMeta): MenuNode {
     spaceId: page.spaceId
   };
 }
-// .map(mapPageToMenuNode): MenuNode[]
-
-export function filterVisiblePages<T extends Pick<PageMeta, 'type' | 'id'>>(
-  pageMap: PagesMap<T>,
+export function filterVisiblePages<T extends Pick<PageMeta, 'type' | 'id'> | undefined>(
+  pageMap: Record<string, T>,
   rootPageIds: string[] = []
 ): T[] {
   return Object.values(pageMap).filter((page) =>
@@ -85,7 +83,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     ? Object.values(pages)
         .filter((page): page is PageMeta => isTruthy(page))
         .map(mapPageToMenuNode)
-    : filterVisiblePages(pages);
+    : filterVisiblePages(pages)
+        .filter((page): page is PageMeta => isTruthy(page))
+        .map(mapPageToMenuNode);
 
   const currentPageId = currentPage?.id ?? '';
 

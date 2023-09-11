@@ -1,12 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getKey } from 'hooks/useLocalStorage';
-import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
 import { getDefaultPageForSpace } from 'lib/session/getDefaultPage';
 import { withSessionSsr } from 'lib/session/withSession';
 
@@ -53,15 +48,3 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   };
 });
-
-// Redirect users to an initial page
-export default function RedirectToMainPage() {
-  const router = useRouter();
-  const { user, isLoaded } = useUser();
-  const { space } = useCurrentSpace();
-  const { pages, loadingPages } = usePages();
-  const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
-  const defaultPage = defaultPageKey ? typeof window !== 'undefined' && localStorage.getItem(defaultPageKey) : null;
-
-  return null;
-}
