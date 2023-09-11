@@ -26,7 +26,8 @@ export function boardWithCardsArgs({
   addPageContent,
   views = 1,
   viewDataSource,
-  boardPageType
+  boardPageType,
+  boardTitle
 }: {
   createdBy: string;
   spaceId: string;
@@ -36,6 +37,7 @@ export function boardWithCardsArgs({
   views?: number;
   viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
+  boardTitle?: string;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -50,7 +52,7 @@ export function boardWithCardsArgs({
     createdBy,
     updatedAt: '2022-08-26T09:22:28.912Z',
     updatedBy: createdBy,
-    title: 'My blog',
+    title: boardTitle ?? 'My blog',
     content: null,
     hasContent: false,
     contentText: '',

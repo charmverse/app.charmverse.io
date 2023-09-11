@@ -13,8 +13,7 @@ import { Constants } from '../constants';
 import { Utils } from '../utils';
 
 import { getBoard } from './boards';
-import { initialLoad, initialReadOnlyLoad } from './initialLoad';
-import { getWorkspaceUsers } from './users';
+import { initialDatabaseLoad } from './initialLoad';
 import { getView } from './views';
 
 import type { RootState } from './index';
@@ -72,7 +71,7 @@ const cardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialReadOnlyLoad.fulfilled, (state, action) => {
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
       state.cards = {};
       state.templates = {};
       for (const block of action.payload) {
@@ -80,35 +79,6 @@ const cardsSlice = createSlice({
           state.templates[block.id] = block as Card;
         } else if (block.type === 'card' && !block.fields.isTemplate) {
           state.cards[block.id] = block as Card;
-        }
-      }
-    });
-    builder.addCase(initialLoad.fulfilled, (state, action) => {
-      state.cards = {};
-      state.templates = {};
-      const boardsRecord: { [key: string]: Board } = {};
-
-      action.payload.blocks.forEach((block) => {
-        if (block.type === 'board') {
-          boardsRecord[block.id] = block as Board;
-        }
-      });
-      for (const block of action.payload.blocks) {
-        const boardPage = boardsRecord[block.parentId];
-        // check boardPage exists, its possible a deleted card still exists. TODO: delete cards when a board is deleted!
-        if (boardPage) {
-          // If the parent board block has been deleted, then doesn't matter which card has been deleted, show them all
-          // Otherwise dont show the card that has been deleted by itself
-          if (
-            block.type === 'card' &&
-            ((boardPage.deletedAt === null && block.deletedAt === null) || boardPage.deletedAt !== null)
-          ) {
-            if (block.fields.isTemplate) {
-              state.templates[block.id] = block as Card;
-            } else {
-              state.cards[block.id] = block as Card;
-            }
-          }
         }
       }
     });
@@ -354,9 +324,9 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; bo
     getBoardCards(props.boardId),
     getBoard(props.boardId),
     getView(props.viewId),
-    getWorkspaceUsers,
-    (cards, board, view, users) => {
-      if (!view || !board || !users || !cards) {
+    () => null,
+    (cards, board, view) => {
+      if (!view || !board || !cards) {
         return [];
       }
       let result = cards;

@@ -258,14 +258,30 @@ class CharmClient {
 
   async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>('/api/blocks', { spaceId })
+      .GET<Block[]>(
+        '/api/blocks',
+        { spaceId },
+        {
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+          }
+        }
+      )
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
-  getSubtree(rootId?: string, levels = 2): Promise<FBBlock[]> {
+  getSubtree({
+    pageIdOrPath,
+    spaceId,
+    levels = 2
+  }: {
+    pageIdOrPath?: string;
+    spaceId?: string;
+    levels: number;
+  }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
+      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/subtree`, { levels, spaceId })
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }

@@ -12,7 +12,6 @@ import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
@@ -146,13 +145,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const pageTop = getPageTop(page);
 
-  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
-
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
-
-  const cannotComment = readOnly || !pagePermissions.comment;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
@@ -320,14 +315,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                           readOnly={readOnly}
                           permissions={bountyPermissions || null}
                           refreshBountyPermissions={() => refreshBountyPermissions()}
-                        />
-                      )}
-                      {(page.type === 'card' || page.type === 'card_synced') && (
-                        <CommentsList
-                          comments={comments}
-                          rootId={card?.rootId ?? page.id}
-                          cardId={card?.id ?? page.id}
-                          readOnly={cannotComment}
                         />
                       )}
                     </div>
