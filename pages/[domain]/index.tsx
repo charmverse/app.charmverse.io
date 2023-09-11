@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   return {
     redirect: {
-      destination: `/${space.domain}destination`,
+      destination: `/${space.domain}${destination}`,
       permanent: false
     }
   };
