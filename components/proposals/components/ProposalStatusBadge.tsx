@@ -24,7 +24,7 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
   evaluation_closed: <BarChartOutlinedIcon />
 };
 
-export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
+export const ProposalStatusColors: Record<ProposalStatus | 'archived', BrandColor> = {
   draft: 'gray',
   discussion: 'teal',
   review: 'yellow',
@@ -32,13 +32,14 @@ export const ProposalStatusColors: Record<ProposalStatus, BrandColor> = {
   vote_active: 'pink',
   vote_closed: 'red',
   evaluation_active: 'pink',
-  evaluation_closed: 'red'
+  evaluation_closed: 'red',
+  archived: 'gray'
 };
 
 const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
-    return theme.palette[ProposalStatusColors[status]].main;
+    return theme.palette[ProposalStatusColors[status]]?.main;
   }};
   .MuiChip-icon {
     display: flex;
@@ -71,7 +72,7 @@ export function ProposalStatusChip({ status, size = 'small' }: { size?: ChipProp
 const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalStatus }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
-    return theme.palette[ProposalStatusColors[status]].main;
+    return theme.palette[ProposalStatusColors[status]]?.main;
   }};
   .MuiChip-icon {
     display: flex;
