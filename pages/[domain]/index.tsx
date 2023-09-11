@@ -48,3 +48,8 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   };
 });
+
+// Next.js requires a component
+export default function PageStub() {
+  return null;
+}
