@@ -55,4 +55,8 @@ export class DatabasePage extends GlobalPage {
       .locator('data-test=property-proposal-url')
       .locator('a');
   }
+
+  getTablePropertyProposalStatusLocator({ cardId }: { cardId: string }) {
+    return this.page.locator(`data-test=database-row-${cardId}`).locator('data-test=proposal-status-badge');
+  }
 }

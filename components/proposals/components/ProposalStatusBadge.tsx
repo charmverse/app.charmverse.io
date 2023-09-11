@@ -1,19 +1,20 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import ArchivedOutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
-const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
+const PROPOSAL_STATUS_ICONS: Record<ProposalStatusWithArchived, ReactNode> = {
   draft: <ModeEditOutlineOutlinedIcon />,
   discussion: <ChatOutlinedIcon />,
   review: <ReviewsOutlinedIcon />,
@@ -21,10 +22,11 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
   vote_active: <HowToVoteOutlinedIcon />,
   vote_closed: <BarChartOutlinedIcon />,
   evaluation_active: <HowToVoteOutlinedIcon />,
-  evaluation_closed: <BarChartOutlinedIcon />
+  evaluation_closed: <BarChartOutlinedIcon />,
+  archived: <ArchivedOutlinedIcon />
 };
 
-export const ProposalStatusColors: Record<ProposalStatus | 'archived', BrandColor> = {
+export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor> = {
   draft: 'gray',
   discussion: 'teal',
   review: 'yellow',
@@ -36,7 +38,7 @@ export const ProposalStatusColors: Record<ProposalStatus | 'archived', BrandColo
   archived: 'gray'
 };
 
-const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
+const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatusWithArchived }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
     return theme.palette[ProposalStatusColors[status]]?.main;
@@ -56,20 +58,26 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
   }
 `;
 
-export function ProposalStatusChip({ status, size = 'small' }: { size?: ChipProps['size']; status: ProposalStatus }) {
+export function ProposalStatusChip({
+  status,
+  size = 'small'
+}: {
+  size?: ChipProps['size'];
+  status: ProposalStatusWithArchived;
+}) {
   return (
     <StyledProposalStatusChip
       data-test='proposal-status-badge'
       size={size}
       status={status}
-      label={PROPOSAL_STATUS_LABELS[status]}
+      label={PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[status]}
       variant='filled'
       icon={<span>{PROPOSAL_STATUS_ICONS[status]}</span>}
     />
   );
 }
 
-const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalStatus }>`
+const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalStatusWithArchived }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
     return theme.palette[ProposalStatusColors[status]]?.main;
@@ -94,14 +102,14 @@ export function ProposalStatusChipTextOnly({
   size = 'small'
 }: {
   size?: ChipProps['size'];
-  status: ProposalStatus;
+  status: ProposalStatusWithArchived;
 }) {
   return (
     <StyledProposalStatusChipNormalText
       data-test='proposal-status-badge'
       size={size}
       status={status}
-      label={PROPOSAL_STATUS_LABELS[status]}
+      label={PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[status]}
       variant='filled'
     />
   );

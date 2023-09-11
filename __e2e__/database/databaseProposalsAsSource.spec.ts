@@ -77,7 +77,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Database with proposals as datasource', async () => {
-  test('create a board', async ({ page, pagesSidebar, databasePage }) => {
+  test('create a database with proposals as source', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
@@ -124,11 +124,23 @@ test.describe.serial('Database with proposals as datasource', async () => {
       },
       select: {
         id: true,
-        syncWithPageId: true
+        syncWithPageId: true,
+        parentId: true
       }
     });
     // Regression check to make sure we did not create duplicate cards
     expect(syncedCards.length).toBe(3);
+
+    databasePagePath = (
+      await prisma.page.findFirstOrThrow({
+        where: {
+          id: syncedCards[0].parentId as string
+        },
+        select: {
+          path: true
+        }
+      })
+    ).path;
 
     const allTargetProposalIds = [firstProposal.id, secondProposal.id, thirdProposal.id];
 
@@ -146,9 +158,9 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
 
-      const statusSelect = row.locator('data-test=proposal-status-badge');
+      const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
 
-      expect((await statusSelect.allInnerTexts())[0]).toEqual('Feedback');
+      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
 
       const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
       const proposalPage = await prisma.page.findUniqueOrThrow({
@@ -168,5 +180,57 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await expect(databasePage.getTableRowByIndex({ index: 1 })).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 2 })).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
+  });
+
+  test('view archived proposals as source', async ({ page, pagesSidebar, databasePage }) => {
+    // Arrange ------------------
+    await loginBrowserUser({
+      browserPage: page,
+      userId: spaceUser.id
+    });
+
+    // Mark the proposal as archived
+    await prisma.proposal.update({
+      where: {
+        id: secondProposal.id
+      },
+      data: {
+        archived: true
+      }
+    });
+
+    await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
+
+    // This is a refresh response
+    await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
+
+    await databasePage.page.waitForTimeout(500);
+
+    // Wait until the database is initialised
+
+    const syncedCards = await prisma.page.findMany({
+      where: {
+        syncWithPageId: {
+          not: null
+        },
+        spaceId: space.id
+      },
+      select: {
+        id: true,
+        syncWithPageId: true
+      }
+    });
+    // Regression check to make sure we did not create duplicate cards
+    expect(syncedCards.length).toBe(3);
+
+    const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
+
+    const archivedRowProposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({
+      cardId: syncedArchivedProposalCardId
+    });
+
+    await expect(archivedRowProposalStatusBadge).toBeVisible();
+
+    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Archived');
   });
 });
