@@ -28,21 +28,23 @@ function matcher({
   return searchPageType === evaluatedPageType;
 }
 
+type PageNodeRequiredFields = Pick<PageNode, 'id' | 'parentId' | 'type'>;
+
 /**
  * Accepts a pagemap (used in the UI) or a target page tree (used in the server)
  * Traverses parents until a matching item is found
  * @returns
  */
-export function findParentOfType<P extends PageNode = PageNode>({
+export function findParentOfType<P extends PageNodeRequiredFields = PageNode>({
   pageType,
   targetPageTree
 }: Required<Pick<FindParentOfTypeOptions<P>, 'targetPageTree' | 'pageType'>>): string | null;
-export function findParentOfType<P extends PageNode = PageNode>({
+export function findParentOfType<P extends PageNodeRequiredFields = PageNode>({
   pageType,
   pageId,
   pageMap
 }: Required<Pick<FindParentOfTypeOptions<P>, 'pageType' | 'pageId' | 'pageMap'>>): string | null;
-export function findParentOfType<P extends PageNode = PageNode>({
+export function findParentOfType<P extends PageNodeRequiredFields = PageNode>({
   pageType,
   pageId,
   pageMap,

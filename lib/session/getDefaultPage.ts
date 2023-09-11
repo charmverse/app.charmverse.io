@@ -77,22 +77,27 @@ export async function getDefaultPageForSpace({ spaceId, userId }: { spaceId: str
     resourceIdType: 'space'
   });
 
-  const accessiblePages = await client.pages.getAccessiblePages({
+  const accessiblePageIds = await client.pages.getAccessiblePageIds({
     spaceId,
     userId,
-    archived: false,
-    limit: 200
+    archived: false
   });
 
-  const pageMap = accessiblePages.reduce<Record<string, PageMeta>>((acc, page) => {
+  const pages = await prisma.page.findMany({
+    where: {
+      id: {
+        in: accessiblePageIds
+      }
+    }
+  });
+
+  const pageMap = pages.reduce<Record<string, PageMeta>>((acc, page) => {
     acc[page.id] = page;
     return acc;
   }, {});
 
   // Find the first top-level page that is not card and hasn't been deleted yet.
-  const topLevelPages = filterVisiblePages(pageMap)
-    // Remove any child pages (eg. that have a parentId)
-    .filter((page) => !page?.parentId);
+  const topLevelPages = filterVisiblePages(pageMap);
 
   const sortedPages = pageTree.sortNodes(topLevelPages);
   const firstPage = sortedPages[0];

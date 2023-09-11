@@ -41,24 +41,26 @@ function mapPageToMenuNode(page: PageMeta): MenuNode {
     spaceId: page.spaceId
   };
 }
+// .map(mapPageToMenuNode): MenuNode[]
 
-export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
-  return Object.values(pageMap)
-    .filter((page): page is PageMeta =>
-      isTruthy(
-        page &&
-          (page.type === 'board' ||
-            page.type === 'page' ||
-            page.type === 'linked_board' ||
-            rootPageIds?.includes(page.id)) &&
-          !findParentOfType({
-            pageId: page.id,
-            pageType: 'card',
-            pageMap
-          })
-      )
+export function filterVisiblePages<T extends Pick<PageMeta, 'type' | 'id'>>(
+  pageMap: PagesMap<T>,
+  rootPageIds: string[] = []
+): T[] {
+  return Object.values(pageMap).filter((page) =>
+    isTruthy(
+      page &&
+        (page.type === 'board' ||
+          page.type === 'page' ||
+          page.type === 'linked_board' ||
+          rootPageIds?.includes(page.id)) &&
+        !findParentOfType({
+          pageId: page.id,
+          pageType: 'card',
+          pageMap
+        })
     )
-    .map(mapPageToMenuNode);
+  );
 }
 
 type PageNavigationProps = {
