@@ -125,6 +125,7 @@ export function boardWithCardsArgs({
             fields: {
               isTemplate: false,
               properties: {
+                '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'd21b567d-fd35-496e-8f7c-1ee62e95d4f2',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661169600000}'
               },
               contentOrder: []
@@ -195,6 +196,7 @@ export function boardWithCardsArgs({
               icon: '',
               isTemplate: false,
               properties: {
+                '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'c5689c24-eb32-4af9-8e8d-e4191fbeb0a1',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661515200000}'
               },
               headerImage: null,
