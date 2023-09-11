@@ -200,7 +200,6 @@ jobs:
             *.zip
           key: webapp-corebump-${{ hashFiles('package-lock.json') }}-${{ needs.build-test-env.outputs.core_bump_commit_hash }}
 
-
   deploy_to_beanstalk:
     name: Deploy to beanstalk
     runs-on: ubuntu-latest
@@ -230,6 +229,9 @@ jobs:
           #   deployment_package: deploy.zip
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore beanstalk payload from cache
         id: restore_from_beanstalk_payload_cache
         uses: actions/cache/restore@v3
