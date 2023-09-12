@@ -256,21 +256,6 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
-    return http
-      .GET<Block[]>(
-        '/api/blocks',
-        { spaceId },
-        {
-          headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
-          }
-        }
-      )
-      .then((blocks) => blocks.map(blockToFBBlock))
-      .then((blocks) => fixBlocks(blocks));
-  }
-
   getSubtree({
     pageIdOrPath,
     spaceId,

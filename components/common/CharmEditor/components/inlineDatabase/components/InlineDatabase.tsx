@@ -6,8 +6,9 @@ import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
 import { useEffect, useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getBoards, getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePage } from 'hooks/usePage';
@@ -88,6 +89,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
@@ -103,8 +105,14 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
-  const boards = useAppSelector(getSortedBoards);
-  const board = boards.find((b) => b.id === pageId);
+  const boards = useAppSelector(getBoards);
+  const board = boards?.[pageId];
+
+  useEffect(() => {
+    if (!board && pageId) {
+      dispatch(initialDatabaseLoad({ pageIdOrPath: pageId }));
+    }
+  }, [pageId]);
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
