@@ -40,7 +40,6 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const allBoards = useAppSelector(getBoards);
   const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
@@ -91,7 +90,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (page.boardId && !allBoards[page.boardId]) {
+    if (page.boardId && !board) {
       dispatch(initialDatabaseLoad({ pageIdOrPath: page.boardId }));
     }
   }, [page.boardId]);
