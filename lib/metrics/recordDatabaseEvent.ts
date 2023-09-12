@@ -45,6 +45,7 @@ export async function recordDatabaseEvent({
           action: 'view_page',
           createdBy: userId,
           distinctUserId,
+          meta: typedEvent.meta,
           pageId: typedEvent.pageId,
           postId: typedEvent.postId,
           spaceId: typedEvent.spaceId,
