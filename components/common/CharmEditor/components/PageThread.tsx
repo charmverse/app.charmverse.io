@@ -1,5 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { Comment } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Check } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -29,10 +30,10 @@ import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import type { CommentWithUser } from 'lib/comments/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
@@ -180,7 +181,11 @@ function EditCommentCharmEditor({
   const isEmpty = checkIsContentEmpty(commentContent);
   const { editComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
-  const comment = thread.comments.find((_comment) => _comment.id === commentId) as CommentWithUser;
+  const comment = thread.comments.find((_comment) => _comment.id === commentId);
+
+  if (!comment) {
+    return null;
+  }
 
   return (
     <>
@@ -241,7 +246,6 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
   ({ createdAt, updatedAt }) => {
     const getDateTime = () => DateTime.fromISO(createdAt.toString());
     const { formatDateTime } = useDateFormatter();
-
     const [dateTime, setTime] = useState(getDateTime());
 
     // update once a minute
@@ -284,7 +288,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const [isMutating, setIsMutating] = useState(false);
     const [editedCommentId, setEditedCommentId] = useState<null | string>(null);
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
-    const [actionComment, setActionComment] = useState<null | CommentWithUser>(null);
+    const [actionComment, setActionComment] = useState<null | Comment>(null);
+    const { members } = useMembers();
 
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
@@ -296,7 +301,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       setIsMutating(false);
     }
 
-    function onClickCommentActions(event: MouseEvent<HTMLButtonElement, MouseEvent>, comment: CommentWithUser) {
+    function onClickCommentActions(event: MouseEvent<HTMLButtonElement, MouseEvent>, comment: Comment) {
       setActionComment(comment);
       menuState.open(event.currentTarget);
     }
@@ -343,6 +348,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       <StyledPageThread inline={inline.toString()} variant='outlined' id={`thread.${threadId}`} ref={ref}>
         <div>
           {thread.comments.map((comment, commentIndex) => {
+            const member = members.find((_member) => _member.id === comment.userId);
+            if (!member) {
+              return null;
+            }
+
             const isEditable = comment.id === editedCommentId;
             return (
               <ThreadCommentListItem
@@ -363,7 +373,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     <UserDisplay
                       showMiniProfile
                       component='div'
-                      user={comment.user}
+                      user={member}
                       avatarSize='small'
                       sx={{
                         '& .MuiTypography-root': {

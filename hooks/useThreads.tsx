@@ -105,10 +105,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       });
 
       setThreads((_threads) => {
-        thread.comments.push({
-          ...comment,
-          user: members.find((m) => m.id === comment.userId) || ({} as any)
-        });
+        thread.comments.push(comment);
         return {
           ..._threads,
           [thread.id]: thread
