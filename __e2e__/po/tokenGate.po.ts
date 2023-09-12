@@ -31,7 +31,7 @@ export class TokenGatePage {
   }
 
   async waitForWorkspaceURL({ domain }: { domain: string }) {
-    await this.page.waitForURL(`**/join?domain=${domain}}`, { timeout: 0 });
+    await this.page.waitForURL(`**/join?domain=${domain}`, { timeout: 0 });
   }
 
   async waitForJoinURL() {

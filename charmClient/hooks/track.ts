@@ -7,11 +7,23 @@ import { TrackApi } from '../apis/trackApi';
 
 const track = new TrackApi();
 
+export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
+  track.trackAction('page_view', {
+    ...page,
+    meta: {
+      pathname: window.location.pathname
+    }
+  });
+}
+
 export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId' | 'userId'>) {
   const { space: currentSpace } = useCurrentSpace();
   useEffect(() => {
     if (currentSpace) {
-      track.trackAction('page_view', { spaceId: currentSpace.id, ...page });
+      trackPageView({
+        spaceId: currentSpace.id,
+        ...page
+      });
     }
   }, [currentSpace?.id]);
 }

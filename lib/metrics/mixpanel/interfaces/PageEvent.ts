@@ -24,6 +24,7 @@ export type StaticPageType =
 
 type ViewPageEvent = PageEvent & {
   postId?: string;
+  meta?: { pathname: string };
   type: PageType | 'post' | StaticPageType;
 };
 
