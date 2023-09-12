@@ -5,7 +5,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { databaseViewsLoad, initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
@@ -141,7 +141,7 @@ function DraggableTreeNode({
 
         // Only load blocks once
         if (item.type?.match('board') && !viewsLoaded) {
-          databasesDispatch(initialDatabaseLoad({ pageIdOrPath: item.id }));
+          databasesDispatch(databaseViewsLoad({ pageIdOrPath: item.id }));
           setViewsLoaded(true);
         }
       });
