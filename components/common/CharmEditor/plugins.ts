@@ -3,7 +3,7 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
-import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+import type { PageType } from '@charmverse/core/prisma-client';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
