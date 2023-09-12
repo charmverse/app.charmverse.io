@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps } from 'next';
 
-import { getDefaultPageForSpace } from 'lib/session/getDefaultPage';
+import { getDefaultPageForSpace } from 'lib/session/getDefaultPageForSpace';
 import { withSessionSsr } from 'lib/session/withSession';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
