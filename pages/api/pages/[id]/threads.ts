@@ -36,9 +36,6 @@ async function getThreads(req: NextApiRequest, res: NextApiResponse) {
     },
     include: {
       comments: {
-        include: {
-          user: true
-        },
         orderBy: {
           createdAt: 'asc'
         }
