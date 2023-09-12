@@ -5,7 +5,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { databaseViewsLoad, initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
+import { databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';

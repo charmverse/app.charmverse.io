@@ -72,8 +72,8 @@ const cardsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.cards = {};
-      state.templates = {};
+      state.cards = state.cards ?? {};
+      state.templates = state.templates ?? {};
       for (const block of action.payload) {
         if (block.type === 'card' && block.fields.isTemplate) {
           state.templates[block.id] = block as Card;

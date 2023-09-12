@@ -43,7 +43,7 @@ const viewsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.views = {};
+      state.views = state.views ?? {};
       for (const block of action.payload) {
         if (block.type === 'view') {
           state.views[block.id] = block as BoardView;
@@ -52,7 +52,7 @@ const viewsSlice = createSlice({
     });
 
     builder.addCase(databaseViewsLoad.fulfilled, (state, action) => {
-      state.views = {};
+      state.views = state.views ?? {};
       for (const block of action.payload) {
         if (block.type === 'view') {
           state.views[block.id] = block as BoardView;

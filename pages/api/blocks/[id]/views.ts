@@ -36,10 +36,8 @@ async function getViews(req: NextApiRequest, res: NextApiResponse<Block[] | { er
   }
   const blocks = await prisma.block.findMany({
     where: {
-      type: {
-        in: ['board', 'view']
-      },
-      OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
+      type: 'view',
+      OR: [{ rootId: blockId }, { parentId: blockId }]
     }
   });
   return res.status(200).json(blocks);
