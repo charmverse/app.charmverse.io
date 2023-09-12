@@ -3,7 +3,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
 
-import { initialDatabaseLoad } from './initialLoad';
+import { databaseViewsLoad, initialDatabaseLoad } from './initialLoad';
 
 import type { RootState } from './index';
 
@@ -44,8 +44,20 @@ const boardsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.boards = {};
-      state.templates = {};
+      state.boards = state.boards ?? {};
+      state.templates = state.templates ?? {};
+      for (const block of action.payload) {
+        if (block.type === 'board' && block.fields.isTemplate) {
+          state.templates[block.id] = block as Board;
+        } else if (block.type === 'board' && !block.fields.isTemplate) {
+          state.boards[block.id] = block as Board;
+        }
+      }
+    });
+
+    builder.addCase(databaseViewsLoad.fulfilled, (state, action) => {
+      state.boards = state.boards ?? {};
+      state.templates = state.templates ?? {};
       for (const block of action.payload) {
         if (block.type === 'board' && block.fields.isTemplate) {
           state.templates[block.id] = block as Board;

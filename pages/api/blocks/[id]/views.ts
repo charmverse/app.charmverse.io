@@ -12,13 +12,13 @@ export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getBlockSubtree);
+handler.get(getViews);
 
-async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+async function getViews(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const blockId = req.query.id as string;
-  const page = await prisma.page.findFirstOrThrow({
+  const page = await prisma.page.findUniqueOrThrow({
     where: {
-      OR: [{ boardId: blockId }, { cardId: blockId }]
+      id: blockId
     },
     select: {
       id: true
@@ -36,6 +36,9 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
   }
   const blocks = await prisma.block.findMany({
     where: {
+      type: {
+        in: ['board', 'view']
+      },
       OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
     }
   });

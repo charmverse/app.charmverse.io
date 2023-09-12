@@ -286,6 +286,13 @@ class CharmClient {
       .then((blocks) => fixBlocks(blocks));
   }
 
+  getViews({ pageIdOrPath, spaceId }: { pageIdOrPath?: string; spaceId?: string }): Promise<FBBlock[]> {
+    return http
+      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/views`, { spaceId })
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
+  }
+
   async insertBlock(block: FBBlock, updater: BlockUpdater): Promise<FBBlock[]> {
     return this.insertBlocks([block], updater);
   }
