@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('node:path');
-
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
-const uuid = require('uuid');
-const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
 
@@ -183,10 +178,10 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/initWebsockets.ts'
+            websockets: './background/initWebsockets.ts',
+            updatePageContentForSync: './scripts/updatePageContentForSync.ts'
             // countSpaceData: './scripts/countSpaceData.ts',
             // importFromDiscourse: './scripts/importFromDiscourse.ts',
-            // updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };
