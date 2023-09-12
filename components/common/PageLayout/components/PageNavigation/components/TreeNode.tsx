@@ -132,6 +132,14 @@ function DraggableTreeNode({
     [onDropAdjacent]
   );
 
+  function refreshViews() {
+    // Only load blocks once
+    if (item.type?.match('board') && !viewsLoaded) {
+      databasesDispatch(databaseViewsLoad({ pageIdOrPath: item.id }));
+      setViewsLoaded(true);
+    }
+  }
+
   const focusListener = useCallback(
     (elt: any) => {
       elt?.addEventListener('focusin', (e: any) => {
@@ -139,11 +147,7 @@ function DraggableTreeNode({
         // see https://github.com/mui-org/material-ui/issues/29518
         e.stopImmediatePropagation();
 
-        // Only load blocks once
-        if (item.type?.match('board') && !viewsLoaded) {
-          databasesDispatch(databaseViewsLoad({ pageIdOrPath: item.id }));
-          setViewsLoaded(true);
-        }
+        refreshViews();
       });
       drag(elt);
     },
@@ -167,12 +171,15 @@ function DraggableTreeNode({
   const allViews = useAppSelector(getSortedViews);
   const views = allViews.filter((view) => view.parentId === item.id);
 
-  // if (views.length === 0 && !viewsLoaded && ) {
-  //   dispatch(initialDat);
-  // }
-
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
+
+  useEffect(() => {
+    if (expanded) {
+      refreshViews();
+    }
+  }, [expanded]);
+
   const hideChildren = !expanded;
 
   useEffect(() => {
@@ -210,19 +217,22 @@ function DraggableTreeNode({
       {hideChildren ? (
         <div>{/* empty div to trick TreeView into showing expand icon */}</div>
       ) : item.type.match(/board/) ? (
-        views.map(
-          (view) =>
-            !view.fields.inline && (
-              <BoardViewTreeItem
-                key={view.id}
-                href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                label={view.title || formatViewTitle(view)}
-                nodeId={view.id}
-                viewType={view.fields.viewType}
-                onClick={onClick}
-              />
-            )
-        )
+        /* empty div to trick TreeView into showing expand icon when a board is expanded but views are not available yet */
+        <div>
+          {views.map(
+            (view) =>
+              !view.fields.inline && (
+                <BoardViewTreeItem
+                  key={view.id}
+                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  label={view.title || formatViewTitle(view)}
+                  nodeId={view.id}
+                  viewType={view.fields.viewType}
+                  onClick={onClick}
+                />
+              )
+          )}
+        </div>
       ) : item.children.length > 0 ? (
         item.children.map((childItem) => (
           // eslint-disable-next-line no-use-before-define
