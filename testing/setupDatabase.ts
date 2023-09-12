@@ -30,6 +30,7 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
+import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -1061,12 +1062,18 @@ export async function generateProposal({
   };
 }
 
+/**
+ * Generate a board with default properties of title, date, and a single select field
+ * @param param0
+ * @returns
+ */
 export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
   cardCount,
   views,
+  viewType,
   addPageContent,
   viewDataSource,
   boardPageType
@@ -1076,6 +1083,7 @@ export async function generateBoard({
   parentId?: string;
   cardCount?: number;
   views?: number;
+  viewType?: IViewType;
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
@@ -1088,7 +1096,8 @@ export async function generateBoard({
     views,
     addPageContent,
     viewDataSource,
-    boardPageType
+    boardPageType,
+    viewType
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

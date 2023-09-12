@@ -1,10 +1,12 @@
-import type { Locator, Page } from '@playwright/test';
 import { selectors } from '@playwright/test';
 
 import type { PropertyType } from 'lib/focalboard/board';
 
 import { GlobalPage } from './global.po';
 
+/**
+ * Used by a locator method to get a specific board when multiple coexist
+ */
 type OptionalBoardId = {
   boardId?: string;
 };
@@ -28,6 +30,10 @@ export class DatabasePage extends GlobalPage {
 
   linkedDatabaseSearch({ boardId }: OptionalBoardId = {}) {
     return this.getPageOrBoardLocator({ boardId }).locator('data-test=linked-database-search').locator('input');
+  }
+
+  linkedDatabaseOption({ sourceBoardId, boardId }: { sourceBoardId: string } & OptionalBoardId) {
+    return this.getPageOrBoardLocator({ boardId }).locator(`data-test=page-option-${sourceBoardId}`);
   }
 
   selectNewDatabaseAsSource({ boardId }: OptionalBoardId = {}) {

@@ -2,6 +2,7 @@ import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { BoardFields, DataSourceType } from 'lib/focalboard/board';
+import type { IViewType } from 'lib/focalboard/boardView';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
@@ -27,7 +28,8 @@ export function boardWithCardsArgs({
   views = 1,
   viewDataSource,
   boardPageType,
-  boardTitle
+  boardTitle,
+  viewType
 }: {
   createdBy: string;
   spaceId: string;
@@ -35,6 +37,7 @@ export function boardWithCardsArgs({
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
+  viewType?: IViewType;
   viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
@@ -300,7 +303,7 @@ export function boardWithCardsArgs({
           filters: [],
           operation: 'and'
         },
-        viewType: 'gallery',
+        viewType: viewType ?? 'table',
         // Leave out view datasource from the views since we are migrating proposals
         sourceType: viewDataSource === 'proposals' ? undefined : viewDataSource,
         cardOrder: [cardIds[1], cardIds[0]],
@@ -312,7 +315,7 @@ export function boardWithCardsArgs({
         collapsedOptionIds: [],
         columnCalculations: {},
         kanbanCalculations: {},
-        visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
+        visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765', '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f']
       } as Partial<BoardFields> as any
     });
   }
