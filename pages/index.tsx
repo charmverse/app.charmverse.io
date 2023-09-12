@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { GetServerSideProps } from 'next';
 
 import { LoginPageView } from 'components/login/LoginPage';
@@ -16,31 +17,38 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     };
   }
 
-  const [sortedSpaces, lastPageView] = await Promise.all([
-    getSpacesOfUser(sessionUserId),
-    getLastViewedSpaceId({ userId: sessionUserId })
-  ]);
+  try {
+    const [sortedSpaces, lastPageView] = await Promise.all([
+      getSpacesOfUser(sessionUserId),
+      getLastViewedSpaceId({ userId: sessionUserId })
+    ]);
 
-  let destination = getDefaultPage({
-    lastViewedSpaceId: lastPageView?.spaceId,
-    returnUrl,
-    spaces: sortedSpaces,
-    userId: sessionUserId
-  });
+    let destination = getDefaultPage({
+      lastViewedSpaceId: lastPageView?.spaceId,
+      returnUrl,
+      spaces: sortedSpaces,
+      userId: sessionUserId
+    });
 
-  // append existing query params, lie 'account' or 'subscription'
-  Object.keys(context.query).forEach((key) => {
-    if (key !== 'returnUrl') {
-      destination += `${destination.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
-    }
-  });
+    // append existing query params, lie 'account' or 'subscription'
+    Object.keys(context.query).forEach((key) => {
+      if (key !== 'returnUrl') {
+        destination += `${destination.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
+      }
+    });
 
-  return {
-    redirect: {
-      destination,
-      permanent: false
-    }
-  };
+    return {
+      redirect: {
+        destination,
+        permanent: false
+      }
+    };
+  } catch (error) {
+    log.error('Error getting spaces for user', { error });
+    return {
+      props: {}
+    };
+  }
 });
 
 export default function LoginPage() {
