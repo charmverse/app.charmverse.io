@@ -107,8 +107,6 @@ test.describe.serial('Edit database select properties', async () => {
     // Create new card and close it
     await databasePage.addCardFromTableButton.click();
 
-    await page.waitForResponse('/api/blocks');
-
     // Leave time for all creation processes to happen
     await page.waitForTimeout(500);
 
