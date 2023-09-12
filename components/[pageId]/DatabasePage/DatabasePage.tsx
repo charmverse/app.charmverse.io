@@ -90,10 +90,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (page.boardId && !board) {
-      dispatch(initialDatabaseLoad({ pageIdOrPath: page.boardId }));
+    if (page.id && (!board || page.id !== board.id)) {
+      dispatch(initialDatabaseLoad({ pageIdOrPath: page.id }));
     }
-  }, [page.boardId]);
+  }, [page.id]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
