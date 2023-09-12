@@ -452,6 +452,7 @@ function CenterPanel(props: Props) {
         ) : null
       )}
       <div
+        data-test={`database-container-${props.board.id}`}
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
         ref={backgroundRef}

@@ -135,7 +135,11 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         {formStep === 'select_source' && (
           <Grid container spacing={1} px={1}>
             {(allowedSourceOptions.includes('linked') || allowedSourceOptions.includes('new')) && (
-              <SourceType active={activeSourceType === 'board_page'} onClick={selectSourceType('board_page')}>
+              <SourceType
+                data-test='source-linked-database'
+                active={activeSourceType === 'board_page'}
+                onClick={selectSourceType('board_page')}
+              >
                 <TbDatabase style={{ fontSize: 24 }} />
                 CharmVerse database
               </SourceType>

@@ -62,12 +62,12 @@ test.describe.serial('Edit database select properties', async () => {
     await expect(pagesSidebar.databasePage).toBeVisible();
 
     // Initialise the new database
-    await expect(databasePage.selectNewDatabaseAsSource).toBeVisible();
+    await expect(databasePage.selectNewDatabaseAsSource()).toBeVisible();
 
-    await databasePage.selectNewDatabaseAsSource.click();
+    await databasePage.selectNewDatabaseAsSource().click();
 
     // Wait until the database is initialised
-    await expect(databasePage.addCardFromTableButton).toBeVisible();
+    await expect(databasePage.addCardFromTableButton()).toBeVisible();
 
     const pageUrl = page.url();
     databasePagePath = pageUrl
@@ -95,17 +95,17 @@ test.describe.serial('Edit database select properties', async () => {
     await expect(databasePage.databasePage).toBeVisible();
 
     // Add select property
-    await expect(databasePage.addTablePropButton).toBeVisible();
+    await expect(databasePage.addTablePropButton()).toBeVisible();
 
-    databasePage.addTablePropButton.click();
+    databasePage.addTablePropButton().click();
 
-    const selectPropertyType = databasePage.getPropertyTypeOptionLocator('select');
+    const selectPropertyType = databasePage.getPropertyTypeOptionLocator({ type: 'select' });
 
     expect(selectPropertyType).toBeVisible();
 
     await selectPropertyType.click();
     // Create new card and close it
-    await databasePage.addCardFromTableButton.click();
+    await databasePage.addCardFromTableButton().click();
 
     // Leave time for all creation processes to happen
     await page.waitForTimeout(500);
