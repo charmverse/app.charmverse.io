@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {
-    if (key !== 'returnUrl') {
+    if (key !== 'returnUrl' && key !== 'domain') {
       destination += `${destination.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
     }
   });
