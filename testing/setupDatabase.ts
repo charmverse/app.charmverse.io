@@ -1064,7 +1064,7 @@ export async function generateProposal({
 
 /**
  * Generate a board with default properties of title, date, and a single select field
- * @param param0
+ * @param linkedSourceId - Used for providing a linked source for the boards views
  * @returns
  */
 export async function generateBoard({
@@ -1076,7 +1076,8 @@ export async function generateBoard({
   viewType,
   addPageContent,
   viewDataSource,
-  boardPageType
+  boardPageType,
+  linkedSourceId
 }: {
   createdBy: string;
   spaceId: string;
@@ -1087,6 +1088,7 @@ export async function generateBoard({
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
+  linkedSourceId?: string;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1097,7 +1099,8 @@ export async function generateBoard({
     addPageContent,
     viewDataSource,
     boardPageType,
-    viewType
+    viewType,
+    linkedSourceId
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

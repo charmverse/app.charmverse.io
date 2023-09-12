@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
 
@@ -100,6 +101,37 @@ describe('generateBoard', () => {
 
     viewBlocks.forEach((block) => {
       expect((block.fields as BoardViewFields).viewType).toEqual(viewType);
+    });
+  });
+
+  it('should generate a database page with linked source IDs if this option is provided', async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
+
+    const viewCount = 3;
+
+    const viewType: IViewType = 'board';
+
+    const sourceId = uuid();
+
+    const board = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      views: viewCount,
+      viewType,
+      linkedSourceId: sourceId
+    });
+
+    const viewBlocks = await prisma.block.findMany({
+      where: {
+        rootId: board.id,
+        type: 'view'
+      }
+    });
+    // 1 board plus 2 nested cards
+    expect(viewBlocks).toHaveLength(viewCount);
+
+    viewBlocks.forEach((block) => {
+      expect((block.fields as BoardViewFields).linkedSourceId).toEqual(sourceId);
     });
   });
 
