@@ -5,12 +5,14 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { Web3ReactProvider } from '@web3-react/core';
+import { wagmiConfig } from 'connectors/config';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
+import { WagmiConfig } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
@@ -230,34 +232,36 @@ function DataProviders({ children }: { children: ReactNode }) {
       <UserProvider>
         <DiscordProvider>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ConnectionManager>
-              <WalletSelectorModal />
-              <Web3AccountProvider>
-                <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <BountiesProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberPropertiesProvider>
-                                    <UserProfileProvider>
-                                      <PageTitleProvider>{children}</PageTitleProvider>
-                                    </UserProfileProvider>
-                                  </MemberPropertiesProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
-                            </BountiesProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
-                </SpacesProvider>
-              </Web3AccountProvider>
-            </Web3ConnectionManager>
+            <WagmiConfig config={wagmiConfig}>
+              <Web3ConnectionManager>
+                <WalletSelectorModal />
+                <Web3AccountProvider>
+                  <SpacesProvider>
+                    <CurrentSpaceProvider>
+                      <PostCategoriesProvider>
+                        <IsSpaceMemberProvider>
+                          <WebSocketClientProvider>
+                            <MembersProvider>
+                              <BountiesProvider>
+                                <PaymentMethodsProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <UserProfileProvider>
+                                        <PageTitleProvider>{children}</PageTitleProvider>
+                                      </UserProfileProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </PaymentMethodsProvider>
+                              </BountiesProvider>
+                            </MembersProvider>
+                          </WebSocketClientProvider>
+                        </IsSpaceMemberProvider>
+                      </PostCategoriesProvider>
+                    </CurrentSpaceProvider>
+                  </SpacesProvider>
+                </Web3AccountProvider>
+              </Web3ConnectionManager>
+            </WagmiConfig>
           </Web3ReactProvider>
         </DiscordProvider>
       </UserProvider>

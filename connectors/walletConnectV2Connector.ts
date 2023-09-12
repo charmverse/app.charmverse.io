@@ -55,7 +55,7 @@ export class WalletConnectV2Connector extends AbstractConnector {
         ],
         events: ['chainChanged', 'accountsChanged'],
         optionalEvents: ['disconnect']
-      });
+      } as any);
     });
 
     const accounts = await provider.enable();
