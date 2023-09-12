@@ -30,7 +30,7 @@ export async function getDefaultPageForSpace({
   host?: string;
   userId: string;
 }) {
-  const { id: spaceId, domain } = space;
+  const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
 
   const defaultSpaceUrl = getSpaceUrl(space, host);
@@ -74,10 +74,17 @@ export async function getDefaultPageForSpace({
       id: {
         in: accessiblePageIds
       }
+    },
+    select: {
+      createdAt: true,
+      id: true,
+      index: true,
+      path: true,
+      type: true
     }
   });
 
-  const pageMap = pages.reduce<Record<string, PageMeta>>((acc, page) => {
+  const pageMap = pages.reduce<Record<string, (typeof pages)[number]>>((acc, page) => {
     acc[page.id] = page;
     return acc;
   }, {});
@@ -85,7 +92,9 @@ export async function getDefaultPageForSpace({
   // Find the first top-level page that is not card and hasn't been deleted yet.
   const topLevelPages = filterVisiblePages(pageMap);
 
-  const sortedPages = pageTree.sortNodes(topLevelPages);
+  // TODO: simplify types of sortNodes input to only be index and createdAt
+  const sortedPages = pageTree.sortNodes(topLevelPages as PageMeta[]);
+
   const firstPage = sortedPages[0];
 
   if (firstPage) {

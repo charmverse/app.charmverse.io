@@ -9,7 +9,18 @@ import { getDefaultPageForSpace } from '../getDefaultPageForSpace';
 describe('getDefaultPageForSpace()', () => {
   it('should send user to first top-level page by default', async () => {
     const { space, user } = await generateUserAndSpace();
+    await createPage({
+      createdAt: new Date(),
+      index: 1,
+      spaceId: space.id,
+      createdBy: user.id,
+      // add basic permission
+      pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }]
+    });
+    // create a page that is first based on index
     const page = await createPage({
+      createdAt: new Date(Date.now() + 100000),
+      index: 0,
       spaceId: space.id,
       createdBy: user.id,
       // add basic permission
