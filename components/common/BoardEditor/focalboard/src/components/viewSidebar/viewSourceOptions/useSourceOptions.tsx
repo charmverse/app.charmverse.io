@@ -18,7 +18,8 @@ import { createTableView } from 'lib/focalboard/tableView';
 
 import mutator from '../../../mutator';
 import { getBoards } from '../../../store/boards';
-import { useAppSelector } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { initialDatabaseLoad } from '../../../store/initialLoad';
 import { getViews } from '../../../store/views';
 
 export const allowedSourceDatabasePageTypes = ['board', 'inline_board'];
@@ -33,6 +34,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
   const { space } = useCurrentSpace();
   const { user } = useUser();
   const { members } = useMembers();
+  const dispatch = useAppDispatch();
 
   const { showMessage } = useSnackbar();
 
@@ -63,7 +65,16 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     }
 
     // We want to get the view from the source database to copy over props such as visible property IDs
-    const relatedSourceView = Object.values(views).find((view) => view.parentId === sourceDatabaseId);
+    let relatedSourceView = Object.values(views).find((view) => view.parentId === sourceDatabaseId);
+
+    if (!relatedSourceView) {
+      const sourceDbViews = (await charmClient.getViews({ pageIdOrPath: sourceDatabaseId })) as BoardView[];
+      relatedSourceView = sourceDbViews.find((view) => view.type === 'view');
+    }
+
+    // Load up blocks for the source view so they will appear
+    dispatch(initialDatabaseLoad({ pageIdOrPath: sourceDatabaseId }));
+
     const constructedView = createTableView({ board: rootBoard, activeView: relatedSourceView });
 
     const viewId = activeView ? activeView.id : uuid();
