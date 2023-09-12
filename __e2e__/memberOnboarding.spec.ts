@@ -14,7 +14,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await login({ page, userId: user.id });
 
     const domain = space.domain;
-    const targetPage = `${baseUrl}/${domain}`;
+    const targetPage = `${baseUrl}/${domain}**`;
 
     await page.goto(targetPage);
     await page.waitForURL(targetPage);
