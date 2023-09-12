@@ -54,18 +54,6 @@ const boardsSlice = createSlice({
         }
       }
     });
-
-    builder.addCase(databaseViewsLoad.fulfilled, (state, action) => {
-      state.boards = state.boards ?? {};
-      state.templates = state.templates ?? {};
-      for (const block of action.payload) {
-        if (block.type === 'board' && block.fields.isTemplate) {
-          state.templates[block.id] = block as Board;
-        } else if (block.type === 'board' && !block.fields.isTemplate) {
-          state.boards[block.id] = block as Board;
-        }
-      }
-    });
   }
 });
 
