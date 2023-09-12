@@ -172,10 +172,6 @@ class CharmClient {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
 
-  getBlockViewsByPageId(pageId: string) {
-    return http.GET<Block[]>(`/api/blocks/views/${pageId}`);
-  }
-
   getPageLink(pageId: string) {
     return http.GET<PageLink>(`/api/pages/${pageId}/link`);
   }
@@ -256,17 +252,13 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  getSubtree({
-    pageIdOrPath,
-    spaceId,
-    levels = 2
-  }: {
-    pageIdOrPath?: string;
-    spaceId?: string;
-    levels?: number;
-  }): Promise<FBBlock[]> {
+  getBlock({ blockId }: { blockId: string }): Promise<FBBlock> {
+    return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
+  }
+
+  getSubtree({ pageIdOrPath, spaceId }: { pageIdOrPath?: string; spaceId?: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/subtree`, { levels, spaceId })
+      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/subtree`, { spaceId })
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }

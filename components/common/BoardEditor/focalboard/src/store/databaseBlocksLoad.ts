@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 export const initialDatabaseLoad = createAsyncThunk(
   'initialDatabaseLoad',
   async ({ pageIdOrPath, spaceId }: { pageIdOrPath: string; spaceId?: string }) => {
-    const blocks = charmClient.getSubtree({ levels: 3, pageIdOrPath, spaceId });
+    const blocks = charmClient.getSubtree({ pageIdOrPath, spaceId });
     return blocks;
   }
 );

@@ -20,8 +20,8 @@ import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -13,7 +13,7 @@ import { Constants } from '../constants';
 import { Utils } from '../utils';
 
 import { getBoard } from './boards';
-import { initialDatabaseLoad } from './initialLoad';
+import { initialDatabaseLoad } from './databaseBlocksLoad';
 import { getView } from './views';
 
 import type { RootState } from './index';

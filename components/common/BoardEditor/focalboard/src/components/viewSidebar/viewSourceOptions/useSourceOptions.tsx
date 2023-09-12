@@ -18,8 +18,8 @@ import { createTableView } from 'lib/focalboard/tableView';
 
 import mutator from '../../../mutator';
 import { getBoards } from '../../../store/boards';
+import { initialDatabaseLoad } from '../../../store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { initialDatabaseLoad } from '../../../store/initialLoad';
 import { getViews } from '../../../store/views';
 
 export const allowedSourceDatabasePageTypes = ['board', 'inline_board'];
@@ -49,8 +49,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       return;
     }
 
-    const sourceBoard =
-      boards[sourceDatabaseId] ?? (await charmClient.getSubtree({ pageIdOrPath: sourceDatabaseId, levels: 0 }));
+    const sourceBoard = boards[sourceDatabaseId] ?? (await charmClient.getBlock({ blockId: sourceDatabaseId }));
     const sourcePage = pages[sourceDatabaseId];
 
     if (

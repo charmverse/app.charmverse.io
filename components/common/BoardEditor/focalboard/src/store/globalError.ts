@@ -1,7 +1,7 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { initialDatabaseLoad } from './initialLoad';
+import { initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 

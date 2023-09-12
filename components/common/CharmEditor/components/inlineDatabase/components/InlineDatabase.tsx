@@ -7,8 +7,8 @@ import { useEffect, useCallback, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getBoards, getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePage } from 'hooks/usePage';
