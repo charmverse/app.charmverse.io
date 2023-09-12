@@ -168,7 +168,12 @@ function DateRange(props: Props): JSX.Element {
           <EmptyPlaceholder>Empty</EmptyPlaceholder>
         )}
       </div>
-      <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>
+      <Popover
+        disableRestoreFocus
+        {...bindPopover(popupState)}
+        onClose={onClose}
+        PaperProps={{ sx: { p: 2, fontSize: 14 } }}
+      >
         <div className={`DateRange ${className}-overlayWrapper`}>
           <div className={`${className}-overlay`}>
             <div className='inputContainer'>

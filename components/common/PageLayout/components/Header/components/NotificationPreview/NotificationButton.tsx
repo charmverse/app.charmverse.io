@@ -21,6 +21,7 @@ export function NotificationButton() {
         </IconButton>
       </NotificationsBadge>
       <Popover
+        disableRestoreFocus
         {...bindPopover(popupState)}
         anchorOrigin={{
           horizontal: 'right',

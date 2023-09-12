@@ -45,6 +45,7 @@ function ShareButton({ headerHeight, pageId }: Props) {
         )}
       </Tooltip>
       <Popover
+        disableRestoreFocus
         {...bindPopover(popupState)}
         anchorOrigin={{
           horizontal: 'right',
