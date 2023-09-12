@@ -307,7 +307,7 @@ class CharmClient {
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
-    const currentBlocks = await http.GET<Block[]>('/api/blocks', { id: blockId });
+    const currentBlocks = await http.GET<Block[]>(`/api/blocks/${blockId}/subtree`);
     const currentFBBlock = blockToFBBlock(currentBlocks[0]);
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
