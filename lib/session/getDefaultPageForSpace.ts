@@ -1,5 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
+import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -19,7 +20,14 @@ const staticPagesToDirect: { [key in StaticPageType]?: string } = {
 const pageTypes = Object.keys(PageType).concat('post', ...Object.keys(staticPagesToDirect));
 
 // get default page when we have a space domain
-export async function getDefaultPageForSpace({ spaceId, userId }: { spaceId: string; userId: string }) {
+export async function getDefaultPageForSpace({
+  space,
+  userId
+}: {
+  space: Pick<Space, 'id' | 'domain'>;
+  userId: string;
+}) {
+  const { id: spaceId, domain } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
 
   if (lastPageView) {
@@ -30,17 +38,17 @@ export async function getDefaultPageForSpace({ spaceId, userId }: { spaceId: str
     // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
     // handle forum posts
     if (lastPageView.post) {
-      return `/forum?postId=${lastPageView.post.id}`;
+      return `/${domain}/forum?postId=${lastPageView.post.id}`;
     }
     // handle pages
     else if (lastPageView.page) {
-      return `/${lastPageView.page.path}`;
+      return `/${domain}/${lastPageView.page.path}`;
     }
     // handle static pages
     else {
       const staticPath = staticPagesToDirect[lastPageView.pageType as StaticPageType];
       if (staticPath) {
-        return staticPath;
+        return `/${domain}${staticPath}`;
       }
     }
   }
@@ -76,9 +84,9 @@ export async function getDefaultPageForSpace({ spaceId, userId }: { spaceId: str
   const firstPage = sortedPages[0];
 
   if (firstPage) {
-    return `/${firstPage.path}`;
+    return `/${domain}/${firstPage.path}`;
   } else {
-    return `/members`;
+    return `/${domain}/members`;
   }
 }
 

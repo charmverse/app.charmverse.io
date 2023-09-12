@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // 3. send user to default page for the space
 
-  let destination = await getDefaultPageForSpace({ spaceId: space.id, userId: sessionUserId });
+  let destination = await getDefaultPageForSpace({ space, userId: sessionUserId });
 
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {
@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   return {
     redirect: {
-      destination: `/${space.domain}${destination}`,
+      destination,
       permanent: false
     }
   };
