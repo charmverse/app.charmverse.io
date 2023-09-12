@@ -1,7 +1,7 @@
 import type { GetServerSideProps } from 'next';
 
 import { LoginPageView } from 'components/login/LoginPage';
-import { getDefaultPage, getLastPageView } from 'lib/session/getDefaultPage';
+import { getDefaultPage, getLastViewedSpaceId } from 'lib/session/getDefaultPage';
 import { withSessionSsr } from 'lib/session/withSession';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 
@@ -18,10 +18,15 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   const [sortedSpaces, lastPageView] = await Promise.all([
     getSpacesOfUser(sessionUserId),
-    getLastPageView({ userId: sessionUserId })
+    getLastViewedSpaceId({ userId: sessionUserId })
   ]);
 
-  let destination = getDefaultPage({ lastPageView, returnUrl, spaces: sortedSpaces, userId: sessionUserId });
+  let destination = getDefaultPage({
+    lastViewedSpaceId: lastPageView?.spaceId,
+    returnUrl,
+    spaces: sortedSpaces,
+    userId: sessionUserId
+  });
 
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {

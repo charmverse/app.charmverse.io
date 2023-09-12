@@ -1,28 +1,17 @@
 import { log } from '@charmverse/core/log';
-import { PageType } from '@charmverse/core/prisma';
-import type { Space, UserSpaceAction } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { StaticPageType } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
-export const staticPagesToDirect: { [key in StaticPageType]?: string } = {
-  bounties_list: '/bounties',
-  forum_posts_list: '/forum',
-  members_list: '/members',
-  proposals_list: '/proposals'
-};
-
-const pageTypes = Object.keys(PageType).concat('post', ...Object.keys(staticPagesToDirect));
-
 export function getDefaultPage({
-  lastPageView,
+  lastViewedSpaceId,
   returnUrl,
   spaces,
   userId
 }: {
-  lastPageView?: Pick<UserSpaceAction, 'spaceId'> | null;
+  lastViewedSpaceId?: string | null;
   returnUrl?: string;
   spaces: Pick<Space, 'id' | 'domain'>[];
   userId?: string;
@@ -40,7 +29,7 @@ export function getDefaultPage({
     log.info('Redirect user to given url', { userId });
     return returnUrl;
   } else {
-    const defaultWorkspace = getDefaultWorkspaceUrl(spaces, lastPageView?.spaceId);
+    const defaultWorkspace = getDefaultWorkspaceUrl(spaces, lastViewedSpaceId);
     log.info('Redirect user to default workspace', { userId });
     return defaultWorkspace;
   }
@@ -51,34 +40,17 @@ export function getDefaultWorkspaceUrl(spaces: Pick<Space, 'id' | 'domain'>[], l
   return getSpaceUrl(defaultSpace || spaces[0]);
 }
 
-export function getLastPageView({ userId, spaceId }: { userId: string; spaceId?: string }) {
+export function getLastViewedSpaceId({ userId }: { userId: string }) {
   return prisma.userSpaceAction.findFirst({
     where: {
       createdBy: userId,
-      action: 'view_page',
-      pageType: {
-        in: pageTypes
-      },
-      spaceId
+      action: 'view_page'
     },
     orderBy: {
       createdAt: 'desc'
     },
     select: {
-      spaceId: true,
-      pageType: true,
-      page: {
-        select: {
-          id: true,
-          path: true
-        }
-      },
-      post: {
-        select: {
-          id: true,
-          path: true
-        }
-      }
+      spaceId: true
     }
   });
 }

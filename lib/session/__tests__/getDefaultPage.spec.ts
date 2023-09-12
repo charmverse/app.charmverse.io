@@ -13,14 +13,11 @@ describe('getDefaultPage()', () => {
   });
 
   it('should use the space of the last page view', () => {
-    const lastPageView = {
-      spaceId: 'spaceId'
-    };
     const url = getDefaultPage({
-      lastPageView,
+      lastViewedSpaceId: 'spaceId',
       spaces: [
         { id: 'brooklyn', domain: 'brooklyn' },
-        { id: lastPageView.spaceId, domain: 'charmverse' }
+        { id: 'spaceId', domain: 'charmverse' }
       ]
     });
     expect(url).toEqual('/charmverse');
