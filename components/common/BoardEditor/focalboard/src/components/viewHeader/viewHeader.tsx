@@ -84,9 +84,7 @@ function ViewHeader(props: Props) {
   );
   useEffect(() => {
     if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId }).then(() => {
-        throw new Error('Proposal source updated');
-      });
+      updateProposalSource({ pageId: currentRootPageId });
     }
   }, [currentRootPageId, activeBoard?.id]);
 
