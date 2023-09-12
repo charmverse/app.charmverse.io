@@ -17,7 +17,7 @@ describe('getDefaultPageForSpace()', () => {
     });
 
     const url = await getDefaultPageForSpace({ space, userId: user.id });
-    expect(url).toEqual(`${space.domain}/${page.path}`);
+    expect(url).toEqual(`/${space.domain}/${page.path}`);
   });
 
   it('should send user to /members page when no other pages are available', async () => {

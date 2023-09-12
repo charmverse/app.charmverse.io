@@ -27,7 +27,8 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
       lastViewedSpaceId: lastPageView?.spaceId,
       returnUrl,
       spaces: sortedSpaces,
-      userId: sessionUserId
+      userId: sessionUserId,
+      host: context.req.headers.host
     });
 
     // append existing query params, lie 'account' or 'subscription'

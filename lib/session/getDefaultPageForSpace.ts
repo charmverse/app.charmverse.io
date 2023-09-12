@@ -7,6 +7,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getSpaceUrl } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -22,13 +23,17 @@ const pageTypes = Object.keys(PageType).concat('post', ...Object.keys(staticPage
 // get default page when we have a space domain
 export async function getDefaultPageForSpace({
   space,
+  host,
   userId
 }: {
-  space: Pick<Space, 'id' | 'domain'>;
+  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  host?: string;
   userId: string;
 }) {
   const { id: spaceId, domain } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
+
+  const defaultSpaceUrl = getSpaceUrl(space, host);
 
   if (lastPageView) {
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
@@ -38,17 +43,17 @@ export async function getDefaultPageForSpace({
     // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
     // handle forum posts
     if (lastPageView.post) {
-      return `/${domain}/forum?postId=${lastPageView.post.id}`;
+      return `${defaultSpaceUrl}/forum?postId=${lastPageView.post.id}`;
     }
     // handle pages
     else if (lastPageView.page) {
-      return `/${domain}/${lastPageView.page.path}`;
+      return `${defaultSpaceUrl}/${lastPageView.page.path}`;
     }
     // handle static pages
     else {
       const staticPath = staticPagesToDirect[lastPageView.pageType as StaticPageType];
       if (staticPath) {
-        return `/${domain}${staticPath}`;
+        return `${defaultSpaceUrl}${staticPath}`;
       }
     }
   }
@@ -84,9 +89,9 @@ export async function getDefaultPageForSpace({
   const firstPage = sortedPages[0];
 
   if (firstPage) {
-    return `/${domain}/${firstPage.path}`;
+    return `${defaultSpaceUrl}/${firstPage.path}`;
   } else {
-    return `/${domain}/members`;
+    return `${defaultSpaceUrl}/members`;
   }
 }
 
