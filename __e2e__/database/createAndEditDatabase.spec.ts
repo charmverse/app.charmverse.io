@@ -39,7 +39,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Edit database select properties', async () => {
-  test('create a board', async ({ page, pagesSidebar, databasePage }) => {
+  test('create a database', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
@@ -106,6 +106,8 @@ test.describe.serial('Edit database select properties', async () => {
     await selectPropertyType.click();
     // Create new card and close it
     await databasePage.addCardFromTableButton.click();
+
+    await page.waitForResponse('/api/blocks');
 
     // Leave time for all creation processes to happen
     await page.waitForTimeout(500);

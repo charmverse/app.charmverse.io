@@ -232,6 +232,9 @@ function CenterPanel(props: Props) {
 
     const card = createCard();
 
+    // eslint-disable-next-line no-console
+    console.log('addCard', 'BOARD', activeBoard, 'VIEW', activeView, 'CARD', card);
+
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
     card.parentId = activeBoard.id;
@@ -257,6 +260,7 @@ function CenterPanel(props: Props) {
       const newCardOrder = insertLast
         ? [...activeView.fields.cardOrder, card.id]
         : [card.id, ...activeView.fields.cardOrder];
+
       // update view order first so that when we add the block it appears in the right spot
       await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
 
