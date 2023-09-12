@@ -4,8 +4,8 @@ import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { filterVisiblePages } from 'components/common/PageLayout/components/PageNavigation/PageNavigation';
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
+import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { getSpaceUrl } from 'lib/utilities/browser';
 

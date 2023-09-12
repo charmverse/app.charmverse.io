@@ -20,7 +20,7 @@ import { useUser } from 'hooks/useUser';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
+import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
@@ -41,26 +41,6 @@ function mapPageToMenuNode(page: PageMeta): MenuNode {
     spaceId: page.spaceId
   };
 }
-export function filterVisiblePages<T extends Pick<PageMeta, 'type' | 'id'> | undefined>(
-  pageMap: Record<string, T>,
-  rootPageIds: string[] = []
-): T[] {
-  return Object.values(pageMap).filter((page) =>
-    isTruthy(
-      page &&
-        (page.type === 'board' ||
-          page.type === 'page' ||
-          page.type === 'linked_board' ||
-          rootPageIds?.includes(page.id)) &&
-        !findParentOfType({
-          pageId: page.id,
-          pageType: 'card',
-          pageMap
-        })
-    )
-  );
-}
-
 type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
