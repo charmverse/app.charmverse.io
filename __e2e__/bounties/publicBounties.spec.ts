@@ -28,7 +28,7 @@ test.describe('Make a bounties page public and visit it', async () => {
     await bountyCard.click();
 
     // 4. Open the card and make sure it renders content
-    await page.waitForURL(/\?bountyId=/);
+    await page.waitForURL(/bountyId=/);
 
     const cardPopup = page.locator('div.Dialog');
 
