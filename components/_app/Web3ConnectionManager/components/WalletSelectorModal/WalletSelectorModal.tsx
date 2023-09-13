@@ -31,10 +31,16 @@ type Props = {
 
 export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
   const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
-  // const { active, activate, setError, error } = useWeb3React();
   const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
   const { pendingConnector, error, isLoading, connectAsync } = useConnect();
   const { connector: activeConnector, isConnected } = useAccount();
+
+  useEffect(() => {
+    // reset WalletConnect if user has changed connector
+    if (activeConnector && activeConnector?.id !== walletConnectConnector.id) {
+      walletConnectConnector.disconnect();
+    }
+  }, [activeConnector]);
 
   const handleConnect = async (_connector: Connector) => {
     try {
@@ -43,11 +49,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
       log.warn('CONNECTION ERROR', { err });
       // We need to reset walletconnect if users have closed the modal
       // resetWalletConnector(_connector);
-      // setError(err);
-      if (activeConnector) {
-        // revert to previous connector
-        return connectAsync({ connector: activeConnector });
-      }
     }
   };
 
@@ -137,12 +138,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
     </div>
   );
 }
-
-// function resetWalletConnector(connector: Connector) {
-//   if (connector && connector instanceof WalletConnectConnector) {
-//     connector.walletConnectProvider = undefined;
-//   }
-// }
 
 export function WalletSelectorModal() {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useWeb3ConnectionManager();
