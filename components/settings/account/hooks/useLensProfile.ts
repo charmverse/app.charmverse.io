@@ -1,6 +1,6 @@
-import type { Web3Provider } from '@ethersproject/providers';
 import { RPC } from 'connectors/index';
 import useSWR from 'swr';
+import { useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,9 +14,10 @@ async function switchNetwork() {
 }
 
 export function useLensProfile() {
-  const { account, library, chainId } = useWeb3AuthSig();
+  const { account, chainId } = useWeb3AuthSig();
   const { user } = useUser();
   const { space } = useCurrentSpace();
+  const { signMessageAsync } = useSignMessage();
 
   const {
     data: lensProfileState = {
@@ -45,8 +46,7 @@ export function useLensProfile() {
     }
 
     const challenge = await lensClient.authentication.generateChallenge(account);
-    const web3Provider: Web3Provider = library;
-    const signature = await web3Provider.getSigner(account).signMessage(challenge);
+    const signature = await signMessageAsync({ message: challenge });
     await lensClient.authentication.authenticate(account, signature);
   }
 

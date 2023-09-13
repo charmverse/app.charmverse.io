@@ -8,8 +8,11 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
+import { injectedConnector } from 'connectors/config';
 import { WalletConnectV2Connector } from 'connectors/walletConnectV2Connector';
 import { useEffect } from 'react';
+import type { Connector } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
 import ErrorComponent from 'components/common/errors/WalletError';
@@ -33,41 +36,36 @@ type Props = {
 };
 
 export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
-  const {
-    setActivatingConnector,
-    closeWalletSelectorModal,
-    isWalletSelectorModalOpen,
-    isConnectingIdentity,
-    activatingConnector
-  } = useWeb3ConnectionManager();
-  const { error } = useWeb3React();
-  const { active, activate, connector, setError } = useWeb3React();
+  const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity, setIsConnectingIdentity } =
+    useWeb3ConnectionManager();
+  // const { active, activate, setError, error } = useWeb3React();
   const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
+  const { pendingConnector, error, isLoading, connectAsync } = useConnect();
+  const { connector: activeConnector, isConnected } = useAccount();
 
-  const handleConnect = (_connector: AbstractConnector) => {
-    setActivatingConnector(_connector);
-    activate(_connector, undefined, true).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.log('CONNECTION ERROR', { err });
-      setActivatingConnector(undefined);
+  const handleConnect = async (_connector: Connector) => {
+    try {
+      await connectAsync({ connector: _connector });
+    } catch (err) {
+      log.warn('CONNECTION ERROR', { err });
       // We need to reset walletconnect if users have closed the modal
-      resetWalletConnector(_connector);
-      setError(err);
-      if (connector) {
+      // resetWalletConnector(_connector);
+      // setError(err);
+      if (activeConnector) {
         // revert to previous connector
-        return activate(connector, undefined, true);
+        return connectAsync({ connector: activeConnector });
       }
-    });
+    }
   };
 
-  const { label, connectMetamask } = useMetamaskConnect(() => handleConnect(injected));
+  const { label, connectMetamask } = useMetamaskConnect(() => handleConnect(injectedConnector));
 
   // close the modal after signing in
   useEffect(() => {
-    if (active && isWalletSelectorModalOpen) {
+    if (isConnected && isWalletSelectorModalOpen) {
       closeWalletSelectorModal();
     }
-  }, [active, isWalletSelectorModalOpen]);
+  }, [closeWalletSelectorModal, isConnected, isWalletSelectorModalOpen]);
 
   useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
@@ -84,21 +82,21 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
 
   return (
     <div>
-      <ErrorComponent error={error} processError={processConnectionError} />
+      <ErrorComponent error={error || undefined} processError={processConnectionError} />
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <ConnectorButton
             name={label}
             onClick={connectMetamask}
             iconUrl='metamask.png'
-            disabled={connector === injected || !!activatingConnector}
-            isActive={connector === injected}
-            isLoading={activatingConnector === injected}
+            disabled={activeConnector?.id === injectedConnector.id || isLoading}
+            isActive={activeConnector?.id === injectedConnector.id}
+            isLoading={isLoading && pendingConnector?.id === injectedConnector.id}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <ConnectorButton
+          {/* <ConnectorButton
             name='WalletConnect'
             onClick={() => {
               WalletConnectV2Connector.clearStorage(window.localStorage);
@@ -108,17 +106,17 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
             disabled={connector === walletConnect || !!activatingConnector}
             isActive={connector === walletConnect}
             isLoading={activatingConnector === walletConnect}
-          />
+          /> */}
         </Grid>
         <Grid item xs={12}>
-          <ConnectorButton
+          {/* <ConnectorButton
             name='Coinbase Wallet'
             onClick={() => handleConnect(walletLink)}
             iconUrl='coinbasewallet.png'
             disabled={connector === walletLink || !!activatingConnector}
             isActive={connector === walletLink}
             isLoading={activatingConnector === walletLink}
-          />
+          /> */}
         </Grid>
 
         <Grid item xs={12}>
@@ -159,6 +157,7 @@ function resetWalletConnector(connector: AbstractConnector) {
     connector.walletConnectProvider = undefined;
   }
 }
+
 export function WalletSelectorModal() {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useWeb3ConnectionManager();
   return (

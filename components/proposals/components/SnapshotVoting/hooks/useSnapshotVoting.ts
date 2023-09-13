@@ -3,6 +3,7 @@ import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from 'lib/snapshot/getVotes';
@@ -14,9 +15,10 @@ import { sleep } from 'lib/utilities/sleep';
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account, library } = useWeb3AuthSig();
+  const { account } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
+  const { provider } = useWeb3Signer();
 
   const { data: snapshotProposal, mutate: refreshProposal } = useSWR<SnapshotProposal | null>(
     `/snapshotProposal/${snapshotProposalId}`,
@@ -44,7 +46,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   const remainingTime = relativeTime(proposalEndDate);
 
   const castSnapshotVote: CastVote = async (choice: VoteChoice) => {
-    if (!snapshotProposal || !snapshotSpaceDomain || !account || !library) {
+    if (!snapshotProposal || !snapshotSpaceDomain || !account || !provider) {
       return;
     }
 
@@ -58,7 +60,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
       app: 'my-app'
     };
 
-    await client.vote(library, utils.getAddress(account as string), vote);
+    await client.vote(provider, utils.getAddress(account as string), vote);
     // we need this delay for vote to be propagated to the graph
     await sleep(5000);
     // workaround - fetch one more time with delay, sometimes it takes more time to get updated value

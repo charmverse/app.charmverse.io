@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
@@ -25,7 +25,7 @@ export function Invites({ space }: { space: Space }) {
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
   const isTokenGatePending = useRef(false);
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { connectWallet } = useContext(Web3Connection);
   const { account } = useWeb3AuthSig();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
 
@@ -39,7 +39,7 @@ export function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
     } else {
       isTokenGatePending.current = true;
-      openWalletSelectorModal();
+      connectWallet();
     }
   }
 

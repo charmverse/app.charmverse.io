@@ -22,6 +22,7 @@ import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -44,8 +45,8 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
-  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected, disconnectWallet } =
-    useWeb3AuthSig();
+  const { isConnectingIdentity } = useWeb3ConnectionManager();
+  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
