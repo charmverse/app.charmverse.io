@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { useTrackPageView } from 'charmClient/hooks/track';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSessionStorage } from 'hooks/useSessionStorage';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -54,7 +53,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
   const [blockQuota, setBlockQuota] = useState(10);
 
-  useTrackPageView({ type: 'billing/settings' });
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', {
+      spaceId: space.id,
+      type: 'billing/settings'
+    });
+  }, []);
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created

@@ -14,6 +14,7 @@ import charmClient from 'charmClient';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
@@ -39,6 +40,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
   const { id: postId } = pagePost;
   const router = useRouter();
   const { showPost } = usePostDialog();
+  const { space: currentSpace } = useCurrentSpace();
 
   const permissions = usePostPermissions({ postIdOrPath: post.id });
 
@@ -89,6 +91,12 @@ export function PostCard({ post, user, category }: ForumPostProps) {
               setUrlWithoutRerender(router.pathname, { postId: null });
             }
           });
+          if (currentSpace) {
+            charmClient.track.trackAction('load_post_page', {
+              resourceId: postId,
+              spaceId: currentSpace.id
+            });
+          }
           setUrlWithoutRerender(router.pathname, { postId });
         }}
       >

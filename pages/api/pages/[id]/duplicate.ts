@@ -66,7 +66,8 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
   trackUserAction('duplicate_page', {
     userId,
     spaceId: pageToDuplicate.spaceId,
-    pageId: pageToDuplicate.id
+    pageId: pageToDuplicate.id,
+    type: pageToDuplicate.type
   });
 
   relay.broadcast(

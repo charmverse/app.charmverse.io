@@ -31,7 +31,7 @@ test('connect wallet - show connect wallet button for token-gated workspaces and
 
   await page.goto(`${baseUrl}${workspacePath}`);
 
-  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain });
+  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
 
   await expect(tokenGatePage.connectWalletButton).toBeVisible();
 });

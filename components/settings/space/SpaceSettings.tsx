@@ -26,7 +26,6 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -35,6 +34,7 @@ import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { getDefaultWorkspaceUrl } from 'components/login/LoginPage';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
@@ -116,7 +116,10 @@ export function SpaceSettings({ space }: { space: Space }) {
     }
   );
 
-  useTrackPageView({ type: 'settings/space' });
+  // set default values when space is set
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
+  }, [space.id]);
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
@@ -459,8 +462,14 @@ export function SpaceSettings({ space }: { space: Space }) {
         onConfirm={async () => {
           if (isAdmin) {
             await charmClient.spaces.deleteSpace(space.id);
-            // redirect to default workspace
-            window.location.href = window.location.origin;
+            const filteredSpaces = spaces.filter((s) => s.id !== space.id);
+            // redirect user to the next space if they have one
+            if (filteredSpaces.length > 0) {
+              await router.push(getDefaultWorkspaceUrl(filteredSpaces));
+            } else {
+              await router.push('/createSpace');
+            }
+            setSpaces(filteredSpaces);
           }
         }}
       />

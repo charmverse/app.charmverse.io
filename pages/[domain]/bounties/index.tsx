@@ -1,4 +1,3 @@
-import { useTrackPageView } from 'charmClient/hooks/track';
 import BountiesPage from 'components/bounties/BountiesPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import getPageLayout from 'components/common/PageLayout/getLayout';
@@ -15,8 +14,6 @@ export default function BountyPage() {
   const bountiesTitle = mappedFeatures.bounties.title;
 
   const { hasAccess: isSpaceMember, isLoadingAccess } = useHasMemberLevel('member');
-
-  useTrackPageView({ type: 'bounties_list' });
 
   setTitle(bountiesTitle);
 

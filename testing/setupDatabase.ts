@@ -632,7 +632,6 @@ export function createPage(
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
-      index: options.index,
       path: options.path ?? getPagePath(),
       title: options.title || 'Example',
       type: options.type ?? 'page',
@@ -1163,22 +1162,20 @@ export async function generateForumComment({
 }
 
 export async function createPost(
-  options: Partial<Post> & { categoryId: string; createdBy: string } & {
-    pagePermissions?: Prisma.PagePermissionCreateManyPageInput[];
-  }
+  options: Partial<Post> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
 ): Promise<Post> {
   const forumPost = await prisma.post.create({
     data: {
       createdAt: options.createdAt || new Date(),
       updatedAt: options.updatedAt || new Date(),
-      deletedAt: options.deletedAt,
-      id: options.id,
+      deletedAt: options.deletedAt || null,
+      id: options.id || v4(),
       title: options.title || 'New Forum Post',
       content: options.content || {},
       contentText: options.contentText || 'Some text in the forum',
       path: options.path || getPagePath(),
-      categoryId: options.categoryId,
-      createdBy: options.createdBy,
+      categoryId: options.categoryId || v4(),
+      createdBy: options.createdBy || v4(),
       spaceId: options.spaceId || v4(),
       pinned: options.pinned ?? false,
       locked: options.locked ?? false

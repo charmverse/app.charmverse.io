@@ -1,41 +1,31 @@
 import type { PageType } from '@charmverse/core/prisma';
 
-import type { BaseEvent } from './BaseEvent';
+import type { BaseEventWithoutGroup, BaseEvent } from './BaseEvent';
 
 export type PageEvent = BaseEvent & {
-  pageId?: string;
+  pageId: string;
 };
 
-export type StaticPageType =
-  | 'proposals_list'
-  | 'bounties_list'
-  | 'forum_posts_list'
-  | 'members_list'
-  | 'settings/my-account'
-  | 'settings/my-profile'
-  | 'settings/api'
-  | 'settings/space'
-  | 'settings/roles-and-permissions'
-  | 'settings/import'
-  | 'settings/invites'
-  | 'billing/marketing'
-  | 'billing/checkout'
-  | 'billing/settings';
+type CustomPageType = 'settings' | 'proposals_list' | 'bounties_list' | 'nexus' | 'profile' | 'integrations';
 
-type ViewPageEvent = PageEvent & {
-  postId?: string;
-  meta?: { pathname: string };
-  type: PageType | 'post' | StaticPageType;
+type CustomPageViewEvent = BaseEventWithoutGroup & {
+  pageId?: string;
+  spaceId?: string;
+  type: CustomPageType;
+};
+
+type PageTypeEvent = PageEvent & {
+  type: PageType | 'billing/marketing' | 'billing/checkout' | 'billing/settings';
 };
 
 export interface PageEventMap {
-  page_view: ViewPageEvent;
+  page_view: PageTypeEvent | CustomPageViewEvent;
   archive_page: PageEvent;
-  duplicate_page: PageEvent;
+  duplicate_page: PageTypeEvent;
   delete_page: PageEvent;
   restore_page: PageEvent;
   edit_page: PageEvent;
-  create_page: PageEvent;
+  create_page: PageTypeEvent;
   page_comment_created: PageEvent;
   page_comment_resolved: PageEvent;
   poll_created: PageEvent;

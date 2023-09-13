@@ -1,12 +1,13 @@
+import type { PageNode, TargetPageTree } from '@charmverse/core/pages';
 import type { PageType } from '@charmverse/core/prisma';
 
-type Page = { type: PageType; id: string };
+import type { PagesMap } from './interfaces';
 
-export interface FindParentOfTypeOptions<P extends Page> {
+export interface FindParentOfTypeOptions<P extends PageNode> {
   pageType: PageType | PageType[];
   pageId?: string;
-  pageMap?: Record<string, P | undefined>;
-  targetPageTree?: { parents: Page[] };
+  pageMap?: PagesMap<P>;
+  targetPageTree?: TargetPageTree<P>;
 }
 
 function matcher({
@@ -27,23 +28,21 @@ function matcher({
   return searchPageType === evaluatedPageType;
 }
 
-type PageNodeRequiredFields = Page & { parentId?: string | null };
-
 /**
  * Accepts a pagemap (used in the UI) or a target page tree (used in the server)
  * Traverses parents until a matching item is found
  * @returns
  */
-export function findParentOfType<P extends PageNodeRequiredFields = PageNodeRequiredFields>({
+export function findParentOfType<P extends PageNode = PageNode>({
   pageType,
   targetPageTree
 }: Required<Pick<FindParentOfTypeOptions<P>, 'targetPageTree' | 'pageType'>>): string | null;
-export function findParentOfType<P extends PageNodeRequiredFields = PageNodeRequiredFields>({
+export function findParentOfType<P extends PageNode = PageNode>({
   pageType,
   pageId,
   pageMap
 }: Required<Pick<FindParentOfTypeOptions<P>, 'pageType' | 'pageId' | 'pageMap'>>): string | null;
-export function findParentOfType<P extends PageNodeRequiredFields = PageNodeRequiredFields>({
+export function findParentOfType<P extends PageNode = PageNode>({
   pageType,
   pageId,
   pageMap,

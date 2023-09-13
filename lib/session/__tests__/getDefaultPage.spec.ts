@@ -13,11 +13,14 @@ describe('getDefaultPage()', () => {
   });
 
   it('should use the space of the last page view', () => {
+    const lastPageView = {
+      spaceId: 'spaceId'
+    };
     const url = getDefaultPage({
-      lastViewedSpaceId: 'spaceId',
+      lastPageView,
       spaces: [
-        { id: 'brooklyn', domain: 'brooklyn', customDomain: null },
-        { id: 'spaceId', domain: 'charmverse', customDomain: null }
+        { id: 'brooklyn', domain: 'brooklyn' },
+        { id: lastPageView.spaceId, domain: 'charmverse' }
       ]
     });
     expect(url).toEqual('/charmverse');
@@ -26,8 +29,8 @@ describe('getDefaultPage()', () => {
   it('should use the first space available', () => {
     const url = getDefaultPage({
       spaces: [
-        { id: 'charmverse', domain: 'charmverse', customDomain: null },
-        { id: 'brooklyn', domain: 'brooklyn', customDomain: null }
+        { id: 'charmverse', domain: 'charmverse' },
+        { id: 'brooklyn', domain: 'brooklyn' }
       ]
     });
     expect(url).toEqual('/charmverse');

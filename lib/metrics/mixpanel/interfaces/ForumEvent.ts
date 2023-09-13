@@ -3,6 +3,10 @@ import type { ResourceEvent } from './ResourceEvent';
 
 type PostEvent = BaseEvent & ResourceEvent;
 
+type PostPageLoadEvent = PostEvent;
+
+type MainFeedLoadEvent = BaseEvent;
+
 type MainFeedFilteredEvent = BaseEvent & {
   categoryName: string;
 };
@@ -34,7 +38,9 @@ type CommentCreateEvent = PostEvent & {
 };
 
 export interface ForumEventMap {
+  main_feed_page_load: MainFeedLoadEvent;
   main_feed_filtered: MainFeedFilteredEvent;
+  load_post_page: PostPageLoadEvent;
   create_a_post: PostCreateEvent;
   // TODO: Deleting a forum post not available yet
   delete_a_post: PostDeleteEvent;

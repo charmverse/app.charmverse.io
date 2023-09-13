@@ -127,6 +127,16 @@ export function ForumPage() {
     }
   }, [router.isReady, router.query.postId]);
 
+  useEffect(() => {
+    if (currentSpace) {
+      charmClient.track
+        .trackAction('main_feed_page_load', {
+          spaceId: currentSpace.id
+        })
+        .catch((err) => log.debug(err));
+    }
+  }, [Boolean(currentSpace)]);
+
   const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
 
   useEffect(() => {

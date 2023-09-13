@@ -3,9 +3,10 @@ import type { Space } from '@charmverse/core/prisma';
 import { Box, Stack, Typography } from '@mui/material';
 import SvgIcon from '@mui/material/SvgIcon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect } from 'react';
 import { SiDiscourse } from 'react-icons/si';
 
-import { useTrackPageView } from 'charmClient/hooks/track';
+import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { ImportZippedMarkdown } from 'components/common/ImportZippedMarkdown';
 import Link from 'components/common/Link';
@@ -19,7 +20,10 @@ import NotionIcon from 'public/images/logos/notion_logo.svg';
 export function ImportSettings({ space }: { space: Space }) {
   const { loading } = useNotionImport();
   const isAdmin = useIsAdmin();
-  useTrackPageView({ type: 'settings/import' });
+  // set default values when space is set
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'settings' });
+  }, [space.id]);
 
   return (
     <>

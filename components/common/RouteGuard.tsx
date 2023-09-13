@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
+import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -26,6 +27,20 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
+
+  useEffect(() => {
+    const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
+    const defaultWorkspaceKey: string = getKey('last-workspace');
+    if (spaceDomain) {
+      localStorage.setItem(defaultWorkspaceKey, spaceDomain);
+    }
+
+    // pathname with domain pattern /[domain]/page_path_pattern
+    const hasPageInPath = !!router.pathname.split('/[domain]')[1];
+    if (spaceDomain && hasPageInPath) {
+      localStorage.setItem(defaultPageKey, router.asPath);
+    }
+  }, [router.asPath, router.pathname, spaceDomain]);
 
   useEffect(() => {
     // wait to listen to events until data is loaded
