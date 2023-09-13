@@ -630,6 +630,7 @@ export function createPage(
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
+      index: options.index,
       path: options.path ?? getPagePath(),
       title: options.title || 'Example',
       type: options.type ?? 'page',

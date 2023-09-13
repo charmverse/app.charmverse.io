@@ -12,6 +12,7 @@ describe('getDefaultPageForSpace()', () => {
     await createPage({
       createdAt: new Date(),
       index: 1,
+      path: 'second-page',
       spaceId: space.id,
       createdBy: user.id,
       // add basic permission
@@ -22,6 +23,7 @@ describe('getDefaultPageForSpace()', () => {
       createdAt: new Date(Date.now() + 100000),
       index: 0,
       spaceId: space.id,
+      path: 'first-page',
       createdBy: user.id,
       // add basic permission
       pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }]
