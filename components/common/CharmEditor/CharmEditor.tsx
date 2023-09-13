@@ -61,7 +61,7 @@ import {
   suggestionsPluginKey,
   inlinePalettePluginKey,
   floatingMenuPluginKey,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   mentionPluginKey,
   emojiPluginKey,
   actionsPluginKey,
@@ -448,6 +448,9 @@ function CharmEditor({
           case 'page': {
             return <NestedPage currentPageId={pageId} {...props} />;
           }
+          case 'page-link': {
+            return <NestedPage currentPageId={pageId} {...props} />;
+          }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
           }
@@ -488,16 +491,16 @@ function CharmEditor({
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
-        nestedPagePluginKey={nestedPagePluginKey}
+        linkedPagePluginKey={linkedPagePluginKey}
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
       {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <NestedPagesList pluginKey={nestedPagePluginKey} />
+      <NestedPagesList pluginKey={linkedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
-        nestedPagePluginKey={nestedPagePluginKey}
+        linkedPagePluginKey={linkedPagePluginKey}
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}

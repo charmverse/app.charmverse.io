@@ -4,7 +4,7 @@ import { rafCommandExec } from '@bangle.dev/utils';
 
 import { hideSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { replaceSuggestionMarkWith } from 'components/common/CharmEditor/components/inlinePalette';
-import type { NestedPagePluginState } from 'components/common/CharmEditor/components/nestedPage';
+import { linkedPageNodeName, type LinkedPagePluginState } from 'components/common/CharmEditor/components/linkedPage';
 
 /**
  * Insert a nested page node in the editor view
@@ -12,18 +12,18 @@ import type { NestedPagePluginState } from 'components/common/CharmEditor/compon
  * @param view Editor view
  * @param pageId Page id to be linked with
  */
-export function insertNestedPage(
-  pluginKey: PluginKey<NestedPagePluginState>,
+export function insertLinkedPage(
+  pluginKey: PluginKey<LinkedPagePluginState>,
   view: EditorView,
   pageId: string,
   type: string,
   path: string
 ) {
-  const { suggestTooltipKey } = pluginKey.getState(view.state) as NestedPagePluginState;
+  const { suggestTooltipKey } = pluginKey.getState(view.state) as LinkedPagePluginState;
   replaceSuggestionMarkWith(pluginKey, '', true)(view.state, view.dispatch, view);
   hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
   rafCommandExec(view, (state, dispatch) => {
-    const nestedPageNode = state.schema.nodes.page.create({
+    const nestedPageNode = state.schema.nodes[linkedPageNodeName].create({
       id: pageId,
       type,
       path

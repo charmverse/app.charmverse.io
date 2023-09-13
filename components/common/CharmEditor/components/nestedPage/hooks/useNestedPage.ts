@@ -16,7 +16,7 @@ export default function useNestedPage(currentPageId?: string) {
   const cardId = new URLSearchParams(window.location.search).get('cardId');
   const isInsideCard = cardId && cardId?.length !== 0;
   const addNestedPage = useCallback(
-    async (type?: Page['type']) => {
+    async (type?: Page['type'], isLinkedPage?: boolean) => {
       if (user && space) {
         await addPage(
           {
@@ -28,9 +28,13 @@ export default function useNestedPage(currentPageId?: string) {
           {
             cb: ({ page }) => {
               rafCommandExec(view, (state, dispatch) => {
-                const nestedPageNode = state.schema.nodes.page.create({
-                  id: page.id
-                });
+                const nestedPageNode = isLinkedPage
+                  ? state.schema.nodes.pageLink.create({
+                      id: page.id
+                    })
+                  : state.schema.nodes.page.create({
+                      id: page.id
+                    });
                 if (dispatch) {
                   dispatch(state.tr.replaceSelectionWith(nestedPageNode));
                   // A small delay to let the inserted page be saved in the editor

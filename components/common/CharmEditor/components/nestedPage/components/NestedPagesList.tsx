@@ -6,7 +6,7 @@ import { useCallback, memo, useEffect, useMemo } from 'react';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
-import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
+import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -73,7 +73,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
 
   const onSelectPage = useCallback(
     (pageId: string, type: AllPagesProp['type'], path: string) => {
-      insertNestedPage(pluginKey, view, pageId, type, path);
+      insertLinkedPage(pluginKey, view, pageId, type, path);
     },
     [view]
   );
