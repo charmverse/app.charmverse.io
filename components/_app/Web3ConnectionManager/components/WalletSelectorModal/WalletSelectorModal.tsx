@@ -3,13 +3,7 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import type { AbstractConnector } from '@web3-react/abstract-connector';
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
-import { injected, walletConnect, walletLink } from 'connectors';
 import { injectedConnector } from 'connectors/config';
-import { WalletConnectV2Connector } from 'connectors/walletConnectV2Connector';
 import { useEffect } from 'react';
 import type { Connector } from 'wagmi';
 import { useAccount, useConnect } from 'wagmi';
@@ -66,12 +60,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
       closeWalletSelectorModal();
     }
   }, [closeWalletSelectorModal, isConnected, isWalletSelectorModalOpen]);
-
-  useEffect(() => {
-    if (error instanceof UnsupportedChainIdError) {
-      closeWalletSelectorModal();
-    }
-  }, [error, closeWalletSelectorModal]);
 
   const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
   log.info('Connect redirectUri', redirectUri);
@@ -152,11 +140,11 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
   );
 }
 
-function resetWalletConnector(connector: AbstractConnector) {
-  if (connector && connector instanceof WalletConnectConnector) {
-    connector.walletConnectProvider = undefined;
-  }
-}
+// function resetWalletConnector(connector: Connector) {
+//   if (connector && connector instanceof WalletConnectConnector) {
+//     connector.walletConnectProvider = undefined;
+//   }
+// }
 
 export function WalletSelectorModal() {
   const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useWeb3ConnectionManager();

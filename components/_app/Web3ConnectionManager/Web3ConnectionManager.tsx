@@ -1,9 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import type { AbstractConnector } from '@web3-react/abstract-connector';
-import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
-import { useContext, createContext, useEffect, useState, useMemo } from 'react';
+import { useContext, createContext, useState, useMemo } from 'react';
 import { useConnect } from 'wagmi';
 
 import useEagerConnect from './hooks/useEagerConnect';
