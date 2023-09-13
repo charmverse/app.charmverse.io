@@ -30,7 +30,7 @@ test("tokenGates - redirect user to join page if they don't have access to works
   await page.goto(`${baseUrl}${workspacePath}`);
 
   // wait for token gate page to open for the workspace
-  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
+  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain });
 
   await expect(tokenGatePage.tokenGateEmptyState).toBeVisible();
 });

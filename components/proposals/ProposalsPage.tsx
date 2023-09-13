@@ -1,7 +1,7 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -30,12 +30,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter, proposals } = useProposals();
-
-  useEffect(() => {
-    if (currentSpace?.id) {
-      charmClient.track.trackAction('page_view', { spaceId: currentSpace.id, type: 'proposals_list' });
-    }
-  }, [currentSpace?.id]);
 
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');

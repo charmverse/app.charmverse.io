@@ -22,7 +22,6 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     const targetPage = `${baseUrl}/${domain}`;
 
     await page.goto(targetPage);
-    await page.waitForNavigation({ waitUntil: 'networkidle' });
 
     // Act ----------------------
     // Part A - Prepare the page as a logged in user
@@ -55,9 +54,12 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     page.locator('data-test=create-workspace').click();
 
     // Intercept the response from the form
-    const response = await page.waitForResponse('**/api/spaces');
+    const response = await page.waitForResponse((r) => {
+      // check response to make sure its the creation endpoint, not the space list endpoint
+      return r.url().includes('/api/spaces') && r.json().then((json) => !!json?.id);
+    });
     const createdSpace = (await response.json()) as Space;
-    await page.waitForURL(`**/${createdSpace.domain}`);
+    await page.waitForURL(`**/${createdSpace.domain}/*`);
 
     // Await new onboarding form popup so we can close it and click on new space
     let closePropertiesModalBtn = page.locator('data-test=close-modal');
@@ -79,7 +81,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
 
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
-    await page.waitForURL(`**/${uniqueDomainName2}`);
+    await page.waitForURL(`**/${uniqueDomainName2}/*`);
 
     // Close the modal again
     closePropertiesModalBtn = page.locator('data-test=close-modal');

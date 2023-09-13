@@ -244,12 +244,12 @@ export function getSubdomainPath(path: string, config?: { domain: string; custom
   return path;
 }
 
-export function getSpaceUrl(config: { domain: string; customDomain?: string | null }) {
+export function getSpaceUrl(config: { domain: string; customDomain?: string | null }, host?: string) {
   const { domain } = config;
-  const subdomain = getValidSubdomain();
-  const customDomain = getValidCustomDomain();
+  const subdomain = getValidSubdomain(host);
+  const customDomain = getValidCustomDomain(host);
 
-  if (isLocalhostAlias()) {
+  if (isLocalhostAlias(host)) {
     return `/${domain}`;
   }
 

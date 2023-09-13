@@ -1,8 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -28,6 +29,7 @@ export function Invites({ space }: { space: Space }) {
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const { account } = useWeb3AuthSig();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
+  useTrackPageView({ type: 'settings/invites' });
 
   if (account && isTokenGatePending.current) {
     setPendingAction();
