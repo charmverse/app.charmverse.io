@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { mutate } from 'swr';
 
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
@@ -19,7 +18,6 @@ import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
@@ -36,7 +34,6 @@ export function GlobalComponents() {
     // Refetch pages after restoration
     if (currentSpace) {
       await mutate(getPagesListCacheKey(currentSpace.id));
-      dispatch(initialLoad({ spaceId: currentSpace.id }));
       mutate(`archived-pages-${currentSpace.id}`);
       // This is required to make the delete page banner go away
       setPages((_pages) => {

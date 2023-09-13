@@ -100,13 +100,13 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await expect(pagesSidebar.databasePage).toBeVisible();
 
     // Initialise the new database
-    await expect(databasePage.selectProposalsAsSource).toBeVisible();
+    await expect(databasePage.selectProposalsAsSource()).toBeVisible();
 
     // This is important as we want to simulate multiple clicks to ensure the card creation only happens once
     await Promise.all([
-      databasePage.selectProposalsAsSource.click(),
-      databasePage.selectProposalsAsSource.click(),
-      databasePage.selectProposalsAsSource.click()
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click()
     ]);
 
     await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);

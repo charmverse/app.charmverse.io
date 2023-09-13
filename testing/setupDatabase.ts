@@ -10,8 +10,8 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalStatus,
   ProposalEvaluationType,
+  ProposalStatus,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -30,6 +30,7 @@ import { v4 } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
+import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -46,6 +47,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
+import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';
 
 export async function generateSpaceUser({
@@ -1062,24 +1064,37 @@ export async function generateProposal({
   };
 }
 
+/**
+ * Generate a board with default properties of title, date, and a single select field
+ * @param linkedSourceId - Used for providing a linked source for the boards views
+ * @returns
+ */
 export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
   cardCount,
+  boardTitle,
   views,
+  viewType,
   addPageContent,
   viewDataSource,
-  boardPageType
+  boardPageType,
+  linkedSourceId,
+  customProps
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  boardTitle?: string;
   views?: number;
+  viewType?: IViewType;
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
+  linkedSourceId?: string;
+  customProps?: CustomBoardProps;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1087,9 +1102,13 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
+    boardTitle,
     addPageContent,
     viewDataSource,
-    boardPageType
+    boardPageType,
+    viewType,
+    linkedSourceId,
+    customProps
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

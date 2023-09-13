@@ -1,4 +1,4 @@
-import type { BulkPagePermissionFlags } from '@charmverse/core/dist/cjs/permissions';
+import type { BulkPagePermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, SubscriptionTier, User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';

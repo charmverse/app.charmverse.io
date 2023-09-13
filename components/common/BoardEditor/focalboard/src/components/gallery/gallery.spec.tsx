@@ -34,9 +34,6 @@ describe('src/components/gallery/Gallery', () => {
         [card2.id]: card2
       },
       templates: {}
-    },
-    comments: {
-      comments: {}
     }
   };
   const store = mockStateStore([], state);

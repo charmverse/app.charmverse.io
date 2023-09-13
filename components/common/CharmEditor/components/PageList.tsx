@@ -89,6 +89,7 @@ export default function PagesList({
     <div style={style}>
       {allPages.map((page, pageIndex) => (
         <MenuItem
+          data-test={`page-option-${page.id}`}
           data-value={page.id}
           data-type={page.type}
           data-path={page.path}

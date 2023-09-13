@@ -6,18 +6,21 @@ import { chromium, expect, test as base } from '@playwright/test';
 import { baseUrl } from 'config/constants';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
+import { DatabasePage } from './po/databasePage.po';
 import { PagePermissionsDialog } from './po/pagePermissions.po';
-import { generateUserAndSpace } from './utils/mocks';
+import { generateUserAndSpace, logoutBrowserUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
 let browser: Browser;
 type Fixtures = {
   pagePermissions: PagePermissionsDialog;
+  databasePage: DatabasePage;
 };
 
 const test = base.extend<Fixtures>({
-  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page))
+  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page)),
+  databasePage: ({ page }, use) => use(new DatabasePage(page))
 });
 
 test.beforeAll(async () => {
@@ -38,7 +41,8 @@ test.describe.serial('Make a page public and visit it', async () => {
     const { space, user } = await generateUserAndSpace();
     boardPage = await generateBoard({
       spaceId: space.id,
-      createdBy: user.id
+      createdBy: user.id,
+      viewType: 'gallery'
     });
 
     spaceUser = user;
@@ -63,7 +67,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
-    await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
+    await await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
     const permissionDialog = pagePermissions.permissionDialog;
@@ -152,7 +156,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(page.locator(`data-test=view-poll-details-button`).first()).not.toBeDisabled();
   });
 
-  test('open a page with invalid domain and path', async () => {
+  test('open a page with invalid domain and path', async ({ databasePage }) => {
     const publicContext = await browser.newContext({});
 
     const page = await publicContext.newPage();
@@ -164,17 +168,15 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(loginPageContent).toBeVisible();
   });
 
-  test('visit the public page', async () => {
+  test('visit the public page', async ({ databasePage, page }) => {
     // Part B - Visit this page as a non logged in user
-    const publicContext = await browser.newContext({});
-
-    const page = await publicContext.newPage();
+    await logoutBrowserUser({ browserPage: page });
 
     // 1. Visit the page
     await page.goto(shareUrl);
 
     // 2. Make sure the board renders
-    const boardTitle = page.locator('data-test=board-title').locator('input');
+    const boardTitle = databasePage.boardTitle();
 
     await expect(boardTitle).toBeVisible();
 
