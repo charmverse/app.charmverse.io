@@ -1,38 +1,44 @@
-import { useWeb3React } from '@web3-react/core';
-import { injected } from 'connectors';
+import { injectedConnector } from 'connectors/config';
 import { useEffect, useState } from 'react';
+import { useAccount, useConnect } from 'wagmi';
 
-const useEagerConnect = (): boolean => {
-  const { activate, active } = useWeb3React();
+export const useEagerConnect = (): boolean => {
+  const { connect } = useConnect();
+  const { isConnected, connector: activeConnector } = useAccount();
 
   const [tried, setTried] = useState(false);
 
   useEffect(() => {
-    injected
+    if (tried || isConnected) {
+      return;
+    }
+
+    if (!injectedConnector || injectedConnector.id === activeConnector?.id) {
+      setTried(true);
+      return;
+    }
+
+    injectedConnector
       .isAuthorized()
       .then((isAuthorized) => {
         if (isAuthorized) {
           setTimeout(() => {
-            activate(injected, undefined, true);
+            connect({ connector: injectedConnector });
           }, 1000);
         }
 
-        return isAuthorized ? activate(injected, undefined, true) : Promise.resolve();
+        return isAuthorized ? connect({ connector: injectedConnector }) : Promise.resolve();
       })
-      .catch((e) => {
-        return setTried(true);
-      })
+      .catch(() => setTried(true))
       .finally(() => setTried(true));
-  }, [activate]);
+  }, [activeConnector?.id, connect, isConnected, tried]);
 
   // if the connection worked, wait until we get confirmation of that to flip the flag
   useEffect(() => {
-    if (!tried && active) {
+    if (!tried && isConnected) {
       setTried(true);
     }
-  }, [tried, active]);
+  }, [tried, isConnected]);
 
   return tried;
 };
-
-export default useEagerConnect;

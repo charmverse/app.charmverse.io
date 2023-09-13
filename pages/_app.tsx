@@ -1,10 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { Web3ReactProvider } from '@web3-react/core';
 import { wagmiConfig } from 'connectors/config';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -124,7 +121,6 @@ import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
 
-const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
@@ -231,38 +227,36 @@ function DataProviders({ children }: { children: ReactNode }) {
     >
       <UserProvider>
         <DiscordProvider>
-          <Web3ReactProvider getLibrary={getLibrary}>
-            <WagmiConfig config={wagmiConfig}>
-              <Web3ConnectionManager>
-                <WalletSelectorModal />
-                <Web3AccountProvider>
-                  <SpacesProvider>
-                    <CurrentSpaceProvider>
-                      <PostCategoriesProvider>
-                        <IsSpaceMemberProvider>
-                          <WebSocketClientProvider>
-                            <MembersProvider>
-                              <BountiesProvider>
-                                <PaymentMethodsProvider>
-                                  <PagesProvider>
-                                    <MemberPropertiesProvider>
-                                      <UserProfileProvider>
-                                        <PageTitleProvider>{children}</PageTitleProvider>
-                                      </UserProfileProvider>
-                                    </MemberPropertiesProvider>
-                                  </PagesProvider>
-                                </PaymentMethodsProvider>
-                              </BountiesProvider>
-                            </MembersProvider>
-                          </WebSocketClientProvider>
-                        </IsSpaceMemberProvider>
-                      </PostCategoriesProvider>
-                    </CurrentSpaceProvider>
-                  </SpacesProvider>
-                </Web3AccountProvider>
-              </Web3ConnectionManager>
-            </WagmiConfig>
-          </Web3ReactProvider>
+          <WagmiConfig config={wagmiConfig}>
+            <Web3ConnectionManager>
+              <WalletSelectorModal />
+              <Web3AccountProvider>
+                <SpacesProvider>
+                  <CurrentSpaceProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <PaymentMethodsProvider>
+                                <PagesProvider>
+                                  <MemberPropertiesProvider>
+                                    <UserProfileProvider>
+                                      <PageTitleProvider>{children}</PageTitleProvider>
+                                    </UserProfileProvider>
+                                  </MemberPropertiesProvider>
+                                </PagesProvider>
+                              </PaymentMethodsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
+                  </CurrentSpaceProvider>
+                </SpacesProvider>
+              </Web3AccountProvider>
+            </Web3ConnectionManager>
+          </WagmiConfig>
         </DiscordProvider>
       </UserProvider>
     </SWRConfig>

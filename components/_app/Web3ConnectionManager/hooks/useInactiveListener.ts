@@ -1,26 +1,27 @@
 import { log } from '@charmverse/core/log';
 import type { Web3Provider } from '@ethersproject/providers';
-import { useWeb3React } from '@web3-react/core';
-import { injected } from 'connectors';
+import { injectedConnector } from 'connectors/config';
 import { useEffect } from 'react';
+import { useAccount, useConnect } from 'wagmi';
 
 type WindowType = Window & typeof globalThis & { ethereum?: Web3Provider };
 
-const useInactiveListener = (suppress = false): void => {
-  const { active, activate } = useWeb3React();
+export const useInactiveListener = (suppress = false): void => {
+  const { connectAsync } = useConnect();
+  const { isConnected } = useAccount();
 
   useEffect((): any => {
     const { ethereum } = window as WindowType;
 
-    if (ethereum?.on && !active && !suppress) {
+    if (ethereum?.on && !isConnected && !suppress) {
       const handleChainChanged = (_chainId: string | number) => {
-        activate(injected).catch((err) => {
+        connectAsync({ connector: injectedConnector }).catch((err) => {
           log.warn('Failed to activate after chain changed', err);
         });
       };
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length > 0) {
-          activate(injected).catch((err) => {
+          connectAsync({ connector: injectedConnector }).catch((err) => {
             log.warn('Failed to activate after accounts changed', err);
           });
         }
@@ -36,7 +37,5 @@ const useInactiveListener = (suppress = false): void => {
         }
       };
     }
-  }, [active, suppress, activate]);
+  }, [connectAsync, suppress, isConnected]);
 };
-
-export default useInactiveListener;
