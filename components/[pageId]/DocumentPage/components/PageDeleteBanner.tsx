@@ -32,7 +32,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
       } else {
         await charmClient.restorePage(pageId);
         await mutate(`pages/${space.id}`);
-        dispatch(initialDatabaseLoad({ pageIdOrPath: pageId }));
+        dispatch(initialDatabaseLoad({ pageId }));
       }
     }
   }

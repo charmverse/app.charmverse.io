@@ -67,12 +67,12 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     let relatedSourceView = Object.values(views).find((view) => view.parentId === sourceDatabaseId);
 
     if (!relatedSourceView) {
-      const sourceDbViews = (await charmClient.getViews({ pageIdOrPath: sourceDatabaseId })) as BoardView[];
+      const sourceDbViews = (await charmClient.getViews({ pageId: sourceDatabaseId })) as BoardView[];
       relatedSourceView = sourceDbViews.find((view) => view.type === 'view');
     }
 
     // Load up blocks for the source view so they will appear
-    dispatch(initialDatabaseLoad({ pageIdOrPath: sourceDatabaseId }));
+    dispatch(initialDatabaseLoad({ pageId: sourceDatabaseId }));
 
     const constructedView = createTableView({ board: rootBoard, activeView: relatedSourceView });
 

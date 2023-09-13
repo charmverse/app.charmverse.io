@@ -9,7 +9,6 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
-  getBoards,
   getCurrentBoard,
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -91,7 +90,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // inline linked board will be loaded manually
   useEffect(() => {
     if (page.id && (!board || page.id !== board.id)) {
-      dispatch(initialDatabaseLoad({ pageIdOrPath: page.id }));
+      dispatch(initialDatabaseLoad({ pageId: page.id }));
     }
   }, [page.id]);
 

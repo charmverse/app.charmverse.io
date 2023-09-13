@@ -2,11 +2,11 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import { getBoards, getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
@@ -110,7 +110,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   useEffect(() => {
     if (!board && pageId) {
-      dispatch(initialDatabaseLoad({ pageIdOrPath: pageId }));
+      dispatch(initialDatabaseLoad({ pageId }));
     }
   }, [pageId]);
 

@@ -1,12 +1,12 @@
 import type { Page } from '@charmverse/core/prisma';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/focalboard/boardView';
@@ -60,11 +60,9 @@ function DraggableTreeNode({
     })
   }));
   const databasesDispatch = useAppDispatch();
+  const loadedViews = useAppSelector(getLoadedBoardViews());
 
   const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
-
-  const [viewsLoaded, setViewsLoaded] = useState(false);
-
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
       accept: 'item',
@@ -132,13 +130,8 @@ function DraggableTreeNode({
     [onDropAdjacent]
   );
 
-  function refreshViews() {
-    // Only load blocks once
-    if (item.type?.match('board') && !viewsLoaded) {
-      databasesDispatch(databaseViewsLoad({ pageIdOrPath: item.id }));
-      setViewsLoaded(true);
-    }
-  }
+  // eslint-disable-next-line no-console
+  console.log('APP', loadedViews);
 
   const focusListener = useCallback(
     (elt: any) => {
@@ -146,8 +139,6 @@ function DraggableTreeNode({
         // Disable Treeview focus system which make draggable on TreeIten unusable
         // see https://github.com/mui-org/material-ui/issues/29518
         e.stopImmediatePropagation();
-
-        refreshViews();
       });
       drag(elt);
     },
@@ -175,10 +166,10 @@ function DraggableTreeNode({
   const { expanded } = useTreeItem(item.id);
 
   useEffect(() => {
-    if (expanded) {
-      refreshViews();
+    if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
+      databasesDispatch(databaseViewsLoad({ pageId: item.id }));
     }
-  }, [expanded]);
+  }, [expanded, loadedViews]);
 
   const hideChildren = !expanded;
 

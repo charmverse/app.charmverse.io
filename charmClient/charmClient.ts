@@ -256,16 +256,16 @@ class CharmClient {
     return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
   }
 
-  getSubtree({ pageIdOrPath, spaceId }: { pageIdOrPath?: string; spaceId?: string }): Promise<FBBlock[]> {
+  getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/subtree`, { spaceId })
+      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
-  getViews({ pageIdOrPath, spaceId }: { pageIdOrPath?: string; spaceId?: string }): Promise<FBBlock[]> {
+  getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageIdOrPath}/views`, { spaceId })
+      .GET<Block[]>(`/api/blocks/${pageId}/views`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }

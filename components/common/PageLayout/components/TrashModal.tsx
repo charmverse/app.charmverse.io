@@ -128,7 +128,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
         });
 
         await mutate(`pages/${space.id}`);
-        dispatch(initialDatabaseLoad({ pageIdOrPath: pageId }));
+        dispatch(initialDatabaseLoad({ pageId }));
       }
     }
   }

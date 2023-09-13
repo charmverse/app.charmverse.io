@@ -3,7 +3,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
 
-import { databaseViewsLoad, initialDatabaseLoad } from './databaseBlocksLoad';
+import { initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
