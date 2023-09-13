@@ -39,10 +39,10 @@ export class CdkDeployStack extends Stack {
       Rules: {
         Environment: {
           Application: {
-            ApplicationRequests4xx: { Enabled: true }
+            ApplicationRequests4xx: { Enabled: false }
           },
           ELB: {
-            ELBRequests4xx: { Enabled: true }
+            ELBRequests4xx: { Enabled: false }
           }
         }
       },
