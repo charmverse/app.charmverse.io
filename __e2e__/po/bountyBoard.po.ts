@@ -11,7 +11,6 @@ export class BountyBoardPage extends GlobalPage {
     public createBountyButton = page.locator('data-test=create-suggest-bounty'),
     public publicLayout = page.locator('data-test=public-page-layout'),
     public loggedInLayout = page.locator('data-test=space-page-layout'),
-    public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
     public allBountiesLayout = page.locator('data-test=all-bounties-layout')
   ) {
     super(page);

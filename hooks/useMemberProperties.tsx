@@ -5,6 +5,7 @@ import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
 import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type {
   CreateMemberPropertyPayload,
@@ -45,11 +46,12 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
 
 export function MemberPropertiesProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
+  const { user } = useUser(); // a user session is required to get a result
 
   const { isFreeSpace } = useIsFreeSpace();
 
   const { data: properties = [], mutate: mutateProperties } = useSWR(
-    () => (space ? `members/properties/${space?.id}` : null),
+    () => (space && user ? `members/properties/${space?.id}` : null),
     () => {
       return charmClient.members.getMemberProperties(space!.id);
     }

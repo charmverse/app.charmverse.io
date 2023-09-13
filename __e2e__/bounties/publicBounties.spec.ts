@@ -14,6 +14,13 @@ test.describe('Make a bounties page public and visit it', async () => {
 
     await bountyBoardPage.goToBountyBoard(space.domain);
 
+    // 5. Make sure page is displayed using public layout
+    await expect(bountyBoardPage.publicLayout).toBeVisible();
+
+    // Make sure bounty property reviewer role is visible
+    await bountyBoardPage.goToView('all');
+    await expect(bountyBoardPage.allBountiesLayout).toBeVisible();
+
     const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
 
     await expect(bountyCard).toBeVisible();
@@ -28,19 +35,11 @@ test.describe('Make a bounties page public and visit it', async () => {
     await expect(cardPopup).toBeVisible();
 
     await expect(documentPage.documentTitle).toBeVisible();
-
-    await expect(bountyBoardPage.joinSpaceButton).toBeVisible();
-
-    // 5. Make sure page is displayed using public layout
-    await expect(bountyBoardPage.publicLayout).toBeVisible();
+    await expect(documentPage.joinSpaceButton).toBeVisible();
 
     // Make sure bounty property reviewer role is visible
     const roleChip = page.getByText(role.name);
     await expect(roleChip).toBeVisible();
-
-    // Make sure bounty property reviewer role is visible
-    await bountyBoardPage.goToView('all');
-    await expect(bountyBoardPage.allBountiesLayout).toBeVisible();
   });
 
   test('visit shared bounties page as logged in user', async ({ bountyBoardPage }) => {
