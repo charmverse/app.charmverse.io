@@ -27,26 +27,6 @@ export const useSharedPage = () => {
   const loadedSpace = filterSpaceByDomain(spaces, spaceDomain || '');
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
 
-  const pageKey = useMemo(() => {
-    if (!isPublicPath) {
-      return null;
-    }
-
-    if (isBountiesPath) {
-      return `${spaceDomain}/bounties`;
-    }
-
-    if (isForumPath) {
-      return `${spaceDomain}/forum`;
-    }
-
-    if (isProposalsPath) {
-      return `${spaceDomain}/proposals`;
-    }
-
-    return `${spaceDomain}/${pagePath}`;
-  }, [isBountiesPath, isPublicPath, isForumPath, spaceDomain, pagePath]);
-
   // user does not have access to space and is page path, so we want to verify if it is a public page
   const shouldLoadPublicPage = useMemo(() => {
     if (!spacesLoaded || !isPublicPath) {
@@ -56,23 +36,15 @@ export const useSharedPage = () => {
     return !loadedSpace;
   }, [spacesLoaded, isPublicPath, loadedSpace]);
 
-  const {
-    data: publicPage,
-    isLoading: isPublicPageLoading,
-    error: publicPageError
-  } = useSWRImmutable(shouldLoadPublicPage ? `public/${pageKey}` : null, () =>
-    charmClient.getPublicPage(pageKey || '')
+  const { data: publicPage, isLoading: isPublicPageLoading } = useSWRImmutable(
+    shouldLoadPublicPage ? `public/${pagePath}` : null,
+    () => (pagePath ? charmClient.getPublicPage(pagePath) : null)
   );
 
-  const {
-    data: space,
-    isLoading: isSpaceLoading,
-    error: spaceError
-  } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
+  const { data: space, isLoading: isSpaceLoading } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
     charmClient.spaces.searchByDomain(spaceDomain || '')
   );
 
-  const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';
   const hasPublicProposals = space?.publicProposals || space?.paidTier === 'free';
   const hasSharedPageAccess =
@@ -84,7 +56,6 @@ export const useSharedPage = () => {
 
   return {
     accessChecked,
-    hasError,
     hasSharedPageAccess,
     publicSpace: space,
     isPublicPath,
