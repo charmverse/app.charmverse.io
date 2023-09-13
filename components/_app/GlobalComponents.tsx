@@ -71,7 +71,7 @@ export function GlobalComponents() {
         openSettingsModal('subscription');
       }
     }
-  }, [isSettingsDialogOpen, router.isReady, openSettingsModal]);
+  }, [isSettingsDialogOpen, router.isReady, openSettingsModal, router.query.account, router.query.subscription]);
 
   return (
     <>
