@@ -3,7 +3,7 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { injectedConnector } from 'connectors/config';
+import { coinbaseWalletConnector, injectedConnector, walletConnectConnector } from 'connectors/config';
 import { useEffect } from 'react';
 import type { Connector } from 'wagmi';
 import { useAccount, useConnect } from 'wagmi';
@@ -30,8 +30,7 @@ type Props = {
 };
 
 export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
-  const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity, setIsConnectingIdentity } =
-    useWeb3ConnectionManager();
+  const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
   // const { active, activate, setError, error } = useWeb3React();
   const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
   const { pendingConnector, error, isLoading, connectAsync } = useConnect();
@@ -84,27 +83,26 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
         </Grid>
 
         <Grid item xs={12}>
-          {/* <ConnectorButton
+          <ConnectorButton
             name='WalletConnect'
             onClick={() => {
-              WalletConnectV2Connector.clearStorage(window.localStorage);
-              handleConnect(walletConnect);
+              handleConnect(walletConnectConnector);
             }}
             iconUrl='walletconnect.svg'
-            disabled={connector === walletConnect || !!activatingConnector}
-            isActive={connector === walletConnect}
-            isLoading={activatingConnector === walletConnect}
-          /> */}
+            disabled={activeConnector?.id === walletConnectConnector.id || isLoading}
+            isActive={activeConnector?.id === walletConnectConnector.id}
+            isLoading={isLoading && pendingConnector?.id === walletConnectConnector.id}
+          />
         </Grid>
         <Grid item xs={12}>
-          {/* <ConnectorButton
+          <ConnectorButton
             name='Coinbase Wallet'
-            onClick={() => handleConnect(walletLink)}
+            onClick={() => handleConnect(coinbaseWalletConnector)}
             iconUrl='coinbasewallet.png'
-            disabled={connector === walletLink || !!activatingConnector}
-            isActive={connector === walletLink}
-            isLoading={activatingConnector === walletLink}
-          /> */}
+            disabled={activeConnector?.id === coinbaseWalletConnector.id || isLoading}
+            isActive={activeConnector?.id === coinbaseWalletConnector.id}
+            isLoading={isLoading && pendingConnector?.id === coinbaseWalletConnector.id}
+          />
         </Grid>
 
         <Grid item xs={12}>
