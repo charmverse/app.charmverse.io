@@ -2,6 +2,7 @@ import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Box, Card, Divider, Typography } from '@mui/material';
 import { Fragment, useMemo } from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 
 import { NotificationPreview } from './NotificationPreview';
@@ -9,7 +10,7 @@ import { NotificationPreview } from './NotificationPreview';
 const MAX_COUNT = 5;
 
 export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
-  const { unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews, openNotificationsModal } =
+  const { isLoading, unmarkedNotificationPreviews, markAsRead, markedNotificationPreviews, openNotificationsModal } =
     useNotifications();
 
   const latestNotifications = useMemo(() => {
@@ -26,31 +27,34 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
         </Typography>
       </Card>
       <Divider />
-      <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-        {latestNotifications.length > 0 ? (
-          latestNotifications.map((notification) => (
-            <Fragment key={notification.taskId}>
-              <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
-              <Divider />
-            </Fragment>
-          ))
-        ) : (
-          <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            flexDirection='row'
-            height='100%'
-            my={2}
-            gap={1}
-          >
-            <Typography variant='h6' color='secondary'>
-              You are up to date!
-            </Typography>
-            <CelebrationIcon color='secondary' fontSize='medium' />
-          </Box>
-        )}
-      </Box>
+      <LoadingComponent isLoading={isLoading} label='Fetching your notifications' size={24}>
+        <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+          {latestNotifications.length > 0 ? (
+            latestNotifications.map((notification) => (
+              <Fragment key={notification.taskId}>
+                <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
+                <Divider />
+              </Fragment>
+            ))
+          ) : (
+            <Box
+              display='flex'
+              justifyContent='center'
+              alignItems='center'
+              flexDirection='row'
+              height='100%'
+              my={2}
+              gap={1}
+            >
+              <Typography variant='h6' color='secondary'>
+                You are up to date!
+              </Typography>
+              <CelebrationIcon color='secondary' fontSize='medium' />
+            </Box>
+          )}
+        </Box>
+      </LoadingComponent>
+
       <Card>
         <Box
           onClick={() => {
