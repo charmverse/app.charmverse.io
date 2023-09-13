@@ -63,7 +63,7 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await page.goto(targetPage);
 
-    // Act ----------------------
+    // Act -----------------------
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
