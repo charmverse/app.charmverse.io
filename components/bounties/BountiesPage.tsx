@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { CSVLink } from 'react-csv';
@@ -42,8 +43,8 @@ const StyledButton = styled(Button)`
 `;
 
 const views = [
-  { icon: <BountyIcon fontSize='small' />, label: 'Open', type: 'gallery' },
-  { icon: <ModeStandbyOutlinedIcon fontSize='small' />, label: 'All', type: 'board' }
+  { icon: <BountyIcon fontSize='small' />, label: 'Open', type: 'open' },
+  { icon: <ModeStandbyOutlinedIcon fontSize='small' />, label: 'All', type: 'all' }
 ] as const;
 
 export function BountiesPage({ publicMode = false, bounties, title }: Props) {
@@ -129,8 +130,9 @@ export function BountiesPage({ publicMode = false, bounties, title }: Props) {
                 >
                   {views.map(({ icon, label, type }) => (
                     <Tab
+                      data-test={`bounties-view-${type}`}
                       disableRipple
-                      component={Link}
+                      component={NextLink}
                       href={getAbsolutePath(`/bounties?view=${type}`, space?.domain)}
                       key={type}
                       value={type}
@@ -158,16 +160,16 @@ export function BountiesPage({ publicMode = false, bounties, title }: Props) {
               videoTitle='Bounties | Getting started with CharmVerse'
               videoUrl='https://tiny.charmverse.io/bounties'
             />
-          ) : currentView.type === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
+          ) : currentView.type === 'open' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
             <Card variant='outlined' sx={{ margin: '0 auto', my: 2, width: 'fit-content' }}>
               <Box p={3} textAlign='center'>
                 <Typography color='secondary'>
-                  There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=board`}>here</Link> to
+                  There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=all`}>here</Link> to
                   see all of your existing bounties
                 </Typography>
               </Box>
             </Card>
-          ) : currentView.type === 'gallery' ? (
+          ) : currentView.type === 'all' ? (
             <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
           ) : (
             <div className='container-container'>
