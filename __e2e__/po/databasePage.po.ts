@@ -20,6 +20,10 @@ export class DatabasePage extends GlobalPage {
     return boardId ? this.getDatabaseContainer({ boardId }) : this.page;
   }
 
+  boardTitle({ boardId }: OptionalBoardId = {}) {
+    return this.getPageOrBoardLocator({ boardId }).locator('data-test=board-title').locator('input');
+  }
+
   selectLinkedDatabaseAsSource({ boardId }: OptionalBoardId = {}) {
     return this.getPageOrBoardLocator({ boardId }).locator('data-test=source-linked-database');
   }
