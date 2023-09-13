@@ -169,7 +169,7 @@ function DraggableTreeNode({
     if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
       databasesDispatch(databaseViewsLoad({ pageId: item.id }));
     }
-  }, [expanded, loadedViews]);
+  }, [expanded, loadedViews?.[item.id]]);
 
   const hideChildren = !expanded;
 
