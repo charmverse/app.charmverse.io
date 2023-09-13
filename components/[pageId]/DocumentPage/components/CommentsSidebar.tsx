@@ -9,9 +9,11 @@ import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -76,13 +78,15 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   }
 
   const view = useEditorViewContext();
+  const extractedThreadIds = extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+
   // Making sure the position sort doesn't filter out comments that are not in the view
   const inlineThreadsIds = Array.from(
     new Set([
       ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
       ...allThreads.map((thread) => thread?.id)
     ])
-  );
+  ).filter((id) => extractedThreadIds.has(id));
 
   const threadListSet = new Set(threadList.map((thread) => thread.id));
   const sortedThreadList = inlineThreadsIds
