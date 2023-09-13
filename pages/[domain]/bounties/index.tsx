@@ -1,5 +1,5 @@
 import { useTrackPageView } from 'charmClient/hooks/track';
-import BountiesPage from 'components/bounties/BountiesPage';
+import { BountiesPage } from 'components/bounties/BountiesPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useBounties } from 'hooks/useBounties';

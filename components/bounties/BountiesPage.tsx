@@ -16,6 +16,7 @@ import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal'
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { BountiesKanbanView } from './components/BountiesKanbanView';
@@ -29,7 +30,6 @@ interface Props {
   publicMode?: boolean;
   bounties: BountyWithDetails[];
   title: string;
-  view?: 'gallery' | 'board';
 }
 
 const StyledButton = styled(Button)`
@@ -42,15 +42,15 @@ const StyledButton = styled(Button)`
 `;
 
 const views = [
-  { label: 'Open', type: 'gallery' },
-  { label: 'All', type: 'board' }
+  { icon: <BountyIcon fontSize='small' />, label: 'Open', type: 'gallery' },
+  { icon: <ModeStandbyOutlinedIcon fontSize='small' />, label: 'All', type: 'board' }
 ] as const;
 
-export default function BountiesPage({ publicMode = false, bounties, title, view }: Props) {
+export function BountiesPage({ publicMode = false, bounties, title }: Props) {
   const { space } = useCurrentSpace();
   const router = useRouter();
-
-  const currentView = views.find((v) => v.type === view) ?? views[0];
+  const viewFromUrl = router.query.view as (typeof views)[number]['type'];
+  const currentView = views.find((v) => v.type === viewFromUrl) ?? views[0];
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
@@ -127,33 +127,25 @@ export default function BountiesPage({ publicMode = false, bounties, title, view
                   value={currentView.type}
                   sx={{ minHeight: 0, mb: '-6px' }}
                 >
-                  {views.map(({ label, type }) => (
+                  {views.map(({ icon, label, type }) => (
                     <Tab
-                      component='div'
                       disableRipple
-                      key={label}
+                      component={Link}
+                      href={getAbsolutePath(`/bounties?view=${type}`, space?.domain)}
+                      key={type}
+                      value={type}
                       label={
                         <StyledButton
-                          startIcon={
-                            view === 'board' ? (
-                              <BountyIcon fontSize='small' />
-                            ) : (
-                              <ModeStandbyOutlinedIcon fontSize='small' />
-                            )
-                          }
-                          onClick={() => {
-                            router.push(`/${space?.domain}/bounties?view=${type}`);
-                          }}
+                          startIcon={icon}
                           variant='text'
                           size='small'
                           sx={{ p: 0, mb: '5px', width: '100%' }}
-                          color={currentView.label === label ? 'textPrimary' : 'secondary'}
+                          color={currentView.type === type ? 'textPrimary' : 'secondary'}
                         >
                           {label}
                         </StyledButton>
                       }
                       sx={{ p: 0 }}
-                      value={view}
                     />
                   ))}
                 </Tabs>
