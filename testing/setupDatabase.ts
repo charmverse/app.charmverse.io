@@ -10,8 +10,8 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalStatus,
   ProposalEvaluationType,
+  ProposalStatus,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -47,6 +47,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
+import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';
 
 export async function generateSpaceUser({
@@ -1072,23 +1073,27 @@ export async function generateBoard({
   spaceId,
   parentId,
   cardCount,
+  boardTitle,
   views,
   viewType,
   addPageContent,
   viewDataSource,
   boardPageType,
-  linkedSourceId
+  linkedSourceId,
+  customProps
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  boardTitle?: string;
   views?: number;
   viewType?: IViewType;
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
+  customProps?: CustomBoardProps;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1096,11 +1101,13 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
+    boardTitle,
     addPageContent,
     viewDataSource,
     boardPageType,
     viewType,
-    linkedSourceId
+    linkedSourceId,
+    customProps
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

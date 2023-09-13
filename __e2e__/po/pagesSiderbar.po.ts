@@ -26,6 +26,10 @@ export class PagesSidebarPage extends GlobalPage {
     return this.page.locator(`data-test=sidebar-link-${path}`);
   }
 
+  getSidebarPageLink(pageId: string) {
+    return this.page.locator(`data-test=page-tree-item-${pageId}`);
+  }
+
   async waitForDocumentPage({ domain, path }: { domain: string; path: string }) {
     await this.page.waitForURL(`${baseUrl}/${domain}/${path}`);
   }

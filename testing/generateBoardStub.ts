@@ -1,13 +1,17 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { BoardFields, DataSourceType } from 'lib/focalboard/board';
+import type { BoardFields, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { pageContentStub } from './generatePageStub';
+
+export type CustomBoardProps = {
+  propertyTemplates: IPropertyTemplate[];
+  cardPropertyValues: Record<string, any>;
+};
 
 /**
  * We are currently lacking a way to generate fresh boards purely from the server side (apart from importing them) as this is currently orchestrated by the client-side focal board libraries
@@ -30,7 +34,8 @@ export function boardWithCardsArgs({
   boardPageType,
   boardTitle,
   viewType,
-  linkedSourceId
+  linkedSourceId,
+  customProps
 }: {
   createdBy: string;
   spaceId: string;
@@ -43,6 +48,7 @@ export function boardWithCardsArgs({
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
   linkedSourceId?: string;
+  customProps?: CustomBoardProps;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -129,7 +135,7 @@ export function boardWithCardsArgs({
             title: 'Card 3',
             fields: {
               isTemplate: false,
-              properties: {
+              properties: customProps?.cardPropertyValues ?? {
                 '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'd21b567d-fd35-496e-8f7c-1ee62e95d4f2',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661169600000}'
               },
@@ -200,7 +206,7 @@ export function boardWithCardsArgs({
             fields: {
               icon: '',
               isTemplate: false,
-              properties: {
+              properties: customProps?.cardPropertyValues ?? {
                 '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'c5689c24-eb32-4af9-8e8d-e4191fbeb0a1',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661515200000}'
               },
@@ -231,7 +237,7 @@ export function boardWithCardsArgs({
           isTemplate: false,
           description: undefined,
           headerImage: null,
-          cardProperties: [
+          cardProperties: customProps?.propertyTemplates ?? [
             {
               id: '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f',
               name: 'Status',
@@ -318,7 +324,9 @@ export function boardWithCardsArgs({
         collapsedOptionIds: [],
         columnCalculations: {},
         kanbanCalculations: {},
-        visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765', '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f']
+        visiblePropertyIds: customProps?.propertyTemplates
+          ? ['__title', ...customProps.propertyTemplates.map((prop) => prop.id)]
+          : ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765', '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f']
       } as Partial<BoardViewFields> as any
     });
   }
