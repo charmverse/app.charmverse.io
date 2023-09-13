@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps } from 'next';
 
+import { LoginPageView } from 'components/login/LoginPage';
 import { getDefaultPageForSpace } from 'lib/session/getDefaultPageForSpace';
 import { withSessionSsr } from 'lib/session/withSession';
 
@@ -10,13 +11,9 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // 1. handle user not logged in
   if (!sessionUserId) {
-    // send user to login
-    log.debug('Send user to login page', { domain: context.query.domain, userId: sessionUserId });
+    // show the normal login UI
     return {
-      redirect: {
-        destination: `/?returnUrl=${encodeURIComponent(context.resolvedUrl)}`,
-        permanent: false
-      }
+      props: {}
     };
   }
 
@@ -56,8 +53,6 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   };
 });
-
-// Next.js requires a component
-export default function PageStub() {
-  return null;
+export default function LoginPage() {
+  return <LoginPageView />;
 }
