@@ -18,7 +18,7 @@ export default function ConfirmDeadlinePopover({
   const [deadline, setDeadline] = useState(DateTime.fromJSDate(new Date(initialDeadline)));
 
   return (
-    <Popover disableRestoreFocus anchorOrigin={{ vertical: 'top', horizontal: 'right' }} {...restProps}>
+    <Popover anchorOrigin={{ vertical: 'top', horizontal: 'right' }} {...restProps}>
       <StaticDateTimePicker
         openTo='day'
         displayStaticWrapperAs='desktop'

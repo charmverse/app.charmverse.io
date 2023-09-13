@@ -134,7 +134,6 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   return (
     <>
       <Popover
-        disableRestoreFocus
         id='asd'
         open={!!editAnchor}
         anchorEl={editAnchor}

@@ -171,7 +171,6 @@ function ViewHeader(props: Props) {
               <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
             </Button>
             <Popover
-              disableRestoreFocus
               {...bindPopover(viewFilterPopup)}
               anchorOrigin={{
                 vertical: 'bottom',

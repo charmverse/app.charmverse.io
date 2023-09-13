@@ -14,7 +14,6 @@ export default function ProposalsShareButton({ headerHeight }: { headerHeight: n
         Share
       </Button>
       <Popover
-        disableRestoreFocus
         {...bindPopover(popupState)}
         anchorOrigin={{
           horizontal: 'right',

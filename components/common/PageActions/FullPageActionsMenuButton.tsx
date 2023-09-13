@@ -113,7 +113,6 @@ export function FullPageActionsMenuButton({ pageId, page: pageProp, post, inside
           </Tooltip>
         </div>
         <Popover
-          disableRestoreFocus
           anchorEl={pageMenuAnchorElement}
           open={!!pageMenuAnchorElement}
           onClose={closeMenu}

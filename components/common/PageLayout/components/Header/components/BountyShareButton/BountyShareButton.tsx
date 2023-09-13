@@ -14,7 +14,6 @@ export default function BountyShareButton({ headerHeight }: { headerHeight: numb
         Share
       </Button>
       <Popover
-        disableRestoreFocus
         {...bindPopover(popupState)}
         anchorOrigin={{
           horizontal: 'right',
