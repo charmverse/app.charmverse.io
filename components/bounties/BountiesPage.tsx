@@ -169,7 +169,7 @@ export function BountiesPage({ publicMode = false, bounties, title }: Props) {
                 </Typography>
               </Box>
             </Card>
-          ) : currentView.type === 'all' ? (
+          ) : currentView.type === 'open' ? (
             <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
           ) : (
             <div className='container-container'>

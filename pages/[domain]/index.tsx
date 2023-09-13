@@ -11,6 +11,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   // 1. handle user not logged in
   if (!sessionUserId) {
     // send user to login
+    log.debug('Send user to login page', { domain: context.query.domain, userId: sessionUserId });
     return {
       redirect: {
         destination: `/?returnUrl=${encodeURIComponent(context.resolvedUrl)}`,
