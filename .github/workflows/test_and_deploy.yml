@@ -77,7 +77,7 @@ jobs:
 
   test:
     name: Tests
-    runs-on: cv-ubuntu-22.04-8core
+    runs-on: cv-ubuntu-22.04-4core
     needs: build-test-env
     strategy:
       max-parallel: 5
