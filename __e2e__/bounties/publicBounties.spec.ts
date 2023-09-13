@@ -99,8 +99,7 @@ async function createMockData() {
       },
       {
         permissionLevel: 'view',
-        public: true,
-        allowDiscovery: true
+        public: true
       }
     ]
   });
