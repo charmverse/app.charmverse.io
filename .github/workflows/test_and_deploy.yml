@@ -107,7 +107,7 @@ jobs:
 
   integration-test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-8core
     needs: build-test-env
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
