@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from 'lib/metrics/mixpanel/interfaces';
-import type { ForumEventMap } from 'lib/metrics/mixpanel/interfaces/ForumEvent';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import type { UserEventMap } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 
@@ -46,24 +45,13 @@ export async function recordDatabaseEvent({
           action: 'view_page',
           createdBy: userId,
           distinctUserId,
+          meta: typedEvent.meta,
           pageId: typedEvent.pageId,
+          postId: typedEvent.postId,
           spaceId: typedEvent.spaceId,
           pageType: typedEvent.type
         }
       });
     }
-  }
-  if (event.event === 'load_post_page') {
-    const typedEvent = event as ForumEventMap['load_post_page'];
-    await prisma.userSpaceAction.create({
-      data: {
-        action: 'view_page',
-        createdBy: userId,
-        distinctUserId,
-        postId: typedEvent.resourceId,
-        spaceId: typedEvent.spaceId,
-        pageType: 'post'
-      }
-    });
   }
 }

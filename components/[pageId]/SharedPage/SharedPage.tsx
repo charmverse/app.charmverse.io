@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -39,7 +39,7 @@ export function SharedPage({ publicPage }: Props) {
   async function onLoad(_publicPage: PublicPageResponse) {
     const { page: rootPage, cards, boards, views } = _publicPage;
 
-    charmClient.track.trackAction('page_view', {
+    trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
       spaceId: rootPage.spaceId
