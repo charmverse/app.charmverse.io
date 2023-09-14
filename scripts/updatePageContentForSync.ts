@@ -3,7 +3,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { BlockNode, PageContent } from 'lib/prosemirror/interfaces';
 import { writeToSameFolder } from 'lib/utilities/file';
 import { pageTree } from '@charmverse/core/pages/utilities';
-import { PageMeta } from '@charmverse/core/dist/cjs/pages';
+import { PageMeta } from '@charmverse/core/pages';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
   function recurse(node: PageContent) {
@@ -28,6 +28,8 @@ export async function updatePageContentForSync() {
   })
 
   const errors: { pageId: string, error: any }[] = []
+  const totalPages = pages.length;
+  let completedPages = 0;
 
   for (const page of pages) {
     try {
@@ -85,7 +87,7 @@ export async function updatePageContentForSync() {
         }
       })
 
-      console.log(`Complete updating page ${page.id}`)
+      console.log(`Complete updating page [${++completedPages}/${totalPages}]: ${page.id}`)
     } catch (error) {
       errors.push({ pageId: page.id, error });
     }
