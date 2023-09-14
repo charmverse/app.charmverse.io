@@ -33,7 +33,9 @@ const esmModules = [
   'jose',
   'nanoid',
   '@charmverse/core',
-  'wagmi'
+  'wagmi',
+  '@wagmi/core',
+  '@wagmi/connectors'
 ];
 
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module

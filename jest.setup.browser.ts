@@ -11,8 +11,6 @@ configure({
   testIdAttribute: 'data-test'
 });
 
-jest.mock('wagmi', () => {});
-
 // fix dynamic imports in next.js 13: https://github.com/vercel/next.js/issues/41725
 jest.mock('next/dynamic', () => ({
   __esModule: true,
