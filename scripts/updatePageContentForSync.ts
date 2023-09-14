@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { BlockNode, PageContent } from 'lib/prosemirror/interfaces';
 import { writeToSameFolder } from 'lib/utilities/file';
 import { pageTree } from '@charmverse/core/pages/utilities';
@@ -28,7 +27,7 @@ export async function updatePageContentForSync() {
     }
   })
 
-  const errors: {pageId: string, error: any}[] = []
+  const errors: { pageId: string, error: any }[] = []
 
   for (const page of pages) {
     try {
@@ -39,7 +38,9 @@ export async function updatePageContentForSync() {
         select: {
           id: true,
           index: true,
-          createdAt: true
+          createdAt: true,
+          path: true,
+          type: true,
         }
       });
 
@@ -53,7 +54,7 @@ export async function updatePageContentForSync() {
       recurseDocument(pageContent, (node) => {
         if (node.type === "page" && node.attrs) {
           const pageId = node.attrs.id;
-          if (!childPageIds.includes(pageId)) {
+          if (!childPageIds.includes(pageId) || nestedPageIds.has(pageId)) {
             node.type = "page-link";
           } else {
             nestedPageIds.add(pageId);
@@ -61,17 +62,20 @@ export async function updatePageContentForSync() {
         }
       })
 
-      const childPageIdsNotInDocument = childPageIds.filter((childPageId) => !nestedPageIds.has(childPageId));
+      const childPagesNotInDocument = childPages.filter((childPage) => !nestedPageIds.has(childPage.id));
 
-      childPageIdsNotInDocument.forEach(childPageId => {
+      childPagesNotInDocument.forEach(childPage => {
         (pageContent.content as BlockNode[]).push({
           type: "page",
           attrs: {
-            id: childPageId,
+            id: childPage.id,
+            path: childPage.path,
+            type: childPage.type,
+            track: []
           }
         })
       })
-      
+
       await prisma.page.update({
         where: {
           id: page.id,
@@ -80,10 +84,10 @@ export async function updatePageContentForSync() {
           content: pageContent,
         }
       })
-  
+
       console.log(`Complete updating page ${page.id}`)
     } catch (error) {
-      errors.push({pageId: page.id, error});
+      errors.push({ pageId: page.id, error });
     }
   }
 
