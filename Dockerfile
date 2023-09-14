@@ -8,7 +8,12 @@ FROM node:18.15.0-slim AS BASE_APP
 
 WORKDIR /app
 
-COPY . .
+COPY node_modules ./node_modules
+COPY ./\.* ./
+COPY [a-m]* ./
+COPY [o-z]* ./
+
+RUN ls -lA /app
 
 ENV PORT 3000
 

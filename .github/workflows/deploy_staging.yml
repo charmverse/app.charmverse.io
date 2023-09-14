@@ -3,6 +3,8 @@ name: 'Deploy to staging'
 on:
   pull_request:
     types: [labeled, opened, synchronize]
+    branches-ignore:                            # <<< change before merge
+      - 'optimize-docker-cache'
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
