@@ -1,9 +1,9 @@
 import { baseUrl, isDevEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
@@ -226,9 +226,10 @@ export function getSubdomainPath(
   config?: { domain: string; customDomain: string | null },
   host?: string
 ) {
-  const subdomain = getValidSubdomain(host);
-  const customDomain = getValidCustomDomain(host);
+  const subdomain = getSpaceDomainFromHost(host);
+  const customDomain = getCustomDomainFromHost(host);
 
+  // strip out domain when using full custom domain
   if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
     // remove space domain from path for custom domain
     if (path.startsWith(`/${config.domain}`)) {
@@ -240,6 +241,7 @@ export function getSubdomainPath(
     }
   }
 
+  // strip out subdomain when using subdomain
   if (subdomain) {
     return path.replace(new RegExp(`^\\/${subdomain}`), '');
   }
@@ -253,8 +255,8 @@ export function getSubdomainPath(
 
 export function getSpaceUrl(config: { domain: string; customDomain?: string | null }, host?: string) {
   const { domain } = config;
-  const subdomain = getValidSubdomain(host);
-  const customDomain = getValidCustomDomain(host);
+  const subdomain = getSpaceDomainFromHost(host);
+  const customDomain = getCustomDomainFromHost(host);
 
   if (isLocalhostAlias(host)) {
     return `/${domain}`;
@@ -286,7 +288,7 @@ export function getSpaceUrl(config: { domain: string; customDomain?: string | nu
 
 export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
   const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
-  const subdomain = getValidSubdomain();
+  const subdomain = getSpaceDomainFromHost();
 
   if (typeof window !== 'undefined') {
     const origin =
@@ -294,7 +296,9 @@ export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
         ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
         : window.location.origin;
 
-    return origin + getSubdomainPath(absolutePath, { domain: spaceDomain || '', customDomain: getValidCustomDomain() });
+    return (
+      origin + getSubdomainPath(absolutePath, { domain: spaceDomain || '', customDomain: getCustomDomainFromHost() })
+    );
   }
 
   return absolutePath;
@@ -342,7 +346,7 @@ export function shouldRedirectToAppLogin() {
     return false;
   }
 
-  const isSubdomainUrl = !!getValidSubdomain();
+  const isSubdomainUrl = !!getSpaceDomainFromHost();
   const appDomain = getAppApexDomain();
 
   return isSubdomainUrl && !!appDomain;
