@@ -5,11 +5,9 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import type { CommentBlock } from './focalboard/src/blocks/commentBlock';
 import store from './focalboard/src/store';
 import { deleteBoards, updateBoards } from './focalboard/src/store/boards';
 import { deleteCards, updateCards } from './focalboard/src/store/cards';
-import { updateComments } from './focalboard/src/store/comments';
 import { deleteViews, updateViews } from './focalboard/src/store/views';
 
 // this code is normally called by a websocket connection in focalboard
@@ -19,7 +17,6 @@ export const publishIncrementalUpdate = async (blocks: Block[]) => {
       dispatch(updateBoards(blocks.filter((b: Block) => b.type === 'board') as Board[]));
       dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view') as BoardView[]));
       dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card') as Card[]));
-      dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment') as CommentBlock[]));
     });
   });
 };

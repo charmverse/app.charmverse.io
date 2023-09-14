@@ -127,11 +127,13 @@ export async function seedTestPages({
 export async function seedTestBoards({
   spaceDomain,
   boardCount = 1,
-  cardCount
+  cardCount,
+  boardTitle
 }: {
   spaceDomain: string;
   boardCount?: number;
   cardCount?: number;
+  boardTitle?: string
 }) {
   const space = await prisma.space.findUnique({
     where: {
@@ -151,7 +153,8 @@ export async function seedTestBoards({
       createdBy: space?.createdBy,
       spaceId: space.id,
       cardCount,
-      addPageContent: true
+      addPageContent: true,
+      boardTitle: boardTitle ? `Board ${i + 1}` : undefined
     });
     pageCreateArgs.push(...pageArgs);
     blockCreateArgs.push(blockArgs);
@@ -201,14 +204,14 @@ async function cleanSpacePages({ spaceDomain }: { spaceDomain: string }) {
   ]);
 }
 
-// cleanSpacePages({spaceDomain: 'slim-ivory-tyrannosaurus'})
+// cleanSpacePages({spaceDomain: 'mushy-beige-angelfish'})
 //   .then(() => console.log('Done'))
 // .catch(e => {
 //   console.error(e)
 //   process.exit(1)
 // })
 
-seedTestBoards({spaceDomain: 'gross-blush-vicuna', boardCount: 75, cardCount: 100})
+seedTestBoards({spaceDomain: 'mushy-beige-angelfish', boardCount: 50, cardCount: 40, boardTitle: 'Board'})
   .then(() => console.log('Done'))
 .catch(e => {
   console.error(e)

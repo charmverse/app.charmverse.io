@@ -48,7 +48,7 @@ test('tokenGates - token gate verify wallet shows error if no condition is met',
 
   // go to a page to which we don't have access
   await page.goto(`${baseUrl}${workspacePath}`);
-  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
+  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain });
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
   await tokenGatePage.verifyWalletButton.click();
   await expect(tokenGatePage.tokenGateFailureState).toBeVisible();

@@ -26,7 +26,6 @@ export const useSharedPage = () => {
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
   const loadedSpace = filterSpaceByDomain(spaces, spaceDomain || '');
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
-
   const pageKey = useMemo(() => {
     if (!isPublicPath) {
       return null;
@@ -56,23 +55,15 @@ export const useSharedPage = () => {
     return !loadedSpace;
   }, [spacesLoaded, isPublicPath, loadedSpace]);
 
-  const {
-    data: publicPage,
-    isLoading: isPublicPageLoading,
-    error: publicPageError
-  } = useSWRImmutable(shouldLoadPublicPage ? `public/${pageKey}` : null, () =>
-    charmClient.getPublicPage(pageKey || '')
+  const { data: publicPage, isLoading: isPublicPageLoading } = useSWRImmutable(
+    shouldLoadPublicPage ? `public/${pageKey}` : null,
+    () => charmClient.getPublicPage(pageKey || '')
   );
 
-  const {
-    data: space,
-    isLoading: isSpaceLoading,
-    error: spaceError
-  } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
+  const { data: space, isLoading: isSpaceLoading } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
     charmClient.spaces.searchByDomain(spaceDomain || '')
   );
 
-  const hasError = !!publicPageError || !!spaceError;
   const hasPublicBounties = space?.publicBountyBoard || space?.paidTier === 'free';
   const hasPublicProposals = space?.publicProposals || space?.paidTier === 'free';
   const hasSharedPageAccess =
@@ -84,7 +75,6 @@ export const useSharedPage = () => {
 
   return {
     accessChecked,
-    hasError,
     hasSharedPageAccess,
     publicSpace: space,
     isPublicPath,

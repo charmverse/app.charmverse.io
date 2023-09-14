@@ -1,3 +1,4 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -13,7 +14,28 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).delete(deleteBlock);
+handler.use(requireUser).get(getBlock).delete(deleteBlock);
+async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
+  const blockId = req.query.id as string;
+
+  const block = await prisma.block.findUniqueOrThrow({
+    where: {
+      id: blockId
+    }
+  });
+
+  const pageId = block.type === 'view' ? block.rootId : block.id;
+
+  const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({ resourceId: pageId, userId: req.session.user?.id })
+  );
+
+  if (!permissions.read) {
+    throw new DataNotFoundError('Block not found');
+  }
+
+  return res.status(200).json(block);
+}
 
 async function deleteBlock(
   req: NextApiRequest,

@@ -2,10 +2,10 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -79,14 +79,7 @@ export function CreateSubscriptionInformation({
         : `Free trial finished`
       : '';
 
-  useEffect(() => {
-    if (space?.id) {
-      charmClient.track.trackAction('page_view', {
-        spaceId: space.id,
-        type: 'billing/marketing'
-      });
-    }
-  }, [space?.id]);
+  useTrackPageView({ type: 'billing/marketing' });
 
   return (
     <>

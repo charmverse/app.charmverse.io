@@ -13,7 +13,13 @@ inputs:
       If set core_pkg_version and commit_core_pkg_upgrade will be ignored. 
       Add your branch to this variable below to install your custom branch.
     required: false
-    default: 
+    default:
+outputs:
+  core_bump_commit_hash:
+    description: |
+      Returns new commit hash after committing core version bump. 
+      If no new commits because core has already been bumped, return the existing github sha'Returns new commit hash after committing core version bump'
+    value: "${{ steps.commit_core_bump.outputs.commit_hash || github.sha }}"
 
 runs:
   using: 'composite'
@@ -45,13 +51,21 @@ runs:
       run: |
         npm install @charmverse/core@${{ inputs.core_pkg_version }}
 
-    # Commits pkg upgrade back to main. Only done on push event with main branch.
+    # Commits pkg upgrade back to the code if commit_core_pkg_upgrade is true
     - name: Commit package and lock file back into repo
-      if: (github.ref == 'refs/heads/main') && inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      id: commit_core_bump
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
+        commit_options: '--no-verify'
         file_pattern: 'package*.json'
         commit_message: 'Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}'
+
+    - name: Print the last commit
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      shell: bash
+      run: |
+        echo "Newest commit hash - ${{ steps.commit_core_bump.outputs.commit_hash }}"
 
     # If installing core via github branch
     - name: Install custom core branch

@@ -4,6 +4,7 @@ import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material'
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
@@ -36,6 +37,9 @@ export function RoleSettings({ space }: { space: Space }) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
   const { mutateMembers } = useMembers();
+
+  useTrackPageView({ type: 'settings/roles-and-permissions' });
+
   const open = Boolean(anchorEl);
   const handleClose = () => {
     setAnchorEl(null);

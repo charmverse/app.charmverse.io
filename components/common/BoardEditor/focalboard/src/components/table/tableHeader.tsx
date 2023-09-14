@@ -327,7 +327,7 @@ function TableHeader(props: Props): JSX.Element {
         ) : (
           <div ref={toggleRef}>
             <div {...popoverToggleProps}>{label}</div>
-            <Popover disableRestoreFocus {...popoverProps}>
+            <Popover {...popoverProps}>
               <Paper>{popupContent}</Paper>
             </Popover>
           </div>

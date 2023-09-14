@@ -383,6 +383,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         ContentProps={ContentProps}
         TransitionProps={TransitionProps}
         ref={ref}
+        data-test={`page-tree-item-${pageId}`}
       >
         {children}
       </StyledTreeItem>

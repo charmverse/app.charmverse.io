@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import path from 'node:path';
 
 // https://github.com/sindresorhus/callsites/blob/main/index.js
 function getCallerDirectory() {
