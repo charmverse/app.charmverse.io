@@ -220,9 +220,14 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
   }, 1000);
 }
 
-export function getSubdomainPath(path: string, config?: { domain: string; customDomain: string | null }) {
-  const subdomain = getValidSubdomain();
-  const customDomain = getValidCustomDomain();
+// strip out custom or domain depending on the host
+export function getSubdomainPath(
+  path: string,
+  config?: { domain: string; customDomain: string | null },
+  host?: string
+) {
+  const subdomain = getValidSubdomain(host);
+  const customDomain = getValidCustomDomain(host);
 
   if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
     // remove space domain from path for custom domain

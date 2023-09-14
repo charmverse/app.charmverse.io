@@ -7,7 +7,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSubdomainPath, getSpaceUrl } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -38,7 +38,7 @@ export async function getDefaultPageForSpace({
   if (lastPageView) {
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     if (pathname) {
-      return pathname;
+      return getSubdomainPath(pathname, space, host);
     }
     // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
     // handle forum posts
