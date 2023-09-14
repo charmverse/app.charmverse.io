@@ -29,15 +29,21 @@ runs:
         node-version: 18
 
     - name: Create .env.test.local file
+      id: calc_cache_key
       shell: bash
-      run: cp .env.test.local.example .env.test.local
+      run: |
+        cp .env.test.local.example .env.test.local
+        echo "cache_key=nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}" >> $GITHUB_OUTPUT
 
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v3
       with:
         path: ./node_modules
-        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: ${{ steps.calc_cache_key.outputs.cache_key }}
+        restore-keys: |
+          nodemodules-cache-${{ hashFiles('package-lock.json') }}-
+          nodemodules-cache-
 
     - name: Install npm dependencies
       shell: bash
