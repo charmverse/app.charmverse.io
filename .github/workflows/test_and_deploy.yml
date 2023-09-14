@@ -20,7 +20,7 @@ env:
 jobs:
   build-test-env:
     name: Build test env
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-4core
     outputs:
       build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
@@ -77,7 +77,7 @@ jobs:
 
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-4core
     needs: build-test-env
     strategy:
       max-parallel: 5
@@ -107,7 +107,7 @@ jobs:
 
   integration-test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-4core
     needs: build-test-env
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
@@ -126,7 +126,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 8
+      max-parallel: 10
       fail-fast: false
       matrix:
         include:
