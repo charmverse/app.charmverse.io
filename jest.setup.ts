@@ -8,6 +8,8 @@ afterAll(() => {
 
 // Mock external requests globally
 
+jest.mock('wagmi', () => {});
+
 jest.mock('lib/blockchain/getENSName', () => ({
   ...jest.requireActual('lib/blockchain/getENSName'),
   __esModule: true,
