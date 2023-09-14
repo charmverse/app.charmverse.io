@@ -10,6 +10,7 @@ import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Dialog, DialogContent, Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { Fragment } from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import type { NotificationDisplayType } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
@@ -56,7 +57,8 @@ export function NotificationModal() {
     unmarkedNotificationPreviews: unmarked,
     closeNotificationsModal,
     openNotificationsModal,
-    markAsRead
+    markAsRead,
+    isLoading
   } = useNotifications();
   const isMobile = useSmallScreen();
   const DialogComponent = isMobile ? MobileDialog : Dialog;
@@ -208,45 +210,47 @@ export function NotificationModal() {
               </Tabs>
             </Box>
             <DialogContent sx={{ height: 'calc(100% - 145px)', px: { xs: 0, md: 3 } }}>
-              {unmarkedNotifications.map((notification) => (
-                <Fragment key={notification.taskId}>
-                  <NotificationPreview
-                    large
-                    unmarked
-                    notification={notification}
-                    markAsRead={markAsRead}
-                    onClose={closeNotificationsModal}
-                  />
-                  <Divider />
-                </Fragment>
-              ))}
-              {markedNotifications.map((notification) => (
-                <Fragment key={notification.taskId}>
-                  <NotificationPreview
-                    large
-                    notification={notification}
-                    markAsRead={markAsRead}
-                    onClose={closeNotificationsModal}
-                  />
-                  <Divider />
-                </Fragment>
-              ))}
+              <LoadingComponent isLoading={isLoading} label='Fetching your notifications' size={24}>
+                {unmarkedNotifications.map((notification) => (
+                  <Fragment key={notification.taskId}>
+                    <NotificationPreview
+                      large
+                      unmarked
+                      notification={notification}
+                      markAsRead={markAsRead}
+                      onClose={closeNotificationsModal}
+                    />
+                    <Divider />
+                  </Fragment>
+                ))}
+                {markedNotifications.map((notification) => (
+                  <Fragment key={notification.taskId}>
+                    <NotificationPreview
+                      large
+                      notification={notification}
+                      markAsRead={markAsRead}
+                      onClose={closeNotificationsModal}
+                    />
+                    <Divider />
+                  </Fragment>
+                ))}
 
-              {unmarkedNotifications.length < 1 && markedNotifications.length < 1 && (
-                <Box
-                  display='flex'
-                  justifyContent='center'
-                  alignItems='center'
-                  flexDirection='row'
-                  height='calc(100% - 70px)'
-                  gap={1}
-                >
-                  <Typography variant='h5' color='secondary'>
-                    You are up to date!
-                  </Typography>
-                  <CelebrationIcon color='secondary' fontSize='large' />
-                </Box>
-              )}
+                {unmarkedNotifications.length < 1 && markedNotifications.length < 1 && (
+                  <Box
+                    display='flex'
+                    justifyContent='center'
+                    alignItems='center'
+                    flexDirection='row'
+                    height='calc(100% - 70px)'
+                    gap={1}
+                  >
+                    <Typography variant='h5' color='secondary'>
+                      You are up to date!
+                    </Typography>
+                    <CelebrationIcon color='secondary' fontSize='large' />
+                  </Box>
+                )}
+              </LoadingComponent>
             </DialogContent>
           </Box>
         </Box>

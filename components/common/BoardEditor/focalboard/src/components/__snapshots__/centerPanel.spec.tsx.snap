@@ -7,6 +7,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
   >
     <div
       class="BoardComponent "
+      data-test="database-container-1"
     >
       <div
         class="top-head"
@@ -704,6 +705,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
   >
     <div
       class="BoardComponent "
+      data-test="database-container-1"
     >
       <div
         class="top-head"
@@ -1085,6 +1087,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
   >
     <div
       class="BoardComponent "
+      data-test="database-container-1"
     >
       <div
         class="top-head"
@@ -1678,6 +1681,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
   >
     <div
       class="BoardComponent "
+      data-test="database-container-1"
     >
       <div
         class="top-head"

@@ -1,20 +1,22 @@
 import { log } from '@charmverse/core/log';
-import type { Space, UserSpaceAction } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 export function getDefaultPage({
-  lastPageView,
+  lastViewedSpaceId,
   returnUrl,
   spaces,
-  userId
+  userId,
+  host
 }: {
-  lastPageView?: Pick<UserSpaceAction, 'spaceId'> | null;
+  lastViewedSpaceId?: string | null;
   returnUrl?: string;
-  spaces: Pick<Space, 'id' | 'domain'>[];
+  spaces: Pick<Space, 'id' | 'domain' | 'customDomain'>[];
   userId?: string;
+  host?: string;
 }) {
   // Send the user in priority to the invites page if they logged in looking to join a space
   if (returnUrl?.match('join') || returnUrl?.match('invite')) {
@@ -29,18 +31,14 @@ export function getDefaultPage({
     log.info('Redirect user to given url', { userId });
     return returnUrl;
   } else {
-    const defaultWorkspace = getDefaultWorkspaceUrl(spaces, lastPageView?.spaceId);
-    log.info('Redirect user to default workspace', { userId });
-    return defaultWorkspace;
+    const defaultSpace = spaces.find((space) => space.id === lastViewedSpaceId);
+    const defaultSpaceUrl = getSpaceUrl(defaultSpace || spaces[0], host);
+    log.info('Redirect user to default workspace', { userId, host, defaultSpaceUrl });
+    return defaultSpaceUrl;
   }
 }
 
-export function getDefaultWorkspaceUrl(spaces: Pick<Space, 'id' | 'domain'>[], lastSpaceId?: string | null) {
-  const defaultSpace = spaces.find((space) => space.id === lastSpaceId);
-  return getSpaceUrl(defaultSpace || spaces[0]);
-}
-
-export function getLastPageView(userId: string) {
+export function getLastViewedSpaceId({ userId }: { userId: string }) {
   return prisma.userSpaceAction.findFirst({
     where: {
       createdBy: userId,
@@ -48,6 +46,9 @@ export function getLastPageView(userId: string) {
     },
     orderBy: {
       createdAt: 'desc'
+    },
+    select: {
+      spaceId: true
     }
   });
 }

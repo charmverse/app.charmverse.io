@@ -5,13 +5,12 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
-import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/browser';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
@@ -27,20 +26,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
-
-  useEffect(() => {
-    const defaultPageKey: string = spaceDomain ? getKey(`last-page-${spaceDomain}`) : '';
-    const defaultWorkspaceKey: string = getKey('last-workspace');
-    if (spaceDomain) {
-      localStorage.setItem(defaultWorkspaceKey, spaceDomain);
-    }
-
-    // pathname with domain pattern /[domain]/page_path_pattern
-    const hasPageInPath = !!router.pathname.split('/[domain]')[1];
-    if (spaceDomain && hasPageInPath) {
-      localStorage.setItem(defaultPageKey, router.asPath);
-    }
-  }, [router.asPath, router.pathname, spaceDomain]);
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -89,7 +74,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
 
     // condition: no user session and no wallet address
     else if (!user) {
-      if (getValidCustomDomain()) {
+      if (getCustomDomainFromHost()) {
         // if app is running on a custom domain, main url will handle login
         return { authorized: true };
       }

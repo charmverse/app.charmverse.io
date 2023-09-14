@@ -1,7 +1,7 @@
 import { getValidDefaultHost } from 'lib/utilities/domains/getValidDefaultHost';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
-export function getValidCustomDomain(host?: string | null) {
+export function getCustomDomainFromHost(host?: string | null) {
   if (process.env.DISABLE_SUBDOMAINS === 'true') {
     return null;
   }

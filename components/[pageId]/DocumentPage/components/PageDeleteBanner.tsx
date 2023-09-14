@@ -6,8 +6,8 @@ import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { StyledBanner } from 'components/common/Banners/Banner';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -32,7 +32,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
       } else {
         await charmClient.restorePage(pageId);
         await mutate(`pages/${space.id}`);
-        dispatch(initialLoad({ spaceId: space.id }));
+        dispatch(initialDatabaseLoad({ pageId }));
       }
     }
   }
