@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
-
-import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import Legend from 'components/settings/Legend';
 import { PublicProfile } from 'components/u/PublicProfile';
 import { useUser } from 'hooks/useUser';
@@ -8,9 +6,7 @@ import { useUser } from 'hooks/useUser';
 export default function ProfileSettings() {
   const { user } = useUser();
 
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { type: 'profile' });
-  }, []);
+  useTrackPageView({ type: 'settings/my-profile' });
 
   if (!user) {
     return null;

@@ -6,7 +6,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
+import { logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { createPage } from 'lib/pages/server/createPage';
@@ -97,7 +97,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);
     updateTrackPageProfile(page.id);
-    trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
+    trackUserAction('create_page', { userId, spaceId, pageId: page.id });
 
     const { content, contentText, ...newPageToNotify } = pageWithPermissions;
     relay.broadcast(

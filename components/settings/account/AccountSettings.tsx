@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
-
-import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { AccountPreferences } from 'components/settings/account/components/AccountPreferences';
 import Legend from 'components/settings/Legend';
 
@@ -9,9 +7,7 @@ import { LensPublication } from './components/LensPublication';
 import { MultiSigList } from './components/MultiSigList';
 
 export function AccountSettings() {
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { type: 'integrations' });
-  }, []);
+  useTrackPageView({ type: 'settings/my-account' });
 
   return (
     <>
