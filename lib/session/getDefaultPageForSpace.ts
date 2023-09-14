@@ -38,7 +38,7 @@ export async function getDefaultPageForSpace({
   if (lastPageView) {
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     if (pathname) {
-      return getSubdomainPath(pathname, space, host);
+      const pathWithoutRemovedDomain = getSubdomainPath(pathname, space, host);
     }
     // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
     // handle forum posts

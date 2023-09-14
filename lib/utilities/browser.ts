@@ -240,12 +240,14 @@ export function getSubdomainPath(
     }
   }
 
-  if (!subdomain) return path;
-
-  if (path.startsWith(`/${subdomain}`)) {
-    return path.replace(`/${subdomain}`, '');
+  if (subdomain) {
+    return path.replace(new RegExp(`^\\/${subdomain}`), '');
   }
 
+  // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
+  if (config && !path.startsWith(`/${config?.domain}`)) {
+    return `/${config.domain}${path}`;
+  }
   return path;
 }
 
