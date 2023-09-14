@@ -1,4 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import { isEmptyDocument } from '@bangle.dev/utils';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -78,7 +79,10 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   }
 
   const view = useEditorViewContext();
-  const extractedThreadIds = extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+  // view.state.doc stays the same (empty content) even when the document content changes
+  const extractedThreadIds = isEmptyDocument(view.state.doc)
+    ? new Set(Object.keys(threads))
+    : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
   // Making sure the position sort doesn't filter out comments that are not in the view
   const inlineThreadsIds = Array.from(
