@@ -4,7 +4,6 @@ import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import { publicProvider } from 'wagmi/providers/public';
 
-// TODO: Supported chains from our rpc list
 const { chains, publicClient } = configureChains([mainnet], [publicProvider()]);
 
 export const injectedConnector = new InjectedConnector({
