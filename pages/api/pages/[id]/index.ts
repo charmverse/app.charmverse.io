@@ -103,7 +103,8 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
       id: true,
       parentId: true,
       type: true,
-      spaceId: true
+      spaceId: true,
+      path: true
     }
   });
 

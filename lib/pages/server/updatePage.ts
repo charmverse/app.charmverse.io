@@ -23,6 +23,15 @@ export async function updatePage(
     delete data.id;
   }
 
+  // TODO - Figure out encoding edge cases (special chars / japanese chars)
+
+  if (data.title) {
+    const newPath = (data.title as string).toLowerCase().replace(/\s/g, '-');
+    data.additionalPaths = {
+      push: `${newPath}-${page.id}`
+    };
+  }
+
   return prisma.page.update({
     where: {
       id: page.id

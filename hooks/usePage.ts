@@ -6,8 +6,11 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
 import type { PageWithContent } from 'lib/pages/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { useCurrentPage } from './useCurrentPage';
+import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
@@ -26,6 +29,8 @@ type PageResult = {
 const noop = () => Promise.resolve(undefined);
 
 export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
+  const { currentPageId } = useCurrentPage();
+  const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const {
     data: pageWithContent,
@@ -35,8 +40,12 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
-  const updatePage = useCallback((updates: PageUpdates) => {
-    return charmClient.pages.updatePage(updates);
+  const updatePage = useCallback(async (updates: PageUpdates) => {
+    await charmClient.pages.updatePage(updates);
+
+    if (currentPageId && currentPageId === pageWithContent?.id && space) {
+      setUrlWithoutRerender(`/${space.domain}/${pageWithContent.id}`, {});
+    }
   }, []);
 
   useEffect(() => {
