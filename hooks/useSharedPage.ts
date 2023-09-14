@@ -26,6 +26,25 @@ export const useSharedPage = () => {
   const spaceDomain = isPublicPath ? (query.domain as string) : null;
   const loadedSpace = filterSpaceByDomain(spaces, spaceDomain || '');
   const pagePath = isPublicPath && !isBountiesPath ? (query.pageId as string) : null;
+  const pageKey = useMemo(() => {
+    if (!isPublicPath) {
+      return null;
+    }
+
+    if (isBountiesPath) {
+      return `${spaceDomain}/bounties`;
+    }
+
+    if (isForumPath) {
+      return `${spaceDomain}/forum`;
+    }
+
+    if (isProposalsPath) {
+      return `${spaceDomain}/proposals`;
+    }
+
+    return `${spaceDomain}/${pagePath}`;
+  }, [isBountiesPath, isPublicPath, isForumPath, spaceDomain, pagePath]);
 
   // user does not have access to space and is page path, so we want to verify if it is a public page
   const shouldLoadPublicPage = useMemo(() => {
@@ -37,8 +56,8 @@ export const useSharedPage = () => {
   }, [spacesLoaded, isPublicPath, loadedSpace]);
 
   const { data: publicPage, isLoading: isPublicPageLoading } = useSWRImmutable(
-    shouldLoadPublicPage ? `public/${pagePath}` : null,
-    () => (pagePath ? charmClient.getPublicPage(pagePath) : null)
+    shouldLoadPublicPage ? `public/${pageKey}` : null,
+    () => charmClient.getPublicPage(pageKey || '')
   );
 
   const { data: space, isLoading: isSpaceLoading } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
