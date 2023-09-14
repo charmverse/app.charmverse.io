@@ -4,9 +4,9 @@ import type { NextRequest } from 'next/server';
 import { isDevEnv, isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
-import { getSpaceDomainFromUrlPath } from 'lib/utilities/getSpaceDomainFromUrlPath';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
+import { getSpaceDomainFromUrlPath } from 'lib/utilities/domains/getSpaceDomainFromUrlPath';
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
@@ -31,8 +31,8 @@ export async function middleware(req: NextRequest) {
   if (isPublicPage) return;
 
   const host = req.headers.get('host');
-  const customDomain = getValidCustomDomain(host);
-  const subdomain = customDomain ? null : getValidSubdomain(host);
+  const customDomain = getCustomDomainFromHost(host);
+  const subdomain = customDomain ? null : getSpaceDomainFromHost(host);
   const spaceDomainFromPath = getSpaceDomainFromUrlPath(url.pathname);
 
   if (FORCE_SUBDOMAINS && !subdomain && !customDomain && spaceDomainFromPath) {

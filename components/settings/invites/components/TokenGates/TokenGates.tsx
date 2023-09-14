@@ -66,8 +66,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
 
   const theme = useTheme();
   const litClient = useLitProtocol();
-  const { chainId } = useWeb3AuthSig();
-  const { walletAuthSignature, sign } = useWeb3AuthSig();
+  const { walletAuthSignature, sign, chainId } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>
@@ -88,7 +87,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
       });
   }
 
-  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient]);
+  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient, walletAuthSignature]);
 
   function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);

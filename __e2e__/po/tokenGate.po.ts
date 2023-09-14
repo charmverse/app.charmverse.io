@@ -30,8 +30,8 @@ export class TokenGatePage {
     this.joinWorkspaceTextField = page.locator('[data-test=join-workspace-textfield] input');
   }
 
-  async waitForWorkspaceURL({ domain, returnUrl }: { domain: string; returnUrl: string }) {
-    await this.page.waitForURL(`**/join?domain=${domain}&returnUrl=${encodeURIComponent(returnUrl)}`, { timeout: 0 });
+  async waitForWorkspaceURL({ domain }: { domain: string }) {
+    await this.page.waitForURL(`**/join?domain=${domain}**`, { timeout: 0 });
   }
 
   async waitForJoinURL() {
