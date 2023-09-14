@@ -47,8 +47,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
       await connectAsync({ connector: _connector });
     } catch (err) {
       log.warn('CONNECTION ERROR', { err });
-      // We need to reset walletconnect if users have closed the modal
-      // resetWalletConnector(_connector);
     }
   };
 

@@ -2,10 +2,7 @@
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { useContext, createContext, useState, useMemo } from 'react';
-import { useConnect } from 'wagmi';
-
-import { useEagerConnect } from './hooks/useEagerConnect';
-import { useInactiveListener } from './hooks/useInactiveListener';
+import { useAccount } from 'wagmi';
 
 const Web3Connection = createContext({
   isWalletSelectorModalOpen: false,
@@ -17,8 +14,7 @@ const Web3Connection = createContext({
 });
 
 function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
-  const { isLoading } = useConnect();
-
+  const { isDisconnected, isConnected } = useAccount();
   const {
     isOpen: isWalletSelectorModalOpen,
     open: connectWallet,
@@ -29,10 +25,8 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   const [isConnectingIdentity, setIsConnectingIdentity] = useState(false);
 
   // try to eagerly connect to an injected provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
-
-  // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!isLoading);
+  // wagmi tries to reconnect automatically with result of state being either connected or disconnected
+  const triedEager = isConnected || isDisconnected;
 
   const value = useMemo(
     () => ({
