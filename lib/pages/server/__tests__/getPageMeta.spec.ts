@@ -2,6 +2,7 @@ import type { PageMeta, PageWithPermissions } from '@charmverse/core/pages';
 import type { PagePermissionWithSource } from '@charmverse/core/permissions';
 import type { Page, PagePermission, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsPages } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -61,6 +62,26 @@ describe('getPageMeta', () => {
     });
 
     const foundPage = await getPageMeta(page.path, page.spaceId as string);
+
+    expect(foundPage).toEqual<Page>(
+      expect.objectContaining<Partial<Page>>({
+        id: page.id,
+        path: page.path,
+        spaceId: page.spaceId
+      })
+    );
+  });
+
+  it('should allow looking up a page by an additionalPath + spaceId', async () => {
+    const customPath = 'page-345';
+    const page = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      path: 'My example path',
+      additionalPaths: ['page-345']
+    });
+
+    const foundPage = await getPageMeta(customPath, page.spaceId as string);
 
     expect(foundPage).toEqual<Page>(
       expect.objectContaining<Partial<Page>>({

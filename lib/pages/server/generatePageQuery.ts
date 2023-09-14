@@ -24,12 +24,12 @@ export function generatePageQuery({ pageIdOrPath, spaceIdOrDomain }: PageQuery):
   }
 
   // Handle searching by page id only
-  if (!spaceIdOrDomain && pageIdOrPathIsValidUUid) {
+  if (pageIdOrPathIsValidUUid) {
     searchQuery = {
       id: pageIdOrPath
     };
     // Handle searching by page path where page path might have been generated as a UUID
-  } else if (spaceIdOrDomainIsValidUUid && pageIdOrPathIsValidUUid) {
+  } else if (spaceIdOrDomainIsValidUUid) {
     searchQuery = {
       spaceId: spaceIdOrDomain,
       OR: [
@@ -37,26 +37,14 @@ export function generatePageQuery({ pageIdOrPath, spaceIdOrDomain }: PageQuery):
           path: pageIdOrPath
         },
         {
-          id: pageIdOrPath
+          additionalPaths: {
+            has: pageIdOrPath
+          }
         }
       ]
     };
     // Classic space domain + page path search
-  } else if (!spaceIdOrDomainIsValidUUid && !pageIdOrPathIsValidUUid) {
-    searchQuery = {
-      space: {
-        domain: spaceIdOrDomain
-      },
-      path: pageIdOrPath
-    };
-    // Space ID + page path search
-  } else if (spaceIdOrDomainIsValidUUid && !pageIdOrPathIsValidUUid) {
-    searchQuery = {
-      spaceId: spaceIdOrDomain,
-      path: pageIdOrPath
-    };
-    // Space domain received along with a UUID
-  } else if (!spaceIdOrDomainIsValidUUid && pageIdOrPathIsValidUUid) {
+  } else if (!spaceIdOrDomainIsValidUUid) {
     searchQuery = {
       space: {
         domain: spaceIdOrDomain
@@ -66,10 +54,13 @@ export function generatePageQuery({ pageIdOrPath, spaceIdOrDomain }: PageQuery):
           path: pageIdOrPath
         },
         {
-          id: pageIdOrPath
+          additionalPaths: {
+            has: pageIdOrPath
+          }
         }
       ]
     };
+    // Space ID + page path search
   } else {
     // This should never happen
     throw new InvalidInputError(`Invalid page id or path: ${pageIdOrPath} ${spaceIdOrDomain}`);

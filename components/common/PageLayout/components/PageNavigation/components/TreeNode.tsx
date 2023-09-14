@@ -130,9 +130,6 @@ function DraggableTreeNode({
     [onDropAdjacent]
   );
 
-  // eslint-disable-next-line no-console
-  console.log('APP', loadedViews);
-
   const focusListener = useCallback(
     (elt: any) => {
       elt?.addEventListener('focusin', (e: any) => {

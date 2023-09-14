@@ -31,6 +31,7 @@ const noop = () => Promise.resolve(undefined);
 
 export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
   const router = useRouter();
+  const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const {
     data: pageWithContent,
@@ -40,18 +41,19 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
-  console.log('Router', router);
+  const updatePage = useCallback(
+    async (updates: PageUpdates) => {
+      const updatedPage = await charmClient.pages.updatePage(updates);
 
-  const updatePage = useCallback(async (updates: PageUpdates) => {
-    await charmClient.pages.updatePage(updates);
-
-    if (router.query.pageId === pageIdOrPath && updates.title) {
-      console.log('UPDATE DETECTED');
-    }
-    // if (currentPageId && currentPageId === pageWithContent?.id && space) {
-    //   setUrlWithoutRerender(`/${space.domain}/${pageWithContent.id}`, {});
-    // }
-  }, []);
+      if (space && router.query.pageId === pageIdOrPath && updates.title) {
+        setUrlWithoutRerender(`/${space.domain}/${updatedPage.path}`, {});
+      }
+      // if (currentPageId && currentPageId === pageWithContent?.id && space) {
+      //
+      // }
+    },
+    [space, pageIdOrPath, router.query.pageId]
+  );
 
   useEffect(() => {
     function handleUpdateEvent(value: WebSocketPayload<'pages_meta_updated'>) {

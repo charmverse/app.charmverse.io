@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { generateSchema } from 'testing/publicApi/schemas';
@@ -51,7 +52,20 @@ describe('getDatabaseWithSchema', () => {
     });
   });
 
-  it('should support lookup of a schema using the page path or a standalone database ID', async () => {
+  it('should support lookup of a schema using the page path, additional page path or a standalone database ID', async () => {
+    const additionalPagePath = `page-database-223848885`;
+
+    await prisma.page.update({
+      where: {
+        id: database.id
+      },
+      data: {
+        additionalPaths: {
+          set: [additionalPagePath]
+        }
+      }
+    });
+
     const results = await Promise.all([
       getDatabaseWithSchema({
         databaseId: database.path,
@@ -64,6 +78,10 @@ describe('getDatabaseWithSchema', () => {
       getDatabaseWithSchema({
         databaseId: database.id,
         spaceId: undefined
+      }),
+      getDatabaseWithSchema({
+        databaseId: additionalPagePath,
+        spaceId: space.id
       })
     ]);
 

@@ -52,7 +52,7 @@ async function cleanupDuplicateProposalCards() {
 
 
   if (cardsToDelete.cardIdsToDelete.length > 0) {
-    console.log(cardsToDelete.cardIdsToDelete.length)
+
     await prisma.$transaction(async tx => {
       await tx.page.deleteMany({
         where: {
