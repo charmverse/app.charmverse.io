@@ -1,8 +1,24 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import { PageContent } from 'lib/prosemirror/interfaces';
+import { BlockNode, PageContent } from 'lib/prosemirror/interfaces';
 import { writeToSameFolder } from 'lib/utilities/file';
+import { pageTree } from '@charmverse/core/pages/utilities';
+import { PageMeta } from '@charmverse/core/dist/cjs/pages';
+
+export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
+  function recurse(node: PageContent) {
+    cb(node);
+
+    if (node.content) {
+      node.content.forEach((childNode) => {
+        recurse(childNode);
+      });
+    }
+  }
+
+  recurse(content);
+}
 
 export async function updatePageContentForSync() {
   const pages = await prisma.page.findMany({
@@ -16,38 +32,46 @@ export async function updatePageContentForSync() {
 
   for (const page of pages) {
     try {
-      const pageContent = (page.content ?? emptyDocument) as PageContent;
-      const nestedPageIds: string[] = [];
-      const pageContentNode = getNodeFromJson(pageContent);
-      pageContentNode.forEach((node) => {
-        if (node.type.name === 'page' && node.attrs) {
-          nestedPageIds.push(node.attrs.id);
-        }
-      });
       const childPages = await prisma.page.findMany({
         where: {
           parentId: page.id,
         },
         select: {
           id: true,
+          index: true,
+          createdAt: true
         }
       });
-      const childPageIds = childPages.map((childPage) => childPage.id);
-      
-      // Loop through all child pages and check if they are added to the page content
-      childPageIds.forEach(childPageId => {
-        if (pageContent.content && !nestedPageIds.includes(childPageId)) {
-          pageContent.content.push({
-            type: "page",
-            attrs: {
-              id: childPageId,
-            }
-          })
-  
-          nestedPageIds.push(childPageId);
+
+      const sortedChildPages = pageTree.sortNodes(childPages as PageMeta[]);
+
+      const childPageIds = sortedChildPages.map((childPage) => childPage.id);
+
+      const pageContent = (page.content ?? emptyDocument) as PageContent;
+      const nestedPageIds: Set<string> = new Set();
+
+      recurseDocument(pageContent, (node) => {
+        if (node.type === "page" && node.attrs) {
+          const pageId = node.attrs.id;
+          if (!childPageIds.includes(pageId)) {
+            node.type = "page-link";
+          } else {
+            nestedPageIds.add(pageId);
+          }
         }
       })
-  
+
+      const childPageIdsNotInDocument = childPageIds.filter((childPageId) => !nestedPageIds.has(childPageId));
+
+      childPageIdsNotInDocument.forEach(childPageId => {
+        (pageContent.content as BlockNode[]).push({
+          type: "page",
+          attrs: {
+            id: childPageId,
+          }
+        })
+      })
+      
       await prisma.page.update({
         where: {
           id: page.id,
@@ -57,18 +81,6 @@ export async function updatePageContentForSync() {
         }
       })
   
-      for (const nestedPageId of nestedPageIds) {
-        if (!childPageIds.includes(nestedPageId)) {
-          await prisma.page.update({
-            where: {
-              id: nestedPageId,
-            },
-            data: {
-              parentId: page.id,
-            }
-          })
-        }
-      }
       console.log(`Complete updating page ${page.id}`)
     } catch (error) {
       errors.push({pageId: page.id, error});
