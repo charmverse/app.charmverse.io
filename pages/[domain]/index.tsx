@@ -8,7 +8,6 @@ import { withSessionSsr } from 'lib/session/withSession';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
   const sessionUserId = context.req.session?.user?.id;
-
   // 1. handle user not logged in
   if (!sessionUserId) {
     // show the normal login UI
@@ -18,9 +17,19 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   }
 
   // retrieve space by domain, and then last page view by spaceId
+  const domainOrCustomDomain = context.query.domain as string;
   const space = await prisma.space.findFirst({
     where: {
-      domain: context.query.domain as string
+      OR: [
+        {
+          // TODO: ask Marek why we need to support case-insensitivity for custom domains
+          customDomain: {
+            equals: domainOrCustomDomain,
+            mode: 'insensitive'
+          }
+        },
+        { domain: domainOrCustomDomain }
+      ]
     }
   });
 
