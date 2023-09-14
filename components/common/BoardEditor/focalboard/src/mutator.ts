@@ -88,6 +88,7 @@ export class Mutator {
 
   async updateBlock(newBlock: Block, oldBlock: Block, description: string): Promise<void> {
     const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock);
+
     await undoManager.perform(
       async () => {
         await this.patchBlock(newBlock.id, updatePatch, publishIncrementalUpdate);
@@ -1006,7 +1007,7 @@ export class Mutator {
     afterRedo?: (newCardId: string) => Promise<void>;
     beforeUndo?: () => Promise<void>;
   }): Promise<[Block[], string]> {
-    const blocks = await charmClient.getSubtree(cardId, 2);
+    const blocks = await charmClient.getSubtree({ pageId: cardId });
     const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       Block[],

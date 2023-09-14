@@ -1,4 +1,4 @@
-import type { Feature } from '@charmverse/core/dist/cjs/prisma-client';
+import type { Feature } from '@charmverse/core/prisma-client';
 import { useMemo } from 'react';
 
 import type { FeatureJson, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';

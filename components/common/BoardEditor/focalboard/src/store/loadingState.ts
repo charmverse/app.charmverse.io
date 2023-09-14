@@ -1,6 +1,6 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import { initialLoad, initialReadOnlyLoad } from './initialLoad';
+import { initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -13,10 +13,7 @@ const viewsSlice = createSlice({
   initialState: { loaded: false } as LoadingState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(initialReadOnlyLoad.fulfilled, (state, action) => {
-      state.loaded = true;
-    });
-    builder.addCase(initialLoad.fulfilled, (state, action) => {
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
       state.loaded = true;
     });
   }

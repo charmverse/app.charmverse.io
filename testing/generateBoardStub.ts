@@ -1,12 +1,17 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { BoardFields, DataSourceType } from 'lib/focalboard/board';
-import { emptyDocument } from 'lib/prosemirror/constants';
+import type { BoardFields, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
 import { pageContentStub } from './generatePageStub';
+
+export type CustomBoardProps = {
+  propertyTemplates: IPropertyTemplate[];
+  cardPropertyValues: Record<string, any>;
+};
 
 /**
  * We are currently lacking a way to generate fresh boards purely from the server side (apart from importing them) as this is currently orchestrated by the client-side focal board libraries
@@ -26,7 +31,11 @@ export function boardWithCardsArgs({
   addPageContent,
   views = 1,
   viewDataSource,
-  boardPageType
+  boardPageType,
+  boardTitle,
+  viewType,
+  linkedSourceId,
+  customProps
 }: {
   createdBy: string;
   spaceId: string;
@@ -34,8 +43,12 @@ export function boardWithCardsArgs({
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
+  viewType?: IViewType;
   viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
+  boardTitle?: string;
+  linkedSourceId?: string;
+  customProps?: CustomBoardProps;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -50,7 +63,7 @@ export function boardWithCardsArgs({
     createdBy,
     updatedAt: '2022-08-26T09:22:28.912Z',
     updatedBy: createdBy,
-    title: 'My blog',
+    title: boardTitle ?? 'My blog',
     content: null,
     hasContent: false,
     contentText: '',
@@ -122,7 +135,8 @@ export function boardWithCardsArgs({
             title: 'Card 3',
             fields: {
               isTemplate: false,
-              properties: {
+              properties: customProps?.cardPropertyValues ?? {
+                '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'd21b567d-fd35-496e-8f7c-1ee62e95d4f2',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661169600000}'
               },
               contentOrder: []
@@ -192,7 +206,8 @@ export function boardWithCardsArgs({
             fields: {
               icon: '',
               isTemplate: false,
-              properties: {
+              properties: customProps?.cardPropertyValues ?? {
+                '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'c5689c24-eb32-4af9-8e8d-e4191fbeb0a1',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661515200000}'
               },
               headerImage: null,
@@ -222,7 +237,7 @@ export function boardWithCardsArgs({
           isTemplate: false,
           description: undefined,
           headerImage: null,
-          cardProperties: [
+          cardProperties: customProps?.propertyTemplates ?? [
             {
               id: '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f',
               name: 'Status',
@@ -275,7 +290,7 @@ export function boardWithCardsArgs({
     }
   }
 
-  rootBoardNode.blocks.views = rootBoardNode.blocks.views.splice(0, views);
+  rootBoardNode.blocks.views = [];
 
   for (let i = 0; i < views; i++) {
     rootBoardNode.blocks.views.push({
@@ -296,7 +311,8 @@ export function boardWithCardsArgs({
           filters: [],
           operation: 'and'
         },
-        viewType: 'gallery',
+        linkedSourceId,
+        viewType: viewType ?? 'table',
         // Leave out view datasource from the views since we are migrating proposals
         sourceType: viewDataSource === 'proposals' ? undefined : viewDataSource,
         cardOrder: [cardIds[1], cardIds[0]],
@@ -308,8 +324,10 @@ export function boardWithCardsArgs({
         collapsedOptionIds: [],
         columnCalculations: {},
         kanbanCalculations: {},
-        visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
-      } as Partial<BoardFields> as any
+        visiblePropertyIds: customProps?.propertyTemplates
+          ? ['__title', ...customProps.propertyTemplates.map((prop) => prop.id)]
+          : ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765', '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f']
+      } as Partial<BoardViewFields> as any
     });
   }
 
@@ -370,7 +388,7 @@ export function boardWithCardsArgs({
 
     const blocks: Block[] = [];
 
-    if (page.type === 'board') {
+    if (page.type.match('board')) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const boardBlock = (page as any as PageWithBlocks).blocks.board!;
       const viewBlocks = (page as any as PageWithBlocks).blocks.views!;

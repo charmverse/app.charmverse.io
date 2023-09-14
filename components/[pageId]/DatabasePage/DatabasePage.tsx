@@ -12,8 +12,8 @@ import {
   getCurrentBoard,
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
   setCurrent as setCurrentView
@@ -89,10 +89,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board' && page.type !== 'linked_board') {
-      dispatch(initialReadOnlyLoad(page.boardId));
+    if (page.id && (!board || page.id !== board.id)) {
+      dispatch(initialDatabaseLoad({ pageId: page.id }));
     }
-  }, [page.boardId]);
+  }, [page.id]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
