@@ -2,7 +2,7 @@ import { isStagingEnv } from 'config/constants';
 import { getValidDefaultHost } from 'lib/utilities/domains/getValidDefaultHost';
 import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
 
-export function getValidSubdomain(host?: string | null) {
+export function getSpaceDomainFromHost(host?: string | null) {
   if (process.env.DISABLE_SUBDOMAINS === 'true') {
     return null;
   }

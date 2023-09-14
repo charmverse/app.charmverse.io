@@ -45,7 +45,7 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
 import Avatar from './components/LargeAvatar';
 import SettingsItem from './components/SettingsItem';
@@ -149,7 +149,7 @@ export function SpaceSettings({ space }: { space: Space }) {
     if (newDomain) {
       // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
       setTimeout(() => {
-        const subdomain = getValidSubdomain();
+        const subdomain = getSpaceDomainFromHost();
         if (subdomain) {
           window.location.href = `${getSpaceUrl({ domain: values.domain })}${getSubdomainPath(router.asPath)}`;
         } else {

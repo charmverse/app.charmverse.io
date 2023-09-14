@@ -10,8 +10,8 @@ import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesFo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { DisabledAccountError } from 'lib/utilities/errors';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 const handler = nc({
   onError,
@@ -25,7 +25,7 @@ handler.get(async (req, res) => {
   // sanitize the redirect path in case of invalid characters
   const redirectPath = (state?.redirect as string) || '/';
   const redirectUrl = getDiscordRedirectUrl(req.headers.host, redirectPath);
-  const subdomain = getValidSubdomain(redirectUrl.host);
+  const subdomain = getSpaceDomainFromHost(redirectUrl.host);
   const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
 
   const tempAuthCode = req.query.code;
