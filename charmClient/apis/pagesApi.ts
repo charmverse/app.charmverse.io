@@ -29,7 +29,7 @@ export class PagesApi {
   }
 
   updatePage(pageOpts: Partial<Page>) {
-    return http.PUT<void>(`/api/pages/${pageOpts.id}`, pageOpts);
+    return http.PUT<PageMeta>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
   convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {

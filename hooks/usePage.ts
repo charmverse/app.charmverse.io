@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -29,8 +30,7 @@ type PageResult = {
 const noop = () => Promise.resolve(undefined);
 
 export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
-  const { currentPageId } = useCurrentPage();
-  const { space } = useCurrentSpace();
+  const router = useRouter();
   const { subscribe } = useWebSocketClient();
   const {
     data: pageWithContent,
@@ -40,12 +40,17 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
+  console.log('Router', router);
+
   const updatePage = useCallback(async (updates: PageUpdates) => {
     await charmClient.pages.updatePage(updates);
 
-    if (currentPageId && currentPageId === pageWithContent?.id && space) {
-      setUrlWithoutRerender(`/${space.domain}/${pageWithContent.id}`, {});
+    if (router.query.pageId === pageIdOrPath && updates.title) {
+      console.log('UPDATE DETECTED');
     }
+    // if (currentPageId && currentPageId === pageWithContent?.id && space) {
+    //   setUrlWithoutRerender(`/${space.domain}/${pageWithContent.id}`, {});
+    // }
   }, []);
 
   useEffect(() => {
