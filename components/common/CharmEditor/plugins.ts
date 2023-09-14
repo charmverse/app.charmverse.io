@@ -91,9 +91,8 @@ export function charmEditorPlugins({
       props: {
         handleDOMEvents: {
           drop(view, ev) {
-            ev.preventDefault();
             if (!ev.dataTransfer || !pageId) {
-              return true;
+              return false;
             }
 
             const coordinates = view.posAtCoords({
@@ -102,19 +101,20 @@ export function charmEditorPlugins({
             });
 
             if (!coordinates) {
-              return true;
+              return false;
             }
 
             const data = ev.dataTransfer.getData('sidebar-page');
             if (!data) {
-              return true;
+              return false;
             }
 
             try {
               const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
               if (!parsedData.pageId) {
-                return true;
+                return false;
               }
+              ev.preventDefault();
               emitSocketMessage({
                 type: 'page_reordered',
                 payload: {
@@ -122,12 +122,14 @@ export function charmEditorPlugins({
                   newParentId: pageId,
                   newIndex: -1,
                   trigger: 'sidebar-to-editor',
-                  pos: coordinates.pos + 1
+                  pos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
                 }
               });
+              // + 1 for dropping in non empty node
+              // + 0 for dropping in empty node (blank line)
               return false;
             } catch (_) {
-              return true;
+              return false;
             }
           }
         }
