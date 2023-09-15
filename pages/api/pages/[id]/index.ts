@@ -161,7 +161,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
           spaceId: pageBeforeUpdate.spaceId,
           id: pageId,
           updatedBy: userId,
-          additionalPaths: pageBeforeUpdate.path !== updatedPage.path ? updatedPage.additionalPaths : undefined
+          additionalPaths: pageBeforeUpdate.path !== updatedPage.path ? [pageBeforeUpdate.path] : undefined
         }
       ]
     },

@@ -14,6 +14,8 @@ import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const pagePath = ctx.query.pageId as string;
@@ -59,52 +61,31 @@ export default function PageView() {
   const { subscribe } = useWebSocketClient();
   useEffect(() => {
     const unsubscribe = subscribe('pages_meta_updated', (updates) => {
-      const currentPath = router.query.pageId as string;
+      // Since we perform a shallow replace, we need the mask value of the browser url
+      const displayedPath = window.history.state.as?.split('/') as string[];
+      const currentPath = displayedPath?.[displayedPath.length - 1] as string;
+
       const updatedPage = updates.find(
         (p) => p.id === basePageId || p.path === currentPath || p.additionalPaths?.includes(currentPath)
       );
-      // eslint-disable-next-line no-console
-      console.log(
-        'PATH',
-        currentPath,
-        'BASE',
-        basePageId,
-        'QUERY',
-        router.query.pageId,
-        'UPDATED',
-        updatedPage,
-        'USER',
-        user?.id
-      );
+
       if (
-        basePageId &&
+        currentPath &&
         updatedPage &&
         user &&
         space &&
-        updatedPage.additionalPaths?.includes(basePageId) &&
         updatedPage.path !== currentPath &&
+        updatedPage.additionalPaths?.includes(currentPath) &&
         updatedPage.updatedBy === user?.id
       ) {
+        const customDomain = getCustomDomainFromHost();
         // eslint-disable-next-line no-console
         console.log('Updating page path', router.pathname);
-        router.replace(
-          {
-            pathname: router.pathname,
-            query: {
-              pageId: updatedPage.path,
-              domain: router.query.domain
-            }
-          }
-          // {
-          //   pathname: router.pathname
-          //   // query: {
-          //   //   pageId: updatedPage.path,
-          //   //   domain: space.domain
-          //   // }
-          // }
-          //          { shallow: true }
+        setUrlWithoutRerender(
+          router.pathname,
+          {},
+          customDomain ? `/${updatedPage.path}` : `/${space.domain}/${updatedPage.path}`
         );
-        // router.replace(router.pathname, `/${space.domain}/${updatedPage.path}`);
       }
     });
 
