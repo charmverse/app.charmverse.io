@@ -28,7 +28,6 @@ enum IDType {
   Board = 'b',
   Card = 'c',
   View = 'v',
-  Session = 's',
   User = 'u',
   Token = 'k',
   BlockID = 'a'
