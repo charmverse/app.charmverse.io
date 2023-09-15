@@ -19,7 +19,7 @@ describe('generatePagePathFromExistingPath', () => {
       title: newPageTitle
     });
 
-    expect(generatedPath).toEqual('page-team-tortilla-tournament-987654321120');
+    expect(generatedPath).toEqual('team-tortilla-tournament-987654321120');
 
     const secondNewPageTitle = 'Absolutely   Amazing Alliteration   ';
 
@@ -28,7 +28,7 @@ describe('generatePagePathFromExistingPath', () => {
       title: secondNewPageTitle
     });
 
-    expect(secondGeneratedPath).toEqual('page-absolutely-amazing-alliteration-987654321120');
+    expect(secondGeneratedPath).toEqual('absolutely-amazing-alliteration-987654321120');
 
     const thirdNewPageTitle = 'a';
 
@@ -37,6 +37,6 @@ describe('generatePagePathFromExistingPath', () => {
       title: thirdNewPageTitle
     });
 
-    expect(thirdGeneratedPath).toEqual('page-a-987654321120');
+    expect(thirdGeneratedPath).toEqual('a-987654321120');
   });
 });

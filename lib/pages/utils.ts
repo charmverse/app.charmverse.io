@@ -21,7 +21,7 @@ export function generatePagePathFromPathAndTitle({
   }
   const titleToPath = stringToValidPath({ input: title ?? '', wordSeparator: '-', autoReplaceEmpty: false });
 
-  return `page-${titleToPath}-${suffix}`;
+  return `${titleToPath}-${suffix}`;
 }
 
 export function canReceiveManualPermissionUpdates({ pageType }: { pageType: PageType }): boolean {
