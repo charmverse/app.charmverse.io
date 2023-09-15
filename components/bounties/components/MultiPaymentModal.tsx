@@ -26,7 +26,6 @@ import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -36,11 +35,10 @@ import MultiPaymentButton from './MultiPaymentButton';
 export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] }) {
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
-  const { chainId } = useWeb3AuthSig();
+  const { chainId, signer } = useWeb3AuthSig();
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { importSafes } = useImportSafes();
   const { onClick } = useSettingsDialog();
-  const { signer } = useWeb3Signer();
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({

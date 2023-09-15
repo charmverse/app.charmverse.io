@@ -17,7 +17,6 @@ import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -85,8 +84,7 @@ export function BountyPaymentButton({
   onError = () => {}
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
-  const { signer } = useWeb3Signer();
-  const { account, chainId } = useWeb3AuthSig();
+  const { account, chainId, signer } = useWeb3AuthSig();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {

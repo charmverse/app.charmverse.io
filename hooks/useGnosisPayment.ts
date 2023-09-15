@@ -8,7 +8,6 @@ import log from 'loglevel';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
@@ -22,10 +21,8 @@ export type GnosisPaymentProps = {
 };
 
 export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
-  const { account, chainId: connectedChainId } = useWeb3AuthSig();
+  const { account, chainId: connectedChainId, signer } = useWeb3AuthSig();
   const { showMessage } = useSnackbar();
-  const { signer } = useWeb3Signer();
-
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {

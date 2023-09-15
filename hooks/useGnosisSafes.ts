@@ -5,13 +5,11 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { isTruthy } from 'lib/utilities/types';
 
 export default function useSafes(safeAddresses: string[]) {
   const [safes, setSafes] = useState<Safe[]>([]);
-  const { account } = useWeb3AuthSig();
-  const { signer } = useWeb3Signer();
+  const { account, signer } = useWeb3AuthSig();
 
   async function loadSafes() {
     if (!signer) return;

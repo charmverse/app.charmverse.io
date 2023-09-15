@@ -3,7 +3,6 @@ import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from 'lib/snapshot/getVotes';
@@ -15,10 +14,9 @@ import { sleep } from 'lib/utilities/sleep';
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account } = useWeb3AuthSig();
+  const { account, provider } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
-  const { provider } = useWeb3Signer();
 
   const { data: snapshotProposal, mutate: refreshProposal } = useSWR<SnapshotProposal | null>(
     `/snapshotProposal/${snapshotProposalId}`,

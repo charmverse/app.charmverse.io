@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { Web3Provider } from '@ethersproject/providers';
 import type {
   CreateCommentTypedDataFragment,
   CreateDataAvailabilityPublicationResultFragment,
