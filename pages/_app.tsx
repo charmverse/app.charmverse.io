@@ -16,6 +16,8 @@ import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
+import type { OpenGraphProps } from 'components/_app/OpenGraphData';
+import { OpenGraphData } from 'components/_app/OpenGraphData';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -127,6 +129,10 @@ type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
 
+export type GlobalPageProps = {
+  openGraphData: OpenGraphProps;
+};
+
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
@@ -183,7 +189,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                   <FocalBoardProvider>
                     <NotionProvider>
                       <IntlProvider>
-                        <PageHead />
+                        <PageHead {...pageProps} />
 
                         <RouteGuard>
                           <ErrorBoundary>
@@ -265,7 +271,7 @@ function DataProviders({ children }: { children: ReactNode }) {
   );
 }
 
-function PageHead() {
+function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -276,6 +282,8 @@ function PageHead() {
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
       <meta name='google-site-verification' content='AhWgWbPVQIsHKmPNTkUSI-hN38XbkpCIrt40-4IgaiM' />
+
+      <OpenGraphData {...openGraphData} />
     </Head>
   );
 }
