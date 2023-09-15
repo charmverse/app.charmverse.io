@@ -53,7 +53,9 @@ const page2 = createMockPage({
 
 const reduxStore = mockStateStore([], {
   boards: {
-    boards: []
+    boards: {
+      [board.id]: board
+    }
   },
   views: {
     current: undefined,
@@ -99,7 +101,10 @@ export function Table() {
           <TableComponent
             activeView={view}
             addCard={voidFunction}
-            cardPages={[]}
+            cardPages={[
+              { card: card1, page: page1 },
+              { card: card2, page: page2 }
+            ]}
             showCard={voidFunction}
             visibleGroups={[]}
             board={board}
@@ -108,10 +113,20 @@ export function Table() {
             cardIdToFocusOnRender=''
             onCardClicked={voidFunction}
             readOnlySourceData={false}
-            selectedCardIds={[]}
+            selectedCardIds={[page1.id]}
           />
         </Paper>
       </PagesProvider>
     </Context>
   );
 }
+
+Table.parameters = {
+  msw: {
+    handlers: {
+      proposal: rest.get('/api/spaces/:spaceId', (req, res, ctx) => {
+        return res(ctx.json([page1]));
+      })
+    }
+  }
+};
