@@ -24,7 +24,7 @@ export type PagesContext = {
   setPages: Dispatch<SetStateAction<PagesMap>>;
   refreshPage: (pageId: string) => Promise<PageMeta>;
   getPageByPath: (pageId: string) => PageMeta | undefined;
-  updatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<PageMeta>;
+  updatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<void>;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<any>;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
   deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
@@ -39,7 +39,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   setPages: () => undefined,
   getPageByPath: () => undefined,
   refreshPage: () => Promise.resolve({} as any),
-  updatePage: () => Promise.resolve({} as any),
+  updatePage: () => Promise.resolve(),
   mutatePage: () => Promise.resolve(),
   mutatePagesRemove: () => null,
   deletePage: () => Promise.resolve(undefined),

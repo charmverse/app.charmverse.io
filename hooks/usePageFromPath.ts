@@ -11,10 +11,6 @@ export function usePageIdFromPath() {
 export function usePageFromPath(): PageMeta | null {
   const basePageId = usePageIdFromPath();
   const { pages } = usePages();
-  const basePage = basePageId
-    ? Object.values(pages).find(
-        (page) => page?.id === basePageId || page?.path === basePageId || page?.additionalPaths.includes(basePageId)
-      )
-    : null;
+  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
   return basePage || null;
 }

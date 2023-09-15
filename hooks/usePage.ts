@@ -7,10 +7,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useCurrentPage } from './useCurrentPage';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -43,14 +41,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
 
   const updatePage = useCallback(
     async (updates: PageUpdates) => {
-      const updatedPage = await charmClient.pages.updatePage(updates);
-
-      // if (space && router.query.pageId === pageIdOrPath && updatedPage.path !== pageIdOrPath) {
-      //   router.push(`/${space.domain}/${pageIdOrPath}`, `/${space.domain}/${updatedPage.path}`, { shallow: true });
-      // }
-      // if (currentPageId && currentPageId === pageWithContent?.id && space) {
-      //
-      // }
+      return charmClient.pages.updatePage(updates);
     },
     [space, pageIdOrPath, router.query.pageId]
   );

@@ -72,7 +72,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   return res.status(200).json(result);
 }
 
-async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
+async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -96,7 +96,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageM
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const page = await prisma.page.findUniqueOrThrow({
+  const pageBeforeUpdate = await prisma.page.findUniqueOrThrow({
     where: {
       id: pageId
     },
@@ -111,9 +111,9 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageM
   });
 
   // Only admins can edit proposal template content
-  if (page.type === 'proposal_template') {
+  if (pageBeforeUpdate.type === 'proposal_template') {
     const { error } = await hasAccessToSpace({
-      spaceId: page.spaceId,
+      spaceId: pageBeforeUpdate.spaceId,
       userId,
       adminOnly: true
     });
@@ -124,7 +124,8 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageM
   }
 
   const hasNewParentPage =
-    updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || !updateContent.parentId);
+    updateContent.parentId !== pageBeforeUpdate.parentId &&
+    (typeof updateContent.parentId === 'string' || !updateContent.parentId);
 
   // Only perform validation if repositioning below another page
   if (hasNewParentPage && typeof updateContent.parentId === 'string') {
@@ -142,22 +143,29 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageM
     }
   }
 
-  const updatedPage = await updatePage(page, userId, req.body);
+  const updatedPage = await updatePage(pageBeforeUpdate, userId, req.body);
 
   const { content, contentText, ...updatedPageMeta } = updateContent;
 
-  if (updatedPage.path !== page.path) {
+  if (updatedPage.path !== pageBeforeUpdate.path) {
     updatedPageMeta.path = updatedPage.path;
-    updatedPageMeta.additionalPaths = updatedPage.additionalPaths;
   }
 
   updateTrackPageProfile(updatedPage.id);
   relay.broadcast(
     {
       type: 'pages_meta_updated',
-      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+      payload: [
+        {
+          ...updatedPageMeta,
+          spaceId: pageBeforeUpdate.spaceId,
+          id: pageId,
+          updatedBy: userId,
+          additionalPaths: pageBeforeUpdate.path !== updatedPage.path ? updatedPage.additionalPaths : undefined
+        }
+      ]
     },
-    page.spaceId
+    pageBeforeUpdate.spaceId
   );
 
   if (hasNewParentPage) {

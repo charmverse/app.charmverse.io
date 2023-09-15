@@ -13,7 +13,7 @@ export async function updatePage(
   page: CurrentPageData,
   userId: string,
   updates: Prisma.PageUpdateInput
-): Promise<PageMeta> {
+): Promise<PageMeta & { additionalPaths?: string[] }> {
   const data: Prisma.PageUpdateInput = {
     ...updates,
     updatedAt: new Date(),
@@ -51,6 +51,9 @@ export async function updatePage(
       id: page.id
     },
     data,
-    select: pageMetaSelect()
+    select: {
+      additionalPaths: true,
+      ...pageMetaSelect()
+    }
   }) as Promise<PageMeta>;
 }

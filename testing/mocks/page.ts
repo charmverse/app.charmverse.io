@@ -27,7 +27,6 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
     syncWithPageId: null,
     spaceId: '',
     path: `page-${uuid()}`,
-    additionalPaths: [],
     parentId: null,
     permissionFlags: {
       read: true,
