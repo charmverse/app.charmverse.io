@@ -39,10 +39,10 @@ html {
 }
 
 .ProseMirror li > p {
-  margin: 0;
-  margin-block-end: 0;
-  margin-block-start: 0;
-  padding-left: 24pt;
+  // margin: 0;
+  // margin-block-end: 0;
+  // margin-block-start: 0;
+  padding-left: 24px;
 }
 
 /* https://css-tricks.com/numbering-in-style/ */
@@ -51,14 +51,14 @@ html {
 
   /* content: '\2022'; */
   display: inline-block;
-  font-size: 1em;
-  left: -5px;
+  font-family: Arial, sans-serif;
+  font-size: 1.5em;
   line-height: 1em;
-  margin-left: -24pt;
+  margin-left: -24px;
   position: relative;
-  text-align: right;
-  top: 0;
-  width: 24pt;
+  text-align: center;
+  top: 2px;
+  width: 24px;
 }
 
 .ProseMirror ol {
@@ -393,14 +393,14 @@ Bullet list type changing fix */
 .ProseMirror ul[data-indent='4'] li > p::before,
 /* prettier-ignore */
 .ProseMirror ul[data-indent='1'] li > p::before {
-  content: '\25cb'; /* circle */
+  content: '\25e6'; /* circle */
 }
 
 /* prettier-ignore */
 .ProseMirror ul[data-indent='5'] li > p::before,
 /* prettier-ignore */
 .ProseMirror ul[data-indent='2'] li > p::before {
-  content: '\25a0'; /* square */
+  content: '\25aa'; /* square */
 }
 
 .ProseMirror ul[data-indent='6'] li > p::before,

@@ -43,31 +43,31 @@
 /* list item indents */
 
 .ProseMirror ol[type='decimal'][data-indent='1'] {
-  margin-left: 12pt;
+  margin-left: 24px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='2'] {
-  margin-left: 24pt;
+  margin-left: 48px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='3'] {
-  margin-left: 36pt;
+  margin-left: 72px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='4'] {
-  margin-left: 48pt;
+  margin-left: 96px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='5'] {
-  margin-left: 60pt;
+  margin-left: 120px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='6'] {
-  margin-left: 72pt;
+  margin-left: 144px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='7'] {
-  margin-left: 84pt;
+  margin-left: 168px;
 }
 
 .ProseMirror ol[type='decimal'][data-indent='8'] {
@@ -83,43 +83,43 @@
 }
 
 .ProseMirror ul[data-indent='1'] {
-  margin-left: 12pt;
+  margin-left: 24px;
 }
 
 .ProseMirror ul[data-indent='2'] {
-  margin-left: 24pt;
+  margin-left: 48px;
 }
 
 .ProseMirror ul[data-indent='3'] {
-  margin-left: 36pt;
+  margin-left: 72px;
 }
 
 .ProseMirror ul[data-indent='4'] {
-  margin-left: 48pt;
+  margin-left: 96px;
 }
 
 .ProseMirror ul[data-indent='5'] {
-  margin-left: 60pt;
+  margin-left: 120px;
 }
 
 .ProseMirror ul[data-indent='6'] {
-  margin-left: 72pt;
+  margin-left: 144px;
 }
 
 .ProseMirror ul[data-indent='7'] {
-  margin-left: 84pt;
+  margin-left: 168px;
 }
 
 .ProseMirror ul[data-indent='8'] {
-  margin-left: 96pt;
+  margin-left: 192px;
 }
 
 .ProseMirror ul[data-indent='9'] {
-  margin-left: 108pt;
+  margin-left: 216px;
 }
 
 .ProseMirror ul[data-indent='10'] {
-  margin-left: 120pt;
+  margin-left: 240px;
 }
 
 /* list item xxx indents */
