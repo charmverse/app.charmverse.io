@@ -14,7 +14,7 @@ describe('POST /api/events - Analytics endpoint', () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
     const event: EventInput<PageEventMap['page_view']> = {
       event: 'page_view',
-      type: 'settings',
+      type: 'settings/my-account',
       userId: uuid(),
       spaceId: space.id
     };

@@ -37,10 +37,16 @@ function UserMenu() {
   const router = useRouter();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
 
+  const isLoginPage = router.pathname === '/';
+
   async function logout() {
     await logoutUser();
     // for some reason the token gate doesn't update when the user logs out
     router.push('/');
+  }
+  // hide login button on login page
+  if (isLoginPage) {
+    return null;
   }
   return (
     <div>

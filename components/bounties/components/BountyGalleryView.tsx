@@ -48,7 +48,7 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
   }, [router.query.bountyId]);
 
   return (
-    <div className='Gallery' style={{ overflow: 'visible' }}>
+    <div data-test='all-bounties-layout' className='Gallery' style={{ overflow: 'visible' }}>
       {filteredBounties.map((bounty) => {
         return (
           <BountyGalleryCard

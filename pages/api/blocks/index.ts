@@ -22,9 +22,9 @@ import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -40,8 +40,8 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  const domain = getValidSubdomain(req.headers.host);
-  const customDomain = getValidCustomDomain(req.headers.host);
+  const domain = getSpaceDomainFromHost(req.headers.host);
+  const customDomain = getCustomDomainFromHost(req.headers.host);
   let spaceDomain = customDomain || domain;
 
   if (!spaceDomain) {
