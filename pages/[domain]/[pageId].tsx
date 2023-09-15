@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
@@ -16,33 +16,80 @@ import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const pagePath = ctx.query.pageId as string;
-  const domain = ctx.query.domain as string;
+  const { domain, pageId: pagePath } = ctx.params ?? {};
 
-  if (pagePath && domain) {
-    const pageRedirect = await prisma.page.findFirst({
+  if (domain && pagePath) {
+    const page = await prisma.page.findFirst({
       where: {
-        additionalPaths: {
-          has: pagePath
-        },
+        OR: [
+          {
+            path: pagePath as string
+          },
+          {
+            additionalPaths: {
+              has: pagePath as string
+            }
+          }
+        ],
         space: {
-          domain
+          OR: [
+            {
+              domain: domain as string
+            },
+            {
+              customDomain: domain as string,
+              isCustomDomainVerified: true
+            }
+          ]
         }
       },
       select: {
-        path: true
+        title: true,
+        path: true,
+        contentText: true,
+        type: true,
+        space: {
+          select: {
+            paidTier: true,
+            publicProposals: true,
+            spaceImage: true
+          }
+        },
+        permissions: {
+          where: {
+            public: true
+          }
+        }
       }
     });
 
-    if (pageRedirect && pageRedirect.path !== pagePath) {
-      return {
-        redirect: {
-          destination: `/${domain}/${pageRedirect.path}`,
-          permanent: false
-        }
-      };
+    if (page) {
+      if (page.path !== pagePath) {
+        return {
+          redirect: {
+            destination: `/${domain}/${page.path}`,
+            permanent: false
+          }
+        };
+        // Only disclose page meta if the page is public
+      } else if (
+        page.permissions.length > 0 ||
+        page.space.paidTier === 'free' ||
+        (page.type === 'proposal' && page.space.publicProposals)
+      ) {
+        return {
+          props: {
+            openGraphData: {
+              title: page.title,
+              description: page.contentText?.slice(0, 200),
+              image: page.space?.spaceImage
+            }
+          } as Pick<GlobalPageProps, 'openGraphData'>
+        };
+      }
     }
   }
 
@@ -50,6 +97,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     props: {}
   };
 }
+
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();

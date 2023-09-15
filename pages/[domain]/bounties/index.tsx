@@ -1,6 +1,8 @@
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { BountiesPage } from 'components/bounties/BountiesPage';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useBounties } from 'hooks/useBounties';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
@@ -23,7 +25,12 @@ export default function BountyPage() {
   if (loadingBounties || !bounties || !accessChecked || isLoadingAccess) {
     return <LoadingComponent isLoading />;
   }
-  return <BountiesPage bounties={bounties} publicMode={!isSpaceMember} title={bountiesTitle} />;
+  return (
+    <PageDialogProvider>
+      <BountiesPage bounties={bounties} publicMode={!isSpaceMember} title={bountiesTitle} />
+      <PageDialogGlobal />
+    </PageDialogProvider>
+  );
 }
 
 BountyPage.getLayout = getPageLayout;
