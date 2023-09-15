@@ -3,8 +3,9 @@ import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
@@ -16,6 +17,7 @@ import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal'
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { BountiesKanbanView } from './components/BountiesKanbanView';
@@ -40,23 +42,16 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const views: { label: string; view: 'gallery' | 'board' }[] = [
-  { label: 'Open', view: 'gallery' },
-  { label: 'All', view: 'board' }
-];
+const views = [
+  { icon: <BountyIcon fontSize='small' />, label: 'Open', type: 'open' },
+  { icon: <ModeStandbyOutlinedIcon fontSize='small' />, label: 'All', type: 'all' }
+] as const;
 
-export default function BountiesPage({ publicMode = false, bounties, title }: Props) {
+export function BountiesPage({ publicMode = false, bounties, title }: Props) {
   const { space } = useCurrentSpace();
   const router = useRouter();
-
-  const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
-
-  useEffect(() => {
-    if (space?.id) {
-      charmClient.track.trackAction('page_view', { spaceId: space.id, type: 'bounties_list' });
-    }
-  }, [space?.id]);
-
+  const viewFromUrl = router.query.view as (typeof views)[number]['type'];
+  const currentView = views.find((v) => v.type === viewFromUrl) ?? views[0];
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
@@ -130,36 +125,29 @@ export default function BountiesPage({ publicMode = false, bounties, title }: Pr
                 <Tabs
                   textColor='primary'
                   indicatorColor='secondary'
-                  value={currentView.view}
+                  value={currentView.type}
                   sx={{ minHeight: 0, mb: '-6px' }}
                 >
-                  {views.map(({ label, view }) => (
+                  {views.map(({ icon, label, type }) => (
                     <Tab
-                      component='div'
+                      data-test={`bounties-view-${type}`}
                       disableRipple
-                      key={label}
+                      component={NextLink}
+                      href={getAbsolutePath(`/bounties?view=${type}`, space?.domain)}
+                      key={type}
+                      value={type}
                       label={
                         <StyledButton
-                          startIcon={
-                            view === 'board' ? (
-                              <BountyIcon fontSize='small' />
-                            ) : (
-                              <ModeStandbyOutlinedIcon fontSize='small' />
-                            )
-                          }
-                          onClick={() => {
-                            router.push(`/${space?.domain}/bounties?view=${view}`);
-                          }}
+                          startIcon={icon}
                           variant='text'
                           size='small'
                           sx={{ p: 0, mb: '5px', width: '100%' }}
-                          color={currentView.label === label ? 'textPrimary' : 'secondary'}
+                          color={currentView.type === type ? 'textPrimary' : 'secondary'}
                         >
-                          {label[0].toUpperCase() + label.slice(1)}
+                          {label}
                         </StyledButton>
                       }
                       sx={{ p: 0 }}
-                      value={view}
                     />
                   ))}
                 </Tabs>
@@ -172,16 +160,16 @@ export default function BountiesPage({ publicMode = false, bounties, title }: Pr
               videoTitle='Bounties | Getting started with CharmVerse'
               videoUrl='https://tiny.charmverse.io/bounties'
             />
-          ) : currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
+          ) : currentView.type === 'open' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
             <Card variant='outlined' sx={{ margin: '0 auto', my: 2, width: 'fit-content' }}>
               <Box p={3} textAlign='center'>
                 <Typography color='secondary'>
-                  There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=board`}>here</Link> to
+                  There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=all`}>here</Link> to
                   see all of your existing bounties
                 </Typography>
               </Box>
             </Card>
-          ) : currentView.view === 'gallery' ? (
+          ) : currentView.type === 'open' ? (
             <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
           ) : (
             <div className='container-container'>

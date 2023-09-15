@@ -1,8 +1,8 @@
 import { appSubdomain, baseUrl, isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 
 export function getCallbackDomain(host?: string | undefined) {
   const protocol = isProdEnv || isStagingEnv ? `https://` : `http://`;
@@ -18,11 +18,11 @@ export function getCallbackDomain(host?: string | undefined) {
     return `${protocol}${appSubdomain}.${getAppApexDomain()}`;
   }
 
-  if (getValidCustomDomain(host)) {
+  if (getCustomDomainFromHost(host)) {
     return getAppOriginURL({ protocol, host }).toString().replace(/\/$/, '');
   }
 
-  const subdomain = getValidSubdomain(host);
+  const subdomain = getSpaceDomainFromHost(host);
 
   if (!subdomain && isStagingEnv) {
     return baseUrl || `${protocol}${host}`;

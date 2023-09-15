@@ -1,4 +1,4 @@
-import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
+import { isValidDomainName } from '../isValidDomainName';
 
 describe('isValidDomainName', () => {
   it('should validate top-level domain names', () => {

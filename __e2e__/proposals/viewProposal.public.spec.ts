@@ -30,7 +30,6 @@ let publicLink: string;
 test.describe.serial('View proposal - public space', () => {
   test('People outside the space can always view proposals at discussion stage and beyond', async ({
     page,
-    proposalListPage,
     documentPage
   }) => {
     // Initial setup

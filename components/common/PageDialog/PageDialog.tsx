@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
-import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
@@ -59,7 +59,7 @@ export function PageDialog(props: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
     }
   }, [page?.id]);
 

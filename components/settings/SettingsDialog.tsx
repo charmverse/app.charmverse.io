@@ -16,8 +16,6 @@ import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
-import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
-import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -30,10 +28,12 @@ import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
+import ProfileSettings from './profile/ProfileSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 import { useBlockCount } from './subscription/hooks/useBlockCount';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
+import { SubscriptionSettings } from './subscription/SubscriptionSettings';
 import { UpgradeChip } from './subscription/UpgradeWrapper';
 
 interface TabPanelProps extends BoxProps {

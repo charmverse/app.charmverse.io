@@ -53,7 +53,7 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
   await page.goto(`${baseUrl}${workspacePath}`);
 
   // wait for token gate page to open for the workspace
-  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
+  await tokenGatePage.waitForWorkspaceURL({ domain: space.domain });
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
 
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();

@@ -1,4 +1,4 @@
-import type { MemberProperty } from '@charmverse/core/dist/cjs/prisma-client';
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { Social } from 'components/u/interfaces';

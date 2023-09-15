@@ -2,7 +2,7 @@ import type { Page } from '@charmverse/core/prisma';
 import log from 'loglevel';
 import { useCallback, useEffect } from 'react';
 
-import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
@@ -32,7 +32,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     if (page) {
-      charmClient.track.trackAction('page_view', {
+      trackPageView({
         type: page.type,
         pageId: page.id,
         spaceId: page.spaceId

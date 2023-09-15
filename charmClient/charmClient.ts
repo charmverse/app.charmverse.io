@@ -172,10 +172,6 @@ class CharmClient {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
 
-  getBlockViewsByPageId(pageId: string) {
-    return http.GET<Block[]>(`/api/blocks/views/${pageId}`);
-  }
-
   getPageLink(pageId: string) {
     return http.GET<PageLink>(`/api/pages/${pageId}/link`);
   }
@@ -256,16 +252,20 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
+  getBlock({ blockId }: { blockId: string }): Promise<FBBlock> {
+    return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
+  }
+
+  getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>('/api/blocks', { spaceId })
+      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
-  getSubtree(rootId?: string, levels = 2): Promise<FBBlock[]> {
+  getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
+      .GET<Block[]>(`/api/blocks/${pageId}/views`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
@@ -299,8 +299,7 @@ class CharmClient {
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
-    const currentBlocks = await http.GET<Block[]>('/api/blocks', { id: blockId });
-    const currentFBBlock = blockToFBBlock(currentBlocks[0]);
+    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<Block>(`/api/blocks/${blockId}`));
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
