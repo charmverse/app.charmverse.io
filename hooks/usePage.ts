@@ -28,8 +28,6 @@ type PageResult = {
 const noop = () => Promise.resolve(undefined);
 
 export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
-  const router = useRouter();
-  const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const {
     data: pageWithContent,
@@ -39,12 +37,9 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
-  const updatePage = useCallback(
-    async (updates: PageUpdates) => {
-      return charmClient.pages.updatePage(updates);
-    },
-    [space, pageIdOrPath, router.query.pageId]
-  );
+  const updatePage = useCallback(async (updates: PageUpdates) => {
+    return charmClient.pages.updatePage(updates);
+  }, []);
 
   useEffect(() => {
     function handleUpdateEvent(value: WebSocketPayload<'pages_meta_updated'>) {
