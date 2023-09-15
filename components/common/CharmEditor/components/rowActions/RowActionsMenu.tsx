@@ -22,8 +22,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utilities/browser';
 
-import { linkedPageNodeName } from '../linkedPage/linkedPage.constants';
-import { nestedPageNodeName } from '../nestedPage';
+import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
 import { getNodeForRowPosition, type PluginState } from './rowActions';
 
@@ -77,17 +76,12 @@ function Component({ menuState }: { menuState: PluginState }) {
     const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
     const nodeTypeName = node?.node.type.name;
     const tr = view.state.tr;
-    const isLinkedPage = nodeTypeName === linkedPageNodeName;
-    if (nodeTypeName === 'page' || isLinkedPage) {
+    if (nodeTypeName === 'page') {
       if (currentSpace && node?.node.attrs.id) {
-        const { rootPageId } = isLinkedPage
-          ? {
-              rootPageId: node.node.attrs.id
-            }
-          : await charmClient.pages.duplicatePage({
-              pageId: node.node.attrs.id
-            });
-        const newNode = view.state.schema.nodes[isLinkedPage ? linkedPageNodeName : nestedPageNodeName].create({
+        const { rootPageId } = await charmClient.pages.duplicatePage({
+          pageId: node.node.attrs.id
+        });
+        const newNode = view.state.schema.nodes[nestedPageNodeName].create({
           id: rootPageId
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
