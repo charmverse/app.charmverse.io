@@ -32,15 +32,15 @@ const esmModules = [
   'formdata-polyfill',
   'jose',
   'nanoid',
-  '@charmverse/core',
-  'wagmi',
-  '@wagmi/core',
-  '@wagmi/connectors'
+  '@charmverse/core'
 ];
 
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module
 if (process.env.NODE_ENV === 'test') {
   esmModules.push('@babel/runtime');
+  esmModules.push('wagmi');
+  esmModules.push('@wagmi/core');
+  esmModules.push('@wagmi/connectors');
 }
 
 exports.esmModules = esmModules;

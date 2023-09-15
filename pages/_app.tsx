@@ -2,14 +2,12 @@ import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { wagmiConfig } from 'connectors/config';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
-import { WagmiConfig } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
@@ -120,6 +118,7 @@ import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
+import { WagmiProvider } from '../components/_app/WagmiProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
@@ -227,7 +226,7 @@ function DataProviders({ children }: { children: ReactNode }) {
     >
       <UserProvider>
         <DiscordProvider>
-          <WagmiConfig config={wagmiConfig}>
+          <WagmiProvider>
             <Web3ConnectionManager>
               <WalletSelectorModal />
               <Web3AccountProvider>
@@ -256,7 +255,7 @@ function DataProviders({ children }: { children: ReactNode }) {
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
-          </WagmiConfig>
+          </WagmiProvider>
         </DiscordProvider>
       </UserProvider>
     </SWRConfig>
