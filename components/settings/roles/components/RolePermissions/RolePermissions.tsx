@@ -143,8 +143,8 @@ function reducerWithContext({ id }: { id: string }) {
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { categories: proposalCategories = [] } = useProposalCategories();
-  const { categories: forumCategories = [] } = useForumCategories();
+  const { categories: proposalCategories = [], isLoading: proposalCategoriesLoading } = useProposalCategories();
+  const { categories: forumCategories = [], isLoading: forumCategoriesLoading } = useForumCategories();
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
   // const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
@@ -161,7 +161,9 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const categoryIds = [...proposalCategories.map((c) => c.id), ...forumCategories.map((c) => c.id)];
 
   const { data: originalPermissions } = useSWR(
-    currentSpaceId ? `/proposals/list-permissions-${currentSpaceId}-${categoryIds}` : null,
+    currentSpaceId && !forumCategoriesLoading && !proposalCategoriesLoading
+      ? `/proposals/list-permissions-${currentSpaceId}-${categoryIds}`
+      : null,
     () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
 
