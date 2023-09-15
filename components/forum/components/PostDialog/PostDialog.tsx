@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
@@ -59,6 +60,12 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
       mounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (spaceId && post?.id) {
+      trackPageView({ spaceId, postId: post.id, type: 'post' });
+    }
+  }, [post?.id]);
 
   function close() {
     onClose();
