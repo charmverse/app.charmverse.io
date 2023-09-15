@@ -26,6 +26,8 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import type { OpenGraphProps } from 'components/OpenGraphData';
+import { OpenGraphData } from 'components/OpenGraphData';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -127,6 +129,10 @@ type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };
 
+export type GlobalPageProps = {
+  openGraphData: OpenGraphProps;
+};
+
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
@@ -183,7 +189,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                   <FocalBoardProvider>
                     <NotionProvider>
                       <IntlProvider>
-                        <PageHead />
+                        <PageHead {...pageProps} />
 
                         <RouteGuard>
                           <ErrorBoundary>
@@ -265,7 +271,7 @@ function DataProviders({ children }: { children: ReactNode }) {
   );
 }
 
-function PageHead() {
+function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -276,6 +282,8 @@ function PageHead() {
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
       <meta name='google-site-verification' content='AhWgWbPVQIsHKmPNTkUSI-hN38XbkpCIrt40-4IgaiM' />
+
+      <OpenGraphData {...openGraphData} />
     </Head>
   );
 }
