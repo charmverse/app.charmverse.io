@@ -57,15 +57,15 @@ export const getTestWagmiConfig = () => {
   // NOTE: we need window object first, to be able to use window.ethereum
   if (typeof window !== 'undefined') {
     // get the test wallet address set by the test runner or use a default one
-    const account = (window.localStorage.getItem('charm.v1.testWalletAddress') ||
-      '0x80c2AE072212ab96B7fa2fEE0efba986DC46C4e5') as Address;
+    const storedAccount = window.localStorage.getItem('charm.v1.testWalletAddress') as Address;
+    const account = storedAccount || '0x80c2AE072212ab96B7fa2fEE0efba986DC46C4e5';
 
     // use mocked window.ethereum when available or default to http provider
     const transport =
       typeof window.ethereum !== 'undefined' ? custom(window.ethereum) : http(mainnet.rpcUrls.default.http[0]);
 
     return createConfig({
-      autoConnect: true,
+      autoConnect: !!storedAccount,
       connectors: [
         new MockConnector({
           chains: [mainnet],
