@@ -67,7 +67,7 @@ describe('countBlocks() - all nodes', () => {
     nft: 1,
     orderedList: 1,
     page: 1,
-    'page-link': 1,
+    linkedPage: 1,
     paragraph: 1,
     pdf: 1,
     poll: 1,

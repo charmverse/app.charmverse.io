@@ -11,7 +11,6 @@ import {
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { Fragment } from 'prosemirror-model';
 import { TextSelection } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
@@ -23,7 +22,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utilities/browser';
 
-import { linkedPageNodeName } from '../linkedPage';
+import { linkedPageNodeName } from '../linkedPage/linkedPage.constants';
 import { nestedPageNodeName } from '../nestedPage';
 
 import { getNodeForRowPosition, type PluginState } from './rowActions';
@@ -76,15 +75,11 @@ function Component({ menuState }: { menuState: PluginState }) {
 
   async function duplicateRow() {
     const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
-    if (!node) {
-      return null;
-    }
-
-    const nodeTypeName = node.node.type.name;
+    const nodeTypeName = node?.node.type.name;
     const tr = view.state.tr;
     const isLinkedPage = nodeTypeName === linkedPageNodeName;
     if (nodeTypeName === 'page' || isLinkedPage) {
-      if (currentSpace && node.node.attrs.id) {
+      if (currentSpace && node?.node.attrs.id) {
         const { rootPageId } = isLinkedPage
           ? {
               rootPageId: node.node.attrs.id
@@ -99,7 +94,7 @@ function Component({ menuState }: { menuState: PluginState }) {
         view.dispatch(newTr.scrollIntoView());
       }
     } else if (nodeTypeName === 'inlineDatabase') {
-      if (currentSpace && node.node.attrs.pageId) {
+      if (currentSpace && node?.node.attrs.pageId) {
         const { rootPageId: newPageId } = await charmClient.pages.duplicatePage({
           pageId: node.node.attrs.pageId
         });

@@ -20,7 +20,7 @@ import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import * as bulletList from '../../bulletList';
-import { linkedPageSuggestMarkName } from '../../linkedPage';
+import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import * as orderedList from '../../orderedList';
 import paragraph from '../../paragraph';

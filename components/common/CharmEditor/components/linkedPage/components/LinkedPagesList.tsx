@@ -12,14 +12,14 @@ import { isTruthy } from 'lib/utilities/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import type { AllPagesProp } from '../../PageList';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
-function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
+function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const view = useEditorViewContext();
@@ -99,4 +99,4 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   );
 }
 
-export default memo(NestedPagesList);
+export default memo(LinkedPagesList);

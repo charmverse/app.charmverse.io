@@ -65,7 +65,7 @@ export function linkedPagePlugins({
       }),
       NodeView.createPlugin({
         name: linkedPageNodeName,
-        containerDOM: ['div', { class: 'page-link-container' }]
+        containerDOM: ['div', { class: 'linkedPage-container' }]
       })
     ];
   };
