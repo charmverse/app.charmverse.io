@@ -11,6 +11,7 @@ import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/sr
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -90,9 +91,11 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
-  const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
+  const [currentViewId, setCurrentViewId] = useState<string | null>(
+    focalboardViewsRecord[pageId] ?? (views[0]?.id || null)
+  );
 
   useEffect(() => {
     if (!currentViewId && views.length > 0) {
@@ -126,6 +129,11 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     e.stopPropagation();
   }
 
+  function showView(viewId: string) {
+    setCurrentViewId(viewId);
+    setFocalboardViewsRecord((prev) => ({ ...prev, [pageId]: viewId }));
+  }
+
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
@@ -153,7 +161,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
         <CenterPanel
           currentRootPageId={pageId}
           disableUpdatingUrl
-          showView={setCurrentViewId}
+          showView={showView}
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}

@@ -6,7 +6,7 @@ import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { addView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useBounties } from 'hooks/useBounties';
@@ -48,7 +48,6 @@ export function SharedPage({ publicPage }: Props) {
     setTitleState(rootPage.title);
     setCurrentPageId(rootPage.id);
 
-    dispatch(setCurrent(rootPage.id));
     cards.forEach((card) => {
       dispatch(addCard(card));
     });

@@ -12,18 +12,14 @@ import type { RootState } from './index';
  * @loadedBoardViews is a map of boardIds for which we have loaded views
  */
 type ViewsState = {
-  current: string;
   views: { [key: string]: BoardView };
   loadedBoardViews: { [key: string]: boolean };
 };
 
 const viewsSlice = createSlice({
   name: 'views',
-  initialState: { views: {}, current: '', loadedBoardViews: {} } as ViewsState,
+  initialState: { views: {}, loadedBoardViews: {} } as ViewsState,
   reducers: {
-    setCurrent: (state, action: PayloadAction<string>) => {
-      state.current = action.payload;
-    },
     addView: (state, action: PayloadAction<BoardView>) => {
       state.views[action.payload.id] = action.payload;
     },
@@ -70,7 +66,7 @@ const viewsSlice = createSlice({
   }
 });
 
-export const { updateViews, setCurrent, updateView, addView, deleteViews } = viewsSlice.actions;
+export const { updateViews, updateView, addView, deleteViews } = viewsSlice.actions;
 export const { reducer } = viewsSlice;
 
 export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;
@@ -105,13 +101,5 @@ export const getCurrentBoardViews = createSelector(
       .filter((v) => v.parentId === boardId)
       .sort((a, b) => a.title.localeCompare(b.title))
       .map((v) => createBoardView(v));
-  }
-);
-
-export const getCurrentView = createSelector(
-  getViews,
-  (state: RootState) => state.views.current,
-  (views, viewId) => {
-    return views[viewId];
   }
 );

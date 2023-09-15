@@ -14,10 +14,7 @@ import {
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentBoardViews,
-  setCurrent as setCurrentView
-} from 'components/common/BoardEditor/focalboard/src/store/views';
+import { getCurrentBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
@@ -39,16 +36,26 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
+  const urlViewId = router.query.viewId as string | undefined;
+  const [currentViewId, setCurrentViewId] = useState<string | undefined>(urlViewId);
   const boardViews = useAppSelector(getCurrentBoardViews);
+  const { setFocalboardViewsRecord, focalboardViewsRecord } = useFocalboardViews();
   // grab the first board view if current view is not specified
   const { showMessage } = useSnackbar();
-  const activeView =
-    typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
+
+  const boardId = page.boardId;
+  const firstBoardView = boardViews.find((view) => view.parentId === boardId);
+  const currentView = typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : null;
+  const localStorageView =
+    boardId && focalboardViewsRecord[boardId]
+      ? boardViews.find((view) => view.id === focalboardViewsRecord[boardId])
+      : null;
+
+  const activeView = currentView ?? localStorageView ?? firstBoardView ?? boardViews[0];
+  const activeViewId = activeView?.id;
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
-  const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   // TODO: remove this feature entirely after some time has passed and we are sure we dont need it. Disabled on April 4, 2023.
   const readOnlySourceData = false; // activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
@@ -59,32 +66,24 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   }, [router.query.cardId]);
 
   useEffect(() => {
-    const boardId = page.boardId;
-    const urlViewId = router.query.viewId as string;
-
-    // Ensure boardViews is for our boardId before redirecting
-    const firstBoardView = boardViews.find((view) => view.parentId === boardId);
-
-    if (!urlViewId && firstBoardView) {
+    if (!urlViewId) {
       router.replace({
         pathname: router.pathname,
         query: {
           ...router.query,
-          viewId: firstBoardView.id,
+          viewId: activeViewId,
           cardId: router.query.cardId ?? ''
         }
       });
-      return;
     }
-
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
-      setCurrentViewId(urlViewId);
-      // Note: current view in Redux is only used for search, which we currently are not using at the moment
-      dispatch(setCurrentView(urlViewId || ''));
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
+      if (activeViewId) {
+        setFocalboardViewsRecord((_focalboardViewsRecord) => ({ ..._focalboardViewsRecord, [boardId]: activeViewId }));
+        setCurrentViewId(activeViewId);
+      }
     }
-  }, [page.boardId, boardViews]);
+  }, [boardId, urlViewId, activeViewId]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
