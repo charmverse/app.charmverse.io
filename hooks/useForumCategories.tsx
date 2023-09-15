@@ -17,7 +17,7 @@ type IContext = {
   setDefaultPostCategory: (option: PostCategory) => Promise<void>;
   getForumCategoryById: (id?: string | null) => PostCategoryWithPermissions | undefined;
   getPostableCategories: () => PostCategoryWithPermissions[];
-  isCategoriesLoaded: boolean;
+  isLoading: boolean;
   categories: PostCategoryWithPermissions[];
   error: any;
   disabled: boolean;
@@ -30,7 +30,7 @@ export const PostCategoriesContext = createContext<Readonly<IContext>>({
   setDefaultPostCategory: () => Promise.resolve(undefined),
   getForumCategoryById: () => undefined,
   getPostableCategories: () => [],
-  isCategoriesLoaded: false,
+  isLoading: false,
   categories: [],
   error: undefined,
   disabled: false
@@ -132,8 +132,6 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
     return (categories ?? []).filter((c) => c.permissions.create_post);
   }
 
-  const isCategoriesLoaded = !!categories;
-
   const value = useMemo<IContext>(
     () => ({
       createForumCategory,
@@ -142,12 +140,12 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
       setDefaultPostCategory,
       getForumCategoryById,
       getPostableCategories,
-      isCategoriesLoaded,
+      isLoading: !categories,
       categories: categories || [],
       error,
       disabled: isValidating
     }),
-    [isCategoriesLoaded, error, categories, isValidating, currentSpace]
+    [error, categories, isValidating, currentSpace]
   );
 
   return <PostCategoriesContext.Provider value={value}>{children}</PostCategoriesContext.Provider>;
