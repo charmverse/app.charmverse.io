@@ -113,6 +113,46 @@ describe('getCardPageInDatabase', () => {
     );
   });
 
+  it('should accept an additional page path instead of a page ID', async () => {
+    const randomAdditionalPath = 'path-32288844';
+
+    const pagePath = (await prisma.page.update({
+      where: {
+        id: card.id
+      },
+      data: {
+        additionalPaths: {
+          push: randomAdditionalPath
+        }
+      },
+      select: {
+        path: true
+      }
+    })) as { path: string };
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const foundCard = await getCardPageInDatabase({ cardId: randomAdditionalPath, spaceId: space.id });
+
+    // Add in actual assertions here
+    expect(foundCard).toEqual<CardPage>(
+      expect.objectContaining<CardPage>({
+        content: expect.any(Object),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        databaseId: expect.any(String),
+        id: expect.any(String),
+        isTemplate: expect.any(Boolean),
+        properties: expect.objectContaining({
+          [textSchema.name]: cardProperties[textSchema.name],
+          [selectSchema.name]: 'Green',
+          [checkboxSchema.name]: true
+        }),
+        spaceId: expect.any(String),
+        title: expect.any(String)
+      })
+    );
+  });
+
   it('should throw a database not found error when the database for the page does not exist', async () => {
     const deletedDatabase = await createDatabase(
       {

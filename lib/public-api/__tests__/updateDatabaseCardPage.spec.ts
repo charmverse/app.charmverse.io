@@ -1,6 +1,6 @@
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
@@ -96,6 +96,42 @@ describe('updateDatabaseCardPage', () => {
 
     const updatedPage = await updateDatabaseCardPage({
       cardId: pagePath.path,
+      spaceId: space.id,
+      update: {
+        title: newTitle
+      },
+      updatedBy: user.id
+    });
+
+    expect(updatedPage.title).toEqual(newTitle);
+  });
+
+  it('should accept an additionalPath of the card page instead of its ID', async () => {
+    const customPath = 'page-123348855';
+
+    const page = await createDatabaseCardPage({
+      boardId: database.id,
+      createdBy: user.id,
+      properties: {},
+      spaceId: space.id,
+      title: 'Test card'
+    });
+
+    await prisma.page.update({
+      where: {
+        id: page.id
+      },
+      data: {
+        additionalPaths: {
+          set: [customPath]
+        }
+      }
+    });
+
+    const newTitle = 'New title';
+
+    const updatedPage = await updateDatabaseCardPage({
+      cardId: customPath,
       spaceId: space.id,
       update: {
         title: newTitle
