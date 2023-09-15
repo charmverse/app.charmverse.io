@@ -12,15 +12,12 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const url = ctx.resolvedUrl?.split('/') ?? [];
-
-  const domain = url[1];
-  const pagePath = url[2];
+  const { domain, pageId: pagePath } = ctx.params ?? {};
 
   if (domain && pagePath) {
     const page = await prisma.page.findFirst({
       where: {
-        path: pagePath,
+        path: pagePath as string,
         permissions: {
           some: {
             public: true
@@ -29,10 +26,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         space: {
           OR: [
             {
-              domain
+              domain: domain as string
             },
             {
-              customDomain: domain
+              customDomain: domain as string,
+              isCustomDomainVerified: true
             }
           ]
         }
