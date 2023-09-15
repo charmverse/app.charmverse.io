@@ -45,9 +45,9 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     async (updates: PageUpdates) => {
       const updatedPage = await charmClient.pages.updatePage(updates);
 
-      if (space && router.query.pageId === pageIdOrPath && updates.title) {
-        setUrlWithoutRerender(`/${space.domain}/${updatedPage.path}`, {});
-      }
+      // if (space && router.query.pageId === pageIdOrPath && updatedPage.path !== pageIdOrPath) {
+      //   router.push(`/${space.domain}/${pageIdOrPath}`, `/${space.domain}/${updatedPage.path}`, { shallow: true });
+      // }
       // if (currentPageId && currentPageId === pageWithContent?.id && space) {
       //
       // }

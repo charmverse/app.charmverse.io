@@ -146,6 +146,11 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<PageM
 
   const { content, contentText, ...updatedPageMeta } = updateContent;
 
+  if (updatedPage.path !== page.path) {
+    updatedPageMeta.path = updatedPage.path;
+    updatedPageMeta.additionalPaths = updatedPage.additionalPaths;
+  }
+
   updateTrackPageProfile(updatedPage.id);
   relay.broadcast(
     {

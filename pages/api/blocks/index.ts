@@ -16,7 +16,7 @@ import {
   requireUser
 } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPageMetaList } from 'lib/pages/server/pageMetaSelectList';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
