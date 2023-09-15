@@ -2,7 +2,7 @@ import { createObject } from '@bangle.dev/utils';
 import { keymap } from 'prosemirror-keymap';
 import { Plugin } from 'prosemirror-state';
 
-import { indentCommand, splitListCommand } from './commands';
+import { indentCommand, listItemMergeCommand, splitListCommand } from './commands';
 import { ListItemNodeView } from './listItemNodeView';
 import { BULLET_LIST, LIST_ITEM } from './nodeNames';
 
@@ -19,7 +19,11 @@ export function plugins() {
     }),
     keymap({
       Enter: splitListCommand(),
-      Tab: indentCommand(1)
+      Tab: indentCommand(1),
+      'Shift-Tab': indentCommand(-1),
+      Backspace: listItemMergeCommand('down'),
+      // "forward delete"
+      Delete: listItemMergeCommand('up')
       // [KEY_BACK_DELETE.common]: LIST_ITEM_MERGE_UP.execute,
       // [KEY_FORWARD_DELETE.common]: LIST_ITEM_MERGE_DOWN.execute,
     })

@@ -28,6 +28,7 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
       // use decorations to add a placeholder when the current line is empty
       decorations: (state) => {
         const hasContent = !checkIsContentEmpty(state.doc.toJSON() as any);
+
         // ignore placeholder if there is no doc content
         if (!hasContent) {
           return null;

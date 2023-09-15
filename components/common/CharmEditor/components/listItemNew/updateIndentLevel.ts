@@ -3,6 +3,8 @@ import { Fragment } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
+import { isAtBeginningOfLine } from '../../utils';
+
 import { consolidateListNodes } from './consolidateListNodes';
 import { isListNode } from './isListNode';
 import { BLOCKQUOTE, HEADING, LIST_ITEM, PARAGRAPH } from './nodeNames';
@@ -40,9 +42,10 @@ export function updateIndentLevel(
   doc.nodesBetween(from, to, (node, pos) => {
     const nodeType = node.type;
     if (nodeType === paragraph || nodeType === heading || nodeType === blockquote) {
-      tr = setNodeIndentMarkup(state, tr, pos, delta, view).tr;
+      // this is handled by our tabIndent plugin
+      // tr = setNodeIndentMarkup(state, tr, pos, delta, view).tr;
       return false;
-    } else if (isListNode(node)) {
+    } else if (isListNode(node) && isAtBeginningOfLine(state)) {
       // List is tricky, we'll handle it later.
       listNodePoses.push(pos);
       return false;
@@ -51,7 +54,7 @@ export function updateIndentLevel(
   });
 
   if (!listNodePoses.length) {
-    return { tr, docChanged: true };
+    return { tr, docChanged: false };
   }
 
   tr = transformAndPreserveTextSelection(tr, schema, (memo) => {
