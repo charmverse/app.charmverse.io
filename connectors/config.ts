@@ -1,6 +1,6 @@
 import { RPCList } from 'connectors/index';
 import type { Address } from 'viem';
-import { createPublicClient, custom, createWalletClient } from 'viem';
+import { createPublicClient, custom, createWalletClient, http } from 'viem';
 import { createConfig, configureChains, mainnet } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
@@ -60,6 +60,10 @@ export const getTestWagmiConfig = () => {
     const account = (window.localStorage.getItem('charm.v1.testWalletAddress') ||
       '0x80c2AE072212ab96B7fa2fEE0efba986DC46C4e5') as Address;
 
+    // use mocked window.ethereum when available or default to http provider
+    const transport =
+      typeof window.ethereum !== 'undefined' ? custom(window.ethereum) : http(mainnet.rpcUrls.default.http[0]);
+
     return createConfig({
       autoConnect: true,
       connectors: [
@@ -68,7 +72,7 @@ export const getTestWagmiConfig = () => {
           options: {
             walletClient: createWalletClient({
               chain: mainnet,
-              transport: custom(window.ethereum),
+              transport,
               account
             }),
             flags: {
@@ -79,7 +83,7 @@ export const getTestWagmiConfig = () => {
       ],
       publicClient: createPublicClient({
         chain: mainnet,
-        transport: custom(window.ethereum)
+        transport
       })
     });
   }
