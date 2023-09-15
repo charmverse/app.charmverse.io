@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: 6191264549-e1d97bb
+  SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
   deploy:
