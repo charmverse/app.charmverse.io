@@ -33,14 +33,34 @@ runs:
       shell: bash
       run: |
         cp .env.test.local.example .env.test.local
-        echo "cache_key=nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}" >> $GITHUB_OUTPUT
+        cache_key="nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}"
+        echo "dep_cache_key: $cache_key"
+        echo "dep_cache_key=$cache_key" >> $GITHUB_OUTPUT
+
+    - name: Cache dependencies
+      id: cache_check
+      uses: actions/cache/restore@v3
+      with:
+        path: ./node_modules
+        lookup-only: true
+        key: ${{ steps.calc_cache_key.outputs.dep_cache_key }}
+        restore-keys: |
+          nodemodules-cache-${{ hashFiles('package-lock.json') }}-
+          nodemodules-cache-
+
+    - name: Print results of cache_check
+      shell: bash
+      run: |
+        echo "cache-hit: ${{ steps.cache_check.outputs.cache-hit }}"
+        echo "cache-primary-key: ${{ steps.cache_check.outputs.cache-primary-key }}"
+        echo "cache-matched-key: ${{ steps.cache_check.outputs.cache-matched-key }}"
 
     - name: Cache dependencies
       id: cache_node_modules
       uses: actions/cache@v3
       with:
         path: ./node_modules
-        key: ${{ steps.calc_cache_key.outputs.cache_key }}
+        key: ${{ steps.calc_cache_key.outputs.dep_cache_key }}
         restore-keys: |
           nodemodules-cache-${{ hashFiles('package-lock.json') }}-
           nodemodules-cache-

@@ -7,7 +7,7 @@ on:
   push:
     branches: [optimize-docker-cache]
   pull_request:
-    branches-ignore:    
+    branches-ignore:
       - main
   workflow_dispatch:
     inputs:
