@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [optimize-docker-cache]
+    branches: [optimize-cache-strategy]
   pull_request:
     branches-ignore:
       - main
@@ -219,7 +219,7 @@ jobs:
     permissions:
       contents: write
     # Re-enable condition before merge
-    if: github.ref == 'refs/heads/optimize-docker-cache'    # << change before merge
+    if: github.ref == 'refs/heads/optimize-cache-strategy'    # << change before merge
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
