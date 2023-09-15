@@ -89,6 +89,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'lib/lit-protocol-modal/index.css';
 import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
 import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';

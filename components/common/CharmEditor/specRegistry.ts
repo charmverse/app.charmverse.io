@@ -5,7 +5,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
-import * as bulletList from './components/bulletList';
 import * as callout from './components/callout/callout';
 import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { cryptoPriceSpec } from './components/CryptoPrice';
@@ -22,11 +21,16 @@ import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { spec as linkSpec } from './components/link/link.specs';
-import * as listItem from './components/listItem/listItem';
+// import * as listItem from './components/listItem/listItem';
+// import * as bulletList from './components/bulletList';
+// import * as orderedList from './components/orderedList';
+import { spec as bulletListItemSpec } from './components/listItemNew/bulletListItemSpecs';
+import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
+import { spec as markSpec } from './components/listItemNew/markSpec';
+import { spec as orderedListItemSpec } from './components/listItemNew/orderedListItemSpecs';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
 import * as nft from './components/nft/nft.specs';
-import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
@@ -57,13 +61,17 @@ export const specRegistry = new SpecRegistry([
   mentionSpecs(), // NO
   inlineVote.spec(),
   bold.spec(), // OK
-  bulletList.spec(), // OK
   hardBreakSpec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   linkSpec(), // OK
-  listItem.spec(), // OK
-  orderedList.spec(), // OK
+  // bulletList.spec(), // OK
+  // listItem.spec(), // OK
+  // orderedList.spec(), // OK
+  orderedListItemSpec(),
+  bulletListItemSpec(),
+  listItemSpec(),
+  markSpec(),
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // OK

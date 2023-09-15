@@ -51,6 +51,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'react-resizable/css/styles.css';
@@ -128,7 +131,6 @@ export const globalTypes = {
     }
   }
 };
-
 
 export const withMuiTheme = (Story, context) => {
   return (

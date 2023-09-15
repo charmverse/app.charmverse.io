@@ -1,0 +1,137 @@
+/* Indent */
+
+.ProseMirror p[data-indent='1'] {
+  margin-left: 30pt !important;
+}
+
+.ProseMirror p[data-indent='2'] {
+  margin-left: 58pt !important;
+}
+
+.ProseMirror p[data-indent='3'] {
+  margin-left: 91pt !important;
+}
+
+.ProseMirror p[data-indent='4'] {
+  margin-left: 117pt !important;
+}
+
+.ProseMirror p[data-indent='5'] {
+  margin-left: 144pt !important;
+}
+
+.ProseMirror p[data-indent='6'] {
+  margin-left: 178pt !important;
+}
+
+.ProseMirror p[data-indent='7'] {
+  margin-left: 215pt !important;
+}
+
+.ProseMirror p[data-indent='8'] {
+  margin-left: 251pt !important;
+}
+
+.ProseMirror p[data-indent='9'] {
+  margin-left: 291pt !important;
+}
+
+.ProseMirror p[data-indent='10'] {
+  margin-left: 326pt !important;
+}
+
+/* list item indents */
+
+.ProseMirror ol[type='decimal'][data-indent='1'] {
+  margin-left: 12pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='2'] {
+  margin-left: 24pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='3'] {
+  margin-left: 36pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='4'] {
+  margin-left: 48pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='5'] {
+  margin-left: 60pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='6'] {
+  margin-left: 72pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='7'] {
+  margin-left: 84pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='8'] {
+  margin-left: 96pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='9'] {
+  margin-left: 108pt;
+}
+
+.ProseMirror ol[type='decimal'][data-indent='10'] {
+  margin-left: 120pt;
+}
+
+.ProseMirror ul[data-indent='1'] {
+  margin-left: 12pt;
+}
+
+.ProseMirror ul[data-indent='2'] {
+  margin-left: 24pt;
+}
+
+.ProseMirror ul[data-indent='3'] {
+  margin-left: 36pt;
+}
+
+.ProseMirror ul[data-indent='4'] {
+  margin-left: 48pt;
+}
+
+.ProseMirror ul[data-indent='5'] {
+  margin-left: 60pt;
+}
+
+.ProseMirror ul[data-indent='6'] {
+  margin-left: 72pt;
+}
+
+.ProseMirror ul[data-indent='7'] {
+  margin-left: 84pt;
+}
+
+.ProseMirror ul[data-indent='8'] {
+  margin-left: 96pt;
+}
+
+.ProseMirror ul[data-indent='9'] {
+  margin-left: 108pt;
+}
+
+.ProseMirror ul[data-indent='10'] {
+  margin-left: 120pt;
+}
+
+/* list item xxx indents */
+
+.ProseMirror ol[type='x.x.x'][data-indent='0'],
+.ProseMirror ol[type='x.x.x'][data-indent='1'],
+.ProseMirror ol[type='x.x.x'][data-indent='2'],
+.ProseMirror ol[type='x.x.x'][data-indent='3'],
+.ProseMirror ol[type='x.x.x'][data-indent='4'],
+.ProseMirror ol[type='x.x.x'][data-indent='5'],
+.ProseMirror ol[type='x.x.x'][data-indent='6'],
+.ProseMirror ol[type='x.x.x'][data-indent='7'],
+.ProseMirror ol[type='x.x.x'][data-indent='8'] {
+  margin-left: 1pt;
+}
