@@ -260,7 +260,6 @@
     "tslib": "^2.4.0",
     "turndown": "^7.1.2",
     "twemoji": "^14.0.1",
-    "typescript": "^5.0.2",
     "undici": "^5.22.0",
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.6.0",
@@ -354,6 +353,7 @@
     "ts-jest": "^29.1.0",
     "tsc-alias": "^1.8.6",
     "tsx": "^3.12.6",
+    "typescript": "^5.2.2",
     "webpack": "^5.76.0"
   },
   "overrides": {
