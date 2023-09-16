@@ -33,23 +33,21 @@ test.describe.serial('Create a inline comment thread and check if the page actio
         id: generatedPage.id
       },
       data: {
-        content: [
-          {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Comment',
-                    marks: [{ type: 'inline-comment', attrs: { id: threadId, resolved: false } }]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Comment',
+                  marks: [{ type: 'inline-comment', attrs: { id: threadId, resolved: false } }]
+                }
+              ]
+            }
+          ]
+        }
       }
     });
 
