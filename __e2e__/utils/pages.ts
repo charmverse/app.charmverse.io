@@ -57,3 +57,16 @@ export function generatePage(
     }
   }) as Promise<PageWithPermissions>;
 }
+
+export function generatePageWithLinkedPage(
+  options: Partial<Page> &
+    Pick<Page, 'spaceId' | 'createdBy'> &
+    Partial<Omit<Page, 'content'>> & {
+      pagePermissions?: Prisma.PagePermissionCreateManyPageInput[];
+      linkedPageId: string;
+    }
+) {
+  const content = { type: 'doc', content: [{ type: 'page', attrs: { id: options.linkedPageId, track: [] } }] };
+
+  return generatePage({ ...options, content });
+}
