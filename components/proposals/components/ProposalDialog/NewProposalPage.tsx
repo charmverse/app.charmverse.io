@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
@@ -70,6 +71,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   );
 
   async function createProposal() {
+    log.info('[user-journey] Create a proposal');
     if (formInputs.categoryId && currentSpace) {
       // TODO: put validation inside the properties form component
       try {

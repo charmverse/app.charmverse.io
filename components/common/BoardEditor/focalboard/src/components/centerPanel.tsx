@@ -232,9 +232,6 @@ function CenterPanel(props: Props) {
 
     const card = createCard();
 
-    // eslint-disable-next-line no-console
-    console.log('addCard', 'BOARD', activeBoard, 'VIEW', activeView, 'CARD', card);
-
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
     card.parentId = activeBoard.id;

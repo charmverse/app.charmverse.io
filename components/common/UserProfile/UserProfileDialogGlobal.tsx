@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -30,6 +32,7 @@ export function UserProfileDialogGlobal() {
 
   // Show member profile for onboarding
   if (showOnboardingFlow) {
+    log.info('[user-journey] Show onboarding flow');
     return (
       <div data-test='member-onboarding-form'>
         <CurrentUserProfile key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />

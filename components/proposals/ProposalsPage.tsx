@@ -1,7 +1,7 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -79,6 +79,15 @@ export function ProposalsPage({ title }: { title: string }) {
   const onDelete = useCallback(async (proposalId: string) => {
     await charmClient.deletePage(proposalId);
   }, []);
+
+  useEffect(() => {
+    if (typeof router.query.id === 'string') {
+      showProposal({
+        pageId: router.query.id,
+        onClose
+      });
+    }
+  }, [router.query.id]);
 
   if (isLoadingAccess) {
     return null;

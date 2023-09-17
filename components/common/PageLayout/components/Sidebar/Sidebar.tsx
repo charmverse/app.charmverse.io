@@ -196,6 +196,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           />
           <SidebarLink
             active={false}
+            external
             href={charmverseDiscordInvite}
             icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
             label='Support & Feedback'

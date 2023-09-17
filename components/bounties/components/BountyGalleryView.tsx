@@ -1,9 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
-import { useOnBountyCardClose } from 'components/bounties/hooks/useOnBountyCardClose';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -17,10 +14,8 @@ interface Props {
 
 export function BountiesGalleryView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
-  const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
-  const { onClose } = useOnBountyCardClose();
 
   const filteredBounties = bounties
     .filter((bounty) => bounty.status === 'open')
@@ -36,17 +31,6 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
       query: { ...router.query, bountyId }
     });
   }
-
-  useEffect(() => {
-    if (typeof router.query.bountyId === 'string') {
-      showPage({
-        bountyId: router.query.bountyId,
-        readOnly: publicMode,
-        onClose
-      });
-    }
-  }, [router.query.bountyId]);
-
   return (
     <div data-test='all-bounties-layout' className='Gallery' style={{ overflow: 'visible' }}>
       {filteredBounties.map((bounty) => {

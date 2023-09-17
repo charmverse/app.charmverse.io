@@ -134,12 +134,18 @@ export function getNewUrl(params: Record<string, string | null>, currentUrl = wi
  *
  * To remove a param from the query, set it as null
  */
-export function setUrlWithoutRerender(pathname: string, params: Record<string, string | null>) {
-  const newUrl = getNewUrl(params);
+export function setUrlWithoutRerender(
+  pathname: string,
+  params: Record<string, string | null>,
+  relativePathToShow?: string
+) {
+  const origin = window.location.origin;
+
+  const newUrl = getNewUrl(params, relativePathToShow ? `${origin}${relativePathToShow}` : undefined);
   // get the path that Next.js uses internally
   const nextjsPath = `${pathname}${newUrl.search}`;
   // get the path that appears in the browsr
-  const displayPath = newUrl.toString().replace(window.location.origin, '');
+  const displayPath = newUrl.toString().replace(origin, '');
 
   const newState = {
     ...window.history.state,

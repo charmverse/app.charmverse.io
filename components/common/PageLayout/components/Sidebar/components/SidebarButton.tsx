@@ -70,6 +70,7 @@ export function SidebarLink({
   className?: string;
   section?: SpaceSettingsSection;
   children?: ReactNode;
+  external?: boolean;
 }) {
   return (
     <StyledSidebarLink {...props}>
