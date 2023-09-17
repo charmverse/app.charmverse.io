@@ -450,7 +450,7 @@ function CharmEditor({
             return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage currentPageId={pageId} {...props} />;
+            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
