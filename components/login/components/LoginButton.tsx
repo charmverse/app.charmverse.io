@@ -106,7 +106,7 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
 
 function LoginHandler(props: DialogProps) {
   const { redirectUrl, onClose, isOpen } = props;
-  const { loginFromWeb3Account } = useWeb3AuthSig();
+  const { loginFromWeb3Account, verifiableWalletDetected } = useWeb3AuthSig();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
   const router = useRouter();
@@ -122,7 +122,7 @@ function LoginHandler(props: DialogProps) {
 
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { loginWithGooglePopup } = useGoogleLogin();
-  const { verifiableWalletDetected } = useWeb3AuthSig();
+
   async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();

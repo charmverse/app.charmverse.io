@@ -56,6 +56,8 @@ export function useUnstoppableDomains() {
     loginSuccess: (loginInfo: AnyIdLogin<'UnstoppableDomain'>) => any;
     onError?: (err: DisabledAccountError) => void;
   }) {
+    setIsConnectingIdentity(true);
+
     if (isOnCustomDomain) {
       const popupLoginCallback = async (data: UdomainsPopupLoginState) => {
         if ('authSig' in data) {

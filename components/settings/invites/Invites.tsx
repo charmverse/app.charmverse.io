@@ -26,7 +26,7 @@ export function Invites({ space }: { space: Space }) {
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
   const isTokenGatePending = useRef(false);
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { connectWallet } = useContext(Web3Connection);
   const { account } = useWeb3AuthSig();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
   useTrackPageView({ type: 'settings/invites' });
@@ -41,7 +41,7 @@ export function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
     } else {
       isTokenGatePending.current = true;
-      openWalletSelectorModal();
+      connectWallet();
     }
   }
 

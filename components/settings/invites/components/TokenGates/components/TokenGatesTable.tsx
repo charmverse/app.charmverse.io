@@ -71,7 +71,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { connectWallet } = useContext(Web3Connection);
 
   function onCopy() {
     showMessage('Link copied to clipboard');
@@ -236,7 +236,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                             if (account) {
                               testConnect(tokenGate);
                             } else {
-                              openWalletSelectorModal();
+                              connectWallet();
                             }
                           }
                         }}
