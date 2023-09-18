@@ -63,6 +63,15 @@ export function linkedPagePlugins({
           tooltipDOMSpec
         }
       }),
+      // add temporary stub to support old mark name
+      suggestTooltip.plugins({
+        key: suggestTooltipKey,
+        markName: 'nestedPageSuggest',
+        tooltipRenderOpts: {
+          ...tooltipRenderOpts,
+          tooltipDOMSpec
+        }
+      }),
       NodeView.createPlugin({
         name: linkedPageNodeName,
         containerDOM: ['div', { class: 'linkedPage-container' }]
