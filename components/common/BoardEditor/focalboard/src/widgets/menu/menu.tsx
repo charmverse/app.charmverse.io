@@ -59,12 +59,6 @@ function Menu({ position = 'bottom-start', children, disablePortal = true }: Pro
       >
         <div className='menu-contents'>
           <div className='menu-options'>{children}</div>
-
-          <div className='menu-spacer hideOnWidescreen' />
-
-          <div className='menu-options hideOnWidescreen'>
-            <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
-          </div>
         </div>
       </div>
     </StyledPopper>
