@@ -103,7 +103,9 @@ const reduxStore = mockStateStore([], {
   },
   views: {
     current: undefined,
-    views: {},
+    views: {
+      [view.id]: view
+    },
     loadedBoardViews: {}
   },
   cards: {
