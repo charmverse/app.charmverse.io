@@ -43,7 +43,12 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
-export default function NestedPage({ node, currentPageId, getPos }: NodeViewProps & { currentPageId?: string }) {
+export default function NestedPage({
+  isLinkedPage,
+  node,
+  currentPageId,
+  getPos
+}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string }) {
   const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
@@ -51,7 +56,6 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
   const documentPage = pages[node.attrs.id];
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
-
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
 
   let pageTitle = '';
@@ -71,11 +75,11 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
-  const isLinkedPage = currentPageId ? parentPage?.id !== currentPageId : false;
+  const _isLinkedPage = isLinkedPage ?? (currentPageId ? parentPage?.id !== currentPageId : false);
 
   return (
     <NestedPageContainer
-      data-test={`nested-page-${pageId}`}
+      data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
       href={appPath ? `/${appPath}` : undefined}
       color='inherit'
       data-id={`page-${pageId}`}
@@ -89,7 +93,7 @@ export default function NestedPage({ node, currentPageId, getPos }: NodeViewProp
     >
       <div>
         <LinkIcon
-          isLinkedPage={isLinkedPage}
+          isLinkedPage={_isLinkedPage}
           documentPage={documentPage}
           staticPage={staticPage}
           isCategoryPage={!!forumCategoryPage}

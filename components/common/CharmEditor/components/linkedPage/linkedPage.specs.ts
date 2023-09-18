@@ -2,18 +2,19 @@ import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 
-import { nestedPageNodeName } from './nestedPage.constants';
-import { encloseNestedPage } from './nestedPage.utils';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { encloseNestedPage } from '../nestedPage/nestedPage.utils';
 
-export function nestedPageSpec(): RawSpecs {
+import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';
+
+export function linkedPageSpec(): RawSpecs {
   return [
     {
       type: 'node',
-      name: nestedPageNodeName,
+      name: linkedPageNodeName,
       schema: {
         inline: false,
         attrs: {
-          // This property is used to reference the page
           id: {
             default: null
           },
@@ -29,9 +30,9 @@ export function nestedPageSpec(): RawSpecs {
         },
         group: 'block',
         draggable: false,
-        parseDOM: [{ tag: 'div.charm-nested-page' }],
+        parseDOM: [{ tag: 'div.charm-linked-page' }],
         toDOM: (): DOMOutputSpec => {
-          return ['div', { class: 'charm-nested-page' }];
+          return ['div', { class: 'charm-linked-page' }];
         },
         atom: true
       },
@@ -45,6 +46,7 @@ export function nestedPageSpec(): RawSpecs {
           }
         }
       }
-    }
+    },
+    suggestTooltip.spec({ markName: linkedPageSuggestMarkName })
   ];
 }
