@@ -163,13 +163,24 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   if (pagePath && !page) {
+    const trimmedPath = pagePath.trim();
+
     page = await prisma.page.findFirst({
       where: {
         deletedAt: null,
         space: {
           domain: spaceDomain
         },
-        path: pagePath.trim()
+        OR: [
+          {
+            path: trimmedPath
+          },
+          {
+            additionalPaths: {
+              has: trimmedPath
+            }
+          }
+        ]
       }
     });
   }

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
@@ -36,7 +37,8 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 };
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
-  const { account, isConnectingIdentity, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
+  const { isConnectingIdentity } = useWeb3ConnectionManager();
+  const { account, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();

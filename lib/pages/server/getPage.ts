@@ -4,6 +4,8 @@ import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
+import { generatePageQuery } from './generatePageQuery';
+
 export async function getPage(
   pageIdOrPath: string,
   spaceId?: string,
@@ -16,14 +18,10 @@ export async function getPage(
     return null;
   }
 
-  const searchQuery: Prisma.PageWhereInput = isValidUUid
-    ? {
-        id: pageIdOrPath
-      }
-    : {
-        path: pageIdOrPath,
-        spaceId
-      };
+  const searchQuery: Prisma.PageWhereInput = generatePageQuery({
+    pageIdOrPath,
+    spaceIdOrDomain: spaceId
+  });
 
   return tx.page.findFirst({
     where: searchQuery,

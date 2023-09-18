@@ -657,7 +657,8 @@ export function createPage(
         : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
-      boardId: options.boardId ?? null
+      boardId: options.boardId ?? null,
+      additionalPaths: options.additionalPaths
     },
     include: {
       permissions: {

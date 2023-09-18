@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 
 import { PageNotFoundError } from './errors';
@@ -25,25 +26,19 @@ export async function updateDatabaseCardPage({
   updatedBy,
   update
 }: CardPageUpdate): Promise<PageFromBlock> {
-  if (!stringUtils.isUUID(spaceId)) {
-    throw new InvalidInputError(`Invalid space ID: ${spaceId}`);
-  } else if (!stringUtils.isUUID(updatedBy)) {
+  if (!stringUtils.isUUID(updatedBy)) {
     throw new InvalidInputError(`Invalid user ID: ${updatedBy}`);
-  } else if (!cardId || typeof cardId !== 'string') {
-    throw new InvalidInputError(`Please provide a valid card ID`);
   }
-
-  const cardIdIsUuid = stringUtils.isUUID(cardId);
 
   const cardPage = await prisma.page.findFirst({
     where: {
       type: 'card',
-      spaceId,
-      id: cardIdIsUuid ? cardId : undefined,
-      path: !cardIdIsUuid ? cardId : undefined
+      ...generatePageQuery({
+        pageIdOrPath: cardId,
+        spaceIdOrDomain: spaceId
+      })
     }
   });
-
   if (!cardPage) {
     throw new PageNotFoundError(cardId);
   }

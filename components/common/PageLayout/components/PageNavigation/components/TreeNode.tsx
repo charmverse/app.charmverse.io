@@ -129,6 +129,7 @@ function DraggableTreeNode({
     }),
     [onDropAdjacent]
   );
+
   const focusListener = useCallback(
     (elt: any) => {
       elt?.addEventListener('focusin', (e: any) => {
