@@ -1302,7 +1302,7 @@
                     }
                   },
                   {
-                    "type": "page",
+                    "type": "linkedPage",
                     "attrs": {
                       "id": "acb96359-1ca2-4bbb-8f78-17960fc43397",
                       "track": []

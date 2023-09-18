@@ -8,8 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import useGnosisSigner from 'hooks/useWeb3Signer';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
@@ -39,9 +38,8 @@ export function useMultiBountyPayment({
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
   const { refreshBounties } = useBounties();
-  const { account, chainId } = useWeb3AuthSig();
+  const { account, chainId, signer } = useWeb3Account();
   const [paymentMethods] = usePaymentMethods();
-  const signer = useGnosisSigner();
   const { data: gnosisSafes } = useSWR(
     signer && account && chainId ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

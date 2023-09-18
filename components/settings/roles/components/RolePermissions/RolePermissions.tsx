@@ -143,8 +143,8 @@ function reducerWithContext({ id }: { id: string }) {
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { categories: proposalCategories = [] } = useProposalCategories();
-  const { categories: forumCategories = [] } = useForumCategories();
+  const { categories: proposalCategories = [], isLoading: proposalCategoriesLoading } = useProposalCategories();
+  const { categories: forumCategories = [], isLoading: forumCategoriesLoading } = useForumCategories();
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
   // const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
@@ -158,8 +158,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   const currentSpaceId = space?.id;
 
+  const categoryIds = [...proposalCategories.map((c) => c.id), ...forumCategories.map((c) => c.id)];
+
   const { data: originalPermissions } = useSWR(
-    currentSpaceId ? `/proposals/list-permissions-${currentSpaceId}` : null,
+    currentSpaceId && !forumCategoriesLoading && !proposalCategoriesLoading
+      ? `/proposals/list-permissions-${currentSpaceId}-${categoryIds}`
+      : null,
     () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
 
@@ -190,12 +194,16 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         // @ts-ignore - add meta to track update
         updatedPermissions.roleIdToTrack = id;
       }
-      await charmClient.permissions.spaces.saveSpacePermissions(currentSpaceId, updatedPermissions);
-      callback();
-      setTouched(false);
-      // refresh all caches of permissions in case multiple rows are being updated
-      mutate(`/proposals/list-permissions-${currentSpaceId}`);
-      showMessage('Permissions updated');
+      try {
+        await charmClient.permissions.spaces.saveSpacePermissions(currentSpaceId, updatedPermissions);
+        callback();
+        setTouched(false);
+        // refresh all caches of permissions in case multiple rows are being updated
+        mutate(`/proposals/list-permissions-${currentSpaceId}`);
+        showMessage('Permissions updated');
+      } catch (error) {
+        showMessage('There was an error saving permissions', 'error');
+      }
     }
   }
 

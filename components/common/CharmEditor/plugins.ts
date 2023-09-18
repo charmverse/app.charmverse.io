@@ -26,10 +26,12 @@ import * as inlineComment from './components/inlineComment';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
+import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';
+import { linkedPagePlugins } from './components/linkedPage/linkedPage.plugins';
 import * as listItem from './components/listItem/listItem';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePluginKeyName, nestedPagePlugins } from './components/nestedPage';
+import { nestedPagePlugins } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
@@ -48,7 +50,7 @@ export const actionsPluginKey = new PluginKey('row-actions');
 export const emojiPluginKey = new PluginKey(emojiSuggestKeyName);
 export const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 export const floatingMenuPluginKey = new PluginKey('floatingMenu');
-export const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
+export const linkedPagePluginKey = new PluginKey(linkedPagePluginKeyName);
 export const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 export const linksPluginKey = new PluginKey('links');
 export const inlinePalettePluginKey = new PluginKey('inlinePalette');
@@ -161,9 +163,10 @@ export function charmEditorPlugins({
       pageId,
       spaceId
     }),
-    nestedPagePlugins({
-      key: nestedPagePluginKey
+    linkedPagePlugins({
+      key: linkedPagePluginKey
     }),
+    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     })

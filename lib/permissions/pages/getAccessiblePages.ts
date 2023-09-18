@@ -45,6 +45,7 @@ export async function getAccessiblePages(input: PagesRequest): Promise<PageMeta[
       headerImage: true,
       icon: true,
       path: true,
+      additionalPaths: true,
       parentId: true,
       spaceId: true,
       type: true,

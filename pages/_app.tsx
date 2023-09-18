@@ -1,10 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -16,6 +13,8 @@ import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
+import type { OpenGraphProps } from 'components/_app/OpenGraphData';
+import { OpenGraphData } from 'components/_app/OpenGraphData';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -44,7 +43,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
-import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
@@ -121,10 +120,14 @@ import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
+import { WagmiProvider } from '../components/_app/WagmiProvider';
 
-const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
+};
+
+export type GlobalPageProps = {
+  openGraphData: OpenGraphProps;
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -183,7 +186,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                   <FocalBoardProvider>
                     <NotionProvider>
                       <IntlProvider>
-                        <PageHead />
+                        <PageHead {...pageProps} />
 
                         <RouteGuard>
                           <ErrorBoundary>
@@ -229,7 +232,7 @@ function DataProviders({ children }: { children: ReactNode }) {
     >
       <UserProvider>
         <DiscordProvider>
-          <Web3ReactProvider getLibrary={getLibrary}>
+          <WagmiProvider>
             <Web3ConnectionManager>
               <WalletSelectorModal />
               <Web3AccountProvider>
@@ -258,14 +261,14 @@ function DataProviders({ children }: { children: ReactNode }) {
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
-          </Web3ReactProvider>
+          </WagmiProvider>
         </DiscordProvider>
       </UserProvider>
     </SWRConfig>
   );
 }
 
-function PageHead() {
+function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -276,6 +279,8 @@ function PageHead() {
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
       <meta name='google-site-verification' content='AhWgWbPVQIsHKmPNTkUSI-hN38XbkpCIrt40-4IgaiM' />
+
+      <OpenGraphData {...openGraphData} />
     </Head>
   );
 }

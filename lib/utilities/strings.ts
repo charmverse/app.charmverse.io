@@ -74,7 +74,17 @@ export function stringToHue(name: string) {
 
 // A future update can use https://www.npmjs.com/package/friendly-url
 // Info for japanese title characters: https://gist.github.com/ryanmcgrath/982242
-export function stringToValidPath(input: string, maxLength?: number): string {
+export function stringToValidPath({
+  input,
+  maxLength,
+  wordSeparator = '_',
+  autoReplaceEmpty = true
+}: {
+  input: string;
+  maxLength?: number;
+  wordSeparator?: string;
+  autoReplaceEmpty?: boolean;
+}): string {
   const sanitizedInput = input
     .slice(0, maxLength)
     .toLowerCase()
@@ -84,10 +94,10 @@ export function stringToValidPath(input: string, maxLength?: number): string {
       ' '
     )
     .trim()
-    .replace(/\s{1,}/g, '_');
+    .replace(/\s{1,}/g, wordSeparator);
 
-  if (sanitizedInput.length < 3) {
-    return `${sanitizedInput}_${uid()}`;
+  if (sanitizedInput.length < 3 && autoReplaceEmpty) {
+    return `${sanitizedInput}${wordSeparator}${uid()}`;
   } else {
     return sanitizedInput;
   }

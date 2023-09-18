@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { Web3Provider } from '@ethersproject/providers';
 import type {
   CreateCommentTypedDataFragment,
   CreateDataAvailabilityPublicationResultFragment,
@@ -16,7 +15,8 @@ import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createCommentPublication } from 'lib/lens/createCommentPublication';
 import { createPostPublication } from 'lib/lens/createPostPublication';
@@ -47,12 +47,13 @@ export function useLensPublication({
   proposalPath: string;
   proposalTitle: string;
 }) {
-  const { account, library, chainId } = useWeb3AuthSig();
+  const { account, chainId } = useWeb3Account();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
   const { updateComment } = usePageComments(proposalId);
+  const { signer } = useWeb3Signer();
 
   async function createPublication(
     params: { content: PageContent } & (
@@ -68,7 +69,7 @@ export function useLensPublication({
   ) {
     const { publicationType, content } = params;
 
-    if (!space || !account || !lensProfile) {
+    if (!space || !account || !lensProfile || !signer) {
       return null;
     }
 
@@ -134,10 +135,7 @@ export function useLensPublication({
           | CreatePostTypedDataFragment
           | CreateCommentTypedDataFragment;
         const { id, typedData } = publicationTypedDataFragment;
-        const web3Provider: Web3Provider = library;
-        const signature = await web3Provider
-          .getSigner(account)
-          ._signTypedData(typedData.domain, typedData.types, typedData.value);
+        const signature = await signer?._signTypedData(typedData.domain, typedData.types, typedData.value);
         broadcastResponse = await lensClient.transaction.broadcastDataAvailability({
           id,
           signature

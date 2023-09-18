@@ -11,7 +11,7 @@ import { WalletSign } from 'components/login/components/WalletSign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export function BountySignupButton({ pagePath }: Props) {
-  const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3AuthSig();
+  const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3Account();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const { space } = useCurrentSpace();
   const { data: spaceWithGates } = useSWRImmutable(space ? `spaceByDomain/${space.domain}` : null, () =>
