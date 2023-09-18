@@ -30,12 +30,20 @@ export function BlocksExplanation() {
     <Stack gap={2}>
       <Box>
         <Typography variant='body2'>
-          30 day Community Edition free trial. Upgrade anytime for
+          Free and forever access to CharmVerse Community Edition for usage under 30,000 blocks.
           <ol>
             <li>Private content with role-based access control.</li>
             <li>Custom domain - bring your URL to this CharmVerse space.</li>
             <li>API access.</li>
           </ol>
+        </Typography>
+      </Box>
+      <Box>
+        <Typography variant='body2'>
+          Need more blocks? See{' '}
+          <Link href='https://www.charmverse.io/pricing' external target='_blank'>
+            pricing details
+          </Link>
         </Typography>
       </Box>
       <Box>

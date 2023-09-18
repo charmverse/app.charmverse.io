@@ -59,19 +59,6 @@ export function BlockCounts() {
           sx={{ ml: 1, cursor: 'pointer' }}
         />
       </Typography>
-      {spaceSubscription?.status === 'free_trial' && spaceSubscription.expiresOn && (
-        <Typography
-          variant='caption'
-          color='secondary'
-          sx={{
-            display: 'inline-flex',
-            width: '100%',
-            whiteSpace: 'break-spaces'
-          }}
-        >
-          Free trial: Community Edition - {getTimeDifference(new Date(spaceSubscription.expiresOn), 'day')} days left
-        </Typography>
-      )}
 
       <BlocksExplanationModal open={isExplanationModalOpen} onClose={closeExplanationModal} />
     </Box>
