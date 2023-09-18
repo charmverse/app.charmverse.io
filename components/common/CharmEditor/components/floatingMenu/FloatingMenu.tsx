@@ -35,7 +35,7 @@ type MenuProps = {
   pluginKey: PluginKey;
   inline?: boolean;
   pagePermissions?: PagePermissionFlags;
-  nestedPagePluginKey?: PluginKey<any>;
+  linkedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
   palettePluginKey?: PluginKey;
   pageId?: string;
@@ -54,7 +54,7 @@ function MenuByType(props: MenuProps) {
     inline,
     pagePermissions,
     enableComments,
-    nestedPagePluginKey,
+    linkedPagePluginKey,
     disableNestedPage,
     pageId
   } = props;
@@ -76,7 +76,7 @@ function MenuByType(props: MenuProps) {
           <MenuGroup>
             <InlinePalletteFloatingMenu
               palettePluginKey={palettePluginKey}
-              nestedPagePluginKey={nestedPagePluginKey}
+              linkedPagePluginKey={linkedPagePluginKey}
               pageId={pageId}
               pluginKey={pluginKey}
               disableNestedPage={disableNestedPage}

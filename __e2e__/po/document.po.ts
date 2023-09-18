@@ -50,4 +50,10 @@ export class DocumentPage extends GlobalPage {
     const isEditable = await this.charmEditor.getAttribute('contenteditable');
     return isEditable === 'true';
   }
+
+  async typeText(text: string) {
+    const charmEditorSelector = '.ProseMirror.bangle-editor';
+    await this.page.click(charmEditorSelector);
+    await this.page.type(charmEditorSelector, text);
+  }
 }

@@ -59,7 +59,7 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
           extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
           attrs.pollId = newPollId;
         }
-      } else if (node.type === 'page') {
+      } else if (node.type === 'page' || node.type === 'linkedPage') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
         let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;

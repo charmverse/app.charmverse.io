@@ -81,6 +81,8 @@ import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
 import { handlers } from './lib/mockApi';
+import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
+import { publicProvider } from 'wagmi/providers/public';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
 initialize({
@@ -138,13 +140,21 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
+const { publicClient } = configureChains([mainnet], [publicProvider()]);
+export const wagmiConfig = createConfig({
+  publicClient
+});
+
+
 export const globalProviders = (Story, context) => {
   return (
-    <IntlProvider locale='en'>
-      <ReactDndProvider>
-        <Story />
-      </ReactDndProvider>
-    </IntlProvider>
+    <WagmiConfig config={wagmiConfig}>
+      <IntlProvider locale='en'>
+        <ReactDndProvider>
+          <Story />
+        </ReactDndProvider>
+      </IntlProvider>
+    </WagmiConfig>
   );
 };
 

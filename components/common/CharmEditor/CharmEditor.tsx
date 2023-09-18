@@ -43,8 +43,9 @@ import { InlineCommentThread } from './components/inlineComment/components/Inlin
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
+import LinkedPagesList from './components/linkedPage/components/LinkedPagesList';
 import Mention, { MentionSuggest } from './components/mention';
-import NestedPage, { NestedPagesList } from './components/nestedPage';
+import NestedPage from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import { PollNodeView } from './components/poll/PollComponent';
@@ -61,7 +62,7 @@ import {
   suggestionsPluginKey,
   inlinePalettePluginKey,
   floatingMenuPluginKey,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   mentionPluginKey,
   emojiPluginKey,
   actionsPluginKey,
@@ -448,6 +449,9 @@ function CharmEditor({
           case 'page': {
             return <NestedPage currentPageId={pageId} {...props} />;
           }
+          case 'linkedPage': {
+            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
+          }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
           }
@@ -488,16 +492,16 @@ function CharmEditor({
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
-        nestedPagePluginKey={nestedPagePluginKey}
+        linkedPagePluginKey={linkedPagePluginKey}
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
       {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <NestedPagesList pluginKey={nestedPagePluginKey} />
+      <LinkedPagesList pluginKey={linkedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
-        nestedPagePluginKey={nestedPagePluginKey}
+        linkedPagePluginKey={linkedPagePluginKey}
         disableNestedPage={disableNestedPage}
         palettePluginKey={inlinePalettePluginKey}
         enableVoting={enableVoting}

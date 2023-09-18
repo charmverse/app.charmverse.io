@@ -14,7 +14,7 @@ import { sleep } from 'lib/utilities/sleep';
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account, library } = useWeb3AuthSig();
+  const { account, provider } = useWeb3AuthSig();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
 
@@ -44,7 +44,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   const remainingTime = relativeTime(proposalEndDate);
 
   const castSnapshotVote: CastVote = async (choice: VoteChoice) => {
-    if (!snapshotProposal || !snapshotSpaceDomain || !account || !library) {
+    if (!snapshotProposal || !snapshotSpaceDomain || !account || !provider) {
       return;
     }
 
@@ -58,7 +58,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
       app: 'my-app'
     };
 
-    await client.vote(library, utils.getAddress(account as string), vote);
+    await client.vote(provider, utils.getAddress(account as string), vote);
     // we need this delay for vote to be propagated to the graph
     await sleep(5000);
     // workaround - fetch one more time with delay, sometimes it takes more time to get updated value
