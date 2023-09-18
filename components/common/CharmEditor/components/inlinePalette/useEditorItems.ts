@@ -20,14 +20,14 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 
 export function useEditorItems({
   disableNestedPage,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   enableVoting,
   pageId
 }: {
   disableNestedPage: boolean;
   // Defaults to true
   enableVoting?: boolean;
-  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   pageId?: string;
 }) {
   const { addNestedPage } = useNestedPage(pageId);
@@ -41,7 +41,7 @@ export function useEditorItems({
 
   const paletteItems = useMemo(() => {
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
-      ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
+      ['text', textItems({ addNestedPage, disableNestedPage, linkedPagePluginKey, userSpacePermissions, pageType })],
       [
         'database',
         user && space && !disableNestedPage && pageId

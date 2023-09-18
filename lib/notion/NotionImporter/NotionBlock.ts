@@ -501,7 +501,7 @@ export class NotionBlock {
             : null;
         if (linkedPageId === this.charmversePage.notionPageId) {
           return {
-            type: 'page',
+            type: 'linkedPage',
             attrs: {
               id: this.charmversePage.charmversePageId
             }
@@ -512,12 +512,17 @@ export class NotionBlock {
           const charmversePage = await this.notionPage.fetchAndCreatePage({
             notionPageId: linkedPageId
           });
-          return {
-            type: 'page',
-            attrs: {
-              id: charmversePage?.id
-            }
-          };
+          if (charmversePage) {
+            return {
+              type: 'linkedPage',
+              attrs: {
+                id: charmversePage.id,
+                type: charmversePage.type,
+                path: charmversePage.path
+              }
+            };
+          }
+          return null;
         }
         return null;
       }

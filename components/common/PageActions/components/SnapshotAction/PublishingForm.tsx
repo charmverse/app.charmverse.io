@@ -23,7 +23,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
@@ -50,7 +50,7 @@ const MIN_VOTING_OPTIONS = 2;
  * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
  */
 export function PublishingForm({ onSubmit, pageId }: Props) {
-  const { account, library } = useWeb3AuthSig();
+  const { account, provider: web3Provider } = useWeb3Account();
 
   const { space } = useCurrentSpace();
   const { members } = useMembers();
@@ -210,7 +210,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
         generatorOptions: { members }
       });
 
-      if (!account) {
+      if (!account || !web3Provider) {
         throw new SystemError({
           errorType: 'External service',
           severity: 'warning',
@@ -251,7 +251,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
       }
 
       const receipt: SnapshotReceipt = (await client.proposal(
-        library,
+        web3Provider,
         utils.getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;

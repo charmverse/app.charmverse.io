@@ -1,20 +1,22 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
+import type { Web3Provider } from '@ethersproject/providers';
 import { verifyMessage } from '@ethersproject/wallet';
-import { useWeb3React } from '@web3-react/core';
 import type { Signer } from 'ethers';
-import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
+import { getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { useAccount, useNetwork, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
+import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
-import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
+import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
@@ -25,61 +27,47 @@ type IContext = {
   // Web3 account belonging to the current logged in user
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
-  library: any;
   chainId: any;
   sign: () => Promise<AuthSig>;
-  triedEager: boolean;
   getStoredSignature: (account: string) => AuthSig | null;
   logoutWallet: () => void;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
-  // Which tool is providing the web3 connection ie. Metamask∂, WalletConnect, etc.
-  connector: any;
   // A wallet is currently connected and can be used to generate signatures. This is different from a user being connected
   verifiableWalletDetected: boolean;
-  // Trigger workflow to connect a new wallet. In future, this can be used to support a situation where a browser has multiple wallets installed
-  connectWallet: () => void;
-  connectWalletModalIsOpen: boolean;
   isSigning: boolean;
-  isConnectingIdentity: boolean;
-  closeWalletSelector: () => void;
   resetSigning: () => void;
   loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
   setAccountUpdatePaused: (paused: boolean) => void;
+  signer: Signer | undefined;
+  provider: Web3Provider | undefined;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSig),
-  triedEager: false,
   getStoredSignature: () => null,
   logoutWallet: () => null,
   disconnectWallet: async () => {},
-  library: null,
   chainId: null,
-  connector: null,
   verifiableWalletDetected: false,
-  connectWallet: () => null,
-  connectWalletModalIsOpen: false,
   isSigning: false,
-  isConnectingIdentity: false,
-  closeWalletSelector: () => null,
   resetSigning: () => null,
   loginFromWeb3Account: () => Promise.resolve(null as any),
-  setAccountUpdatePaused: () => null
+  setAccountUpdatePaused: () => null,
+  signer: undefined,
+  provider: undefined
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
-  const { account, library, chainId, connector } = useWeb3React();
+  // const { account, library, chainId, connector } = useWeb3React();
+  const { address: account, connector: activeConnector } = useAccount();
+  const { chain } = useNetwork();
+  const chainId = chain?.id;
+  const { signMessageAsync } = useSignMessage();
 
-  const {
-    triedEager,
-    openWalletSelectorModal,
-    closeWalletSelectorModal,
-    isWalletSelectorModalOpen,
-    isConnectingIdentity
-  } = useWeb3ConnectionManager();
+  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account && !isConnectingIdentity;
 
@@ -92,50 +80,103 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
+  const { signer, provider } = useWeb3Signer();
 
-  async function loginFromWeb3Account(authSig?: AuthSig) {
-    if (!account) {
-      throw new Error('No wallet address connected');
-    }
-    if (!verifiableWalletDetected && !authSig) {
+  const setSignature = useCallback(
+    (_account: string, signature: AuthSig | null, writeToLocalStorage?: boolean) => {
+      if (writeToLocalStorage) {
+        window.localStorage.setItem(getStorageKey(_account), JSON.stringify(signature));
+      }
+
+      // Ensures Lit signature is always in sync
+      setLitAuthSignature(signature);
+      setLitProvider('metamask');
+      setWalletAuthSignature(signature);
+    },
+    [setLitAuthSignature, setLitProvider]
+  );
+
+  const sign = useCallback(async (): Promise<AuthSig> => {
+    if (!account || !chainId) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? (account ? getStoredSignature(account) : null);
-
-    if (!signature) {
-      signature = await sign();
-    }
+    setIsSigning(true);
 
     try {
-      // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
+      const preparedMessage = {
+        domain: window.location.host,
+        address: getAddress(account), // convert to EIP-55 format or else SIWE complains
+        uri: globalThis.location.origin,
+        version: '1',
+        chainId
+      };
 
-      setSignature(account, signature, true);
-      setUser(refreshedProfile);
+      const message = new SiweMessage(preparedMessage);
+      const body = message.prepareMessage();
 
-      return refreshedProfile;
-    } catch (err) {
-      if ((err as SystemError)?.errorType === 'Disabled account') {
-        throw err;
+      const newSignature = await signMessageAsync({
+        message: body
+      });
+      const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
+
+      if (!lowerCaseEqual(signatureAddress, account)) {
+        throw new Error('Signature address does not match account');
       }
 
-      const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
-      setSignature(account, signature, true);
-      setUser(newProfile);
-      return newProfile;
-    }
-  }
-  function setSignature(_account: string, signature: AuthSig | null, writeToLocalStorage?: boolean) {
-    if (writeToLocalStorage) {
-      window.localStorage.setItem(getStorageKey(_account), JSON.stringify(signature));
-    }
+      const generated: AuthSig = {
+        sig: newSignature,
+        derivedVia: 'charmverse.sign',
+        signedMessage: body,
+        address: signatureAddress
+      };
 
-    // Ensures Lit signature is always in sync
-    setLitAuthSignature(signature);
-    setLitProvider('metamask');
-    setWalletAuthSignature(signature);
-  }
+      setSignature(account, generated, true);
+      setIsSigning(false);
+
+      return generated;
+    } catch (err) {
+      setIsSigning(false);
+      throw err;
+    }
+  }, [account, chainId, setSignature, signMessageAsync]);
+
+  const loginFromWeb3Account = useCallback(
+    async (authSig?: AuthSig) => {
+      if (!account) {
+        throw new Error('No wallet address connected');
+      }
+      if (!verifiableWalletDetected && !authSig) {
+        throw new MissingWeb3AccountError();
+      }
+
+      let signature = authSig ?? (account ? getStoredSignature(account) : null);
+
+      if (!signature) {
+        signature = await sign();
+      }
+
+      try {
+        // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
+        const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
+
+        setSignature(account, signature, true);
+        setUser(refreshedProfile);
+
+        return refreshedProfile;
+      } catch (err) {
+        if ((err as SystemError)?.errorType === 'Disabled account') {
+          throw err;
+        }
+
+        const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
+        setSignature(account, signature, true);
+        setUser(newProfile);
+        return newProfile;
+      }
+    },
+    [account, setSignature, setUser, sign, verifiableWalletDetected]
+  );
 
   // Only expose account if current user and account match up
   useEffect(() => {
@@ -177,61 +218,17 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         logoutUser();
       }
     }
-  }, [account, !!user, isConnectingIdentity, accountUpdatePaused]);
+  }, [
+    account,
+    isConnectingIdentity,
+    accountUpdatePaused,
+    user,
+    storedAccount,
+    setSignature,
+    loginFromWeb3Account,
+    logoutUser
+  ]);
 
-  async function sign(): Promise<AuthSig> {
-    if (!account) {
-      throw new MissingWeb3AccountError();
-    }
-
-    const signer = library.getSigner(account) as Signer;
-
-    if (!signer) {
-      throw new ExternalServiceError('Missing signer');
-    }
-
-    setIsSigning(true);
-
-    try {
-      const signerChainId = await signer.getChainId();
-
-      const preparedMessage = {
-        domain: window.location.host,
-        address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-        uri: globalThis.location.origin,
-        version: '1',
-        chainId: signerChainId
-      };
-
-      const message = new SiweMessage(preparedMessage);
-
-      const body = message.prepareMessage();
-
-      const messageBytes = toUtf8Bytes(body);
-
-      const newSignature = await signer.signMessage(messageBytes);
-      const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
-
-      if (!lowerCaseEqual(signatureAddress, account)) {
-        throw new Error('Signature address does not match account');
-      }
-
-      const generated: AuthSig = {
-        sig: newSignature,
-        derivedVia: 'charmverse.sign',
-        signedMessage: body,
-        address: signatureAddress
-      };
-
-      setSignature(account, generated, true);
-      setIsSigning(false);
-
-      return generated;
-    } catch (err) {
-      setIsSigning(false);
-      throw err;
-    }
-  }
   const logoutWallet = useCallback(() => {
     if (account) {
       window.localStorage.removeItem(getStorageKey(account));
@@ -251,7 +248,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         setLitProvider(null);
         setStoredAccount(null);
         setUser(updatedUser);
-        connector?.deactivate();
+        activeConnector?.disconnect();
         await mutate(`/nfts/${updatedUser?.id}`);
         await mutate(`/orgs/${updatedUser?.id}`);
         await mutate(`/poaps/${updatedUser?.id}`);
@@ -259,48 +256,44 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     }
   );
 
-  async function disconnectWallet(address: UserWallet['address']) {
-    await triggerDisconnectWallet(address);
-  }
-
-  function connectWallet() {
-    openWalletSelectorModal();
-  }
+  const disconnectWallet = useCallback(
+    async (address: string) => {
+      await triggerDisconnectWallet(address);
+    },
+    [triggerDisconnectWallet]
+  );
 
   const value = useMemo<IContext>(
     () => ({
       account: storedAccount,
       walletAuthSignature,
-      triedEager,
       sign,
       getStoredSignature,
       disconnectWallet,
       logoutWallet,
-      library,
       chainId,
-      connector,
       verifiableWalletDetected,
-      connectWallet,
-      connectWalletModalIsOpen: isWalletSelectorModalOpen,
       isSigning: isSigning || isDisconnectingWallet,
-      isConnectingIdentity,
-      closeWalletSelector: closeWalletSelectorModal,
       resetSigning: () => setIsSigning(false),
       loginFromWeb3Account,
-      setAccountUpdatePaused
+      setAccountUpdatePaused,
+      signer,
+      provider
     }),
     [
-      account,
-      walletAuthSignature,
-      triedEager,
-      storedAccount,
-      connector,
-      isWalletSelectorModalOpen,
-      isSigning,
       chainId,
-      library,
-      isConnectingIdentity,
-      setAccountUpdatePaused
+      walletAuthSignature,
+      storedAccount,
+      isSigning,
+      setAccountUpdatePaused,
+      disconnectWallet,
+      isDisconnectingWallet,
+      loginFromWeb3Account,
+      logoutWallet,
+      sign,
+      verifiableWalletDetected,
+      signer,
+      provider
     ]
   );
 
@@ -338,4 +331,4 @@ function getStoredSignature(_account: string) {
   }
 }
 
-export const useWeb3AuthSig = () => useContext(Web3Context);
+export const useWeb3Account = () => useContext(Web3Context);

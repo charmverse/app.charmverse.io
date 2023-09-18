@@ -12,7 +12,7 @@ import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalet
 type Props = {
   pluginKey: PluginKey;
   palettePluginKey: PluginKey;
-  nestedPagePluginKey?: PluginKey;
+  linkedPagePluginKey?: PluginKey;
   disableNestedPage?: boolean;
   pageId?: string;
 };
@@ -20,7 +20,7 @@ type Props = {
 export function InlinePalletteFloatingMenu({
   pluginKey,
   palettePluginKey,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   disableNestedPage,
   pageId
 }: Props) {
@@ -42,7 +42,7 @@ export function InlinePalletteFloatingMenu({
       <InlineCommandPalette
         palettePluginKey={palettePluginKey}
         menuKey={pluginKey}
-        nestedPagePluginKey={nestedPagePluginKey}
+        linkedPagePluginKey={linkedPagePluginKey}
         disableNestedPage={disableNestedPage}
         externalPopupState={popupState}
         filterItem={(item) => !!item.showInFloatingMenu}

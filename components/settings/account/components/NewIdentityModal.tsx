@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
@@ -14,7 +15,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -36,7 +37,8 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 };
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
-  const { account, isConnectingIdentity, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
+  const { isConnectingIdentity } = useWeb3ConnectionManager();
+  const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();

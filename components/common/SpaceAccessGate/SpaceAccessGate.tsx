@@ -6,7 +6,7 @@ import { WalletSign } from 'components/login/components/WalletSign';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
@@ -31,7 +31,7 @@ export function SpaceAccessGate({
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
-  const { account, loginFromWeb3Account } = useWeb3AuthSig();
+  const { account, loginFromWeb3Account } = useWeb3Account();
 
   const discordGate = useDiscordGate({
     joinType,

@@ -5,7 +5,7 @@ import type { Blockchain } from 'connectors';
 import { RPC } from 'connectors';
 
 import { Button } from 'components/common/Button';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { greyColor2 } from 'theme/colors';
 
 type Props = {
@@ -19,7 +19,7 @@ const ImageIcon = styled.img`
 `;
 
 function NetworkButton({ chain, requestNetworkChange }: Props) {
-  const { chainId } = useWeb3AuthSig();
+  const { chainId } = useWeb3Account();
 
   const isCurrentChain = RPC[chain].chainId === chainId;
 

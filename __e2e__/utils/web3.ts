@@ -96,6 +96,8 @@ export async function mockWeb3<T extends MockContext>({
             ? `
           // mock wallet signature
           window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.address}', '${walletSig}');
+          // store wallet address to be used for connector mock
+          window.localStorage.setItem('charm.v1.testWalletAddress', '${context.address}');
         `
             : ''
         }

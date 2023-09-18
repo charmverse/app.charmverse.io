@@ -11,7 +11,6 @@ import {
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { Fragment } from 'prosemirror-model';
 import { TextSelection } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
@@ -22,6 +21,8 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utilities/browser';
+
+import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
 import { getNodeForRowPosition, type PluginState } from './rowActions';
 
@@ -73,20 +74,21 @@ function Component({ menuState }: { menuState: PluginState }) {
 
   async function duplicateRow() {
     const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
+    const nodeTypeName = node?.node.type.name;
     const tr = view.state.tr;
-    if (node?.node.type.name === 'page') {
-      if (currentSpace && node.node.attrs.id) {
+    if (nodeTypeName === 'page') {
+      if (currentSpace && node?.node.attrs.id) {
         const { rootPageId } = await charmClient.pages.duplicatePage({
-          pageId: node?.node.attrs.id
+          pageId: node.node.attrs.id
         });
-        const newNode = view.state.schema.nodes.page.create({
+        const newNode = view.state.schema.nodes[nestedPageNodeName].create({
           id: rootPageId
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
       }
-    } else if (node?.node.type.name === 'inlineDatabase') {
-      if (currentSpace && node.node.attrs.pageId) {
+    } else if (nodeTypeName === 'inlineDatabase') {
+      if (currentSpace && node?.node.attrs.pageId) {
         const { rootPageId: newPageId } = await charmClient.pages.duplicatePage({
           pageId: node.node.attrs.pageId
         });
@@ -98,7 +100,7 @@ function Component({ menuState }: { menuState: PluginState }) {
       }
     } else if (node) {
       const copy = node.node.copy(node.node.content);
-      const newTr = safeInsert(copy, node?.node.type.name === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
+      const newTr = safeInsert(copy, nodeTypeName === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
     }
     popupState.close();
