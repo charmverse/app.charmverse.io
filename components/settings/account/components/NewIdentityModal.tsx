@@ -15,7 +15,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -38,7 +38,7 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { account, isSigning, setAccountUpdatePaused } = useWeb3AuthSig();
+  const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();

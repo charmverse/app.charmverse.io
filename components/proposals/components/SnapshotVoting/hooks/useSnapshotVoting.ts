@@ -2,7 +2,7 @@ import { utils } from 'ethers';
 import useSWR from 'swr';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from 'lib/snapshot/getVotes';
@@ -14,7 +14,7 @@ import { sleep } from 'lib/utilities/sleep';
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account, provider } = useWeb3AuthSig();
+  const { account, provider } = useWeb3Account();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
 

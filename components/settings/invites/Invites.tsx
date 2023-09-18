@@ -9,7 +9,7 @@ import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import Legend from '../Legend';
 
@@ -27,7 +27,7 @@ export function Invites({ space }: { space: Space }) {
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
   const isTokenGatePending = useRef(false);
   const { connectWallet } = useContext(Web3Connection);
-  const { account } = useWeb3AuthSig();
+  const { account } = useWeb3Account();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
   useTrackPageView({ type: 'settings/invites' });
 

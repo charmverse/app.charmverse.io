@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getTransaction } from 'lib/gnosis/mantleClient';
 
 const GNOSIS_TX_BASE_URL = 'https://app.safe.global/transactions/queue?safe=';
@@ -15,7 +15,7 @@ const MANTLE_TX_BASE_URL = 'https://multisig.mantle.xyz/transactions/queue?safe=
 export function useGnosisTransaction({ tx }: { tx?: Transaction }) {
   const network = tx?.chainId ? getChainById(Number(tx.chainId)) : null;
   const safeTxHash = tx?.safeTxHash || tx?.transactionId;
-  const { provider } = useWeb3AuthSig();
+  const { provider } = useWeb3Account();
   const ethAdapter = useMemo(() => {
     if (!provider) return null;
 

@@ -16,7 +16,7 @@ import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -84,7 +84,7 @@ export function BountyPaymentButton({
   onError = () => {}
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
-  const { account, chainId, signer } = useWeb3AuthSig();
+  const { account, chainId, signer } = useWeb3Account();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {

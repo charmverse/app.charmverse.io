@@ -15,7 +15,7 @@ import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { createCommentPublication } from 'lib/lens/createCommentPublication';
@@ -47,7 +47,7 @@ export function useLensPublication({
   proposalPath: string;
   proposalTitle: string;
 }) {
-  const { account, chainId } = useWeb3AuthSig();
+  const { account, chainId } = useWeb3Account();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();

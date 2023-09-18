@@ -331,4 +331,4 @@ function getStoredSignature(_account: string) {
   }
 }
 
-export const useWeb3AuthSig = () => useContext(Web3Context);
+export const useWeb3Account = () => useContext(Web3Context);
