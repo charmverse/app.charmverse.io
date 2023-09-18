@@ -5,7 +5,7 @@ import { isProdEnv } from 'config/constants';
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
 // Equivalent to 30k
-export const defaultFreeTrialBlockQuota = 30;
+export const defaultFreeBlockQuota = 30;
 
 export const communityProduct = {
   id: 'community',
@@ -65,8 +65,9 @@ export const SubscriptionStatus = {
   pending: 'pending',
   cancelled: 'cancelled',
   cancel_at_end: 'cancel_at_end',
-  free_trial: 'free_trial',
   unpaid: 'unpaid'
 };
 
 export type SubscriptionStatusType = keyof typeof SubscriptionStatus;
+
+export const DeprecatedFreeTrial = 'deprecated_free_trial';

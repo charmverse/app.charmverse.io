@@ -10,7 +10,6 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
-import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
 import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
@@ -125,8 +124,7 @@ function PageLayout({ children }: PageLayoutProps) {
   });
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const { spaceSubscription } = useSpaceSubscription();
-  const { blockCount } = useBlockCount();
+  const { spaceBlockQuota, hasPassedBlockQuota } = useSpaceSubscription();
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
   const { accessChecked, publicPage } = useSharedPage();
@@ -163,9 +161,7 @@ function PageLayout({ children }: PageLayoutProps) {
     [handleDrawerClose, !!user, isMobile]
   );
 
-  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
-  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
-  const showUpgradeBanner = spaceSubscription && !!user && passedBlockQuota && space?.paidTier !== 'enterprise';
+  const showUpgradeBanner = !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
 
   if (!accessChecked) {
     return (
@@ -200,7 +196,7 @@ function PageLayout({ children }: PageLayoutProps) {
                       <AnnouncementBanner hideClose={true} errorBackground>
                         <Typography>
                           This space has passed the block limit of{' '}
-                          <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
+                          <Typography component='span'>{spaceBlockQuota.toLocaleString()}</Typography>
                         </Typography>
                       </AnnouncementBanner>
                     )}

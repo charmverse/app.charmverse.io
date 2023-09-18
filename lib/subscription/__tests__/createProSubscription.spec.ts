@@ -256,8 +256,7 @@ describe('createProSubscription', () => {
         period: 'monthly',
         spaceId: space.id,
         blockQuota: 10,
-        billingEmail: 'test@gmail.com',
-        freeTrial: true
+        billingEmail: 'test@gmail.com'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
