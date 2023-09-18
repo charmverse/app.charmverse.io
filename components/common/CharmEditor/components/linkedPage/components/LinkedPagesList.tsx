@@ -6,20 +6,20 @@ import { useCallback, memo, useEffect, useMemo } from 'react';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
-import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
+import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import type { AllPagesProp } from '../../PageList';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import type { NestedPagePluginState } from '../nestedPage.interfaces';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
-function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
+function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const view = useEditorViewContext();
@@ -73,7 +73,7 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
 
   const onSelectPage = useCallback(
     (pageId: string, type: AllPagesProp['type'], path: string) => {
-      insertNestedPage(pluginKey, view, pageId, type, path);
+      insertLinkedPage(pluginKey, view, pageId, type, path);
     },
     [view]
   );
@@ -99,4 +99,4 @@ function NestedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   );
 }
 
-export default memo(NestedPagesList);
+export default memo(LinkedPagesList);

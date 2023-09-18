@@ -345,7 +345,13 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     }
 
     return (
-      <StyledPageThread inline={inline.toString()} variant='outlined' id={`thread.${threadId}`} ref={ref}>
+      <StyledPageThread
+        inline={inline.toString()}
+        variant='outlined'
+        data-test={`thread.${threadId}`}
+        id={`thread.${threadId}`}
+        ref={ref}
+      >
         <div>
           {thread.comments.map((comment, commentIndex) => {
             const member = members.find((_member) => _member.id === comment.userId);

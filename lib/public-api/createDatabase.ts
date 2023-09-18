@@ -2,6 +2,7 @@ import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 
 import type { PageProperty } from './interfaces';
@@ -18,7 +19,7 @@ export async function createDatabase(
     data: {
       id: boardId,
       title: 'Example title',
-      path: `path-${v4()}`,
+      path: getPagePath(),
       type: 'board',
       contentText: '',
       boardId,

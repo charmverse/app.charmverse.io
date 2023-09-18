@@ -19,10 +19,9 @@ import { TextSelection } from 'prosemirror-state';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import * as bulletList from '../../bulletList';
-import { nestedPageSuggestMarkName } from '../../nestedPage/nestedPage.constants';
+import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
+import * as listItemCommands from '../../listItemNew/commands';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import * as orderedList from '../../orderedList';
 import paragraph from '../../paragraph';
 import { isList } from '../commands';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
@@ -31,7 +30,7 @@ import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 interface ItemsProps {
   addNestedPage: () => Promise<void>;
   disableNestedPage: boolean;
-  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   userSpacePermissions?: SpacePermissionFlags;
   pageType?: PageType;
 }
@@ -53,8 +52,14 @@ function createTableHeader(state: EditorState, text: string) {
 }
 
 const { convertToParagraph } = paragraph;
-const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBulletList } = bulletList;
-const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
+const {
+  toggleTodoList,
+  queryIsBulletListActive,
+  queryIsTodoListActive,
+  toggleBulletList,
+  toggleOrderedList,
+  queryIsOrderedListActive
+} = listItemCommands;
 
 const setHeadingBlockType =
   (level: number) => (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {
@@ -63,7 +68,7 @@ const setHeadingBlockType =
   };
 
 export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
-  const { addNestedPage, disableNestedPage, nestedPagePluginKey, pageType, userSpacePermissions } = props;
+  const { addNestedPage, disableNestedPage, linkedPagePluginKey, pageType, userSpacePermissions } = props;
 
   const insertPageItem: PaletteItemTypeNoGroup[] =
     pageType !== 'card_template' && !disableNestedPage
@@ -390,12 +395,12 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       description: 'Link to an existing page',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (async (state, dispatch, view) => {
-          if (nestedPagePluginKey) {
-            const nestedPagePluginState = nestedPagePluginKey.getState(state);
+          if (linkedPagePluginKey) {
+            const nestedPagePluginState = linkedPagePluginKey.getState(state);
             if (nestedPagePluginState) {
               replaceSuggestionMarkWith(
                 palettePluginKey,
-                state.schema.text(' ', [state.schema.marks[nestedPageSuggestMarkName].create({})]),
+                state.schema.text(' ', [state.schema.marks[linkedPageSuggestMarkName].create({})]),
                 true
               )(state, dispatch, view);
             }

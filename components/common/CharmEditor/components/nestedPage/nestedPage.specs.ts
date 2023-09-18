@@ -2,9 +2,7 @@ import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
-
-import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
+import { nestedPageNodeName } from './nestedPage.constants';
 import { encloseNestedPage } from './nestedPage.utils';
 
 export function nestedPageSpec(): RawSpecs {
@@ -47,7 +45,6 @@ export function nestedPageSpec(): RawSpecs {
           }
         }
       }
-    },
-    suggestTooltip.spec({ markName: nestedPageSuggestMarkName })
+    }
   ];
 }

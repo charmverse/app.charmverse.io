@@ -1,4 +1,3 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
@@ -11,7 +10,6 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';

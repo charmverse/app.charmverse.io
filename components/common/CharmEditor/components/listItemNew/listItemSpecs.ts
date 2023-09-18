@@ -1,5 +1,5 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import type { DOMOutputSpec, NodeSpec, Node } from 'prosemirror-model';
+import type { DOMOutputSpec, NodeSpec } from 'prosemirror-model';
 
 import { LIST_ITEM } from './nodeNames';
 

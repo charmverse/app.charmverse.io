@@ -7,7 +7,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
@@ -15,7 +15,7 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
-  const { walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
+  const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
 
   async function joinSpace() {
     if (!user && verifiableWalletDetected && walletAuthSignature) {

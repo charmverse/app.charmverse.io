@@ -22,6 +22,7 @@ import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { spec as linkSpec } from './components/link/link.specs';
+import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
 import * as listItem from './components/listItem/listItem';
 import { spec as bulletListItemSpec } from './components/listItemNew/bulletListItemSpecs';
 import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
@@ -87,6 +88,7 @@ export const specRegistry = new SpecRegistry([
   image.spec(), // OK
   columnLayout.spec(), // NO
   nestedPageSpec(), // NO
+  linkedPageSpec(),
   quote.spec(), // OK
   tabIndent.spec(),
   tableSpec(), // OK - only for text content

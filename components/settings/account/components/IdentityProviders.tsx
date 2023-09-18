@@ -22,6 +22,7 @@ import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -29,7 +30,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
@@ -44,8 +45,8 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
-  const { account, isConnectingIdentity, sign, isSigning, verifiableWalletDetected, disconnectWallet } =
-    useWeb3AuthSig();
+  const { isConnectingIdentity } = useWeb3ConnectionManager();
+  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
