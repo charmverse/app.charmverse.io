@@ -13,7 +13,7 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { LitShareModal } from 'lib/lit-protocol-modal';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
@@ -66,7 +66,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
 
   const theme = useTheme();
   const litClient = useLitProtocol();
-  const { walletAuthSignature, sign, chainId } = useWeb3AuthSig();
+  const { walletAuthSignature, sign, chainId } = useWeb3Account();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>

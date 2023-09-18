@@ -4,7 +4,11 @@
 // Used for __tests__/testing-library.js
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
+import { TextEncoder } from 'util';
+
 import { configure } from '@testing-library/react';
+
+global.TextEncoder = TextEncoder;
 
 configure({
   // Align data-test attribute with Playwright

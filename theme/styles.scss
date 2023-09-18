@@ -112,3 +112,8 @@ input:-webkit-autofill:active {
     font-family: var(--font-family-default);
   }
 }
+
+body {
+  /* wallet connect modal */
+  --wcm-z-index: 1500;
+}

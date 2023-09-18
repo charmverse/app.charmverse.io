@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -8,6 +9,7 @@ import type { PageUpdates } from 'lib/pages';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
@@ -35,7 +37,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
-  const updatePage = useCallback((updates: PageUpdates) => {
+  const updatePage = useCallback(async (updates: PageUpdates) => {
     return charmClient.pages.updatePage(updates);
   }, []);
 

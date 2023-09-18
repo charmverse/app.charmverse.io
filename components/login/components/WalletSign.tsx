@@ -2,9 +2,10 @@ import { log } from '@charmverse/core/log';
 import type { SxProps, Theme } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
@@ -31,16 +32,8 @@ export function WalletSign({
   loading,
   onError
 }: Props) {
-  const {
-    account,
-    sign,
-    isSigning,
-    walletAuthSignature,
-    verifiableWalletDetected,
-    connectWallet,
-    connectWalletModalIsOpen,
-    isConnectingIdentity
-  } = useWeb3AuthSig();
+  const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
+  const { account, sign, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
   const showLoadingState = loading || isSigning || isVerifyingWallet;
@@ -76,7 +69,7 @@ export function WalletSign({
         data-test='connect-wallet-button'
         sx={buttonStyle}
         size={buttonSize ?? 'large'}
-        loading={connectWalletModalIsOpen || isConnectingIdentity}
+        loading={isWalletSelectorModalOpen || isConnectingIdentity}
         onClick={() => {
           connectWallet();
         }}

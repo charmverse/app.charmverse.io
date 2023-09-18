@@ -312,7 +312,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
           changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
-          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig)+'
+          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig|components/common/CharmEditor/components)+'
           for file in $changed_files; do
             echo "evaluating $file:"
             if [[ $file =~ $websocket_src_file_pattern ]]; then
