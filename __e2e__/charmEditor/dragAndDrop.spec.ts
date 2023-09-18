@@ -15,7 +15,7 @@ const test = base.extend<Fixtures>({
   documentPage: async ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('Drag and drop a nested page node over a linked page node in the CharmEditor', async ({ documentPage }) => {
+test.only('Drag and drop a nested page node over a linked page node in the CharmEditor', async ({ documentPage }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
 
   const nestedPage = await createPage({
@@ -93,6 +93,8 @@ test('Drag and drop a nested page node over a linked page node in the CharmEdito
       y: 0
     }
   });
+
+  await documentPage.page.waitForTimeout(1000);
 
   const documentText = await documentPage.getDocumentText();
   expect(documentText).toBe(`${linkedPage.title}${nestedPage.title}`);
