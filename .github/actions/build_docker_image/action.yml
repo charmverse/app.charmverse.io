@@ -53,22 +53,22 @@ runs:
         flavor: |
           latest=${{ github.ref == 'refs/heads/main' }}
 
-    - uses: whoan/docker-build-with-cache-action@v5
-      with:
-        username: "${{ env.AWS_ACCESS_KEY_ID }}"  # no need to provide it if you already logged in with aws-actions/configure-aws-credentials
-        password: "${{ env.AWS_SECRET_ACCESS_KEY }}"  # no need to provide it if you already logged in with aws-actions/configure-aws-credentials
-        # private registry
-        registry: ${{ steps.login-ecr.outputs.registry }}
-        # or public registry
-        #registry: public.ecr.aws
-        image_name: charmverse-web3-workspace
-        image_tag: ${{ steps.get_img_tag.outputs.tags }}
-
-    # - name: Build and push
-    #   uses: docker/build-push-action@v3
+    # - uses: whoan/docker-build-with-cache-action@v5
     #   with:
-    #     context: .
-    #     push: true
-    #     tags: ${{ steps.get_img_tag.outputs.tags }}
-    #     cache-from: type=gha
-    #     cache-to: type=gha,mode=max
+    #     username: "${{ env.AWS_ACCESS_KEY_ID }}"  # no need to provide it if you already logged in with aws-actions/configure-aws-credentials
+    #     password: "${{ env.AWS_SECRET_ACCESS_KEY }}"  # no need to provide it if you already logged in with aws-actions/configure-aws-credentials
+    #     # private registry
+    #     registry: ${{ steps.login-ecr.outputs.registry }}
+    #     # or public registry
+    #     #registry: public.ecr.aws
+    #     image_name: charmverse-web3-workspace
+    #     image_tag: ${{ steps.get_img_tag.outputs.tags }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.get_img_tag.outputs.tags }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
