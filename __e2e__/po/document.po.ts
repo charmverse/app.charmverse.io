@@ -6,6 +6,8 @@ import { GlobalPage } from './global.po';
 import { PageHeader } from './pageHeader.po';
 import { PagePermissionsDialog } from './pagePermissions.po';
 
+const charmEditorSelector = '.ProseMirror.bangle-editor';
+
 // capture actions on the pages in signup flow
 export class DocumentPage extends GlobalPage {
   constructor(
@@ -52,8 +54,12 @@ export class DocumentPage extends GlobalPage {
   }
 
   async typeText(text: string) {
-    const charmEditorSelector = '.ProseMirror.bangle-editor';
     await this.page.click(charmEditorSelector);
     await this.page.type(charmEditorSelector, text);
+  }
+
+  async getDocumentText() {
+    const editorLocator = this.page.locator(charmEditorSelector);
+    return editorLocator.textContent();
   }
 }

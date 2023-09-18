@@ -2,9 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { test as base, expect } from '@playwright/test';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { createPage } from 'testing/setupDatabase';
 
-import { DocumentPage } from './po/document.po';
-import { generateUserAndSpace, loginBrowserUser } from './utils/mocks';
+import { DocumentPage } from '../po/document.po';
+import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
   documentPage: DocumentPage;
@@ -14,8 +15,33 @@ const test = base.extend<Fixtures>({
   documentPage: async ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('Drag and drop one paragraph over another in the CharmEditor', async ({ documentPage }) => {
+test('Drag and drop a nested page node over a linked page node in the CharmEditor', async ({ documentPage }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
+
+  const nestedPage = await createPage({
+    spaceId: space.id,
+    createdBy: user.id,
+    title: 'Nested Page',
+    parentId: generatedPage.id,
+    pagePermissions: [
+      {
+        spaceId: space.id,
+        permissionLevel: 'full_access'
+      }
+    ]
+  });
+
+  const linkedPage = await createPage({
+    spaceId: space.id,
+    createdBy: user.id,
+    title: 'Linked Page',
+    pagePermissions: [
+      {
+        spaceId: space.id,
+        permissionLevel: 'full_access'
+      }
+    ]
+  });
 
   await prisma.page.update({
     where: {
@@ -26,24 +52,12 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
         type: 'doc',
         content: [
           {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Item 1',
-                type: 'text'
-              }
-            ]
+            type: 'page',
+            attrs: { id: nestedPage.id, track: [] }
           },
           {
-            type: 'paragraph',
-            attrs: { track: [] },
-            content: [
-              {
-                text: 'Item 2',
-                type: 'text'
-              }
-            ]
+            type: 'linkedPage',
+            attrs: { id: linkedPage.id, track: [] }
           }
         ]
       }
@@ -62,13 +76,13 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
 
   await expect(documentPage.charmEditor).toBeVisible();
 
-  const paragraph1Locator = documentPage.page.locator('.bangle-editor-core p:nth-child(1)');
-  const paragraph2Locator = documentPage.page.locator('.bangle-editor-core p:nth-child(2)');
-  await paragraph2Locator.hover();
+  const nestedPageLocator = documentPage.page.locator('.bangle-editor-core .page-container');
+  const linkedPageLocator = documentPage.page.locator('.bangle-editor-core .linkedPage-container');
+  await linkedPageLocator.hover();
 
   const rowActionsHandleLocator = documentPage.page.locator('.bangle-editor-core .charm-drag-handle');
   await expect(rowActionsHandleLocator).toBeVisible();
-  await rowActionsHandleLocator.dragTo(paragraph1Locator, {
+  await rowActionsHandleLocator.dragTo(nestedPageLocator, {
     force: true,
     targetPosition: {
       x: 0,
@@ -80,6 +94,9 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
     }
   });
 
+  const documentText = await documentPage.getDocumentText();
+  expect(documentText).toBe(`${linkedPage.title}${nestedPage.title}`);
+
   const page = await prisma.page.findUniqueOrThrow({
     where: {
       id: generatedPage.id
@@ -88,35 +105,24 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
       content: true
     }
   });
-
   const pageContent = page.content as PageContent;
 
   expect(pageContent).toMatchObject({
     type: 'doc',
     content: [
       {
-        type: 'paragraph',
-        attrs: {
-          track: []
-        },
-        content: [
-          {
-            text: 'Item 2',
-            type: 'text'
-          }
-        ]
+        type: 'linkedPage',
+        attrs: { id: linkedPage.id, track: [] }
+      },
+      {
+        type: 'page',
+        attrs: { id: nestedPage.id, track: [] }
       },
       {
         type: 'paragraph',
         attrs: {
           track: []
-        },
-        content: [
-          {
-            text: 'Item 1',
-            type: 'text'
-          }
-        ]
+        }
       }
     ]
   });
