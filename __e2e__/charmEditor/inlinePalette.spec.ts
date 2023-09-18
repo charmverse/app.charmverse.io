@@ -13,7 +13,7 @@ const test = base.extend<Fixtures>({
   documentPage: async ({ page }, use) => use(new DocumentPage(page))
 });
 
-test.only('Create linkedPage using inline palette in the charmEditor', async ({ documentPage }) => {
+test('Create linkedPage using inline palette in the charmEditor', async ({ documentPage }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
 
   const linkedPage = await createPage({
@@ -57,4 +57,6 @@ test.only('Create linkedPage using inline palette in the charmEditor', async ({ 
   await linkedPageCharmEditorLocator.click();
 
   await documentPage.page.waitForURL(`${baseUrl}/${space.domain}/${linkedPage.path}`);
+
+  await expect(documentPage.charmEditor).toBeVisible();
 });
