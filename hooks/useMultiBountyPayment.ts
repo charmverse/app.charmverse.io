@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
@@ -38,7 +38,7 @@ export function useMultiBountyPayment({
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
   const { refreshBounties } = useBounties();
-  const { account, chainId, signer } = useWeb3AuthSig();
+  const { account, chainId, signer } = useWeb3Account();
   const [paymentMethods] = usePaymentMethods();
   const { data: gnosisSafes } = useSWR(
     signer && account && chainId ? `/connected-gnosis-safes/${account}` : null,

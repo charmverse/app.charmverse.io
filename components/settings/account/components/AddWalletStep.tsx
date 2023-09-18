@@ -4,7 +4,7 @@ import { Typography, Stack } from '@mui/material';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 type Props = {
   isConnectingWallet: boolean;
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export function AddWalletStep({ isConnectingWallet, onSignSuccess }: Props) {
-  const { account } = useWeb3AuthSig();
+  const { account } = useWeb3Account();
 
   const { user } = useUser();
   const currentWallets = user?.wallets || [];

@@ -17,7 +17,7 @@ import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models/User';
@@ -60,7 +60,7 @@ type Props = {
 
 export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
-  const { resetSigning } = useWeb3AuthSig();
+  const { resetSigning } = useWeb3Account();
 
   const handleClickOpen = () => {
     loginDialog.open();
@@ -106,7 +106,7 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
 
 function LoginHandler(props: DialogProps) {
   const { redirectUrl, onClose, isOpen } = props;
-  const { loginFromWeb3Account, verifiableWalletDetected } = useWeb3AuthSig();
+  const { loginFromWeb3Account, verifiableWalletDetected } = useWeb3Account();
   // Governs whether we should auto-request a signature. Should only happen on first login.
   const [enableAutosign, setEnableAutoSign] = useState(true);
   const router = useRouter();

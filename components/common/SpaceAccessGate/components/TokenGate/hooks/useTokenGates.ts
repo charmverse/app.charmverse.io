@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
@@ -39,7 +39,7 @@ export function useTokenGates({
 }: Props): TokenGateState {
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { getStoredSignature } = useWeb3AuthSig();
+  const { getStoredSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
 
   const [isVerifying, setIsVerifying] = useState(false);
