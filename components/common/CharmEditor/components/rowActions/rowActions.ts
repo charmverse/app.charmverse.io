@@ -8,7 +8,7 @@ import { NodeSelection } from 'prosemirror-state';
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
 // TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
-const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList'];
+const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList', 'bullet_list', 'ordered_list'];
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 // helpful links:

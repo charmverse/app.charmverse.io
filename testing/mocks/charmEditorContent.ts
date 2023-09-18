@@ -358,11 +358,11 @@ export const contentWithBlocksAndMarks = {
       ]
     },
     {
-      type: 'bulletList',
+      type: 'bullet_list',
       attrs: { tight: false },
       content: [
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
@@ -390,7 +390,7 @@ export const contentWithBlocksAndMarks = {
           ]
         },
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
@@ -418,7 +418,7 @@ export const contentWithBlocksAndMarks = {
           ]
         },
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
@@ -470,11 +470,11 @@ export const contentWithBlocksAndMarks = {
       ]
     },
     {
-      type: 'orderedList',
+      type: 'ordered_list',
       attrs: { order: 1, tight: false, track: [] },
       content: [
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
@@ -501,7 +501,7 @@ export const contentWithBlocksAndMarks = {
           ]
         },
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
@@ -528,7 +528,7 @@ export const contentWithBlocksAndMarks = {
           ]
         },
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { track: [], todoChecked: null },
           content: [
             {
