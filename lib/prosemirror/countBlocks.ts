@@ -5,6 +5,8 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 // dont count these nodes as "BLOCKS" because they are really inline marks
 const INLINE_NODES_TO_IGNORE = [
   'bold',
+  'bullet_list',
+  'bulletList',
   'code',
   'columnBlock',
   'date',
@@ -24,6 +26,8 @@ const INLINE_NODES_TO_IGNORE = [
   'mention',
   'mentionSuggest',
   'nestedPageSuggest',
+  'ordered_list',
+  'orderedList',
   'strike',
   'tabIndent',
   'table_cell',
