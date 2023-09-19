@@ -8,7 +8,13 @@ import { Plugin } from 'prosemirror-state';
 
 import { isMac } from 'lib/utilities/browser';
 
-import { updateNodeAttrs, indentCommand, listItemMergeCommand, removeList, splitListCommand } from './commands';
+import {
+  updateNodeAttrs,
+  indentCommand,
+  listItemMergeCommand,
+  backspaceKeyCommand,
+  splitListCommand
+} from './commands';
 import { ListItemNodeView } from './listItemNodeView';
 import { BULLET_LIST, ORDERED_LIST, LIST_ITEM } from './nodeNames';
 import { isNodeTodo, wrappingInputRuleForTodo } from './todo';
@@ -56,7 +62,7 @@ export function plugins(): RawPlugins {
         Enter: splitListCommand(),
         Tab: indentCommand(1),
         'Shift-Tab': indentCommand(-1),
-        Backspace: removeList(),
+        Backspace: backspaceKeyCommand(schema.nodes[BULLET_LIST]),
         // Backspace: listItemMergeCommand('up'),
         // "forward delete"
         Delete: listItemMergeCommand('down')

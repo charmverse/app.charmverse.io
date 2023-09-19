@@ -135,7 +135,7 @@ const rootListDepth = (type: NodeType, pos: ResolvedPos, nodes: Schema['nodes'])
   return depth!;
 };
 
-function canToJoinToPreviousListItem(state: EditorState) {
+export function canToJoinToPreviousListItem(state: EditorState) {
   const { $from } = state.selection;
   const { bullet_list: bulletList, ordered_list: orderedList } = state.schema.nodes;
   const $before = state.doc.resolve($from.pos - 1);
@@ -592,31 +592,6 @@ function mergeLists(listItem: NodeType, range: NodeRange): (command: Command) =>
   };
 }
 
-// Chaining runs each command until one of them returns true
-export const backspaceKeyCommand =
-  (type: NodeType): Command =>
-  (state, dispatch, view) => {
-    return chainCommands(
-      // if we're at the start of a list item, we need to either backspace
-      // directly to an empty list item above, or outdent this node
-      filter(
-        [
-          isInsideListItem(type),
-          isEmptySelectionAtStart,
-
-          // list items might have multiple paragraphs; only do this at the first one
-          isFirstChildOfParent,
-          canOutdent(type)
-        ],
-        chainCommands(deletePreviousEmptyListItem(type), outdentList(type))
-      ),
-
-      // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
-      // the text to the previous list item, if one exists
-      filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem(type))
-    )(state, dispatch, view);
-  };
-
 export function enterKeyCommand(type: NodeType): Command {
   return (state, dispatch, view) => {
     const { selection } = state;
@@ -725,7 +700,7 @@ function splitListItem(itemType: NodeType, splitAttrs?: (node: Node) => Node['at
   };
 }
 
-function joinToPreviousListItem(type?: NodeType): Command {
+export function joinToPreviousListItem(type?: NodeType): Command {
   return (state, dispatch) => {
     let listItem = type;
     if (!listItem) {

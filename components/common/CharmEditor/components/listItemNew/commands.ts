@@ -1,17 +1,16 @@
 import type { Command } from '@bangle.dev/pm';
 import { chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
+import { filter, isEmptySelectionAtStart, isFirstChildOfParent } from '@bangle.dev/utils';
 import type { Node, NodeType } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
-
-import { isAtBeginningOfLine } from '../../utils';
 
 import { mergeListItemDown, mergeListItemUp } from './mergeListItems';
 import { BULLET_LIST, LIST_ITEM, ORDERED_LIST } from './nodeNames';
 import { splitListItem } from './splitListItem';
 import { isNodeTodo, removeTodo, setTodo } from './todo';
-import { toggleList, liftListItems } from './toggleList';
+import { canToJoinToPreviousListItem, joinToPreviousListItem, toggleList, liftListItems } from './toggleList';
 import { updateIndentLevel } from './updateIndentLevel';
 
 export const splitListCommand = (): Command => (state, dispatch) => {
@@ -85,6 +84,21 @@ export function toggleBulletList(): Command {
 
   return chainCommands(removeTodo, handleBulletLists);
 }
+
+// Chaining runs each command until one of them returns true
+export const backspaceKeyCommand =
+  (type: NodeType): Command =>
+  (state, dispatch, view) => {
+    return chainCommands(
+      // if we're at the start of a list item, we need to either backspace
+      // directly to an empty list item above, or outdent this node
+      removeList(),
+
+      // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
+      // the text to the previous list item, if one exists
+      filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem(type))
+    )(state, dispatch, view);
+  };
 
 export function removeList(): Command {
   return (state: EditorState, dispatch) => {
