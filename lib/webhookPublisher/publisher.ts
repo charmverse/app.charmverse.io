@@ -4,8 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
-import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { WebhookEvent, WebhookPayload, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
 
@@ -59,17 +58,15 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string
       signingSecret: null
     };
 
-    if (event.scope !== WebhookEventNames.PageMention) {
-      // Find if the space is subscribed to an event name or name space
-      const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
+    // Find if the space is subscribed to an event name or name space
+    const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
-      // If no subscription, we stop here
-      if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-        return;
-      }
-      webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
-      webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
+    // If no subscription, we stop here
+    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
+      return;
     }
+    webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
+    webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
 
     // Add the message to the queue
     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));

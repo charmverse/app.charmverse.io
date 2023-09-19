@@ -9,7 +9,10 @@ import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -68,6 +71,22 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
   }
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
+
+  const extractedMentions = extractMentions(body.content);
+
+  if (extractedMentions.length) {
+    await Promise.all(
+      extractedMentions.map((mention) =>
+        publishPageEvent({
+          pageId,
+          scope: WebhookEventNames.PageMention,
+          commentId: pageComment.id,
+          spaceId: page.spaceId,
+          mention
+        })
+      )
+    );
+  }
 
   res.status(200).json({
     ...pageComment,

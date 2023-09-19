@@ -1,5 +1,5 @@
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { CommentEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
   getBountyEntity,
@@ -149,6 +149,7 @@ type PageEventContext = {
   pageId: string;
   spaceId: string;
   mention: UserMentionMetadata;
+  commentId?: string;
 };
 
 export async function publishPageEvent(context: PageEventContext) {
@@ -157,6 +158,7 @@ export async function publishPageEvent(context: PageEventContext) {
     scope: context.scope,
     page,
     space,
-    mention: context.mention
+    mention: context.mention,
+    commentId: context.commentId
   });
 }

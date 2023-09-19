@@ -36,7 +36,10 @@ export async function getDiscussionNotifications(userId: string): Promise<Discus
     discussionNotificationsGroup.unmarked.push(...unmarked);
   });
 
-  return discussionNotificationsGroup;
+  return {
+    marked: discussionNotificationsGroup.marked.sort(sortByDate),
+    unmarked: discussionNotificationsGroup.unmarked.sort(sortByDate)
+  };
 }
 
 async function getPageMentions(userId: string): Promise<DiscussionNotificationsGroup> {
@@ -52,6 +55,7 @@ async function getPageMentions(userId: string): Promise<DiscussionNotificationsG
     include: {
       page: {
         select: {
+          bountyId: true,
           path: true,
           type: true,
           title: true
@@ -87,9 +91,9 @@ async function getPageMentions(userId: string): Promise<DiscussionNotificationsG
   pageNotifications.forEach((notification) => {
     const discussionNotification = {
       taskId: notification.id,
-      bountyId: null,
-      bountyTitle: null,
-      commentId: null,
+      bountyId: notification.page.bountyId,
+      bountyTitle: notification.page.title,
+      commentId: notification.commentId,
       mentionId: notification.mentionId,
       createdAt: notification.record.createdAt.toISOString(),
       createdBy: notification.record.user,

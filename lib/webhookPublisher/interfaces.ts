@@ -139,6 +139,7 @@ export type WebhookEvent<T = WebhookEventNames> =
       scope: WebhookEventNames.PageMention;
       page: PageEntity;
       mention: UserMentionMetadata;
+      commentId?: string;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;
