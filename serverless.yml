@@ -1,6 +1,6 @@
 service: cvServerless
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 useDotenv: true
 
@@ -17,7 +17,7 @@ plugins:
 custom:
   esbuild:
     watch:
-      pattern: ['serverless/**/*.ts'] # match only typescript files in serverless directory
+      pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
 
 # This uses the lift plugin to generate our SQS setup in AWS
 # Based on https://github.com/getlift/lift/blob/master/docs/queue.md
@@ -48,4 +48,7 @@ functions:
   webhookChecker:
     handler: serverless/handler.webhookChecker
     events:
-      - httpApi: 'POST /webhook'
+      - httpApi: "POST /webhook"
+  # Uncomment the following lines to test webhookWorker locally
+  # webhookWorker:
+  #   handler: serverless/handler.webhookWorker

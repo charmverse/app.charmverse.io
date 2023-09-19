@@ -1,8 +1,9 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
 import { signJwt } from 'lib/webhookPublisher/authentication';
-import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames, type WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 /**
  * SQS worker, message are executed one by one
@@ -21,6 +22,40 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
       try {
         // Gets message information
         const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
+
+        switch (webhookData.event.scope) {
+          case WebhookEventNames.PageMention: {
+            const mentionedUserId = webhookData.event.mention.value;
+            const eventId = webhookData.id;
+            await prisma.pageNotification.upsert({
+              create: {
+                page: {
+                  connect: {
+                    id: webhookData.event.page.id
+                  }
+                },
+                id: eventId,
+                record: {
+                  create: {
+                    createdBy: mentionedUserId,
+                    spaceId: webhookData.spaceId,
+                    userId: mentionedUserId
+                  }
+                },
+                mentionId: webhookData.event.mention.id
+              },
+              update: {},
+              where: {
+                id: eventId
+              }
+            });
+
+            break;
+          }
+          default:
+            break;
+        }
+
         if (webhookURL && signingSecret) {
           const secret = Buffer.from(signingSecret, 'hex');
 

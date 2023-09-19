@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 } from 'uuid';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
@@ -50,6 +51,7 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string
     }
 
     const webhookPayload: WebhookPayload = {
+      id: v4(),
       event,
       createdAt: new Date().toISOString(),
       spaceId,

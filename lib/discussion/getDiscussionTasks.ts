@@ -1,17 +1,10 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { getPermissionsClient } from 'lib/permissions/api';
-import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
-import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 
-import type { DiscussionPropertiesFromPage } from './getPropertiesFromPage';
 import { getPropertiesFromPage } from './getPropertiesFromPage';
 import { getProposalDiscussionTasks } from './getProposalDiscussionTasks';
 import type { DiscussionTask } from './interfaces';
