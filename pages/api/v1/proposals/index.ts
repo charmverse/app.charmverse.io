@@ -91,7 +91,7 @@ type ProposalReviewer = {
  *          example: https://app.charmverse.io/charmverse/proposals?id=3334afc4-5f0a-4d3c-8889-56fcc2b2ed8d
  *
  */
-export interface PublicApiProposal {
+export type PublicApiProposal = {
   id: string;
   createdAt: string;
   content: {
@@ -103,7 +103,7 @@ export interface PublicApiProposal {
   status: ProposalStatus;
   title: string;
   url: string;
-}
+};
 
 handler.get(listProposals);
 
@@ -117,7 +117,7 @@ handler.get(listProposals);
  *      - 'Space API'
  *     responses:
  *       200:
- *         description: List of proposals of casted vote
+ *         description: List of proposals
  *         content:
  *            application/json:
  *              schema:
@@ -134,7 +134,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
     throw new InvalidStateError('Space ID is undefined');
   }
 
-  const space = await prisma.space.findUnique({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     }
