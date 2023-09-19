@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { Discussion, GetDiscussionsResponse } from 'lib/discussion/getDiscussionTasks';
+import type { Discussion, GetDiscussionsResponse } from 'lib/discussion/getDiscussionNotifications';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
 import type {
   NotificationProposalData,

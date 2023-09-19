@@ -2,7 +2,7 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionTask } from 'lib/discussion/interfaces';
+import type { DiscussionNotification } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -24,11 +24,11 @@ const createDiscussionTask = ({
   mentionText,
   type = 'page'
 }: {
-  type?: DiscussionTask['type'];
+  type?: DiscussionNotification['type'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
-}): DiscussionTask => {
+}): DiscussionNotification => {
   const id = v4();
   return {
     mentionId: id,

@@ -1,10 +1,9 @@
-import type { Comment, Block, Bounty, Page, Space, User } from '@charmverse/core/prisma';
+import type { Comment, Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import {
   createPage,
-  createBlock,
   generateBounty,
   generateComment,
   generateThread,
@@ -12,7 +11,7 @@ import {
   generateSpaceUser
 } from 'testing/setupDatabase';
 
-import { getDiscussionTasks } from '../getDiscussionTasks';
+import { getDiscussionNotifications } from '../getDiscussionNotifications';
 
 let user1: User;
 let user2: User;
@@ -24,7 +23,6 @@ let bounty1: Bounty;
 let bounty2: Bounty;
 let comment1: Comment;
 let comment2: Comment;
-let commentBlock: Block;
 
 const discussionIds = new Array(13).fill(0).map(() => v4());
 
@@ -32,7 +30,7 @@ function expectSome<T>(arr: T[], condition: (item: T) => boolean) {
   expect(arr.some(condition)).toBeTruthy();
 }
 
-describe('getDiscussionTasks', () => {
+describe('getDiscussionNotifications', () => {
   it('Should return seen and new mention tasks', async () => {
     const generated1 = await generateUserAndSpaceWithApiToken();
     const generated2 = await generateUserAndSpaceWithApiToken();
@@ -378,36 +376,7 @@ describe('getDiscussionTasks', () => {
       }
     });
 
-    commentBlock = await createBlock({
-      type: 'comment',
-      spaceId: space2.id,
-      createdBy: user2.id,
-      rootId: page2.id,
-      fields: {
-        content: {
-          type: 'doc',
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                {
-                  type: 'mention',
-                  attrs: {
-                    id: discussionIds[12],
-                    type: 'user',
-                    value: user1.id,
-                    createdAt: new Date().toISOString(),
-                    createdBy: user2.id
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      }
-    });
-
-    const { marked: seenNotifications, unmarked: newNotifications } = await getDiscussionTasks(user1.id);
+    const { marked: seenNotifications, unmarked: newNotifications } = await getDiscussionNotifications(user1.id);
 
     expect(seenNotifications.length).toBe(1);
     expect(newNotifications.length).toBe(6);
@@ -473,7 +442,7 @@ describe('getDiscussionTasks', () => {
     const commentId1 = commentsThread.comments[0].id;
     const commentId2 = commentsThread.comments[1].id;
 
-    const { unmarked: newNotifications } = await getDiscussionTasks(pageAuthor.id);
+    const { unmarked: newNotifications } = await getDiscussionNotifications(pageAuthor.id);
 
     expectSome(newNotifications, (item) => item.commentId === commentId1 && item.pageId === page.id);
 
@@ -538,7 +507,7 @@ describe('getDiscussionTasks', () => {
     const commentId1 = commentsThread.comments[0].id;
     const commentId2 = commentsThread.comments[1].id;
 
-    const { unmarked: newNotifications } = await getDiscussionTasks(pageAuthor.id);
+    const { unmarked: newNotifications } = await getDiscussionNotifications(pageAuthor.id);
 
     expectSome(newNotifications, (item) => item.commentId === commentId1 && item.pageId === page.id);
 
@@ -608,7 +577,7 @@ describe('getDiscussionTasks', () => {
 
     const commentId = commentsThread.comments[1].id;
 
-    const { unmarked: newNotifications } = await getDiscussionTasks(pageCommenter.id);
+    const { unmarked: newNotifications } = await getDiscussionNotifications(pageCommenter.id);
 
     expect(newNotifications).toHaveLength(1);
 

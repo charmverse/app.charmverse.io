@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
+import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
@@ -64,7 +64,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const discussionTasks = await getDiscussionTasks(user.id);
+    const discussionTasks = await getDiscussionNotifications(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
     const forumTasks = await getForumNotifications(user.id);

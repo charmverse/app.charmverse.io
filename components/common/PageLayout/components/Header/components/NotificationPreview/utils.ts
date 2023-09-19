@@ -2,7 +2,7 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionTask } from 'lib/discussion/interfaces';
+import type { DiscussionNotification } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
@@ -35,14 +35,14 @@ export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
   }));
 }
 
-function getDiscussionContent(n: DiscussionTask) {
+function getDiscussionContent(n: DiscussionNotification) {
   const { createdBy, pageTitle } = n;
   return pageTitle
     ? `${createdBy?.username} left a comment in ${pageTitle}.`
     : `${createdBy?.username} left a comment.`;
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionTask[]) {
+export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,

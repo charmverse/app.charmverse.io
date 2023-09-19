@@ -5,7 +5,12 @@ import type { ProposalWithCommentsAndUsers } from '@charmverse/core/proposals';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { getProposalComments, getProposalCommentMentions } from 'lib/proposal/getProposalTasks';
 
-import type { SpaceRecord, GetDiscussionsResponse, GetDiscussionsInput, Discussion } from './getDiscussionTasks';
+import type {
+  SpaceRecord,
+  GetDiscussionsResponse,
+  GetDiscussionsInput,
+  Discussion
+} from './getDiscussionNotifications';
 import type { DiscussionPropertiesFromPage } from './getPropertiesFromPage';
 
 export type NotificationProposalData = Pick<Proposal, 'id' | 'createdBy' | 'spaceId'> & {

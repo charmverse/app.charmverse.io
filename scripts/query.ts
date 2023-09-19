@@ -2,8 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { customAlphabet } from 'nanoid';
 import fs from 'node:fs/promises';
 
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
-
 /**
 
   userId: cb9a5ede-6ff7-4eaa-9c23-91e684e23aed
