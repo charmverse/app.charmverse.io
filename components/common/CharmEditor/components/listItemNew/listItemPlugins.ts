@@ -8,14 +8,14 @@ import { Plugin } from 'prosemirror-state';
 
 import { isMac } from 'lib/utilities/browser';
 
-import { updateNodeAttrs, indentCommand, listItemMergeCommand, splitListCommand } from './commands';
+import { updateNodeAttrs, indentCommand, listItemMergeCommand, removeList, splitListCommand } from './commands';
 import { ListItemNodeView } from './listItemNodeView';
 import { BULLET_LIST, ORDERED_LIST, LIST_ITEM } from './nodeNames';
 import { isNodeTodo, wrappingInputRuleForTodo } from './todo';
 
 const isValidList = (state: EditorState) => {
   const type = state.schema.nodes[LIST_ITEM];
-  return parentHasDirectParentOfType(type, [state.schema.nodes.bulletList, state.schema.nodes.orderedList]);
+  return parentHasDirectParentOfType(type, [state.schema.nodes.bullet_list, state.schema.nodes.ordered_list]);
 };
 
 export function plugins(): RawPlugins {
@@ -56,9 +56,10 @@ export function plugins(): RawPlugins {
         Enter: splitListCommand(),
         Tab: indentCommand(1),
         'Shift-Tab': indentCommand(-1),
-        Backspace: listItemMergeCommand('down'),
+        Backspace: removeList(),
+        // Backspace: listItemMergeCommand('up'),
         // "forward delete"
-        Delete: listItemMergeCommand('up')
+        Delete: listItemMergeCommand('down')
         // [KEY_BACK_DELETE.common]: LIST_ITEM_MERGE_UP.execute,
         // [KEY_FORWARD_DELETE.common]: LIST_ITEM_MERGE_DOWN.execute,
       })

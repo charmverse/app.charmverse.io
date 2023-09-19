@@ -15,7 +15,7 @@ function liftListItem(type: NodeType, state: EditorState, selection: Selection, 
   const { $from, $to } = selection;
   let listItem = type;
   if (!listItem) {
-    ({ listItem } = state.schema.nodes);
+    ({ list_item: listItem } = state.schema.nodes);
   }
 
   let range = $from.blockRange(
@@ -54,7 +54,7 @@ export function liftFollowingList(
 ) {
   let listItem = type;
   if (!listItem) {
-    ({ listItem } = state.schema.nodes);
+    ({ list_item: listItem } = state.schema.nodes);
   }
   let lifted = false;
   tr.doc.nodesBetween(from, to, (node, pos) => {
@@ -109,7 +109,7 @@ const getListType = (node: Node, schema: Schema): [NodeType, number] | null => {
   if (!node.text) {
     return null;
   }
-  const { bulletList, orderedList } = schema.nodes;
+  const { bullet_list: bulletList, ordered_list: orderedList } = schema.nodes;
   return [
     {
       node: bulletList,
@@ -128,7 +128,7 @@ const getListType = (node: Node, schema: Schema): [NodeType, number] | null => {
   }, null);
 };
 const extractListFromParagaph = (type: NodeType, node: Node, schema: Schema) => {
-  const { hardBreak, bulletList, orderedList } = schema.nodes;
+  const { hardBreak, bullet_list: bulletList, ordered_list: orderedList } = schema.nodes;
   const content = mapChildren(node.content, (_node) => _node);
   const listTypes = [bulletList, orderedList];
   // wrap each line into a listItem and a containing list

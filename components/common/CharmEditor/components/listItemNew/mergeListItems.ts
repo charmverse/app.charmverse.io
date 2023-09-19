@@ -46,7 +46,7 @@ export function mergeListItemUp(tr: Transaction, schema: Schema): Transaction {
   const paragraphNode = node.firstChild;
   const textNode = schema.text(' ');
 
-  // Delete the list item
+  // Delete the list item HERE
   tr = tr.delete(pos - 2, pos + node.nodeSize);
   // Append extra space character to its previous list item.
   tr = tr.insert(pos - 2, Fragment.from(textNode));
@@ -97,7 +97,6 @@ export function mergeListItemDown(tr: Transaction, schema: Schema): Transaction 
     nextNode = nodeAtSafe(tr.doc, nextFrom + 1);
     deleteFrom += 1;
   }
-
   if (!nextNode) {
     return tr;
   }

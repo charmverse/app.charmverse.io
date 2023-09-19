@@ -9,6 +9,7 @@ html {
   counter-reset: czi-counter-5;
   counter-reset: czi-counter-6;
   counter-reset: czi-counter-7;
+  --tab-width: 24px;
 }
 
 .ProseMirror ol,
@@ -42,7 +43,7 @@ html {
   // margin: 0;
   // margin-block-end: 0;
   // margin-block-start: 0;
-  padding-left: 24px;
+  padding-left: var(--tab-width);
 }
 
 /* https://css-tricks.com/numbering-in-style/ */
@@ -54,11 +55,11 @@ html {
   font-family: Arial, sans-serif;
   font-size: 1.5em;
   line-height: 1em;
-  margin-left: -24px;
-  position: relative;
+  margin-left: calc(-1 * var(--tab-width));
+  position: absolute;
   text-align: center;
   top: 2px;
-  width: 24px;
+  width: var(--tab-width);
 }
 
 .ProseMirror ol {

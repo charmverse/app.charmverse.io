@@ -54,7 +54,7 @@ const numberNestedLists = (resolvedPos: ResolvedPos, nodes: Schema['nodes']) => 
   return count;
 };
 
-const isInsideList = (state: EditorState, listType: NodeType) => {
+export const isInsideList = (state: EditorState, listType: NodeType) => {
   const { $from } = state.selection;
   const parent = $from.node(-2);
   const grandGrandParent = $from.node(-3);
@@ -66,7 +66,7 @@ const canOutdent = (type?: NodeType) => (state: EditorState) => {
   const { parent } = state.selection.$from;
   let listItem = type;
   if (!listItem) {
-    ({ listItem } = state.schema.nodes);
+    ({ list_item: listItem } = state.schema.nodes);
   }
   const { paragraph } = state.schema.nodes;
 
@@ -108,7 +108,7 @@ export const isInsideListItem = (type: NodeType) => (state: EditorState) => {
 
   let listItem = type;
   if (!listItem) {
-    ({ listItem } = state.schema.nodes);
+    ({ list_item: listItem } = state.schema.nodes);
   }
   const { paragraph } = state.schema.nodes;
   if (state.selection instanceof GapCursorSelection) {
@@ -277,10 +277,12 @@ function wrapInList(nodeType: NodeType, attrs?: Node['attrs']): Command {
   );
 }
 
-function liftListItems(): Command {
+export function liftListItems(indent = 1): Command {
   return function (state, dispatch) {
     const { tr } = state;
     const { $from, $to } = state.selection;
+
+    tr.insert($from.pos, state.schema.nodes.tabIndent.create({ indent }));
 
     tr.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
       // Following condition will ensure that block types paragraph, heading, codeBlock, blockquote, panel are lifted.
@@ -388,7 +390,7 @@ export function indentList(type: NodeType) {
   return function indentListCommand(state: EditorState, dispatch?: (tr: Transaction) => void) {
     let listItem = type;
     if (!listItem) {
-      ({ listItem } = state.schema.nodes);
+      ({ list_item: listItem } = state.schema.nodes);
     }
     if (isInsideListItem(listItem)(state)) {
       // Record initial list indentation
@@ -485,7 +487,7 @@ export function outdentList(type: NodeType): Command {
   return function (state, dispatch, view) {
     let listItem = type;
     if (!listItem) {
-      ({ listItem } = state.schema.nodes);
+      ({ list_item: listItem } = state.schema.nodes);
     }
     const { $from, $to } = state.selection;
     if (!isInsideListItem(listItem)(state)) {
@@ -622,7 +624,7 @@ export function enterKeyCommand(type: NodeType): Command {
       const { $from } = selection;
       let listItem = type;
       if (!listItem) {
-        ({ listItem } = state.schema.nodes);
+        ({ list_item: listItem } = state.schema.nodes);
       }
       const { codeBlock } = state.schema.nodes;
 
@@ -727,11 +729,11 @@ function joinToPreviousListItem(type?: NodeType): Command {
   return (state, dispatch) => {
     let listItem = type;
     if (!listItem) {
-      ({ listItem } = state.schema.nodes);
+      ({ list_item: listItem } = state.schema.nodes);
     }
 
     const { $from } = state.selection;
-    const { paragraph, codeBlock, heading, bulletList, orderedList } = state.schema.nodes;
+    const { paragraph, codeBlock, heading, bullet_list: bulletList, ordered_list: orderedList } = state.schema.nodes;
     const isGapCursorShown = state.selection instanceof GapCursorSelection;
     const $cutPos = isGapCursorShown ? state.doc.resolve($from.pos + 1) : $from;
     const $cut = findCutBefore($cutPos);
@@ -804,7 +806,7 @@ function deletePreviousEmptyListItem(type: NodeType): Command {
     const { $from } = state.selection;
     let listItem = type;
     if (!listItem) {
-      ({ listItem } = state.schema.nodes);
+      ({ list_item: listItem } = state.schema.nodes);
     }
     const $cut = findCutBefore($from);
     if (!$cut || !$cut.nodeBefore || !($cut.nodeBefore.type === listItem)) {
@@ -846,7 +848,7 @@ export function moveEdgeListItem(type: NodeType, dir: MoveDirection = 'UP'): Com
     let listItem = type;
 
     if (!listItem) {
-      ({ listItem } = state.schema.nodes);
+      ({ list_item: listItem } = state.schema.nodes);
     }
 
     if (!state.selection.empty) {

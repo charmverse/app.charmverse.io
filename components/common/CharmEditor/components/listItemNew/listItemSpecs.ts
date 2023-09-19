@@ -6,9 +6,9 @@ import { LIST_ITEM } from './nodeNames';
 export const ATTRIBUTE_LIST_STYLE_TYPE = 'data-list-style-type';
 
 const ListItemNodeSpec: NodeSpec = {
-  attrs: {
-    align: { default: null }
-  },
+  // attrs: {
+  //   align: { default: null }
+  // },
 
   // NOTE:
   // This spec does not support nested lists (e.g. `'paragraph block*'`)

@@ -56,7 +56,7 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
   });
 }
 
-const parentNodesToShow = ['columnBlock', 'listItem'];
+const parentNodesToShow = ['columnBlock', 'listItem', 'list_item'];
 
 function shouldShowPlaceholder(state: EditorState) {
   const selectionStart = state.selection.$from;

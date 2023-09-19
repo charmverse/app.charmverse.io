@@ -3,12 +3,15 @@ import { chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import type { Node, NodeType } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
+import { findParentNodeOfType } from 'prosemirror-utils';
+
+import { isAtBeginningOfLine } from '../../utils';
 
 import { mergeListItemDown, mergeListItemUp } from './mergeListItems';
 import { BULLET_LIST, LIST_ITEM, ORDERED_LIST } from './nodeNames';
 import { splitListItem } from './splitListItem';
 import { isNodeTodo, removeTodo, setTodo } from './todo';
-import { toggleList } from './toggleList';
+import { toggleList, liftListItems } from './toggleList';
 import { updateIndentLevel } from './updateIndentLevel';
 
 export const splitListCommand = (): Command => (state, dispatch) => {
@@ -81,6 +84,41 @@ export function toggleBulletList(): Command {
     toggleList(state.schema.nodes[BULLET_LIST], state.schema.nodes[LIST_ITEM])(state, dispatch, view);
 
   return chainCommands(removeTodo, handleBulletLists);
+}
+
+export function removeList(): Command {
+  return (state: EditorState, dispatch) => {
+    const { schema, selection } = state;
+    const listItem = schema.nodes[LIST_ITEM];
+    if (!listItem) {
+      return false;
+    }
+    const { from, empty } = selection;
+    if (!empty) {
+      // Selection is collapsed.
+      return false;
+    }
+    const result = findParentNodeOfType(listItem)(selection);
+    if (!result) {
+      return false;
+    }
+    const { pos, node } = result;
+    if (from !== pos + 2) {
+      // Selection is not at the begining of the list item.
+      return false;
+    }
+    if (node.childCount !== 1) {
+      // list item should only have one child (paragraph).
+      return false;
+    }
+
+    if (result.node.type.name === LIST_ITEM) {
+      const grandParent = state.selection.$from.node(-2);
+      liftListItems(grandParent.attrs.indent)(state, dispatch);
+      return true;
+    }
+    return false;
+  };
 }
 
 export function toggleTodoList(): Command {

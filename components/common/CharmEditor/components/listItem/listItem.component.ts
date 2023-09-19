@@ -121,7 +121,7 @@ function pluginsFactory({ keybindings = defaultKeys, nodeView = true, readOnly =
             }))
           ),
 
-          Backspace: backspaceKeyCommand(type),
+          // Backspace: backspaceKeyCommand(type),
           Enter: enterKeyCommand(type),
           ...createObject([
             [keybindings.indent, filter(isValidList, indentListItem())],
