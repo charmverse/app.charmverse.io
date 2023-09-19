@@ -1,3 +1,7 @@
+import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+
 export type UserEntity = {
   id: string;
   avatar?: string;
@@ -49,11 +53,19 @@ export type BountyEntity = {
   customReward: string | null;
 };
 
+export type PageEntity = {
+  id: string;
+  title: string;
+  path: string;
+  type: PageType;
+};
+
 export enum WebhookNameSpaces {
   Bounty = 'bounty',
   Forum = 'forum',
   user = 'user',
-  Proposal = 'proposal'
+  Proposal = 'proposal',
+  Page = 'page'
 }
 
 export enum WebhookEventNames {
@@ -67,7 +79,8 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   UserJoined = 'user.joined',
-  HelloWorld = 'hello.world'
+  HelloWorld = 'hello.world',
+  PageMention = 'page.mention'
 }
 
 // Utils to share common props among events
@@ -123,6 +136,11 @@ export type WebhookEvent<T = WebhookEventNames> =
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.PageMention;
+      page: PageEntity;
+      mention: UserMentionMetadata;
+    })
+  | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;
       user: UserEntity;
     })
@@ -135,8 +153,8 @@ export type WebhookPayload<T = WebhookEventNames> = {
   createdAt: string;
   event: WebhookEvent<T>;
   spaceId: string;
-  webhookURL: string;
-  signingSecret: string;
+  webhookURL: string | null;
+  signingSecret: string | null;
 };
 
 // Payload example

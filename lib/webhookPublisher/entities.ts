@@ -2,7 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 
-import type { BountyEntity, CommentEntity, PostEntity, ProposalEntity, SpaceEntity, UserEntity } from './interfaces';
+import type {
+  BountyEntity,
+  CommentEntity,
+  PageEntity,
+  PostEntity,
+  ProposalEntity,
+  SpaceEntity,
+  UserEntity
+} from './interfaces';
 
 export async function getBountyEntity(id: string): Promise<BountyEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
@@ -120,4 +128,18 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
     walletAddress: user.wallets[0]?.address,
     discordId: user.discordUser?.discordId
   };
+}
+
+export async function getPageEntity(id: string): Promise<PageEntity> {
+  return prisma.page.findFirstOrThrow({
+    where: {
+      id
+    },
+    select: {
+      id: true,
+      title: true,
+      path: true,
+      type: true
+    }
+  });
 }

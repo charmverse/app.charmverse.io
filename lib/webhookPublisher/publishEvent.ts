@@ -1,3 +1,4 @@
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
@@ -6,7 +7,8 @@ import {
   getCommentEntity,
   getSpaceEntity,
   getPostEntity,
-  getProposalEntity
+  getProposalEntity,
+  getPageEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -139,5 +141,22 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
     proposal,
     space,
     user
+  });
+}
+
+type PageEventContext = {
+  scope: WebhookEventNames.PageMention;
+  pageId: string;
+  spaceId: string;
+  mention: UserMentionMetadata;
+};
+
+export async function publishPageEvent(context: PageEventContext) {
+  const [space, page] = await Promise.all([getSpaceEntity(context.spaceId), getPageEntity(context.pageId)]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    page,
+    space,
+    mention: context.mention
   });
 }

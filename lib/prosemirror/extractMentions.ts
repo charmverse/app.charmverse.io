@@ -1,14 +1,21 @@
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 
+export interface UserMentionMetadata {
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  text: string;
+  value: string;
+}
+
 /**
  * Extract all mention ids from page content (json)
  * @param content Page content as raw json
  * @returns An array of mention ids
  */
 export function extractMentions(content: PageContent, username?: string) {
-  const mentions: Map<string, { id: string; createdAt: string; createdBy: string; text: string; value: string }> =
-    new Map();
+  const mentions: Map<string, UserMentionMetadata> = new Map();
 
   function recurse(node: PageContent, parentNode: PageContent | null) {
     if (node.content) {
