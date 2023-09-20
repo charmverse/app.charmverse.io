@@ -94,31 +94,6 @@ exports[`components/cardDetail/comment return comment 1`] = `
                     />
                   </div>
                 </div>
-                <div
-                  class="menu-spacer hideOnWidescreen"
-                />
-                <div
-                  class="menu-options hideOnWidescreen"
-                >
-                  <div
-                    aria-label="Cancel"
-                    class="MenuOption TextOption menu-option menu-cancel"
-                    data-mui-internal-clone-element="true"
-                    role="button"
-                  >
-                    <div
-                      class="noicon"
-                    />
-                    <div
-                      class="menu-name"
-                    >
-                      Cancel
-                    </div>
-                    <div
-                      class="noicon"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -129,7 +104,6 @@ exports[`components/cardDetail/comment return comment 1`] = `
       >
         <div
           class="bangle-editor-core readonly"
-          style="cursor: default;"
         >
           <span />
           <div
@@ -281,31 +255,6 @@ exports[`components/cardDetail/comment return comment and delete comment 1`] = `
                     />
                   </div>
                 </div>
-                <div
-                  class="menu-spacer hideOnWidescreen"
-                />
-                <div
-                  class="menu-options hideOnWidescreen"
-                >
-                  <div
-                    aria-label="Cancel"
-                    class="MenuOption TextOption menu-option menu-cancel"
-                    data-mui-internal-clone-element="true"
-                    role="button"
-                  >
-                    <div
-                      class="noicon"
-                    />
-                    <div
-                      class="menu-name"
-                    >
-                      Cancel
-                    </div>
-                    <div
-                      class="noicon"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -316,7 +265,6 @@ exports[`components/cardDetail/comment return comment and delete comment 1`] = `
       >
         <div
           class="bangle-editor-core readonly"
-          style="cursor: default;"
         >
           <span />
           <div
@@ -408,7 +356,6 @@ exports[`components/cardDetail/comment return comment readonly 1`] = `
       >
         <div
           class="bangle-editor-core readonly"
-          style="cursor: default;"
         >
           <span />
           <div
