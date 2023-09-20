@@ -265,6 +265,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
     const expectedResult: PublicApiProposalComment[] = [
       {
         id: rootComments[0].id,
+        createdAt: rootComments[0].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -277,6 +278,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: rootComments[1].id,
+        createdAt: rootComments[1].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -289,6 +291,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: childComments[0].id,
+        createdAt: childComments[0].createdAt.toISOString(),
         content: {
           markdown: childCommentText,
           text: childCommentText
@@ -301,6 +304,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: childComments[1].id,
+        createdAt: childComments[0].createdAt.toISOString(),
         content: {
           markdown: childCommentText,
           text: childCommentText
@@ -313,6 +317,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: nestedChildComments[0].id,
+        createdAt: nestedChildComments[0].createdAt.toISOString(),
         content: {
           markdown: nestedCommentText,
           text: nestedCommentText
@@ -343,6 +348,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
     const expectedTree: PublicApiProposalComment[] = [
       {
         id: rootComments[0].id,
+        createdAt: rootComments[0].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -354,6 +360,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
         children: expect.arrayContaining<PublicApiProposalComment>([
           {
             id: childComments[0].id,
+            createdAt: childComments[0].createdAt.toISOString(),
             content: {
               markdown: childCommentText,
               text: childCommentText
@@ -361,6 +368,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
             children: [
               {
                 id: nestedChildComments[0].id,
+                createdAt: nestedChildComments[0].createdAt.toISOString(),
                 content: {
                   markdown: nestedCommentText,
                   text: nestedCommentText
@@ -379,6 +387,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
           },
           {
             id: childComments[1].id,
+            createdAt: childComments[1].createdAt.toISOString(),
             content: {
               markdown: childCommentText,
               text: childCommentText
@@ -393,6 +402,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: rootComments[1].id,
+        createdAt: rootComments[1].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -423,6 +433,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
     const expectedResult: PublicApiProposalComment[] = [
       {
         id: rootComments[0].id,
+        createdAt: rootComments[0].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -435,6 +446,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: rootComments[1].id,
+        createdAt: rootComments[1].createdAt.toISOString(),
         content: {
           markdown: commentText,
           text: commentText
@@ -447,6 +459,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: childComments[0].id,
+        createdAt: childComments[0].createdAt.toISOString(),
         content: {
           markdown: childCommentText,
           text: childCommentText
@@ -459,6 +472,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: childComments[1].id,
+        createdAt: childComments[1].createdAt.toISOString(),
         content: {
           markdown: childCommentText,
           text: childCommentText
@@ -471,6 +485,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: nestedChildComments[0].id,
+        createdAt: nestedChildComments[0].createdAt.toISOString(),
         content: {
           markdown: nestedCommentText,
           text: nestedCommentText

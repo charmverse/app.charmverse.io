@@ -2,15 +2,16 @@ import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-clien
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { InvalidStateError } from 'lib/middleware';
+import { InvalidStateError, requireKeys } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { PublicApiProposal } from '../../index';
-
 const handler = apiHandler();
+
+handler.get(getProposalComments);
+handler.post(requireKeys(['userId', 'content'], 'body'), createProposalComment);
 
 /**
  * @swagger
@@ -40,6 +41,10 @@ const handler = apiHandler();
  *           type: string
  *           description: User ID of the user who created the comment
  *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *         createdAt:
+ *           type: string
+ *           description: ISO Timestamp of comment creation date
+ *           example: '2023-09-20T01:37:24.262Z'
  *         upvotes:
  *           type: integer
  *           example: 5
@@ -65,39 +70,23 @@ const handler = apiHandler();
  */
 export type PublicApiProposalComment = {
   id: string;
+  createdBy: string;
+  createdAt: string;
   parentId: string | null;
   content: {
     text: string;
     markdown: string;
   };
-  createdBy: string;
   upvotes: number;
   downvotes: number;
   children: PublicApiProposalComment[];
 };
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     ProposalWithDetails:
- *       allOf:
- *         - $ref: '#/components/schemas/Proposal'
- *         - type: object
- *           properties:
- *             comments:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/ProposalComment'
- */
-export type PublicApiProposalWithDetails = PublicApiProposal & {
-  comments: PublicApiProposalComment[];
-};
 async function mapReducePageComments({
   comments,
   reduceToTree
 }: {
-  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdBy'> & {
+  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt' | 'createdBy'> & {
     votes: Pick<PageCommentVote, 'upvoted'>[];
   })[];
   reduceToTree?: boolean;
@@ -127,6 +116,7 @@ async function mapReducePageComments({
     const commentWithDetails: PublicApiProposalComment = {
       id: comment.id,
       createdBy: comment.createdBy,
+      createdAt: comment.createdAt.toISOString(),
       parentId: comment.parentId,
       content: {
         markdown: parsedContent,
@@ -162,9 +152,6 @@ async function mapReducePageComments({
 
   return rootComments;
 }
-
-handler.get(getProposalComments);
-
 /**
  * @swagger
  * /proposals/{proposalIdOrPath}/comments:
@@ -220,6 +207,7 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
       content: true,
       contentText: true,
       createdBy: true,
+      createdAt: true,
       votes: {
         select: {
           upvoted: true
@@ -234,6 +222,60 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
   });
 
   return res.status(200).json(mappedComments);
+}
+
+async function createProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
+  // This should never be undefined, but adding this safeguard for future proofing
+  const spaceId = req.authorizedSpaceId;
+
+  if (!spaceId) {
+    throw new InvalidStateError('Space ID is undefined');
+  }
+
+  const proposal = await prisma.proposal.findFirstOrThrow({
+    where: {
+      page: generatePageQuery({
+        pageIdOrPath: req.query.proposalId as string,
+        spaceIdOrDomain: spaceId
+      })
+    },
+    select: {
+      id: true
+    }
+  });
+
+  const userId = req.body.userId as string;
+
+  const proposalComment = await prisma.pageComment.create({
+    data: {
+      page: { connect: { id: proposal.id } },
+      parentId: req.body.parentId,
+      contentText: req.body.content,
+      user: { connect: { id: userId } },
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: req.body.content }]
+          }
+        ]
+      }
+    }
+  });
+
+  const apiComment: PublicApiProposalComment = {
+    id: proposalComment.id,
+    createdAt: proposalComment.createdAt.toISOString(),
+    content: req.body.content,
+    createdBy: userId,
+    downvotes: 0,
+    upvotes: 0,
+    parentId: proposalComment.parentId,
+    children: []
+  };
+
+  return res.status(201).json(apiComment);
 }
 
 export default withSessionRoute(handler);
