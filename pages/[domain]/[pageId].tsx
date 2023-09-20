@@ -70,7 +70,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       if (page.path !== pagePath) {
         return {
           redirect: {
-            destination: `/${domain}/${page.path}`,
+            destination: encodeURI(`/${domain}/${page.path}`),
             permanent: false
           }
         };
