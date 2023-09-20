@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
+import { getBrowserPath } from 'lib/utilities/browser';
 
 export function useAppLoadedEvent() {
   const { isLoaded } = useUser();
@@ -15,7 +16,7 @@ export function useAppLoadedEvent() {
     if (isLoaded) {
       debouncedTrackAction('app_loaded', {
         spaceId: space?.id,
-        meta: { pathname: window.location.pathname + window.location.search }
+        meta: { pathname: getBrowserPath() }
       });
     }
   }, [isLoaded, space?.id]);
