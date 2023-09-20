@@ -47,7 +47,7 @@ const isValidList = (state: EditorState) => {
 
 function specFactory(): RawSpecs {
   const { toDOM, parseDOM } = domSerializationHelpers(name, {
-    tag: 'li',
+    tag: 'li.old-list-item',
     // @ts-ignore DOMOutputSpec in @types is buggy
     content: 0
   });

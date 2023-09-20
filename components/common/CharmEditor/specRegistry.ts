@@ -67,10 +67,10 @@ export const specRegistry = new SpecRegistry([
   italic.spec(), // OK
   linkSpec(), // OK
   bulletList.spec(), // OK
+  bulletListItemSpec(), // Note that bullets should appear first, so drag/drop and copy/paste prefers bullet lists, since the type is not carried over
   listItem.spec(), // OK
   orderedList.spec(), // OK
   orderedListItemSpec(),
-  bulletListItemSpec(),
   listItemSpec(),
   markSpec(),
   strike.spec(), // OK
