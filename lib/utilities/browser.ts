@@ -226,6 +226,29 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
   }, 1000);
 }
 
+// decode the path to handle special characters
+export function getBrowserPath() {
+  return decodeURIComponent(window.location.pathname + window.location.search);
+}
+
+// determine if a URL has encoded characters (ex: '/civil-lime-planarian/%E5%A0%B1%%85%AC%E3')
+function isEncoded(uri: string) {
+  uri = uri || '';
+  try {
+    const decoded = decodeURIComponent(uri);
+    return decoded !== uri;
+  } catch (error) {
+    return false;
+  }
+}
+
+export function fullyDecodeURI(uri: string) {
+  while (isEncoded(uri)) {
+    uri = decodeURIComponent(uri);
+  }
+
+  return uri;
+}
 // strip out custom or domain depending on the host
 export function getSubdomainPath(
   path: string,

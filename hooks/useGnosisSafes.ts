@@ -4,12 +4,12 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isTruthy } from 'lib/utilities/types';
 
 export default function useSafes(safeAddresses: string[]) {
   const [safes, setSafes] = useState<Safe[]>([]);
-  const { account, signer } = useWeb3AuthSig();
+  const { account, signer } = useWeb3Account();
 
   async function loadSafes() {
     if (!signer) return;

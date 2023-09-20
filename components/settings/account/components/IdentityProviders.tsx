@@ -30,7 +30,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
@@ -46,7 +46,7 @@ import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3AuthSig();
+  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();

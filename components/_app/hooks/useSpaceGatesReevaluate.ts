@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 export function useSpaceGatesReevaluate() {
   const { user, refreshUser } = useUser();
   const { space: currentSpace } = useCurrentSpace();
-  const { getStoredSignature, account } = useWeb3AuthSig();
+  const { getStoredSignature, account } = useWeb3Account();
 
   useEffect(() => {
     const reevaluateRoles = async () => {

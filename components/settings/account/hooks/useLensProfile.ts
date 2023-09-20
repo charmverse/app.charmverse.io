@@ -5,7 +5,7 @@ import { useSignMessage } from 'wagmi';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { LensChain, lensClient } from 'lib/lens/lensClient';
 
@@ -14,7 +14,7 @@ async function switchNetwork() {
 }
 
 export function useLensProfile() {
-  const { account, chainId } = useWeb3AuthSig();
+  const { account, chainId } = useWeb3Account();
   const { user } = useUser();
   const { space } = useCurrentSpace();
   const { signMessageAsync } = useSignMessage();

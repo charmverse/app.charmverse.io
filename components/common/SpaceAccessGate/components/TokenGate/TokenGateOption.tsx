@@ -4,7 +4,7 @@ import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 import { GateOption } from '../GateOption';
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
-  const { account } = useWeb3AuthSig();
+  const { account } = useWeb3Account();
   const [description, setDescription] = useState<string>('');
 
   useEffect(() => {
