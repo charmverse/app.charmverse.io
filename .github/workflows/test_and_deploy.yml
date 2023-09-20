@@ -76,7 +76,7 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
-    name: Tests
+    name: Validate code
     runs-on: ubuntu-latest
     needs: build-test-env
     steps:
