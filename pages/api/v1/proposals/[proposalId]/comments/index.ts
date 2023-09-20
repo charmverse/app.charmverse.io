@@ -1,17 +1,20 @@
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
-import { InvalidStateError, requireKeys } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { apiHandler } from 'lib/public-api/handler';
+import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { logApiRequest } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = apiHandler();
+const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getProposalComments);
-handler.post(requireKeys(['userId', 'content'], 'body'), createProposalComment);
+handler.get(requireApiKey, logApiRequest, getProposalComments);
+
+handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'content'], 'body'), createProposalComment);
 
 /**
  * @swagger
@@ -54,18 +57,7 @@ handler.post(requireKeys(['userId', 'content'], 'body'), createProposalComment);
  *         children:
  *           type: array
  *           description: Child comments of this comment. By default, this array is empty unless you request comments as a tree
- *           items:
- *             $ref: '#/components/schemas/ProposalComment'
- *             example:
- *               id: "4ba85f64-5717-4562-b3fc-2c963f66afa7"
- *               parentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
- *               content:
- *                 text: "This is a child comment."
- *                 markdown: "### This is a child comment."
- *               createdBy: "79a54a56-50d6-4f7b-b350-2d9c312f81f4"
- *               upvotes: 3
- *               downvotes: 1
- *               children: []
+ *           example: []
  *
  */
 export type PublicApiProposalComment = {
@@ -169,7 +161,7 @@ async function mapReducePageComments({
  *           type: boolean
  *     responses:
  *       200:
- *         description: List of proposals of casted vote
+ *         description: List of proposals
  *         content:
  *            application/json:
  *              schema:
@@ -224,20 +216,68 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
   return res.status(200).json(mappedComments);
 }
 
+/**
+ * @swagger
+ * /proposals/{proposalIdOrPath}/comments:
+ *   post:
+ *     summary: Create proposal comment
+ *     description: Adds a new top-level comment to a proposal, or a response to an existing proposal comment
+ *     tags:
+ *      - 'Space API'
+ *     parameters:
+ *       - name: proposalIdOrPath
+ *         in: params
+ *         required: true
+ *         type: string
+ *         description: ID of the related proposal
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: User ID of comment author
+ *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *               content:
+ *                 type: string
+ *                 description: Content of the comment
+ *                 example: "This is a comment."
+ *              parentId:
+ *                 type: string
+ *                 nullable: true
+ *                 description: ID of the parent comment, if this is a response to an existing comment
+ *                 example: "36d31192-af56-4e74-9f85-502a21032b51"
+ *
+ *             required:
+ *               - userId
+ *               - content
+ *     responses:
+ *       200:
+ *         description: Created comment
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                $ref: '#/components/schemas/ProposalComment'
+ *
+ */
 async function createProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
-  const spaceId = req.authorizedSpaceId;
-
-  if (!spaceId) {
+  if (!req.spaceIdRange) {
     throw new InvalidStateError('Space ID is undefined');
   }
 
   const proposal = await prisma.proposal.findFirstOrThrow({
     where: {
       page: generatePageQuery({
-        pageIdOrPath: req.query.proposalId as string,
-        spaceIdOrDomain: spaceId
-      })
+        pageIdOrPath: req.query.proposalId as string
+      }),
+      spaceId: {
+        in: req.spaceIdRange
+      }
     },
     select: {
       id: true
@@ -246,28 +286,25 @@ async function createProposalComment(req: NextApiRequest, res: NextApiResponse<P
 
   const userId = req.body.userId as string;
 
+  const commentContent = await parseMarkdown(req.body.content);
+
   const proposalComment = await prisma.pageComment.create({
     data: {
       page: { connect: { id: proposal.id } },
       parentId: req.body.parentId,
       contentText: req.body.content,
       user: { connect: { id: userId } },
-      content: {
-        type: 'doc',
-        content: [
-          {
-            type: 'paragraph',
-            content: [{ type: 'text', text: req.body.content }]
-          }
-        ]
-      }
+      content: commentContent
     }
   });
 
   const apiComment: PublicApiProposalComment = {
     id: proposalComment.id,
     createdAt: proposalComment.createdAt.toISOString(),
-    content: req.body.content,
+    content: {
+      markdown: req.body.content,
+      text: req.body.content
+    },
     createdBy: userId,
     downvotes: 0,
     upvotes: 0,
