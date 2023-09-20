@@ -17,7 +17,7 @@ export function defaultHandler() {
 export function apiHandler() {
   return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch })
     .use(requireApiKey)
-    .use(secureApiRequest)
+    .use(secureSpaceApiRequest)
     .use(logApiRequest);
 }
 
@@ -28,7 +28,7 @@ export function apiPageKeyHandler() {
 export function superApiHandler() {
   return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch })
     .use(requireSuperApiKey)
-    .use(secureApiRequest)
+    .use(securePartnerSpaceApiRequest)
     .use(logApiRequest);
 }
 export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: NextApiResponse, next: VoidFunction) {
@@ -68,9 +68,19 @@ export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: Next
 
   next();
 }
-function secureApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
+
+function secureSpaceApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
   if (!req.authorizedSpaceId) {
     throw new ActionNotPermittedError('No authorised space ID found');
+  }
+  next();
+}
+
+function securePartnerSpaceApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
+  const spaceId = (req.query.spaceId ?? req.body.spaceId) as string;
+
+  if (!req.spaceIdRange || !req.spaceIdRange.length || (spaceId && !req.spaceIdRange.includes(spaceId))) {
+    throw new ActionNotPermittedError('No matching space ID found for partner API key');
   }
   next();
 }
