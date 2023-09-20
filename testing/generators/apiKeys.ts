@@ -40,7 +40,16 @@ export async function generateSpaceApiKey({ spaceId }: { spaceId: string }): Pro
   });
 }
 
-export async function generateSuperApiKey({ spaceId }: { spaceId: string }): Promise<SuperApiToken> {
+export async function generateSuperApiKey({ spaceId }: { spaceId?: string } = {}): Promise<SuperApiToken> {
+  if (!spaceId) {
+    return prisma.superApiToken.create({
+      data: {
+        token: uuid(),
+        name: `super-api-key-${uuid()}`
+      }
+    });
+  }
+
   const botUser = await prisma.user.findFirst({
     where: {
       isBot: true,

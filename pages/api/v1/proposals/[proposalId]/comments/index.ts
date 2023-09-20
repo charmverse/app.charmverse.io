@@ -1,16 +1,15 @@
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
+import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
-import { logApiRequest } from 'lib/public-api/handler';
+import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = defaultHandler();
 
 handler.get(requireApiKey, logApiRequest, getProposalComments);
 
