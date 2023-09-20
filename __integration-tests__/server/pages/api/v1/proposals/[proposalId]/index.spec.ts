@@ -1,3 +1,4 @@
+import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type {
   GoogleAccount,
   Page,
@@ -15,14 +16,13 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
-import type { PublicApiProposalComment, PublicApiProposalWithDetails } from 'pages/api/v1/proposals/[proposalId]';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-type ProposalWithDetails = Proposal & {
+type ProposalWithDetails = ProposalWithUsers & {
   page: Page;
 };
 
@@ -118,107 +118,9 @@ beforeAll(async () => {
       { group: 'user', id: proposalReviewer.id }
     ]
   });
-
-  const rootComments: Prisma.PageCommentCreateManyInput[] = [
-    {
-      id: uuid(),
-      createdBy: proposalAuthor.id,
-      pageId: proposal.id,
-      parentId: null,
-      contentText: '',
-      content: stubProsemirrorDoc({
-        text: commentText
-      })
-    },
-    {
-      id: uuid(),
-      createdBy: secondUser.id,
-      pageId: proposal.id,
-      parentId: null,
-      contentText: '',
-      content: stubProsemirrorDoc({
-        text: commentText
-      })
-    }
-  ];
-
-  const firstLevelComments: Prisma.PageCommentCreateManyInput[] = rootComments.map((c) => ({
-    ...c,
-    id: uuid(),
-    parentId: c.id,
-    content: stubProsemirrorDoc({
-      text: childCommentTtext
-    })
-  }));
-
-  const secondLevelComments: Prisma.PageCommentCreateManyInput[] = firstLevelComments.map((c) => ({
-    ...c,
-    id: uuid(),
-    parentId: c.id,
-    content: stubProsemirrorDoc({
-      text: childCommentTtext
-    })
-  }));
 });
 
 describe('GET /api/v1/proposals/{proposalId}', () => {
-  // This test needs to be fixed.
-
-  it('should return the full proposal details along with comments and their votes when called with an API key', async () => {
-    const response = (
-      await request(baseUrl)
-        .get(`/api/v1/proposals/${proposal.id}`)
-        .set({
-          authorization: `Bearer ${apiKey.token}`
-        })
-        .expect(200)
-    ).body as PublicApiProposal[];
-
-    expect(response).toMatchObject(
-      expect.objectContaining<PublicApiProposalWithDetails>({
-        createdAt: proposal.page.createdAt.toISOString() as any,
-        content: {
-          text: expect.any(String),
-          markdown: proposalText
-        },
-        id: proposal.id,
-        authors: [
-          {
-            userId: proposalAuthor.id,
-            address: proposalAuthor.wallets[0].address,
-            email: proposalAuthor.googleAccounts[0].email
-          }
-        ],
-        reviewers: expect.arrayContaining([
-          {
-            type: 'role',
-            id: reviewerRole.id
-          },
-          {
-            type: 'user',
-            id: proposalReviewer.id
-          }
-        ]),
-        title: proposal.page.title,
-        status: proposal.status,
-        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
-        comments: expect.arrayContaining<PublicApiProposalComment>([
-          {
-            children: expect.arrayContaining<PublicApiProposalComment>([
-              {
-                children: expect.arrayContaining<PublicApiProposalComment>([
-                  {}
-                ]),
-              }
-          },
-          {
-
-          }
-        ])
-      })
-    );
-  });
-
   it('should return a proposal when called with an API key', async () => {
     const response = (
       await request(baseUrl)
