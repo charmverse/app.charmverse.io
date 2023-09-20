@@ -20,26 +20,37 @@ handler.get(computeProposalPermissions);
  *       properties:
  *         edit:
  *           type: boolean
+ *           example: false
  *         view:
  *           type: boolean
+ *           example: true
  *         delete:
  *           type: boolean
+ *           example: false
  *         create_vote:
  *           type: boolean
+ *           example: false
  *         vote:
  *           type: boolean
+ *           example: true
  *         comment:
  *           type: boolean
+ *           example: false
  *         review:
  *           type: boolean
+ *           example: false
  *         evaluate:
  *           type: boolean
+ *           example: false
  *         make_public:
  *           type: boolean
+ *           example: false
  *         archive:
  *           type: boolean
+ *           example: false
  *         unarchive:
  *           type: boolean
+ *           example: false
  *     ProposalPermissions:
  *       type: object
  *       properties:
@@ -65,15 +76,15 @@ export type PublicProposalApiPermissions = {
  * @swagger
  * /proposals/{proposalIdOrPath}/compute-permissions:
  *   get:
- *     summary: Compute Permissions
+ *     summary: Compute user permissions for a proposal
  *     description: Compute the permissions for a given resource and user.
  *     tags:
- *      - 'Permission API'
+ *      - 'Space API'
  *     parameters:
- *       - name: resourceId
- *         in: query
+ *       - name: proposalIdOrPath
+ *         in: params
  *         required: true
- *         description: The ID of the resource for which to compute permissions.
+ *         description: The ID or page link of ie. "page-123344453" of the proposal for which to compute permissions.
  *         schema:
  *           type: string
  *       - name: userId
@@ -84,11 +95,11 @@ export type PublicProposalApiPermissions = {
  *           type: string
  *     responses:
  *       200:
- *         description: Computed permissions for the resource and user.
+ *         description: Computed permissions for the proposal and user.
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/PublicProposalApiPermissions'
+ *                $ref: '#/components/schemas/ProposalPermissions'
  */
 async function computeProposalPermissions(req: NextApiRequest, res: NextApiResponse<PublicProposalApiPermissions>) {
   const spaceId = req.authorizedSpaceId;
