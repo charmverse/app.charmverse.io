@@ -277,12 +277,14 @@ function wrapInList(nodeType: NodeType, attrs?: Node['attrs']): Command {
   );
 }
 
-export function liftListItems(indent = 1): Command {
+export function liftListItems(indent?: number): Command {
   return function (state, dispatch) {
     const { tr } = state;
     const { $from, $to } = state.selection;
 
-    tr.insert($from.pos, state.schema.nodes.tabIndent.create({ indent }));
+    if (typeof indent === 'number') {
+      tr.insert($from.pos, state.schema.nodes.tabIndent.create({ indent }));
+    }
 
     tr.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
       // Following condition will ensure that block types paragraph, heading, codeBlock, blockquote, panel are lifted.
@@ -300,11 +302,9 @@ export function liftListItems(indent = 1): Command {
         if (target === undefined || target === null) {
           return false;
         }
-
         tr.lift(range, target);
       }
     });
-
     if (dispatch) {
       dispatch(tr);
     }
