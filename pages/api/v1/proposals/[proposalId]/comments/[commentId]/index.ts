@@ -20,7 +20,7 @@ handler.put(requireKeys(['userId', 'content'], 'body'), updateProposalComment);
  *     summary: Update a proposal comment
  *     description: Update the content of an existing proposal comment
  *     tags:
- *      - 'Space API'
+ *      - 'Partner API'
  *     parameters:
  *       - name: proposalIdOrPath
  *         in: params

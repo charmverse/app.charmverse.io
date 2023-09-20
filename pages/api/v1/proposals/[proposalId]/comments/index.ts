@@ -223,12 +223,13 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
  *     summary: Create proposal comment
  *     description: Adds a new top-level comment to a proposal, or a response to an existing proposal comment
  *     tags:
- *      - 'Space API'
+ *      - 'Partner API'
  *     parameters:
  *       - name: proposalIdOrPath
- *         in: params
+ *         in: path
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
  *         description: ID of the related proposal
  *     requestBody:
  *       required: true
@@ -245,7 +246,7 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
  *                 type: string
  *                 description: Content of the comment
  *                 example: "This is a comment."
- *              parentId:
+ *               parentId:
  *                 type: string
  *                 nullable: true
  *                 description: ID of the parent comment, if this is a response to an existing comment

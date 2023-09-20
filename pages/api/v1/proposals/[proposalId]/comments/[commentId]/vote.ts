@@ -1,18 +1,17 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
-import { InvalidStateError, onError, onNoMatch, requireKeys, requireSuperApiKey } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { logApiRequest } from 'lib/public-api/handler';
+import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import type { PublicApiProposalComment } from '../index';
 
-const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+const handler = superApiHandler();
 
-handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId'], 'body'), voteComment);
+handler.post(requireKeys(['userId'], 'body'), voteComment);
 
 /**
  * @swagger
@@ -21,15 +20,15 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId'], 'body'),
  *     summary: Up/downvote a proposal comment
  *     description: Adds a vote for a proposal comment by a specific user
  *     tags:
- *      - 'Space API'
+ *      - 'Partner API'
  *     parameters:
  *       - name: proposalIdOrPath
- *         in: params
+ *         in: path
  *         required: true
  *         type: string
  *         description: ID or page path of the related proposal
  *       - name: commentId
- *         in: params
+ *         in: path
  *         required: true
  *         type: string
  *         description: ID of the comment to create a vote for
@@ -54,7 +53,7 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId'], 'body'),
  *               - upvoted
  *     responses:
  *       200:
- *         description: Updated comment
+ *         description: Comment where the vote was made with refreshed vote count
  *         content:
  *            application/json:
  *              schema:
