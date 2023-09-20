@@ -8,7 +8,7 @@ import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkd
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { PublicApiProposal } from '../index';
+import type { PublicApiProposal } from '../../index';
 
 const handler = apiHandler();
 
