@@ -6,9 +6,6 @@ import { BULLET_LIST, LIST_ITEM } from './nodeNames';
 
 export const ATTRIBUTE_INDENT = 'data-indent';
 export const MIN_INDENT_LEVEL = 0;
-
-export const RESERVED_STYLE_NONE = 'None';
-
 const AUTO_LIST_STYLE_TYPES = ['disc', 'square', 'circle'];
 
 type Attrs = {
