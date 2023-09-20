@@ -20,7 +20,7 @@ export type LinkPluginState = {
 
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
-  let tooltipTimer: null | NodeJS.Timer = null;
+  let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
   return [
     link.plugins(),

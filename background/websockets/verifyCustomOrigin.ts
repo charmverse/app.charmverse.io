@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 
 let cache: Record<string, { isValid: boolean }> = {};
-let intervalId: NodeJS.Timer;
+let intervalId: ReturnType<typeof setInterval> | undefined;
 
 const INVALIDATE_CACHE_INTERVAL = 1000 * 60 * 5; // 5mins
 
