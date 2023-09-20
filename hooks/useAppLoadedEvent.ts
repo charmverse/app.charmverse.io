@@ -13,7 +13,10 @@ export function useAppLoadedEvent() {
 
   const trackAppLoaded = useCallback(() => {
     if (isLoaded) {
-      debouncedTrackAction('app_loaded', { spaceId: space?.id });
+      debouncedTrackAction('app_loaded', {
+        spaceId: space?.id,
+        meta: { pathname: window.location.pathname + window.location.search }
+      });
     }
   }, [isLoaded, space?.id]);
 
