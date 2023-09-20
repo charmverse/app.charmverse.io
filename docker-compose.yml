@@ -29,7 +29,7 @@ services:
       - '80:3000'
     command: ['npm', 'run', 'cron:staging']
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
     profiles:
       - stg-cron
 
@@ -61,7 +61,7 @@ services:
         'npm run prisma:deploy && node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-webapp
@@ -82,7 +82,7 @@ services:
     ports:
       - '3002:3000'
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
     profiles:
       - stg-sockets
       - stg-webapp

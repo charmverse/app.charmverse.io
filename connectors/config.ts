@@ -37,7 +37,7 @@ export const coinbaseWalletConnector = new CoinbaseWalletConnector({
 export const walletConnectConnector = new WalletConnectConnector({
   chains,
   options: {
-    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECTID as string
+    projectId: process.env.REACT_APP_WALLETCONNECT_PROJECTID as string
   }
 });
 

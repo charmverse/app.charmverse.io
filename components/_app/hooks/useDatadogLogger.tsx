@@ -17,25 +17,25 @@ export default function useDatadogLogger() {
 
   // Load DD_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && isProdEnv) {
+    if (process.env.REACT_APP_DD_CLIENT_TOKEN && isProdEnv) {
       datadogLogs.init({
-        clientToken: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN,
+        clientToken: process.env.REACT_APP_DD_CLIENT_TOKEN,
         site: DD_SITE,
         service: DD_SERVICE,
         forwardErrorsToLogs: true,
         sessionSampleRate: 100,
         env,
-        version: process.env.NEXT_PUBLIC_BUILD_ID
+        version: process.env.REACT_APP_BUILD_ID
       });
     }
   }, []);
 
   // Load DD_RUM_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN && process.env.NEXT_PUBLIC_DD_RUM_APP_ID && isProdEnv) {
+    if (process.env.REACT_APP_DD_RUM_CLIENT_TOKEN && process.env.REACT_APP_DD_RUM_APP_ID && isProdEnv) {
       datadogRum.init({
-        applicationId: process.env.NEXT_PUBLIC_DD_RUM_APP_ID,
-        clientToken: process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN,
+        applicationId: process.env.REACT_APP_DD_RUM_APP_ID,
+        clientToken: process.env.REACT_APP_DD_RUM_CLIENT_TOKEN,
         site: DD_SITE,
         service: DD_SERVICE,
         sampleRate: 100,
@@ -45,7 +45,7 @@ export default function useDatadogLogger() {
         trackLongTasks: true,
         defaultPrivacyLevel: 'mask-user-input',
         env,
-        version: process.env.NEXT_PUBLIC_BUILD_ID
+        version: process.env.REACT_APP_BUILD_ID
       });
 
       datadogRum.startSessionReplayRecording();

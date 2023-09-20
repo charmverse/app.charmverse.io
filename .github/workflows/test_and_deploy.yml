@@ -48,8 +48,8 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          REACT_APP_APP_ENV: 'test'
+          REACT_APP_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   chromatic:
     name: Publish to Chromatic
@@ -68,8 +68,8 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
+          REACT_APP_APP_ENV: 'test'
+          REACT_APP_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - uses: chromaui/action@v1
         with:
@@ -99,8 +99,8 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
+          REACT_APP_APP_ENV: 'test'
+          REACT_APP_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -205,8 +205,8 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
+          REACT_APP_APP_ENV: 'test'
+          REACT_APP_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
@@ -241,25 +241,25 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'production'
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
-          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          REACT_APP_APP_ENV: 'production'
+          REACT_APP_DD_CLIENT_TOKEN: ${{ secrets.REACT_APP_DD_CLIENT_TOKEN }}
+          REACT_APP_DD_RUM_CLIENT_TOKEN: ${{ secrets.REACT_APP_DD_RUM_CLIENT_TOKEN }}
+          REACT_APP_DD_RUM_APP_ID: ${{ secrets.REACT_APP_DD_RUM_APP_ID }}
+          REACT_APP_TELEGRAM_BOT_ID: ${{ secrets.REACT_APP_TELEGRAM_BOT_ID }}
+          REACT_APP_IFRAMELY_API_KEY: ${{ secrets.REACT_APP_IFRAMELY_API_KEY }}
+          REACT_APP_WEBSOCKETS_HOST: https://sockets.charmverse.io
+          REACT_APP_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.REACT_APP_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          REACT_APP_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.REACT_APP_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_AUTH_DOMAIN: ${{ secrets.REACT_APP_GOOGLE_AUTH_DOMAIN }}
+          REACT_APP_GOOGLE_PROJECT_ID: ${{ secrets.REACT_APP_GOOGLE_PROJECT_ID }}
+          REACT_APP_GOOGLE_STORAGE_BUCKET: ${{ secrets.REACT_APP_GOOGLE_STORAGE_BUCKET }}
+          REACT_APP_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_GOOGLE_MESSAGING_SENDER_ID }}
+          REACT_APP_STRIPE_PUBLIC_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLIC_KEY }}
+          REACT_APP_GOOGLE_APP_ID: ${{ secrets.REACT_APP_GOOGLE_APP_ID }}
+          REACT_APP_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.REACT_APP_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
+          REACT_APP_WALLETCONNECT_PROJECTID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECTID }}
+          REACT_APP_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
       - name: Build and Push Docker image
         id: docker_build_push
