@@ -15,7 +15,7 @@ import { v4 } from 'uuid';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;

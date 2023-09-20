@@ -1,15 +1,6 @@
 import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
-import type {
-  GoogleAccount,
-  Page,
-  Proposal,
-  Role,
-  Space,
-  SuperApiToken,
-  User,
-  UserWallet
-} from '@charmverse/core/prisma';
-import type { PageComment, Prisma, SpaceApiToken } from '@charmverse/core/prisma-client';
+import type { GoogleAccount, Page, Role, Space, SuperApiToken, User, UserWallet } from '@charmverse/core/prisma';
+import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
@@ -19,7 +10,7 @@ import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 type ProposalWithDetails = ProposalWithUsers & {
@@ -222,7 +213,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
       .expect(404);
     // Space ID provided not included in authorized space IDs for super API key
     await request(baseUrl)
-      .get(`/api/v1/proposals/${proposal.id}?spaceid=${space.id}`)
+      .get(`/api/v1/proposals/${proposal.id}?spaceId=${space.id}`)
       .set({ authorization: `Bearer ${otherSpaceSuperApiKey.token}` })
       .expect(401);
   });
