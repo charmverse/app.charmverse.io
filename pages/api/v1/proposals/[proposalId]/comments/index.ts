@@ -153,6 +153,12 @@ async function mapReducePageComments({
  *     tags:
  *      - 'Space API'
  *     parameters:
+ *       - name: proposalIdOrPath
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID or path of the database to create a card in
  *       - name: resultsAsTree
  *         in: query
  *         required: false

@@ -82,7 +82,7 @@ export type PublicProposalApiPermissions = {
  *      - 'Space API'
  *     parameters:
  *       - name: proposalIdOrPath
- *         in: params
+ *         in: path
  *         required: true
  *         description: The ID or page link of ie. "page-123344453" of the proposal for which to compute permissions.
  *         schema:

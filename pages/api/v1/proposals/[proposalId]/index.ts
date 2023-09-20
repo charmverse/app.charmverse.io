@@ -21,9 +21,16 @@ handler.get(getProposal);
  *     description: Return data for a proposal from the API
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *       - name: proposalIdOrPath
+ *         in: path
+ *         required: true
+ *         description: The ID or page link of ie. "page-123344453" of the proposal to retrieve
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
- *         description: List of proposals of casted vote
+ *         description: Proposal data and page content
  *         content:
  *            application/json:
  *              schema:
