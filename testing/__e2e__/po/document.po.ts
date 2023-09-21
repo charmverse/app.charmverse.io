@@ -31,6 +31,10 @@ export class DocumentPage extends GlobalPage {
     return this.page.goto(`${baseUrl}/${domain}/${path}`);
   }
 
+  getSelectProperties() {
+    return this.cardDetailProperties.locator('data-test=closed-select-input').all();
+  }
+
   openTrash() {
     this.trashToggle.click();
   }

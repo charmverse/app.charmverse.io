@@ -11,7 +11,7 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { blockLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -118,14 +118,15 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   }, [printRef, _printRef]);
 
   const card = useAppSelector((state) => {
-    if (!page.cardId) {
+    if (page.type !== 'card') {
       return null;
     }
-    const _card = state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId];
+    const _card = state.cards.cards[page.id] ?? state.cards.templates[page.id];
 
     if (!_card) {
-      blocksDispatch(blockLoad({ blockId: page.cardId }));
+      blocksDispatch(blockLoad({ blockId: page.id }));
       blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
       return null;
     }
     return _card;
