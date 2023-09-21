@@ -136,16 +136,16 @@ export function getProposalCommentMentions({
         extractedMentions.forEach((mention) => {
           if (mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
             discussionUserIds.push(mention.createdBy);
-            mentions.push({
-              ...getPropertiesFromPage(proposal.page, spaceRecord[proposal.spaceId]),
-              mentionId: mention.id,
-              createdAt: mention.createdAt,
-              userId: mention.createdBy,
-              text: mention.text,
-              commentId: comment.id,
-              type: 'proposal',
-              taskId: comment.id
-            });
+            // mentions.push({
+            //   ...getPropertiesFromPage(proposal.page, spaceRecord[proposal.spaceId]),
+            //   mentionId: mention.id,
+            //   createdAt: mention.createdAt,
+            //   userId: mention.createdBy,
+            //   text: mention.text,
+            //   commentId: comment.id,
+            //   type: 'proposal',
+            //   taskId: comment.id,
+            // });
           }
         });
       }

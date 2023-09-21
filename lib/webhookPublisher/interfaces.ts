@@ -71,10 +71,10 @@ export enum WebhookNameSpaces {
 
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
-  CommentCreated = 'forum.comment.created',
-  CommentUpvoted = 'forum.comment.upvoted',
-  CommentDownvoted = 'forum.comment.downvoted',
-  PostCreated = 'forum.post.created',
+  ForumPostCommentCreated = 'forum.post.comment.created',
+  ForumPostCommentUpvoted = 'forum.post.comment.upvoted',
+  ForumPostCommentDownvoted = 'forum.post.comment.downvoted',
+  ForumPostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
@@ -96,22 +96,22 @@ type WebhookEventSharedProps<T = WebhookEventNames> = {
 // Strongly typed events, shared between API, serverless functions and possibly our end users
 export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.PostCreated;
+      scope: WebhookEventNames.ForumPostCreated;
       post: PostEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentCreated;
+      scope: WebhookEventNames.ForumPostCommentCreated;
       comment: CommentEntity;
       post: PostEntity | null;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentUpvoted;
+      scope: WebhookEventNames.ForumPostCommentUpvoted;
       comment: CommentEntity;
       post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentDownvoted;
+      scope: WebhookEventNames.ForumPostCommentDownvoted;
       comment: CommentEntity;
       post: PostEntity;
       voter: UserEntity;

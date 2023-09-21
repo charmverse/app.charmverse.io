@@ -51,7 +51,8 @@ const createDiscussionTask = ({
       avatar: '',
       path: '',
       avatarTokenId: null
-    }
+    },
+    taskType: 'inline_comment.created'
   };
 };
 

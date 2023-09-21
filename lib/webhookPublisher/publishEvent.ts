@@ -13,7 +13,7 @@ import {
 import { publishWebhookEvent } from './publisher';
 
 type PostEventContext = {
-  scope: WebhookEventNames.PostCreated;
+  scope: WebhookEventNames.ForumPostCreated;
   spaceId: string;
   postId: string;
 };
@@ -28,7 +28,7 @@ export async function publishPostEvent(context: PostEventContext) {
 }
 
 type CommentEventContext = {
-  scope: WebhookEventNames.CommentCreated;
+  scope: WebhookEventNames.ForumPostCommentCreated;
   spaceId: string;
   postId: string;
   commentId: string;
@@ -49,7 +49,7 @@ export async function publishPostCommentEvent(context: CommentEventContext) {
 }
 
 type CommentVoteEventContext = {
-  scope: WebhookEventNames.CommentDownvoted | WebhookEventNames.CommentUpvoted;
+  scope: WebhookEventNames.ForumPostCommentDownvoted | WebhookEventNames.ForumPostCommentUpvoted;
   spaceId: string;
   postId: string;
   commentId: string;

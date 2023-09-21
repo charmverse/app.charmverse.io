@@ -56,7 +56,7 @@ export async function createPostComment({
 
   // Publish webhook event if needed
   await publishPostCommentEvent({
-    scope: WebhookEventNames.CommentCreated,
+    scope: WebhookEventNames.ForumPostCommentCreated,
     spaceId: post.spaceId,
     commentId: comment.id,
     postId
