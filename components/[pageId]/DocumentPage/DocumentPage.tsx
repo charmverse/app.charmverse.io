@@ -105,6 +105,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
 
+  // eslint-disable-next-line no-console
+  console.log('Rendered doc');
+
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -118,24 +121,17 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   }, [printRef, _printRef]);
 
   const card = useAppSelector((state) => {
-    if (page.type !== 'card') {
+    if (page?.type !== 'card') {
       return null;
     }
-    const _card = state.cards.cards[page.id] ?? state.cards.templates[page.id];
-
-    if (!_card) {
-      blocksDispatch(blockLoad({ blockId: page.id }));
-      blocksDispatch(blockLoad({ blockId: page.parentId as string }));
-      blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-      return null;
-    }
-    return _card;
+    return state.cards.cards[page.id] ?? state.cards.templates[page.id];
   });
 
   const board = useAppSelector((state) => {
     if (!card) {
       return null;
     }
+
     return state.boards.boards[card.parentId];
   });
 
@@ -153,6 +149,14 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
     return [];
   });
+
+  useEffect(() => {
+    if (page?.type === 'card' && !card) {
+      blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+      blocksDispatch(blockLoad({ blockId: page.id }));
+      blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+    }
+  }, [page.id]);
 
   const activeView = boardViews[0];
 
