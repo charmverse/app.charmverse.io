@@ -72,9 +72,12 @@ export enum WebhookNameSpaces {
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
   ForumPostCommentCreated = 'forum.post.comment.created',
+  ForumPostCommentReplied = 'forum.post.comment.replied',
   ForumPostCommentUpvoted = 'forum.post.comment.upvoted',
   ForumPostCommentDownvoted = 'forum.post.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
+  ForumPostMentionCreated = 'forum.post.mention.created',
+  ForumPostCommentMentionCreated = 'forum.post.comment.mention.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',

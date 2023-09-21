@@ -7,7 +7,7 @@ import { ProposalStatusColors } from 'components/proposals/components/ProposalSt
 import { baseUrl } from 'config/constants';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionNotification } from 'lib/discussion/interfaces';
-import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
+import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { VoteTask } from 'lib/votes/interfaces';
@@ -36,7 +36,7 @@ export interface PendingTasksProps {
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
   bountyTasks: BountyTask[];
-  forumTasks: ForumTask[];
+  forumTasks: ForumNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
 }
@@ -380,7 +380,11 @@ function DiscussionNotification({
   );
 }
 
-function ForumTask({ task: { commentText, spaceName, spaceDomain, postPath, postTitle } }: { task: ForumTask }) {
+function ForumTask({
+  task: { commentText, spaceName, spaceDomain, postPath, postTitle }
+}: {
+  task: ForumNotification;
+}) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

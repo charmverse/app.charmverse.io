@@ -5,8 +5,8 @@ import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
 import type { DiscussionNotificationsGroup } from 'lib/discussion/getDiscussionNotifications';
 import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifications';
-import type { ForumTasksGroup } from 'lib/forums/getForumNotifications/getForumNotifications';
-import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
+import type { ForumNotificationsGroup } from 'lib/forums/notifications/getForumNotifications';
+import { getForumNotifications } from 'lib/forums/notifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
 import { getProposalTasks } from 'lib/proposal/getProposalTasks';
@@ -23,7 +23,7 @@ export interface GetTasksResponse {
   votes: VoteTasksGroup;
   proposals: ProposalTasksGroup;
   bounties: BountyTasksGroup;
-  forum: ForumTasksGroup;
+  forum: ForumNotificationsGroup;
 }
 
 async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {

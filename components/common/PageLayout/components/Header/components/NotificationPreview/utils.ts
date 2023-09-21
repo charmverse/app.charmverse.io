@@ -3,12 +3,12 @@ import { NotificationType } from '@charmverse/core/prisma';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionNotification } from 'lib/discussion/interfaces';
-import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
+import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
-function getForumContent(n: ForumTask) {
+function getForumContent(n: ForumNotification) {
   const { createdBy, commentId, postTitle } = n;
   if (commentId) {
     return createdBy?.username
@@ -21,7 +21,7 @@ function getForumContent(n: ForumTask) {
     : `New forum post "${postTitle}"`;
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
+export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,

@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionNotification } from 'lib/discussion/interfaces';
-import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
+import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
@@ -64,12 +64,12 @@ const createForumTask = ({
   spaceName: string;
   commentText: string;
   postTitle: string;
-}): ForumTask => {
+}): ForumNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
     taskId: v4(),
-    taskType: 'forum_post',
+    taskType: 'post.comment.created',
     spaceName,
     postId: v4(),
     postTitle,

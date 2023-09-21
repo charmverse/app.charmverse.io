@@ -2,6 +2,7 @@ import type { Post } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createPostNotifications } from 'lib/forums/notifications/createPostNotifications';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
@@ -89,6 +90,10 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
       scope: WebhookEventNames.ForumPostCreated,
       postId: createdPost.id,
       spaceId: createdPost.spaceId
+    });
+
+    await createPostNotifications({
+      post: createdPost
     });
   }
 

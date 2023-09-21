@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createPostNotifications } from 'lib/forums/notifications/createPostNotifications';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
@@ -104,6 +105,10 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
       scope: WebhookEventNames.ForumPostCreated,
       postId: post.id,
       spaceId: post.spaceId
+    });
+
+    await createPostNotifications({
+      post
     });
   }
 
