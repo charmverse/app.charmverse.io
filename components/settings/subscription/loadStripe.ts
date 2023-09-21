@@ -1,7 +1,8 @@
+import env from '@beam-australia/react-env';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe as _loadStripe } from '@stripe/stripe-js';
 
-const stripePublicKey = process.env.REACT_APP_STRIPE_PUBLIC_KEY as string;
+const stripePublicKey = env('STRIPE_PUBLIC_KEY');
 
 let stripePromise: Promise<Stripe | null>;
 

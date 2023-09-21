@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
@@ -9,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'webapp-browser';
 
-const env = isStagingEnv ? 'stg' : isProdEnv ? 'prd' : 'dev';
+const appEnv = isStagingEnv ? 'stg' : isProdEnv ? 'prd' : 'dev';
 
 export default function useDatadogLogger() {
   const { user } = useUser();
@@ -17,25 +18,25 @@ export default function useDatadogLogger() {
 
   // Load DD_LOGS
   useEffect(() => {
-    if (process.env.REACT_APP_DD_CLIENT_TOKEN && isProdEnv) {
+    if (env('DD_CLIENT_TOKEN') && isProdEnv) {
       datadogLogs.init({
-        clientToken: process.env.REACT_APP_DD_CLIENT_TOKEN,
+        clientToken: env('DD_CLIENT_TOKEN'),
         site: DD_SITE,
         service: DD_SERVICE,
         forwardErrorsToLogs: true,
         sessionSampleRate: 100,
-        env,
-        version: process.env.REACT_APP_BUILD_ID
+        env: appEnv,
+        version: env('BUILD_ID')
       });
     }
   }, []);
 
   // Load DD_RUM_LOGS
   useEffect(() => {
-    if (process.env.REACT_APP_DD_RUM_CLIENT_TOKEN && process.env.REACT_APP_DD_RUM_APP_ID && isProdEnv) {
+    if (env('DD_RUM_CLIENT_TOKEN') && env('DD_RUM_APP_ID') && isProdEnv) {
       datadogRum.init({
-        applicationId: process.env.REACT_APP_DD_RUM_APP_ID,
-        clientToken: process.env.REACT_APP_DD_RUM_CLIENT_TOKEN,
+        applicationId: env('DD_RUM_APP_ID'),
+        clientToken: env('DD_RUM_CLIENT_TOKEN'),
         site: DD_SITE,
         service: DD_SERVICE,
         sampleRate: 100,
@@ -44,8 +45,8 @@ export default function useDatadogLogger() {
         trackResources: true,
         trackLongTasks: true,
         defaultPrivacyLevel: 'mask-user-input',
-        env,
-        version: process.env.REACT_APP_BUILD_ID
+        env: appEnv,
+        version: env('BUILD_ID')
       });
 
       datadogRum.startSessionReplayRecording();

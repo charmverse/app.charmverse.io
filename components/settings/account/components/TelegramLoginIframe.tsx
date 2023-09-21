@@ -1,8 +1,9 @@
+import env from '@beam-australia/react-env';
 import * as React from 'react';
 
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-export const TELEGRAM_BOT_ID = process.env.REACT_APP_TELEGRAM_BOT_ID;
+export const TELEGRAM_BOT_ID = env('TELEGRAM_BOT_ID');
 
 export function loginWithTelegram(callback: (user: TelegramAccount) => void) {
   // @ts-ignore - defined by the script: https://telegram.org/js/telegram-widget.js
