@@ -39,8 +39,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'test'
 
   chromatic:
     name: Publish to Chromatic
@@ -58,8 +56,6 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'test'
 
       - uses: chromaui/action@v1
         with:
@@ -81,8 +77,6 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'test'
 
       - run: npm run typecheck
       - run: npm run lint
@@ -187,10 +181,10 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
+        env: 
+          REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
   deploy:
@@ -198,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
-    needs: [build-test-env, test, integration-test]
+    needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -221,8 +215,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'production'
 
       - name: Build and Push Docker image
         id: docker_build_push
