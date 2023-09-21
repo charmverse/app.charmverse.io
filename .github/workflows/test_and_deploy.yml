@@ -76,16 +76,9 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
-    name: Tests
+    name: Validate code
     runs-on: ubuntu-latest
     needs: build-test-env
-    strategy:
-      max-parallel: 5
-      fail-fast: false
-      matrix:
-        include:
-          - test_name: 'Type check, lint, and verify dependencies'
-            test_command: 'npm run typecheck && npm run lint && npm run verifydeps'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -102,8 +95,9 @@ jobs:
           NEXT_PUBLIC_APP_ENV: 'test'
           NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
-      - name: Run ${{matrix.test_name}}
-        run: ${{matrix.test_command}}
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run verifydeps
 
   integration-test:
     name: Tests
@@ -310,7 +304,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
           changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
-          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig)+'
+          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig|components/common/CharmEditor/components)+'
           for file in $changed_files; do
             echo "evaluating $file:"
             if [[ $file =~ $websocket_src_file_pattern ]]; then

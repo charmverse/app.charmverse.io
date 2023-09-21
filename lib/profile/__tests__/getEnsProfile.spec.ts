@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 
 import { getENSDetails } from 'lib/blockchain';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getEnsProfile } from '../getEnsProfile';
@@ -30,7 +30,7 @@ describe('getEnsProfile', () => {
   });
 
   it(`Should return null if no wallets of the user has ens attached`, async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: Wallet.createRandom().address });
+    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: randomETHWalletAddress() });
     const user = generated.user;
 
     const ensProfile = await getEnsProfile({ userId: user.id });
@@ -38,13 +38,13 @@ describe('getEnsProfile', () => {
   });
 
   it(`Should return the ens profile of the first wallet of the user`, async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: Wallet.createRandom().address });
+    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: randomETHWalletAddress() });
     const user = generated.user;
 
     await prisma.userWallet.create({
       data: {
         userId: user.id,
-        address: Wallet.createRandom().address,
+        address: randomETHWalletAddress(),
         ensname: 'test.eth'
       }
     });

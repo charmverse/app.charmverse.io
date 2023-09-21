@@ -1,5 +1,5 @@
+import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-import log from 'loglevel';
 import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';

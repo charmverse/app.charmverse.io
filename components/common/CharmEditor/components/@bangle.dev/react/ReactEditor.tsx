@@ -240,8 +240,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
         data-page-id={pageId}
         style={{
-          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined,
-          cursor: readOnly ? 'default' : 'text'
+          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined
         }}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />

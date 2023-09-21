@@ -1,11 +1,10 @@
 import type { Space, SuperApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsSpaces, testUtilsUser } from '@charmverse/core/test';
-import { Wallet } from 'ethers';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
+import { randomETHWallet } from 'lib/utilities/blockchain';
 import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
@@ -124,7 +123,7 @@ describe('GET /api/v1/spaces', () => {
 
   it('should create a space for XPS Engine', async () => {
     const xpsEngineId = `xps-4eva-${uuid()}`;
-    const wallet = Wallet.createRandom();
+    const wallet = randomETHWallet();
 
     const response = await request(baseUrl)
       .post('/api/v1/spaces')

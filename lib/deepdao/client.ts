@@ -1,5 +1,5 @@
 import { GET } from '@charmverse/core/http';
-import log from 'loglevel';
+import { log } from '@charmverse/core/log';
 
 import { isTestEnv } from 'config/constants';
 

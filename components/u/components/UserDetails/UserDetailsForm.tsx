@@ -22,7 +22,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
 
 import type { Social } from '../../interfaces';
