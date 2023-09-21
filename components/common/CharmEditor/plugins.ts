@@ -197,7 +197,7 @@ export function charmEditorPlugins({
     }),
     // bulletList.plugins(),
     // orderedList.plugins(),
-    listPlugins(),
+    listPlugins({ readOnly }),
     columnLayout.plugins({
       key: columnsPluginKey,
       readOnly

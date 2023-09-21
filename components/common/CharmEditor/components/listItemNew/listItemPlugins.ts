@@ -24,14 +24,14 @@ const isValidList = (state: EditorState) => {
   return parentHasDirectParentOfType(type, [state.schema.nodes.bullet_list, state.schema.nodes.ordered_list]);
 };
 
-export function plugins(): RawPlugins {
+export function plugins({ readOnly }: { readOnly: boolean }): RawPlugins {
   return ({ schema }) => {
     return [
       new Plugin({
         props: {
           nodeViews: {
-            [LIST_ITEM]: (node) => {
-              return new ListItemNodeView(node);
+            [LIST_ITEM]: (node, view, getPos) => {
+              return new ListItemNodeView(node, view, getPos, readOnly);
             }
           }
         }
@@ -52,6 +52,7 @@ export function plugins(): RawPlugins {
         todoChecked: false
       }),
       keymap({
+        // toggle done
         [isMac() ? 'Ctrl-Enter' : 'Ctrl-I']: filter(
           isValidList,
           updateNodeAttrs(schema.nodes.listItem, (attrs) => ({

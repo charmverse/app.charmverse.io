@@ -39,7 +39,7 @@ html {
   zoom: 1;
 }
 
-.ProseMirror li > p {
+.ProseMirror li > span > p {
   // margin: 0;
   // margin-block-end: 0;
   // margin-block-start: 0;
@@ -47,7 +47,7 @@ html {
 }
 
 /* https://css-tricks.com/numbering-in-style/ */
-.ProseMirror ul li > p::before {
+.ProseMirror ul li > span > p::before {
   color: var(--czi-list-style-color);
 
   /* content: '\2022'; */
@@ -84,7 +84,7 @@ html {
   counter-reset: none;
 }
 
-.ProseMirror ol > li > p::before {
+.ProseMirror ol > li > span > p::before {
   /*
    * Note that this CSS Rule will not work in MS-Edge 15:
    * - MS-Edge 15 does not supported using CSS variable isnide pseudo element
@@ -111,23 +111,43 @@ html {
 Bullet list type changing fix */
 
 /* prettier-ignore */
-.ProseMirror ul[data-indent='7'] li > p::before,
+.ProseMirror ul[data-indent='7'] li > span > p::before,
 /* prettier-ignore */
-.ProseMirror ul[data-indent='4'] li > p::before,
+.ProseMirror ul[data-indent='4'] li > span > p::before,
 /* prettier-ignore */
-.ProseMirror ul[data-indent='1'] li > p::before {
+.ProseMirror ul[data-indent='1'] li > span > p::before {
   content: '\25e6'; /* circle */
 }
 
 /* prettier-ignore */
-.ProseMirror ul[data-indent='5'] li > p::before,
+.ProseMirror ul[data-indent='5'] li > span > p::before,
 /* prettier-ignore */
-.ProseMirror ul[data-indent='2'] li > p::before {
+.ProseMirror ul[data-indent='2'] li > span > p::before {
   content: '\25aa'; /* square */
 }
 
-.ProseMirror ul[data-indent='6'] li > p::before,
-.ProseMirror ul[data-indent='3'] li > p::before,
-.ProseMirror ul[data-indent='0'] li > p::before {
+.ProseMirror ul[data-indent='6'] li > span > p::before,
+.ProseMirror ul[data-indent='3'] li > span > p::before,
+.ProseMirror ul[data-indent='0'] li > span > p::before {
   content: '\2022'; /* circle */
+}
+
+/* To do lists */
+
+
+.ProseMirror {
+  li[data-bangle-is-todo] {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    & > span:first-child > input {
+      margin-top: 0.5rem;
+      margin-right: 6px;
+      outline: none;
+      position: absolute;
+    }
+    & > span > p::before {
+      display: none;
+    }
+  }
 }
