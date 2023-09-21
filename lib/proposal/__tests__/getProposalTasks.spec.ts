@@ -5,9 +5,9 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { getProposalTasks } from '../getProposalTasks';
+import { getProposalNotifications } from '../getProposalNotifications';
 
-describe('getProposalTasks', () => {
+describe('getProposalNotifications', () => {
   it('Should only return non deleted proposals', async () => {
     const { user, space } = await generateUserAndSpace();
 
@@ -40,7 +40,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -72,7 +72,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -113,7 +113,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked.length).toEqual(0);
   });
@@ -138,7 +138,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -189,7 +189,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -255,7 +255,7 @@ describe('getProposalTasks', () => {
       categoryId: visibleCategory.id
     });
 
-    const proposalTasks = await getProposalTasks(spaceMember.id);
+    const proposalTasks = await getProposalNotifications(spaceMember.id);
 
     expect(proposalTasks.unmarked).toHaveLength(1);
 
@@ -327,7 +327,7 @@ describe('getProposalTasks', () => {
       categoryId: visibleCategory.id
     });
 
-    const proposalTasks = await getProposalTasks(spaceMember.id);
+    const proposalTasks = await getProposalNotifications(spaceMember.id);
 
     expect(proposalTasks.unmarked).toHaveLength(1);
 
@@ -355,7 +355,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual([]);
   });
@@ -371,7 +371,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const proposalTasks = await getProposalTasks(user.id);
+    const proposalTasks = await getProposalNotifications(user.id);
 
     expect(proposalTasks.unmarked).toEqual([]);
   });

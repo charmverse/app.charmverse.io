@@ -5,13 +5,11 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { createPageCommentNotifications } from 'lib/pages/comments/createPageCommentNotifications';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -56,34 +54,15 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     userId
   });
 
-  if (typeof comment !== 'string') {
-    const extractedMentions = extractMentions(comment);
-    if (extractedMentions.length) {
-      await Promise.all(
-        extractedMentions.map((mention) =>
-          publishPageEvent({
-            pageId,
-            scope: WebhookEventNames.PageInlineCommentMentionCreated,
-            spaceId: page.spaceId,
-            userId,
-            mention,
-            commentId: newThread.comments[0].id
-          })
-        )
-      );
-    }
-  }
-
-  if (page.createdBy !== userId) {
-    await publishPageEvent({
-      pageId,
-      scope: WebhookEventNames.PageInlineCommentCreated,
-      spaceId: page.spaceId,
-      userId,
-      mention: null,
-      commentId: newThread.comments[0].id
-    });
-  }
+  await createPageCommentNotifications({
+    commentId: newThread.comments[0].id,
+    content: typeof comment !== 'string' ? comment : null,
+    pageAuthor: page.createdBy,
+    pageId,
+    spaceId: page.spaceId,
+    userId,
+    inline: true
+  });
 
   trackUserAction('page_comment_created', {
     pageId,

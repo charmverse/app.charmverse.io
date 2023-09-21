@@ -18,7 +18,7 @@ import { getPermissionsClient } from 'lib/permissions/api';
 import type { ProposalTaskAction } from './getProposalAction';
 import { getProposalAction } from './getProposalAction';
 
-export type ProposalTask = {
+export type ProposalNotification = {
   id: string; // the id of the workspace event
   spaceDomain: string;
   spaceName: string;
@@ -29,7 +29,6 @@ export type ProposalTask = {
 
   taskId: string;
   action: ProposalTaskAction | null;
-  eventDate: Date;
   createdAt: Date;
   createdBy?: NotificationActor | null;
 };
@@ -60,7 +59,7 @@ type WorkspaceEventSpecialWithMeta = WorkspaceEventSpecial & {
 };
 
 export async function getProposalStatusChangeTasks(userId: string, proposalChangeEvents: WorkspaceEventSpecial[]) {
-  const proposalTasks: ProposalTask[] = [];
+  const proposalTasks: ProposalNotification[] = [];
 
   // Sort the events in descending order based on their created date to help in de-duping
   proposalChangeEvents.sort((we1, we2) => (we1.createdAt > we2.createdAt ? -1 : 1));
@@ -282,7 +281,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           continue;
         }
 
-        const proposalTask: ProposalTask = {
+        const proposalTask: ProposalNotification = {
           action,
           id: workspaceEvent.id,
           pagePath: proposal.page.path,
@@ -291,7 +290,6 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           spaceName: space.name,
           status: proposal.status,
           pageId: proposal.page.id,
-          eventDate: workspaceEvent.createdAt,
           createdBy: workspaceEvent.actor ? mapNotificationActor(workspaceEvent.actor) : null,
           taskId: workspaceEvent.id,
           createdAt: workspaceEvent.createdAt

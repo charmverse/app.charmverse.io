@@ -8,8 +8,8 @@ import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifica
 import type { ForumNotificationsGroup } from 'lib/forums/notifications/getForumNotifications';
 import { getForumNotifications } from 'lib/forums/notifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
-import { getProposalTasks } from 'lib/proposal/getProposalTasks';
+import type { ProposalNotificationsGroup } from 'lib/proposal/getProposalNotifications';
+import { getProposalNotifications } from 'lib/proposal/getProposalNotifications';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { VoteTasksGroup } from 'lib/votes/getVoteTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
@@ -21,7 +21,7 @@ handler.use(requireUser).get(getTasks);
 export interface GetTasksResponse {
   discussions: DiscussionNotificationsGroup;
   votes: VoteTasksGroup;
-  proposals: ProposalTasksGroup;
+  proposals: ProposalNotificationsGroup;
   bounties: BountyTasksGroup;
   forum: ForumNotificationsGroup;
 }
@@ -31,7 +31,7 @@ async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksRespon
   const [discussionTasks, voteTasks, proposalTasks, bountiesTasks, forumTasks] = await Promise.all([
     getDiscussionNotifications(userId),
     getVoteTasks(userId),
-    getProposalTasks(userId),
+    getProposalNotifications(userId),
     getBountyTasks(userId),
     getForumNotifications(userId)
   ]);

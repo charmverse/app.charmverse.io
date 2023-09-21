@@ -8,7 +8,7 @@ import { baseUrl } from 'config/constants';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionNotification } from 'lib/discussion/interfaces';
 import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
-import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
+import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
@@ -34,7 +34,7 @@ export interface PendingTasksProps {
   discussionTasks: DiscussionNotification[];
   totalTasks: number;
   voteTasks: VoteTask[];
-  proposalTasks: ProposalTask[];
+  proposalTasks: ProposalNotification[];
   bountyTasks: BountyTask[];
   forumTasks: ForumNotification[];
   // eslint-disable-next-line
@@ -288,7 +288,7 @@ function VoteTaskMjml({ task }: { task: VoteTask }) {
   );
 }
 
-function ProposalTaskMjml({ task }: { task: ProposalTask }) {
+function ProposalTaskMjml({ task }: { task: ProposalNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>

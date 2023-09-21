@@ -72,7 +72,6 @@ export enum WebhookNameSpaces {
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
   ForumPostCommentCreated = 'forum.post.comment.created',
-  ForumPostCommentReplied = 'forum.post.comment.replied',
   ForumPostCommentUpvoted = 'forum.post.comment.upvoted',
   ForumPostCommentDownvoted = 'forum.post.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -87,7 +86,10 @@ export enum WebhookEventNames {
   PageMentionCreated = 'page.mention.created',
   PageInlineCommentCreated = 'page.inline_comment.created',
   PageInlineCommentMentionCreated = 'page.inline_comment.mention.created',
-  PageInlineCommentReplied = 'page.inline_comment.replied'
+  PageInlineCommentReplied = 'page.inline_comment.replied',
+  PageCommentCreated = 'page.comment.created',
+  PageCommentMentionCreated = 'page.comment.mention.created',
+  PageCommentReplied = 'page.comment.replied'
 }
 
 // Utils to share common props among events
@@ -144,15 +146,17 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       user: UserEntity;
-      scope: WebhookEventNames.PageMentionCreated | WebhookEventNames.PageInlineCommentMentionCreated;
+      scope:
+        | WebhookEventNames.PageInlineCommentCreated
+        | WebhookEventNames.PageInlineCommentReplied
+        | WebhookEventNames.PageCommentCreated
+        | WebhookEventNames.PageCommentReplied
+        | WebhookEventNames.PageMentionCreated
+        | WebhookEventNames.PageInlineCommentMentionCreated
+        | WebhookEventNames.PageCommentMentionCreated;
       page: PageEntity;
-      mention: UserMentionMetadata;
-    })
-  | (WebhookEventSharedProps<T> & {
-      user: UserEntity;
-      scope: WebhookEventNames.PageInlineCommentCreated | WebhookEventNames.PageInlineCommentReplied;
-      page: PageEntity;
-      comment: CommentEntity;
+      comment: CommentEntity | null;
+      mention: UserMentionMetadata | null;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;

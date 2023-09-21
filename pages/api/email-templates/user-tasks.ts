@@ -7,7 +7,7 @@ import type { ForumNotification } from 'lib/forums/notifications/getForumNotific
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
-import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
+import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
@@ -126,9 +126,9 @@ const createProposalTasks = ({
   spaceName,
   status
 }: Omit<
-  ProposalTask,
+  ProposalNotification,
   'id' | 'taskId' | 'spaceDomain' | 'pagePath' | 'pageId' | 'createdAt' | 'eventDate'
->): ProposalTask => {
+>): ProposalNotification => {
   return {
     id: v4(),
     action,

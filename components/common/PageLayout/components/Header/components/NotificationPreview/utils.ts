@@ -5,7 +5,7 @@ import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionNotification } from 'lib/discussion/interfaces';
 import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
-import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
+import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 function getForumContent(n: ForumNotification) {
@@ -112,7 +112,7 @@ export function getBountiesNotificationPreviewItems(notifications: BountyTask[])
   }));
 }
 
-function getProposalContent(n: ProposalTask, currentUserId: string) {
+function getProposalContent(n: ProposalNotification, currentUserId: string) {
   const status = 'status' in n ? n.status : null;
   const { createdBy, pageTitle: title } = n;
   const isCreator = currentUserId === createdBy?.id;
@@ -145,7 +145,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalTask[], currentUserId?: string) {
+export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[], currentUserId?: string) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,

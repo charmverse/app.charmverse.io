@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { generateProposal, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import type { ProposalTask } from '../getProposalStatusChangeTasks';
+import type { ProposalNotification } from '../getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from '../getProposalStatusChangeTasks';
 import { updateProposalStatus } from '../updateProposalStatus';
 
@@ -208,31 +208,31 @@ describe('getProposalStatusChangeTasks', () => {
 
     expect(proposalTasks).toEqual(
       expect.arrayContaining([
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'vote',
           pagePath: voteActiveProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'start_vote',
           pagePath: reviewedProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'discuss',
           pagePath: discussedProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'start_review',
           pagePath: authoredStartReviewProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'review',
           pagePath: reviewProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'review',
           pagePath: rubricReviewerProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'evaluation_closed',
           pagePath: rubricClosedProposal.path
         })
@@ -241,7 +241,7 @@ describe('getProposalStatusChangeTasks', () => {
 
     expect(proposalTasks).toEqual(
       expect.not.arrayContaining([
-        expect.objectContaining<Partial<ProposalTask>>({
+        expect.objectContaining<Partial<ProposalNotification>>({
           action: 'start_discussion',
           pagePath: authoredDraftProposal.path
         })
