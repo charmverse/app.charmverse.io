@@ -36,17 +36,19 @@ export const subscriptionDetails = {
   free: [
     'Community space with docs, databases, & forum',
     'Member Directory, Proposal Builder, & crypto payments',
-    'Up to 200 monthly active members',
+    'Include 500,000 blocks',
     'Integrate with Discord, Snapshot, Safe, & NFTs/POAPs',
     'Compatible with most EVM chains',
     'Upload limit/video: 20MB'
   ],
   community: [
-    'Everything in Free, and',
+    'All Public Good features, and',
+    'Include 30,000 blocks',
     'Comprehensive access control. Unlimited roles',
-    'Invite 100 guests',
     'Custom domain',
     'API access',
+    'Invite 100 guests',
+    'Up to 200 monthly active members',
     'Upload limit/video: 1GB'
   ],
   enterprise: [

@@ -56,6 +56,7 @@ export function useSpaceSubscription() {
     subscriptionEnded,
     refetchSpaceSubscription,
     hasPassedBlockQuota,
-    spaceBlockQuota
+    spaceBlockQuota,
+    paidTier: currentSpace?.paidTier
   };
 }

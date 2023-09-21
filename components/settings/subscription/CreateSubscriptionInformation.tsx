@@ -46,7 +46,7 @@ export function CreateSubscriptionInformation({
   pendingPayment?: boolean;
   spaceId: string;
 }) {
-  const { refetchSpaceSubscription } = useSpaceSubscription();
+  const { refetchSpaceSubscription, paidTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
   const { refreshCurrentSpace } = useCurrentSpace();
@@ -87,7 +87,7 @@ export function CreateSubscriptionInformation({
             </Box>
           </DesktopIconContainer>
           <Typography variant='h6' mb={1}>
-            Free Plan
+            Public Good
           </Typography>
           {isFreeSpace ? <Chip size='small' label='Current Plan' /> : null}
           <MobileIconContainer>
@@ -101,7 +101,7 @@ export function CreateSubscriptionInformation({
                 onClick={openConfirmFreeTierDowngradeDialog}
                 disabled={pendingPayment || isSwitchToFreeLoading}
               >
-                Switch to free
+                Switch to public good
               </Button>
               <ConfirmFreeDowngradeModal
                 isOpen={isConfirmDowngradeDialogOpen}
@@ -134,10 +134,14 @@ export function CreateSubscriptionInformation({
               <CommunityIcon width='100px' height='100px' />
             </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
-              Community Edition
+              Community
             </Typography>
 
-            <Chip size='small' label='Recommended Plan' variant='outlined' />
+            <Chip
+              size='small'
+              label={paidTier === 'community' ? 'Current Plan' : 'Recommended Plan'}
+              variant='outlined'
+            />
           </div>
           <MobileIconContainer>
             <CommunityIcon width='150px' height='150px' />
@@ -168,7 +172,7 @@ export function CreateSubscriptionInformation({
               <EnterpriseIcon width='90px' height='90px' />
             </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
-              Enterprise Edition
+              Enterprise
             </Typography>
             <MobileIconContainer>
               <EnterpriseIcon width='150px' height='150px' />
