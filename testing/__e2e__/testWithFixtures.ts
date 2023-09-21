@@ -36,7 +36,7 @@ type Fixtures = {
   loginPage: LoginPage;
   pageHeader: PageHeader;
   pagePermissionsDialog: PagePermissionsDialog;
-  pagesSidebarPage: PagesSidebarPage;
+  pagesSidebar: PagesSidebarPage;
   proposalPage: ProposalPage;
   proposalsListPage: ProposalsListPage;
   settingsModal: SettingsModal;
@@ -61,7 +61,7 @@ export const test = base.extend<Fixtures>({
   loginPage: async ({ page }, use) => use(new LoginPage(page)),
   pageHeader: async ({ page }, use) => use(new PageHeader(page)),
   pagePermissionsDialog: async ({ page }, use) => use(new PagePermissionsDialog(page)),
-  pagesSidebarPage: async ({ page }, use) => use(new PagesSidebarPage(page)),
+  pagesSidebar: async ({ page }, use) => use(new PagesSidebarPage(page)),
   proposalPage: async ({ page }, use) => use(new ProposalPage(page)),
   proposalsListPage: async ({ page }, use) => use(new ProposalsListPage(page)),
   settingsModal: async ({ page }, use) => use(new SettingsModal(page)),

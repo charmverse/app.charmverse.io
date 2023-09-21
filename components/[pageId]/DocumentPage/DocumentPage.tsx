@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import { dispatch } from '@svgdotjs/svg.js';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
@@ -10,7 +11,8 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { blockLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
@@ -91,6 +93,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const blocksDispatch = useAppDispatch();
 
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
     bountyId: page.bountyId
@@ -115,14 +118,24 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   }, [printRef, _printRef]);
 
   const card = useAppSelector((state) => {
-    if (page.cardId) {
-      return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
+    if (!page.cardId) {
+      return null;
     }
-    return null;
+    const _card = state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId];
+
+    if (!_card) {
+      blocksDispatch(blockLoad({ blockId: page.cardId }));
+      blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      return null;
+    }
+    return _card;
   });
 
   const board = useAppSelector((state) => {
-    return card ? state.boards.boards[card.parentId] : null;
+    if (!card) {
+      return null;
+    }
+    return state.boards.boards[card.parentId];
   });
 
   const cards = useAppSelector((state) => {

@@ -3,7 +3,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
 
-import { initialDatabaseLoad } from './databaseBlocksLoad';
+import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -52,6 +52,14 @@ const boardsSlice = createSlice({
         } else if (block.type === 'board' && !block.fields.isTemplate) {
           state.boards[block.id] = block as Board;
         }
+      }
+    });
+
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.boards = state.boards ?? {};
+      const block = action.payload;
+      if (block.type === 'board') {
+        state.boards[block.id] = block as Board;
       }
     });
   }

@@ -21,7 +21,8 @@ export class DocumentPage extends GlobalPage {
     public proposalBanner = page.locator('data-test=proposal-banner'),
     public documentTitle = page.locator(`data-test=editor-page-title`),
     public openAsPageButton = page.locator('data-test=open-as-page'),
-    public joinSpaceButton = page.locator('data-test=public-bounty-space-action')
+    public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
+    public cardDetailProperties = page.locator('data-test=card-detail-properties')
   ) {
     super(page);
   }
