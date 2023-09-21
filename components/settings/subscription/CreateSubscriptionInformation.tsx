@@ -147,7 +147,7 @@ export function CreateSubscriptionInformation({
             <CommunityIcon width='150px' height='150px' />
           </MobileIconContainer>
           <Button onClick={onUpgrade} disabled={pendingPayment}>
-            {pendingPayment ? 'Payment pending' : 'Upgrade $10/month'}
+            {pendingPayment ? 'Payment pending' : 'Get more blocks'}
           </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
