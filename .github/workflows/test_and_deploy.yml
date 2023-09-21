@@ -196,8 +196,6 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [build-test-env, test, integration-test]
