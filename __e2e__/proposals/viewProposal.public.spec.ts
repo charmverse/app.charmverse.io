@@ -1,9 +1,10 @@
 import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
-import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
+
+import { DocumentPage } from 'testing/__e2e__/po/document.po';
+import { PagePermissionsDialog } from 'testing/__e2e__/po/pagePermissions.po';
+import { ProposalsListPage } from 'testing/__e2e__/po/proposalsList.po';
 
 import { createUserAndSpace, logoutBrowserUser } from '../utils/mocks';
 

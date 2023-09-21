@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 
-import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
+import { SpaceProfileSettings } from '../../testing/__e2e__/po/settings/spaceProfileSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

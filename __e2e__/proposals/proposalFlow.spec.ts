@@ -1,10 +1,10 @@
 import { testUtilsProposals } from '@charmverse/core/test';
 import { test, expect } from '@playwright/test';
-import { ProposalPage } from '__e2e__/po/proposalPage.po';
-import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
 import type { PageWithProposal } from 'lib/pages';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { ProposalPage } from 'testing/__e2e__/po/proposalPage.po';
+import { ProposalsListPage } from 'testing/__e2e__/po/proposalsList.po';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 

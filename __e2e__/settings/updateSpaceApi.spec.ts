@@ -1,7 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { ApiSettings } from '../po/settings/spaceApiSettings.po';
+import { ApiSettings } from '../../testing/__e2e__/po/settings/spaceApiSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

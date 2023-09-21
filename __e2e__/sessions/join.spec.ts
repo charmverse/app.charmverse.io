@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import type { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
+import type { TokenGatePage } from 'testing/__e2e__/po/tokenGate.po';
 
-import type { LoginPage } from '../po/login.po';
-import type { SignUpPage } from '../po/signup.po';
+import type { LoginPage } from '../../testing/__e2e__/po/login.po';
+import type { SignUpPage } from '../../testing/__e2e__/po/signup.po';
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

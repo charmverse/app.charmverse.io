@@ -1,10 +1,10 @@
 import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { LoginPage } from '../../testing/__e2e__/po/login.po';
+import { SignUpPage } from '../../testing/__e2e__/po/signup.po';
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
-import { LoginPage } from '../po/login.po';
-import { SignUpPage } from '../po/signup.po';
 
 type Fixtures = {
   sandboxPage: Page;

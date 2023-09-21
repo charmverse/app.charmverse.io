@@ -1,9 +1,10 @@
 import { test as base, expect } from '@playwright/test';
-import { PageHeader } from '__e2e__/po/pageHeader.po';
 
+import { PageHeader } from 'testing/__e2e__/po/pageHeader.po';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
-import { DocumentPage } from './po/document.po';
+import { DocumentPage } from '../testing/__e2e__/po/document.po';
+
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
 

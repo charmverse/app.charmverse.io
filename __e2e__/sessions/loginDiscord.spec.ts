@@ -3,9 +3,9 @@ import { expect, test as base } from '@playwright/test';
 
 import { createDiscordUser } from 'testing/utils/discord';
 
+import { LoginPage } from '../../testing/__e2e__/po/login.po';
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
-import { LoginPage } from '../po/login.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 

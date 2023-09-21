@@ -1,11 +1,11 @@
 import { expect, test as base } from '@playwright/test';
-import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';
 import { generateAndMockTokenGateRequests } from '__e2e__/utils/tokenGates';
 import { mockWeb3 } from '__e2e__/utils/web3';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
+import { TokenGatePage } from 'testing/__e2e__/po/tokenGate.po';
 
 import { generateSpaceRole, generateUserAndSpace } from '../../utils/mocks';
 

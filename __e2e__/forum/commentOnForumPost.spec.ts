@@ -6,8 +6,8 @@ import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCa
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { ForumHomePage } from '../po/forumHome.po';
-import { ForumPostPage } from '../po/forumPost.po';
+import { ForumHomePage } from '../../testing/__e2e__/po/forumHome.po';
+import { ForumPostPage } from '../../testing/__e2e__/po/forumPost.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
 

@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 
-import { LoginPage } from '../po/login.po';
-import { SpacesDropdown } from '../po/spacesDropdown.po';
+import { LoginPage } from '../../testing/__e2e__/po/login.po';
+import { SpacesDropdown } from '../../testing/__e2e__/po/spacesDropdown.po';
 import { createUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
