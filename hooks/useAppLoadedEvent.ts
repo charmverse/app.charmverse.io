@@ -8,18 +8,18 @@ import { getBrowserPath } from 'lib/utilities/browser';
 
 export function useAppLoadedEvent() {
   const { isLoaded } = useUser();
-  const { space } = useCurrentSpace();
+  const { space, isLoading: isSpaceLoading } = useCurrentSpace();
 
   const debouncedTrackAction = useRef(debounce(charmClient.track.trackAction, 2000)).current;
 
   const trackAppLoaded = useCallback(() => {
-    if (isLoaded) {
+    if (isLoaded && !isSpaceLoading) {
       debouncedTrackAction('app_loaded', {
         spaceId: space?.id,
         meta: { pathname: getBrowserPath() }
       });
     }
-  }, [isLoaded, space?.id]);
+  }, [isLoaded, isSpaceLoading, space?.id]);
 
   useEffect(() => {
     trackAppLoaded();
