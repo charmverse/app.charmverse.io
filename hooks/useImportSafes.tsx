@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import type { Signer } from 'ethers';
-import log from 'loglevel';
 import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
+import { getBrowserPath } from 'lib/utilities/browser';
 
 import { TrackApi } from '../apis/trackApi';
 
@@ -11,7 +12,7 @@ export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
   track.trackAction('page_view', {
     ...page,
     meta: {
-      pathname: window.location.pathname + window.location.search
+      pathname: getBrowserPath()
     }
   });
 }
