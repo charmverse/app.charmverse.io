@@ -2,13 +2,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Provider } from 'react-redux';
+import type { MockStoreEnhanced } from 'redux-mock-store';
 import { v4 as uuid } from 'uuid';
 
-import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
+import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
@@ -24,8 +24,8 @@ import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/sche
 import { spaces } from '../../../../.storybook/lib/mockData';
 
 export default {
-  title: 'common/Databases',
-  component: CenterPanel
+  title: 'Databases/Composites',
+  component: Table
 };
 
 const firstUserId = uuid();
@@ -116,7 +116,7 @@ const reduxStore = mockStateStore([], {
     },
     templates: {}
   }
-});
+}) as MockStoreEnhanced<Pick<RootState, 'boards' | 'views' | 'cards'>>;
 
 function Context({ children }: { children: ReactNode }) {
   // mock the current space since it usually relies on the URL
@@ -152,18 +152,25 @@ export function DatabaseTableView() {
   return (
     <Context>
       <Paper>
-        <CenterPanel
-          board={board}
-          currentRootPageId={board.id}
-          setPage={voidFunction}
-          showCard={voidFunction}
-          showView={voidFunction}
-          readOnly={false}
-          readOnlySourceData={false}
-          views={[view]}
-          activeView={view}
-          page={boardPage}
-        />
+        <div className='focalboard-body'>
+          <Table
+            board={board}
+            showCard={voidFunction}
+            readOnly={false}
+            readOnlySourceData={false}
+            views={[view]}
+            activeView={view}
+            addCard={voidFunction}
+            cardIdToFocusOnRender=''
+            onCardClicked={voidFunction}
+            selectedCardIds={[]}
+            visibleGroups={[]}
+            cardPages={[
+              { card: card1, page: page1 },
+              { card: card2, page: page2 }
+            ]}
+          />
+        </div>
       </Paper>
     </Context>
   );
@@ -175,8 +182,11 @@ DatabaseTableView.parameters = {
       pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
         return res(ctx.json([boardPage, page1, page2]));
       }),
-      blocks: rest.get('/api/blocks/:pageId/subtree', (req, res, ctx) => {
-        return res(ctx.json([board, card1, card2]));
+      getBlock: rest.get('/api/blocks/:pageId', (req, res, ctx) => {
+        return res(ctx.json(reduxStore.getState().cards.cards[req.params.pageId as string]));
+      }),
+      updateBlocks: rest.put('/api/blocks', async (req, res, ctx) => {
+        return res(ctx.json(req.json()));
       }),
       views: rest.get('/api/blocks/:pageId/views', (req, res, ctx) => {
         return res(ctx.json([view]));

@@ -2,15 +2,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Provider } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
@@ -25,7 +23,7 @@ import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/sche
 import { spaces } from '../../../../.storybook/lib/mockData';
 
 export default {
-  title: 'common/Databases',
+  title: 'Databases/Composites',
   component: CardDetailProperties
 };
 
@@ -128,10 +126,6 @@ function Context({ children }: { children: ReactNode }) {
   );
 }
 
-function voidFunction() {
-  return Promise.resolve();
-}
-
 export function CardPropsView() {
   // const dispatch = useAppDispatch();
 
@@ -142,16 +136,18 @@ export function CardPropsView() {
   return (
     <Context>
       <Paper>
-        <CardDetailProperties
-          board={board}
-          readOnly={false}
-          views={[view]}
-          activeView={view}
-          card={card1}
-          cards={[card1]}
-          pageUpdatedAt={new Date().toISOString()}
-          pageUpdatedBy={firstUserId}
-        />
+        <CardPropertiesWrapper>
+          <CardDetailProperties
+            board={board}
+            readOnly={false}
+            views={[view]}
+            activeView={view}
+            card={card1}
+            cards={[card1]}
+            pageUpdatedAt={new Date().toISOString()}
+            pageUpdatedBy={firstUserId}
+          />
+        </CardPropertiesWrapper>
       </Paper>
     </Context>
   );

@@ -1,4 +1,3 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
@@ -11,9 +10,9 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
@@ -275,50 +274,48 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       />
                     </Box>
                   )}
-                  <div className='focalboard-body font-family-default'>
-                    <div className='CardDetail content'>
-                      {/* Property list */}
-                      {card && board && (
-                        <>
-                          <CardDetailProperties
-                            syncWithPageId={page.syncWithPageId}
-                            board={board}
-                            card={card}
-                            cards={cards}
-                            activeView={activeView}
-                            views={boardViews}
-                            readOnly={readOnly}
-                            pageUpdatedAt={page.updatedAt.toString()}
-                            pageUpdatedBy={page.updatedBy}
-                          />
-                          <AddBountyButton readOnly={readOnly} cardId={page.id} />
-                        </>
-                      )}
-                      {proposalId && (
-                        <ProposalProperties
-                          pageId={page.id}
-                          proposalId={proposalId}
-                          pagePermissions={pagePermissions}
-                          snapshotProposalId={page.snapshotProposalId}
-                          refreshPagePermissions={refreshPage}
-                          readOnly={readonlyProposalProperties}
-                          isTemplate={page.type === 'proposal_template'}
-                          title={page.title}
-                          proposalPage={page}
-                        />
-                      )}
-                      {(draftBounty || page.bountyId) && (
-                        <BountyProperties
-                          bountyId={page.bountyId}
-                          pageId={page.id}
-                          pagePath={page.path}
+                  <CardPropertiesWrapper>
+                    {/* Property list */}
+                    {card && board && (
+                      <>
+                        <CardDetailProperties
+                          syncWithPageId={page.syncWithPageId}
+                          board={board}
+                          card={card}
+                          cards={cards}
+                          activeView={activeView}
+                          views={boardViews}
                           readOnly={readOnly}
-                          permissions={bountyPermissions || null}
-                          refreshBountyPermissions={() => refreshBountyPermissions()}
+                          pageUpdatedAt={page.updatedAt.toString()}
+                          pageUpdatedBy={page.updatedBy}
                         />
-                      )}
-                    </div>
-                  </div>
+                        <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                      </>
+                    )}
+                    {proposalId && (
+                      <ProposalProperties
+                        pageId={page.id}
+                        proposalId={proposalId}
+                        pagePermissions={pagePermissions}
+                        snapshotProposalId={page.snapshotProposalId}
+                        refreshPagePermissions={refreshPage}
+                        readOnly={readonlyProposalProperties}
+                        isTemplate={page.type === 'proposal_template'}
+                        title={page.title}
+                        proposalPage={page}
+                      />
+                    )}
+                    {(draftBounty || page.bountyId) && (
+                      <BountyProperties
+                        bountyId={page.bountyId}
+                        pageId={page.id}
+                        pagePath={page.path}
+                        readOnly={readOnly}
+                        permissions={bountyPermissions || null}
+                        refreshBountyPermissions={() => refreshBountyPermissions()}
+                      />
+                    )}
+                  </CardPropertiesWrapper>
                 </CharmEditor>
 
                 {page.type === 'proposal' && (
