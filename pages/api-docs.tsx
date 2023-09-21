@@ -13,7 +13,7 @@ const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
   ssr: false
 });
 
-const postmanCollectionUrl = `https://github.com/charmverse/app.charmverse.io/blob/main/lib/public-api/CharmVerse%20API%20v1.postman_collection.json`;
+const postmanCollectionUrl = `https://github.com/charmverse/app.charmverse.io/blob/464b385ac468c76552ac993eede40c3b52fcfe96/lib/public-api/CharmVerse%20API%20v1.postman_collection.json`;
 
 export const getStaticProps: GetStaticProps = async () => {
   // See this site for official OAS format https://swagger.io/docs/specification/basic-structure/
