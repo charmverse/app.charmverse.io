@@ -1,3 +1,4 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
@@ -5,6 +6,13 @@ import { stripeClient } from './stripe';
 
 export async function updateToFreeTier(spaceId: string, userId: string) {
   const subscription = await getActiveSpaceSubscription({ spaceId });
+
+  if (!subscription) {
+    const space = await prisma.space.findFirst({ where: { id: spaceId } });
+    if (!space) {
+      throw new DataNotFoundError('Space not found');
+    }
+  }
 
   const updatedSpace = await prisma.space.update({
     where: {
