@@ -27,7 +27,7 @@ import Legend from 'components/settings/Legend';
 import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;

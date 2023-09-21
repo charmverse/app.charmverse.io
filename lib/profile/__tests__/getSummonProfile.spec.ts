@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
 import { SUMMON_BASE_URL } from 'lib/summon/api';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';
@@ -33,7 +33,7 @@ describe('getSummonProfile', () => {
   });
 
   it(`Should return null if user doesn't have any summon account connected with wallet address, email or discord account`, async () => {
-    const walletAddress = Wallet.createRandom().address.toLowerCase();
+    const walletAddress = randomETHWalletAddress().toLowerCase();
     const emailAddress = `test-${v4()}@gmail.com`;
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
 
@@ -71,7 +71,7 @@ describe('getSummonProfile', () => {
   });
 
   it(`Should return summon profile attached with user's wallet address`, async () => {
-    const walletAddress = Wallet.createRandom().address.toLowerCase();
+    const walletAddress = randomETHWalletAddress().toLowerCase();
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     mockSandbox
       .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, {
@@ -100,7 +100,7 @@ describe('getSummonProfile', () => {
 
   it(`Should return summon profile attached with user's discord handle`, async () => {
     const discordUsername = `test123`;
-    const walletAddress = Wallet.createRandom().address.toLowerCase();
+    const walletAddress = randomETHWalletAddress().toLowerCase();
 
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     await prisma.discordUser.create({
@@ -143,7 +143,7 @@ describe('getSummonProfile', () => {
     const discordUsername = `test`;
     const discordDiscriminator = v4();
     const emailAddress = `test-${v4()}@gmail.com`;
-    const walletAddress = Wallet.createRandom().address.toLowerCase();
+    const walletAddress = randomETHWalletAddress().toLowerCase();
     const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
 
     await prisma.googleAccount.create({

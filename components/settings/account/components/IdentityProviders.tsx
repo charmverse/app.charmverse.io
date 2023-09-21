@@ -34,8 +34,9 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
-import { lowerCaseEqual, shortWalletAddress } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
