@@ -71,7 +71,7 @@ const card1 = createMockCard(board);
 card1.fields.properties = {
   [schema.text.id]: 'First',
   [schema.checkbox.id]: 'true',
-  [schema.date.id]: '{"from":"1695067400713"}',
+  [schema.date.id]: '{"from":1694001600000}',
   [schema.email.id]: 'test1@example.com',
   [schema.multiSelect.id]: [schema.multiSelect.options[0].id, schema.multiSelect.options[1].id],
   [schema.number.id]: 7223,
@@ -82,6 +82,19 @@ card1.fields.properties = {
 };
 
 const card2 = createMockCard(board);
+
+card2.fields.properties = {
+  [schema.text.id]: 'Second',
+  [schema.checkbox.id]: 'false',
+  [schema.date.id]: '{"from":1694501600000}',
+  [schema.email.id]: 'test2@example.com',
+  [schema.multiSelect.id]: [schema.multiSelect.options[1].id, schema.multiSelect.options[2].id],
+  [schema.number.id]: 8345,
+  [schema.person.id]: secondUserId,
+  [schema.phone.id]: '+1 (345) 8345 345',
+  [schema.select.id]: schema.select.options[1].id,
+  [schema.url.id]: 'https://www.example.com'
+};
 
 const page1 = createMockPage({
   id: card1.id,
