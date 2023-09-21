@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Prisma, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscussionNotification } from './interfaces';
@@ -25,7 +25,9 @@ export type GetDiscussionsInput = {
 };
 
 export async function getDiscussionNotifications(userId: string): Promise<DiscussionNotificationsGroup> {
-  const discussionNotificationsGroups = (await Promise.all([getPageMentions(userId)])).flat();
+  const discussionNotificationsGroups = (
+    await Promise.all([getPageMentions(userId), getPageInlineComments(userId)])
+  ).flat();
   const discussionNotificationsGroup: DiscussionNotificationsGroup = {
     marked: [],
     unmarked: []
@@ -42,47 +44,77 @@ export async function getDiscussionNotifications(userId: string): Promise<Discus
   };
 }
 
+const pageNotificationInclude = {
+  page: {
+    select: {
+      bountyId: true,
+      path: true,
+      type: true,
+      title: true
+    }
+  },
+  notificationMetadata: {
+    include: {
+      space: {
+        select: {
+          name: true,
+          domain: true
+        }
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          path: true,
+          avatar: true,
+          avatarTokenId: true
+        }
+      }
+    }
+  }
+} as const;
+
+type PageNotificationWithMetadata = Prisma.PageNotificationGetPayload<{ include: typeof pageNotificationInclude }>;
+
 async function getPageMentions(userId: string): Promise<DiscussionNotificationsGroup> {
   const pageNotifications = await prisma.pageNotification.findMany({
     where: {
-      record: {
+      notificationMetadata: {
         userId
       },
       mentionId: {
         not: null
+      },
+      type: {
+        in: ['mention.created', 'inline_comment.mention.created']
       }
     },
-    include: {
-      page: {
-        select: {
-          bountyId: true,
-          path: true,
-          type: true,
-          title: true
-        }
-      },
-      record: {
-        include: {
-          space: {
-            select: {
-              name: true,
-              domain: true
-            }
-          },
-          user: {
-            select: {
-              id: true,
-              username: true,
-              path: true,
-              avatar: true,
-              avatarTokenId: true
-            }
-          }
-        }
-      }
-    }
+    include: pageNotificationInclude
   });
 
+  return groupPageNotifications(pageNotifications);
+}
+
+async function getPageInlineComments(userId: string): Promise<DiscussionNotificationsGroup> {
+  const pageNotifications = await prisma.pageNotification.findMany({
+    where: {
+      notificationMetadata: {
+        userId
+      },
+      commentId: {
+        not: null
+      },
+      type: {
+        in: ['inline_comment.created', 'inline_comment.replied']
+      }
+    },
+    include: pageNotificationInclude
+  });
+
+  return groupPageNotifications(pageNotifications);
+}
+
+function groupPageNotifications(pageNotifications: PageNotificationWithMetadata[]) {
   const discussionNotificationsGroup: DiscussionNotificationsGroup = {
     marked: [],
     unmarked: []
@@ -95,19 +127,20 @@ async function getPageMentions(userId: string): Promise<DiscussionNotificationsG
       bountyTitle: notification.page.title,
       commentId: notification.commentId,
       mentionId: notification.mentionId,
-      createdAt: notification.record.createdAt.toISOString(),
-      createdBy: notification.record.user,
+      createdAt: notification.notificationMetadata.createdAt.toISOString(),
+      createdBy: notification.notificationMetadata.user,
       pageId: notification.pageId,
       pagePath: notification.page.path,
       pageTitle: notification.page.title,
-      spaceDomain: notification.record.space.domain,
-      spaceId: notification.record.spaceId,
-      spaceName: notification.record.space.name,
+      spaceDomain: notification.notificationMetadata.space.domain,
+      spaceId: notification.notificationMetadata.spaceId,
+      spaceName: notification.notificationMetadata.space.name,
       type: notification.page.type as DiscussionNotification['type'],
-      text: ''
+      text: '',
+      taskType: notification.type
     };
 
-    if (notification.record.seenAt) {
+    if (notification.notificationMetadata.seenAt) {
       discussionNotificationsGroup.marked.push(discussionNotification);
     } else {
       discussionNotificationsGroup.unmarked.push(discussionNotification);

@@ -35,8 +35,9 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                     id: webhookData.event.page.id
                   }
                 },
+                type: webhookData.event.scope.split('.').slice(1).join('.'),
                 id: eventId,
-                record: {
+                notificationMetadata: {
                   create: {
                     createdBy: mentionAuthorId,
                     spaceId: webhookData.spaceId,

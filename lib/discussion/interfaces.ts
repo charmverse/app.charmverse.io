@@ -18,4 +18,5 @@ export interface DiscussionNotification {
   createdBy: TaskUser | null;
   text: string;
   type: 'bounty' | 'page' | 'proposal';
+  taskType: string;
 }
