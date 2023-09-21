@@ -5,7 +5,7 @@
     "defaults"
   ],
   "scripts": {
-    "build": "npx react-env --path=$ENV_PATH -- NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build",
     "build:win": "npx next build",
     "build:analyze": "cross-env ANALYZE=true next build",
     "verifydeps": "npx depcruise --ts-config ./tsconfig.json --config -- ./",
