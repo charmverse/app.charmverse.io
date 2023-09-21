@@ -14,7 +14,6 @@ import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
-import { createCommentBlock } from './blocks/commentBlock';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';
@@ -139,9 +138,6 @@ class OctoUtils {
       }
       case 'image': {
         return createImageBlock(block);
-      }
-      case 'comment': {
-        return createCommentBlock(block);
       }
       case 'checkbox': {
         return createCheckboxBlock(block);

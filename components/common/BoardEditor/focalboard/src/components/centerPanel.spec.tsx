@@ -1,6 +1,5 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { Constants } from '../constants';
@@ -44,10 +43,6 @@ describe('components/centerPanel', () => {
   card2.id = '2';
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
-  const comment1 = TestBlockFactory.createComment(card1);
-  comment1.id = '1';
-  const comment2 = TestBlockFactory.createComment(card2);
-  comment2.id = '2';
   const state = {
     clientConfig: {
       value: {
@@ -76,7 +71,7 @@ describe('components/centerPanel', () => {
       current: activeView.id
     },
     comments: {
-      comments: [comment1, comment2]
+      comments: []
     }
   };
   const store = mockStateStore([], state);

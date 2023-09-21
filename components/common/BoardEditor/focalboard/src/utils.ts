@@ -10,7 +10,6 @@ import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 
-import { createCommentBlock } from './blocks/commentBlock';
 import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
@@ -531,8 +530,7 @@ class Utils {
         return createBoardView(block);
       case 'card':
         return createCard(block);
-      case 'comment':
-        return createCommentBlock(block);
+
       default:
         return block;
     }
