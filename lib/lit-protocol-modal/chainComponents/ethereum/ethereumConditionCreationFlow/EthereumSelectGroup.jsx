@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState, Fragment } from 'react';
-import { ethers, utils } from "ethers";
 import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenSelect";
 import LitInput from "../../../reusableComponents/litInput/LitInput";
@@ -7,7 +6,7 @@ import { logDevError } from "../../../shareModal/helpers/helperFunctions";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
 import { decimalPlaces } from "@lit-protocol/misc"
 import { Radio, RadioGroup, FormControlLabel } from "@mui/material";
-
+import { isAddress, parseUnits, parseEther } from 'viem';
 const nativeTokenOption = {
   label: 'Ethereum',
   value: 'ethereum',
@@ -59,7 +58,7 @@ const EthereumSelectGroup = ({
     if (selectedToken?.['value'] === 'ethereum') {
       setContractAddress('');
     }
-    if (selectedToken?.['value'] && utils.isAddress(selectedToken?.['value'])) {
+    if (selectedToken?.['value'] && isAddress(selectedToken?.['value'])) {
       setContractAddress(selectedToken['value']);
     }
     // Disabled - contractType should only be ERC20, ERC721, or ERC1155, and selectedToken['standard'] is used for Ethereum balance
@@ -104,7 +103,7 @@ const EthereumSelectGroup = ({
 
   const checkEthereum = () => {
     // ethereum
-    const amountInWei = ethers.utils.parseEther(amount);
+    const amountInWei = parseEther(amount);
     const unifiedAccessControlConditions = [
       {
         conditionType: 'evmBasic',
@@ -173,7 +172,7 @@ const EthereumSelectGroup = ({
 
     let amountInBaseUnit;
     try {
-      amountInBaseUnit = ethers.utils.parseUnits(amount, decimals);
+      amountInBaseUnit = parseUnits(amount, decimals);
     } catch (err) {
       logDevError(err)
     }

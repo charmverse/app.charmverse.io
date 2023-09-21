@@ -1,5 +1,5 @@
-import { utils } from 'ethers';
 import useSWR from 'swr';
+import { getAddress } from 'viem';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -58,7 +58,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
       app: 'my-app'
     };
 
-    await client.vote(provider, utils.getAddress(account as string), vote);
+    await client.vote(provider, getAddress(account as string), vote);
     // we need this delay for vote to be propagated to the graph
     await sleep(5000);
     // workaround - fetch one more time with delay, sometimes it takes more time to get updated value

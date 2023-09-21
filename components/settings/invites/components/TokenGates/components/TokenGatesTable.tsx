@@ -25,7 +25,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
