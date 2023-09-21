@@ -154,7 +154,7 @@
     "formidable": "^3.5.0",
     "gaxios": "^5.0.2",
     "google-auth-library": "^8.7.0",
-    "graphql": "^16.4.0",
+    "graphql": "^16.8.1",
     "hot-shots": "^9.0.0",
     "html-to-text": "^8.2.0",
     "immutable": "^4.0.0",
