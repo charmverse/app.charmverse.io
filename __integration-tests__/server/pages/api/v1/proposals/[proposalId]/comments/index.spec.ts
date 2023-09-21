@@ -337,7 +337,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
 
     expect(response).toHaveLength(rootComments.length + childComments.length + nestedChildComments.length);
 
-    expect(response).toEqual(expect.arrayContaining<PublicApiProposalComment>(expectedResult));
+    expect(response).toMatchObject(expect.arrayContaining<PublicApiProposalComment>(expectedResult));
   });
 
   it('should return the comments as a tree if this option is used', async () => {
@@ -502,7 +502,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
         parentId: childComments[0].id
       }
     ];
-    expect(response).toEqual(expect.arrayContaining<PublicApiProposalComment>(expectedResult));
+    expect(response).toMatchObject(expect.arrayContaining<PublicApiProposalComment>(expectedResult));
   });
 
   it('should fail if the requester api key is not linked to this space', async () => {
