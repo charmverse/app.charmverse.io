@@ -3,14 +3,14 @@ import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
+import { DatabasePage } from '__e2e__/po/databasePage.po';
+import { DocumentPage } from '__e2e__/po/document.po';
+import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
 import { baseUrl } from 'config/constants';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { CardFields } from 'lib/focalboard/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
-import { DatabasePage } from 'testing/__e2e__/po/databasePage.po';
-import { DocumentPage } from 'testing/__e2e__/po/document.po';
-import { PagesSidebarPage } from 'testing/__e2e__/po/pagesSiderbar.po';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';

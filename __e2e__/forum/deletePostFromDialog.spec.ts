@@ -1,10 +1,10 @@
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
+import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { ForumHomePage } from 'testing/__e2e__/po/forumHome.po';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateRole } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';

@@ -1,8 +1,8 @@
 import { test as base, expect } from '@playwright/test';
+import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
-import { TokenGatePage } from 'testing/__e2e__/po/tokenGate.po';
 
 import { generateUser, generateUserAndSpace } from '../../utils/mocks';
 

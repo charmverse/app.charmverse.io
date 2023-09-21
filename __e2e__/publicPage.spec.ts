@@ -6,9 +6,8 @@ import { chromium, expect, test as base } from '@playwright/test';
 import { baseUrl } from 'config/constants';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
-import { DatabasePage } from '../testing/__e2e__/po/databasePage.po';
-import { PagePermissionsDialog } from '../testing/__e2e__/po/pagePermissions.po';
-
+import { DatabasePage } from './po/databasePage.po';
+import { PagePermissionsDialog } from './po/pagePermissions.po';
 import { generateUserAndSpace, logoutBrowserUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';

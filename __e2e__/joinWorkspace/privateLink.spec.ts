@@ -1,9 +1,9 @@
 import { test as base } from '@playwright/test';
+import { AcceptInvitePage } from '__e2e__/po/inviteLink.po';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
 import { createInviteLink } from 'lib/invites/createInviteLink';
-import { AcceptInvitePage } from 'testing/__e2e__/po/inviteLink.po';
 
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
 

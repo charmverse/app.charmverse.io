@@ -4,8 +4,7 @@ import { test as base, expect } from '@playwright/test';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { createThread, toggleThreadStatus } from 'lib/threads';
 
-import { DocumentPage } from '../testing/__e2e__/po/document.po';
-
+import { DocumentPage } from './po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from './utils/mocks';
 
 type Fixtures = {

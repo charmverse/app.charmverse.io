@@ -1,12 +1,12 @@
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { expect, test as base } from '@playwright/test';
+import { ForumHomePage } from '__e2e__/po/forumHome.po';
+import { ForumPostPage } from '__e2e__/po/forumPost.po';
+import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { createUserAndSpace, createUser, generateSpaceRole } from '__e2e__/utils/mocks';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { ForumHomePage } from 'testing/__e2e__/po/forumHome.po';
-import { ForumPostPage } from 'testing/__e2e__/po/forumPost.po';
-import { PageHeader } from 'testing/__e2e__/po/pageHeader.po';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 

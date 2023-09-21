@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 
-import { ForumHomePage } from '../../testing/__e2e__/po/forumHome.po';
+import { ForumHomePage } from '../po/forumHome.po';
 import { generateSpaceRole, generateUser } from '../utils/mocks';
 import { login } from '../utils/session';
 

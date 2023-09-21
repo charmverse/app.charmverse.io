@@ -1,6 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 
-import { ForumHomePage } from '../../testing/__e2e__/po/forumHome.po';
+import { ForumHomePage } from '../po/forumHome.po';
 import { createUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

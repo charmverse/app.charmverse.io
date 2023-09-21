@@ -1,8 +1,8 @@
 import { testUtilsProposals } from '@charmverse/core/test';
 import { test, expect } from '@playwright/test';
+import { ProposalPage } from '__e2e__/po/proposalPage.po';
+import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
-import { ProposalPage } from 'testing/__e2e__/po/proposalPage.po';
-import { ProposalsListPage } from 'testing/__e2e__/po/proposalsList.po';
 import { generateProposal } from 'testing/setupDatabase';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';

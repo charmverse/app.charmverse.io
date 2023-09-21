@@ -2,10 +2,10 @@ import type { User } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 
 import { baseUrl } from 'config/constants';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { expect, test } from 'testing/__e2e__/testWithFixtures';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 

@@ -1,7 +1,7 @@
 import { expect, test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SpaceProfileSettings } from '../../testing/__e2e__/po/settings/spaceProfileSettings.po';
+import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

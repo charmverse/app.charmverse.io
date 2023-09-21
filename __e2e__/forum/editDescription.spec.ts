@@ -5,7 +5,7 @@ import { randomIntFromInterval } from 'lib/utilities/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { ForumHomePage } from '../../testing/__e2e__/po/forumHome.po';
+import { ForumHomePage } from '../po/forumHome.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
 

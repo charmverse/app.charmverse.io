@@ -1,6 +1,5 @@
 import { expect, test as base } from '@playwright/test';
-
-import { DocumentPage } from 'testing/__e2e__/po/document.po';
+import { DocumentPage } from '__e2e__/po/document.po';
 
 import type { UserAndSpaceContext } from './utils/mocks';
 import { generateUserAndSpace } from './utils/mocks';

@@ -1,7 +1,7 @@
 import { expect, test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SettingsModal } from '../../testing/__e2e__/po/settings/settings.po';
+import { SettingsModal } from '../po/settings/settings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 

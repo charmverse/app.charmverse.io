@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test';
 
-import { BountyBoardPage } from '../../testing/__e2e__/po/bountyBoard.po';
-import { DocumentPage } from '../../testing/__e2e__/po/document.po';
+import { BountyBoardPage } from '../po/bountyBoard.po';
+import { DocumentPage } from '../po/document.po';
 
 type Fixtures = {
   bountyBoardPage: BountyBoardPage;

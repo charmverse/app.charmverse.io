@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { generateSpaceForUser } from 'testing/utils/spaces';
 
-import { SpaceProfileSettings } from '../../testing/__e2e__/po/settings/spaceProfileSettings.po';
+import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
