@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
