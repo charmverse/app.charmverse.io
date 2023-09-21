@@ -10,6 +10,7 @@ import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import useSWR from 'swr';
+import { parseEther, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
@@ -140,7 +141,7 @@ export function BountyPaymentButton({
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         const tx = await signer.sendTransaction({
           to: receiver,
-          value: ethers.utils.parseEther(amount)
+          value: parseEther(amount)
         });
 
         onSuccess(tx.hash, chainToUse.chainId);
@@ -167,7 +168,7 @@ export function BountyPaymentButton({
           }
         }
 
-        const parsedTokenAmount = ethers.utils.parseUnits(amount, tokenDecimals);
+        const parsedTokenAmount = parseUnits(amount, tokenDecimals);
 
         // get allowance
         const allowance = await tokenContract.allowance(account, receiver);
