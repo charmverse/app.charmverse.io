@@ -247,7 +247,7 @@ function CardDetailProperties(props: Props) {
   );
 
   return (
-    <div className='octo-propertylist'>
+    <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
