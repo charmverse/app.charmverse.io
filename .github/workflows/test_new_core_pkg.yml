@@ -19,6 +19,7 @@ jobs:
           EVENT_CONTEXT: ${{ toJSON(github.event) }}
         run: |
           echo $EVENT_CONTEXT
+          exit 1
       - uses: actions/checkout@v3
       - name: Install dependencies
         uses: ./.github/actions/install
