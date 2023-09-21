@@ -1,10 +1,10 @@
 import type { Space, SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
 
 import { DEEPDAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -17,7 +17,7 @@ jest.mock('undici', () => {
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
 
-const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address].map((a) => a.toLowerCase());
+const walletAddresses = [randomETHWalletAddress(), randomETHWalletAddress()].map((a) => a.toLowerCase());
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken({ walletAddress: walletAddresses[0] }, false);

@@ -9,7 +9,7 @@ import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/ge
 import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 import type { DiscussionPropertiesFromPage } from './getPropertiesFromPage';
 import { getPropertiesFromPage } from './getPropertiesFromPage';

@@ -1,5 +1,5 @@
 import { getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { toHex } from 'viem';
 
 /**
  * See
@@ -11,7 +11,7 @@ export async function switchActiveNetwork(chainId: number) {
   try {
     await (window as any).ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.utils.hexValue(chainId) }]
+      params: [{ chainId: toHex(chainId) }]
     });
   } catch (error: any) {
     if (error.code === 4902) {
@@ -29,7 +29,7 @@ export async function switchActiveNetwork(chainId: number) {
             nativeCurrency,
             rpcUrls,
             blockExplorerUrls,
-            chainId: ethers.utils.hexValue(chainId)
+            chainId: toHex(chainId)
           }
         ]
       });

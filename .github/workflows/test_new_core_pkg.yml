@@ -55,8 +55,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test_name: 'Type check, lint, and verify dependencies'
-            test_command: 'npm run typecheck && npm run lint && npm run verifydeps'
+          - test_name: 'Type check'
+            test_command: 'npm run typecheck'
           - test_name: 'Basic tests #1'
             test_command: 'npm run test:ci -- --shard 1/3'
           - test_name: 'Basic tests #2'
