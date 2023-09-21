@@ -5,6 +5,6 @@ export default async function wipeTestData() {
   if (process.env.NODE_ENV === 'test') {
     // eslint-disable-next-line no-console
     console.log('Wiping test data');
-    execSync('npx dotenv -e .env.test.local -- npx tsx ./jest.teardown.ts');
+    execSync('npx react-env --path .env.test.local -- npx tsx ./jest.teardown.ts');
   }
 }

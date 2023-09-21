@@ -22,8 +22,8 @@
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
-  "jestrunner.jestCommand": "npx dotenv -e .env.test.local -- node 'node_modules/.bin/jest'",
-  //"jestrunner.jestCommand": "dotenv -e .env.test.local -- npx jest -r tsconfig-paths/register",
+  "jestrunner.jestCommand": "npx react-env --path .env.test.local -- node 'node_modules/.bin/jest'",
+  //"jestrunner.jestCommand": "react-env --path .env.test.local -- npx jest -r tsconfig-paths/register",
   "jestrunner.configPath": "jest.config.all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
 }
