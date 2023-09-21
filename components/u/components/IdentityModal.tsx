@@ -3,9 +3,9 @@ import { Refresh as RefreshIcon } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Box, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import { utils } from 'ethers';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -13,8 +13,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
-import { shortWalletAddress } from 'lib/utilities/strings';
 
 import Integration from './Integration';
 
@@ -91,7 +91,7 @@ function IdentityModal(props: IdentityModalProps) {
                       <RefreshIcon fontSize='small' />
                     </IconButton>
                   </Tooltip>
-                ) : utils.isAddress(usernameToDisplay) ? (
+                ) : isAddress(usernameToDisplay) ? (
                   <Tooltip
                     //                    disableHoverListener
                     onMouseEnter={(e) => e.stopPropagation()}

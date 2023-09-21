@@ -22,7 +22,7 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getSafesForAddress } from 'lib/gnosis';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 interface Props {
   receiver: string;

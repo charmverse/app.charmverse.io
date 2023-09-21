@@ -10,8 +10,8 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
+import { shortenHex } from 'lib/utilities/blockchain';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

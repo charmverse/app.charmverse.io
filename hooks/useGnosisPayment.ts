@@ -3,7 +3,8 @@ import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
+import { getAddress } from 'viem';
 
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -54,7 +55,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       signerOrProvider: signer
     });
 
-    const senderAddress = utils.getAddress(account);
+    const senderAddress = getAddress(account);
 
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
     if (chainId === 5001 || chainId === 5000) {

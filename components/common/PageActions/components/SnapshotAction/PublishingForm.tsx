@@ -9,9 +9,9 @@ import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { getChainById } from 'connectors';
-import { utils } from 'ethers';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
+import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -252,7 +252,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
 
       const receipt: SnapshotReceipt = (await client.proposal(
         web3Provider,
-        utils.getAddress(account as string),
+        getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
 

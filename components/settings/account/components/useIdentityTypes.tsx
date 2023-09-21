@@ -4,8 +4,8 @@ import type { IntegrationModel } from 'components/u/components';
 import { IdentityIcon } from 'components/u/components/IdentityIcon';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export function useIdentityTypes() {
